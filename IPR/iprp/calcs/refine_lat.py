@@ -91,7 +91,6 @@ def refine_lat(lammps_exe, pot, elements, masses, proto, alat_init):
                 for j in xrange(0,6):
                     sig_ij = stresses[2*i+2, j] - stresses[2*i+1, j]
                     cij[j,i] = sig_ij/eps_ij
-            print 'yes'
             converged = True
             break
             
