@@ -1,10 +1,19 @@
+#ignore compiled python
 *.pyc
 
-IPR\test.in
+#ignore Notebook checkpoints
+Notebooks/.ipynb_checkpoints/
 
-IPR\ref\potentialInstances-LAMMPS\Ta--ThompsonAP--2015.json
-IPR\ref\potentials\Ta--ThompsonAP--2015
+#ignore non-IPR potentials
+IPR/ref/potentialInstances-LAMMPS/Ta--ThompsonAP--2015.json
+IPR/ref/potentials/Ta--ThompsonAP--2015/
+IPR/ref/potentialInstances-LAMMPS/Fe--ChamatiM--2006.json
+IPR/ref/potentials/Fe--ChamatiM--2006/Fe_cham-mishin.eam.alloy
+IPR/ref/potentialInstances-LAMMPS/Fe--ProvilleL--2012.json
+IPR/ref/potentials/Fe--ProvilleL--2012/
 
-IPR\results\json\*
-IPR\results\sim\*
-IPR\results\temp\*
+#ignore personal results
+IPR/test.in
+IPR/results/json/*
+IPR/results/sim/*
+IPR/results/temp/*
