@@ -546,8 +546,8 @@ def run_point_defect(terms, lammps_exe, ipr_dir, potentials, crystals):
         #set strain
         if terms[0] == 'size_range':
             try:
-                min_size = float(terms[1])
-                max_size = float(terms[2])
+                min_size = int(terms[1])
+                max_size = int(terms[2])
                 terms = terms[3:]
                 if min_size%2 == 1 or max_size%2 == 1:
                     raise RuntimeError('Invalid run_point_defect command: sizes must be even')

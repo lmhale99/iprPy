@@ -1,5 +1,7 @@
 *.pyc
 
+IPR\test.in
+
 IPR\ref\potentialInstances-LAMMPS\Ta--ThompsonAP--2015.json
 IPR\ref\potentials\Ta--ThompsonAP--2015
 
