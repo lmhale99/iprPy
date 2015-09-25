@@ -1,0 +1,46 @@
+{
+    "crystalPrototype": {
+        "crystalProtoypeID": { 
+            "common": "white tin", 
+            "tag": "b-Sn",
+            "prototype": "b-Sn",
+            "Strukturbericht": "A5"
+        },            
+        "crystalProtoypeInfo": { 
+            "PearsonSymbol": "tI4",
+            "spaceGroupTag": "I 41/a m d",
+            "SpaceGroupNumber": 141
+        },
+        "orthorhombicCell": {
+            "latticeParameters": {
+                "value": [1.0000000000000, 1.0000000000000, 0.5500000000000],
+                "unit": "reduced"
+            },
+            "atomPositions": {
+                "site": [
+                    {
+                        "component": 1,
+                        "atomCoordinates": [
+                            {
+                                "value": [0.0000000000000, 0.0000000000000, 0.0000000000000],
+                                "unit": "scaled"
+                            },                      
+                            {
+                                "value": [0.5000000000000, 0.5000000000000, 0.5000000000000],
+                                "unit": "scaled"
+                            },
+                            {
+                                "value": [0.0000000000000, 0.5000000000000, 0.2500000000000],
+                                "unit": "scaled"
+                            },                      
+                            {
+                                "value": [0.5000000000000, 0.0000000000000, 0.7500000000000],
+                                "unit": "scaled"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+}

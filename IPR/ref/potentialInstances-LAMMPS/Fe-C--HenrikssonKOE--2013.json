@@ -1,0 +1,30 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Fe-C--HenrikssonKOE--2013"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": [
+            {
+                "element": "Fe"
+            },
+            {
+                "element": "C"
+            }
+        ],
+        "pair_style": {
+            "type": "tersoff/zbl"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "FeC_Henriksson_2013.tersoff.zbl"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

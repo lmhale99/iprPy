@@ -1,0 +1,46 @@
+{
+    "crystalPrototype": {
+        "crystalProtoypeID": { 
+            "common": "hexagonal close-packed", 
+            "tag": "hcp",
+            "prototype": "Mg",
+            "Strukturbericht": "A3"
+        },            
+        "crystalProtoypeInfo": { 
+            "PearsonSymbol": "hP2",
+            "spaceGroupTag": "P 63/m m c",
+            "SpaceGroupNumber": 194
+        },
+        "orthorhombicCell": {
+            "latticeParameters": {
+                "value": [1.0000000000000, 1.7320508075689, 1.6329931618555],
+                "unit": "reduced"
+            },
+            "atomPositions": {
+                "site": [
+                    {
+                        "component": 1,
+                        "atomCoordinates": [
+                            {
+                                "value": [0.0000000000000, 0.0000000000000, 0.0000000000000],
+                                "unit": "scaled"
+                            },                      
+                            {
+                                "value": [0.5000000000000, 0.5000000000000, 0.0000000000000],
+                                "unit": "scaled"
+                            },
+                            {
+                                "value": [0.5000000000000, 0.8333333333333, 0.5000000000000],
+                                "unit": "scaled"
+                            },
+                            {
+                                "value": [0.0000000000000, 0.3333333333333, 0.5000000000000],
+                                "unit": "scaled"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+}

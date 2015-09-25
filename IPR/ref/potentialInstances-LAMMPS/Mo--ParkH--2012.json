@@ -1,0 +1,25 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Mo--ParkH--2012"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": {
+            "element": "Mo"
+        },
+        "pair_style": {
+            "type": "meam/spline"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Park_MEAM_Mo_2012.spline"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

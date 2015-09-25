@@ -1,0 +1,62 @@
+{
+    "crystalPrototype": {
+        "crystalProtoypeID": { 
+            "common": "diamond cubic", 
+            "tag": "dc",
+            "prototype": "C",
+            "Strukturbericht": "A4"
+        },            
+        "crystalProtoypeInfo": { 
+            "PearsonSymbol": "cF8",
+            "spaceGroupTag": "F d -3 m",
+            "SpaceGroupNumber": 227
+        },
+        "orthorhombicCell": {
+            "latticeParameters": {
+                "value": [1.0000000000000, 1.0000000000000, 1.0000000000000],
+                "unit": "reduced"
+            },
+            "atomPositions": {
+                "site": [
+                    {
+                        "component": 1,
+                        "atomCoordinates": [
+                            {
+                                "value": [0.0000000000000, 0.0000000000000, 0.0000000000000],
+                                "unit": "scaled"
+                            },                      
+                            {
+                                "value": [0.5000000000000, 0.5000000000000, 0.0000000000000],
+                                "unit": "scaled"
+                            },
+                            {
+                                "value": [0.5000000000000, 0.0000000000000, 0.5000000000000],
+                                "unit": "scaled"
+                            },
+                            {
+                                "value": [0.0000000000000, 0.5000000000000, 0.5000000000000],
+                                "unit": "scaled"
+                            },
+                            {
+                                "value": [0.2500000000000, 0.2500000000000, 0.2500000000000],
+                                "unit": "scaled"
+                            },                      
+                            {
+                                "value": [0.2500000000000, 0.7500000000000, 0.7500000000000],
+                                "unit": "scaled"
+                            },
+                            {
+                                "value": [0.7500000000000, 0.2500000000000, 0.7500000000000],
+                                "unit": "scaled"
+                            },
+                            {
+                                "value": [0.7500000000000, 0.7500000000000, 0.2500000000000],
+                                "unit": "scaled"
+                            }                                
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+}

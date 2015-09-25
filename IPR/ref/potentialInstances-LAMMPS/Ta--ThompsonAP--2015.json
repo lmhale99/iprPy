@@ -1,0 +1,39 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Ta--ThompsonAP--2015"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": [
+            {
+                "element": "Ta"
+            }
+        ],
+        "pair_style": {
+            "type": "hybrid/overlay",
+            "term": {
+                "option": "zbl 4 4.8 snap"
+            }            
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "option": "zbl 0.0\npair_coeff * * zbl 73\npair_coeff * * snap"
+                },
+                {
+                    "file": "Ta06A.snapcoeff"
+                },
+                {
+                    "symbolsList": "True"
+                },
+                {
+                    "file": "Ta06A.snapparam"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

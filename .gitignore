@@ -1,0 +1,11 @@
+#Ignore compiled Python code
+*.pyc
+
+#Ignore non-IPR potentials
+IPR\ref\potentialInstances-LAMMPS\Ta--ThompsonAP--2015.json
+IPR\ref\potentials\Ta--ThompsonAP--2015
+
+#Ignore personal results
+IPR\results\json\*
+IPR\results\sim\*
+IPR\results\temp\*

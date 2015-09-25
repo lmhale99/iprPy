@@ -1,0 +1,55 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Al-Si-Mg-Cu-Fe--JelinekB--2012"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": [
+            {
+                "element": "Al",
+                "mass": 26.9815,
+                "symbol": "AlS"
+            },
+            {
+                "element": "Si",
+                "mass": 28.086,
+                "symbol": "SiS"
+            },
+            {
+                "element": "Mg",
+                "mass": 24.305,
+                "symbol": "MgS"
+            },
+            {
+                "element": "Cu",
+                "mass": 63.54,
+                "symbol": "CuS"
+            },
+            {
+                "element": "Fe",
+                "mass": 55.847,
+                "symbol": "FeS"
+            }
+        ],
+        "pair_style": {
+            "type": "meam"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Jelinek_2012_meamf"
+                },
+                {
+                    "symbolsList": "True"
+                },
+                {
+                    "file": "Jelinek_2012_meam.alsimgcufe"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

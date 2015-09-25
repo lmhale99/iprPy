@@ -1,0 +1,32 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Ni-Zr--MendelevMI--2015"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": [
+            {
+                "element": "Ni",
+                "mass": 58.6934
+            },
+            {
+                "element": "Zr",
+                "mass": 91.224                
+            }
+        ],
+        "pair_style": {
+            "type": "eam/fs"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Ni-Zr_Mendelev_2014.eam.fs"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

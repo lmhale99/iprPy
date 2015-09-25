@@ -1,0 +1,34 @@
+{
+    "crystalPrototype": {
+        "crystalProtoypeID": { 
+            "common": "simple cubic", 
+            "tag": "sc",
+            "prototype": "a-Po",
+            "Strukturbericht": "Ah"
+        },            
+        "crystalProtoypeInfo": { 
+            "PearsonSymbol": "cP1",
+            "spaceGroupTag": "P m -3 m",
+            "SpaceGroupNumber": 221
+        },
+        "orthorhombicCell": {
+            "latticeParameters": {
+                "value": [1.0000000000000, 1.0000000000000, 1.0000000000000],
+                "unit": "reduced"
+            },
+            "atomPositions": {
+                "site": [
+                    {
+                        "component": 1,
+                        "atomCoordinates": [
+                            {
+                                "value": [0.0000000000000, 0.0000000000000, 0.0000000000000],
+                                "unit": "scaled"
+                            }                      
+                        ]
+                    }
+                ]
+            }
+        }    
+    }
+}
