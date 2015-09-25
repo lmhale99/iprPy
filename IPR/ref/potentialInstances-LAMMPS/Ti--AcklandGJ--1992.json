@@ -1,0 +1,26 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Ti--AcklandGJ--1992"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": {
+            "element": "Ti",
+            "mass": 47.867
+        },
+        "pair_style": {
+            "type": "eam/fs"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Ti.eam.fs"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

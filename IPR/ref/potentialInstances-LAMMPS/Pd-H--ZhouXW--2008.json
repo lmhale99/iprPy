@@ -1,0 +1,32 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Pd-H--ZhouXW--2008"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": [
+            {
+                "element": "Pd",
+                "mass": 106.42
+            },
+            {
+                "element": "H",
+                "mass": 1.01
+            }
+        ],
+        "pair_style": {
+            "type": "eam/alloy"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "PdH_Zhou_June29_2007_2.set"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

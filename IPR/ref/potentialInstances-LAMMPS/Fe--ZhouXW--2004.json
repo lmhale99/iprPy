@@ -1,0 +1,26 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Fe--ZhouXW--2004"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": {
+            "element": "Fe",
+            "mass": 55.847
+        },
+        "pair_style": {
+            "type": "eam/alloy"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Fe.set"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Mo--AcklandGJ--1987"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": {
+            "element": "Mo",
+            "mass": 95.94
+        },
+        "pair_style": {
+            "type": "eam/alloy"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Mo.AT1.fs"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

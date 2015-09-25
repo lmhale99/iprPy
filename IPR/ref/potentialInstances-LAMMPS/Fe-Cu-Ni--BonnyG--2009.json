@@ -1,0 +1,36 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Fe-Cu-Ni--BonnyG--2009"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": [
+            {
+                "element": "Fe",
+                "mass": 55.845
+            },
+            {
+                "element": "Cu",
+                "mass": 63.546
+            },
+            {
+                "element": "Ni",
+                "mass": 58.6934
+            }
+        ],
+        "pair_style": {
+            "type": "eam/alloy"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "FeCuNi.eam.alloy"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

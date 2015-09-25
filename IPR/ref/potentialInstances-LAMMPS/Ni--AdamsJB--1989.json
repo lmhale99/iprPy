@@ -1,0 +1,27 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Ni--AdamsJB--1989"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": {
+            "element": "Ni",
+            "mass": 58.710
+        },
+        "pair_style": {
+            "type": "eam"
+        },
+        "pair_coeff": {
+            "interaction": {
+                "element": [
+                    "Ni",
+                    "Ni"
+                ]
+            },
+            "term": {
+                "file": "niu6.txt"
+            }
+        }
+    }
+}

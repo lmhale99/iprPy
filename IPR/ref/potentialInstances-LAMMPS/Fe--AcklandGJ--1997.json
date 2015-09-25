@@ -1,0 +1,26 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Fe--AcklandGJ--1997"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": {
+            "element": "Fe",
+            "mass": 55.85
+        },
+        "pair_style": {
+            "type": "eam/fs"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Fe.eam.fs"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

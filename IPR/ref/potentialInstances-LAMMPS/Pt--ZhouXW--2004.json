@@ -1,0 +1,26 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Pt--ZhouXW--2004"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": {
+            "element": "Pt",
+            "mass": 195.08
+        },
+        "pair_style": {
+            "type": "eam/alloy"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Pt.set"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

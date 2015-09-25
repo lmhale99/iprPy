@@ -1,0 +1,26 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Cu--MendelevMI--2008"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": {
+            "element": "Cu",
+            "mass": 63.546
+        },
+        "pair_style": {
+            "type": "eam/fs"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Cu1.eam.fs"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

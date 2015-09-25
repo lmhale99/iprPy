@@ -1,0 +1,26 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Ta--LiYH--2003"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": {
+            "element": "Ta",
+            "mass": 180.95
+        },
+        "pair_style": {
+            "type": "eam/alloy"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "newPP1_47-setfl.eam.alloy"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

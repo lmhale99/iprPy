@@ -1,0 +1,27 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Au--AdamsJB--1989"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": {
+            "element": "Au",
+            "mass": 196.97
+        },
+        "pair_style": {
+            "type": "eam"
+        },
+        "pair_coeff": {
+            "interaction": {
+                "element": [
+                    "Au",
+                    "Au"
+                ]
+            },
+            "term": {
+                "file": "auu6.txt"
+            }
+        }
+    }
+}

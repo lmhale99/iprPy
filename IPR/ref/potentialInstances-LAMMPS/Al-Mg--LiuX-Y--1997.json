@@ -1,0 +1,32 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Al-Mg--LiuX-Y--1997"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": [
+            {
+                "element": "Al",
+                "mass": 26.982
+            },
+            {
+                "element": "Mg",
+                "mass": 24.305
+            }
+        ],
+        "pair_style": {
+            "type": "eam/alloy"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "mg-al-set.eam.alloy"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

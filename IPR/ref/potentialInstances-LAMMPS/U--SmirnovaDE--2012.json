@@ -1,0 +1,26 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "U--SmirnovaDE--2012"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": {
+            "element": "U",
+            "mass": 238.03
+        },
+        "pair_style": {
+            "type": "eam/alloy"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "U.eam.sss2012.alloy"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

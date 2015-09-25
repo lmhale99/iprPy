@@ -6,7 +6,8 @@
         "units": "metal",
         "atom_style": "atomic",
         "atom": {
-            "element": "Mo"
+            "element": "Mo",
+            "mass": 95.96
         },
         "pair_style": {
             "type": "meam/spline"

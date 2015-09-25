@@ -1,0 +1,36 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Al-Mn-Pd--SchopfD--2012"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": [
+            {
+                "element": "Al",
+                "mass": 26.981540
+            },
+            {
+                "element": "Mn",
+                "mass": 54.938
+            },
+            {
+                "element": "Pd",
+                "mass": 106.4
+            }
+        ],
+        "pair_style": {
+            "type": "eam/alloy"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "AlMnPd_Schopf_2012.lammps.EAM_CORRECT"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

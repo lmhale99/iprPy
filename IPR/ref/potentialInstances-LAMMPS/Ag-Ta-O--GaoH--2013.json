@@ -1,0 +1,42 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Ag-Ta-O--GaoH--2013"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": [
+            {
+                "element": "Ag",
+                "mass": 107.8682
+            },
+            {
+                "element": "Ta",
+                "mass": 180.9479
+            },
+            {
+                "element": "O",
+                "mass": 15.9994
+            }
+        ],
+        "pair_style": {
+            "type": "meam"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "library_AgTaO3.meam"
+                },
+                {
+                    "symbolsList": "True"
+                },
+                {
+                    "file": "AgTaO3.meam"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

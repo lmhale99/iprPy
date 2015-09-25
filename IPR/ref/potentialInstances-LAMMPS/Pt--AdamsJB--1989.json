@@ -1,0 +1,27 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Pt--AdamsJB--1989"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": {
+            "element": "Pt",
+            "mass": 195.09
+        },
+        "pair_style": {
+            "type": "eam"
+        },
+        "pair_coeff": {
+            "interaction": {
+                "element": [
+                    "Pt",
+                    "Pt"
+                ]
+            },
+            "term": {
+                "file": "ptu6.txt"
+            }
+        }
+    }
+}

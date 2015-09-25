@@ -1,0 +1,27 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Ag--AdamsJB--1989"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": {
+            "element": "Ag",
+            "mass": 107.87
+        },
+        "pair_style": {
+            "type": "eam"
+        },
+        "pair_coeff": {
+            "interaction": {
+                "element": [
+                    "Ag",
+                    "Ag"
+                ]
+            },
+            "term": {
+                "file": "agu6.txt"
+            }
+        }
+    }
+}
