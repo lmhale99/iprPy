@@ -18,6 +18,7 @@ def xml_2_dict(text,i=0):
                     i += 1
             #read in tags
             else:
+                #save tag name as key
                 key = u''
                 while i < len(text) and text[i] != '>':
                     key += text[i]
@@ -25,34 +26,46 @@ def xml_2_dict(text,i=0):
                 i += 1
                 #if tag is ender
                 if key[0] == '/':
+                    #try to send up value
                     try:
-                        test = term
                         return term, i
                     except:
-                        return out, i
+                        #try to send up lower structure
+                        try:
+                            return out, i
+                        #if neither value or structure, then indicate an empty element
+                        except:
+                            return None, i
                 #if tag is starter
                 else:
+                    #pass text after tag to the converter
                     lowerout, newi = xml_2_dict(text,i=i)
                     i = newi
+                    #test if dictionary exists at the current level and create it if needed
                     try:
                         test = out                            
                     except:
                         out = OrderedDict()  
+                    #add lowerout to out
                     try:    
                         test = out[key]
-                        if isinstance(test,list):
+                        if isinstance(test, list):
                             out[key].append(lowerout)
                         else:
                             out[key] = [test]
                             out[key].append(lowerout)
                     except:
                         out[key] = lowerout
+        #identify element terms
         else:
             term = u''
+            #extract term string
             while i < len(text) and text[i] != '<':
                 term += text[i]
                 i += 1
-            terms = term.split(' ')            
+            #break into space delimited terms
+            terms = term.split(' ')          
+            #try to convert to ints and floats
             term = numconvert(terms)
     return out
     
