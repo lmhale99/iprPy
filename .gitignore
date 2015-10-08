@@ -17,3 +17,6 @@ IPR/test.in
 IPR/results/json/*
 IPR/results/sim/*
 IPR/results/temp/*
+
+#ignore personal research scripts and results
+research/
