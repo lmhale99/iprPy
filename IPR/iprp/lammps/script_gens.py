@@ -77,7 +77,7 @@ def create_sys(lammps, atomtypes, pbc,
     f = open('create_sys.in', 'w')
     f.write(script)
     f.close()
-    output = subprocess.check_output(lammps + ' < create_sys.in', shell=True)
+    output = subprocess.check_output(lammps + ' -in create_sys.in', shell=True)
 
     sys0 = read_dump('sys0.dump', atomtypes)
     sys0.set('pbc', pbc)
