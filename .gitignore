@@ -20,3 +20,6 @@ IPR/results/temp/*
 
 #ignore personal research scripts and results
 research/
+
+#ignore debug tests
+debug/
