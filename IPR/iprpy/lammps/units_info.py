@@ -102,7 +102,6 @@ def get_units(units):
                      "dipole":           "picocoulomb-micrometer",
                      "electric field":   "volt/micrometer",
                      "density":          "picograms/micrometer^dim"}
-
     elif units == 'nano':
         unit_dict = {"mass":             "attograms",
                      "distance":         "nanometers",
