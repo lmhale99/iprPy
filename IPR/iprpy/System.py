@@ -9,12 +9,17 @@ from tools import mag
 class System:
     #Define atomic system
     
-    def __init__(self, atoms=[], box=Box(), pbc=(True, True, True)):
-        #Initializ System instance
-        self.__atoms = atoms
+    def __init__(self, atoms=[], box=Box(), pbc=(True, True, True), scale=False):
+        #Initialize System instance
+                
+        assert isinstance(box, Box), 'Invalid box entry'
         self.__box = box
-        self.__pbc = pbc
-        self.__prop = {}
+        
+        assert len(pbc) == 3 and isinstance(pbc[0], bool) and isinstance(pbc[1], bool) and isinstance(pbc[2], bool), 'invalid pbc entry' 
+        self.__pbc = tuple(pbc)
+        
+        self.atoms(atoms, scale=scale)
+        #self.__prop = {}
     
     def atoms(self, arg1=None, arg2=None, arg3=None, scale=False):
         #Get or set the atom list and atomic property values
@@ -34,13 +39,14 @@ class System:
         #Set atoms list if first argument is a list of Atoms
         elif isinstance(arg1, (list, tuple)):
             assert arg2 is None and arg3 is None,   'Invalid arguments: if first argument is a list only scale is allowed'
-            for item in arg1:
-                assert isinstance(item, Atom),      'Invalid arguments: list is not a list of iprPy.Atoms'
             if scale:
                 self.__atoms = []
                 for item in arg1:
+                    assert isinstance(item, Atom),      'Invalid arguments: list is not a list of iprPy.Atoms'
                     self.__atoms.append(self.unscale(item))
             else:
+                for item in arg1:
+                    assert isinstance(item, Atom),      'Invalid arguments: list is not a list of iprPy.Atoms'
                 self.__atoms = arg1
         
         #Access per-atom values if first argument is an integer
@@ -167,8 +173,6 @@ class System:
             return Atom(point.atype(), pos)
         else:
             return pos
-        
-    
     
     def natoms(self):
         #Return the number of atoms in the system
