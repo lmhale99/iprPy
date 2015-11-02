@@ -66,7 +66,7 @@ class Box:
         self.set_origin(origin=origin)
         
     def set_abc(self, origin=None, a=None, b=None, c=None, alpha=None, beta=None, gamma=None):
-    #Set the direction vectors using vector magnitudes (a, b, c) and angles (alpha, beta, gamma).If values not supplied, defaults are magnitudes = 1 and angles = 90.
+    #Set the direction vectors using vector magnitudes (a, b, c) and angles (alpha, beta, gamma). If values not supplied, defaults are magnitudes = 1 and angles = 90.
     
         if a is None and b is None and c is None:
             a = 1.0
