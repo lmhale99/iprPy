@@ -1,7 +1,7 @@
 from style_params import atom_style_params, velocity_style_params
 
 #Writes a LAMMPS style atom file from sys using supplied atom style    
-def write_atom(fname, sys, units='metal', atom_style='atomic'):
+def write_data(fname, sys, units='metal', atom_style='atomic'):
     #Header info
     f = open(fname,'w')
     f.write('\n%i atoms\n' % sys.natoms())
@@ -11,7 +11,7 @@ def write_atom(fname, sys, units='metal', atom_style='atomic'):
     f.write('%f %f zlo zhi\n' % (sys.box('zlo'), sys.box('zhi')))
     if np.isclose(sys.box('xy'), 0.0) and np.isclose(sys.box('xz'), 0.0) and np.isclose(sys.box('yz'), 0.0):
         pass
-    else
+    else:
         f.write('%f %f %f xy xz yz\n' % (sys.box('xy'), sys.box('xz'), sys.box('yz')))
     
     #Write atom info
@@ -31,7 +31,7 @@ def write_atom(fname, sys, units='metal', atom_style='atomic'):
             elif prop == 'z':
                 line += ' %.13e' % sys.atoms(i, 'pos', 2)
             else:
-                if isinstance(sys.atoms(i, prop), int)
+                if isinstance(sys.atoms(i, prop), int):
                     line += ' %i' % sys.atoms(i, prop)
                 else:
                     line += ' %.13e' % sys.atoms(i, prop)
@@ -54,7 +54,7 @@ def write_atom(fname, sys, units='metal', atom_style='atomic'):
             if prop == 'id':
                 pass
             else:
-                if isinstance(sys.atoms(i, prop), int)
+                if isinstance(sys.atoms(i, prop), int):
                     line += ' %i' % sys.atoms(i, prop)
                 else:
                     line += ' %.13e' % sys.atoms(i, prop)

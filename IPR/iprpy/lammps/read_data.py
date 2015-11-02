@@ -4,7 +4,7 @@ from style_params import atom_style_params, velocity_style_params
 
 #Reads a LAMMPS style data input file and returns a iprpy.System. 
 #Periodic boundary information needs to be supplied as it is not given in the data file. 
-def read_atom(fname, pbc=(True, True, True), atom_style='atomic'):
+def read_data(fname, pbc=(True, True, True), atom_style='atomic'):
     with open(fname, 'r') as fin:
         readtime = False
         count = 0

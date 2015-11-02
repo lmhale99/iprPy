@@ -74,9 +74,11 @@ class System:
                 #Set a per-atom property
                 else:
                     if arg2 == 'pos' and scale:
-                        self.__atoms[a_id].pos(self.unscale(arg3))
+                        val = self.__atoms[a_id].pos(self.unscale(arg3))
                     else:
-                        self.__atoms[a_id].prop(arg2, arg3)
+                        val = self.__atoms[a_id].prop(arg2, arg3)
+                    if val is not None:
+                        return val
             
             else:
                 raise TypeError('Invalid argument types')
@@ -162,7 +164,7 @@ class System:
         pos = spos[0] * avect + spos[1] * bvect + spos[2] * cvect + self.box('origin')
         
         if isinstance(point, Atom):
-            return Atom(point.atype, pos)
+            return Atom(point.atype(), pos)
         else:
             return pos
         

@@ -3,6 +3,7 @@
 
 #ignore Notebook checkpoints
 Notebooks/.ipynb_checkpoints/
+.ipynb_checkpoints/
 
 #ignore non-IPR potentials
 IPR/ref/potentialInstances-LAMMPS/Ta--ThompsonAP--2015.json

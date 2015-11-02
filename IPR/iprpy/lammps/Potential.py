@@ -101,10 +101,19 @@ class Potential(DataModel):
                 el_list.append(data['element'])
             return el_list
         else:
-            try:
-                return self.__atom_data[arg]['element']
-            except:
-                return None
+            if isinstance(arg, (list, tuple)):
+                el_list = []
+                for sym in arg:
+                    try:
+                        el_list.append(self.__atom_data[sym]['element'])
+                    except:
+                        el_list.append(None)
+                return el_list
+            else:
+                try:
+                    return self.__atom_data[arg]['element']
+                except:
+                    return None
     
     def masses(self, arg = None):
         if arg is None:
@@ -113,10 +122,19 @@ class Potential(DataModel):
                 el_list.append(data['mass'])
             return el_list
         else:
-            try:
-                return self.__atom_data[arg]['mass']
-            except:
-                return None
+            if isinstance(arg, (list, tuple)):
+                el_list = []
+                for sym in arg:
+                    try:
+                        el_list.append(self.__atom_data[sym]['mass'])
+                    except:
+                        el_list.append(None)
+                return el_list
+            else:
+                try:
+                    return self.__atom_data[arg]['mass']
+                except:
+                    return None
     
     def symbols(self):
         el_list = []

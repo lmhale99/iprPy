@@ -14,13 +14,21 @@ class Atom:
         #Print atom type and coordinates when converted to a string
         return '%i %.13e %.13e %.13e'%(self.__atype, self.__pos[0], self.__pos[1], self.__pos[2]) 
     def __add__(self, y):    
-        return Atom(self.__atype, self.__pos + y)
+        newatom = deepcopy(self)
+        newatom.pos(self.__pos + y)
+        return newatom
     def __sub__(self, y):    
-        return Atom(self.__atype, self.__pos - y)
+        newatom = deepcopy(self)
+        newatom.pos(self.__pos - y)
+        return newatom
     def __mul__(self, y):
-        return Atom(self.__atype, self.__pos * y) 
+        newatom = deepcopy(self)
+        newatom.pos(self.__pos * y)
+        return newatom
     def __rmul__(self, y):
-        return Atom(self.__atype, y * self.__pos)
+        newatom = deepcopy(self)
+        newatom.pos(y * self.__pos)
+        return newatom
          
     def atype(self, atype=None):
         #Get or set the atom's type
@@ -61,7 +69,9 @@ class Atom:
             if term == 'atype':
                 self.atype(value)
             elif term == 'pos':
-                self.pos(value)
+                val = self.pos(value)
+                if val is not None:
+                    return val
             else:
                 self.__prop[term] = value
         
