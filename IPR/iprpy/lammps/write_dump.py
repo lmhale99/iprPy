@@ -49,7 +49,7 @@ def write_dump(fname, sys):
 
     #Write atomic header info
     prop_list = sys.atoms(0).prop_list()
-    print prop_list
+
     f.write('ITEM: ATOMS id')
     for prop in prop_list:
         if prop == 'pos':
@@ -83,7 +83,7 @@ def write_dump(fname, sys):
                             if   isinstance(sys.atoms(i, prop)[j][k], int):
                                 f.write(' %i' % sys.atoms(i, prop)[j][k])
                             elif isinstance(sys.atoms(i, prop)[j][k], float):
-                                f.write(' %.14e' % sys.atoms(i, prop)[j][k])
+                                f.write(' %.13e' % sys.atoms(i, prop)[j][k])
                             else:
                                 f.write(' %s' % sys.atoms(i, prop)[j][k])
                 else:
@@ -91,7 +91,7 @@ def write_dump(fname, sys):
                         if   isinstance(sys.atoms(i, prop)[j], int):
                             f.write(' %i' % sys.atoms(i, prop)[j])
                         elif isinstance(sys.atoms(i, prop)[j], float):
-                            f.write(' %.14e' % sys.atoms(i, prop)[j])
+                            f.write(' %.13e' % sys.atoms(i, prop)[j])
                         else:
                             f.write(' %s' % sys.atoms(i, prop)[j])
             else:

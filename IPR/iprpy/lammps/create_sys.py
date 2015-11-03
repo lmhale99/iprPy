@@ -37,6 +37,6 @@ def create_sys(file_name, lammps_exe,
     output = subprocess.check_output(lammps_exe + ' -in create_sys.in', shell=True)
 
     sys0 = read_dump(file_name)
-    #os.remove('create_sys.in')
-    #os.remove('log.lammps')
+    os.remove('create_sys.in')
+    os.remove('log.lammps')
     return sys0      
