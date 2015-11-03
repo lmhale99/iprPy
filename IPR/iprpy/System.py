@@ -19,7 +19,7 @@ class System:
         self.__pbc = tuple(pbc)
         
         self.atoms(atoms, scale=scale)
-        #self.__prop = {}
+        self.__prop = {}
     
     def atoms(self, arg1=None, arg2=None, arg3=None, scale=False):
         #Get or set the atom list and atomic property values
@@ -91,18 +91,12 @@ class System:
         else:
             raise TypeError('Invalid argument types')
     
-    
-    
-    
-    
     def box(self, arg1=None):
         #Get properties of the system's box
         if arg1 is None:
             return self.__box
         else:
             return self.__box.get(arg1)
-    
-    
     
     def pbc(self, arg1=None, arg2=None, arg3=None):
         #Get or set periodic boundary conditions
@@ -126,6 +120,48 @@ class System:
             self.__pbc = (arg1, arg2, arg3)
         else:
             raise TypeError('Invalid pbc arguments')
+    
+    def prop(self, term, arg1=None, arg2=None, arg3=None, scale=None):
+        assert isinstance(term, (str, unicode)), 'property term needs to be a string'
+        
+        #Deal with atoms properties
+        if term == 'atoms':
+            if scale is None:
+                scale = False
+            output = self.atoms(arg1=arg1, arg2=arg2, arg3=arg3, scale=scale)
+            if output is not None:
+                return output
+
+        #Deal with box properties
+        elif term == 'box':
+            assert arg2 is None and arg3 is None,   'Only one argument supported for box'
+            assert scale is None,                   'scale argument is only for atoms'
+            output = self.box(arg1=arg1)
+            if output is not None:
+                return output        
+        
+        #Deal with pbc properties
+        elif term == 'pbc':
+            assert scale is None,                   'scale argument is only for atoms'
+            output = self.pbc(arg1=arg1, arg2=arg2, arg3=arg3)
+            if output is not None:
+                return output 
+        
+        #Deal with custom properties
+        else:
+            assert arg2 is None and arg3 is None,   'Only one argument supported for custom properties'
+            assert scale is None,                   'scale argument is only for atoms'
+            
+            if arg1 is None:
+                try:
+                    return self.__prop[term]
+                except:
+                    return None
+            else:
+                self.__prop[term] = arg1
+                
+            
+    
     
     def scale(self, point):
         #Converts an atom or 3D vector position from absolute to reduced-box coordinates
@@ -419,9 +455,6 @@ class System:
                             lo_corner[i] = corner[i] - cutoff
                         if corner[i] +  cutoff > hi_corner[i]:
                             hi_corner[i] = corner[i] + cutoff
-          
-        print lo_corner
-        print hi_corner
         
         #Create bins
         numbins = np.zeros(3, dtype=int)
@@ -431,10 +464,6 @@ class System:
             hi_corner[i] = lo_corner[i] + numbins[i] * binsize
         bins = [[[[] for z in xrange(numbins[2])] for y in xrange(numbins[1])] for x in xrange(numbins[0])]
         real = [[[False for z in xrange(numbins[2])] for y in xrange(numbins[1])] for x in xrange(numbins[0])]
-        print        
-        print lo_corner
-        print hi_corner
-        print numbins
         
         #Fill superbox with atoms 
         for i in xrange(natoms):
@@ -492,4 +521,78 @@ class System:
         for i in xrange(natoms):
             self.atoms(i, 'coordination', len(nlist[i]))
         
-        self.set('nlist', nlist)
+        self.prop('nlist', nlist)
+
+    def write_nlist(self, fname):
+        nlist = self.prop('nlist')
+        
+        if nlist is None:
+            raise ValueError('nlist not defined for this system!')
+        else:
+            with open(fname, 'w') as f:
+                f.write('#Generated neighbor list\n')
+                f.write('#index n_index_1 n_index_2 ...\n')
+                for i in xrange(len(nlist)):
+                    f.write(str(i))
+                    for n in nlist[i]:
+                        f.write(' ' + str(n))
+                    f.write('\n')
+    
+    def read_nlist(self, fname):
+        nlist = [[] for i in xrange(self.natoms())]
+        
+        with open(fname, 'r') as f:
+            for line in f:
+                if len(line) > 0:
+                    terms = line.split()
+                    if terms[0][0] != '#':
+                        i = int(terms[0])
+                        self.atoms(i, 'coordination', len(terms[1:]))
+                        for j in terms[1:]:
+                            nlist[i].append(j)
+        
+        self.prop('nlist', nlist)
+                        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
