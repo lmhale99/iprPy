@@ -4,80 +4,163 @@ from copy import deepcopy
 import numpy as np
 
 class Atom:
-    def __init__(self, atype=0, pos=np.zeros(3)):
+    def __init__(self, atype=0, pos=np.zeros(3), init_size=4):
         #initialize Atom instance
+        assert isinstance(init_size, int) and init_size >= 4, 'Invalid init_size term'
+        self.__values = np.empty(init_size)
+        self.__prop_names = ['atype', 'pos']
+        self.__prop_dtype = ['int32', 'float64']
+        self.__prop_shape = [(),      (3L,)]
+
         self.atype(atype)
         self.pos(pos)
-        self.__prop = OrderedDict()
     
     def __str__(self):
         #Print atom type and coordinates when converted to a string
-        return '%i %.13e %.13e %.13e'%(self.__atype, self.__pos[0], self.__pos[1], self.__pos[2]) 
+        return '%i %.13e %.13e %.13e'%(self.atype(), self.pos(0), self.pos(1), self.pos(2)) 
     def __add__(self, y):    
         newatom = deepcopy(self)
-        newatom.pos(self.__pos + y)
+        newatom.pos(self.pos() + y)
         return newatom
     def __sub__(self, y):    
         newatom = deepcopy(self)
-        newatom.pos(self.__pos - y)
+        newatom.pos(self.pos() - y)
         return newatom
     def __mul__(self, y):
         newatom = deepcopy(self)
-        newatom.pos(self.__pos * y)
+        newatom.pos(self.pos() * y)
         return newatom
     def __rmul__(self, y):
         newatom = deepcopy(self)
-        newatom.pos(y * self.__pos)
+        newatom.pos(y * self.pos())
         return newatom
-         
-    def atype(self, atype=None):
-        #Get or set the atom's type
-        if atype is None:
-            #Return atom type
-            return self.__atype
+    
+    def prop(self, term, arg1=None, arg2=None):
+        #Get or set per-atom properties
+        assert isinstance(term, (str, unicode)), 'property term needs to be a string'
+        
+        #Return full term if no arguments supplied
+        if arg1 is None:
+            assert arg1 is None,  'Arguments not set in order!'
+            
+            #Test if term has been assigned
+            try:
+                p_index = self.__prop_names.index(term)
+            except:
+                return None
+            
+            start = self.__allsum(self.__prop_shape[:p_index])
+            shape = self.__prop_shape[p_index]
+            dtype = self.__prop_dtype[p_index]
+            
+            #Handle scalers
+            if len(shape) == 0:
+                return np.array(self.__values[start], dtype=dtype)
+            
+            #Handle vectors
+            elif len(shape) == 1:
+                end = start + shape[0]
+                return np.array(self.__values[start:end], dtype=dtype)
+            
+            #Handle 2D arrays
+            elif len(shape) == 2:
+                property = np.empty(shape, dtype=dtype)
+                for i in xrange(shape[0]):
+                    for j in xrange(shape[1]):
+                        property[i,j] = self.__values[start + i * shape[0] + j]
+                return property
+        
+        #if an argument is supplied
         else:
-            #Set atom type if integer
-            assert isinstance(atype, int),  'Atom type must be an integer'
-            self.__atype = atype    
+            arg1 = np.array(arg1)
+            
+            #Append term, dtype info, and shape info if new property
+            if term not in self.prop_list():
+                assert len(arg1.shape) <= 2, 'Terms must be scalers, 1D vectors or 2D arrays'
+                self.__prop_names.append(term)
+                self.__prop_dtype.append(arg1.dtype)
+                self.__prop_shape.append(arg1.shape)
+                
+                #Expand size of values if needed
+                if self.__allsum(self.__prop_shape) > len(self.__values):
+                    vals = np.empty(self.__allsum(self.__prop_shape) + 5)
+                    for i in xrange(self.__allsum(self.__prop_shape[:-1])):
+                        vals[i] = self.__values[i]
+                    self.__values = vals    
+            
+            #Identify property's index, shape and dtype
+            p_index = self.__prop_names.index(term)
+            shape = self.__prop_shape[p_index]
+            dtype = self.__prop_dtype[p_index]            
+            start = self.__allsum(self.__prop_shape[:p_index])
+            
+            #Handle scalers
+            if len(shape) == 0:
+                assert arg2 is None,  'Invalid arguments for scaler property'
+                if dtype == 'int32':
+                    assert arg1.dtype == 'int32',   term + ' must be an integer'
+                self.__values[start] = arg1
+            
+            #Handle vectors
+            elif len(shape) == 1:
+                assert arg2 is None,            'Invalid arguments for vector property'
+                if len(arg1.shape) == 0 and arg1.dtype == 'int32' and arg1 >= 0 and arg1 < shape[0]:
+                    return np.array(self.__values[start + arg1], dtype=dtype)
+                else:
+                    assert shape == arg1.shape,  ' Invalid arguments for vector property'
+                    if dtype == 'int32':
+                        assert arg1.dtype == 'int32',   term + ' must be integers'
+                    for i in xrange(shape[0]):
+                        self.__values[start + i] = arg1[i]
+                
+            #Handle 2D arrays
+            elif len(shape) == 2:
+                if len(arg1.shape) == 0 and arg1.dtype == 'int32' and arg1 >= 0 and arg1 < shape[0]:
+                    if arg2 is None:
+                        start = start + arg1 * shape[0]
+                        end = start + shape[1]
+                        return np.array(self.__values[start:end], dtype=dtype)    
+                    else:
+                        arg2 = np.array(arg2)
+                        assert len(arg2.shape) == 0 and arg2.dtype == 'int32' and arg2 >= 0 and arg2 < shape[1], 'Invalid arguments for 2D array property'
+                        return np.array(self.__values[start + arg1 * shape[0] + arg2], dtype=dtype)
+                           
+                else:
+                    assert shape == arg1.shape,     'Invalid arguments for 2D array property'
+                    assert arg2 is None,            'Invalid arguments for 2D array property'
+                    if dtype == 'int32':
+                        assert arg1.dtype == 'int32',   term + ' must be integers'
+                        
+                    for i in xrange(shape[0]):
+                        for j in xrange(shape[1]):
+                            self.__values[start + i * shape[0] + j] = arg1[i,j]
+            
+    def __allsum(self, listy):
+        summy = 0
+        for item in listy:
+            if len(item) == 0:
+                summy += 1
+            elif len(item) == 1:
+                summy += item[0]
+            elif len(item) == 2:
+                summy += item[0] * item[1]
+        return summy
+    
+    def atype(self, arg1=None):
+        #Get or set the atom's type
+        output = self.prop('atype', arg1)
+        if output is not None:
+            return output
     
     def pos(self, arg1=None):
         #Get or set the atom's position
-        if arg1 is None:
-            #Return atom position
-            return deepcopy(self.__pos)
-        elif isinstance(arg1, int) and arg1 >=0 and arg1 < 3:
-            return self.__pos[arg1]
-        elif isinstance(arg1, (list, tuple, np.ndarray)) and len(arg1) == 3:
-            self.__pos = np.array(arg1, dtype=np.float)
-        else:
-            raise TypeError('Invalid argument')
-    
-    def prop(self, term, value=None):
-        #Get or set per-atom properties
-        assert isinstance(term, (str, unicode)), 'property term needs to be a string'
-        if value is None:
-            if term == 'atype':
-                return self.atype()
-            elif term == 'pos':
-                return self.pos()
-            else:
-                try:
-                    return self.__prop[term]
-                except:
-                    return None
-        else:
-            if term == 'atype':
-                self.atype(value)
-            elif term == 'pos':
-                val = self.pos(value)
-                if val is not None:
-                    return val
-            else:
-                self.__prop[term] = value
-        
+        #if isinstance(arg1, np.int) and arg1 >=0 and arg1 < 3:
+        #    return self.prop('pos')[arg1]
+        #else:
+        output = self.prop('pos', arg1)
+        if output is not None:
+            return output
+       
     def prop_list(self):
         #Returns list of assigned per-atom properties
-        l = ['atype', 'pos']
-        for k, v in self.__prop.iteritems():
-            l.append(k)
-        return l
+        return self.__prop_names
