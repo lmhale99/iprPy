@@ -364,7 +364,10 @@ class System:
         return delta
     
     def wrap(self):
-        #Wrap atoms around periodic boundaries
+        #Wrap atoms around periodic boundaries and extend non-periodic boundaries if needed
+        mins = np.array([0.0, 0.0, 0.0])
+        maxs = np.array([1.0, 1.0, 1.0])
+        
         for i in xrange(self.natoms()):
             spos = self.scale(self.atoms(i, 'pos'))
             if spos[0] < 0 or spos[0] > 1 or spos[1] < 0 or spos[1] > 1 or spos[2] < 0 or spos[2] > 1:
@@ -374,7 +377,19 @@ class System:
                             spos[j] += 1
                         while spos[j] >= 1:
                             spos[j] -= 1
+                    else:
+                        if spos[j] < mins[j]:
+                            mins[j] = spos[j]
+                        elif spos[j] >= maxs[j]:
+                            maxs[j] = spos[j]                           
                 self.atoms( i, 'pos', self.unscale(spos) )        
+        
+        origin = self.box('origin') + mins[0] * self.box('avect') + mins[1] * self.box('bvect') + mins[2] * self.box('cvect') 
+        avect = self.box('avect') * (maxs[0] - mins[0])
+        bvect = self.box('bvect') * (maxs[1] - mins[1])
+        cvect = self.box('cvect') * (maxs[2] - mins[2])
+        self.__box = Box(avect=avect, bvect=bvect, cvect=cvect, origin=origin)
+        
     
     def pt_defect(self, ptdtype='v', atype=None, pos=None, ptd_id=None, db_vect=None, shift=False):
         #Returns two new systems, one with and one without a point defect with matching atom ids.  Defect is given largest id value
