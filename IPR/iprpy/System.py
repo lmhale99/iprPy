@@ -9,7 +9,7 @@ from tools import mag
 class System:
     #Define atomic system
     
-    def __init__(self, atoms=[], box=Box(), pbc=(True, True, True), scale=False):
+    def __init__(self, atoms=[], natoms=None, box=Box(), pbc=(True, True, True), scale=False):
         #Initialize System instance
                 
         assert isinstance(box, Box), 'Invalid box entry'
@@ -18,78 +18,148 @@ class System:
         assert len(pbc) == 3 and isinstance(pbc[0], bool) and isinstance(pbc[1], bool) and isinstance(pbc[2], bool), 'invalid pbc entry' 
         self.__pbc = tuple(pbc)
         
-        self.atoms(atoms, scale=scale)
+        self.__atoms_prop_names = ['atype', 'pos']
+        self.__atoms_prop_dtype = ['int32', 'float64']
+        self.__atoms_prop_shape = [(),      (3L,)]
+        
+        if natoms is None:
+            self.atoms(atoms, scale=scale)
+        else:
+            self.__atoms = np.empty((natoms, 30))
+ 
         self.__prop = {}
     
-    def atoms(self, arg1=None, arg2=None, arg3=None, scale=False):
+    def atoms(self, arg1=None, arg2=None, arg3=None, arg4=None, scale=False):
         #Get or set the atom list and atomic property values
         
-        assert isinstance(scale, bool),             'scale must be True/False'
-        
         #Return a copy of the atom list if no arguments (besides scale) given
-        if arg1 is None and arg2 is None and arg3 is None:
-            if scale:
-                scaledatoms = []
-                for atom in self.__atoms:
-                    scaledatoms.append(self.scale(atom))
-                return scaledatoms
-            else:
-                return deepcopy(self.__atoms)
-                
+        if arg1 is None and arg2 is None and arg3 is None and arg4 is None:
+            return [self.atoms(i, scale=scale) for i in xrange(self.natoms())]
+              
         #Set atoms list if first argument is a list of Atoms
-        elif isinstance(arg1, (list, tuple)):
-            assert arg2 is None and arg3 is None,   'Invalid arguments: if first argument is a list only scale is allowed'
-            if scale:
-                self.__atoms = []
-                for item in arg1:
-                    assert isinstance(item, Atom),      'Invalid arguments: list is not a list of iprPy.Atoms'
-                    self.__atoms.append(self.unscale(item))
-            else:
-                for item in arg1:
-                    assert isinstance(item, Atom),      'Invalid arguments: list is not a list of iprPy.Atoms'
-                self.__atoms = arg1
+        elif isinstance(arg1, (list, tuple)) and arg2 is None and arg3 is None and arg4 is None:
+            assert all([isinstance(item, Atom) for item in arg1]), 'Invalid arguments: list is not a list of iprPy.Atoms'
+            self.__atoms = np.empty((len(arg1), 30))
+            for i in xrange(len(arg1)):
+                self.atoms(i, arg1[i], scale=scale)
         
         #Access per-atom values if first argument is an integer
         elif isinstance(arg1, int):
-            assert arg1 >= 0 and arg1 < self.natoms(),  'Invalid arguments: atom index out of range' 
-            a_id = arg1
+            assert arg1 >= 0 and arg1 < self.natoms(),          'Invalid arguments: atom index out of range' 
         
-            #Return a copy of the atom if no other arguments supplied
-            if arg2 is None:
-                assert arg3 is None,               'Invalid arguments: third argument has value, second does not'
-                if scale:
-                    return self.scale(self.__atoms[a_id])
-                else:
-                    return deepcopy(self.__atoms[a_id])
-            
+            #Return an Atom if no other arguments supplied
+            if arg2 is None and arg3 is None and arg4 is None:
+                atomi = Atom(atype=self.atoms(arg1, 'atype'),  pos=self.atoms(arg1, 'pos', scale=scale))
+                for prop_name in self.__atoms_prop_names[2:]:
+                    atomi.prop(prop_name, self.atoms(arg1, prop_name))
+                return atomi
+                
             #Set the atom to arg2 if it is an Atom
-            elif isinstance(arg2, Atom):
-                assert arg3 is None,                'Invalid arguments: third argument has no meaning here'
-                self.__atoms[a_id] = arg2
+            elif isinstance(arg2, Atom) and arg3 is None and arg4 is None:
+                for prop_name in arg2.prop_list():
+                    self.atoms(arg1, prop_name, arg2.prop(prop_name), scale=scale)    
             
             #Set or return a per-atom property
             elif isinstance(arg2, (str, unicode)):
                 
                 #Return a per-atom property
-                if arg3 is None:
-                    if arg2 == 'pos' and scale:
-                        return self.scale(self.__atoms[a_id].pos())
-                    else:
-                        return self.__atoms[a_id].prop(arg2)
-                
+                if arg3 is None and arg4 is None:
+                    try:
+                        p_index = self.__atoms_prop_names.index(arg2)
+                    except:
+                        return None
+                   
+                    start = self.__allsum(self.__atoms_prop_shape[:p_index])
+                    shape = self.__atoms_prop_shape[p_index]
+                    dtype = self.__atoms_prop_dtype[p_index]                    
+                   
+                    #Handle scalers
+                    if len(shape) == 0:
+                        return np.array(self.__atoms[arg1, start], dtype=dtype)
+                    
+                    #Handle vectors
+                    elif len(shape) == 1:
+                        assert isinstance(scale, bool),             'scale must be True/False'
+                        end = start + shape[0]
+                        if arg2 == 'pos' and scale:
+                            return self.scale(np.array(self.__atoms[arg1, start:end], dtype=dtype))
+                        else:
+                            return np.array(self.__atoms[arg1, start:end], dtype=dtype)
+                    
+                    #Handle 2D arrays
+                    elif len(shape) == 2:
+                        property = np.empty(shape, dtype=dtype)
+                        for i in xrange(shape[0]):
+                            for j in xrange(shape[1]):
+                                property[i,j] = self.__atoms[arg1, start + i * shape[0] + j]
+                        return property
+                   
                 #Set a per-atom property
                 else:
-                    if arg2 == 'pos' and scale:
-                        val = self.__atoms[a_id].pos(self.unscale(arg3))
+                    arg3 = np.array(arg3)
+                    self.__append_prop(arg2, arg3)
+                    
+                    #Identify property's index, shape and dtype
+                    p_index = self.__atoms_prop_names.index(arg2)
+                    start = self.__allsum(self.__atoms_prop_shape[:p_index])
+                    shape = self.__atoms_prop_shape[p_index]
+                    dtype = self.__atoms_prop_dtype[p_index]  
+                    
+                    #Handle scalers
+                    if len(shape) == 0 and arg4 is None:
+                        if dtype == 'int32':
+                            assert arg3.dtype == 'int32',   term + ' must be an integer'
+                        self.__atoms[arg1, start] = arg3
+                    
+                    #Handle vectors
+                    elif len(shape) == 1 and arg4 is None:
+                        assert isinstance(scale, bool),             'scale must be True/False'
+                        #if arg3 is an integer return the index value
+                        if len(arg3.shape) == 0 and arg3.dtype == 'int32':
+                            assert arg3 >= 0 and arg3 < shape[0], 'Vector index out of range'
+                            if arg2 == 'pos' and scale:
+                                return self.atoms(arg1, 'pos', scale=scale)[arg3]
+                            else:
+                                return np.array(self.__atoms[arg1, start + arg3], dtype=dtype)
+                            
+                        #if shapes match set values
+                        elif shape == arg3.shape and arg4 is None:
+                            if dtype == 'int32':
+                                assert arg3.dtype == 'int32',   term + ' must be integers'
+                            if arg2 == 'pos' and scale:
+                                arg3 = self.unscale(arg3)
+                            for i in xrange(shape[0]):
+                                self.__atoms[arg1, start + i] = arg3[i]
+                        else:
+                            raise TypeError('Invalid arguments')
+                        
+                    #Handle 2D arrays
+                    elif len(shape) == 2:
+                        #if arg3 is an integer return the index value
+                        if len(arg3.shape) == 0 and arg3.dtype == 'int32':
+                            assert arg3 >= 0 and arg3 < shape[0], 'Array index out of range'
+                            if arg4 is None:
+                                start = start + arg3 * shape[0]
+                                end = start + shape[1]
+                                return np.array(self.__atoms[arg1, start:end], dtype=dtype)    
+                            elif isinstance(arg4, int):
+                                assert arg4 >= 0 and arg4 < shape[1], 'Array index out of range'
+                                return np.array(self.__atoms[arg1, start + arg3 * shape[0] + arg4], dtype=dtype)
+                        #If shapes match set values           
+                        elif shape == arg3.shape and arg4 is None:
+                            if dtype == 'int32':
+                                assert arg3.dtype == 'int32',   term + ' must be integers'   
+                            for i in xrange(shape[0]):
+                                for j in xrange(shape[1]):
+                                    self.__atoms[arg1, start + i * shape[0] + j] = arg3[i,j]
+                        else:
+                            raise TypeError('Invalid arguments')
                     else:
-                        val = self.__atoms[a_id].prop(arg2, arg3)
-                    if val is not None:
-                        return val
-            
+                        raise TypeError('Invalid arguments')
             else:
-                raise TypeError('Invalid argument types')
+                raise TypeError('Invalid arguments')
         else:
-            raise TypeError('Invalid argument types')
+            raise TypeError('Invalid arguments')
     
     def box(self, arg1=None):
         #Get properties of the system's box
@@ -97,6 +167,23 @@ class System:
             return self.__box
         else:
             return self.__box.get(arg1)
+    
+    def __append_prop(self, prop_name, prop_value):
+        #Append term, dtype info, and shape info if new property
+        if prop_name not in self.__atoms_prop_names:
+            assert len(prop_value.shape) <= 2, 'Terms must be scalers, 1D vectors or 2D arrays'
+            self.__atoms_prop_names.append(prop_name)
+            self.__atoms_prop_dtype.append(prop_value.dtype)
+            self.__atoms_prop_shape.append(prop_value.shape)
+            
+            #Expand size of values if needed
+            if self.__allsum(self.__atoms_prop_shape) > self.__atoms.shape[1]:
+                vals = np.empty((self.natoms(), self.__allsum(self.__atoms_prop_shape) + 5))
+                for i in xrange(self.natoms()):
+                    for j in xrange(self.__allsum(self.__atoms_prop_shape[:-1])):
+                        vals[i,j] = self.__atoms[i,j]
+                self.__atoms = vals    
+    
     
     def pbc(self, arg1=None, arg2=None, arg3=None):
         #Get or set periodic boundary conditions
@@ -160,7 +247,16 @@ class System:
             else:
                 self.__prop[term] = arg1
                 
-            
+    def __allsum(self, listy):
+        summy = 0
+        for item in listy:
+            if len(item) == 0:
+                summy += 1
+            elif len(item) == 1:
+                summy += item[0]
+            elif len(item) == 2:
+                summy += item[0] * item[1]
+        return summy        
     
     
     def scale(self, point):
@@ -217,9 +313,9 @@ class System:
     def natypes(self):
         #Return the max atype value in all of the atoms
         nt = 0
-        for atom in self.__atoms:
-            if atom.atype() > nt:
-                nt = atom.atype()
+        for i in xrange(self.natoms()):
+            if self.atoms(i, 'atype'):
+                nt = self.atoms(i, 'atype')
         return nt
     
     def dvect(self, a1, a2):
@@ -486,8 +582,8 @@ class System:
                             if x == 0 and y == 0 and z == 0:
                                 real[xb][yb][zb] = True
 
-        #Go through bins and build neighbor list
-        nlist = [[] for i in xrange(natoms)] 
+        nlist = np.zeros((natoms, 41), dtype=np.int)
+        
         for z in xrange(numbins[2]):
             for y in xrange(numbins[1]):
                 for x in xrange(numbins[0]):
@@ -497,15 +593,15 @@ class System:
                         #For atom u in bin
                         for u in xrange(len(bins[x][y][z])):
                             id_u = bins[x][y][z][u]
+                                
                             #for atom v in same bin
                             for v in xrange(u):
                                 id_v = bins[x][y][z][v]
                                 #Compare distance between u and v
                                 if mag(self.dvect(id_u, id_v)) < cutoff:
                                     #Add neighbors to each other if not already paired
-                                    if id_v not in nlist[id_u] and id_u != id_v:
-                                        nlist[id_u].append(id_v)
-                                        nlist[id_v].append(id_u)
+                                    self.__append_neighbor(nlist, id_u, id_v)
+                                        
                                       
                             #iterate over neighbor bins and compare to cutoff
                             for dx, dy, dz in box_iter(cmult):
@@ -514,15 +610,37 @@ class System:
                                     id_w = bins[x+dx][y+dy][z+dz][w]
                                     if mag(self.dvect(id_u, id_w)) < cutoff:
                                         #Add neighbors to each other if not already paired
-                                        if id_w not in nlist[id_u] and id_u != id_w:
-                                            nlist[id_u].append(id_w)
-                                            nlist[id_w].append(id_u)
+                                        self.__append_neighbor(nlist, id_u, id_w)
     
         for i in xrange(natoms):
-            self.atoms(i, 'coordination', len(nlist[i]))
+            self.atoms(i, 'coordination', nlist[i, 0])
         
         self.prop('nlist', nlist)
 
+    def __append_neighbor(self, nlist, a, b):
+        if b not in nlist[a, 1:nlist[a, 0]+1] and a != b:
+            nlist[a, 0] += 1
+            nlist[b, 0] += 1
+            try:
+                nlist[a, nlist[a, 0]] = b
+            except:
+                newlist = np.empty((len(nlist), nlist[a, 0] * 2), dtype=np.int)
+                for i in xrange(len(nlist)):
+                    for j in xrange(len(nlist)):
+                        newlist[i, j] = nlist[i,j]
+                nlist = newlist
+                nlist[a, nlist[a, 0]] = b
+            try:
+                nlist[b, nlist[b, 0]] = a
+            except:
+                newlist = np.empty((len(nlist), nlist[b, 0] * 2), dtype=np.int)
+                for i in xrange(len(nlist)):
+                    for j in xrange(len(nlist)):
+                        newlist[i, j] = nlist[i, j]
+                nlist = newlist
+                nlist[b, nlist[b, 0]] = a
+                        
+        
     def write_nlist(self, fname):
         nlist = self.prop('nlist')
         
@@ -534,12 +652,12 @@ class System:
                 f.write('#index n_index_1 n_index_2 ...\n')
                 for i in xrange(len(nlist)):
                     f.write(str(i))
-                    for n in nlist[i]:
-                        f.write(' ' + str(n))
+                    for j in xrange(1, nlist[i, 0]+1):
+                        f.write(' ' + str(nlist[i, j]))
                     f.write('\n')
     
     def read_nlist(self, fname):
-        nlist = [[] for i in xrange(self.natoms())]
+        nlist = np.zeros((self.natoms(), 41), dtype=np.int)
         
         with open(fname, 'r') as f:
             for line in f:
@@ -547,13 +665,24 @@ class System:
                     terms = line.split()
                     if terms[0][0] != '#':
                         i = int(terms[0])
-                        self.atoms(i, 'coordination', len(terms[1:]))
-                        for j in terms[1:]:
-                            nlist[i].append(j)
+                        coord = len(terms[1:])
+                        
+                        if coord >= len(nlist[0]): 
+                            newlist = np.empty((len(nlist), coord * 2), dtype=np.int)
+                            for ii in xrange(len(nlist)):
+                                for j in xrange(len(nlist)):
+                                    newlist[ii, j] = nlist[ii, j]
+                            nlist = newlist
+                        
+                        self.atoms(i, 'coordination', coord)
+                        nlist[i, 0] = coord
+                        for j in xrange(1, coord+1):
+                            nlist[i, j] = terms[j]
         
         self.prop('nlist', nlist)
                         
-        
+    def atoms_prop_list(self):
+        return deepcopy(self.__atoms_prop_names)
         
         
         

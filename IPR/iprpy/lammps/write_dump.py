@@ -1,7 +1,7 @@
 import numpy as np
 
-#Writes a LAMMPS style dump file from sys using all assigned per-atom properties    
-def write_dump(fname, sys):
+#Writes a LAMMPS style dump file from system using all assigned per-atom properties    
+def write_dump(fname, system, xf='%.13e', scale=False):
     f = open(fname,'w')
     
     #Write timestep info
@@ -10,92 +10,150 @@ def write_dump(fname, sys):
     
     #Write number of atoms
     f.write('ITEM: NUMBER OF ATOMS\n')
-    f.write('%i\n' % ( sys.natoms() ))
+    f.write('%i\n' % ( system.natoms() ))
     
-    #Write system boundary info for an orthogonal box
-    if np.isclose(sys.box('xy'), 0.0) and np.isclose(sys.box('xz'), 0.0) and np.isclose(sys.box('yz'), 0.0):
+    #Write systemtem boundary info for an orthogonal box
+    if np.isclose(system.box('xy'), 0.0) and np.isclose(system.box('xz'), 0.0) and np.isclose(system.box('yz'), 0.0):
         f.write('ITEM: BOX BOUNDS')
         for i in xrange(3):
-            if sys.pbc(i):
+            if system.pbc(i):
                 f.write(' pp')
             else:
                 f.write(' fm')
         f.write('\n')
         
-        f.write('%f %f\n' % ( sys.box('xlo'), sys.box('xhi') )) 
-        f.write('%f %f\n' % ( sys.box('ylo'), sys.box('yhi') ))
-        f.write('%f %f\n' % ( sys.box('zlo'), sys.box('zhi') ))
+        f.write('%f %f\n' % ( system.box('xlo'), system.box('xhi') )) 
+        f.write('%f %f\n' % ( system.box('ylo'), system.box('yhi') ))
+        f.write('%f %f\n' % ( system.box('zlo'), system.box('zhi') ))
     
-    #Write system boundary info for a triclinic box
+    #Write systemtem boundary info for a triclinic box
     else:
         f.write('ITEM: BOX BOUNDS xy xz yz')
         for i in xrange(3):
-            if sys.pbc(i):
+            if system.pbc(i):
                 f.write(' pp')
             else:
                 f.write(' fm')
         f.write('\n')
 
-        xlo_bound = sys.box('xlo') + min(( 0.0, sys.box('xy'), sys.box('xz'), sys.box('xy') + sys.box('xz') ))
-        xhi_bound = sys.box('xhi') + max(( 0.0, sys.box('xy'), sys.box('xz'), sys.box('xy') + sys.box('xz') ))
-        ylo_bound = sys.box('ylo') + min(( 0.0, sys.box('yz') ))
-        yhi_bound = sys.box('yhi') + max(( 0.0, sys.box('yz') ))
-        zlo_bound = sys.box('zlo')
-        zhi_bound = sys.box('zhi')
+        xlo_bound = system.box('xlo') + min(( 0.0, system.box('xy'), system.box('xz'), system.box('xy') + system.box('xz') ))
+        xhi_bound = system.box('xhi') + max(( 0.0, system.box('xy'), system.box('xz'), system.box('xy') + system.box('xz') ))
+        ylo_bound = system.box('ylo') + min(( 0.0, system.box('yz') ))
+        yhi_bound = system.box('yhi') + max(( 0.0, system.box('yz') ))
+        zlo_bound = system.box('zlo')
+        zhi_bound = system.box('zhi')
         
-        f.write('%f %f %f\n' % ( xlo_bound, xhi_bound, sys.box('xy') )) 
-        f.write('%f %f %f\n' % ( ylo_bound, yhi_bound, sys.box('xz') ))
-        f.write('%f %f %f\n' % ( zlo_bound, zhi_bound, sys.box('yz') ))
+        f.write('%f %f %f\n' % ( xlo_bound, xhi_bound, system.box('xy') )) 
+        f.write('%f %f %f\n' % ( ylo_bound, yhi_bound, system.box('xz') ))
+        f.write('%f %f %f\n' % ( zlo_bound, zhi_bound, system.box('yz') ))
 
     #Write atomic header info
-    prop_list = sys.atoms(0).prop_list()
+    prop_list = system.atoms_prop_list()
 
     f.write('ITEM: ATOMS id')
     for prop in prop_list:
-        if prop == 'pos':
-            f.write(' x y z')
-        elif prop == 'atype':
+        #Change atype to type
+        if prop == 'atype':
             f.write(' type')
-        elif isinstance(sys.atoms(0, prop), (list, tuple, np.ndarray)) and len(sys.atoms(0, prop)) > 1:
-            if isinstance(sys.atoms(0, prop)[0], (list, tuple, np.ndarray)) and len(sys.atoms(0, prop)[0]) > 1:
-                for i in xrange(len(sys.atoms(0, prop))):
-                    for j in xrange(len(sys.atoms(0, prop)[0])):
-                        f.write(' %s[%i][%i]' % (prop, i+1, j+1))
+        
+        #Change pos to x y z or xs ys zs
+        elif prop == 'pos':
+            if scale:
+                f.write(' xs ys zs')
             else:
-                for i in xrange(len(sys.atoms(0, prop))):
-                    f.write(' %s[%i]' % (prop, i+1))
+                f.write(' x y z')
+        
+        #Handle all other properties
         else:
-            f.write(' ' + prop)
+            test = system.atoms(0, prop)
+            shape = test.shape
+            #Scaler
+            if len(shape) == 0:
+                f.write(' ' + prop)
+            #Vector
+            elif len(shape) == 1:
+                for i in xrange(shape[0]):
+                    f.write(' %s[%i]' % (prop, i))
+            #Array
+            elif len(shape) == 2:
+                for i in xrange(shape[0]):
+                    for j in xrange(shape[1]):
+                        f.write(' %s[%i][%i]' % (prop, i, j))
+                
     f.write('\n')
     
     #Write atomic info
-    for i in xrange(sys.natoms()):
+    for i in xrange(system.natoms()):
         f.write('%i' % (i+1))
         for prop in prop_list:
-            if isinstance(sys.atoms(i, prop), int):
-                f.write(' %i' % sys.atoms(i, prop))
-            elif isinstance(sys.atoms(i, prop), float):
-                f.write(' %.14e' % sys.atoms(i, prop))
-            elif isinstance(sys.atoms(i, prop), (tuple, list, np.ndarray)) and len(sys.atoms(i, prop)) > 1:
-                if isinstance(sys.atoms(i, prop)[0], (list, tuple, np.ndarray)) and len(sys.atoms(i, prop)[0]) > 1:
-                    for j in xrange(len(sys.atoms(i, prop))):
-                        for k in xrange(len(sys.atoms(i, prop)[0])):
-                            if   isinstance(sys.atoms(i, prop)[j][k], int):
-                                f.write(' %i' % sys.atoms(i, prop)[j][k])
-                            elif isinstance(sys.atoms(i, prop)[j][k], float):
-                                f.write(' %.13e' % sys.atoms(i, prop)[j][k])
-                            else:
-                                f.write(' %s' % sys.atoms(i, prop)[j][k])
+            value = system.atoms(i, prop)
+            shape = value.shape
+            dtype = value.dtype
+            
+            #Scaler
+            if len(shape) == 0:
+                if dtype == 'int32':
+                    f.write(' %i' % value)
                 else:
-                    for j in xrange(len(sys.atoms(i, prop))):
-                        if   isinstance(sys.atoms(i, prop)[j], int):
-                            f.write(' %i' % sys.atoms(i, prop)[j])
-                        elif isinstance(sys.atoms(i, prop)[j], float):
-                            f.write(' %.13e' % sys.atoms(i, prop)[j])
+                    f.write(' ' + xf % value)
+            
+            #Vector
+            elif len(shape) == 1:
+                if prop == 'pos' and scale:
+                    value = system.scale(value)
+                for j in xrange(shape[0]):
+                    if dtype == 'int32':
+                        f.write(' %i' % value[j])
+                    else:
+                        f.write(' ' + xf % value[j])
+
+            #Array
+            elif len(shape) == 2:
+                for j in xrange(shape[0]):
+                    for k in xrange(shape[0]):
+                        if dtype == 'int32':
+                            f.write(' %i' % value[j][k])
                         else:
-                            f.write(' %s' % sys.atoms(i, prop)[j])
-            else:
-                f.write(' %s' % sys.atoms(i, prop))
+                            f.write(' ' + xf % value[j][k])
+            
         f.write('\n')
 
     f.close()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

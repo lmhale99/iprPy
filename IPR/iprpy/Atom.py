@@ -4,7 +4,7 @@ from copy import deepcopy
 import numpy as np
 
 class Atom:
-    def __init__(self, atype=0, pos=np.zeros(3), init_size=4):
+    def __init__(self, atype=0, pos=np.zeros(3), init_size=30):
         #initialize Atom instance
         assert isinstance(init_size, int) and init_size >= 4, 'Invalid init_size term'
         self.__values = np.empty(init_size)
@@ -40,8 +40,7 @@ class Atom:
         assert isinstance(term, (str, unicode)), 'property term needs to be a string'
         
         #Return full term if no arguments supplied
-        if arg1 is None:
-            assert arg1 is None,  'Arguments not set in order!'
+        if arg1 is None and arg2 is None:
             
             #Test if term has been assigned
             try:
@@ -95,45 +94,49 @@ class Atom:
             start = self.__allsum(self.__prop_shape[:p_index])
             
             #Handle scalers
-            if len(shape) == 0:
-                assert arg2 is None,  'Invalid arguments for scaler property'
+            if len(shape) == 0 and arg2 is None:
                 if dtype == 'int32':
                     assert arg1.dtype == 'int32',   term + ' must be an integer'
                 self.__values[start] = arg1
             
             #Handle vectors
-            elif len(shape) == 1:
-                assert arg2 is None,            'Invalid arguments for vector property'
-                if len(arg1.shape) == 0 and arg1.dtype == 'int32' and arg1 >= 0 and arg1 < shape[0]:
+            elif len(shape) == 1 and arg2 is None:
+                #if arg1 is an integer return the index value
+                if len(arg1.shape) == 0 and arg1.dtype == 'int32':
+                    assert arg1 >= 0 and arg1 < shape[0], 'Vector index out of range'
                     return np.array(self.__values[start + arg1], dtype=dtype)
-                else:
-                    assert shape == arg1.shape,  ' Invalid arguments for vector property'
+                
+                #if shapes match set values
+                elif shape == arg1.shape:
                     if dtype == 'int32':
                         assert arg1.dtype == 'int32',   term + ' must be integers'
                     for i in xrange(shape[0]):
                         self.__values[start + i] = arg1[i]
-                
+                else:
+                    raise TypeError('Invalid arguments')
+                    
             #Handle 2D arrays
             elif len(shape) == 2:
-                if len(arg1.shape) == 0 and arg1.dtype == 'int32' and arg1 >= 0 and arg1 < shape[0]:
+                if len(arg1.shape) == 0 and arg1.dtype == 'int32':
+                    assert arg1 >= 0 and arg1 < shape[0], 'Array index out of range'
                     if arg2 is None:
                         start = start + arg1 * shape[0]
                         end = start + shape[1]
                         return np.array(self.__values[start:end], dtype=dtype)    
-                    else:
-                        arg2 = np.array(arg2)
-                        assert len(arg2.shape) == 0 and arg2.dtype == 'int32' and arg2 >= 0 and arg2 < shape[1], 'Invalid arguments for 2D array property'
+                    elif isinstance(arg2, int):
+                        assert arg2 >= 0 and arg2 < shape[1], 'Array index out of range'
                         return np.array(self.__values[start + arg1 * shape[0] + arg2], dtype=dtype)
+                    else:
+                        raise TypeError('Invalid arguments')
                            
-                else:
-                    assert shape == arg1.shape,     'Invalid arguments for 2D array property'
-                    assert arg2 is None,            'Invalid arguments for 2D array property'
+                elif shape == arg1.shape and arg2 is None:   
                     if dtype == 'int32':
                         assert arg1.dtype == 'int32',   term + ' must be integers'
-                        
                     for i in xrange(shape[0]):
                         for j in xrange(shape[1]):
                             self.__values[start + i * shape[0] + j] = arg1[i,j]
+                else:
+                    raise TypeError('Invalid arguments')
             
     def __allsum(self, listy):
         summy = 0
@@ -163,4 +166,4 @@ class Atom:
        
     def prop_list(self):
         #Returns list of assigned per-atom properties
-        return self.__prop_names
+        return deepcopy(self.__prop_names)
