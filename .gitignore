@@ -1,9 +1,11 @@
 #ignore compiled python
 *.pyc
 
-#ignore Notebook checkpoints
+#ignore Notebook checkpoints and data
 Notebooks/.ipynb_checkpoints/
-.ipynb_checkpoints/
+Notebooks/tool-a-Cij-quick/
+Notebooks/tool-Cij-vs-P/
+Notebooks/tool-E-vs-r0/
 
 #ignore non-IPR potentials
 IPR/ref/potentialInstances-LAMMPS/Ta--ThompsonAP--2015.json
