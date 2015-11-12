@@ -11,14 +11,14 @@
             "spaceGroupTag": "P 63/m m c",
             "SpaceGroupNumber": 194
         },
-        "orthorhombicCell": {
-            "latticeParameters": {
-                "value": [1.0000000000000, 1.7320508075689, 3.2659863237110],
-                "unit": "reduced"
-            },
-            "atomPositions": {
-                "site": [
-                    {
+        "lattice": {
+            "orthorhombic": {
+                "idealParameters": {
+                    "b_a": 1.7320508075689,
+                    "c_a": 3.2659863237110
+                },
+                "atomPositions": {
+                    "site": {
                         "component": 1,
                         "atomCoordinates": [
                             {
@@ -55,7 +55,7 @@
                             }                                
                         ]
                     }
-                ]
+                }
             }
         }
     }

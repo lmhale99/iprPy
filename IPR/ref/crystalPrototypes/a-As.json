@@ -11,14 +11,14 @@
             "spaceGroupTag": "R -3 m",
             "SpaceGroupNumber": 166
         },
-        "orthorhombicCell": {
-            "latticeParameters": {
-                "value": [1.0000000000000, 1.7320508075689, 2.8000000000000],
-                "unit": "reduced"
-            },
-            "atomPositions": {
-                "site": [
-                    {
+        "lattice": {
+            "orthorhombic": {
+                "idealParameters": {
+                    "b_a": 1.7320508075689,
+                    "c_a": 2.8000000000000
+                },
+                "atomPositions": {
+                    "site": {
                         "component": 1,
                         "atomCoordinates": [
                             {
@@ -71,7 +71,7 @@
                             }
                         ]
                     }
-                ]
+                }
             }
         }    
     }
