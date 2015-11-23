@@ -1,4 +1,3 @@
-import iprp
 from DataModel import *
 import numpy as np
 from collections import OrderedDict
@@ -24,6 +23,7 @@ class PointDefect(DataModel):
             self.__datalist[tag] = OrderedDict()
             self.__datalist['list'].append(tag)
             self.__datalist[tag]['name'] = str(defect['pointDefectID']['name'])
+            self.__datalist[tag]['tag'] = tag
             self.__datalist[tag]['parameters'] = []
             
             if isinstance(defect['parameters'], list):
@@ -36,19 +36,19 @@ class PointDefect(DataModel):
                 try:
                     pset['ptdtype'] = str(param['defectType'])
                 except:
-                    pset['ptdtype'] = 'v'
+                    pset['ptdtype'] = None
                 try:
-                    pset['type'] = param['atomType']
+                    pset['atype'] = int(param['atype'])
                 except:
-                    pset['type'] = 1
+                    pset['atype'] = None
                 try:
                     pset['pos'] = np.array(param['coordinates']['value'])
                 except:
-                    pset['pos'] = np.zeros(3)
+                    pset['pos'] = None
                 try:
                     pset['d'] = np.array(param['dumbbellVector']['value'])
                 except:
-                    pset['d'] = np.zeros(3)
+                    pset['d'] = None
                 self.__datalist[tag]['parameters'].append(pset)
             
     def get(self, term1 = None, term2 = None, safe = True):

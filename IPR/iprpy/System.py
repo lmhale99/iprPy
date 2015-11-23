@@ -369,6 +369,7 @@ class System:
         maxs = np.array([1.0, 1.0, 1.0])
         
         for i in xrange(self.natoms()):
+        
             spos = self.scale(self.atoms(i, 'pos'))
             if spos[0] < 0 or spos[0] > 1 or spos[1] < 0 or spos[1] > 1 or spos[2] < 0 or spos[2] > 1:
                 for j in xrange(3):
@@ -379,9 +380,9 @@ class System:
                             spos[j] -= 1
                     else:
                         if spos[j] < mins[j]:
-                            mins[j] = spos[j]
+                            mins[j] = spos[j] - 0.001
                         elif spos[j] >= maxs[j]:
-                            maxs[j] = spos[j]                           
+                            maxs[j] = spos[j] + 0.001                          
                 self.atoms( i, 'pos', self.unscale(spos) )        
         
         origin = self.box('origin') + mins[0] * self.box('avect') + mins[1] * self.box('bvect') + mins[2] * self.box('cvect') 
@@ -393,7 +394,7 @@ class System:
     
     def pt_defect(self, ptdtype='v', atype=None, pos=None, ptd_id=None, db_vect=None, shift=False):
         #Returns two new systems, one with and one without a point defect with matching atom ids.  Defect is given largest id value
-        
+
         #Check that ptdtype and shift are valid
         assert ptdtype == 'v' or ptdtype == 'i' or ptdtype == 's' or ptdtype == 'db',       'Invalid ptdtype. Options are: v, i, s, or db'
         assert isinstance(shift, bool),                                                     'shift must be a bool'
@@ -497,11 +498,11 @@ class System:
             datoms.append( Atom( atype, pos + cshift ) )
             patoms.append( self.atoms(ptd_id) + cshift )
                 
-        #if dumbbell, add atoms at pos + shift +- d 
+        #if dumbbell, add atoms at pos + shift +- db_vect 
         elif ptdtype =='db':
             assert j == natoms-1,                                                           'Error copying atoms!'
-            datoms.append( self.atoms(ptd_id) + cshift - d ) 
-            datoms.append( Atom( atype, pos + cshift + d ) )
+            datoms.append( self.atoms(ptd_id) + cshift - db_vect ) 
+            datoms.append( Atom( atype, pos + cshift + db_vect ) )
             patoms.append( self.atoms(ptd_id) + cshift )
                 
         psys = System(atoms=patoms, box=deepcopy(self.box()), pbc=self.pbc())
