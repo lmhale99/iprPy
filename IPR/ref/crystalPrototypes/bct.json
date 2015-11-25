@@ -11,14 +11,13 @@
             "spaceGroupTag": "I 4/m m m",
             "SpaceGroupNumber": 139
         },
-        "orthorhombicCell": {
-            "latticeParameters": {
-                "value": [1.0000000000000, 1.0000000000000, 1.5000000000000],
-                "unit": "reduced"
-            },
-            "atomPositions": {
-                "site": [
-                    {
+        "lattice": {
+            "tetragonal": {
+                "idealParameters": {
+                    "c_a": 1.5000000000000
+                },
+                "atomPositions": {
+                    "site": {
                         "component": 1,
                         "atomCoordinates": [
                             {
@@ -31,7 +30,7 @@
                             }
                         ]
                     }
-                ]
+                }
             }
         }
     }

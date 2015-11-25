@@ -11,40 +11,36 @@
             "spaceGroupTag": "P m -3 m",
             "SpaceGroupNumber": 221
         },
-        "orthorhombicCell": {
-            "latticeParameters": {
-                "value": [1.0000000000000, 1.0000000000000, 1.0000000000000],
-                "unit": "reduced"
-            },
-            "atomPositions": {
-                "site": [
-                    {
-                        "component": 1,
-                        "atomCoordinates": [
-                            {
+        "lattice": {
+            "cubic": {
+                "atomPositions": {
+                    "site": [
+                        {
+                            "component": 1,
+                            "atomCoordinates": {
                                 "value": [0.0000000000000, 0.0000000000000, 0.0000000000000],
                                 "unit": "scaled"
                             }
-                        ]
-                    },
-                    {
-                        "component": 2,
-                        "atomCoordinates": [
-                            {
-                                "value": [0.0000000000000, 0.5000000000000, 0.5000000000000],
-                                "unit": "scaled"
-                            },
-                            {
-                                "value": [0.5000000000000, 0.0000000000000, 0.5000000000000],
-                                "unit": "scaled"
-                            },
-                            {
-                                "value": [0.5000000000000, 0.5000000000000, 0.0000000000000],
-                                "unit": "scaled"
-                            }
-                        ]
-                    }
-                ]
+                        },
+                        {
+                            "component": 2,
+                            "atomCoordinates": [
+                                {
+                                    "value": [0.0000000000000, 0.5000000000000, 0.5000000000000],
+                                    "unit": "scaled"
+                                },
+                                {
+                                    "value": [0.5000000000000, 0.0000000000000, 0.5000000000000],
+                                    "unit": "scaled"
+                                },
+                                {
+                                    "value": [0.5000000000000, 0.5000000000000, 0.0000000000000],
+                                    "unit": "scaled"
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
         }    
     }

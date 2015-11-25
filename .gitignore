@@ -1,8 +1,16 @@
 #ignore compiled python
 *.pyc
 
-#ignore Notebook checkpoints
+#ignore Notebook checkpoints and data
 Notebooks/.ipynb_checkpoints/
+Notebooks/tool-a-Cij-quick/
+Notebooks/tool-alat-full-relax/
+Notebooks/tool-Cij-vs-P/
+Notebooks/tool-Dislocation/
+Notebooks/tool-E-vs-r0/
+Notebooks/tool-Point-Defect/
+Notebooks/tool-T-vs-Cij/
+Notebooks/tool-Vacancy-Mobility/
 
 #ignore non-IPR potentials
 IPR/ref/potentialInstances-LAMMPS/Ta--ThompsonAP--2015.json
@@ -20,3 +28,6 @@ IPR/results/temp/*
 
 #ignore personal research scripts and results
 research/
+
+#ignore debug tests
+debug/
