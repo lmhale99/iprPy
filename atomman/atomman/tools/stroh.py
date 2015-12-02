@@ -1,12 +1,5 @@
 import numpy as np
 
-#Transforms the 4D elastic constant matrix, C, using the transformation matrix, T.
-def c_transform(initC, T, tol=1e-8):
-    Q = np.einsum('km,ln->mnkl', T, T)
-    C = np.einsum('ghij,ghmn,mnkl->ijkl', Q, initC, Q)
-    C[abs(C) < tol] = 0.0
-    return C  
-
 def c_transform(initC, T, tol=1e-8):
     #Transforms the 4D elastic constant matrix, C, using the transformation matrix, T.
     Q = np.einsum('km,ln->mnkl', T, T)

@@ -7,7 +7,7 @@ def nye(system, p, tmax = 27):
     nlist = system.prop('nlist')
     natoms = system.natoms()
     
-    T,vmag = ax_check(axes)
+    T,vmag = axes_check(axes)
     if len(p) == 1:
         p = p[0]
     else:

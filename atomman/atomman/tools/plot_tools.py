@@ -4,50 +4,11 @@ from mag import mag
 from scipy.interpolate import griddata
 
 import matplotlib
-matplotlib.use('Agg')
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.collections import PatchCollection
-
-
-#Calculates the shortest interatomic distance, r, wrt a
-def calculate_r_a(proto, alat=None):
-
-    ucell = proto.get('ucell')
-    cell = []
-    
-    if alat is None:
-        lat_mult = proto.get('lat_mult')
-    else:
-        lat_mult = np.array([1.0, alat[1]/alat[0], alat[2]/alat[0]])
-    for atom in ucell:
-        cell.append(atom * lat_mult)
-    
-    box = np.array([[0.0, lat_mult[0], 0.0], 
-                    [0.0, lat_mult[1], 0.0], 
-                    [0.0, lat_mult[2], 0.0]])
-    minimum_r = min(lat_mult)  
-    
-    pro_sys = iprp.System(atoms=cell, box=box, pbc=[True, True, True])
-    
-    for i in xrange(len(ucell)):
-        for j in xrange(i):
-            rdist = mag(pro_sys.dvect(i,j))
-            if rdist < minimum_r:
-                minimum_r = rdist
-    
-    return minimum_r
-
-#Allows for dynamic iteration over all arrays of length b where each term is in range 0-a                           
-def iterbox(a,b):
-    for i in xrange(a):    
-        if b > 1:
-            for j in iterbox(a,b-1):
-                yield [i] + j    
-        elif b == 1:
-            yield [i] 
-            
+          
 def print_cij(o_cij):
     cij = np.empty((6,6))
     for i in xrange(6):

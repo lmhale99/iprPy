@@ -38,3 +38,9 @@ research/
 
 #debug tests
 tests/
+
+#calcs results and temp folders
+calcs/*/*.json
+calcs/*/*.dump
+calcs/*/*.png
+calcs/*/*/

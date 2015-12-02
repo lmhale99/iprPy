@@ -1,6 +1,7 @@
-#Checks that the axes are orthogonal and returns normalized direction vectors
-#The normalized array is the transformation matrix, T, relative to a [1,0,0],[0,1,0],[0,0,1] orientation
+import numpy as np
+
 def axes_check(axes, tol=1e-8):
+    #Checks axis relationship and returns transformation matrix, T, and axis magnitudes, mag
     mag = np.apply_along_axis(np.linalg.norm, 1, axes)
     uaxes = axes / mag[:,None]
     if (np.isclose(np.dot(uaxes[0], uaxes[1]), 0., atol=tol) == False or 
