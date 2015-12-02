@@ -1,7 +1,14 @@
-#ignore compiled python
+#compiled python modules
 *.pyc
 
-#ignore Notebook checkpoints and data
+#Setuptools distribution folder for atomman
+atomman/dist/
+
+#Python egg metadata for atomman
+atomman/*.egg-info/
+atomman/*.egg
+
+#Notebook checkpoints and data
 Notebooks/.ipynb_checkpoints/
 Notebooks/tool-a-Cij-quick/
 Notebooks/tool-alat-full-relax/
@@ -12,7 +19,7 @@ Notebooks/tool-Point-Defect/
 Notebooks/tool-T-vs-Cij/
 Notebooks/tool-Vacancy-Mobility/
 
-#ignore non-IPR potentials
+#non-IPR potentials
 IPR/ref/potentialInstances-LAMMPS/Ta--ThompsonAP--2015.json
 IPR/ref/potentials/Ta--ThompsonAP--2015/
 IPR/ref/potentialInstances-LAMMPS/Fe--ChamatiM--2006.json
@@ -20,14 +27,14 @@ IPR/ref/potentials/Fe--ChamatiM--2006/Fe_cham-mishin.eam.alloy
 IPR/ref/potentialInstances-LAMMPS/Fe--ProvilleL--2012.json
 IPR/ref/potentials/Fe--ProvilleL--2012/
 
-#ignore personal results
+#personal results
 IPR/test.in
 IPR/results/json/*
 IPR/results/sim/*
 IPR/results/temp/*
 
-#ignore personal research scripts and results
+#personal research scripts and results
 research/
 
-#ignore debug tests
-debug/
+#debug tests
+tests/

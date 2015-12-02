@@ -1,7 +1,6 @@
 import numpy as np
 from collections import OrderedDict
 from copy import deepcopy
-import numpy as np
 
 class Atom:
     def __init__(self, atype=0, pos=np.zeros(3), init_size=30):

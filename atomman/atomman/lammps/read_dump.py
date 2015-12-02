@@ -1,8 +1,8 @@
-import iprpy
+import atomman as am
 import numpy as np
 from collections import OrderedDict
 
-#Reads a LAMMPS style dump file and returns a iprpy.System. 
+#Reads a LAMMPS style dump file and returns an atomman.System. 
 def read_dump(fname):
     with open(fname, 'r') as fin:
         pbc = None
@@ -22,7 +22,7 @@ def read_dump(fname):
                 if readnatoms:                
                     natoms = int(terms[0])
                     if box is not None:
-                        system = iprpy.System(natoms=natoms, box=box, pbc=pbc)
+                        system = am.System(natoms=natoms, box=box, pbc=pbc)
                     readnatoms = False
                 
                 #read x boundary condition values if time to do so
@@ -51,11 +51,11 @@ def read_dump(fname):
                         xhi = xhi - max((0.0, xy, xz, xy + xz))
                         ylo = ylo - min((0.0, yz))
                         yhi = yhi - max((0.0, yz))
-                        box = iprpy.Box(xlo=xlo, xhi=xhi, ylo=ylo, yhi=yhi, zlo=zlo, zhi=zhi, xy=xy, xz=xz, yz=yz)
+                        box = am.Box(xlo=xlo, xhi=xhi, ylo=ylo, yhi=yhi, zlo=zlo, zhi=zhi, xy=xy, xz=xz, yz=yz)
                     else:
-                        box = iprpy.Box(xlo=xlo, xhi=xhi, ylo=ylo, yhi=yhi, zlo=zlo, zhi=zhi)
+                        box = am.Box(xlo=xlo, xhi=xhi, ylo=ylo, yhi=yhi, zlo=zlo, zhi=zhi)
                     if natoms is not None:
-                        system = iprpy.System(natoms=natoms, box=box, pbc=pbc)  
+                        system = am.System(natoms=natoms, box=box, pbc=pbc)  
                     bcount += 1
                 
                 #read atomic values if time to do so
@@ -217,16 +217,6 @@ def read_dump(fname):
                                         maxj = long(maxj+1)
                                         prop_shapes[terms_info[i][0]] = (maxi, maxj)
 
-                            
-                                        
-                            
-                            
-                            
-                                            
-                                        
-                                        
-                                
-                            
                             readtime = True  
         
     return system    

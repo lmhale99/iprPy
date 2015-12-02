@@ -1,4 +1,4 @@
-from DataModel import *
+from DataModel import DataModel
 import numpy as np
 from collections import OrderedDict
 from copy import deepcopy

@@ -1,7 +1,7 @@
-from iprpy.models import DataModel
+from atomman.tools import DataModel
 from copy import deepcopy
 from collections import OrderedDict
-from iprpy.elemental_values import el_tag, get_mass
+from atomman.tools.elemental_values import el_tag, get_mass
 import os
 
 class Potential(DataModel):

@@ -1,8 +1,8 @@
-import iprpy
+import atomman as am
 import numpy as np
 from style_params import atom_style_params, velocity_style_params
 
-#Reads a LAMMPS style data input file and returns a iprpy.System. 
+#Reads a LAMMPS style data input file and returns an atomman.System. 
 #Periodic boundary information needs to be supplied as it is not given in the data file. 
 def read_data(fname, pbc=(True, True, True), atom_style='atomic'):
     with open(fname, 'r') as fin:
@@ -72,17 +72,17 @@ def read_data(fname, pbc=(True, True, True), atom_style='atomic'):
                 elif len(terms) == 1:
                     if terms[0] == 'Atoms':
                         if sys is None:
-                            sys = iprpy.System(box = iprpy.Box(xlo=xlo, xhi=xhi, ylo=ylo, yhi=yhi, zlo=zlo, zhi=zhi, xy=xy, xz=xz, yz=yz),
-                                               atoms = [iprpy.Atom(1, np.zeros(3)) for i in xrange(natoms)],
-                                               pbc = pbc)    
+                            sys = am.System(box = am.Box(xlo=xlo, xhi=xhi, ylo=ylo, yhi=yhi, zlo=zlo, zhi=zhi, xy=xy, xz=xz, yz=yz),
+                                            atoms = [am.Atom(1, np.zeros(3)) for i in xrange(natoms)],
+                                            pbc = pbc)    
                         prop_names = atom_style_params(atom_style)
                         readtime = True
                         
                     elif terms[0] == 'Velocities':
                         if sys is None:
-                            sys = iprpy.System(box = iprpy.Box(xlo=xlo, xhi=xhi, ylo=ylo, yhi=yhi, zlo=zlo, zhi=zhi, xy=xy, xz=xz, yz=yz),
-                                               atoms = [iprpy.Atom(1, np.zeros(3)) for i in xrange(natoms)],
-                                               pbc = pbc)    
+                            sys = am.System(box = am.Box(xlo=xlo, xhi=xhi, ylo=ylo, yhi=yhi, zlo=zlo, zhi=zhi, xy=xy, xz=xz, yz=yz),
+                                            atoms = [am.Atom(1, np.zeros(3)) for i in xrange(natoms)],
+                                            pbc = pbc)    
                         prop_names = velocity_style_params(atom_style)
                         readtime = True        
     return sys        

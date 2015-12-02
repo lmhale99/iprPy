@@ -1,6 +1,7 @@
-from DataModel import *
+from DataModel import DataModel
 import numpy as np
 from copy import deepcopy
+from collections import OrderedDict
 
 class DislocationMonopole(DataModel):
     def load(self, file_name):

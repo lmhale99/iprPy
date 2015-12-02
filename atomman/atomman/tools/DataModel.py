@@ -1,4 +1,85 @@
 from collections import OrderedDict
+import json
+from copy import deepcopy
+
+class DataModel:
+    def __init__(self, file_name = None):
+        if file_name != None:
+            self.load(file_name)
+        else:
+            self.__data = OrderedDict()
+    
+    def load(self, file_name):
+        if file_name[-5:] == '.json':
+            with open(file_name,'r') as f:
+                self.__data = json.load(f, object_pairs_hook = OrderedDict) 
+                
+        elif file_name[-4:] == '.xml':
+            with open(file_name, 'r') as f:
+                self.__data = xml_2_dict(f.read())
+        
+        else:
+            raise ValueError('Unsupported file type for DataModel load')
+    
+    def dump(self, file_name):
+        if file_name[-5:] == '.json':
+            with open(file_name,'w') as f:
+                f.write(json.dumps( self.__data, indent = 4, separators = (',',': ') ))
+        
+        elif file_name[-4:] == '.xml':
+            with open(file_name,'w') as f:
+                f.write(dict_2_xml(self.__data))
+        
+        else:
+            raise ValueError('Unsupported file type for DataModel dump')
+    
+    def get(self, safe = True):
+        if safe:
+            return deepcopy(self.__data)
+        else:
+            return self.__data
+            
+
+def dict_2_xml(lib,spaces='',out=''):
+    #evaluate each key, value pair for the dictionary
+    for k,v in lib.iteritems():
+        
+        #if the value is another dictionary, add spaces and run recursively
+        if isinstance(v, dict):
+            out += '%s<%s>\n'%(spaces,k)
+            out = dict_2_xml(v,spaces=spaces+'    ',out=out)
+            out += '%s</%s>\n'%(spaces,k)
+        
+        #if the value is a list
+        elif isinstance(v, list):
+            
+            #if all terms are numbers, then print with space delimiters
+            if all(isinstance(i, (int,float)) for i in v):                    
+                out += '%s<%s>%s</%s>\n'%(spaces,k,' '.join(map(str,v)).lower(),k)
+            #if not all numers, each term is added with the same key
+            else:
+                #investigate each term in list
+                for value in v:
+                    #if term is a dictionary, add spaces and run recursively
+                    if isinstance(value, dict):
+                        out += '%s<%s>\n'%(spaces,k)
+                        out = dict_2_xml(value,spaces=spaces+'    ',out=out)
+                        out += '%s</%s>\n'%(spaces,k)
+                    #if not a dictionary, add as a string
+                    elif isinstance(value, (str, unicode)):
+                        out += '%s<%s>%s</%s>\n'%(spaces,k,value,k)
+        
+        #if the value is a string
+        elif isinstance(v, (str, unicode)):
+            out += '%s<%s>%s</%s>\n'%(spaces,k,v,k)
+        #if the value is None, add empty element
+        elif v is None:
+            out += '%s<%s></%s>\n'%(spaces,k,k)
+        #for everything else, convert to a string
+        else:
+            out += '%s<%s>%s</%s>\n'%(spaces,k,str(v).lower(),k)
+    return out
+    
 def xml_2_dict(text,i=0):
     text = unicode(text)
     while i < len(text):
@@ -123,34 +204,4 @@ def numconvert(terms):
     
     return ' '.join(terms)
     
-    
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-            
+ 

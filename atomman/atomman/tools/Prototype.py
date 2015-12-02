@@ -1,8 +1,8 @@
-import iprpy
-from DataModel import *
+import atomman as am
+from DataModel import DataModel
 import numpy as np
 from copy import deepcopy
-from iprpy.tools import mag
+from mag import mag
 
 class Prototype(DataModel):
     #Class for handling the crystalPrototype xml/json data model
@@ -59,7 +59,7 @@ class Prototype(DataModel):
                 site['atomCoordinates'] = [site['atomCoordinates']]
             for coords in site['atomCoordinates']:
                 pos = coords['value']
-                self.__atoms.append(iprpy.Atom(atype, pos))
+                self.__atoms.append(am.Atom(atype, pos))
     
     def ucell(self, a=None, b=None, c=None, alpha=None, beta=None, gamma=None):
     #Generate a unit cell based on the ideal or supplied lattice parameters
@@ -170,9 +170,9 @@ class Prototype(DataModel):
             if gamma is None:
                 gamma = self.__ideal_params['gamma']
         
-        return iprpy.System(box = iprpy.Box(a=a, b=b, c=c, alpha=alpha, beta=beta, gamma=gamma), 
-                            atoms = self.__atoms, 
-                            scale = True)
+        return am.System(box = am.Box(a=a, b=b, c=c, alpha=alpha, beta=beta, gamma=gamma), 
+                         atoms = self.__atoms, 
+                         scale = True)
     
     def r_a(self):
     #Calculate the shortest radial distance between atoms wrt a

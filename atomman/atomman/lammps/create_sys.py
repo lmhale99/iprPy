@@ -25,6 +25,6 @@ def create_sys(lammps_exe, system_info):
 
     system = read_dump('temp.dump')
     os.remove('create_sys.in')
-    #os.remove('log.lammps')
+    os.remove('log.lammps')
     os.remove('temp.dump')
     return system      
