@@ -51,7 +51,7 @@ class Atom:
             shape = self.__prop_shape[p_index]
             dtype = self.__prop_dtype[p_index]
             
-            #Handle scalers
+            #Handle scalars
             if len(shape) == 0:
                 return np.array(self.__values[start], dtype=dtype)
             
@@ -74,7 +74,7 @@ class Atom:
             
             #Append term, dtype info, and shape info if new property
             if term not in self.prop_list():
-                assert len(arg1.shape) <= 2, 'Terms must be scalers, 1D vectors or 2D arrays'
+                assert len(arg1.shape) <= 2, 'Terms must be scalars, 1D vectors or 2D arrays'
                 self.__prop_names.append(term)
                 self.__prop_dtype.append(arg1.dtype)
                 self.__prop_shape.append(arg1.shape)
@@ -92,8 +92,9 @@ class Atom:
             dtype = self.__prop_dtype[p_index]            
             start = self.__allsum(self.__prop_shape[:p_index])
             
-            #Handle scalers
+            #Handle scalars
             if len(shape) == 0 and arg2 is None:
+                assert len(arg1.shape) == 0, 'Value must be a scalar'
                 if dtype == 'int32':
                     assert arg1.dtype == 'int32',   term + ' must be an integer'
                 self.__values[start] = arg1
@@ -136,6 +137,8 @@ class Atom:
                             self.__values[start + i * shape[0] + j] = arg1[i,j]
                 else:
                     raise TypeError('Invalid arguments')
+            else:
+                raise TypeError('Invalid arguments')
             
     def __allsum(self, listy):
         summy = 0
@@ -156,9 +159,6 @@ class Atom:
     
     def pos(self, arg1=None):
         #Get or set the atom's position
-        #if isinstance(arg1, np.int) and arg1 >=0 and arg1 < 3:
-        #    return self.prop('pos')[arg1]
-        #else:
         output = self.prop('pos', arg1)
         if output is not None:
             return output
