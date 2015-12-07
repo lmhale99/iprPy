@@ -92,7 +92,7 @@ def write_dump(fname, system, xf='%.13e', scale=False):
             
             #Scaler
             if len(shape) == 0:
-                if dtype == 'int32':
+                if dtype == int:
                     f.write(' %i' % value)
                 else:
                     f.write(' ' + xf % value)
@@ -102,7 +102,7 @@ def write_dump(fname, system, xf='%.13e', scale=False):
                 if prop == 'pos' and scale:
                     value = system.scale(value)
                 for j in xrange(shape[0]):
-                    if dtype == 'int32':
+                    if dtype == int:
                         f.write(' %i' % value[j])
                     else:
                         f.write(' ' + xf % value[j])
@@ -111,7 +111,7 @@ def write_dump(fname, system, xf='%.13e', scale=False):
             elif len(shape) == 2:
                 for j in xrange(shape[0]):
                     for k in xrange(shape[0]):
-                        if dtype == 'int32':
+                        if dtype == int:
                             f.write(' %i' % value[j][k])
                         else:
                             f.write(' ' + xf % value[j][k])

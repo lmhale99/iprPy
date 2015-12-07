@@ -8,7 +8,7 @@ class Atom:
         assert isinstance(init_size, int) and init_size >= 4, 'Invalid init_size term'
         self.__values = np.empty(init_size)
         self.__prop_names = ['atype', 'pos']
-        self.__prop_dtype = ['int32', 'float64']
+        self.__prop_dtype = [int,     float]
         self.__prop_shape = [(),      (3L,)]
 
         self.atype(atype)
@@ -95,21 +95,21 @@ class Atom:
             #Handle scalars
             if len(shape) == 0 and arg2 is None:
                 assert len(arg1.shape) == 0, 'Value must be a scalar'
-                if dtype == 'int32':
-                    assert arg1.dtype == 'int32',   term + ' must be an integer'
+                if dtype == int:
+                    assert arg1.dtype == int,   term + ' must be an integer'
                 self.__values[start] = arg1
             
             #Handle vectors
             elif len(shape) == 1 and arg2 is None:
                 #if arg1 is an integer return the index value
-                if len(arg1.shape) == 0 and arg1.dtype == 'int32':
+                if len(arg1.shape) == 0 and arg1.dtype == int:
                     assert arg1 >= 0 and arg1 < shape[0], 'Vector index out of range'
                     return np.array(self.__values[start + arg1], dtype=dtype)
                 
                 #if shapes match set values
                 elif shape == arg1.shape:
-                    if dtype == 'int32':
-                        assert arg1.dtype == 'int32',   term + ' must be integers'
+                    if dtype == int:
+                        assert arg1.dtype == int,   term + ' must be integers'
                     for i in xrange(shape[0]):
                         self.__values[start + i] = arg1[i]
                 else:
@@ -117,7 +117,7 @@ class Atom:
                     
             #Handle 2D arrays
             elif len(shape) == 2:
-                if len(arg1.shape) == 0 and arg1.dtype == 'int32':
+                if len(arg1.shape) == 0 and arg1.dtype == int:
                     assert arg1 >= 0 and arg1 < shape[0], 'Array index out of range'
                     if arg2 is None:
                         start = start + arg1 * shape[0]
@@ -130,8 +130,8 @@ class Atom:
                         raise TypeError('Invalid arguments')
                            
                 elif shape == arg1.shape and arg2 is None:   
-                    if dtype == 'int32':
-                        assert arg1.dtype == 'int32',   term + ' must be integers'
+                    if dtype == int:
+                        assert arg1.dtype == int,   term + ' must be integers'
                     for i in xrange(shape[0]):
                         for j in xrange(shape[1]):
                             self.__values[start + i * shape[0] + j] = arg1[i,j]

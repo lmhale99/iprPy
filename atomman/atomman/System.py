@@ -19,7 +19,7 @@ class System:
         self.__pbc = tuple(pbc)
         
         self.__atoms_prop_names = ['atype', 'pos']
-        self.__atoms_prop_dtype = ['int32', 'float64']
+        self.__atoms_prop_dtype = [int,     float]
         self.__atoms_prop_shape = [(),      (3L,)]
         
         if natoms is None:
@@ -107,15 +107,15 @@ class System:
                     
                     #Handle scalers
                     if len(shape) == 0 and arg4 is None:
-                        if dtype == 'int32':
-                            assert arg3.dtype == 'int32',   term + ' must be an integer'
+                        if dtype == int:
+			    assert arg3.dtype == int,   str(arg2) + str(arg3) + str(arg3.dtype) + ' must be an integer'
                         self.__atoms[arg1, start] = arg3
                     
                     #Handle vectors
                     elif len(shape) == 1 and arg4 is None:
                         assert isinstance(scale, bool),             'scale must be True/False'
                         #if arg3 is an integer return the index value
-                        if len(arg3.shape) == 0 and arg3.dtype == 'int32':
+                        if len(arg3.shape) == 0 and arg3.dtype == int:
                             assert arg3 >= 0 and arg3 < shape[0], 'Vector index out of range'
                             if arg2 == 'pos' and scale:
                                 return self.atoms(arg1, 'pos', scale=scale)[arg3]
@@ -124,8 +124,8 @@ class System:
                             
                         #if shapes match set values
                         elif shape == arg3.shape and arg4 is None:
-                            if dtype == 'int32':
-                                assert arg3.dtype == 'int32',   term + ' must be integers'
+                            if dtype == int:
+                                assert arg3.dtype == int,   arg2 + ' must be integers'
                             if arg2 == 'pos' and scale:
                                 arg3 = self.unscale(arg3)
                             for i in xrange(shape[0]):
@@ -136,7 +136,7 @@ class System:
                     #Handle 2D arrays
                     elif len(shape) == 2:
                         #if arg3 is an integer return the index value
-                        if len(arg3.shape) == 0 and arg3.dtype == 'int32':
+                        if len(arg3.shape) == 0 and arg3.dtype == int:
                             assert arg3 >= 0 and arg3 < shape[0], 'Array index out of range'
                             if arg4 is None:
                                 start = start + arg3 * shape[0]
@@ -147,8 +147,8 @@ class System:
                                 return np.array(self.__atoms[arg1, start + arg3 * shape[0] + arg4], dtype=dtype)
                         #If shapes match set values           
                         elif shape == arg3.shape and arg4 is None:
-                            if dtype == 'int32':
-                                assert arg3.dtype == 'int32',   term + ' must be integers'   
+                            if dtype == int:
+                                assert arg3.dtype == int,   arg2 + ' must be integers'   
                             for i in xrange(shape[0]):
                                 for j in xrange(shape[1]):
                                     self.__atoms[arg1, start + i * shape[0] + j] = arg3[i,j]

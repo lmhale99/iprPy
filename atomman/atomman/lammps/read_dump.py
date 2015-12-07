@@ -67,9 +67,9 @@ def read_dump(fname):
                             #If scaler
                             if len(terms_info[i]) == 1:
                                 try:
-                                    prop_dict[prop] = np.array(terms[i], dtype='int32')
+                                    prop_dict[prop] = np.array(terms[i], dtype=int)
                                 except:
-                                    prop_dict[prop] = np.array(terms[i], dtype='float64')
+                                    prop_dict[prop] = np.array(terms[i], dtype=float)
                             
                             #If vector
                             elif len(terms_info[i]) == 2:
@@ -79,9 +79,9 @@ def read_dump(fname):
                                 except:
                                     try:
                                         test = int(terms[i])
-                                        prop_dict[prop] = np.zeros(prop_shapes[prop], dtype='int32')
+                                        prop_dict[prop] = np.zeros(prop_shapes[prop], dtype=int)
                                     except:
-                                        prop_dict[prop] = np.zeros(prop_shapes[prop], dtype='float64')
+                                        prop_dict[prop] = np.zeros(prop_shapes[prop], dtype=float)
                                     prop_dict[prop][i_index] = terms[i]
                             
                             #If array        
@@ -93,9 +93,9 @@ def read_dump(fname):
                                 except:
                                     try:
                                         test = int(terms[i])
-                                        prop_dict[prop] = np.zeros(prop_shapes[prop], dtype='int32')
+                                        prop_dict[prop] = np.zeros(prop_shapes[prop], dtype=int)
                                     except:
-                                        prop_dict[prop] = np.zeros(prop_shapes[prop], dtype='float64')
+                                        prop_dict[prop] = np.zeros(prop_shapes[prop], dtype=float)
                                     prop_dict[prop][i_index][j_index] = terms[i]
                                       
                     for prop_name, prop_value in prop_dict.iteritems():
@@ -136,9 +136,9 @@ def read_dump(fname):
                                         start2 = terms_info[i][end+1:].index('[')
                                         end2 = terms_info[i][end+1:].index(']')
                                         j_index = int(terms_info[i][end+1:][start2+1:end2])
-                                        terms_info[i] = (pname, i_index-1, j_index-1)
+                                        terms_info[i] = (pname, i_index, j_index)
                                     except:
-                                        terms_info[i] = (pname, i_index-1)
+                                        terms_info[i] = (pname, i_index)
                                 except:
                                     terms_info[i] = (terms_info[i],)
 
@@ -150,7 +150,7 @@ def read_dump(fname):
                                 elif terms_info[i][0] == 'type':
                                     assert len(terms_info[i]) == 1
                                     terms_info[i] = ('atype',)
-                                    prop_dict['atype'] = np.zeros((), dtype=np.int)
+                                    prop_dict['atype'] = np.zeros((), dtype=int)
 
                                 elif terms_info[i][0] in ['x', 'xu', 'xs', 'xsu']:
                                     assert len(terms_info[i]) == 1
@@ -181,10 +181,10 @@ def read_dump(fname):
                                     
                             if pos_list == ['x', 'y', 'z'] or pos_list == ['xu', 'yu', 'zu']:
                                 scale = False
-                                prop_dict['pos'] = np.zeros((3L,), dtype=np.float)
+                                prop_dict['pos'] = np.zeros((3L,), dtype=float)
                             elif pos_list == ['xs', 'ys', 'zs'] or pos_list == ['xsu', 'ysu', 'zsu']:
                                 scale = True
-                                prop_dict['pos'] = np.zeros((3L,), dtype=np.float) 
+                                prop_dict['pos'] = np.zeros((3L,), dtype=float) 
                             else:
                                 raise ValueError('Missing or mixed coordinates not allowed')
 
@@ -216,7 +216,6 @@ def read_dump(fname):
                                         maxi = long(maxi+1)
                                         maxj = long(maxj+1)
                                         prop_shapes[terms_info[i][0]] = (maxi, maxj)
-
                             readtime = True  
         
     return system    
