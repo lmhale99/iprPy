@@ -74,7 +74,7 @@ def write_data(fname, system, units='metal', atom_style='atomic'):
             boundary += 'm '    
     
     newline = '\n'
-    script = newline.join(['#Script prepared by NIST iprPy code',
+    script = newline.join(['#Script and data file prepared by AtomMan package',
                            '',
                            'units ' + units,
                            'atom_style ' + atom_style,

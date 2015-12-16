@@ -215,7 +215,7 @@ class Potential(DataModel):
         for term in terms:
             for ttype, tval in term.iteritems():
                 if ttype == 'option': 
-                    line += ' ' + tval
+                    line += ' ' + str(tval)
                     
                 elif ttype == 'file':
                     line += ' ' + str( os.path.join(self.__pot_dir, tval) )

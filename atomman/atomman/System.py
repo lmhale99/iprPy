@@ -164,7 +164,7 @@ class System:
     def box(self, arg1=None):
         #Get properties of the system's box
         if arg1 is None:
-            return self.__box
+            return deepcopy(self.__box)
         else:
             return self.__box.get(arg1)
     
@@ -189,7 +189,7 @@ class System:
         #Get or set periodic boundary conditions
         if arg1 is None:
             assert arg2 is None,   'Terms should be set in order'
-            return self.__pbc
+            return deepcopy(self.__pbc)
         elif isinstance(arg1, (list, tuple, np.ndarray)) and len(arg1) == 3:
             assert isinstance(arg1[0], bool) and isinstance(arg1[1], bool) and isinstance(arg1[2], bool), 'pbcs must be True/False'
             assert arg2 is None and arg3 is None,   'Invalid pbc arguments'
