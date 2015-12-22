@@ -145,9 +145,6 @@ class Cif:
                 i += 1
         keys = alldict.keys()
         self.alldict = alldict[keys[0]]
-        
-        #for k, v in self.alldict.iteritems():
-        #    print k, v
     
     def __calc(self, symm, site):
         pos = np.empty(3)
@@ -216,11 +213,10 @@ class Cif:
             
             #Save value and put inside box
             pos[i] = terms[0]          
-            if pos[i] >= 1:
+            while pos[i] >= 1:
                 pos[i] -= 1.0
-            elif pos[i] < 0:
-                pos[i] += 1.0
-                
+            while pos[i] < 0:
+                pos[i] += 1.0  
         return pos
     
     def __tofloat(self, value):
@@ -298,43 +294,39 @@ class Cif:
                 coord = self.__calc(symm, site_fract)
                 unique = True
                 for c in coords:
-                    if np.allclose(c, coord):
+                    if np.allclose(c, coord, rtol = 0.000001):
                         unique = False
                         break
                 if unique:
                     coords.append(coord)
-            
             for coord in coords:
                 cell.append(atomman.Atom(site, coord))
-        
+
         system = atomman.System(box=box, atoms=cell, scale=True)
         
         return system
         
-    def __createatomlist(self, coords):
-        sind=0
-        numsites=len(coords)
-        atomlist=[]
-        atypes=[]
-        mats=[]
-        charges=[]
-        while sind<(numsites):
-            atomname='atom'+str(sind+1)
-            atomlist.append(atomname)
-            atypes.append(sind+1)
-            sind+=1
-        mats_raw = list(self.__gen_ex('_atom_site_type_symbol',self.alldict))
-        if mats_raw == []:
-            mats_raw=list(self.__gen_ex('_atom_site_label',self.alldict))
-        if isinstance(mats_raw[0], list): mats_raw=mats_raw[0]
-        for symbol in mats_raw:
-            s=''
-            for char in symbol:
-                if char.isalpha():
-                    s+=char
-            mats.append(s)
-        charges.append(''.join([s for s in symbol if not s.isalpha()]))
-        return atomlist, atypes, mats, charges    
+    def element_list(self):
+        try:
+            try:
+                elements = self.alldict['_atom_site_type_symbol']
+            except:
+                elements = self.alldict['_atom_site_label']
+        except:
+            print 'No atom site symbols or labels!'
+            return None
+        
+        for i in xrange(len(elements)):
+            for j in xrange(len(elements[i])):
+                if elements[i][j].isdigit():
+                    elements[i] = elements[i][:j]
+                    break
+            if len(elements[i]) == 0:
+                print 'Bad atom site symbol or label!'
+                return None
+        return elements
+            
+            
     
         
 
