@@ -1,5 +1,3 @@
-import numpy as np
-
 #Returns the magnitude of a vector
 def mag(vector):
     magval = 0.0

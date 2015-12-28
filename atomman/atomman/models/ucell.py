@@ -8,6 +8,12 @@ except:
     has_pmg = False
     
 def ucell(object, a=None, b=None, c=None, alpha=None, beta=None, gamma=None):
+    if isinstance(object, (str, unicode)):
+        if object[-4:] == '.cif':
+            object = am.models.Cif(object)
+        elif object[-4:] == '.xml' or object[-5:] == '.json':
+            object = am.models.DataModel(object)
+    
     
     if isinstance(object, am.models.DataModel):
         return ucell_dm(object, a, b, c, alpha, beta, gamma)      

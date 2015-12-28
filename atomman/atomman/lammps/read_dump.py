@@ -1,4 +1,4 @@
-import atomman as am
+from atomman import Atom, Box, System
 import numpy as np
 from collections import OrderedDict
 
@@ -22,7 +22,7 @@ def read_dump(fname):
                 if readnatoms:                
                     natoms = int(terms[0])
                     if box is not None:
-                        system = am.System(natoms=natoms, box=box, pbc=pbc)
+                        system = System(natoms=natoms, box=box, pbc=pbc)
                     readnatoms = False
                 
                 #read x boundary condition values if time to do so
@@ -51,11 +51,11 @@ def read_dump(fname):
                         xhi = xhi - max((0.0, xy, xz, xy + xz))
                         ylo = ylo - min((0.0, yz))
                         yhi = yhi - max((0.0, yz))
-                        box = am.Box(xlo=xlo, xhi=xhi, ylo=ylo, yhi=yhi, zlo=zlo, zhi=zhi, xy=xy, xz=xz, yz=yz)
+                        box = Box(xlo=xlo, xhi=xhi, ylo=ylo, yhi=yhi, zlo=zlo, zhi=zhi, xy=xy, xz=xz, yz=yz)
                     else:
-                        box = am.Box(xlo=xlo, xhi=xhi, ylo=ylo, yhi=yhi, zlo=zlo, zhi=zhi)
+                        box = Box(xlo=xlo, xhi=xhi, ylo=ylo, yhi=yhi, zlo=zlo, zhi=zhi)
                     if natoms is not None:
-                        system = am.System(natoms=natoms, box=box, pbc=pbc)  
+                        system = System(natoms=natoms, box=box, pbc=pbc)  
                     bcount += 1
                 
                 #read atomic values if time to do so

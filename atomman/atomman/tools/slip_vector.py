@@ -1,5 +1,5 @@
 import atomman as am
-from mag import mag
+from atomman.tools import mag
 import numpy as np
 
 def slip_vector(sys0, sys1, variable_name='slip'):

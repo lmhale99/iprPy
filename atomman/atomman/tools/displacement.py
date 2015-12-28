@@ -1,6 +1,5 @@
 import atomman as am
-from mag import mag
-import numpy as np
+from atomman.tools import mag
 
 def displacement(sys0, sys1, variable_name='disp'):
     #Computes the slip vector for all atoms in sys1 relative to sys0    

@@ -10,6 +10,9 @@ class DataModel():
         else:
             self.data = OrderedDict()
     
+    def __str__(self):
+        return json.dumps( self.data, indent = 4, separators = (',',': ') )
+    
     def load(self, file_name):
         if file_name[-5:] == '.json':
             with open(file_name,'r') as f:

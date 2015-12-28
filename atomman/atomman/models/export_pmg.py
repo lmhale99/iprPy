@@ -1,4 +1,3 @@
-import atomman as am
 try:
     import pymatgen as pmg
     has_pmg = True

@@ -1,9 +1,6 @@
 import os
-import subprocess
-
 import numpy as np
-
-from read_dump import read_dump
+from atomman.lammps import read_dump, run
 
 #Uses LAMMPS to create a iprpy.System from the supplied system parameters    
 def create_sys(lammps_exe, system_info):
@@ -21,7 +18,7 @@ def create_sys(lammps_exe, system_info):
     f = open('create_sys.in', 'w')
     f.write(script)
     f.close()
-    output = subprocess.check_output(lammps_exe + ' -in create_sys.in', shell=True)
+    output = run(lammps_exe, 'create_sys.in')
 
     system = read_dump('temp.dump')
     os.remove('create_sys.in')

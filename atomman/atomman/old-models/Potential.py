@@ -1,11 +1,11 @@
-import atomman as am
+from atomman.tools import DataModel
 from copy import deepcopy
 from collections import OrderedDict
 from atomman.tools.elemental_values import el_tag, get_mass
 import os
 
-class Potential():
-    def __init__(self, object = None, pot_dir = None):
+class Potential(DataModel):
+    def __init__(self, file_name = None, pot_dir = None):
         self.__tag = None
         self.__units = None
         self.__atom_style = None
@@ -16,39 +16,26 @@ class Potential():
         self.__atom_data = OrderedDict()
         self.__pair_style = OrderedDict()
         self.__pair_coeff = OrderedDict()
-
+                
+        DataModel.__init__(self, file_name = file_name)
         
-        if isinstance(object, (str, unicode)):
-            object = am.models.DataModel(object)
-        
-        if isinstance(object, am.models.DataModel):
-            self.read(object)
-        elif object is None:
-            pass
-        else:
-            raise TypeError('Invalid argument')
-                        
     def __str__(self):
         return self.__tag
     
-    def read(self, datamodel, pot_dir=None):
-        if pot_dir is not None:
-            self.__pot_dir = pot_dir
-        
-        data = datamodel.find('LAMMPS_potential')
-        assert len(data) == 1, 'Exactly one LAMMPS potential implementation allowed per data model'
-        data = data[0]
+    def load(self, file_name):
+        DataModel.load(self, file_name)
+        data = DataModel.get(self)
         
         #Set basic properties
-        self.__tag =        data['identifier']['description']
-        self.__units =      data['units']
-        self.__atom_style = data['atom_style']
+        self.__tag =        data['interatomicPotentialImplementationLAMMPS']['potentialID']['descriptionIdentifier']
+        self.__units =      data['interatomicPotentialImplementationLAMMPS']['units']
+        self.__atom_style = data['interatomicPotentialImplementationLAMMPS']['atom_style']
         
         #Set atomic properties
-        if isinstance(data['atom'], list) is False:
-            data['atom'] = [data['atom']]
+        if isinstance(data['interatomicPotentialImplementationLAMMPS']['atom'], list) is False:
+            data['interatomicPotentialImplementationLAMMPS']['atom'] = [data['interatomicPotentialImplementationLAMMPS']['atom']]
         
-        for atom in data['atom']:
+        for atom in data['interatomicPotentialImplementationLAMMPS']['atom']:
             #Check if element is listed
             try:
                 test = atom['element']
@@ -78,7 +65,7 @@ class Potential():
             self.__atom_data[ atom['symbol'] ] = atom
         
         #Read pair_style information
-        self.__pair_style = data['pair_style']
+        self.__pair_style = data['interatomicPotentialImplementationLAMMPS']['pair_style']
         try:
             test = self.__pair_style['type']
         except:
@@ -92,7 +79,7 @@ class Potential():
             self.__pair_style['term'] = []
         
         #Read pair_coeff information
-        self.__pair_coeff = data['pair_coeff']
+        self.__pair_coeff = data['interatomicPotentialImplementationLAMMPS']['pair_coeff']
         if isinstance(self.__pair_coeff, list) is False:
             self.__pair_coeff = [self.__pair_coeff]       
         for coeff_line in self.__pair_coeff:

@@ -2,7 +2,7 @@ from collections import OrderedDict
 import numpy as np
 import os
 import sys
-import atomman
+from atomman import Atom, Box, System
 
 class Cif:
     def __init__(self, filename=None):
@@ -237,7 +237,7 @@ class Cif:
             alpha = self.__tofloat(self.alldict['_cell_angle_alpha'] )
             beta =  self.__tofloat(self.alldict['_cell_angle_beta']  )
             gamma = self.__tofloat(self.alldict['_cell_angle_gamma'] )
-            box = atomman.Box(a=a, b=b, c=c, alpha=alpha, beta=beta, gamma=gamma)
+            box = Box(a=a, b=b, c=c, alpha=alpha, beta=beta, gamma=gamma)
         except:
             print 'Bad cell parameters'
             return None
@@ -300,9 +300,9 @@ class Cif:
                 if unique:
                     coords.append(coord)
             for coord in coords:
-                cell.append(atomman.Atom(site, coord))
+                cell.append(Atom(site, coord))
 
-        system = atomman.System(box=box, atoms=cell, scale=True)
+        system = System(box=box, atoms=cell, scale=True)
         
         return system
         

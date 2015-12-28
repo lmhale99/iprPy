@@ -1,6 +1,5 @@
-import atomman as am
 import numpy as np
-from mag import mag
+from atomman.tools import mag
 from scipy.interpolate import griddata
 
 import matplotlib
@@ -9,22 +8,6 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.collections import PatchCollection
           
-def print_cij(o_cij):
-    cij = np.empty((6,6))
-    for i in xrange(6):
-        for j in xrange(6):
-            if np.isclose(o_cij[i,j], 0.0, rtol=0, atol=0.01):
-                cij[i,j] = 0.0
-            else:
-                cij[i,j] = o_cij[i,j]
-    
-    print '[[%7.2f, %7.2f, %7.2f, %7.2f, %7.2f, %7.2f],' % (cij[0,0], cij[0,1], cij[0,2], cij[0,3], cij[0,4], cij[0,5])
-    print ' [%7.2f, %7.2f, %7.2f, %7.2f, %7.2f, %7.2f],' % (cij[1,0], cij[1,1], cij[1,2], cij[1,3], cij[1,4], cij[1,5])
-    print ' [%7.2f, %7.2f, %7.2f, %7.2f, %7.2f, %7.2f],' % (cij[2,0], cij[2,1], cij[2,2], cij[2,3], cij[2,4], cij[2,5])
-    print ' [%7.2f, %7.2f, %7.2f, %7.2f, %7.2f, %7.2f],' % (cij[3,0], cij[3,1], cij[3,2], cij[3,3], cij[3,4], cij[3,5])
-    print ' [%7.2f, %7.2f, %7.2f, %7.2f, %7.2f, %7.2f],' % (cij[4,0], cij[4,1], cij[4,2], cij[4,3], cij[4,4], cij[4,5])
-    print ' [%7.2f, %7.2f, %7.2f, %7.2f, %7.2f, %7.2f]]' % (cij[5,0], cij[5,1], cij[5,2], cij[5,3], cij[5,4], cij[5,5])
- 
 def grid_interpolate_2d(x, y, v, bins=50, range=None):
     #Handle range and bins options
     if range is None:

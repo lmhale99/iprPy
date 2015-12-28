@@ -6,11 +6,10 @@ from atomman.tools import mag
 def sys_gen(units = 'metal',
             atom_style = 'atomic',
             pbc = (True, True, True),
-            ucell_box = am.Box(),
-            ucell_atoms = [am.Atom(1, np.array([0.0, 0.0, 0.0])),
-                           am.Atom(1, np.array([0.5, 0.5, 0.0])),
-                           am.Atom(1, np.array([0.0, 0.5, 0.5])),
-                           am.Atom(1, np.array([0.5, 0.0, 0.5]))],
+            ucell = am.System(atoms = [am.Atom(1, np.array([0.0, 0.0, 0.0])),
+                                       am.Atom(1, np.array([0.5, 0.5, 0.0])),
+                                       am.Atom(1, np.array([0.0, 0.5, 0.5])),
+                                       am.Atom(1, np.array([0.5, 0.0, 0.5]))]),                              
             axes = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]]),
             shift = np.array([0.1, 0.1, 0.1]),
             size = np.array([[-3,3], [-3,3], [-3,3]], dtype=np.int)):
@@ -22,19 +21,18 @@ def sys_gen(units = 'metal',
         else:
             boundary += 'm '
     
-    ntypes = 0
+    ntypes = ucell.natypes()
     pos_basis = ''
     type_basis = ''
-    for i in xrange(len(ucell_atoms)):
-        pos_basis += '        basis %f %f %f' %(ucell_atoms[i].pos(0), ucell_atoms[i].pos(1), ucell_atoms[i].pos(2))
-        if i < len(ucell_atoms) - 1:
+    for i in xrange(ucell.natoms()):
+        pos = ucell.atoms(i, 'pos', scale = True)
+        pos_basis += '        basis %f %f %f' %(pos[0], pos[1], pos[2])
+        if i < ucell.natoms() - 1:
             pos_basis += ' &\n'
-        if ucell_atoms[i].atype() > ntypes:
-            ntypes = ucell_atoms[i].atype()
-        if ucell_atoms[i].atype() > 1:
-            type_basis += ' &\n             basis %i %i'%(i+1, ucell_atoms[i].atype())
+        if ucell.atoms(i, 'atype') > 1:
+            type_basis += ' &\n             basis %i %i'%(i+1,  ucell.atoms(i, 'atype'))
     
-    vects = (ucell_box.get('avect'), ucell_box.get('bvect'), ucell_box.get('cvect'))
+    vects = (ucell.box('avect'), ucell.box('bvect'), ucell.box('cvect'))
     
     #Test if box is cubic
     if vects[1][0] == 0.0 and vects[2][0] == 0.0 and vects[2][1] == 0.0:

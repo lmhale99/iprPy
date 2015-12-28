@@ -3,7 +3,7 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.collections import PatchCollection
-from mag import mag
+from atomman.tools import mag
 
 def dd(base, data, prange, burgers, scale=[1], save=False, show=True):
     #initialize fig and define image size

@@ -1,6 +1,5 @@
 import numpy as np
-from mag import mag
-from axes_check import axes_check
+from atomman.tools import mag, axes_check
 
 def nye(system, p, tmax = 27):
     axes = system.prop('axes')
