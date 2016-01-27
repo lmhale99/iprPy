@@ -1,13 +1,6 @@
 #compiled python modules
 *.pyc
 
-#Setuptools distribution folder for atomman
-atomman/dist/
-
-#Python egg metadata for atomman
-atomman/*.egg-info/
-atomman/*.egg
-
 #Notebook checkpoints and data
 Notebooks/.ipynb_checkpoints/
 Notebooks/tool-a-Cij-quick/
