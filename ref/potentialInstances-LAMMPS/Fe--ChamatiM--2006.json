@@ -1,0 +1,26 @@
+{
+    "interatomicPotentialImplementationLAMMPS": {
+        "potentialID": {
+            "descriptionIdentifier": "Fe--ChamatiM--2006"
+        },
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": {
+            "element": "Fe",
+            "mass": 55.847
+        },
+        "pair_style": {
+            "type": "eam/alloy"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Fe_cham-mishin.eam.alloy"
+                },
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

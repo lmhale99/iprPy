@@ -2,35 +2,15 @@
 *.pyc
 
 #Notebook checkpoints and data
-Notebooks/.ipynb_checkpoints/
-Notebooks/tool-a-Cij-quick/
-Notebooks/tool-alat-full-relax/
-Notebooks/tool-Cij-vs-P/
-Notebooks/tool-Dislocation/
-Notebooks/tool-E-vs-r0/
-Notebooks/tool-Point-Defect/
-Notebooks/tool-T-vs-Cij/
-Notebooks/tool-Vacancy-Mobility/
+Notebooks/*/
 
 #non-IPR potentials
-IPR/ref/potentialInstances-LAMMPS/Ta--ThompsonAP--2015.json
-IPR/ref/potentials/Ta--ThompsonAP--2015/
-IPR/ref/potentialInstances-LAMMPS/Fe--ChamatiM--2006.json
-IPR/ref/potentials/Fe--ChamatiM--2006/Fe_cham-mishin.eam.alloy
-IPR/ref/potentialInstances-LAMMPS/Fe--ProvilleL--2012.json
-IPR/ref/potentials/Fe--ProvilleL--2012/
-
-#personal results
-IPR/test.in
-IPR/results/json/*
-IPR/results/sim/*
-IPR/results/temp/*
-
-#personal research scripts and results
-research/
-
-#debug tests
-tests/
+ref/potentialInstances-LAMMPS/Ta--ThompsonAP--2015.json
+ref/potentials/Ta--ThompsonAP--2015/
+ref/potentialInstances-LAMMPS/Fe--ChamatiM--2006.json
+ref/potentials/Fe--ChamatiM--2006/Fe_cham-mishin.eam.alloy
+ref/potentialInstances-LAMMPS/Fe--ProvilleL--2012.json
+ref/potentials/Fe--ProvilleL--2012/
 
 #calcs results and temp folders
 calcs/*/*.json
