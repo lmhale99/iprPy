@@ -1,0 +1,27 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "id": "Mo--ZhouXW--2004", 
+            "key": "7447a36d-7f5c-4562-b569-825d3cf66cc1"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Mo", 
+            "mass": 95.94
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Mo.set"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

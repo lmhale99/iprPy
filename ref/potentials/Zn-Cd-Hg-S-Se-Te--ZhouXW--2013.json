@@ -1,0 +1,43 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "id": "Zn-Cd-Hg-S-Se-Te--ZhouXW--2013", 
+            "key": "95fe0b68-f5a1-4bb6-9a11-f446b361d12b"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Zn"
+            }, 
+            {
+                "element": "Cd"
+            }, 
+            {
+                "element": "Hg"
+            }, 
+            {
+                "element": "S"
+            }, 
+            {
+                "element": "Se"
+            }, 
+            {
+                "element": "Te"
+            }
+        ], 
+        "pair_style": {
+            "type": "sw"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "CdTeZnSeHgS0.sw"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

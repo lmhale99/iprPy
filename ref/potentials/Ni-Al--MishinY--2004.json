@@ -1,0 +1,33 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "id": "Ni-Al--MishinY--2004", 
+            "key": "13051c1b-48f7-47f5-bad7-fc627fe10376"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ni", 
+                "mass": 58.71
+            }, 
+            {
+                "element": "Al", 
+                "mass": 26.982
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "NiAl.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

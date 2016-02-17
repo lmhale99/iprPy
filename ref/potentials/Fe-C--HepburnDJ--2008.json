@@ -1,0 +1,33 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "id": "Fe-C--HepburnDJ--2008", 
+            "key": "88820775-7b63-43bb-8c1c-026a5264b351"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Fe", 
+                "mass": 55.845
+            }, 
+            {
+                "element": "C", 
+                "mass": 12.0107
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Fe-C_Hepburn_Ackland.eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

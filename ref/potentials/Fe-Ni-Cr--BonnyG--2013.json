@@ -1,0 +1,37 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "id": "Fe-Ni-Cr--BonnyG--2013", 
+            "key": "e30ac130-16af-4ca8-8685-eacbd145578d"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Fe", 
+                "mass": 55.845
+            }, 
+            {
+                "element": "Ni", 
+                "mass": 58.71
+            }, 
+            {
+                "element": "Cr", 
+                "mass": 51.996
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "FeNiCr_Bonny_2013_ptDef.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

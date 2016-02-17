@@ -1,0 +1,27 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "id": "Co--ZhouXW--2004", 
+            "key": "86bc9f81-1601-4a4f-bcc1-f5d7d96c3e9b"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Co", 
+            "mass": 58.933
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Co.set"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

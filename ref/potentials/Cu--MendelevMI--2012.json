@@ -1,0 +1,27 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "id": "Cu--MendelevMI--2012", 
+            "key": "6e89fdb2-4d7f-4032-a14d-53f7d1c8f2eb"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Cu", 
+            "mass": 63.546
+        }, 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Mendelev_Cu2_2012.eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

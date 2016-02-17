@@ -1,0 +1,27 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "id": "Mo--AcklandGJ--1987", 
+            "key": "ff748ef8-f019-42b2-bdda-b5b5cadd6264"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Mo", 
+            "mass": 95.94
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Mo.AT1.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

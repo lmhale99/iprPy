@@ -1,0 +1,27 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "id": "Cu--MishinY--2001--1", 
+            "key": "5a94a06a-22c7-41e0-8593-ee42d4728018"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Cu", 
+            "mass": 63.546
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Cu01.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,28 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "id": "Pd--AdamsJB--1989", 
+            "key": "d43c300c-e557-42f8-87a0-c26cf82370df"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Pd", 
+            "mass": 106.4
+        }, 
+        "pair_style": {
+            "type": "eam"
+        }, 
+        "pair_coeff": {
+            "interaction": {
+                "element": [
+                    "Pd", 
+                    "Pd"
+                ]
+            }, 
+            "term": {
+                "file": "pdu6.txt"
+            }
+        }
+    }
+}
