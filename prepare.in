@@ -1,7 +1,10 @@
 lammps_exe              C:\users\lmh1\Documents\lmp_serial.exe
 simulation_dir          C:\users\lmh1\Documents\iprPy_run
 
-potential              add C:/Users/lmh1/Documents/iprPy/ref/potentials with Au 
+potential               add C:/Users/lmh1/Documents/iprPy/ref/potentials
 
-prototype              add C:/Users/lmh1/Documents/iprPy_run/prototype
 
+crystal                 add prototypes C:/Users/lmh1/Documents/iprPy/ref/prototypes/                only bcc
+crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A2-W-bcc.json   elements W
+crystal                 add cifs       C:/Users/lmh1/Documents/cif/1/00/01                          only 1000180
+crystal                 add cif        C:/Users/lmh1/Documents/cif/1/00/01/1000181.cif              elements W W W W W W
