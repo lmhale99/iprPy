@@ -1,0 +1,7 @@
+lammps_exe              C:\users\lmh1\Documents\lmp_serial.exe
+simulation_dir          C:\users\lmh1\Documents\iprPy_run
+
+potential              add C:/Users/lmh1/Documents/iprPy/ref/potentials with Au 
+
+prototype              add C:/Users/lmh1/Documents/iprPy_run/prototype
+

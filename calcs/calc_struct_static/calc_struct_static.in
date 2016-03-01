@@ -1,8 +1,0 @@
-number_of_processors    4
-lammps_exe              C:\\users\\lmh1\\Documents\\lmp_serial.exe
-potential_file          C:\\users\\lmh1\Documents\\iprpy\\IPR\\ref\\potentialInstances-LAMMPS\\Al-Mg--MendelevMI--2009.json
-potential_dir           C:\\users\\lmh1\Documents\\iprpy\\IPR\\ref\\potentials\\Al-Mg--MendelevMI--2009
-r_min                   2.0
-r_max                   5.0
-steps                   200
-prototype_dir           C:\\users\\lmh1\Documents\\iprpy\\IPR\\ref\\crystalPrototypes
