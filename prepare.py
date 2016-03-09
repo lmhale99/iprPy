@@ -10,7 +10,7 @@ import atomman.lammps as lmp
 from DataModelDict import DataModelDict
 
 #Internal python libraries
-#from iprpy_test.prepare import *
+import prepare
 
 
 def main(args):
@@ -19,6 +19,12 @@ def main(args):
     potential_directories = []
     crystals = []
     elements = []
+    xml_library_dir = None
+    iprPy_dir = os.getcwd()
+    u_length = 'angstrom'
+    u_press = 'GPa'
+    u_energy = 'eV'
+    u_time = 'ns'
     
     defined_element = {'*': ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'K', 'Ca', 'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr', 'Rb', 'Sr', 'Y', 'Zr', 'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd', 'In', 'Sn', 'Sb', 'Te', 'I', 'Xe', 'Cs', 'Ba', 'Hf', 'Ta', 'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg', 'Tl', 'Pb', 'Bi', 'Po', 'At', 'Rn', 'Fr', 'Ra', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', 'Mt', 'Ds', 'Rg', 'Cn', 'Uut', 'Fl', 'Uup', 'Lv', 'Uus', 'Uuo', 'La', 'Ce', 'Pr', 'Nd', 'Pm', 'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Er', 'Tm', 'Yb', 'Lu', 'Ac', 'Th', 'Pa', 'U', 'Np', 'Pu', 'Am', 'Cm', 'Bk', 'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr']}
 
@@ -26,7 +32,7 @@ def main(args):
         
         #go through input lines in order
         for line in prepare_in:
-            print line
+            #print line
             terms = line.split()
             
             #ignore blank and comment lines
@@ -37,6 +43,12 @@ def main(args):
                 
                 elif terms[0] == 'simulation_dir':
                     set_simulation_dir(terms[1:])
+                    
+                elif terms[0] == 'xml_library_dir':
+                    xml_library_dir = set_xml_library_dir(terms[1:])
+                    
+                elif terms[0] == 'iprPy_dir':
+                    iprPy_dir = set_iprPy_dir(terms[1:])
                 
                 elif terms[0] == 'define_element_list':
                     defined_element = set_define_element_list(terms[1:], defined_element)
@@ -47,23 +59,13 @@ def main(args):
                 elif terms[0] == 'crystal':
                     crystals, elements  = set_crystal(terms[1:], crystals, elements)
                     
-                #elif terms[0] == 'calc_structure_static':
-                #    assert lammps_exe is not None, 'lammps_exe not specified'
-                #    assert len(pot_list) > 0, 'no potentials set'
-                #    assert len(proto_list) > 0, 'no prototypes set'
-        
-
-
-    print 'lammps_exe = ', lammps_exe
-    print 'simulation_dir = ', os.getcwd()
-    print 'potential:'
-    for i in xrange(len(potentials)):
-        print potentials[i]
-        print potential_directories[i]
-        print
-    
-    for i in xrange(len(crystals)):
-        print crystals[i], elements[i]
+                elif terms[0] == 'calc_structure_static':
+                    prepare.structure_static(terms[1:],
+                                             lammps_exe, xml_library_dir, iprPy_dir,
+                                             defined_element, 
+                                             potentials, potential_directories,
+                                             crystals, elements,
+                                             u_length, u_press, u_energy)
     
                             
 def set_lammps_exe(terms):
@@ -84,6 +86,31 @@ def set_simulation_dir(terms):
     except:
         os.makedirs(dir)
         os.chdir(dir)
+    if not os.path.isdir('to_run'):    
+        os.mkdir('to_run')
+    if not os.path.isdir('has_ran'):    
+        os.mkdir('has_ran')
+    
+def set_xml_library_dir(terms):
+    """Interpret xml_library_dir arguments."""
+    xml_library_dir = ' '.join(terms)
+    try:
+        xml_library_dir = os.path.abspath(os.path.realpath(xml_library_dir))
+        assert os.path.isdir(xml_library_dir)
+    except:
+        raise ValueError('xml_library_dir argument not accessible directory')
+    return xml_library_dir
+    
+def set_iprPy_dir(terms):
+    """Interpret iprPy_dir arguments."""
+    iprPy_dir = ' '.join(terms)
+    try:
+        iprPy_dir = os.path.abspath(os.path.realpath(iprPy_dir))
+        assert os.path.isdir(iprPy_dir)
+    except:
+        raise ValueError('iprPy_dir argument not accessible directory')
+    return iprPy_dir    
+
 
 def set_element_list(terms, defined_element):
     """Interpret define_element_list arguments."""
@@ -191,7 +218,7 @@ def set_crystal(terms, crystals, elements):
                     with open(crystal) as f:
                         model = DataModelDict(f)
                         natypes = atomman.models.crystal(model)[0].natypes
-                        model.find('atom-system', {"@xsi": "crystal-prototype"})
+                        model.find('crystal-prototype')
                 except:
                     continue
     
@@ -211,7 +238,7 @@ def set_crystal(terms, crystals, elements):
                 else:
                     crystals.append(crystal)
                     elements.append(['*' for i in xrange(natypes)])
-            
+
         elif terms[1] == 'prototype':
             try:
                 i = terms.index('elements')
@@ -229,7 +256,7 @@ def set_crystal(terms, crystals, elements):
                 with open(crystal) as f:
                     model = DataModelDict(f)
                     natypes = atomman.models.crystal(model)[0].natypes
-                    model.find('atom-system', {"@xsi": "crystal-prototype"})
+                    model.find('crystal-prototype')
             except:
                 raise ValueError(path + ' is not a crystal prototype file')
                 
@@ -286,12 +313,12 @@ def set_crystal(terms, crystals, elements):
             except:
                 raise ValueError(path + ' is not an accessible file')
             
-            try:
+            if True:
                 crystal = path
                 with open(crystal) as f:
                     element = atomman.models.cif_cell(f)[1]
                     natypes = len(element)
-            except:
+            else:
                 raise ValueError(path + ' is not a cif file')
             
             if len(terms[i+1:]) > 0:

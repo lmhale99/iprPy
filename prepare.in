@@ -1,10 +1,15 @@
 lammps_exe              C:\users\lmh1\Documents\lmp_serial.exe
 simulation_dir          C:\users\lmh1\Documents\iprPy_run
+xml_library_dir         C:\users\lmh1\Documents\iprPy_run\xml_library
+iprPy_dir               C:\users\lmh1\Documents\iprPy
 
 potential               add C:/Users/lmh1/Documents/iprPy/ref/potentials
 
 
-crystal                 add prototypes C:/Users/lmh1/Documents/iprPy/ref/prototypes/                only bcc
-crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A2-W-bcc.json   elements W
-crystal                 add cifs       C:/Users/lmh1/Documents/cif/1/00/01                          only 1000180
-crystal                 add cif        C:/Users/lmh1/Documents/cif/1/00/01/1000181.cif              elements W W W W W W
+crystal                  add prototypes C:/Users/lmh1/Documents/iprPy/ref/prototypes/             
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A2--W--bcc.json 
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/Ah--alpha-Po--sc.json   elements U
+#crystal                 add cifs       C:/Users/lmh1/Documents/cif/1/00/01                          only 1000180
+#crystal                 add cif        C:/Users/lmh1/Documents/cif/1/00/01/1000181.cif              elements W W W W W W
+
+calc_structure_static    r_range 2.0 6.0 steps 300
