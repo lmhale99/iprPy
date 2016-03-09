@@ -1,0 +1,168 @@
+{
+    "crystal-prototype": {
+        "identifier": {
+            "common": "alpha As", 
+            "tag": "a-As", 
+            "prototype": "As", 
+            "Pearson-symbol": "hR2", 
+            "Strukturbericht": "A7"
+        }, 
+        "space-group": {
+            "number": 166, 
+            "Hermann-Maguin": "R -3 m", 
+            "Schoenflies": "D3d^5"
+        }, 
+        "atomic-system": {
+            "cell": {
+                "orthorhombic": {
+                    "a": {
+                        "value": 1, 
+                        "unit": "scaled"
+                    }, 
+                    "b": {
+                        "value": 1.7320508075689, 
+                        "unit": "scaled"
+                    }, 
+                    "c": {
+                        "value": 2.8, 
+                        "unit": "scaled"
+                    }
+                }
+            }, 
+            "atom": [
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.0, 
+                            0.0
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.0, 
+                            0.5458
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.3333333333333, 
+                            0.3333333333333
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.3333333333333, 
+                            0.8791333333333
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.1666666666667, 
+                            0.6666666666667
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.1666666666667, 
+                            0.2124666666667
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.5, 
+                            0.0
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.5, 
+                            0.5458
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.8333333333333, 
+                            0.3333333333333
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.8333333333333, 
+                            0.8791333333333
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.6666666666667, 
+                            0.6666666666667
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.6666666666667, 
+                            0.2124666666667
+                        ], 
+                        "unit": "scaled"
+                    }
+                }
+            ]
+        }
+    }
+}

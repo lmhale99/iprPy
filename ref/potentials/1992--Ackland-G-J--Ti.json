@@ -1,0 +1,27 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "key": "8a634ace-23df-4e28-8041-007bd0e11cfb", 
+            "id": "1992--Ackland-G-J--Ti"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ti", 
+            "mass": 47.867
+        }, 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Ti.eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

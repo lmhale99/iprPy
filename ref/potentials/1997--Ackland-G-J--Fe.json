@@ -1,0 +1,27 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "key": "372f9e5f-dcbd-4cc6-902a-ebcafd664018", 
+            "id": "1997--Ackland-G-J--Fe"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Fe", 
+            "mass": 55.85
+        }, 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Fe.eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

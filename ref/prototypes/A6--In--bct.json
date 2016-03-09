@@ -1,0 +1,58 @@
+{
+    "crystal-prototype": {
+        "identifier": {
+            "common": "body-centered tetragonal", 
+            "tag": "bct", 
+            "prototype": "In", 
+            "Pearson-symbol": "tI2", 
+            "Strukturbericht": "A6"
+        }, 
+        "space-group": {
+            "number": 139, 
+            "Hermann-Maguin": "I 4/m m m", 
+            "Schoenflies": "D4h^17", 
+            "Wykoff": {
+                "letter": "a", 
+                "multiplicity": 2
+            }
+        }, 
+        "atomic-system": {
+            "cell": {
+                "tetragonal": {
+                    "a": {
+                        "value": 1.0, 
+                        "unit": "scaled"
+                    }, 
+                    "c": {
+                        "value": 1.5, 
+                        "unit": "scaled"
+                    }
+                }
+            }, 
+            "atom": [
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.0, 
+                            0.0
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.5, 
+                            0.5
+                        ], 
+                        "unit": "scaled"
+                    }
+                }
+            ]
+        }
+    }
+}

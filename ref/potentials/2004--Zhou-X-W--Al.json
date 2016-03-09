@@ -1,0 +1,27 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "key": "5aad5c57-cd85-48b3-acb0-db0cc4f68e31", 
+            "id": "2004--Zhou-X-W--Al"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Al", 
+            "mass": 26.982
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Al.set"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

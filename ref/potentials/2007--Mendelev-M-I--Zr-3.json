@@ -1,0 +1,27 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "key": "bd58ae4c-dc17-40e4-91f0-db3eae46f933", 
+            "id": "Zr--MendelevMI--2007--3"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Zr", 
+            "mass": 91.224
+        }, 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Zr_3.eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

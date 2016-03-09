@@ -1,0 +1,33 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "key": "fbb1e782-509e-4103-a735-db0050ad7477", 
+            "id": "2007--Mendelev-M-I--Cu-Zr"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Cu", 
+                "mass": 63.546
+            }, 
+            {
+                "element": "Zr", 
+                "mass": 91.224
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Cu-Zr.eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

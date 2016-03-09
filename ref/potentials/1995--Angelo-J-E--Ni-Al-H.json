@@ -1,0 +1,37 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "key": "0b194551-81ba-45ba-b4e1-7e035729f11c", 
+            "id": "1995--Angelo-J-E--Ni-Al-H"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ni", 
+                "mass": 58.71
+            }, 
+            {
+                "element": "Al", 
+                "mass": 26.982
+            }, 
+            {
+                "element": "H", 
+                "mass": 1.008
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "NiAlH_jea.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

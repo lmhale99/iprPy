@@ -1,0 +1,27 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "key": "248c41b3-6861-43d0-876c-e528541b699f", 
+            "id": "2004--Zhou-X-W--Ag"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ag", 
+            "mass": 107.87
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Ag.set"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

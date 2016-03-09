@@ -1,0 +1,126 @@
+{
+    "crystal-prototype": {
+        "identifier": {
+            "common": "cubic zinc-blende", 
+            "tag": "c-ZnS", 
+            "prototype": "c-ZnS", 
+            "Pearson-symbol": "cF8", 
+            "Strukturbericht": "B3"
+        }, 
+        "space-group": {
+            "number": 216, 
+            "Hermann-Maguin": "F -4 3 m", 
+            "Schoenflies": "Td^2", 
+            "Wykoff": [
+                {
+                    "letter": "a", 
+                    "multiplicity": 4
+                },
+                {
+                    "letter": "c", 
+                    "multiplicity": 4
+                }
+            ]
+        }, 
+        "atomic-system": {
+            "cell": {
+                "cubic": {
+                    "a": {
+                        "value": 1.0, 
+                        "unit": "scaled"
+                    }
+                }
+            }, 
+            "atom": [
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.0, 
+                            0.0
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.5, 
+                            0.5
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.0, 
+                            0.5
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.5, 
+                            0.0
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 2, 
+                    "position": {
+                        "value": [
+                            0.25, 
+                            0.25, 
+                            0.25
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 2, 
+                    "position": {
+                        "value": [
+                            0.25, 
+                            0.75, 
+                            0.75
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 2, 
+                    "position": {
+                        "value": [
+                            0.75, 
+                            0.25, 
+                            0.75
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 2, 
+                    "position": {
+                        "value": [
+                            0.75, 
+                            0.75, 
+                            0.25
+                        ], 
+                        "unit": "scaled"
+                    }
+                }
+            ]
+        }
+    }
+}

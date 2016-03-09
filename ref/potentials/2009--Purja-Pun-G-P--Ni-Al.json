@@ -1,0 +1,33 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "key": "d71da5f1-db8a-46ad-a78d-c026768200af", 
+            "id": "2009--Purja-Pun-G-P--Ni-Al"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ni", 
+                "mass": 58.71
+            }, 
+            {
+                "element": "Al", 
+                "mass": 26.982
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Mishin-Ni-Al-2009.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}
