@@ -1,0 +1,21 @@
+#compiled python modules
+*.pyc
+
+#Notebook checkpoints and data
+Notebooks/*/
+
+#non-IPR potentials
+ref/potentialInstances-LAMMPS/2015--Thompson-A-P--Ta.json
+ref/potentials/2015--Thompson-A-P--Ta/
+ref/potentialInstances-LAMMPS/2006--Chamati-M--Fe.json
+ref/potentials/2006--Chamati-M--Fe/Fe_cham-mishin.eam.alloy
+ref/potentialInstances-LAMMPS/2012--Proville-L--Fe.json
+ref/potentials/2012--Proville-L--Fe/
+
+#test scripts
+test/
+test.py
+*/test.py
+*/*/test.py
+*/*/*/test.py
+*/*/*/*/test.py
