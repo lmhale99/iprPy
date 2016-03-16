@@ -90,7 +90,7 @@ def structure_static(terms,
                 i = terms.index('r_range')
                 r_min = float(terms[i+1])
                 r_max = float(terms[i+2])
-            elif 'steps' in terms:
+            if 'steps' in terms:
                 i = terms.index('steps')
                 steps = int(terms[i+1])
             

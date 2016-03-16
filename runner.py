@@ -8,7 +8,7 @@ import sys
 
 def main():
     to_run_dir = 'C:/users/lmh1/Documents/iprPy_run/to_run'
-    xml_dir = 'C:/users/lmh1/Documents/iprPy_run/xml_library'
+    xml_dir = 'C:/users/lmh1/Documents/iprPy_run/xml_library2'
 
     orphan_dir = os.path.join(xml_dir, 'orphan')
     

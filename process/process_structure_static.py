@@ -12,7 +12,7 @@ def structure_static(xml_lib_dir):
         if os.path.isdir(group_dir):
             calc_dir, group_name = os.path.split(group_dir)
             pot_name = os.path.basename(os.path.dirname(calc_dir))
-        
+            print pot_name
             try:
                 with open(os.path.join(calc_dir, 'badlist.txt'), 'r') as f:
                     badlist = f.read().split()
@@ -84,22 +84,17 @@ def structure_static(xml_lib_dir):
                 data.append('C66 (GPa)', C_dict.get('6 6', ''))
                 
             
-            if len(data.keys()) > 0:        
+            if len(data.keys()) > 0: 
                 with open(os.path.join(calc_dir, 'structure_static_'+group_name+'.csv'), 'w') as f:
                     f.write(','.join(data.keys())+'\n')
-                    for i in xrange(len(data['key'])):
-                        f.write(','.join([str(data[k][i]) for k in data.keys()]) + '\n')
+                    for i in xrange(len(data.aslist('key'))):
+                        f.write(','.join([str(data.aslist(k)[i]) for k in data.keys()]) + '\n')
 
             
             with open(os.path.join(calc_dir, 'badlist.txt'), 'w') as f:
                 for bad in badlist:
                     f.write(bad+'\n')
-    #with open(os.path.join(xml_lib_dir, 'bad_structure_static.txt'), 'w') as fw:   
-    #    for key in error_dict:
-    #        fw.write(key+'\n')
-    #        for term in error_dict.iteraslist(key):
-    #            fw.write(term+'\n')
-    #        fw.write('\n')
+
 
     
 
