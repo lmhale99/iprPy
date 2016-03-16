@@ -1,32 +1,30 @@
 {
     "crystal-prototype": {
         "identifier": {
-            "common": "rock salt", 
-            "tag": "NaCl", 
-            "prototype": "NaCl", 
-            "Pearson-symbol": "cF8", 
-            "Strukturbericht": "B1"
+            "common": "double hcp", 
+            "tag": "a-La", 
+            "prototype": "La", 
+            "Pearson-symbol": "hP4", 
+            "Strukturbericht": "A3'"
         }, 
         "space-group": {
-            "number": 225, 
-            "Hermann-Maguin": "F m -3 m", 
-            "Schoenflies": "Oh^5", 
-            "Wykoff": [
-                {
-                    "letter": "a", 
-                    "multiplicity": 4
-                }, 
-                {
-                    "letter": "b", 
-                    "multiplicity": 4
-                }
-            ]
+            "number": 194, 
+            "Hermann-Maguin": "P 63/m m c", 
+            "Schoenflies": "D6h^4"
         }, 
         "atomic-system": {
             "cell": {
-                "cubic": {
+                "orthorhombic": {
                     "a": {
                         "value": 1.0, 
+                        "unit": "scaled"
+                    }, 
+                    "b": {
+                        "value": 1.7320508075689, 
+                        "unit": "scaled"
+                    }, 
+                    "c": {
+                        "value": 3.265986323711, 
                         "unit": "scaled"
                     }
                 }
@@ -47,8 +45,52 @@
                     "component": 1, 
                     "position": {
                         "value": [
-                            0.0, 
                             0.5, 
+                            0.5, 
+                            0.0
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.8333333333333, 
+                            0.25
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.3333333333333, 
+                            0.25
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.1666666666667, 
+                            0.5
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.6666666666667, 
                             0.5
                         ], 
                         "unit": "scaled"
@@ -59,8 +101,8 @@
                     "position": {
                         "value": [
                             0.5, 
-                            0.0, 
-                            0.5
+                            0.8333333333333, 
+                            0.75
                         ], 
                         "unit": "scaled"
                     }
@@ -69,53 +111,9 @@
                     "component": 1, 
                     "position": {
                         "value": [
-                            0.5, 
-                            0.5, 
-                            0.0
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.5, 
-                            0.5
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.5, 
                             0.0, 
-                            0.0
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.5, 
-                            0.0
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.0, 
-                            0.5
+                            0.3333333333333, 
+                            0.75
                         ], 
                         "unit": "scaled"
                     }
