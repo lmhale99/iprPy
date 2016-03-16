@@ -86,19 +86,15 @@ def set_simulation_dir(terms):
     except:
         os.makedirs(dir)
         os.chdir(dir)
-    if not os.path.isdir('to_run'):    
-        os.mkdir('to_run')
-    if not os.path.isdir('has_ran'):    
-        os.mkdir('has_ran')
     
 def set_xml_library_dir(terms):
     """Interpret xml_library_dir arguments."""
     xml_library_dir = ' '.join(terms)
-    try:
-        xml_library_dir = os.path.abspath(os.path.realpath(xml_library_dir))
-        assert os.path.isdir(xml_library_dir)
-    except:
-        raise ValueError('xml_library_dir argument not accessible directory')
+
+    xml_library_dir = os.path.abspath(os.path.realpath(xml_library_dir))
+    if not os.path.isdir(xml_library_dir):
+        os.makedirs(xml_library_dir)
+
     return xml_library_dir
     
 def set_iprPy_dir(terms):

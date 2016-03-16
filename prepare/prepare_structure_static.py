@@ -94,7 +94,7 @@ def structure_static(terms,
                 i = terms.index('steps')
                 steps = int(terms[i+1])
             
-            sim_dir = os.path.join('to_run', UUID)
+            sim_dir = os.path.join(os.getcwd(), UUID)
             os.mkdir(sim_dir)
             shutil.copy(pot, sim_dir)
             shutil.copy(crystal, sim_dir)

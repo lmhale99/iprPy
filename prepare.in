@@ -1,9 +1,9 @@
 lammps_exe              C:\users\lmh1\Documents\lmp_serial.exe
-simulation_dir          C:\users\lmh1\Documents\iprPy_run
+simulation_dir          C:\users\lmh1\Documents\iprPy_run\to_run
 xml_library_dir         C:\users\lmh1\Documents\iprPy_run\xml_library
 iprPy_dir               C:\users\lmh1\Documents\iprPy
 
-potential               add C:/Users/lmh1/Documents/iprPy/ref/potentials
+potential               add C:/Users/lmh1/Documents/iprPy/ref/potentials/
 
 
 crystal                  add prototypes C:/Users/lmh1/Documents/iprPy/ref/prototypes/             

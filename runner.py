@@ -7,11 +7,10 @@ from DataModelDict import DataModelDict
 import sys
 
 def main():
-    sim_dir = 'C:/users/lmh1/Documents/iprPy_run/'
+    to_run_dir = 'C:/users/lmh1/Documents/iprPy_run/to_run'
     xml_dir = 'C:/users/lmh1/Documents/iprPy_run/xml_library'
-    
-    to_run_dir = os.path.join(sim_dir, 'to_run')
-    has_ran_dir = os.path.join(sim_dir, 'has_ran')
+
+    orphan_dir = os.path.join(xml_dir, 'orphan')
     
     os.chdir(to_run_dir)
     flist = os.listdir(to_run_dir)
@@ -54,25 +53,38 @@ def main():
                 assert pot_name is not None, 'LAMMPS-potential data model not found'                
                 assert calc_py is not None, 'calc_*.py script not found'
                 assert calc_py is not None, 'calc_*.in script not found'
-                run = subprocess.Popen(['python', calc_py, calc_in, sim], stderr=subprocess.PIPE)
-                if run.stderr.read() != '':
-                    raise RuntimeError(run.stderr.read())
-
             except:
-                with open(os.path.join(xml_dir, sim + '.xml')) as f:
+                print sim, sys.exc_info()[1]
+                os.chdir(to_run_dir)
+                if not os.path.isdir(orphan_dir):
+                    os.makedirs(orphan_dir)
+                shutil.make_archive(os.path.join(orphan_dir, sim), 'gztar', root_dir=to_run_dir, base_dir=sim)
+                shutil.rmtree(os.path.join(to_run_dir, sim))
+                flist = os.listdir(to_run_dir)
+                continue
+            
+            pot_xml_dir = os.path.join(xml_dir, pot_name, calc_name, 'standard')
+            
+            try:    
+                run = subprocess.Popen(['python', calc_py, calc_in, sim], stderr=subprocess.PIPE)
+                err_mess = run.stderr.read()
+                if err_mess != '':
+                    raise RuntimeError(err_mess)
+            except:
+                with open(os.path.join(pot_xml_dir, sim + '.xml')) as f:
                     model = DataModelDict(f)
                 key = model.keys()[0]
                 model[key]['error'] = str(sys.exc_info()[1])
                 with open('results.json', 'w') as f:
                     model.json(fp=f, indent=4)
-            pot_xml_dir = os.path.join(xml_dir, pot_name, calc_name, 'standard')
-            print pot_xml_dir
+
             with open('results.json') as f:
                 model = DataModelDict(f)
             with open(os.path.join(pot_xml_dir, sim + '.xml'), 'w') as f:
                 model.xml(fp=f, indent=4)
             os.chdir(to_run_dir)
-            shutil.move(os.path.join(to_run_dir, sim), os.path.join(has_ran_dir, sim))    
+            shutil.make_archive(os.path.join(pot_xml_dir, sim), 'gztar', root_dir=to_run_dir, base_dir=sim)
+            shutil.rmtree(os.path.join(to_run_dir, sim))    
             
         flist = os.listdir(to_run_dir)
         
@@ -80,30 +92,31 @@ def main():
         
 #Bids for chance to run simulation        
 def bid(sim):
-    #check if bid already exists
-    for fname in os.listdir(sim):
-        if fname[-4:] == '.bid':
+    try:
+        #check if bid already exists
+        for fname in os.listdir(sim):
+            if fname[-4:] == '.bid':
+                return False
+
+        #place a bid
+        pid = os.getpid()
+        with open(os.path.join(sim, str(pid)+'.bid'), 'w') as f:
+            f.write('bid for pid: %i' % pid)
+        
+        #wait one second
+        time.sleep(1)
+
+        #check bids
+        bids = []
+        for fname in os.listdir(sim):
+            if fname[-4:] == '.bid':
+                bids.append(int(fname[:-4]))
+        if min(bids) == pid:
+            return True
+        else:
             return False
-
-    #place a bid
-    pid = os.getpid()
-    with open(os.path.join(sim, str(pid)+'.bid'), 'w') as f:
-        f.write('bid for pid: %i' % pid)
-    
-    #wait one second
-    time.sleep(1)
-
-    #check bids
-    bids = []
-    for fname in os.listdir(sim):
-        if fname[-4:] == '.bid':
-            bids.append(int(fname[:-4]))
-    if min(bids) == pid:
-        return True
-    else:
-        return False
-    
-                
+    except:
+        return False                
             
             
 if __name__ == '__main__':

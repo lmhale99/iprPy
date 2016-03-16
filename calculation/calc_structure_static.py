@@ -213,7 +213,7 @@ def quick_a_Cij(lammps_exe, ucell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=
     
     for cycle in xrange(100):
         
-        #Run LAMMPS and evaluate results based on box0
+        #Run LAMMPS and evaluate results based on ucell_old
         results = calc_cij(lammps_exe, ucell_current, potential, symbols, p_xx, p_yy, p_zz)
         ucell_new = results['ucell_new']
         
@@ -226,8 +226,8 @@ def quick_a_Cij(lammps_exe, ucell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=
         elif ucell_old is not None and np.allclose(ucell_new.box.vects, ucell_old.box.vects, rtol=tol):
             #Run LAMMPS Cij script using average between alat0 and alat1
             box = am.Box(a = (ucell_new.box.a + ucell_old.box.a) / 2.,
-                         b = (box1.b + box0.b) / 2.,
-                         c = (box1.c + box0.c) / 2.)
+                         b = (ucell_new.box.b + ucell_old.box.b) / 2.,
+                         c = (ucell_new.box.c + ucell_old.box.c) / 2.)
             ucell_current.box_set(vects=box.vects, scale=True)
             results = calc_cij(lammps_exe, ucell_current, potential, symbols, p_xx, p_yy, p_zz)                 
             
@@ -236,13 +236,13 @@ def quick_a_Cij(lammps_exe, ucell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=
         
         #Test if values have diverged from initial guess
         elif ucell_new.box.a < ucell.box.a / diverge_scale or ucell_new.box.a > ucell.box.a * diverge_scale:
-            break
+            raise RuntimeError('Divergence of box dimensions')
         elif ucell_new.box.b < ucell.box.b / diverge_scale or ucell_new.box.b > ucell.box.b * diverge_scale:
-            break
+            raise RuntimeError('Divergence of box dimensions')
         elif ucell_new.box.c < ucell.box.c / diverge_scale or ucell_new.box.c > ucell.box.c * diverge_scale:
-            break  
+            raise RuntimeError('Divergence of box dimensions')  
         elif results['ecoh'] == 0.0:
-            break
+            raise RuntimeError('Divergence: cohesive energy is 0')
                 
         #if not converged or diverged, update ucell_old and ucell_current
         else:
@@ -252,7 +252,7 @@ def quick_a_Cij(lammps_exe, ucell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=
     if converged:        
         return results
     else:
-        raise RuntimeError('Failed to converge')
+        raise RuntimeError('Failed to converge after 100 cycles')
 
 def calc_cij(lammps_exe, ucell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=0.0):
     """Runs cij_script and returns current Cij, stress, Ecoh, and new ucell guess."""
@@ -318,19 +318,32 @@ def calc_cij(lammps_exe, ucell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=0.0
             cij[i,j] = cij[j,i] = (cij[i,j] + cij[j,i]) / 2
 
     C = am.tools.ElasticConstants(Cij=cij)
-    S = C.Sij
+    
+    if np.allclose(C.Cij, 0.0):
+        raise RuntimeError('Divergence of elastic constants to <= 0')
+    try:
+        S = C.Sij
+    except:
+        raise RuntimeError('singular C:\n'+str(C.Cij))
+
     
     #extract the current stress state
     stress = -1 * np.array([[pxx[0], pxy[0], pxz[0]],
                             [pxy[0], pyy[0], pyz[0]],
                             [pxz[0], pyz[0], pzz[0]]])
+    
     s_xx = stress[0,0] + p_xx
     s_yy = stress[1,1] + p_yy
     s_zz = stress[2,2] + p_zz
     
-    newbox = am.Box(a=(ucell.box.a / (S[0,0]*s_xx + S[0,1]*s_yy + S[0,2]*s_zz + 1)),
-                    b=(ucell.box.b / (S[1,0]*s_xx + S[1,1]*s_yy + S[1,2]*s_zz + 1)),
-                    c=(ucell.box.c / (S[2,0]*s_xx + S[2,1]*s_yy + S[2,2]*s_zz + 1)))
+    new_a = ucell.box.a / (S[0,0]*s_xx + S[0,1]*s_yy + S[0,2]*s_zz + 1)
+    new_b = ucell.box.b / (S[1,0]*s_xx + S[1,1]*s_yy + S[1,2]*s_zz + 1)
+    new_c = ucell.box.c / (S[2,0]*s_xx + S[2,1]*s_yy + S[2,2]*s_zz + 1)
+    
+    if new_a <= 0 or new_b <= 0 or new_c <=0:
+        raise RuntimeError('Divergence of box dimensions to <= 0')
+    
+    newbox = am.Box(a=new_a, b=new_b, c=new_c)
     ucell_new = deepcopy(ucell)
     ucell_new.box_set(vects=newbox.vects, scale=True)
     
@@ -388,7 +401,7 @@ def main(args):
     a0 = avals[np.argmin(evals)]
     ucell = am.models.crystal(prototype)[0]
     cell_0 = ucell.model(symbols=symbols, box_unit='scaled')
-    ucell.box_set(a = a0, b = a0 * ucell.box.a, c = a0 * ucell.box.a, scale=True)
+    ucell.box_set(a = a0, b = a0 * ucell.box.b, c = a0 * ucell.box.c, scale=True)
     
     #Run quick_aCij to refine values
     results = quick_a_Cij(lammps_exe, ucell, potential, symbols)
