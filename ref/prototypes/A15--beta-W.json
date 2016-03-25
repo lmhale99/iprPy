@@ -1,0 +1,126 @@
+{
+    "crystal-prototype": {
+        "identifier": {
+            "common": "beta-tungsten", 
+            "tag": "b-W", 
+            "prototype": "W", 
+            "Pearson-symbol": "cP8", 
+            "Strukturbericht": "A15"
+        }, 
+        "space-group": {
+            "number": 223, 
+            "Hermann-Maguin": "P m -3 n", 
+            "Schoenflies": "Oh^3", 
+            "Wykoff": [
+                {
+                    "letter": "a", 
+                    "multiplicity": 2
+                }, 
+                {
+                    "letter": "c", 
+                    "multiplicity": 6
+                }
+            ]
+        }, 
+        "atomic-system": {
+            "cell": {
+                "cubic": {
+                    "a": {
+                        "value": 1.0, 
+                        "unit": "scaled"
+                    }
+                }
+            }, 
+            "atom": [
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.0, 
+                            0.0
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.5, 
+                            0.5
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.25, 
+                            0.0, 
+                            0.5
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.75, 
+                            0.0, 
+                            0.5
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.25, 
+                            0.0
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.75, 
+                            0.0
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.5, 
+                            0.25
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.5, 
+                            0.75
+                        ], 
+                        "unit": "scaled"
+                    }
+                }
+            ]
+        }
+    }
+}
