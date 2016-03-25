@@ -138,9 +138,8 @@ def cij_script(system_info, pair_info, delta = 1e-5, steps = 2):
                       'change_box all xy final 0 remap units box'])
     return script    
         
-def ecoh_vs_r(lammps_exe, prototype, potential, symbols, rmin=2.0, rmax=5.0, rsteps=200):
-    """Measure cohesive energy of a crystal prototype as a function of nearest neighbor distance, r0"""
-    ucell = am.models.crystal(prototype)[0]
+def ecoh_vs_r(lammps_exe, ucell, potential, symbols, rmin=2.0, rmax=5.0, rsteps=200):
+    """Measure cohesive energy of a crystal as a function of nearest neighbor distance, r0"""
     
     #Initial size setup
     r_a = r_a_ratio(ucell)
@@ -150,8 +149,8 @@ def ecoh_vs_r(lammps_exe, prototype, potential, symbols, rmin=2.0, rmax=5.0, rst
     delta = (amax-amin)/alat0
     
     #Create unit cell with a = alat0
-    ucell.box_set(a = alat0, b = alat0 * ucell.box.b, c = alat0 * ucell.box.c, scale=True)
-    
+    ucell.box_set(a = alat0, b = alat0 * ucell.box.b / ucell.box.a, c = alat0 * ucell.box.c / ucell.box.a, scale=True)
+
     #LAMMPS script setup
     pair_info = potential.pair_info(symbols)
     
@@ -392,17 +391,21 @@ def main(args):
         
     #read in prototype_file
     with open(input_dict['crystal_file']) as f:
-        prototype = DataModelDict(f).find('crystal-prototype')
+        try:
+            ucell = am.models.crystal(f)[0]
+        except:
+            f.seek(0)
+            ucell = am.models.cif_cell(f)[0]
     
     #Run ecoh_vs_r
-    rvals, avals, evals = ecoh_vs_r(lammps_exe, prototype, potential, symbols, rmin=r_min, rmax=r_max, rsteps=steps)
+    rvals, avals, evals = ecoh_vs_r(lammps_exe, deepcopy(ucell), potential, symbols, rmin=r_min, rmax=r_max, rsteps=steps)
     
     #Use plot to get rough lattice parameter guess, a0, and build ucell
     a0 = avals[np.argmin(evals)]
-    ucell = am.models.crystal(prototype)[0]
     cell_0 = ucell.model(symbols=symbols, box_unit='scaled')
-    ucell.box_set(a = a0, b = a0 * ucell.box.b, c = a0 * ucell.box.c, scale=True)
-    
+
+    ucell.box_set(a = a0, b = a0 * ucell.box.b / ucell.box.a, c = a0 * ucell.box.c / ucell.box.a, scale=True)
+    print ucell
     #Run quick_aCij to refine values
     results = quick_a_Cij(lammps_exe, ucell, potential, symbols)
     
