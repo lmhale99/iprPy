@@ -7,8 +7,17 @@ potential               add C:/Users/lmh1/Documents/iprPy/ref/potentials/
 
 
 #crystal                  add prototypes C:/Users/lmh1/Documents/iprPy/ref/prototypes/             
-#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A2--W--bcc.json 
-crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/Ah--alpha-Po--sc.json   elements U
+crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A1--Cu--fcc.json 
+crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A2--W--bcc.json 
+crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A3'--alpha-La--double-hcp.json 
+crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A3--Mg--hcp.json 
+crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A4--C--dc.json 
+crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A5--beta-Sn.json 
+crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A7--alpha-As.json 
+crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A15--beta-W.json 
+crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/Ah--alpha-Po--sc.json 
+
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/Ah--alpha-Po--sc.json   elements U
 #crystal                 add cifs       C:/Users/lmh1/Documents/cif/1/00/01                          only 1000180
 #crystal                 add cif        C:/Users/lmh1/Documents/cif/1/00/01/1000181.cif              elements W W W W W W
 
