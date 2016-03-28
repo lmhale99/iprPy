@@ -2,15 +2,15 @@
 *.pyc
 
 #Notebook checkpoints and data
-Notebooks/*/
+demo-Notebooks/*/
 
 #non-IPR potentials
-ref/potentials/2015--Thompson-A-P--Ta.json
-ref/potentials/2015--Thompson-A-P--Ta/
-ref/potentials/2006--Chamati-M--Fe.json
-ref/potentials/2006--Chamati-M--Fe/Fe_cham-mishin.eam.alloy
-ref/potentials/2012--Proville-L--Fe.json
-ref/potentials/2012--Proville-L--Fe/
+reference-libraries/potentials/2015--Thompson-A-P--Ta.json
+reference-libraries/potentials/2015--Thompson-A-P--Ta/
+reference-libraries/potentials/2006--Chamati-M--Fe.json
+reference-libraries/potentials/2006--Chamati-M--Fe/Fe_cham-mishin.eam.alloy
+reference-libraries/potentials/2012--Proville-L--Fe.json
+reference-libraries/potentials/2012--Proville-L--Fe/
 
 #test scripts
 test/
