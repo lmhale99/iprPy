@@ -8,10 +8,13 @@ Interatomic Potential Repository.
 
 The project is divided into three major components:
 
-.. sectnum::
+1. :ref:`demo`
 
-.. contents:: The tiny table of contents
+2. :ref:`library`
 
+3. :ref:`tools`
+
+.. _demo:
 
 Demonstration Calculations 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -26,11 +29,15 @@ The Notebooks folder holds Jupyter demonstration Notebooks associated with the
 calculations.  Ideally, the code in the Notebooks should be as close to the 
 code in the calc.py scripts as possible.  
 
+.. _library:
+
 Reference Library
 ~~~~~~~~~~~~~~~~~
 
 The ref folder holds the potential artifacts and json files for all the IPR 
 potentials, as well as json files for the crystal prototypes.
+
+.. _tools:
 
 High-Throughput Calculation Tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
