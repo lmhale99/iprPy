@@ -1,0 +1,19 @@
+{
+    "point-defect": {
+        "crystal-info": {
+            "artifact": "A1--Cu--fcc.json"
+        }, 
+        "identifier": {
+            "name": "vacancy"
+        }, 
+        "atomman-defect-point-parameters": {
+            "ptd_type": "v", 
+            "pos": [
+                0.0, 
+                0.0, 
+                0.0
+            ], 
+            "scale": true
+        }
+    }
+}

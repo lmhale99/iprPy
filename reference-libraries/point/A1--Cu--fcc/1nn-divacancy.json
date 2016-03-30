@@ -1,0 +1,30 @@
+{
+    "point-defect": {
+        "crystal-info": {
+            "artifact": "A1--Cu--fcc.json"
+        }, 
+        "identifier": {
+            "name": "1nn-divacancy"
+        }, 
+        "atomman-defect-point-parameters": [
+            {
+                "ptd_type": "v", 
+                "pos": [
+                    0.0, 
+                    0.0, 
+                    0.0
+                ], 
+                "scale": true
+            }, 
+            {
+                "ptd_type": "v", 
+                "pos": [
+                    0.0, 
+                    0.5, 
+                    0.5
+                ], 
+                "scale": true
+            }
+        ]
+    }
+}

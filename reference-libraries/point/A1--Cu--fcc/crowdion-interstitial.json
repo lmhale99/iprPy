@@ -1,0 +1,20 @@
+{
+    "point-defect": {
+        "crystal-info": {
+            "artifact": "A1--Cu--fcc.json"
+        }, 
+        "identifier": {
+            "name": "crowdion-interstitial"
+        }, 
+        "atomman-defect-point-parameters": {
+            "ptd_type": "i", 
+            "atype": 1, 
+            "pos": [
+                0.25, 
+                0.25, 
+                0.0
+            ], 
+            "scale": true
+        }
+    }
+}

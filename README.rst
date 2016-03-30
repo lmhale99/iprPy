@@ -65,7 +65,7 @@ into folders according to what they represent:
   as well as the necessary parameters for generating a system based on the 
   prototype.  These files can be read using atomman.models.crystal().
 
-.. `point`_ contains JSON data files associated with different types of point 
+- `point`_ contains JSON data files associated with different types of point 
   defects. Each file contains metadata for the defect, as well as the parameter 
   sets used by atomman.defects.point() for adding the defect to a system.  The 
   files are collected into folders named after the crystal prototypes that the 
