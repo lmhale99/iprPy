@@ -3,7 +3,7 @@ import process
 
 def main():
     
-    xml_dir = 'C:/users/lmh1/Documents/iprPy_run/xml_library2' 
+    xml_dir = 'C:/users/lmh1/Documents/iprPy_run/xml_library' 
     
     process.structure_static(xml_dir)
     

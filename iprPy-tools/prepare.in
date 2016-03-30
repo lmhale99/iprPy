@@ -1,23 +1,44 @@
 lammps_exe              c:\users\lmh1\Documents\lmp_serial.exe
 simulation_dir          C:\users\lmh1\Documents\iprPy_run\to_run
-xml_library_dir         C:\users\lmh1\Documents\iprPy_run\xml_library2
-iprPy_dir               C:\users\lmh1\Documents\iprPy
+xml_library_dir         C:\users\lmh1\Documents\iprPy_run\xml_library
+iprPy_dir               C:\users\lmh1\Documents\iprPy\iprPy-tools
 
-potential               add C:/Users/lmh1/Documents/iprPy/ref/potentials/
+#potential               add C:/Users/lmh1/Documents/iprPy/reference-libraries/potentials/
+potential               add C:/Users/lmh1/Documents/iprPy/reference-libraries/potentials/2013--Zhou-X-W--Zn-Cd-Hg-S-Se-Te.json
+#potential               add C:/Users/lmh1/Documents/iprPy/reference-libraries/potentials/2014--Liyanage-L-S-I--Fe-C.json
+#potential               add C:/Users/lmh1/Documents/iprPy/reference-libraries/potentials/2015--Mendelev-M-I--Al-Sm.json
+#potential               add C:/Users/lmh1/Documents/iprPy/reference-libraries/potentials/2015--Mendelev-M-I--Ni-Zr.json
+#potential               add C:/Users/lmh1/Documents/iprPy/reference-libraries/potentials/2015--Purja-Pun-G-P--Cu-Ta.json
+#potential               add C:/Users/lmh1/Documents/iprPy/reference-libraries/potentials/2015--Thompson-A-P--Ta.json
+#potential               add C:/Users/lmh1/Documents/iprPy/reference-libraries/potentials/2015--Wilson-S-R--Na.json
 
 
-#crystal                  add prototypes C:/Users/lmh1/Documents/iprPy/ref/prototypes/             
-crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A1--Cu--fcc.json 
-crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A2--W--bcc.json 
-crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A3'--alpha-La--double-hcp.json 
-crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A3--Mg--hcp.json 
-crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A4--C--dc.json 
-crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A5--beta-Sn.json 
-crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A7--alpha-As.json 
-crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/A15--beta-W.json 
-crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/Ah--alpha-Po--sc.json 
 
-#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/ref/prototypes/Ah--alpha-Po--sc.json   elements U
+#crystal                 add prototypes C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/             
+
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A1--Cu--fcc.json 
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A2--W--bcc.json 
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A3'--alpha-La--double-hcp.json 
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A3--Mg--hcp.json 
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A4--C--dc.json 
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A5--beta-Sn.json 
+crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A7--alpha-As.json 
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A15--beta-W.json 
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/Ah--alpha-Po--sc.json 
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A6--In--bct.json
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A15--Cr3Si.json
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/B1--NaCl--rock-salt.json
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/B2--CsCl.json
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/B3--ZnS--cubic-zinc-blende.json
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/C1--CaF2--fluorite.json
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/D0_3--BiF3.json
+crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/L1_0--AuCu.json
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/L1_2--AuCu3.json
+crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/L2_1--AlCu2Mn--heusler.json
+
+
+
+#crystal                 add prototype  C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/Ah--alpha-Po--sc.json   elements U
 #crystal                 add cifs       C:/Users/lmh1/Documents/cif/1/00/01                          only 1000180
 #crystal                 add cif        C:/Users/lmh1/Documents/cif/1/00/01/1000181.cif              elements W W W W W W
 

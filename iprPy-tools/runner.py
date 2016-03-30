@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import subprocess
 import random
@@ -8,7 +9,7 @@ import sys
 
 def main():
     to_run_dir = 'C:/users/lmh1/Documents/iprPy_run/to_run'
-    xml_dir = 'C:/users/lmh1/Documents/iprPy_run/xml_library2'
+    xml_dir = 'C:/users/lmh1/Documents/iprPy_run/xml_library'
 
     orphan_dir = os.path.join(xml_dir, 'orphan')
     
@@ -93,6 +94,9 @@ def main():
 #Bids for chance to run simulation        
 def bid(sim):
     try:
+        #wait to make sure sim is not being deleted
+        time.sleep(0.25)
+        
         #check if bid already exists
         for fname in os.listdir(sim):
             if fname[-4:] == '.bid':
@@ -103,8 +107,8 @@ def bid(sim):
         with open(os.path.join(sim, str(pid)+'.bid'), 'w') as f:
             f.write('bid for pid: %i' % pid)
         
-        #wait one second
-        time.sleep(1)
+        #wait to make sure all bids are in
+        time.sleep(0.75)
 
         #check bids
         bids = []
