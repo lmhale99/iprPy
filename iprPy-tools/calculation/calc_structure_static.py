@@ -405,7 +405,7 @@ def main(args):
     cell_0 = ucell.model(symbols=symbols, box_unit='scaled')
 
     ucell.box_set(a = a0, b = a0 * ucell.box.b / ucell.box.a, c = a0 * ucell.box.c / ucell.box.a, scale=True)
-    print ucell
+
     #Run quick_aCij to refine values
     results = quick_a_Cij(lammps_exe, ucell, potential, symbols)
     
@@ -418,7 +418,7 @@ def main(args):
     plt.close()
 
     ucell_new = results['ucell_new']
-    cell_1 = ucell.model(symbols=symbols, box_unit=u_length)
+    cell_1 = ucell_new.model(symbols=symbols, box_unit=u_length)
     ecoh = uc.get_in_units(results['ecoh'], u_energy)
     C = results['C']    
     
