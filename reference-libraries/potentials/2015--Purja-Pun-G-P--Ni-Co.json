@@ -1,15 +1,15 @@
 {
     "LAMMPS-potential": {
         "potential": {
-            "key": "71b03297-b66d-4efd-9502-02cf83d9dc38", 
-            "id": "2013--Purja-Pun-G-P--Al-Co"
+            "key": "20fa46b5-6b6f-4e6e-9400-66edb643c679", 
+            "id": "2015--Purja-Pun-G-P--Ni-Co"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
         "atom": [
             {
-                "element": "Al", 
-                "mass": 26.981539
+                "element": "Ni", 
+                "mass": 58.6934
             }, 
             {
                 "element": "Co", 
@@ -22,7 +22,7 @@
         "pair_coeff": {
             "term": [
                 {
-                    "file": "Mishin_updated-Al-Co-2013.eam.alloy"
+                    "file": "Mishin_updated-Ni-Co-2013.eam.alloy"
                 }, 
                 {
                     "symbols": "True"

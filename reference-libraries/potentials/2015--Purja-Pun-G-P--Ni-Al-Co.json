@@ -1,8 +1,8 @@
 {
     "LAMMPS-potential": {
         "potential": {
-            "key": "ee7b64fc-4e6e-4b43-8de1-082b8f85bd91", 
-            "id": "2015--Mendelev-M-I--Ni-Zr"
+            "key": "0f6e3cef-c588-4dcb-a0a6-66878f64ac50", 
+            "id": "2015--Purja-Pun-G-P--Ni-Al-Co"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
@@ -12,17 +12,21 @@
                 "mass": 58.6934
             }, 
             {
-                "element": "Zr", 
-                "mass": 91.224
+                "element": "Al", 
+                "mass": 26.981539
+            }, 
+            {
+                "element": "Co", 
+                "mass": 58.9332
             }
         ], 
         "pair_style": {
-            "type": "eam/fs"
+            "type": "eam/alloy"
         }, 
         "pair_coeff": {
             "term": [
                 {
-                    "file": "Ni-Zr_Mendelev_2014.eam.fs"
+                    "file": "NiAlCo_updated.eam.alloy"
                 }, 
                 {
                     "symbols": "True"
