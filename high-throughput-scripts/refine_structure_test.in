@@ -1,0 +1,89 @@
+pot_location    add C:/Users/lmh1/Documents/calculations/bcc/potentials
+proto_location  add C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes 
+
+run_directory   add C:/Users/lmh1/Documents/calculations/bcc/torun
+lib_directory   add C:/Users/lmh1/Documents/calculations/bcc/results
+
+lammps_command  add lmp_serial
+
+prepare         lammps_potentials pot_location 
+
+load            add system_model C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A2--W--bcc.json
+load_options    add
+load_elements   add [Li]
+box_parameters  add 3.491 3.491 3.491
+
+load            add system_model C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A2--W--bcc.json
+load_options    add
+load_elements   add [Na]
+box_parameters  add 4.225 4.225 4.225 
+
+load            add system_model C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A2--W--bcc.json
+load_options    add
+load_elements   add [K]
+box_parameters  add 5.225 5.225 5.225
+
+load            add system_model C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A2--W--bcc.json
+load_options    add
+load_elements   add [V]
+box_parameters  add 3.03 3.03 3.03
+
+load            add system_model C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A2--W--bcc.json
+load_options    add
+load_elements   add [Cr]
+box_parameters  add 2.88 2.88 2.88
+
+load            add system_model C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A2--W--bcc.json
+load_options    add
+load_elements   add [Fe]
+box_parameters  add 2.87 2.87 2.87
+
+load            add system_model C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A2--W--bcc.json
+load_options    add
+load_elements   add [Rb]
+box_parameters  add 5.585 5.585 5.585
+
+load            add system_model C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A2--W--bcc.json
+load_options    add
+load_elements   add [Nb]
+box_parameters  add 3.30 3.30 3.30
+
+load            add system_model C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A2--W--bcc.json
+load_options    add
+load_elements   add [Mo]
+box_parameters  add 3.15 3.15 3.15
+
+load            add system_model C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A2--W--bcc.json
+load_options    add
+load_elements   add [Cs]
+box_parameters  add 6.045 6.045 6.045
+
+load            add system_model C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A2--W--bcc.json
+load_options    add
+load_elements   add [Ba]
+box_parameters  add 5.02 5.02 5.02
+
+load            add system_model C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A2--W--bcc.json
+load_options    add
+load_elements   add [Ta]
+box_parameters  add 3.30 3.30 3.30
+
+load            add system_model C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A2--W--bcc.json
+load_options    add
+load_elements   add [W]
+box_parameters  add 3.16 3.16 3.16
+
+load            add system_model C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A2--W--bcc.json
+load_options    add
+load_elements   add [Eu]
+box_parameters  add 4.58 4.58 4.58
+
+size_mults      add 3 3 3
+
+prepare         refine_structure_static strain_range 1e-7 
+
+ptd_model       add C:/Users/lmh1/Documents/iprPy/reference-libraries/point/A2--W--bcc/vacancy.json
+ptd_model       add C:/Users/lmh1/Documents/iprPy/reference-libraries/point/A1--Cu--fcc/vacancy.json
+prepare         point_defect_formation_static
+
+#print_check

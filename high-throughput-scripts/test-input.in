@@ -1,0 +1,28 @@
+pot_location    add C:/Users/lmh1/Documents/calculations/bcc/potentials
+proto_location  add C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes 
+
+run_directory   add C:/Users/lmh1/Documents/calculations/bcc/torun
+lib_directory   add C:/Users/lmh1/Documents/calculations/bcc/results
+
+lammps_command  add lmp_mpi
+mpi_command     add mpiexec -localonly 2
+
+prepare         lammps_potentials pot_location 
+
+prepare         load_from_library refine_structure_static
+
+size_mults      add 3 3 3 
+size_mults      add 4 4 4  
+size_mults      add 5 5 5 
+size_mults      add 6 6 6 
+size_mults      add 7 7 7 
+size_mults      add 8 8 8 
+size_mults      add 9 9 9 
+size_mults      add 10 10 10 
+
+ptd_model       add C:/Users/lmh1/Documents/iprPy/reference-libraries/point/A2--W--bcc/vacancy.json
+
+#print_check
+prepare         point_defect_formation_static
+
+

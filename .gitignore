@@ -1,6 +1,14 @@
 #compiled python modules
 *.pyc
 
+#Python egg metadata for atomman
+*.egg-info/
+*.egg
+
+#PyPI dist and build
+dist/
+build/
+
 #Notebook checkpoints and data
 demo-Notebooks/*/
 
