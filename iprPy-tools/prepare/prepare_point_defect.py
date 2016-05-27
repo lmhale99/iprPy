@@ -7,11 +7,11 @@ from DataModelDict import DataModelDict
 import glob
 import shutil
 
-def structure_static(terms, 
-                     lammps_exe, xml_library_dir, iprPy_dir,
-                     defined_element, potentials, potential_directories, 
-                     crystals, crystal_elements,
-                     u_length, u_press, u_energy):
+def point_defect(terms, 
+                 lammps_exe, xml_library_dir, iprPy_dir,
+                 defined_element, potentials, potential_directories, 
+                 crystals, crystal_elements,
+                 u_length, u_press, u_energy):
                      
     """Prepares structure static calculations."""
     assert lammps_exe is not None, 'No lammps_exe set'
@@ -59,11 +59,10 @@ def structure_static(terms,
             UUID = str(uuid.uuid4())
             
             with open(crystal) as f:
-                ucell = am.System()
                 try:
-                    ucell.load('system_model', f)
+                    ucell = am.models.crystal(f)[0]
                 except:
-                    ucell.load('cif', f)
+                    ucell = am.models.cif_cell(f)[0]
             
             model = DataModelDict()
             model['calculation-crystal-phase'] = calc = DataModelDict()

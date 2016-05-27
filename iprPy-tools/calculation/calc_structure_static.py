@@ -391,11 +391,12 @@ def main(args):
         
     #read in prototype_file
     with open(input_dict['crystal_file']) as f:
+        ucell = am.System()
         try:
-            ucell = am.models.crystal(f)[0]
+            ucell.load('system_model', f)
         except:
             f.seek(0)
-            ucell = am.models.cif_cell(f)[0]
+            ucell.load('cif', f)
     
     #Run ecoh_vs_r
     rvals, avals, evals = ecoh_vs_r(lammps_exe, deepcopy(ucell), potential, symbols, rmin=r_min, rmax=r_max, rsteps=steps)

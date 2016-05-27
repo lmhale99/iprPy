@@ -172,8 +172,12 @@ def set_potential(terms, potentials, potential_directories, defined_element):
                 
         for pot in new_list:
             if pot not in potentials:
-                with open(pot) as f:
-                    potential = lmp.Potential(f)
+                try:
+                    with open(pot) as f:
+                        potential = lmp.Potential(f)
+                except:
+                    print pot, "not a valid potential file"
+                    continue
                 potentials.append(pot)
                 pot_dir = os.path.join(os.path.dirname(pot), potential.id)
                 if not os.path.isdir(pot_dir):
@@ -213,9 +217,10 @@ def set_crystal(terms, crystals, elements):
                     crystal = os.path.join(path, fname)
                     with open(crystal) as f:
                         model = DataModelDict(f)
-                        natypes = atomman.models.crystal(model)[0].natypes
+                        natypes = atomman.convert.system_model.load(model)[0].natypes
                         model.find('crystal-prototype')
                 except:
+                    print 'Could not load', fname
                     continue
     
                 if len(names) > 0:
@@ -234,6 +239,7 @@ def set_crystal(terms, crystals, elements):
                 else:
                     crystals.append(crystal)
                     elements.append(['*' for i in xrange(natypes)])
+                    print 'added system', fname
 
         elif terms[1] == 'prototype':
             try:

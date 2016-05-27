@@ -53,7 +53,7 @@ def main():
 
                 assert pot_name is not None, 'LAMMPS-potential data model not found'                
                 assert calc_py is not None, 'calc_*.py script not found'
-                assert calc_py is not None, 'calc_*.in script not found'
+                assert calc_in is not None, 'calc_*.in script not found'
             except:
                 print sim, sys.exc_info()[1]
                 os.chdir(to_run_dir)
