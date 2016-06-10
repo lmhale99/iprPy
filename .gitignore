@@ -27,3 +27,6 @@ test.py
 */*/test.py
 */*/*/test.py
 */*/*/*/test.py
+
+#High-throughput log files
+high-throughput-scripts/*-runner.log
