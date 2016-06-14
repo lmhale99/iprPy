@@ -26,9 +26,23 @@ def main(input_file):
             if terms[0] == 'print_check':
                 print model.json(indent=2)
                 
-            elif terms[0] == 'prepare':
+            elif terms[0] == 'calculation':
                 calc_name = terms[1]
-                iprPy.prepare(calc_name, terms[2:], variable)    
+                iprPy.calculation_prepare(calc_name, terms[2:], variable)    
+            
+            elif terms[0] == 'list_calculations':
+                for name in iprPy.calculation_names():
+                    print name
+            
+            elif terms[0] == 'function':
+                calc_name = terms[1]
+                iprPy.prepare_function(calc_name, terms[2:], variable) 
+            
+            elif terms[0] == 'list_functions':
+                for name in iprPy.prepare_function_names():
+                    print name
+            elif terms[0] == 'end':
+                break
             
             else:
                 name = terms[0]

@@ -1,13 +1,14 @@
-pot_location    add C:/Users/lmh1/Documents/calculations/bcc/potentials
-proto_location  add C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes 
-
+#Initial path and command information
 run_directory   add C:/Users/lmh1/Documents/calculations/bcc/torun
-lib_directory   add C:/Users/lmh1/Documents/calculations/bcc/results
+lib_directory   add C:/Users/lmh1/Documents/calculations/bcc/results2
+lammps_command  add lmp_mpi
+mpi_command     add mpiexec -localonly 2
 
-lammps_command  add lmp_serial
+#Read in all potentials from a directory
+pot_location    add C:/Users/lmh1/Documents/calculations/bcc/test
+function        lammps_potentials pot_location 
 
-prepare         lammps_potentials pot_location 
-
+#Build list of stable bcc elements using experimental lattice constants
 load            add system_model C:/Users/lmh1/Documents/iprPy/reference-libraries/prototypes/A2--W--bcc.json
 load_options    add
 load_elements   add [Li]
@@ -78,12 +79,30 @@ load_options    add
 load_elements   add [Eu]
 box_parameters  add 4.58 4.58 4.58
 
+#Relax structures
 size_mults      add 3 3 3
+calculation     refine_structure_static strain_range 1e-7 
 
-prepare         refine_structure_static strain_range 1e-7 
+#Clear system information
+load            clear
+load_options    clear
+load_elements   clear
+box_parameters  clear
 
+#Find all refine_structure_static results and prepare systems for loading
+function        load_from_library refine_structure_static
+
+#Add more sizes
+size_mults      add 4 4 4  
+size_mults      add 5 5 5 
+size_mults      add 6 6 6 
+size_mults      add 7 7 7 
+size_mults      add 8 8 8 
+size_mults      add 9 9 9 
+size_mults      add 10 10 10 
+
+#Run point_defect_formation_static for bcc vacancies
 ptd_model       add C:/Users/lmh1/Documents/iprPy/reference-libraries/point/A2--W--bcc/vacancy.json
-ptd_model       add C:/Users/lmh1/Documents/iprPy/reference-libraries/point/A1--Cu--fcc/vacancy.json
-prepare         point_defect_formation_static
+calculation     point_defect_formation_static
 
 #print_check

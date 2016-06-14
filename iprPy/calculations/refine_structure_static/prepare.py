@@ -7,28 +7,29 @@ import uuid
 from DataModelDict import DataModelDict as DM
 import atomman.lammps as lmp
 
-from iprPy.tools import fill_template, import_calc, atomman_input, term_extractor
+from iprPy.tools import fill_template, atomman_input, term_extractor
+from .data_model import data_model
+from .read_input import read_input
 
 #Automatically identify the calculation's directory and name
 __calc_dir__ = os.path.dirname(os.path.realpath(__file__)) 
 __calc_type__ =  os.path.basename(__calc_dir__)
 __calc_name__ = 'calc_' + __calc_type__
-calc = import_calc(__calc_dir__, __calc_name__)
 
 def prepare(terms, variable):
     """This is the prepare method for the calculation"""
     
     working_dir = os.getcwd()
     
-    #Identify the necessary run files in the calculation directory
-    calc_template = os.path.join(__calc_dir__, __calc_name__ + '.template')
-    calc_py =       os.path.join(__calc_dir__, __calc_name__ + '.py')
-    cij_template =  os.path.join(__calc_dir__, 'cij.template')
-    
     #Read in the calc_template 
-    with open(calc_template) as f:
+    calc_template = __calc_name__ + '.template'
+    with open(os.path.join(__calc_dir__, 'calc_files', calc_template)) as f:
         template = f.read()
     
+    #Identify the contents of calc_files
+    calc_files = os.listdir(os.path.join(__calc_dir__, 'calc_files'))
+    calc_files.remove(calc_template)  
+
     #Interpret and check terms and variables
     run_directory, lib_directory, v_dict = __initial_setup(terms, variable)
     
@@ -39,7 +40,7 @@ def prepare(terms, variable):
         #Load potential
         with open(potential_file) as f:
             potential = lmp.Potential(f)
-        
+
         #Pass potential's file and directory info to v_dict
         v_dict['potential_file'] = os.path.basename(potential_file)
         v_dict['potential_dir'] = os.path.basename(potential_dir)
@@ -55,7 +56,7 @@ def prepare(terms, variable):
             load_style = load_terms[0]
             load_file = ' '.join(load_terms[1:])
             load_base = os.path.basename(load_file)
-            
+
             #Check for system_model fields from previous simulations
             if load_style == 'system_model':
                 with open(load_file) as f:
@@ -66,7 +67,7 @@ def prepare(terms, variable):
                     system_family = os.path.splitext(load_base)[0]
             else:
                 system_family = os.path.splitext(load_base)[0]
-            
+
             #Pass system's file, options and box parameters to v_dict
             v_dict['load'] = ' '.join([load_terms[0], load_base])
             v_dict['load_options'] = load_options
@@ -77,7 +78,7 @@ def prepare(terms, variable):
                 
                 #Pass symbols to v_dict
                 v_dict['symbols'] = ' '.join(symbols)
-                
+
                 #Define directory path for the record
                 record_dir = os.path.join(lib_directory, str(potential), '-'.join(symbols), system_family, __calc_type__)
                   
@@ -90,8 +91,8 @@ def prepare(terms, variable):
                     os.makedirs(sim_dir)
                     
                     #Copy files to run folder
-                    shutil.copy(calc_py, sim_dir)
-                    shutil.copy(cij_template, sim_dir)
+                    for fname in calc_files:
+                        shutil.copy(os.path.join(__calc_dir__, 'calc_files', fname), sim_dir)
                     shutil.copy(potential_file, sim_dir)
                     shutil.copy(load_file, sim_dir)
                     
@@ -103,13 +104,13 @@ def prepare(terms, variable):
                     #Create calculation input file by filling in template with v_dict terms
                     os.chdir(sim_dir)
                     calc_in = fill_template(template, v_dict, '<', '>')
-                    input_dict = calc.input(calc_in, UUID)
+                    input_dict = read_input(calc_in, UUID)
                     with open(__calc_name__ + '.in', 'w') as f:
                         f.write('\n'.join(calc_in))
                     os.chdir(working_dir)
                     
                     #Save the incomplete record
-                    model = calc.data_model(input_dict)
+                    model = data_model(input_dict)
                     with open(os.path.join(record_dir, UUID + '.json'), 'w') as f:
                         model.json(fp=f, indent=2)
                     

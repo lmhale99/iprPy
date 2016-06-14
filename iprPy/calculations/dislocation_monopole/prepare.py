@@ -80,13 +80,13 @@ def prepare(terms, variable):
             else:
                 system_family = os.path.splitext(load_base)[0]
             
-            #Loop over all point defect data models
-            for ptd_model in variable.aslist('ptd_model'):
+            #Loop over all dislocation data models
+            for disl_model in variable.aslist('dislocation_model'):
                     
-                #Check if ptd_model's system_family matches the load_file's system_family
-                with open(ptd_model) as f:
-                    ptd = DM(f)
-                if system_family != ptd['point-defect-parameters']['system-family']:
+                #Check if disl_model's system_family matches the load_file's system_family
+                with open(disl_model) as f:
+                    disl = DM(f)
+                if system_family != disl['dislocation-monopole-parameters']['system-family']:
                     continue
                
                 #Pass system's file, options and box parameters to v_dict
@@ -95,9 +95,9 @@ def prepare(terms, variable):
                 v_dict['box_parameters'] = box_parameters
                 
                 #Pass defect model to v_dict
-                ptd_file = os.path.basename(ptd_model)
-                v_dict['ptd_model'] = ptd_file
-                v_dict['ptd_name'] = ptd['point-defect-parameters']['point-defect']['id']
+                disl_file = os.path.basename(disl_model)
+                v_dict['dislocation_model'] = disl_file
+                v_dict['dislocation_name'] = disl['dislocation-monopole-parameters']['dislocation']['id']
                 
                 #Loop over all symbols combinations
                 for symbols in atomman_input.yield_symbols(load, load_options, load_elements, variable, potential):
@@ -124,7 +124,7 @@ def prepare(terms, variable):
                                 shutil.copy(os.path.join(__calc_dir__, 'calc_files', fname), sim_dir)
                             shutil.copy(potential_file, sim_dir)
                             shutil.copy(load_file, sim_dir)
-                            shutil.copy(ptd_model, sim_dir)
+                            shutil.copy(disl_model, sim_dir)
                             
                             #Copy potential_dir and contents to run folder
                             os.mkdir(os.path.join(sim_dir, os.path.basename(potential_dir)))
@@ -167,6 +167,9 @@ def __initial_setup(t, v):
     v_dict['energy_unit'] =    atomman_input.get_value(v, 'energy_unit',   '')
     v_dict['force_unit'] =     atomman_input.get_value(v, 'force_unit',    '')
     
+    v_dict['anneal_temperature']    = atomman_input.get_value(v, 'anneal_temperature',    '')
+    v_dict['boundary_width']    = atomman_input.get_value(v, 'boundary_width',    '')
+    v_dict['boundary_shape']    = atomman_input.get_value(v, 'boundary_shape',    '')
     v_dict['energy_tolerance']    = atomman_input.get_value(v, 'energy_tolerance',    '')
     v_dict['force_tolerance']     = atomman_input.get_value(v, 'force_tolerance',     '')
     v_dict['maximum_iterations']  = atomman_input.get_value(v, 'maximum_iterations',  '')
@@ -181,7 +184,7 @@ def __initial_setup(t, v):
     #Check that other variables are of at least length 1
     if len(v.aslist('size_mults')) == 0:
         v['size_mults'] = '1 1 1'  
-    assert len(v.aslist('ptd_model')) > 0, 'no ptd_model found'
+    assert len(v.aslist('dislocation_model')) > 0, 'no dislocation_model found'
     
     #Read in terms
     #NO TERMS DEFINED FOR THIS CALCULATION
@@ -210,23 +213,40 @@ def __is_new_record(record_dir, v_dict):
             if sys_file != load_file:
                 continue
             
-            ptd_name = record.find('point-defect-parameters')['point-defect']['id']
-            if ptd_name != v_dict['ptd_name']:
+            disl_name = record.find('dislocation-monopole-parameters')['dislocation']['id']
+            if disl_name != v_dict['dislocation_name']:
                 continue
-                
-            a_mult = record.find('a-multiplyer')
-            b_mult = record.find('b-multiplyer')
-            c_mult = record.find('c-multiplyer')
+            
+            
+            
+            a_mult = record.finds('a-multiplyer')
+            b_mult = record.finds('b-multiplyer')
+            c_mult = record.finds('c-multiplyer')
+            if len(a_mult) == 1:
+                if a_mult < 0: a_mult = [a_mult, 0]
+                else:          a_mult = [0, a_mult]
+            if len(b_mult) == 1:
+                if b_mult < 0: b_mult = [b_mult, 0]
+                else:          b_mult = [0, b_mult]
+            if len(c_mult) == 1:
+                if c_mult < 0: c_mult = [c_mult, 0]
+                else:          c_mult = [0, c_mult]
             
             mults = v_dict['size_mults'].split()
             if len(mults) == 3:
-                a_m = abs(int(mults[0]))
-                b_m = abs(int(mults[1]))
-                c_m = abs(int(mults[2]))
+                a_m = int(mults[0])
+                if a_m < 0: a_m = [a_m, 0]
+                else:       a_m = [0, a_m]    
+                b_m = int(mults[1])
+                if b_m < 0: b_m = [b_m, 0]
+                else:       b_m = [0, b_m] 
+                c_m = int(mults[2])
+                if a_m < 0: c_m = [c_m, 0]
+                else:       c_m = [0, c_m] 
             elif len(mults) == 6:
-                a_m = int(mults[1]) - int(mults[0])
-                b_m = int(mults[3]) - int(mults[2])
-                c_m = int(mults[5]) - int(mults[4])
+                a_m = [int(mults[0]), int(mults[1])]
+                b_m = [int(mults[2]), int(mults[3])]
+                c_m = [int(mults[4]), int(mults[5])]
             else:
                 raise ValueError('Invalid size_mults term')
                 
@@ -235,3 +255,47 @@ def __is_new_record(record_dir, v_dict):
                 break
         
     return is_new
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        

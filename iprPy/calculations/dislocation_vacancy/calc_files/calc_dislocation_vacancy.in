@@ -1,0 +1,38 @@
+#Run script for calc_refine_structure_static.py
+
+#Command lines for LAMMPS (and MPI).
+#For lammps_command, exclude passing in a script, i.e. no "-in term" or "< term"
+lammps_command              lmp_serial
+mpi_command                 
+
+#Paths to the potential data model file, and directory containing potential parameters
+potential_file              C:/Users/lmh1/Documents/iprPy/reference-libraries/potentials/2006--Chamati-M--Fe.json
+potential_dir               C:/Users/lmh1/Documents/iprPy/reference-libraries/potentials/2006--Chamati-M--Fe
+
+#Initial system configuration to load
+load                        system_model 522c8437-eceb-480d-8f0c-77f83cdb3125.json
+load_options                key relaxed-atomic-system
+symbols                     Fe
+
+#System manipulations
+size_mults                  -12 12 -20 20 0 1
+box_parameters              
+
+#Units that input/output values are in
+length_unit                 
+pressure_unit               
+energy_unit                 
+force_unit                  
+
+#Defect parameters
+dislocation_model           bcc/111-screw.json
+elastic_constants_model     
+anneal_temperature          100.0
+boundary_width              3.0
+boundary_shape              rect
+
+#Run parameters
+energy_tolerance            
+force_tolerance             
+maximum_iterations          
+maximum_evaluations         

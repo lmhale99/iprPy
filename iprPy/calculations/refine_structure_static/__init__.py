@@ -1,6 +1,7 @@
 import os
 from prepare import prepare
-from process import process
+from data_model import data_model
+from read_input import read_input
 
 
 

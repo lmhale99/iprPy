@@ -1,9 +1,10 @@
 {
-    "point-defect": {
-        "system-family": "A2--W--bcc", 
-        "identifier": {
-            "name": "vacancy"
+    "point-defect-parameters": {
+        "point-defect": {
+            "key": "488272d4-1b9a-4586-9941-9ae7314551de",
+            "id": "vacancy"
         }, 
+        "system-family": "A2--W--bcc", 
         "atomman-defect-point-parameters": {
             "ptd_type": "v", 
             "pos": [

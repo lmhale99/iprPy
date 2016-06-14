@@ -4,10 +4,11 @@ import glob
 
 from iprPy.tools import atomman_input, list_build, term_extractor
 
-
 def prepare(terms, v):
-    """Builds up lists related to calc_refine_structure_* results."""
-    
+    """
+    Builds up load, load_options, elements, and box_parameter lists from 
+    existing calculation records in a local directory library.
+    """    
     
     assert len(v.aslist('load')) == len(v.aslist('load_options')),   'load and load_options must be the same length'
     assert len(v.aslist('load')) == len(v.aslist('load_elements')),  'load and load_elements must be the same length'
@@ -60,9 +61,8 @@ def prepare(terms, v):
         v.append('load_elements', '')
         v.append('box_parameters', '')
         
-
 def is_path_in_list(path, p_list):
     for p in p_list:
-        if os.path.normcase(path) == os.path.normcase(p):
+        if os.path.normcase(os.path.realpath(path)) == os.path.normcase(os.path.realpath(p)):
             return True
-    return False        
+    return False 

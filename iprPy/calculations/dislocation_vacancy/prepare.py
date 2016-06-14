@@ -8,9 +8,7 @@ from DataModelDict import DataModelDict as DM
 import atomman.lammps as lmp
 import atomman as am
 
-from iprPy.tools import fill_template, atomman_input, term_extractor
-from .data_model import data_model
-from .read_input import read_input
+from iprPy.tools import fill_template, import_calc, atomman_input, term_extractor
 
 #Automatically identify the calculation's directory and name
 __calc_dir__ = os.path.dirname(os.path.realpath(__file__))   
@@ -22,14 +20,14 @@ def prepare(terms, variable):
     
     working_dir = os.getcwd()
     
-    #Read in the calc_template 
-    calc_template = __calc_name__ + '.template'
-    with open(os.path.join(__calc_dir__, 'calc_files', calc_template)) as f:
-        template = f.read()
+    #Identify the necessary run files in the calculation directory
+    calc_template = os.path.join(__calc_dir__, __calc_name__ + '.template')
+    calc_py =       os.path.join(__calc_dir__, __calc_name__ + '.py')
+    min_template =  os.path.join(__calc_dir__, 'min.template')
     
-    #Identify the contents of calc_files
-    calc_files = os.listdir(os.path.join(__calc_dir__, 'calc_files'))
-    calc_files.remove(calc_template) 
+    #Read in the calc_template 
+    with open(calc_template) as f:
+        template = f.read()
     
     #Interpret and check terms and variables
     run_directory, lib_directory, v_dict = __initial_setup(terms, variable)
@@ -86,7 +84,7 @@ def prepare(terms, variable):
                 #Check if ptd_model's system_family matches the load_file's system_family
                 with open(ptd_model) as f:
                     ptd = DM(f)
-                if system_family != ptd['point-defect-parameters']['system-family']:
+                if system_family != ptd['point-defect']['system-family']:
                     continue
                
                 #Pass system's file, options and box parameters to v_dict
@@ -97,7 +95,7 @@ def prepare(terms, variable):
                 #Pass defect model to v_dict
                 ptd_file = os.path.basename(ptd_model)
                 v_dict['ptd_model'] = ptd_file
-                v_dict['ptd_name'] = ptd['point-defect-parameters']['point-defect']['id']
+                v_dict['ptd_name'] = ptd['point-defect']['identifier']['name']
                 
                 #Loop over all symbols combinations
                 for symbols in atomman_input.yield_symbols(load, load_options, load_elements, variable, potential):
@@ -120,8 +118,8 @@ def prepare(terms, variable):
                             os.makedirs(sim_dir)
                             
                             #Copy files to run folder
-                            for fname in calc_files:
-                                shutil.copy(os.path.join(__calc_dir__, 'calc_files', fname), sim_dir)
+                            shutil.copy(calc_py, sim_dir)
+                            shutil.copy(min_template, sim_dir)
                             shutil.copy(potential_file, sim_dir)
                             shutil.copy(load_file, sim_dir)
                             shutil.copy(ptd_model, sim_dir)
@@ -134,13 +132,13 @@ def prepare(terms, variable):
                             #Create calculation input file by filling in template with v_dict terms
                             os.chdir(sim_dir)
                             calc_in = fill_template(template, v_dict, '<', '>')
-                            input_dict = read_input(calc_in, UUID)
+                            input_dict = calc.input(calc_in, UUID)
                             with open(__calc_name__ + '.in', 'w') as f:
                                 f.write('\n'.join(calc_in))
                             os.chdir(working_dir)
                             
                             #Save the incomplete record
-                            model = data_model(input_dict)
+                            model = calc.data_model(input_dict)
                             with open(os.path.join(record_dir, UUID + '.json'), 'w') as f:
                                 model.json(fp=f, indent=2)
                     
@@ -210,7 +208,7 @@ def __is_new_record(record_dir, v_dict):
             if sys_file != load_file:
                 continue
             
-            ptd_name = record.find('point-defect-parameters')['point-defect']['id']
+            ptd_name = record.find('point-defect')['identifier']['name']
             if ptd_name != v_dict['ptd_name']:
                 continue
                 
@@ -235,3 +233,47 @@ def __is_new_record(record_dir, v_dict):
                 break
         
     return is_new
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
