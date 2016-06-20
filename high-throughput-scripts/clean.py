@@ -4,6 +4,7 @@ import os
 import shutil
 import tarfile 
 import sys
+from DataModelDict import DataModelDict as DM
 
 def main(*args):
     
@@ -22,6 +23,35 @@ def main(*args):
         
     for biddy in glob.iglob(os.path.join(run_directory, '*', '*.bid')):
         os.remove(biddy)
+    for result in glob.iglob(os.path.join(run_directory, '*', 'results.json')):
+	os.remove(result)
+
+    for record in glob.iglob(os.path.join(run_directory, '*', '*.json')):
+        with open(record) as f:    
+            model = DM(f)
+        key = model.keys()[0]
+        try:
+            if model[key]['status'] == 'error':
+                model[key]['status'] = 'not calculated'
+                del(model[key]['error'])
+                with open(record, 'w') as f:
+                    model.json(fp=f, indent=4)
+        except:
+            pass
+
+    for record in glob.iglob(os.path.join(lib_directory, '*', '*', '*', '*', '*.json')):
+        with open(record) as f:
+            model = DM(f)
+        key = model.keys()[0]
+        try:
+            if model[key]['status'] == 'error':
+                model[key]['status'] = 'not calculated'
+                del(model[key]['error'])
+                with open(record, 'w') as f:
+                    model.json(fp=f, indent=4)
+        except:
+            pass
+
     
 def __initial_setup(*args):            
     run_directory = None

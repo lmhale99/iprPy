@@ -18,7 +18,7 @@ def main(*args):
     orphan_dir = os.path.join(lib_directory, 'orphan')
     
     log_file = str(os.getpid()) + '-runner.log'
-    with open(log_file, 'w') as log:
+    with open(log_file, 'a') as log:
         
         #Change to the run directory
         os.chdir(run_directory)
@@ -111,11 +111,16 @@ def main(*args):
                 try:   
                     assert not error_flag, error_message
                     run = subprocess.Popen(['python', calc_py, calc_in, sim], stderr=subprocess.PIPE)
-                    err_mess = run.stderr.read()
-                    if err_mess != '':
-                        raise RuntimeError(err_mess)
-                    else:
-                        log.write('sim calculated successfully\n\n')
+                    error_message = run.stderr.read()
+                    
+                    #Check for results.json file
+                    try:
+                        with open('results.json') as f:
+                            model = DM(f)
+                    except:
+                        error_flag = True
+                    assert not error_flag, error_message
+                    log.write('sim calculated successfully\n\n')
                 
                 #Catch any errors and add them to results.json
                 except:
@@ -143,6 +148,8 @@ def main(*args):
                 except:
                     pass
             flist = os.listdir(run_directory)
+            log.flush()
+            os.fsync(log.fileno())
         
 #Bids for chance to run simulation        
 def bid(sim):
