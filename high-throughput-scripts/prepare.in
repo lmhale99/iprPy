@@ -2,11 +2,11 @@
 #Common Setup#
 ##############
 
-lib_directory           add /data/lmh1/calculations/ipr/Kittel
-lammps_command          add /users/lmh1/LAMMPS/lammps-9Dec14/src/lmp_mpi
+lib_directory           add C:/Users/lmh1/Documents/calculations/ipr/Kittel
+lammps_command          add lmp_mpi
 
 #Read in all potentials from a directory
-pot_location            add /users/lmh1/iprPy/reference-libraries/potentials
+pot_location            add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/potentials
 function                lammps_potentials pot_location 
 
 ###################
@@ -14,16 +14,15 @@ function                lammps_potentials pot_location
 ###################
 
 #Initial path and command information
-run_directory           add /data/lmh1/calculations/ipr/torun/1
+run_directory           add C:/Users/lmh1/Documents/calculations/ipr/torun/1
 mpi_command             add 
 
 #Build list of prototypes from reference-libraries/prototypes directory
-#proto_dir               add /users/lmh1/iprPy/reference-libraries/prototypes
-#function                add_directory_files proto proto_dir
-proto			add /users/lmh1/iprPy/reference-libraries/prototypes/A2--W--bcc.json
+proto_dir               add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/prototypes
+function                add_directory_files proto proto_dir
 
 #Make load systems from prototypes and experimental lattice constants
-proto_params            add /users/lmh1/iprPy/reference-libraries/experimental-values/prototype_params.json
+proto_params            add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/experimental-values/prototype_params.json
 function                load_from_prototypes proto proto_params
 
 #Define box size multipliers
@@ -37,47 +36,47 @@ calculation             refine_structure_static strain_range 1e-7
 ###############
 
 #Clear system information
-load                    clear
-load_options            clear
-load_elements           clear
-box_parameters          clear
+#load                    clear
+#load_options            clear
+#load_elements           clear
+#box_parameters          clear
 
 #Find all refine_structure_static results and prepare systems for loading
-function                load_from_library refine_structure_static
+#function                load_from_library refine_structure_static
 
 #Add more sizes
-size_mults              add 4 4 4  
-size_mults              add 5 5 5 
-size_mults              add 6 6 6 
-size_mults              add 7 7 7 
-size_mults              add 8 8 8 
-size_mults              add 9 9 9 
-size_mults              add 10 10 10 
+#size_mults              add 4 4 4  
+#size_mults              add 5 5 5 
+#size_mults              add 6 6 6 
+#size_mults              add 7 7 7 
+#size_mults              add 8 8 8 
+#size_mults              add 9 9 9 
+#size_mults              add 10 10 10 
 
 #Build list of point defects
-ptd_dir                 add /users/lmh1/iprPy/reference-libraries/point/A2--W--bcc
-function                add_directory_files ptd_model ptd_dir
+#ptd_dir                 add C:/users/lmh1/documents/iprPy/reference-libraries/point/A2--W--bcc
+#function                add_directory_files ptd_model ptd_dir
 
 #Run calculation
-calculation             point_defect_formation_static
+#calculation             point_defect_formation_static
 
 ######################
 #Dislocation Monopole#
 ######################
 
 #Change box size multipliers
-size_mults              clear
-size_mults              add -24 24 -40 40 0 32
-anneal_temperature      add 0
+#size_mults              clear
+#size_mults              add -24 24 -40 40 0 32
+#anneal_temperature      add 0
 
 #Change mpi command
-mpi_command             clear
-mpi_command             add mpirun -np 16
-run_directory           clear
-run_directory           add /data/lmh1/calculations/ipr/torun/16
+#mpi_command             clear
+#mpi_command             add mpirun -np 16
+#run_directory           clear
+#run_directory           add /data/lmh1/calculations/ipr/torun/16
 
 #Load dislocation model
-dislocation_model       add /users/lmh1/iprPy/reference-libraries/dislocations/A2--W--bcc/111-screw.json
+#dislocation_model       add /users/lmh1/iprPy/reference-libraries/dislocations/A2--W--bcc/111-screw.json
 
 #Run calculation
-calculation             dislocation_monopole
+#calculation             dislocation_monopole
