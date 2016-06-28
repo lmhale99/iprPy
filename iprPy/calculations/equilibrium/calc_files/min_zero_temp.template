@@ -1,0 +1,28 @@
+#LAMMPS input script that performs a simple energy minimization
+
+<atomman_system_info>
+
+<atomman_pair_info>
+
+compute pe all pe/atom
+compute ke all ke/atom
+compute stress all stress/atom NULL
+compute rdf all rdf 100
+
+thermo <thermo_steps>
+thermo_style custom step temp pe ke etotal lx ly lz pxx pyy pzz pyz pxz pxy
+timestep 0.001
+
+fix nph all nph aniso <pressure> <pressure> 1.0
+fix langevin all langevin 0.0 0.0 1.0 <random_seed>
+
+displace_atoms all random  0.05 0.05 0.05 <random_seed> units box
+
+dump dump_chkpt all custom <dump_every> dump.* id type mass xu yu zu &
+vx vy vz &
+c_pe c_ke & 
+c_stress[1] c_stress[2] c_stress[3] c_stress[4] c_stress[5] c_stress[6]
+
+fix print_rdf all ave/time <dump_every> 1 <dump_every> c_rdf file rdf.dat mode vector
+
+run <run_steps>

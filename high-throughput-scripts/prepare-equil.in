@@ -1,0 +1,41 @@
+##############
+#Common Setup#
+##############
+
+#Initial path and command information
+lib_directory           add C:/Users/lmh1/Documents/calculations/ipr/Kittel-alt
+run_directory           add C:/Users/lmh1/Documents/calculations/ipr/torun/1
+lammps_command          add lmp_mpi
+mpi_command             add 
+
+#Read in potentials from a directory
+pot_location            add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/potentials
+pot_name                add 2003--Mendelev-M-I--Fe-2
+
+function                lammps_potentials pot_location name pot_name
+
+#############
+#Equilibrium#
+#############
+
+#load systems from prototypes and experimental lattice constants
+proto                   add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/prototypes/A2--W--bcc.json
+proto_params            add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/experimental-values/prototype_params.json
+function                load_from_prototypes proto proto_params
+
+#Define box size multipliers
+size_mults              add 5 5 5
+size_mults              add 3 3 3
+size_mults              add 10 10 10 
+
+#Define temperature and pressure
+temperature             adds 300.0
+pressure                add 0.0
+
+#Specify run step parameters
+thermo_steps            add 1
+dump_every              add 100000
+run_steps               add 1000000
+
+#Run calculation
+calculation             equilibrium

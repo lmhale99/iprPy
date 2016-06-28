@@ -1,0 +1,33 @@
+#Run script for calc_refine_structure_static.py
+
+#Command lines for LAMMPS (and MPI).
+#For lammps_command, exclude passing in a script, i.e. no "-in term" or "< term"
+lammps_command              <lammps_command>
+mpi_command                 <mpi_command>
+
+#Paths to the potential data model file, and directory containing potential parameters
+potential_file              <potential_file>
+potential_dir               <potential_dir>
+
+#Initial system configuration to load
+load                        <load>
+load_options                <load_options>
+symbols                     <symbols>
+
+#System manipulations
+size_mults                  <size_mults>
+box_parameters              <box_parameters>
+
+#Units that input/output values are in
+length_unit                 <length_unit>
+pressure_unit               <pressure_unit>
+energy_unit                 <energy_unit>
+force_unit                  <force_unit>
+
+#Run parameters
+thermo_steps                <thermo_steps>
+pressure                    <pressure>
+dump_every                  <dump_every>
+run_steps                   <run_steps>
+temperature                 <temperature>
+random_seed                 <random_seed>
