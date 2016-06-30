@@ -47,7 +47,7 @@ def process_common_terms(input_dict, UUID=None):
     assert 'load'           in input_dict, 'load value not supplied'
     
     #Set default values to optional keys
-    if uuid is not None:
+    if UUID is not None:
         input_dict['uuid'] =       UUID
     else:
         input_dict['uuid'] =       input_dict.get('uuid',           str(uuid.uuid4()))
@@ -68,7 +68,7 @@ def process_common_terms(input_dict, UUID=None):
     input_dict['y-axis'] =         input_dict.get('y-axis',         [0, 1, 0])
     input_dict['z-axis'] =         input_dict.get('z-axis',         [0, 0, 1])
     input_dict['atom_shift'] =     input_dict.get('atom_shift',     [0, 0, 0])   
-    input_dict['size_mults'] =     input_dict.get('size_mults',     [1, 1, 1])
+    input_dict['size_mults'] =     input_dict.get('size_mults',     [(0,1), (0,1), (0,1)])
  
     #Convert strings to number lists
     if isinstance(input_dict['x-axis'], (str, unicode)): 
@@ -155,7 +155,7 @@ def process_common_terms(input_dict, UUID=None):
         
         #x-axis, y-axis, z-axis
         axes = np.array([input_dict['x-axis'], input_dict['y-axis'], input_dict['z-axis']], dtype='float64')
-        print axes
+
         if True:
             input_dict['initial_system'] = am.tools.rotate_cubic(input_dict['initial_system'], axes)
         else:
@@ -169,12 +169,20 @@ def process_common_terms(input_dict, UUID=None):
         input_dict['initial_system'].atoms_prop(key='pos', value=pos+shift)
         
         #size_mults
+        if len(input_dict['size_mults']) == 6:
+            input_dict['size_mults'] = [(input_dict['size_mults'][0], input_dict['size_mults'][1]), 
+                                        (input_dict['size_mults'][2], input_dict['size_mults'][3]),
+                                        (input_dict['size_mults'][4], input_dict['size_mults'][5])]
+            
         if len(input_dict['size_mults']) == 3:
+            for i in xrange(3):
+                if isinstance(input_dict['size_mults'][i], (int, long)):
+                    if input_dict['size_mults'][i] > 0:
+                        input_dict['size_mults'][i] = (0, input_dict['size_mults'][i])
+                    elif input_dict['size_mults'][i] < 0:
+                        input_dict['size_mults'][i] = (input_dict['size_mults'][i], 0)
             input_dict['initial_system'].supersize(input_dict['size_mults'][0], input_dict['size_mults'][1], input_dict['size_mults'][2])
-        elif len(size_params) == 6:
-            input_dict['initial_system'].supersize((input_dict['size_mults'][0], input_dict['size_mults'][1]), 
-                                                   (input_dict['size_mults'][2], input_dict['size_mults'][3]),
-                                                   (input_dict['size_mults'][4], input_dict['size_mults'][5]))
+                                                   
         else:
             raise ValueError('Invalid size_mults command')                              
         
