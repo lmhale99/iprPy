@@ -1,26 +1,20 @@
 from DataModelDict import DataModelDict as DM
-from iprPy.tools import atomman_input
+from iprPy.tools import input
 import atomman as am
 
-def read_input(*args):
+def read_input(f, uuid=None):
     """Reads the calc_*.in input commands for this calculation."""
     
-    #Read in input terms. 
-    #This also interprets terms consistent across the atomman-based calculations.
-    input_dict = atomman_input.input(*args)
+    #Read input file in as dictionary    
+    input_dict = input.file_to_dict(f)
+    
+    #Interpret input terms common across calculations
+    input.process_common_terms(input_dict)  
     
     #Interpret input terms unique to this calculation.
     input_dict['strain_range'] = float(input_dict.get('strain_range', 1e-5))
-    input_dict['pressure_xx'] = atomman_input.value_unit(input_dict.get('pressure_xx', '0.0'), default_unit=input_dict['pressure_unit'])
-    input_dict['pressure_yy'] = atomman_input.value_unit(input_dict.get('pressure_yy', '0.0'), default_unit=input_dict['pressure_unit'])
-    input_dict['pressure_zz'] = atomman_input.value_unit(input_dict.get('pressure_zz', '0.0'), default_unit=input_dict['pressure_unit'])
-    
-    #Convert ucell box mult terms to single integers
-    try: input_dict['a_mult'] = input_dict['a_mult'][1] - input_dict['a_mult'][0]
-    except: pass
-    try: input_dict['b_mult'] = input_dict['b_mult'][1] - input_dict['b_mult'][0]
-    except: pass
-    try: input_dict['c_mult'] = input_dict['c_mult'][1] - input_dict['c_mult'][0]
-    except: pass     
+    input_dict['pressure_xx'] = input.value_unit(input_dict, 'pressure_xx', default_unit=input_dict['pressure_unit'], default_term='0.0 GPa')
+    input_dict['pressure_yy'] = input.value_unit(input_dict, 'pressure_yy', default_unit=input_dict['pressure_unit'], default_term='0.0 GPa')
+    input_dict['pressure_zz'] = input.value_unit(input_dict, 'pressure_zz', default_unit=input_dict['pressure_unit'], default_term='0.0 GPa')   
     
     return input_dict

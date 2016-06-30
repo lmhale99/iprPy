@@ -22,9 +22,10 @@ def data_model(input_dict, results_dict=None):
     
     calc['calculation']['run-parameter'] = run_params = DM()
     run_params['strain-range'] = input_dict['strain_range']
-    run_params['a-multiplyer'] = input_dict['a_mult']
-    run_params['b-multiplyer'] = input_dict['b_mult']
-    run_params['c-multiplyer'] = input_dict['c_mult']
+    run_params['size-multipliers'] = DM()
+    run_params['size-multipliers']['a'] = list(input_dict['size_mults'][0])
+    run_params['size-multipliers']['b'] = list(input_dict['size_mults'][1])
+    run_params['size-multipliers']['c'] = list(input_dict['size_mults'][2])
     
     #Copy over potential data model info
     calc['potential'] = input_dict['potential']['LAMMPS-potential']['potential']
@@ -60,10 +61,13 @@ def data_model(input_dict, results_dict=None):
     else:
         
         #Update ucell to relaxed lattice parameters
+        a_mult = input_dict['size_mults'][0][1] - input_dict['size_mults'][0][0]
+        b_mult = input_dict['size_mults'][1][1] - input_dict['size_mults'][1][0]
+        c_mult = input_dict['size_mults'][2][1] - input_dict['size_mults'][2][0]
         relaxed_ucell = deepcopy(input_dict['ucell'])
-        relaxed_ucell.box_set(a = results_dict['cell_new'].box.a / input_dict['a_mult'],
-                              b = results_dict['cell_new'].box.b / input_dict['b_mult'],
-                              c = results_dict['cell_new'].box.c / input_dict['c_mult'],
+        relaxed_ucell.box_set(a = results_dict['cell_new'].box.a / a_mult,
+                              b = results_dict['cell_new'].box.b / b_mult,
+                              c = results_dict['cell_new'].box.c / c_mult,
                               scale = True)
         
         #Save data model of the relaxed ucell                      

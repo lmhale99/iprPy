@@ -28,7 +28,8 @@ def read_input(f, uuid=None):
         
     else:
         input_dict['dislocation_model'] = None
-        
+     
+    #Interpret input terms common across calculations
     input.process_common_terms(input_dict)    
     
     #Interpret input terms unique to this calculation.
