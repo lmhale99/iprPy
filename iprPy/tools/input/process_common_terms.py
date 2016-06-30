@@ -77,7 +77,7 @@ def process_common_terms(input_dict, UUID=None):
         input_dict['y-axis'] = list(np.array(input_dict['y-axis'].strip().split(), dtype=float))
     if isinstance(input_dict['z-axis'], (str, unicode)):
         input_dict['z-axis'] = list(np.array(input_dict['z-axis'].strip().split(), dtype=float))
-    if isinstance(input_dict['size_mults'], (str, unicode)): 
+    if isinstance(input_dict['atom_shift'], (str, unicode)): 
         input_dict['atom_shift'] = list(np.array(input_dict['atom_shift'].strip().split(), dtype=float))
     if isinstance(input_dict['size_mults'], (str, unicode)): 
         input_dict['size_mults'] = list(np.array(input_dict['size_mults'].strip().split(), dtype=int))        
