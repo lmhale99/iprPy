@@ -10,7 +10,8 @@ dist/
 build/
 
 #Notebook checkpoints and data
-demo-Notebooks/*/
+demo-Notebooks/.ipynb_checkpoints/
+demo-Notebooks/*/*/
 
 #non-IPR potentials
 reference-libraries/potentials/2015--Thompson-A-P--Ta.json
