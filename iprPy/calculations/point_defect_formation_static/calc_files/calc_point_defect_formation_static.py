@@ -29,11 +29,12 @@ def main(*args):
     
     #Unscale vector parameters relative to ucell
     for params in input_dict['ptd_model'].iterfinds('atomman-defect-point-parameters'):
-        if 'pos' in params:
-            params['pos'] = list(input_dict['ucell'].unscale(params['pos']))
-        if 'db_vect' in params:
-            params['db_vect'] = list(input_dict['ucell'].unscale(params['db_vect']))
-        params['scale'] = False
+        if 'scale' in params and params['scale'] is True:
+            if 'pos' in params:
+                params['pos'] = list(input_dict['ucell'].unscale(params['pos']))
+            if 'db_vect' in params:
+                params['db_vect'] = list(input_dict['ucell'].unscale(params['db_vect']))
+            params['scale'] = False
         
     #Run quick_a_Cij to refine values
     results_dict = ptd_energy(input_dict['lammps_command'],

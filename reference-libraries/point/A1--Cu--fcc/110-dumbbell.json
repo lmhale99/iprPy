@@ -1,11 +1,10 @@
 {
-    "point-defect": {
-        "crystal-info": {
-            "artifact": "A1--Cu--fcc.json"
+    "point-defect-parameters": {
+        "point-defect": {
+            "key": "e774b498-a339-4689-846a-8ac53acf588e",
+            "id": "110-dumbbell"
         }, 
-        "identifier": {
-            "name": "110-dumbbell"
-        }, 
+        "system-family": "A1--Cu--fcc", 
         "atomman-defect-point-parameters": {
             "ptd_type": "db", 
             "atype": 1, 

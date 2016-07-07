@@ -1,11 +1,10 @@
 {
-    "point-defect": {
-        "crystal-info": {
-            "artifact": "A1--Cu--fcc.json"
+    "point-defect-parameters": {
+        "point-defect": {
+            "key": "e7c2e1cf-eb2c-4ead-9880-3f45080420f1",
+            "id": "1nn-divacancy"
         }, 
-        "identifier": {
-            "name": "1nn-divacancy"
-        }, 
+        "system-family": "A1--Cu--fcc", 
         "atomman-defect-point-parameters": [
             {
                 "ptd_type": "v", 

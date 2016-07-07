@@ -21,10 +21,10 @@ def data_model(input_dict, results_dict=None):
     calc['calculation']['script'] = __calc_name__
     
     calc['calculation']['run-parameter'] = run_params = DM()
-    run_params['a-multiplyer'] = input_dict['a_mult']
-    run_params['b-multiplyer'] = input_dict['b_mult']
-    run_params['c-multiplyer'] = input_dict['c_mult']
-    run_params['c-multiplyer'] = input_dict['c_mult']
+    run_params['size-multipliers'] = DM()
+    run_params['size-multipliers']['a'] = list(input_dict['size_mults'][0])
+    run_params['size-multipliers']['b'] = list(input_dict['size_mults'][1])
+    run_params['size-multipliers']['c'] = list(input_dict['size_mults'][2])
     run_params['energy_tolerance']    = input_dict['energy_tolerance']
     run_params['force_tolerance']     = input_dict['force_tolerance']
     run_params['maximum_iterations']  = input_dict['maximum_iterations']

@@ -1,10 +1,10 @@
 {
     "point-defect-parameters": {
         "point-defect": {
-            "key": "97628465-3654-47b8-9176-12c597424067",
-            "id": "111-dumbbell"
+            "key": "0be942c9-8cf7-495a-a960-7ae21b437154",
+            "id": "2110-dumbbell"
         }, 
-        "system-family": "A1--Cu--fcc", 
+        "system-family": "A3--Mg--hcp", 
         "atomman-defect-point-parameters": {
             "ptd_type": "db", 
             "atype": 1, 
@@ -14,9 +14,9 @@
                 0.0
             ], 
             "db_vect": [
-                0.25, 
-                0.25, 
-                0.25
+                0.33333333333333, 
+                0.0, 
+                0.0
             ], 
             "scale": true
         }

@@ -1,17 +1,17 @@
 {
     "point-defect-parameters": {
         "point-defect": {
-            "key": "610f3964-c647-45ce-a62e-31941ff007b5",
-            "id": "tetrahedral-interstitial"
+            "key": "c24e4400-e680-43ef-be68-6bc4a04986b5",
+            "id": "basal-tetrahedral-interstitial"
         }, 
-        "system-family": "A1--Cu--fcc", 
+        "system-family": "A3--Mg--hcp", 
         "atomman-defect-point-parameters": {
             "ptd_type": "i", 
             "atype": 1, 
             "pos": [
-                0.25, 
-                0.25, 
-                0.25
+                0.5, 
+                -0.1666666666666666666667, 
+                0.0
             ], 
             "scale": true
         }

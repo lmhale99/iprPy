@@ -1,11 +1,10 @@
 {
-    "point-defect": {
-        "crystal-info": {
-            "artifact": "A1--Cu--fcc.json"
+    "point-defect-parameters": {
+        "point-defect": {
+            "key": "3aa3bb62-f109-468b-b651-3590b0f666c5",
+            "id": "octahedral-interstitial"
         }, 
-        "identifier": {
-            "name": "octahedral-interstitial"
-        }, 
+        "system-family": "A1--Cu--fcc", 
         "atomman-defect-point-parameters": {
             "ptd_type": "i", 
             "atype": 1, 

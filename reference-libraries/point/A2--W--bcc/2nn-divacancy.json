@@ -1,10 +1,10 @@
 {
     "point-defect-parameters": {
         "point-defect": {
-            "key": "6a811ef7-6ec9-4570-8079-6e407742ca31",
+            "key": "a24282b1-253f-4f59-81da-1a4261c5dbde",
             "id": "2nn-divacancy"
         }, 
-        "system-family": "A1--Cu--fcc", 
+        "system-family": "A2--W--bcc", 
         "atomman-defect-point-parameters": [
             {
                 "ptd_type": "v", 
