@@ -1,0 +1,18 @@
+{
+    "stacking_fault-parameters": {
+        "stacking-fault": {
+            "id": "110-stacking-fault"
+        },
+        "system-family": "A1--Cu--fcc",
+        "atomman-generalized-fault-parameters": {         
+            "crystallographic-axes": {
+                "x-axis": [0, 0, 1],
+                "y-axis": [1, -1, 0],
+                "z-axis": [ 1, 1, 0]
+            },
+            "shift": [ 0.00000000000000, 0.00000000000000, 0.00000000000000],
+            "cutting-axis": "z",
+            "cutting-plane-location": 0.5
+        }
+    }
+}

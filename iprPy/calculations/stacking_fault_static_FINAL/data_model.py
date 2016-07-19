@@ -21,7 +21,6 @@ def data_model(input_dict, results_dict=None):
     calc['calculation']['script'] = __calc_name__
     
     calc['calculation']['run-parameter'] = run_params = DM()
-    run_params['strain-range'] = input_dict['strain_range']
     run_params['size-multipliers'] = DM()
     run_params['size-multipliers']['a'] = list(input_dict['size_mults'][0])
     run_params['size-multipliers']['b'] = list(input_dict['size_mults'][1])
@@ -30,6 +29,7 @@ def data_model(input_dict, results_dict=None):
     run_params['force_tolerance']     = input_dict['force_tolerance']
     run_params['maximum_iterations']  = input_dict['maximum_iterations']
     run_params['maximum_evaluations'] = input_dict['maximum_evaluations']
+    run_params['stacking_fault_shift_amount'] = input_dict['stacking_fault_shift_amount']
     
     #Copy over potential data model info
     calc['potential'] = input_dict['potential']['LAMMPS-potential']['potential']
@@ -43,7 +43,7 @@ def data_model(input_dict, results_dict=None):
     calc['system-info']['artifact']['family'] = input_dict['system_family']
     calc['system-info']['symbols'] = input_dict['symbols']
     
-    if input_dict['sf_model'] is None:
+    if input_dict['stacking_fault_model'] is None:
         calc['stacking-fault-parameters'] = sfp = DM()
         sfp['system-family'] = input_dict['system_family']
         sfp['atomman-generalized-fault-parameters'] = DM()
@@ -51,11 +51,11 @@ def data_model(input_dict, results_dict=None):
         sfp['atomman-generalized-fault-parameters']['crystallographic-axes']['x-axis'] = input_dict['x-axis']
         sfp['atomman-generalized-fault-parameters']['crystallographic-axes']['y-axis'] = input_dict['y-axis']
         sfp['atomman-generalized-fault-parameters']['crystallographic-axes']['z-axis'] = input_dict['z-axis']
-        sfp['atomman-generalized-fault-parameters']['shift'] = input_dict['atom_shift']
-        sfp['atomman-generalized-fault-parameters']['plane'] = input_dict['Which plane is cut?']
+        sfp['atomman-generalized-fault-parameters']['shift'] = input_dict['shift_amount']
+        sfp['atomman-generalized-fault-parameters']['cutting-axis'] = input_dict['cutting_axis']
     else:
-        calc['stacking-fault-parameters'] = input_dict['sf_model']['stacking-fault-parameters']
-    
+        calc['stacking-fault-parameters'] = input_dict['stacking_fault_model']['stacking_fault-parameters']
+        
     if results_dict is None:
         calc['status'] = 'not calculated'
     else:              
@@ -65,14 +65,15 @@ def data_model(input_dict, results_dict=None):
                                       ('unit', input_dict['energy_unit'])])
         
         #Specify the fault plane
-        if input_dict['Which plane is cut?'] == 'x':
+        if input_dict['stacking_fault_model']['stacking_fault-parameters']['atomman-generalized-fault-parameters']['cutting-axis'] == 'x':
             calc['fault-plane'] = input_dict['x-axis']
-        if input_dict['Which plane is cut?'] == 'y':
+        if input_dict['stacking_fault_model']['stacking_fault-parameters']['atomman-generalized-fault-parameters']['cutting-axis'] == 'y':
             calc['fault-plane'] = input_dict['y-axis']
-        if input_dict['Which plane is cut?'] == 'z':
+        if input_dict['stacking_fault_model']['stacking_fault-parameters']['atomman-generalized-fault-parameters']['cutting-axis'] == 'z':
             calc['fault-plane'] = input_dict['z-axis']
-        #Save the free surface energy
         
+        
+        #Save the free surface energy
         calc['free-surface-energy'] = DM([('value', uc.get_in_units(results_dict['surface_energy'], 
                                                                     input_dict['energy_unit']+'/'+input_dict['length_unit']+'^2')), 
                                           ('unit', input_dict['energy_unit']+'/'+input_dict['length_unit']+'^2')])

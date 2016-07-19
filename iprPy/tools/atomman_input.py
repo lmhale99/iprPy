@@ -23,7 +23,7 @@ def get_value(v, key, default=None):
     if value is None:
         raise KeyError('Variable ' + key + ' not defined')
     elif isinstance(value, list):
-        assert len(value) == 1, 'Variable ' + key + ' must have exactly one value for ' + __calc_name__
+        assert len(value) == 1, 'Variable ' + key + ' must have exactly one value'
         return value[0]
     else:
         return value
