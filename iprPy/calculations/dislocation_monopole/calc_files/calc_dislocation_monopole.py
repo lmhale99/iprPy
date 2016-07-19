@@ -25,27 +25,22 @@ def main(*args):
         input_dict = iprPy.calculation_read_input(__calc_type__, f, *args[1:])
     
     #Pull out dislocation-related parameters
-    disl_params = input_dict['dislocation_model'].find('atomman-defect-Stroh-parameters')
-    burgers = input_dict['ucell'].box.a * np.array(disl_params['burgers'])
+    burgers = input_dict['ucell'].box.a * np.array(input_dict['burgers'])
     b_width = input_dict['ucell'].box.a * np.array(input_dict['boundary_width'])
-    axes = np.array([disl_params['crystallographic-axes']['x-axis'],
-                     disl_params['crystallographic-axes']['y-axis'],
-                     disl_params['crystallographic-axes']['z-axis']], dtype='int32')                     
-    C = am.tools.ElasticConstants(model=input_dict['elastic_constants_model'])
+    axes = np.array([input_dict['x-axis'], input_dict['y-axis'], input_dict['z-axis']])                     
+    C = input_dict['C']
     
     #Read in potential
     potential = lmp.Potential(input_dict['potential'], input_dict['potential_dir'])        
     
-    #Generate perfect system
-    system = am.tools.rotate_cubic(input_dict['ucell'], axes)
-    spos = system.atoms_prop(key='pos', scale=True) + np.array(disl_params['shift'])
-    system.atoms_prop(key='pos', value=spos, scale=True)
-    system.wrap()
-    system.supersize(input_dict['a_mult'], input_dict['b_mult'],input_dict['c_mult'])
+    #Save initial perfect system
+    system = input_dict['initial_system']
     system_info = am.lammps.atom_data.dump('base.dat', system, units=potential.units, atom_style=potential.atom_style)
     
-    #Generate dislocation monopole system
+    #Solve Stroh method for the dislocation
     stroh = am.defect.Stroh(C, burgers, axes=axes)
+    
+    #Use Stroh displacements to add dislocation monopole to the system
     pos = system.atoms_prop(key='pos')
     disp = stroh.displacement(pos)
     system.atoms_prop(key='pos', value=pos+disp)
@@ -90,7 +85,7 @@ def main(*args):
     #Save data model of results 
     results = iprPy.calculation_data_model(__calc_type__, input_dict, results_dict)
     with open('results.json', 'w') as f:
-        results.json(fp=f)
+        results.json(fp=f, indent=4)
 
 
 def boundary_fix(system, symbols, b_width, shape='circle'):

@@ -6,9 +6,9 @@
         },
         "character": {
             "type": "screw",
-            "burgersVector": "a/2[ 1, 1, 1]",
-            "slipPlane": [-1, 0, 1],
-            "lineDirection": [ 1, 1, 1]
+            "Burgers-vector": "a/2[ 1, 1, 1]",
+            "slip-plane": [-1, 0, 1],
+            "line-direction": [ 1, 1, 1]
         },
         "system-family": "A2--W--bcc",
         "atomman-defect-Stroh-parameters": {

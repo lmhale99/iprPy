@@ -1,0 +1,24 @@
+{
+    "dislocation-monopole-parameters": {    
+        "dislocation": {
+            "key": "d59f2382-17e5-4fbd-b398-407c75e6009a", 
+            "id": "111-edge"
+        },
+        "character": {
+            "type": "edge",
+            "Burgers-vector": "a/2[ 1, 0,-1]",
+            "slip-plane": [ 1, 1, 1],
+            "line-direction": [ 1,-2, 1]
+        },
+        "system-family": "A1--Cu--fcc",
+        "atomman-defect-Stroh-parameters": {
+            "burgers": [ 0.5, 0.0,-0.5],
+            "crystallographic-axes": {
+                "x-axis": [ 1, 0,-1],
+                "y-axis": [ 1, 1, 1],
+                "z-axis": [ 1,-2, 1]
+            },
+            "shift": [ 0.00000000000000, 0.25000000000000, 0.00000000000000]
+        }
+    }
+}

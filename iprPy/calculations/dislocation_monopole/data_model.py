@@ -20,9 +20,10 @@ def data_model(input_dict, results_dict=None):
     calc['calculation']['script'] = __calc_name__
     
     calc['calculation']['run-parameter'] = run_params = DM()
-    run_params['a-multiplyer'] = input_dict['a_mult']
-    run_params['b-multiplyer'] = input_dict['b_mult']
-    run_params['c-multiplyer'] = input_dict['c_mult']
+    run_params['size-multipliers'] = DM()
+    run_params['size-multipliers']['a'] = list(input_dict['size_mults'][0])
+    run_params['size-multipliers']['b'] = list(input_dict['size_mults'][1])
+    run_params['size-multipliers']['c'] = list(input_dict['size_mults'][2])
     run_params['anneal_temperature'] = input_dict['anneal_temperature']
     run_params['boundary_width'] = input_dict['boundary_width']
     run_params['boundary_shape'] = input_dict['boundary_shape']
@@ -44,12 +45,26 @@ def data_model(input_dict, results_dict=None):
     calc['system-info']['symbols'] = input_dict['symbols']
     
     #Save data model of the initial ucell
-    calc['dislocation-monopole-parameters'] = input_dict['dislocation_model']['dislocation-monopole-parameters']
+    if input_dict['dislocation_model'] is None:
+        calc['dislocation-monopole-parameters'] = dmp = DM()
+        dmp['system-family'] = input_dict['system_family']
+        dmp['atomman-defect-Stroh-parameters'] = DM()
+        dmp['atomman-defect-Stroh-parameters']['burgers'] = input_dict['burgers']
+        dmp['atomman-defect-Stroh-parameters']['crystallographic-axes'] = DM()
+        dmp['atomman-defect-Stroh-parameters']['crystallographic-axes']['x-axis'] = input_dict['x-axis']
+        dmp['atomman-defect-Stroh-parameters']['crystallographic-axes']['y-axis'] = input_dict['y-axis']
+        dmp['atomman-defect-Stroh-parameters']['crystallographic-axes']['z-axis'] = input_dict['z-axis']
+        dmp['atomman-defect-Stroh-parameters']['shift'] = input_dict['atom_shift']
+    else:
+        calc['dislocation-monopole-parameters'] = input_dict['dislocation_model']['dislocation-monopole-parameters']
     
     if results_dict is None:
         calc['status'] = 'not calculated'
     else:
-        calc['elastic-constants'] = input_dict['elastic_constants_model'].find('elastic-constants')
+        if input_dict['elastic_constants_model'] is None:
+            calc['elastic-constants'] = input_dict['C'].model(unit=input_dict['pressure_unit'])['elastic-constants']
+        else:
+            calc['elastic-constants'] = input_dict['elastic_constants_model']['elastic-constants']
     
         calc['defect-free-system'] = DM()
         calc['defect-free-system']['artifact'] = DM()

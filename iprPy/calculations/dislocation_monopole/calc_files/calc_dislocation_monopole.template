@@ -13,10 +13,34 @@ potential_dir               <potential_dir>
 load                        <load>
 load_options                <load_options>
 symbols                     <symbols>
+box_parameters              <box_parameters>
 
 #System manipulations
+x-axis                      <x-axis>
+y-axis                      <y-axis>
+z-axis                      <z-axis>
+atom_shift                  <atom_shift>
 size_mults                  <size_mults>
-box_parameters              <box_parameters>
+
+#Dislocation model (contains axes, shift, and burgers_vector terms)
+dislocation_model           <dislocation_model>
+
+#Elastic constants model (contains all Cij terms)
+elastic_constants_model     <elastic_constants_model>
+
+#Dislocation parameters
+burgers_vector              <burgers_vector>
+boundary_width              <boundary_width>
+boundary_shape              <boundary_shape>
+C11                         <C11>
+C22                         <C22>
+C33                         <C33>
+C12                         <C12>
+C13                         <C13>
+C23                         <C23>
+C44                         <C44>
+C55                         <C55>   
+C66                         <C66>
 
 #Units that input/output values are in
 length_unit                 <length_unit>
@@ -24,13 +48,8 @@ pressure_unit               <pressure_unit>
 energy_unit                 <energy_unit>
 force_unit                  <force_unit>
 
-#Defect parameters
-dislocation_model           <dislocation_model>
-anneal_temperature          <anneal_temperature>
-boundary_width              <boundary_width>
-boundary_shape              <boundary_shape>
-
 #Run parameters
+anneal_temperature          <anneal_temperature>
 energy_tolerance            <energy_tolerance>
 force_tolerance             <force_tolerance>
 maximum_iterations          <maximum_iterations>
