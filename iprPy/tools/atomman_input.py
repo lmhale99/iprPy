@@ -29,7 +29,7 @@ def get_value(v, key, default=None):
         return value
         
         
-def yield_symbols(load, load_options, load_elements, v, potential):
+def yield_symbols(load, load_options, load_elements, variables, potential):
     """Interpret the load_elements string and yield all symbols combinations"""
 
     #if load_elements is empty, then use elements from the load file
@@ -78,8 +78,8 @@ def yield_symbols(load, load_options, load_elements, v, potential):
     load_elements = load_elements[1:-1].split(',')
     for i in xrange(len(load_elements)):
         element = load_elements[i].strip()
-        if element in v:
-            load_elements[i] = v[element]
+        if element in variables:
+            load_elements[i] = variables[element]
         else:
             load_elements[i] = [element]
     #print load_elements

@@ -2,92 +2,69 @@ import os
 import atomman.lammps as lmp
 import sys
 
-from iprPy.tools import list_build
+from iprPy.tools import term_extractor
+import add_directory_files
 
-def prepare(terms, variable):
-    """Generate potential_file and potential_dir terms."""
+def description():
+    """Returns a description for the prepare_function."""
+    return "The lammps_potentials prepare_function adds matching values to the 'potential_file' and 'potential_dir' variables. The directories given by 'potential_path' should contain LAMMPS-potential data model (JSON/XML) files and sub-directories with matching names containing the potential's artifacts (eg. setfl file). The optional variables 'potential_name' and 'elements' limits the search for only potentials with the given names, and/or potentials containing at least one of the listed elements."
+    
+def keywords():
+    """Return the list of keywords used by this prepare_function that are searched for from the inline terms and pre-defined variables."""
+    return ['potential_path', 'potential_name', 'elements']
+
+
+def prepare(terms, variables):
+    """Add to 'potential_file' and 'potential_dir' variables from the given 'file_directory'. The optional variables 'potential_name' and 'elements' limits the search for only potentials with the given names, and/or potentials containing at least one of the listed elements."""
     
     #check on existing potential_file and potential_dir terms
-    potential_file = variable.aslist('potential_file')
-    potential_dir = variable.aslist('potential_dir')
-    assert len(potential_file) == len(potential_dir), 'potential_file and potential_dir must be of the same length!'
-    for i in xrange(len(potential_file)):
-        potential_file[i] = os.path.realpath(potential_file[i])
-        potential_dir[i] = os.path.realpath(potential_dir[i])
+    assert len(variables.aslist('potential_file')) == len(variables.aslist('potential_dir')), 'potential_file and potential_dir must be of the same length!'
     
-    #break terms apart using keywords 'name' and 'with'
-    try: i_with = terms.index('with')
-    except: i_with = len(terms)
-    try: i_name = terms.index('name')
-    except: i_name = len(terms)
+    v = term_extractor(terms, variables, keywords())
     
-    if i_name < i_with:
-        pot_paths = ' '.join(terms[:i_name])
-        pot_names = terms[i_name+1:i_with]
-        with_elems = terms[i_with+1:]
-    else:
-        pot_paths = ' '.join(terms[:i_with])
-        with_elems = terms[i_with+1:i_name]
-        pot_names = terms[i_name+1:]
-    assert 'with' not in pot_names and 'with' not in with_elems, 'with can only appear once in prepare lammps_potentials'     
-    assert 'name' not in pot_names and 'name' not in with_elems, 'name can only appear once in prepare lammps_potentials'  
+    #Generate list of files within file_directory
+    add_directory_files.prepare(['file_directory', 'potential_path', 'v_name', 'all_files'], v)
     
-    #replace terms with defined variables
-    if pot_paths in variable:
-        pot_paths = variable.aslist(pot_paths)
-    else:
-        pot_paths = [pot_paths]
-    
-    pot_names = list_build(pot_names, variable)
-    with_elems = list_build(with_elems, variable)
-    
-    #generate list of all potential names from pot_paths if none were given
-    if len(pot_names) == 0:
-        for pot_path in pot_paths:
-            for fname in os.listdir(pot_path): 
-                name, ext = os.path.splitext(fname)
-                if ext in ['.json', '.xml'] and name not in pot_names:
-                    pot_names.append(name)    
-    
-    #iterate through pot_paths, pot_names and with_elems to build 
-    #potential_file and potential_dir variable lists
-    for pot_path in pot_paths:
-        for pot_name in pot_names:
-            p_dir = os.path.realpath(os.path.join(pot_path, pot_name))
-            if os.path.isdir(p_dir) and not is_path_in_list(p_dir, potential_dir):
-                try:
-                    with open(p_dir+'.xml') as f:
-                        pot = lmp.Potential(f)
-                        p_file = p_dir+'.xml'
-                except:
-                    try:
-                        with open(p_dir+'.json') as f:
-                            pot = lmp.Potential(f)
-                            p_file = p_dir+'.json'
-                    except:
-                        p_file = None
-                if p_file is not None:
-                    if len(with_elems) == 0:
-                        potential_file.append(p_file)
-                        potential_dir.append(p_dir)
-                    else:
-                        elements = pot.elements()
-                        for with_elem in with_elems:
-                            if with_elem in elements:
-                                potential_file.append(p_file)
-                                potential_dir.append(p_dir)
-                                break
-    variable['potential_file'] = potential_file
-    variable['potential_dir'] = potential_dir
-
-
-
+    #iterate through the files
+    for fname in v.iteraslist('all_files'):
+        pot_name, ext = os.path.splitext(os.path.basename(fname))
+        
+        #Check if the file is a data model
+        if ext in ['.json', '.xml']:
+            
+            #If potential_name is given, check that pot_name is in it
+            if 'potential_name' in v:
+                if pot_name not in v.aslist('potential_name'):
+                    continue
+            
+            #Check that the file is a LAMMPS-potential data model
+            try:
+                with open(fname) as f:
+                    pot = lmp.Potential(f)
+            except:
+                continue
+                
+            #If elements is given, check that the potential contains at least one
+            if 'elements' in v:
+                match = False
+                for el in pot.elements():
+                    if el in v.aslist('elements'):
+                        match = True
+                        break
+                if not match:
+                    continue
+                    
+            #Add to potential_file and potential directory if not already there
+            if not is_path_in_list(fname, variables.aslist('potential_file')):
+                dname = os.path.splitext(fname)[0]
+                if not os.path.isdir(dname):
+                    dname = ''
+                variables.append('potential_file', fname)
+                variables.append('potential_dir',  dname)
 
 def is_path_in_list(path, p_list):
     for p in p_list:
-        if os.path.normcase(path) == os.path.normcase(p):
+        if os.path.normcase(os.path.realpath(path)) == os.path.normcase(os.path.realpath(p)):
             return True
-    return False
+    return False 
     
-def process(*args, **kwargs):
-    pass

@@ -1,26 +1,36 @@
 import os
 import glob
 
-from iprPy.tools import list_build
+from iprPy.tools import term_extractor
 
-def prepare(t,v):
+def description():
+    """Returns a description for the prepare_function."""
+    return "The add_directory_files prepare_function adds all file paths in the directories listed in 'file_directory' to a variable name 'v_name'."
+    
+def keywords():
+    """Return the list of keywords used by this prepare_function that are searched for from the inline terms and pre-defined variables."""
+    return ['v_name', 'file_directory']
+
+def prepare(terms, variables):
     """
-    Function for adding all file paths within a directory to a variable name.
-    Requires exactly two terms:
-    - name of the variable to add the file paths to.
-    - directory or variable listing directories containing the files to be added.
+    Function for adding all file paths within a directory or list of directories to a variable name.
     """
 
-    assert len(t) >= 2
-    name = t[0]
-    dirs = list_build(' '.join(t[1:]), v)
+    v = term_extractor(terms, variables, keywords())
+    
+    key = v.get('v_name', 'file')
+    assert not isinstance(key, list), 'v_name must be single-valued'
+    dirs = v.aslist('file_directory')
+    assert len(dirs) > 0, 'No values found for file_directory'
     
     for dir in dirs:
+
         for fname in glob.iglob(os.path.join(dir, '*')):
             fname = os.path.realpath(fname)
+
             if os.path.isfile(fname):
-                if not is_path_in_list(fname, v.aslist(name)):
-                    v.append(name, fname)
+                if not is_path_in_list(fname, variables.aslist(key)):
+                    variables.append(key, fname)
                 
 def is_path_in_list(path, p_list):
     for p in p_list:

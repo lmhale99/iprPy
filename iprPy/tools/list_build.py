@@ -1,26 +1,30 @@
-def list_build(terms, t_dict):
+#def expand_values(values, variables):
+def list_build(values, variables):
     """
-    Takes a list of terms and a dictionary of terms t_dict and builds a full 
-    list where any terms matching names in t_dict are replaced by the t_dict 
-    values. 
+    Expands a list by replacing any values that match key names in a 
+    variable dictionary with the corresponding dictionary's values. Duplicate
+    values are excluded. 
     
     For example:
-    terms = ['x', 'y', 'z']
-    t_dict = {'y':'a', 'z':['b', 'c']}
-    then list_build(terms, t_dict) returns ['x', 'a', 'b', 'c']
-    
+    values = ['x', 'y', 'z']
+    variables = {'y':'a', 'z':['b', 'c']}
+    then expand_values(values, variables) returns ['x', 'a', 'b', 'c']    
     """
     
-    new_terms = []
-    if not isinstance(terms, list):
-        terms = [terms]
+    new_values = []
+    if not isinstance(values, list):
+        values = [values]
     
-    for term in terms:
-        if term in t_dict:
-            for val in t_dict.iteraslist(term):
-                if val not in new_terms:
-                    new_terms.append(val)
+    for value in values:
+        if value in variables:
+            for val in variables.iteraslist(value):
+                if val not in new_values:
+                    new_values.append(val)
         else:  
-            if term not in new_terms:
-                new_terms.append(term)
-    return new_terms
+            if value not in new_values:
+                new_values.append(value)
+    
+    if len(new_values) == 1:
+        new_values = new_values[0]
+    
+    return new_values
