@@ -52,6 +52,12 @@ def main(input_file):
                 elif terms[1] == 'clear':
                     del(variable[name])
                 
+                elif terms[1] == 'set':
+                    value = ' '.join(terms[2:])
+                    if value in variable:
+                        value = deepcopy(variable[value])
+                    variable[name] = value
+                
                 elif terms[1] == 'add':
                     value = ' '.join(terms[2:])
                     if value in variable:

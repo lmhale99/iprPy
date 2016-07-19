@@ -13,13 +13,25 @@ potential_dir               <potential_dir>
 load                        <load>
 load_options                <load_options>
 symbols                     <symbols>
+box_parameters              <box_parameters>
+
+#System manipulations
+x-axis                      <x-axis>
+y-axis                      <y-axis>
+z-axis                      <z-axis>
+shift                       <shift>
+size_mults                  <size_mults>
 
 #Defect data model
 ptd_model                   <ptd_model>
 
-#System manipulations
-size_mults                  <size_mults>
-box_parameters              <box_parameters>
+#Defect parameters (alternative to giving defect data model)
+ptd_type                    <ptd_type>
+ptd_atype                   <ptd_atype>
+ptd_pos                     <ptd_pos>
+ptd_aid                     <ptd_aid>
+ptd_dumbbell_vect           <ptd_dumbbell_vect>
+ptd_scale                   <ptd_scale>
 
 #Units that input/output values are in
 length_unit                 <length_unit>

@@ -2,12 +2,18 @@
 #Common Setup#
 ##############
 
-lib_directory           add C:/Users/lmh1/Documents/calculations/ipr/Kittel
-lammps_command          add lmp_mpi
+potential_path          add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/potentials
+prototype_path          add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/prototypes
+prototype_reference     add C:\Users\lmh1\Documents\Python-packages\iprPy\reference-libraries\experimental-values\prototype_params.json
 
-#Read in all potentials from a directory
-pot_location            add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/potentials
-function                lammps_potentials pot_location 
+potential_name          add 2015--Mendelev-M-I--Al-Sm
+elements                add Al
+
+lammps_command          add lmp_mpi
+lib_directory           add C:/Users/lmh1/Documents/calculations/ipr/Kittel-test
+
+function                load_from_prototypes
+function                lammps_potentials  
 
 ###################
 #Static Structures#
@@ -17,19 +23,12 @@ function                lammps_potentials pot_location
 run_directory           add C:/Users/lmh1/Documents/calculations/ipr/torun/1
 mpi_command             add 
 
-#Build list of prototypes from reference-libraries/prototypes directory
-proto_dir               add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/prototypes
-function                add_directory_files proto proto_dir
-
-#Make load systems from prototypes and experimental lattice constants
-proto_params            add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/experimental-values/prototype_params.json
-function                load_from_prototypes proto proto_params
-
 #Define box size multipliers
 size_mults              add 3 3 3
+print_check
 
 #Run calculation
-calculation             refine_structure_static strain_range 1e-7 
+calculation             refine_structure_static strain_range 4e-7 
 
 ###############
 #Point Defects#
