@@ -19,7 +19,7 @@ box_parameters              <box_parameters>
 x-axis                      <x-axis>
 y-axis                      <y-axis>
 z-axis                      <z-axis>
-atom_shift                  <atom_shift>
+shift                       <shift>
 size_mults                  <size_mults>
 
 #Dislocation model (contains axes, shift, and burgers_vector terms)

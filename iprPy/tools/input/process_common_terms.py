@@ -39,8 +39,7 @@ def process_common_terms(input_dict, UUID=None):
     - initial_system -- the system after ucell has been shifted, rotated and 
                         supersized according to atom_shift, x-axis, y-axis, 
                         z-axis, and size_mults 
-    """    
-        
+    """      
     #Assert required keys exist
     assert 'lammps_command' in input_dict, 'lammps_command value not supplied'
     assert 'potential_file' in input_dict, 'potential_file value not supplied'
@@ -69,7 +68,7 @@ def process_common_terms(input_dict, UUID=None):
     input_dict['z-axis'] =         input_dict.get('z-axis',         [0, 0, 1])
     input_dict['atom_shift'] =     input_dict.get('atom_shift',     [0, 0, 0])   
     input_dict['size_mults'] =     input_dict.get('size_mults',     [(0,1), (0,1), (0,1)])
- 
+
     #Convert strings to number lists
     if isinstance(input_dict['x-axis'], (str, unicode)): 
         input_dict['x-axis'] = list(np.array(input_dict['x-axis'].strip().split(), dtype=float))
@@ -81,7 +80,7 @@ def process_common_terms(input_dict, UUID=None):
         input_dict['atom_shift'] = list(np.array(input_dict['atom_shift'].strip().split(), dtype=float))
     if isinstance(input_dict['size_mults'], (str, unicode)): 
         input_dict['size_mults'] = list(np.array(input_dict['size_mults'].strip().split(), dtype=int))        
-        
+   
     #Read contents of potential_file into potential
     with open(input_dict['potential_file']) as f:
         input_dict['potential'] = DM(f)
@@ -111,20 +110,38 @@ def process_common_terms(input_dict, UUID=None):
     kwargs= {}
     if input_dict['load_options'] is not None:
         load_options_keys = ['key', 'data_set', 'pbc', 'atom_style', 'units', 'prop_info']
-        kwargs = term_extractor(input_dict['load_options'], load_options_keys)
+        kwargs = term_extractor(input_dict['load_options'], {}, load_options_keys)
         
     #ucell and symbols
     ucell = am.System()
-    if True:
+    try:
         symbols = ucell.load(load_style, load_file, **kwargs)
-    else:
+    except:
         symbols = None
         ucell = None            
     if input_dict['symbols'] is None:
         input_dict['symbols'] = symbols
     else:
         input_dict['symbols'] = input_dict['symbols'].split(' ')
-        assert len(symbols) == len(input_dict['symbols']), 'Number of symbols does not match number of sites'
+       # assert len(symbols) == len(input_dict['symbols']), 'Number of symbols does not match number of sites'
+    
+    #size_mults
+    if len(input_dict['size_mults']) == 6:
+        input_dict['size_mults'] = [(input_dict['size_mults'][0], input_dict['size_mults'][1]), 
+                                    (input_dict['size_mults'][2], input_dict['size_mults'][3]),
+                                    (input_dict['size_mults'][4], input_dict['size_mults'][5])]
+        
+    elif len(input_dict['size_mults']) == 3:
+        new_mults = []
+        for i in xrange(3):
+            if input_dict['size_mults'][i] > 0:
+                new_mults.append((0, input_dict['size_mults'][i]))
+            elif input_dict['size_mults'][i] < 0:
+                new_mults.append((input_dict['size_mults'][i], 0)) 
+        input_dict['size_mults'] = new_mults
+    
+    else:
+        raise ValueError('Invalid size_mults command') 
     
     #This is necessary if trying to read an incomplete system_model
     if ucell is not None:
@@ -167,23 +184,7 @@ def process_common_terms(input_dict, UUID=None):
                  input_dict['atom_shift'][2] * input_dict['initial_system'].box.cvect)
         pos = input_dict['initial_system'].atoms_prop(key='pos')
         input_dict['initial_system'].atoms_prop(key='pos', value=pos+shift)
-        
-        #size_mults
-        if len(input_dict['size_mults']) == 6:
-            input_dict['size_mults'] = [(input_dict['size_mults'][0], input_dict['size_mults'][1]), 
-                                        (input_dict['size_mults'][2], input_dict['size_mults'][3]),
-                                        (input_dict['size_mults'][4], input_dict['size_mults'][5])]
-            
-        if len(input_dict['size_mults']) == 3:
-            for i in xrange(3):
-                if isinstance(input_dict['size_mults'][i], (int, long)):
-                    if input_dict['size_mults'][i] > 0:
-                        input_dict['size_mults'][i] = (0, input_dict['size_mults'][i])
-                    elif input_dict['size_mults'][i] < 0:
-                        input_dict['size_mults'][i] = (input_dict['size_mults'][i], 0)
-            input_dict['initial_system'].supersize(input_dict['size_mults'][0], input_dict['size_mults'][1], input_dict['size_mults'][2])
-                                                   
-        else:
-            raise ValueError('Invalid size_mults command')                              
-        
+       
+        #Multiply system
+        input_dict['initial_system'].supersize(input_dict['size_mults'][0], input_dict['size_mults'][1], input_dict['size_mults'][2])
         

@@ -13,15 +13,20 @@ potential_dir               <potential_dir>
 load                        <load>
 load_options                <load_options>
 symbols                     <symbols>
+box_parameters              <box_parameters>
 
 #System manipulations
+x-axis                      <x-axis>
+y-axis                      <y-axis>
+z-axis                      <z-axis>
+shift                       <shift>
 size_mults                  <size_mults>
-box_parameters              <box_parameters>
 
 #Units that input/output values are in
 length_unit                 <length_unit>
 pressure_unit               <pressure_unit>
 energy_unit                 <energy_unit>
+force_unit                  <force_unit>
 
 #Run parameters
 strain_range                <strain_range>

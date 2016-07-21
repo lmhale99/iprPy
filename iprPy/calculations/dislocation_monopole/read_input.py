@@ -7,7 +7,7 @@ def read_input(f, uuid=None):
     
     #Read input file in as dictionary    
     input_dict = input.file_to_dict(f)
-    
+        
     #Load a dislocation model if given
     if 'dislocation_model' in input_dict:
         assert 'burgers'    not in input_dict, 'burgers and dislocation_model cannot both be supplied'
@@ -52,28 +52,24 @@ def read_input(f, uuid=None):
     for key in input_dict.iterkeys():
         if key[0] == 'C':
             Cdict[key] = input.value_unit(input_dict, key, default_unit=input_dict['pressure_unit'])
-    
-    #If no elastic constants defined
-    if len(Cdict) == 0:
-        #Check for elastic_constants_model
-        if 'elastic_constants_model' in input_dict:
-            with open(input_dict['elastic_constants_model']) as f:
-                C_model = DM(f).find('elastic-constants')
-            input_dict['elastic_constants_model'] = DM([('elastic-constants', C_model)])
-            input_dict['C'] = am.tools.ElasticConstants(model=input_dict['elastic_constants_model'])
-        #Check load file for elastic-constants
-        else:    
-            try:
-                with open(input_dict['load'].split()[1]) as f:
-                    C_model = DM(f).find('elastic-constants')
-            except:
-                raise ValueError('No elastic constants found!')
-            input_dict['elastic_constants_model'] = DM([('elastic-constants', C_model)])
-            input_dict['C'] = am.tools.ElasticConstants(model=input_dict['elastic_constants_model'])
-        
-    else:
+    if len(Cdict) > 0:
         assert 'elastic_constants_model' not in input_dict, 'Cij values and elastic_constants_model cannot both be specified.'
         input_dict['elastic_constants_model'] = None 
         input_dict['C'] = am.tools.ElasticConstants(**Cdict)
+    
+    #If no Cij elastic constants defined check for elastic_constants_model
+    else:
+        #load file may be the elastic_constants_model file
+        input_dict['elastic_constants_model'] = input_dict.get('elastic_constants_model', input_dict['load'].split()[1])
+        
+        with open(input_dict['elastic_constants_model']) as f:
+            C_model = DM(f)
+            
+        try:
+            input_dict['elastic_constants_model'] = DM([('elastic-constants', C_model.find(elastic-constants))])
+            input_dict['C'] = am.tools.ElasticConstants(model=input_dict['elastic_constants_model'])
+        except:
+            input_dict['elastic_constants_model'] = None 
+            input_dict['C'] = None 
         
     return input_dict

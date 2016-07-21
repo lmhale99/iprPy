@@ -13,10 +13,14 @@ potential_dir               <potential_dir>
 load                        <load>
 load_options                <load_options>
 symbols                     <symbols>
+box_parameters              <box_parameters>
 
 #System manipulations
+x-axis                      <x-axis>
+y-axis                      <y-axis>
+z-axis                      <z-axis>
+shift                       <shift>
 size_mults                  <size_mults>
-box_parameters              <box_parameters>
 
 #Units that input/output values are in
 length_unit                 <length_unit>
@@ -25,9 +29,12 @@ energy_unit                 <energy_unit>
 force_unit                  <force_unit>
 
 #Run parameters
+temperature                 <temperature>
+pressure_xx                 <pressure_xx>
+pressure_yy                 <pressure_yy>
+pressure_zz                 <pressure_zz>
+
 thermo_steps                <thermo_steps>
-pressure                    <pressure>
 dump_every                  <dump_every>
 run_steps                   <run_steps>
-temperature                 <temperature>
 random_seed                 <random_seed>

@@ -28,7 +28,7 @@ def main(*args):
     potential = lmp.Potential(input_dict['potential'], input_dict['potential_dir'])        
     
     #Unscale vector parameters relative to ucell
-    for params in input_dict['ptd_model'].iterfinds('atomman-defect-point-parameters'):
+    for params in input_dict['point_defect_model'].iterfinds('atomman-defect-point-parameters'):
         if 'scale' in params and params['scale'] is True:
             if 'pos' in params:
                 params['pos'] = list(input_dict['ucell'].unscale(params['pos']))
@@ -41,14 +41,14 @@ def main(*args):
                               input_dict['initial_system'], 
                               potential, 
                               input_dict['symbols'], 
-                              input_dict['ptd_model'],
+                              input_dict['point_defect_model'],
                               mpi_command = input_dict['mpi_command'],
                               etol =        input_dict['energy_tolerance'], 
                               ftol =        input_dict['force_tolerance'], 
                               maxiter =     input_dict['maximum_iterations'],
                               maxeval =     input_dict['maximum_evaluations'])
     
-    check_config('ptd.dump', input_dict['ptd_model'], 1.05*input_dict['ucell'].box.a, results_dict)
+    check_config('ptd.dump', input_dict['point_defect_model'], 1.05*input_dict['ucell'].box.a, results_dict)
     
     #Save data model of results 
     results = iprPy.calculation_data_model(__calc_type__, input_dict, results_dict)

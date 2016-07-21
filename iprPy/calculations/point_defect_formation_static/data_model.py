@@ -22,9 +22,11 @@ def data_model(input_dict, results_dict=None):
     
     calc['calculation']['run-parameter'] = run_params = DM()
     run_params['size-multipliers'] = DM()
+
     run_params['size-multipliers']['a'] = list(input_dict['size_mults'][0])
     run_params['size-multipliers']['b'] = list(input_dict['size_mults'][1])
     run_params['size-multipliers']['c'] = list(input_dict['size_mults'][2])
+    
     run_params['energy_tolerance']    = input_dict['energy_tolerance']
     run_params['force_tolerance']     = input_dict['force_tolerance']
     run_params['maximum_iterations']  = input_dict['maximum_iterations']
@@ -43,7 +45,7 @@ def data_model(input_dict, results_dict=None):
     calc['system-info']['symbols'] = input_dict['symbols']
     
     #Save data model of the initial ucell
-    calc['point-defect-parameters'] = input_dict['ptd_model']['point-defect-parameters']
+    calc['point-defect-parameters'] = input_dict['point_defect_model']['point-defect-parameters']
     
     if results_dict is None:
         calc['status'] = 'not calculated'

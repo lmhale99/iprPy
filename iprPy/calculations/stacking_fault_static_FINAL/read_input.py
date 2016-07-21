@@ -2,7 +2,7 @@ from DataModelDict import DataModelDict as DM
 from iprPy.tools import input
 import atomman as am
 
-def read_input(f, uuid=None):
+def read_input(f, UUID=None):
     """Reads the calc_*.in input commands for this calculation."""
     
     #Read input file in as dictionary    
@@ -10,7 +10,7 @@ def read_input(f, uuid=None):
     
     #Load a stacking fault model if given
     if 'stacking_fault_model' in input_dict:     
-        assert 'atom_shift' not in input_dict, 'atom_shift and stacking_fault_model cannot both be supplied'
+        assert 'shift'      not in input_dict, 'atom_shift and stacking_fault_model cannot both be supplied'
         assert 'x-axis'     not in input_dict, 'x-axis and stacking_fault_model cannot both be supplied'
         assert 'y-axis'     not in input_dict, 'y-axis and stacking_fault_model cannot both be supplied'
         assert 'z-axis'     not in input_dict, 'z-axis and stacking_fault_model cannot both be supplied'
@@ -27,7 +27,7 @@ def read_input(f, uuid=None):
     else:
         input_dict['stacking_fault_model'] = None
         
-    input.process_common_terms(input_dict)    
+    input.process_common_terms(input_dict, UUID)    
     
     #Interpret input terms unique to this calculation.
     input_dict['energy_tolerance'] =  float(input_dict.get('energy_tolerance',    0.0))

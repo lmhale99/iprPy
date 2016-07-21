@@ -23,6 +23,7 @@ def data_model(input_dict, results_dict=None):
     calc['calculation']['run-parameter'] = run_params = DM()
     run_params['strain-range'] = input_dict['strain_range']
     run_params['size-multipliers'] = DM()
+
     run_params['size-multipliers']['a'] = list(input_dict['size_mults'][0])
     run_params['size-multipliers']['b'] = list(input_dict['size_mults'][1])
     run_params['size-multipliers']['c'] = list(input_dict['size_mults'][2])

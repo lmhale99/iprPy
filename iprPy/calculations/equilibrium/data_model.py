@@ -21,16 +21,13 @@ def data_model(input_dict, results_dict=None):
     calc['calculation']['script'] = __calc_name__
     
     calc['calculation']['run-parameter'] = run_params = DM()
-    run_params['a-multiplyer'] = input_dict['a_mult']
-    run_params['b-multiplyer'] = input_dict['b_mult']
-    run_params['c-multiplyer'] = input_dict['c_mult']
-    run_params['c-multiplyer'] = input_dict['c_mult']
+    run_params['size-multipliers'] = DM()
+    run_params['size-multipliers']['a'] = list(input_dict['size_mults'][0])
+    run_params['size-multipliers']['b'] = list(input_dict['size_mults'][1])
+    run_params['size-multipliers']['c'] = list(input_dict['size_mults'][2])
     run_params['thermo_steps'] = input_dict['thermo_steps']
-    run_params['pressure'] = input_dict['pressure']
     run_params['run_steps'] = input_dict['run_steps']
     run_params['random_seed'] = input_dict['random_seed']
-    run_params['temperature'] = input_dict['temperature']
-    
     
     #Copy over potential data model info
     calc['potential'] = input_dict['potential']['LAMMPS-potential']['potential']
@@ -44,12 +41,17 @@ def data_model(input_dict, results_dict=None):
     calc['system-info']['artifact']['family'] = input_dict['system_family']
     calc['system-info']['symbols'] = input_dict['symbols']
     
-    
-    #Save phase-state info
+     #Save phase-state info
     calc['phase-state'] = DM()
-    calc['phase-state']['temperature'] = DM([('value', input_dict['temperature']), ('unit', 'K')])
-    calc['phase-state']['pressure'] = DM([('value', uc.get_in_units(input_dict['pressure'],
+    calc['phase-state']['temperature'] = DM([('value', 0.0), ('unit', 'K')])
+    calc['phase-state']['pressure-xx'] = DM([('value', uc.get_in_units(input_dict['pressure_xx'],
                                                                        input_dict['pressure_unit'])), 
+                                                       ('unit', input_dict['pressure_unit'])])
+    calc['phase-state']['pressure-yy'] = DM([('value', uc.get_in_units(input_dict['pressure_yy'],
+                                                                       input_dict['pressure_unit'])),
+                                                       ('unit', input_dict['pressure_unit'])])
+    calc['phase-state']['pressure-zz'] = DM([('value', uc.get_in_units(input_dict['pressure_zz'],
+                                                                       input_dict['pressure_unit'])),
                                                        ('unit', input_dict['pressure_unit'])])                                                     
     
     #Save data model of the initial ucell
@@ -60,26 +62,6 @@ def data_model(input_dict, results_dict=None):
     else:
         
         calc['results'] = results_dict
-        
-        #Update ucell to relaxed lattice parameters
-        #relaxed_ucell = deepcopy(input_dict['ucell'])
-        #relaxed_ucell.box_set(a = results_dict['cell_new'].box.a / input_dict['a_mult'],
-        #                      b = results_dict['cell_new'].box.b / input_dict['b_mult'],
-        #                      c = results_dict['cell_new'].box.c / input_dict['c_mult'],
-        #                      scale = True)
-        
-        #Save data model of the relaxed ucell                      
-        #calc['relaxed-atomic-system'] = relaxed_ucell.model(symbols = input_dict['symbols'], 
-        #                                                    box_unit = input_dict['length_unit'])['atomic-system']
-        
-        #Save the final cohesive energy
-        #calc['cohesive-energy'] = DM([('value', uc.get_in_units(results_dict['ecoh'], 
-        #                                                                   input_dict['energy_unit'])), 
-        #                                         ('unit', input_dict['energy_unit'])])
-        
-        #Save the final elastic constants
-        #c_family = calc['relaxed-atomic-system']['cell'].keys()[0]
-        #calc['elastic-constants'] = results_dict['C'].model(unit = input_dict['pressure_unit'], 
-        #                                                    crystal_system = c_family)['elastic-constants']
+       
 
     return output

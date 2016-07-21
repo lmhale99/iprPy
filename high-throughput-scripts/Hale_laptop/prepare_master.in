@@ -1,0 +1,286 @@
+#Set if files are to be copied (default is true)
+#NOTE: The current version of runner.py will not properly handle calculation heierarchy if False
+copy_files              add True
+
+#################
+#Run Information#
+#################
+
+#ALL TERMS IN THIS SECTION ARE SPECIFIC TO YOUR COMPUTER!!!! 
+
+#Set library directory
+lib_directory           set C:/Users/lmh1/Documents/calculations/ipr/Kittel
+
+#Set run directories
+run_directory_1         set C:/Users/lmh1/Documents/calculations/ipr/torun/1
+run_directory_2         set C:/Users/lmh1/Documents/calculations/ipr/torun/2
+run_directory_3         set C:/Users/lmh1/Documents/calculations/ipr/torun/3
+run_directory_4         set C:/Users/lmh1/Documents/calculations/ipr/torun/4
+
+#Set the lammps command to use
+lammps_command          set lmp_mpi
+
+#Set the mpi_commands to use
+mpi_command_1           set 
+mpi_command_2           set mpiexec -localonly 2
+mpi_command_3           set mpiexec -localonly 3
+mpi_command_4           set mpiexec -localonly 4
+
+#######################
+#Reference Information#
+#######################
+
+#ALL TERMS IN THIS SECTION ARE SPECIFIC TO YOUR COMPUTER!!!!
+
+#Set paths to the various reference libraries
+potential_path          add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/potentials
+
+prototype_path          add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/prototypes
+prototype_reference     add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/experimental-values/prototype_params.json
+
+point_defect_dir        add C:/users/lmh1/documents/Python-packages/iprPy/reference-libraries/point/A1--Cu--fcc
+point_defect_dir        add C:/users/lmh1/documents/Python-packages/iprPy/reference-libraries/point/A2--W--bcc
+point_defect_dir        add C:/users/lmh1/documents/Python-packages/iprPy/reference-libraries/point/A3--Mg--hcp
+point_defect_dir        add C:/users/lmh1/documents/Python-packages/iprPy/reference-libraries/point/A4--C--dc
+
+stacking_fault_dir      add C:/users/lmh1/documents/Python-packages/iprPy/reference-libraries/stacking-faults/A1--Cu--fcc
+
+dislocation_dir         add C:/users/lmh1/documents/Python-packages/iprPy/reference-libraries/dislocations/A1--Cu--fcc
+dislocation_dir         add C:/users/lmh1/documents/Python-packages/iprPy/reference-libraries/dislocations/A2--W--bcc
+
+#################
+#Load Potentials#
+#################
+
+potential_name          add 2015--Mendelev-M-I--Al-Sm
+elements                add Al
+
+function                lammps_potentials  
+
+#################
+#Load Prototypes#
+#################
+
+function                load_from_prototypes
+
+###################
+#Static Structures#
+###################
+
+#Run directory and mpi command information
+run_directory           set run_directory_1
+mpi_command             set mpi_command_1
+
+#Define calculation variables
+size_mults              set 3 3 3
+strain_range            set 1e-7 
+
+#Run calculation
+calculation             refine_structure_static 
+
+#########################
+#Load Refined Structures#
+#########################
+
+#Clear system information
+load                    clear
+load_options            clear
+load_elements           clear
+box_parameters          clear
+
+#Find all refine_structure_static results and fill in system information
+function                load_from_library calc_name refine_structure_static load_key relaxed-atomic-system
+
+###############
+#Point Defects#
+###############
+
+#Run directory and mpi command information
+run_directory           set run_directory_1
+mpi_command             set mpi_command_1
+
+#Define calculation variables
+size_mults              set 3 3 3
+size_mults              add 4 4 4  
+size_mults              add 5 5 5 
+size_mults              add 6 6 6 
+size_mults              add 7 7 7 
+size_mults              add 8 8 8 
+size_mults              add 9 9 9 
+size_mults              add 10 10 10 
+
+#Build list of point defect models
+function                add_directory_files v_name point_defect_model file_directory point_defect_dir
+
+#Run calculation
+calculation             point_defect_formation_static
+
+################
+#Stacking Fault#
+################
+
+#Run directory and mpi command information
+run_directory           set run_directory_1
+mpi_command             set mpi_command_1
+
+#Define calculation variables
+size_mults              set 5 5 10 
+
+#Build list of stacking fault models
+function                add_directory_files v_name stacking_fault_model file_directory stacking_fault_dir
+
+#Build list of stacking fault shift amounts
+#function               COMMING SOON
+
+stacking_fault_shift_amount add 0.0 0.0 0
+stacking_fault_shift_amount add 0.1 0.0 0
+stacking_fault_shift_amount add 0.2 0.0 0
+stacking_fault_shift_amount add 0.3 0.0 0
+stacking_fault_shift_amount add 0.4 0.0 0
+stacking_fault_shift_amount add 0.5 0.0 0
+stacking_fault_shift_amount add 0.6 0.0 0
+stacking_fault_shift_amount add 0.7 0.0 0
+stacking_fault_shift_amount add 0.8 0.0 0
+stacking_fault_shift_amount add 0.9 0.0 0
+
+stacking_fault_shift_amount add 0.0 0.1 0
+stacking_fault_shift_amount add 0.1 0.1 0
+stacking_fault_shift_amount add 0.2 0.1 0
+stacking_fault_shift_amount add 0.3 0.1 0
+stacking_fault_shift_amount add 0.4 0.1 0
+stacking_fault_shift_amount add 0.5 0.1 0
+stacking_fault_shift_amount add 0.6 0.1 0
+stacking_fault_shift_amount add 0.7 0.1 0
+stacking_fault_shift_amount add 0.8 0.1 0
+stacking_fault_shift_amount add 0.9 0.1 0
+
+stacking_fault_shift_amount add 0.0 0.2 0
+stacking_fault_shift_amount add 0.1 0.2 0
+stacking_fault_shift_amount add 0.2 0.2 0
+stacking_fault_shift_amount add 0.3 0.2 0
+stacking_fault_shift_amount add 0.4 0.2 0
+stacking_fault_shift_amount add 0.5 0.2 0
+stacking_fault_shift_amount add 0.6 0.2 0
+stacking_fault_shift_amount add 0.7 0.2 0
+stacking_fault_shift_amount add 0.8 0.2 0
+stacking_fault_shift_amount add 0.9 0.2 0
+
+stacking_fault_shift_amount add 0.0 0.3 0
+stacking_fault_shift_amount add 0.1 0.3 0
+stacking_fault_shift_amount add 0.2 0.3 0
+stacking_fault_shift_amount add 0.3 0.3 0
+stacking_fault_shift_amount add 0.4 0.3 0
+stacking_fault_shift_amount add 0.5 0.3 0
+stacking_fault_shift_amount add 0.6 0.3 0
+stacking_fault_shift_amount add 0.7 0.3 0
+stacking_fault_shift_amount add 0.8 0.3 0
+stacking_fault_shift_amount add 0.9 0.3 0
+
+stacking_fault_shift_amount add 0.0 0.4 0
+stacking_fault_shift_amount add 0.1 0.4 0
+stacking_fault_shift_amount add 0.2 0.4 0
+stacking_fault_shift_amount add 0.3 0.4 0
+stacking_fault_shift_amount add 0.4 0.4 0
+stacking_fault_shift_amount add 0.5 0.4 0
+stacking_fault_shift_amount add 0.6 0.4 0
+stacking_fault_shift_amount add 0.7 0.4 0
+stacking_fault_shift_amount add 0.8 0.4 0
+stacking_fault_shift_amount add 0.9 0.4 0
+
+stacking_fault_shift_amount add 0.0 0.5 0
+stacking_fault_shift_amount add 0.1 0.5 0
+stacking_fault_shift_amount add 0.2 0.5 0
+stacking_fault_shift_amount add 0.3 0.5 0
+stacking_fault_shift_amount add 0.4 0.5 0
+stacking_fault_shift_amount add 0.5 0.5 0
+stacking_fault_shift_amount add 0.6 0.5 0
+stacking_fault_shift_amount add 0.7 0.5 0
+stacking_fault_shift_amount add 0.8 0.5 0
+stacking_fault_shift_amount add 0.9 0.5 0
+
+stacking_fault_shift_amount add 0.0 0.6 0
+stacking_fault_shift_amount add 0.1 0.6 0
+stacking_fault_shift_amount add 0.2 0.6 0
+stacking_fault_shift_amount add 0.3 0.6 0
+stacking_fault_shift_amount add 0.4 0.6 0
+stacking_fault_shift_amount add 0.5 0.6 0
+stacking_fault_shift_amount add 0.6 0.6 0
+stacking_fault_shift_amount add 0.7 0.6 0
+stacking_fault_shift_amount add 0.8 0.6 0
+stacking_fault_shift_amount add 0.9 0.6 0
+
+stacking_fault_shift_amount add 0.0 0.7 0
+stacking_fault_shift_amount add 0.1 0.7 0
+stacking_fault_shift_amount add 0.2 0.7 0
+stacking_fault_shift_amount add 0.3 0.7 0
+stacking_fault_shift_amount add 0.4 0.7 0
+stacking_fault_shift_amount add 0.5 0.7 0
+stacking_fault_shift_amount add 0.6 0.7 0
+stacking_fault_shift_amount add 0.7 0.7 0
+stacking_fault_shift_amount add 0.8 0.7 0
+stacking_fault_shift_amount add 0.9 0.7 0
+
+stacking_fault_shift_amount add 0.0 0.8 0
+stacking_fault_shift_amount add 0.1 0.8 0
+stacking_fault_shift_amount add 0.2 0.8 0
+stacking_fault_shift_amount add 0.3 0.8 0
+stacking_fault_shift_amount add 0.4 0.8 0
+stacking_fault_shift_amount add 0.5 0.8 0
+stacking_fault_shift_amount add 0.6 0.8 0
+stacking_fault_shift_amount add 0.7 0.8 0
+stacking_fault_shift_amount add 0.8 0.8 0
+stacking_fault_shift_amount add 0.9 0.8 0
+
+stacking_fault_shift_amount add 0.0 0.9 0
+stacking_fault_shift_amount add 0.1 0.9 0
+stacking_fault_shift_amount add 0.2 0.9 0
+stacking_fault_shift_amount add 0.3 0.9 0
+stacking_fault_shift_amount add 0.4 0.9 0
+stacking_fault_shift_amount add 0.5 0.9 0
+stacking_fault_shift_amount add 0.6 0.9 0
+stacking_fault_shift_amount add 0.7 0.9 0
+stacking_fault_shift_amount add 0.8 0.9 0
+stacking_fault_shift_amount add 0.9 0.9 0
+
+#Run calculation
+calculation             stacking_fault_static_FINAL
+
+######################
+#Dislocation Monopole#
+######################
+
+#Run directory and mpi command information
+run_directory           set run_directory_4
+mpi_command             set mpi_command_4
+
+#Define calculation variables
+#size_mults SHOULD BE SPECIFIC TO EACH DISLOCATION TYPE!!!!!!
+size_mults              set -10 10 -10 10 0 1
+anneal_temperature      add 0
+
+#Build list of dislocation models
+function                add_directory_files v_name dislocation_model file_directory dislocation_dir
+
+#Run calculation
+calculation             dislocation_monopole
+
+killit
+#############
+#Equilibrium#
+#############
+
+#Run directory and mpi command information
+run_directory           set run_directory_4
+mpi_command             set mpi_command_4
+
+#Define calculation variables
+#size_mults SHOULD BE SPECIFIC TO EACH DISLOCATION TYPE!!!!!!
+size_mults              set 5 5 5
+temperature             adds   0  50 100 150 200 250 300 350 400 450 500
+temperature             adds     550 600 650 700 750 800 850 900 950 1000
+
+#Build list of dislocation models
+function                add_directory_files v_name dislocation_model file_directory dislocation_dir
+
+#Run calculation
+calculation             equilibrium

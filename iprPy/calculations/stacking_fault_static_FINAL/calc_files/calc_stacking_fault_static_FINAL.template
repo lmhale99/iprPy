@@ -13,14 +13,20 @@ potential_dir               <potential_dir>
 load                        <load>
 load_options                <load_options>
 symbols                     <symbols>
+box_parameters              <box_parameters>
+
+#System manipulations
+x-axis                      <x-axis>
+y-axis                      <y-axis>
+z-axis                      <z-axis>
+shift                       <shift>
+size_mults                  <size_mults>
 
 #Defect parameters
 stacking_fault_model        <stacking_fault_model>
 stacking_fault_shift_amount <stacking_fault_shift_amount>
-
-#System manipulations
-size_mults                  <size_mults>
-box_parameters              <box_parameters>
+stacking_fault_cutting_axis <stacking_fault_cutting_axis>
+stacking_fault_cutting_pos  <stacking_fault_cutting_pos>
 
 #Units that input/output values are in
 length_unit                 <length_unit>

@@ -1,4 +1,4 @@
-#Run script for calc_refine_structure_static.py
+#Run script for calc_point_defect_formation_static.py
 
 #Command lines for LAMMPS (and MPI).
 #For lammps_command, exclude passing in a script, i.e. no "-in term" or "< term"
@@ -23,15 +23,15 @@ shift                       <shift>
 size_mults                  <size_mults>
 
 #Defect data model
-ptd_model                   <ptd_model>
+point_defect_model          <point_defect_model>
 
 #Defect parameters (alternative to giving defect data model)
-ptd_type                    <ptd_type>
-ptd_atype                   <ptd_atype>
-ptd_pos                     <ptd_pos>
-ptd_aid                     <ptd_aid>
-ptd_dumbbell_vect           <ptd_dumbbell_vect>
-ptd_scale                   <ptd_scale>
+point_defect_type           <point_defect_type>
+point_defect_atype          <point_defect_atype>
+point_defect_pos            <point_defect_pos>
+point_defect_aid            <point_defect_aid>
+point_defect_dumbbell_vect  <point_defect_dumbbell_vect>
+point_defect_scale          <point_defect_scale>
 
 #Units that input/output values are in
 length_unit                 <length_unit>
