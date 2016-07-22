@@ -120,7 +120,7 @@ def ptd_energy(lammps_command, system, potential, symbols, ptd, mpi_command='',
 
 def check_config(dump_file, ptd, cutoff, results_dict={}):
     #Extract the parameter sets
-    params = ptd.finds('atomman-defect-point-parameters')
+    params = deepcopy(ptd.finds('atomman-defect-point-parameters'))
     
     #if there is only one set, use that set
     if len(params) == 1:
