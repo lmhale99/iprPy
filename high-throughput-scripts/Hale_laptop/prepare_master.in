@@ -53,13 +53,16 @@ dislocation_dir         add C:/users/lmh1/documents/Python-packages/iprPy/refere
 #################
 
 potential_name          add 2015--Mendelev-M-I--Al-Sm
-elements                add Al
+potential_name          add 1997--Ackland-G-J--Fe
+elements                adds Al Fe
 
 function                lammps_potentials  
 
 #################
 #Load Prototypes#
 #################
+
+prototype_name          adds A1--Cu--fcc A2--W--bcc
 
 function                load_from_prototypes
 
@@ -77,6 +80,62 @@ strain_range            set 1e-7
 
 #Run calculation
 calculation             refine_structure_static 
+
+#############
+#Equilibrium#
+#############
+
+#Run directory and mpi command information
+run_directory           set run_directory_1
+mpi_command             set mpi_command_1
+
+#Define calculation variables
+integration             add nph
+size_mults              set 5 5 5
+temperature             adds 0 50 100 150 200 250 300 350 400 450 500
+thermo_steps            add 10
+dump_every              add 100000
+run_steps               add 100000
+
+#Run calculation
+calculation             equilibrium
+
+#####################
+#Bain Transformation#
+#####################
+
+#Clear system information
+load                    clear
+load_options            clear
+load_elements           clear
+box_parameters          clear
+
+#load only bcc
+prototype_name          set A2--W--bcc
+function                load_from_prototypes
+
+#Run directory and mpi command information
+run_directory           set run_directory_1
+mpi_command             set mpi_command_1
+
+#Define calculation variables
+size_mults              set 3 3 3
+bain_a_scale            adds 0.8 0.9 1.0 1.1 1.2
+bain_c_scale            adds 0.8 0.8 0.8 0.8 0.8
+
+bain_a_scale            adds 0.8 0.9 1.0 1.1 1.2
+bain_c_scale            adds 0.9 0.9 0.9 0.9 0.9
+
+bain_a_scale            adds 0.8 0.9 1.0 1.1 1.2
+bain_c_scale            adds 1.0 1.0 1.0 1.0 1.0
+
+bain_a_scale            adds 0.8 0.9 1.0 1.1 1.2
+bain_c_scale            adds 1.1 1.1 1.1 1.1 1.1
+
+bain_a_scale            adds 0.8 0.9 1.0 1.1 1.2
+bain_c_scale            adds 1.2 1.2 1.2 1.2 1.2
+
+calculation             bain_transformation_static
 
 #########################
 #Load Refined Structures#
@@ -250,8 +309,8 @@ calculation             stacking_fault_static_FINAL
 ######################
 
 #Run directory and mpi command information
-run_directory           set run_directory_4
-mpi_command             set mpi_command_4
+run_directory           set run_directory_1
+mpi_command             set mpi_command_1
 
 #Define calculation variables
 #size_mults SHOULD BE SPECIFIC TO EACH DISLOCATION TYPE!!!!!!
@@ -263,24 +322,3 @@ function                add_directory_files v_name dislocation_model file_direct
 
 #Run calculation
 calculation             dislocation_monopole
-
-killit
-#############
-#Equilibrium#
-#############
-
-#Run directory and mpi command information
-run_directory           set run_directory_4
-mpi_command             set mpi_command_4
-
-#Define calculation variables
-#size_mults SHOULD BE SPECIFIC TO EACH DISLOCATION TYPE!!!!!!
-size_mults              set 5 5 5
-temperature             adds   0  50 100 150 200 250 300 350 400 450 500
-temperature             adds     550 600 650 700 750 800 850 900 950 1000
-
-#Build list of dislocation models
-function                add_directory_files v_name dislocation_model file_directory dislocation_dir
-
-#Run calculation
-calculation             equilibrium

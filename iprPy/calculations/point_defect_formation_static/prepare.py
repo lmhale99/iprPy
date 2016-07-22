@@ -132,9 +132,10 @@ def prepare(inline_terms, global_variables):
                 
                     #Loop over all symbols combinations
                     for symbols in atomman_input.yield_symbols(load, load_options, load_elements, global_variables, potential):
-                        
+
                         #Define directory path for the record
-                        record_dir = os.path.join(calculation_variables['lib_directory'], str(potential), '-'.join(symbols), system_family, __calc_type__, point_defect_id)
+                        record_dir = os.path.join(calculation_variables['lib_directory'], str(potential), '-'.join(symbols), system_family, __calc_type__)
+                        #record_dir = os.path.join(calculation_variables['lib_directory'], str(potential), '-'.join(symbols), system_family, __calc_type__, point_defect_id)
                         
                         #Add symbols to input_dict and build incomplete record
                         input_dict['symbols'] = list(symbols)               
