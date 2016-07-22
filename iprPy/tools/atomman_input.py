@@ -29,67 +29,62 @@ def get_value(v, key, default=None):
         return value
         
         
-def yield_symbols(load, load_options, load_elements, variables, potential):
+def yield_symbols(load, load_options, load_elements, global_variables, potential):
     """Interpret the load_elements string and yield all symbols combinations"""
 
-    #if load_elements is empty, then use elements from the load file
-    if load_elements == '':
-        load_style = load.split()[0]
-        load_file = ' '.join(load.split()[1:])
-        load_terms = load_options.split()
-        
-        #system_model format stores symbols not elements
-        if load_style == 'system_model':
-            with open(load_file) as f:
-                model = DM(f)
-            symbols = model.finds('symbols')
-            if len(symbols) == 0:
-                kwargs = {}
-                i=0
-                while i < len(load_terms):
-                    load_key = load_terms[i]
-                    kwargs[load_key] = load_terms[i+1]
-                    i += 2
-                ucell = am.System()
-                symbols = ucell.load(load_style, model, **kwargs)
-            
-            yield symbols
-            raise StopIteration()
-        
-        kwargs = {}
-        i=0
-        while i < len(load_terms):
-            load_key = load_terms[i]
-            if load_key == 'load_prop_info':
-                kwargs[load_key] = ' '.join(load_terms[i+1:])
-                i = len(load_terms)
-            else:
-                kwargs[load_key] = load_terms[i+1]
-                i += 2
-        ucell = am.System()
-        with open(load_file) as f:
-            elements = ucell.load(load_style, f, **kwargs)  
-        
-        #Other formats store element names
-        load_elements = '[' + ','.join(elements) + ']'
-  
-    #if load_elements are given, then generate possibilities from them
-    assert load_elements[0] == '[' and load_elements[-1] == ']', 'Invalid symbols entry'
-    load_elements = load_elements[1:-1].split(',')
-    for i in xrange(len(load_elements)):
-        element = load_elements[i].strip()
-        if element in variables:
-            load_elements[i] = variables[element]
-        else:
-            load_elements[i] = [element]
-    #print load_elements
     pot_symbols = np.array(potential.symbols)
     pot_elements = np.array(potential.elements())
     
+    #if load_elements is empty, then use elements from the load file
+    if load_elements == '':
+        load_elements = []
+        
+        load_terms = load.split(' ')
+        load_style = load_terms[0]
+        load_file =  ' '.join(load_terms[1:])    
+        
+        if load_style == 'system_model':
+            #system_model stores symbols
+            pot_elements = pot_symbols
+            
+            #try searching for 'symbols'
+            with open(load_file) as f:
+                model = DM(f)
+            load_elements = model.finds('symbols')
+            
+        if len(load_elements) == 0:
+            #parse load_options
+            kwargs= {}
+            if load_options != '':
+                load_options_keys = ['key', 'data_set', 'pbc', 'atom_style', 'units', 'prop_info']
+                kwargs = term_extractor(load_options, {}, load_options_keys)
+    
+            #try loading file
+            try:
+                ucell = am.System()
+                load_elements = ucell.load(load_style, load_file, **kwargs)
+            except:
+                raise ValueError('Failed to load file')
+  
+    else:
+        assert load_elements[0] == '[' and load_elements[-1] == ']', 'Invalid symbols entry'
+        load_elements = load_elements[1:-1].split(',')
+        
+    if len(load_elements) == 0:
+        raise ValueError('Failed to find elements')
+    
+    #Check if elements are names in global_variables
+    for i in xrange(len(load_elements)):
+        load_element = load_elements[i].strip()
+        if load_element in global_variables:
+            load_elements[i] = global_variables[load_element]
+        else:
+            load_elements[i] = [load_element]
+
     #iterate over every symbols combination allowed by the potential
     for i_vals in iterbox(len(pot_elements), len(load_elements)):
         elements = pot_elements[i_vals]
-        #print elements
+
         match = True
         for j in xrange(len(elements)):
             if elements[j] not in load_elements[j]: 
