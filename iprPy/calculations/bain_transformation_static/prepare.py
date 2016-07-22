@@ -121,6 +121,9 @@ def prepare(inline_terms, global_variables):
                     #Extract info from input dict
                     potential = lmp.Potential(input_dict['potential'])
                     system_family = input_dict['system_family']
+                    
+                    if system_family != 'A2--W--bcc':
+                        continue
                 
                     #Loop over all symbols combinations
                     for symbols in atomman_input.yield_symbols(load, load_options, load_elements, global_variables, potential):
