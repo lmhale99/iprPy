@@ -13,9 +13,8 @@ thermo <thermo_steps>
 thermo_style custom step temp pe ke etotal lx ly lz pxx pyy pzz pyz pxz pxy
 timestep 0.001
 
-variable two_temp equal 2*<temperature>
+variable two_temp equal 2*(<temperature>+1)
 velocity all create ${two_temp} <random_seed>
-#fix npt all npt temp <temperature> <temperature> 0.1 aniso <pressure> <pressure> 1.0
 fix nph all nph aniso <pressure> <pressure> 1.0
 fix langevin all langevin <temperature> <temperature> 1.0 <random_seed>
 

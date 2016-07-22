@@ -13,10 +13,9 @@ thermo <thermo_steps>
 thermo_style custom step temp pe ke etotal lx ly lz pxx pyy pzz pyz pxz pxy
 timestep 0.001
 
-fix nph all nph aniso <pressure> <pressure> 1.0
-fix langevin all langevin 0.0 0.0 1.0 <random_seed>
-
-displace_atoms all random  0.05 0.05 0.05 <random_seed> units box
+variable two_temp equal 2*(<temperature>+1)
+velocity all create ${two_temp} <random_seed>
+fix npt all npt temp <temperature> <temperature> 0.1 aniso <pressure> <pressure> 1.0
 
 dump dump_chkpt all custom <dump_every> dump.* id type mass xu yu zu &
 vx vy vz &

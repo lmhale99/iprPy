@@ -18,7 +18,7 @@ __calc_name__ = 'calc_' + __calc_type__
 
 def description():
     """Returns a description for the calculation."""
-    return "The dislocation_monopole calculation constructs a system containing a dislocation monopole using the Stroh method."
+    return "The equilibrium calculation integrates a system with time and evaluates bulk properties for a given temperature and pressure."
     
 def keywords():
     """Return the list of keywords used by the calculation's prepare function that are searched for from the inline terms and pre-defined variables."""
@@ -39,9 +39,8 @@ def keywords():
             'energy_unit',
             'force_unit',
             'temperature',
-            'pressure_xx',
-            'pressure_yy',
-            'pressure_zz',
+            'pressure',
+            'integration',
             'thermo_steps',
             'dump_every',
             'run_steps',
@@ -66,7 +65,7 @@ def unused_keywords():
             'z-axis', 
             'shift']
 
-def prepare(terms, variable):
+def prepare(inline_terms, global_variables):
     """This is the prepare method for the calculation"""
     
     working_dir = os.getcwd()
@@ -92,109 +91,103 @@ def prepare(terms, variable):
         for load, load_options, load_elements, box_parameters in zip(prepare_variables.aslist('load'), 
                                                                      prepare_variables.aslist('load_options'), 
                                                                      prepare_variables.aslist('load_elements'), 
-                                                                     prepare_variables.aslist('box_parameters'):
-        
+                                                                     prepare_variables.aslist('box_parameters')):
+            #print 'l'
             #Loop over all size_mults
             for size_mults in prepare_variables.aslist('size_mults'):
-
+                #print 's'
                 for thermo_steps, dump_every, run_steps in zip(prepare_variables.aslist('thermo_steps'), 
                                                                prepare_variables.aslist('dump_every'),
                                                                prepare_variables.aslist('run_steps')):
-                    
-                    for pressure_xx, pressure_yy, pressure_zz in zip(prepare_variables.aslist('pressure_xx'),
-                                                                     prepare_variables.aslist('pressure_yy')
-                                                                     prepare_variables.aslist('pressure_zz'):
-                        
-                        for temperature in prepare_variables.aslist('temperature'):
-                            
-                            for random_seed in prepare_variables.aslist('random_seed'):
-                                #Add iterated values to calculation_variables
-                                calculation_variables['potential_file'] =    potential_file
-                                calculation_variables['potential_dir'] =     potential_dir
-                                calculation_variables['load'] =              load
-                                calculation_variables['load_options'] =      load_options
-                                calculation_variables['box_parameters'] =    box_parameters
-                                calculation_variables['size_mults'] =        size_mults
-                                calculation_variables['symbols'] =           ''
-                                calculation_variables['thermo_steps'] =      thermo_steps
-                                calculation_variables['dump_every'] =        dump_every
-                                calculation_variables['run_steps'] =         run_steps
-                                calculation_variables['pressure_xx'] =       pressure_xx
-                                calculation_variables['pressure_yy'] =       pressure_yy
-                                calculation_variables['pressure_zz'] =       pressure_zz
-                                calculation_variables['temperature'] =       temperature
-                                calculation_variables['random_seed'] =       random_seed
-                                
-                                #Fill in template using calculation_variables values, and build input_dict
-                                calc_in = fill_template(template, calculation_variables, '<', '>')
-                                input_dict = read_input(calc_in)
-                                
-                                #Extract info from input dict
-                                potential = lmp.Potential(input_dict['potential'])
-                                system_family = input_dict['system_family']
-                                dislocation_id = input_dict['dislocation_model']['dislocation-monopole-parameters']['dislocation']['id']
-                                
-                                #Check if disl_model's system_family matches the load_file's system_family
-                                if system_family != input_dict['dislocation_model']['dislocation-monopole-parameters']['system-family']:
-                                    continue
-                                
-                                #Loop over all symbols combinations
-                                for symbols in atomman_input.yield_symbols(load, load_options, load_elements, global_variables, potential):
+                    #print 't'
+                    for pressure in prepare_variables.aslist('pressure'):
+                        #print 'p'
+                        for integration in prepare_variables.aslist('integration'):
+                            #print 'i'
+                            for temperature in prepare_variables.aslist('temperature'):
+                                #print 't'
+                                for random_seed in prepare_variables.aslist('random_seed'):
+                                    #Add iterated values to calculation_variables
+                                    calculation_variables['potential_file'] =    potential_file
+                                    calculation_variables['potential_dir'] =     potential_dir
+                                    calculation_variables['load'] =              load
+                                    calculation_variables['load_options'] =      load_options
+                                    calculation_variables['box_parameters'] =    box_parameters
+                                    calculation_variables['size_mults'] =        size_mults
+                                    calculation_variables['symbols'] =           ''
+                                    calculation_variables['thermo_steps'] =      thermo_steps
+                                    calculation_variables['dump_every'] =        dump_every
+                                    calculation_variables['run_steps'] =         run_steps
+                                    calculation_variables['pressure'] =          pressure
+                                    calculation_variables['temperature'] =       temperature
+                                    calculation_variables['integration'] =       integration
+                                    calculation_variables['random_seed'] =       random_seed
                                     
-                                    #Define directory path for the record
-                                    record_dir = os.path.join(calculation_variables['lib_directory'], str(potential), '-'.join(symbols), system_family, __calc_type__)
+                                    #Fill in template using calculation_variables values, and build input_dict
+                                    calc_in = fill_template(template, calculation_variables, '<', '>')
+                                    input_dict = read_input(calc_in)
                                     
-                                    #Add symbols to input_dict and build incomplete record
-                                    input_dict['symbols'] = list(symbols)               
-                                    record = data_model(input_dict)  
+                                    #Extract info from input dict
+                                    potential = lmp.Potential(input_dict['potential'])
+                                    system_family = input_dict['system_family']
+                                    
+                                    #Loop over all symbols combinations
+                                    for symbols in atomman_input.yield_symbols(load, load_options, load_elements, global_variables, potential):
+                                        
+                                        #Define directory path for the record
+                                        record_dir = os.path.join(calculation_variables['lib_directory'], str(potential), '-'.join(symbols), system_family, __calc_type__)
+                                        
+                                        #Add symbols to input_dict and build incomplete record
+                                        input_dict['symbols'] = list(symbols)               
+                                        record = data_model(input_dict)  
 
-                                    #Check if record already exists
-                                    if __is_new_record(record_dir, record):
-                                        
-                                        UUID = str(uuid.uuid4())
-                                        calculation_variables['symbols'] = ' '.join(symbols)
-                                        
-                                        #Create calculation run folder
-                                        sim_dir = os.path.join(calculation_variables['run_directory'], UUID)
-                                        os.makedirs(sim_dir)
-                                        
-                                        #Copy calc_files to run folder
-                                        for fname in calc_files:
-                                            shutil.copy(os.path.join(__calc_dir__, 'calc_files', fname), sim_dir)
-                                        
-                                        #Copy potential and load files to run directory and shorten paths
-                                        if calculation_variables['copy_files']:
+                                        #Check if record already exists
+                                        if __is_new_record(record_dir, record):
+                                            
+                                            UUID = str(uuid.uuid4())
+                                            calculation_variables['symbols'] = ' '.join(symbols)
+                                            
+                                            #Create calculation run folder
+                                            sim_dir = os.path.join(calculation_variables['run_directory'], UUID)
+                                            os.makedirs(sim_dir)
+                                            
+                                            #Copy calc_files to run folder
+                                            for fname in calc_files:
+                                                shutil.copy(os.path.join(__calc_dir__, 'calc_files', fname), sim_dir)
+                                            
+                                            #Copy potential and load files to run directory and shorten paths
+                                            if calculation_variables['copy_files']:
+                                                    
+                                                #Divy up the load information
+                                                load_terms = load.split()
+                                                load_style = load_terms[0]
+                                                load_file = ' '.join(load_terms[1:])
                                                 
-                                            #Divy up the load information
-                                            load_terms = load.split()
-                                            load_style = load_terms[0]
-                                            load_file = ' '.join(load_terms[1:])
+                                                #Copy loose files
+                                                shutil.copy(potential_file, sim_dir)
+                                                shutil.copy(load_file, sim_dir)
+                                                
+                                                #Copy potential_dir and contents to run folder
+                                                os.mkdir(os.path.join(sim_dir, os.path.basename(potential_dir)))
+                                                for fname in glob.iglob(os.path.join(potential_dir, '*')):
+                                                    shutil.copy(fname, os.path.join(sim_dir, os.path.basename(potential_dir)))
+                                                
+                                                #Shorten file paths to be relative
+                                                calculation_variables['potential_file'] =     os.path.basename(potential_file)
+                                                calculation_variables['potential_dir'] =      os.path.basename(potential_dir)
+                                                calculation_variables['load'] =               ' '.join([load_style, os.path.basename(load_file)])
                                             
-                                            #Copy loose files
-                                            shutil.copy(potential_file, sim_dir)
-                                            shutil.copy(load_file, sim_dir)
+                                            #Create calculation input file by filling in template with calculation_variables terms
+                                            os.chdir(sim_dir)
+                                            calc_in = fill_template(template, calculation_variables, '<', '>')
+                                            input_dict = read_input(calc_in, UUID)
+                                            with open(__calc_name__ + '.in', 'w') as f:
+                                                f.write('\n'.join(calc_in))
+                                            os.chdir(working_dir)
                                             
-                                            #Copy potential_dir and contents to run folder
-                                            os.mkdir(os.path.join(sim_dir, os.path.basename(potential_dir)))
-                                            for fname in glob.iglob(os.path.join(potential_dir, '*')):
-                                                shutil.copy(fname, os.path.join(sim_dir, os.path.basename(potential_dir)))
-                                            
-                                            #Shorten file paths to be relative
-                                            calculation_variables['potential_file'] =     os.path.basename(potential_file)
-                                            calculation_variables['potential_dir'] =      os.path.basename(potential_dir)
-                                            calculation_variables['load'] =               ' '.join([load_style, os.path.basename(load_file)])
-                                        
-                                        #Create calculation input file by filling in template with calculation_variables terms
-                                        os.chdir(sim_dir)
-                                        calc_in = fill_template(template, calculation_variables, '<', '>')
-                                        input_dict = read_input(calc_in, UUID)
-                                        with open(__calc_name__ + '.in', 'w') as f:
-                                            f.write('\n'.join(calc_in))
-                                        os.chdir(working_dir)
-                                        
-                                        #Save the record to the library
-                                        with open(os.path.join(record_dir, UUID + '.json'), 'w') as f:
-                                            record.json(fp=f, indent=2)
+                                            #Save the record to the library
+                                            with open(os.path.join(record_dir, UUID + '.json'), 'w') as f:
+                                                record.json(fp=f, indent=2)
                         
 def __initial_setup(inline_terms, global_variables):
     """
@@ -230,20 +223,18 @@ def __initial_setup(inline_terms, global_variables):
     #Set default values for iterated variables
     if len(prepare_variables.aslist('size_mults')) == 0:   prepare_variables['size_mults'] = '1 1 1'
     if len(prepare_variables.aslist('temperature')) == 0:  prepare_variables['temperature'] = ''
-    if len(prepare_variables.aslist('pressure_xx')) == 0:  prepare_variables['pressure_xx'] = ''
-    if len(prepare_variables.aslist('pressure_yy')) == 0:  prepare_variables['pressure_yy'] = ''
-    if len(prepare_variables.aslist('pressure_zz')) == 0:  prepare_variables['pressure_zz'] = ''
+    if len(prepare_variables.aslist('pressure')) == 0:     prepare_variables['pressure'] = ''
     if len(prepare_variables.aslist('thermo_steps')) == 0: prepare_variables['thermo_steps'] = ''
     if len(prepare_variables.aslist('dump_every')) == 0:   prepare_variables['dump_every'] = ''
     if len(prepare_variables.aslist('run_steps')) == 0:    prepare_variables['run_steps'] = ''
+    if len(prepare_variables.aslist('integration')) == 0:  prepare_variables['integration'] = ''
+    if len(prepare_variables.aslist('random_seed')) == 0:  prepare_variables['random_seed'] = ''
     
     #Check lengths of the iterated variables
     assert len(prepare_variables.aslist('potential_file')) == len(prepare_variables.aslist('potential_dir')),  'potential_file and potential_dir must be of the same length'
     assert len(prepare_variables.aslist('load')) ==           len(prepare_variables.aslist('load_options')),   'load and load_options must be of the same length'
     assert len(prepare_variables.aslist('load')) ==           len(prepare_variables.aslist('load_elements')),  'load and load_elements must be of the same length'
     assert len(prepare_variables.aslist('load')) ==           len(prepare_variables.aslist('box_parameters')), 'load and box_parameters must be of the same length'
-    assert len(prepare_variables.aslist('pressure_xx')) ==    len(prepare_variables.aslist('pressure_yy')),    'pressure_xx and pressure_yy must be of the same length'
-    assert len(prepare_variables.aslist('pressure_xx')) ==    len(prepare_variables.aslist('pressure_zz')),    'pressure_xx and pressure_zz must be of the same length'
     assert len(prepare_variables.aslist('thermo_steps')) ==   len(prepare_variables.aslist('dump_every')),     'thermo_steps and dump_every must be of the same length'
     assert len(prepare_variables.aslist('thermo_steps')) ==   len(prepare_variables.aslist('run_steps')),      'thermo_steps and run_steps must be of the same length'
 
@@ -261,9 +252,7 @@ def __is_new_record(record_dir, record):
                   ['calculation-system-equilibrium', 'system-info', 'artifact'],
                   ['calculation-system-equilibrium', 'system-info', 'symbols'],
                   ['calculation-system-equilibrium', 'phase-state', 'temperature', 'value'],
-                  ['calculation-system-equilibrium', 'phase-state', 'pressure-xx', 'value'],
-                  ['calculation-system-equilibrium', 'phase-state', 'pressure-yy', 'value'],
-                  ['calculation-system-equilibrium', 'phase-state', 'pressure-zz', 'value']
+                  ['calculation-system-equilibrium', 'phase-state', 'pressure', 'value']]
     
     try:
         flist = os.listdir(record_dir) 

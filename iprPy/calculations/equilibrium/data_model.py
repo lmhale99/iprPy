@@ -28,6 +28,7 @@ def data_model(input_dict, results_dict=None):
     run_params['thermo_steps'] = input_dict['thermo_steps']
     run_params['run_steps'] = input_dict['run_steps']
     run_params['random_seed'] = input_dict['random_seed']
+    run_params['integration'] = input_dict['integration']
     
     #Copy over potential data model info
     calc['potential'] = input_dict['potential']['LAMMPS-potential']['potential']
@@ -41,19 +42,14 @@ def data_model(input_dict, results_dict=None):
     calc['system-info']['artifact']['family'] = input_dict['system_family']
     calc['system-info']['symbols'] = input_dict['symbols']
     
-     #Save phase-state info
-    calc['phase-state'] = DM()
-    calc['phase-state']['temperature'] = DM([('value', 0.0), ('unit', 'K')])
-    calc['phase-state']['pressure-xx'] = DM([('value', uc.get_in_units(input_dict['pressure_xx'],
-                                                                       input_dict['pressure_unit'])), 
-                                                       ('unit', input_dict['pressure_unit'])])
-    calc['phase-state']['pressure-yy'] = DM([('value', uc.get_in_units(input_dict['pressure_yy'],
-                                                                       input_dict['pressure_unit'])),
-                                                       ('unit', input_dict['pressure_unit'])])
-    calc['phase-state']['pressure-zz'] = DM([('value', uc.get_in_units(input_dict['pressure_zz'],
-                                                                       input_dict['pressure_unit'])),
-                                                       ('unit', input_dict['pressure_unit'])])                                                     
     
+    #Save phase-state info
+    calc['phase-state'] = DM()
+    calc['phase-state']['temperature'] = DM([('value', input_dict['temperature']), ('unit', 'K')])
+    calc['phase-state']['pressure'] = DM([('value', uc.get_in_units(input_dict['pressure'],
+                                                                    input_dict['pressure_unit'])),
+                                          ('unit',                  input_dict['pressure_unit'])])
+
     #Save data model of the initial ucell
     calc['as-constructed-atomic-system'] = input_dict['ucell'].model(symbols = input_dict['symbols'], 
                                                                      box_unit = input_dict['length_unit'])['atomic-system']
@@ -61,7 +57,6 @@ def data_model(input_dict, results_dict=None):
         calc['status'] = 'not calculated'
     else:
         
-        calc['results'] = results_dict
-       
-
+        calc['equilibrium-calculations'] = calculation = results_dict['calc']
+        
     return output
