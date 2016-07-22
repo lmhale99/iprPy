@@ -66,7 +66,7 @@ def read_input(f, uuid=None):
             C_model = DM(f)
             
         try:
-            input_dict['elastic_constants_model'] = DM([('elastic-constants', C_model.find(elastic-constants))])
+            input_dict['elastic_constants_model'] = DM([('elastic-constants', C_model.find('elastic-constants'))])
             input_dict['C'] = am.tools.ElasticConstants(model=input_dict['elastic_constants_model'])
         except:
             input_dict['elastic_constants_model'] = None 
