@@ -17,21 +17,7 @@ def read_input(f, uuid=None):
     if 'y-axis' in input_dict and input_dict['x-axis'] != '0 1 0':
         raise ValueError('y-axis not allowed with bain_transformation')
     if 'z-axis' in input_dict and input_dict['x-axis'] != '0 0 1':
-        raise ValueError('z-axis not allowed with bain_transformation')        
-    
-    #Check that system load file is A2--W--bcc or a decendent
-    load_style = input_dict['load'].split()[0]
-    load_file = ' '.join(input_dict['load'].split()[1:])
-    if load_style == 'system_model':
-        try:
-            with open(load_file) as f:
-                system_family = DM(f).find('system-info')['artifact']['family']
-        except:
-            system_family = os.path.splitext(os.path.basename(load_file))[0]
-        if system_family != 'A2--W--bcc':
-            raise ValueError('load must be a system_model in the A2--W--bcc family')
-    else:
-        raise ValueError('load must be a system_model in the A2--W--bcc family')    
+        raise ValueError('z-axis not allowed with bain_transformation')
     
     #Process 
     input.process_common_terms(input_dict)    

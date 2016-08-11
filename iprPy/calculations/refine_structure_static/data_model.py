@@ -22,8 +22,9 @@ def data_model(input_dict, results_dict=None):
     
     calc['calculation']['run-parameter'] = run_params = DM()
     run_params['strain-range'] = input_dict['strain_range']
+    run_params['load_options'] = input_dict['load_options']
+    
     run_params['size-multipliers'] = DM()
-
     run_params['size-multipliers']['a'] = list(input_dict['size_mults'][0])
     run_params['size-multipliers']['b'] = list(input_dict['size_mults'][1])
     run_params['size-multipliers']['c'] = list(input_dict['size_mults'][2])
@@ -53,13 +54,12 @@ def data_model(input_dict, results_dict=None):
                                                                        input_dict['pressure_unit'])),
                                                        ('unit', input_dict['pressure_unit'])])                                                       
     
-    #Save data model of the initial ucell
-    calc['as-constructed-atomic-system'] = input_dict['ucell'].model(symbols = input_dict['symbols'], 
-                                                                     box_unit = input_dict['length_unit'])['atomic-system']
-    
     if results_dict is None:
         calc['status'] = 'not calculated'
     else:
+        #Save data model of the initial ucell
+        calc['as-constructed-atomic-system'] = input_dict['ucell'].model(symbols = input_dict['symbols'], 
+                                                                         box_unit = input_dict['length_unit'])['atomic-system']
         
         #Update ucell to relaxed lattice parameters
         a_mult = input_dict['size_mults'][0][1] - input_dict['size_mults'][0][0]

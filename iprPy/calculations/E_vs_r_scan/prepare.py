@@ -37,10 +37,9 @@ def keywords():
             'length_unit',
             'pressure_unit',
             'energy_unit',
-            'strain_range',
-            'pressure_xx',
-            'pressure_yy',
-            'pressure_zz']
+            'minimum_r',
+            'maximum_r',
+            'number_of_steps_r']
 
 def singular_keywords():
     """Returns a dictionary of keywords that should have only one value for the calculation's prepare function, and the default values.""" 
@@ -53,10 +52,9 @@ def singular_keywords():
             'pressure_unit':       '',
             'energy_unit':         '',
             'force_unit':          '',
-            'strain_range':        '',
-            'pressure_xx':         '',
-            'pressure_yy':         '',
-            'pressure_zz':         ''}
+            'minimum_r':           '',
+            'maximum_r':           '',
+            'number_of_steps_r':   ''}
 
 def unused_keywords():
     """Returns a list of the keywords in the calculation's template input file that the prepare function does not use."""
@@ -113,67 +111,64 @@ def prepare(inline_terms, global_variables):
                 potential = lmp.Potential(input_dict['potential'])
                 system_family = input_dict['system_family']
                 
-                #Check that the same potential is being used
-                if 'system_potential' not in input_dict or input_dict['system_potential'] == potential.uuid:
+                #Loop over all symbols combinations
+                for symbols in atomman_input.yield_symbols(load, load_options, load_elements, global_variables, potential):
                     
-                    #Loop over all symbols combinations
-                    for symbols in atomman_input.yield_symbols(load, load_options, load_elements, global_variables, potential):
+                    #Define directory path for the record
+                    record_dir = os.path.join(calculation_variables['lib_directory'], str(potential), '-'.join(symbols), system_family, __calc_type__)
+                    
+                    #Add symbols to input_dict and build incomplete record
+                    input_dict['symbols'] = list(symbols)               
+                    record = data_model(input_dict)  
+                    
+                    #Check that no matching record already exists
+                    if __is_new_record(record_dir, record):
                         
-                        #Define directory path for the record
-                        record_dir = os.path.join(calculation_variables['lib_directory'], str(potential), '-'.join(symbols), system_family, __calc_type__)
+                        UUID = str(uuid.uuid4())
+                        calculation_variables['symbols'] = ' '.join(symbols)
                         
-                        #Add symbols to input_dict and build incomplete record
-                        input_dict['symbols'] = list(symbols)               
-                        record = data_model(input_dict)  
+                        #Create calculation run folder
+                        sim_dir = os.path.join(calculation_variables['run_directory'], UUID)
+                        os.makedirs(sim_dir)
                         
-                        #Check that no matching record already exists
-                        if __is_new_record(record_dir, record):
-                            
-                            UUID = str(uuid.uuid4())
-                            calculation_variables['symbols'] = ' '.join(symbols)
-                            
-                            #Create calculation run folder
-                            sim_dir = os.path.join(calculation_variables['run_directory'], UUID)
-                            os.makedirs(sim_dir)
-                            
-                            #Copy calc_files to run folder
-                            for fname in calc_files:
-                                shutil.copy(os.path.join(__calc_dir__, 'calc_files', fname), sim_dir)
-                            
-                            #Copy potential and load files to run directory and shorten paths
-                            if calculation_variables['copy_files']:
-                                
-                                #Divy up the load information
-                                load_terms = load.split()
-                                load_style = load_terms[0]
-                                load_file = ' '.join(load_terms[1:])
-                                
-                                #Copy loose files
-                                shutil.copy(potential_file, sim_dir)
-                                shutil.copy(load_file,      sim_dir)
-                                
-                                #Copy potential_dir and contents to run folder
-                                os.mkdir(os.path.join(sim_dir, os.path.basename(potential_dir)))
-                                for fname in glob.iglob(os.path.join(potential_dir, '*')):
-                                    shutil.copy(fname, os.path.join(sim_dir, os.path.basename(potential_dir)))
-                                
-                                #Shorten file paths to be relative
-                                calculation_variables['potential_file'] = os.path.basename(potential_file)
-                                calculation_variables['potential_dir'] =  os.path.basename(potential_dir)
-                                calculation_variables['load'] =           ' '.join([load_style, os.path.basename(load_file)])
-                            
-                            #Create calculation input file by filling in template with calculation_variables inline_terms
-                            os.chdir(sim_dir)
-                            calc_in = fill_template(template, calculation_variables, '<', '>')
-                            input_dict = read_input(calc_in, UUID)
-                            with open(__calc_name__ + '.in', 'w') as f:
-                                f.write('\n'.join(calc_in))
-                            os.chdir(working_dir)
-                            
-                            #Save the record to the library
-                            with open(os.path.join(record_dir, UUID + '.json'), 'w') as f:
-                                record.json(fp=f, indent=2)
+                        #Copy calc_files to run folder
+                        for fname in calc_files:
+                            shutil.copy(os.path.join(__calc_dir__, 'calc_files', fname), sim_dir)
                         
+                        #Copy potential and load files to run directory and shorten paths
+                        if calculation_variables['copy_files']:
+                            
+                            #Divy up the load information
+                            load_terms = load.split()
+                            load_style = load_terms[0]
+                            load_file = ' '.join(load_terms[1:])
+                            
+                            #Copy loose files
+                            shutil.copy(potential_file, sim_dir)
+                            shutil.copy(load_file,      sim_dir)
+                            
+                            #Copy potential_dir and contents to run folder
+                            os.mkdir(os.path.join(sim_dir, os.path.basename(potential_dir)))
+                            for fname in glob.iglob(os.path.join(potential_dir, '*')):
+                                shutil.copy(fname, os.path.join(sim_dir, os.path.basename(potential_dir)))
+                            
+                            #Shorten file paths to be relative
+                            calculation_variables['potential_file'] = os.path.basename(potential_file)
+                            calculation_variables['potential_dir'] =  os.path.basename(potential_dir)
+                            calculation_variables['load'] =           ' '.join([load_style, os.path.basename(load_file)])
+                        
+                        #Create calculation input file by filling in template with calculation_variables inline_terms
+                        os.chdir(sim_dir)
+                        calc_in = fill_template(template, calculation_variables, '<', '>')
+                        input_dict = read_input(calc_in, UUID)
+                        with open(__calc_name__ + '.in', 'w') as f:
+                            f.write('\n'.join(calc_in))
+                        os.chdir(working_dir)
+                        
+                        #Save the record to the library
+                        with open(os.path.join(record_dir, UUID + '.json'), 'w') as f:
+                            record.json(fp=f, indent=2)
+                    
 def __initial_setup(inline_terms, global_variables):
     """
     Checks that the values in prepare_variables are of appropriate length, and returns calculation_variables dictionary with all empty and singular values.
@@ -218,17 +213,14 @@ def __initial_setup(inline_terms, global_variables):
     
 def __is_new_record(record_dir, record):
     """Check if a matching record already exists."""
-    match_keys = [['calculation-system-relax', 'calculation', 'script'],
-                  ['calculation-system-relax', 'calculation', 'run-parameter', 'strain-range'],
-                  ['calculation-system-relax', 'calculation', 'run-parameter', 'load_options'],
-                  ['calculation-system-relax', 'potential', 'id'],
-                  ['calculation-system-relax', 'system-info', 'artifact'],
-                  ['calculation-system-relax', 'system-info', 'symbols'],
-                  ['calculation-system-relax', 'phase-state', 'temperature'],
-                  ['calculation-system-relax', 'phase-state', 'pressure-xx'],
-                  ['calculation-system-relax', 'phase-state', 'pressure-yy'],
-                  ['calculation-system-relax', 'phase-state', 'pressure-zz']]
-
+    match_keys = [['calculation-cohesive-energy-relation', 'calculation', 'script'],
+                  ['calculation-cohesive-energy-relation', 'calculation', 'run-parameter', 'minimum_r'],
+                  ['calculation-cohesive-energy-relation', 'calculation', 'run-parameter', 'maximum_r'],
+                  ['calculation-cohesive-energy-relation', 'calculation', 'run-parameter', 'number_of_steps_r'],
+                  ['calculation-cohesive-energy-relation', 'potential', 'id'],
+                  ['calculation-cohesive-energy-relation', 'system-info', 'artifact'],
+                  ['calculation-cohesive-energy-relation', 'system-info', 'symbols']]
+    
     try:
         flist = os.listdir(record_dir) 
     except:

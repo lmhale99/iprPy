@@ -34,7 +34,7 @@ def yield_symbols(load, load_options, load_elements, global_variables, potential
 
     pot_symbols = np.array(potential.symbols)
     pot_elements = np.array(potential.elements())
-    
+
     #if load_elements is empty, then use elements from the load file
     if load_elements == '':
         load_elements = []
@@ -69,29 +69,32 @@ def yield_symbols(load, load_options, load_elements, global_variables, potential
     else:
         assert load_elements[0] == '[' and load_elements[-1] == ']', 'Invalid symbols entry'
         load_elements = load_elements[1:-1].split(',')
-        
-    if len(load_elements) == 0:
-        raise ValueError('Failed to find elements')
-    
-    #Check if elements are names in global_variables
-    for i in xrange(len(load_elements)):
-        load_element = load_elements[i].strip()
-        if load_element in global_variables:
-            load_elements[i] = global_variables[load_element]
-        else:
-            load_elements[i] = [load_element]
-
-    #iterate over every symbols combination allowed by the potential
-    for i_vals in iterbox(len(pot_elements), len(load_elements)):
-        elements = pot_elements[i_vals]
-
-        match = True
-        for j in xrange(len(elements)):
-            if elements[j] not in load_elements[j]: 
-                match = False
-                break
-        if match:
+  
+    if load_elements[0] is None:
+        #iterate over every symbols combination allowed by the potential
+        for i_vals in iterbox(len(pot_elements), len(load_elements)):
             yield pot_symbols[i_vals]
+                
+    else:
+        #Check if elements are names in global_variables
+        for i in xrange(len(load_elements)):
+            load_element = load_elements[i].strip()
+            if load_element in global_variables:
+                load_elements[i] = global_variables[load_element]
+            else:
+                load_elements[i] = [load_element]
+
+        #iterate over every symbols combination allowed by the potential
+        for i_vals in iterbox(len(pot_elements), len(load_elements)):
+            elements = pot_elements[i_vals]
+
+            match = True
+            for j in xrange(len(elements)):
+                if elements[j] not in load_elements[j]: 
+                    match = False
+                    break
+            if match:
+                yield pot_symbols[i_vals]
             
 def iterbox(a, b):
     """Allows for dynamic iteration over all arrays of length b where each term is in range 0-a"""

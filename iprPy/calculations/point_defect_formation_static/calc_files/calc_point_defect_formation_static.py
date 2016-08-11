@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import uuid
 from copy import deepcopy
+import shutil
 
 import iprPy
 from DataModelDict import DataModelDict as DM
@@ -48,7 +49,7 @@ def main(*args):
                               maxiter =     input_dict['maximum_iterations'],
                               maxeval =     input_dict['maximum_evaluations'])
     
-    check_config('ptd.dump', input_dict['point_defect_model'], 1.05*input_dict['ucell'].box.a, results_dict)
+    check_config(results_dict, input_dict['point_defect_model'], 1.05*input_dict['ucell'].box.a)
     
     #Save data model of results 
     results = iprPy.calculation_data_model(__calc_type__, input_dict, results_dict)
@@ -58,67 +59,81 @@ def main(*args):
 def ptd_energy(lammps_command, system, potential, symbols, ptd, mpi_command='',
                etol=0.0, ftol=1e-6, maxiter=100000, maxeval=100000):
     
-    pair_info = potential.pair_info(symbols)
-        
-    #write system to data file
-    system_info = lmp.atom_data.dump('perfect.dat', system, 
-                                     units=potential.units, 
-                                     atom_style=potential.atom_style)
+    #initialize results_dict
+    results_dict = DM()
+    results_dict['perfect_system_dump_file'] = 'perfect.dump'
+    results_dict['defect_system_dump_file'] =  'defect.dump'
+    
+    #Get lammps units
+    lammps_units = lmp.style.unit(potential.units)
+    
+    #Define lammps variables
+    lammps_variables = {}
+    lammps_variables['atomman_system_info'] = lmp.atom_data.dump('perfect.dat', system, 
+                                                                 units = potential.units, 
+                                                                 atom_style = potential.atom_style)
+    lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
+    lammps_variables['energy_tolerance'] = etol
+    lammps_variables['force_tolerance'] = uc.get_in_units(ftol, lammps_units['force'])
+    lammps_variables['maximum_iterations'] = maxiter
+    lammps_variables['maximum_evaluations'] = maxeval
 
-    #create LAMMPS input script
-    min_in = min_script('min.template', system_info, pair_info, etol=etol, ftol=ftol, maxiter=maxiter, maxeval=maxeval)
-    with open('perfect_min.in', 'w') as f:
-        f.write(min_in)
+    #Write lammps input script
+    template_file = 'min.template'
+    lammps_script = 'min.in'
+    with open(template_file) as f:
+        template = f.read()
+    with open(lammps_script, 'w') as f:
+        f.write('\n'.join(iprPy.tools.fill_template(template, lammps_variables, '<', '>')))
 
     #run lammps
-    data = lmp.run(lammps_command, 'perfect_min.in', mpi_command)
-
-    #extract cohesive energy
-    e_coh = uc.set_in_units(data.finds('peatom')[-1], 
-                            lmp.style.unit(potential.units)['energy'])
+    output = lmp.run(lammps_command, lammps_script, mpi_command)
     
-    #Rename final dump file
-    try:
-        os.rename('atom.'+str(int(data.finds('Step')[-1])), 'perfect.dump')
-    except:
-        os.remove('perfect.dump')
-        os.rename('atom.'+str(int(data.finds('Step')[-1])), 'perfect.dump')
+    #rename log and dump files
+    shutil.move('log.lammps', 'min-perfect-log.lammps')
+    shutil.move('atom.'+str(int(output.finds('Step')[-1])), results_dict['perfect_system_dump_file'])
     
-    #add defect(s) to system
-    system = lmp.atom_dump.load('perfect.dump')    
+    #Extract LAMMPS thermo data.
+    results_dict['perfect_system_total_energy'] = uc.set_in_units(output.finds('PotEng')[-1], lammps_units['energy'])
+    results_dict['cohesive_energy'] =             uc.set_in_units(output.finds('peatom')[-1], lammps_units['energy'])
+    
+    #Load system from dump file and check that box dimensions are not cropped by lammps
+    vects = system.box.vects
+    system = lmp.atom_dump.load(results_dict['perfect_system_dump_file'])
+    system.box_set(vects=vects)    
+    
+    #Add defect(s)
     for params in ptd.iterfinds('atomman-defect-point-parameters'):       
         system = am.defect.point(system, **params)
         
-    #write system to data file
-    system_info = lmp.atom_data.dump('ptd.dat', system, 
-                                     units=potential.units, 
-                                     atom_style=potential.atom_style)
+    #update lammps variables
+    lammps_variables['atomman_system_info'] = lmp.atom_data.dump('defect.dat', system, 
+                                                                 units = potential.units, 
+                                                                 atom_style = potential.atom_style)
     
-    #create LAMMPS input script
-    min_in = min_script('min.template', system_info, pair_info, etol=etol, ftol=ftol, maxiter=maxiter, maxeval=maxeval)
-    with open('ptd_min.in', 'w') as f:
-        f.write(min_in)
+    #Write lammps input script
+    with open(lammps_script, 'w') as f:
+        f.write('\n'.join(iprPy.tools.fill_template(template, lammps_variables, '<', '>')))
 
     #run lammps
-    data = lmp.run(lammps_command, 'ptd_min.in', mpi_command)
-
-    #extract per-atom energy and caclulate formation energy
-    d_pot_eng = uc.set_in_units(data.finds('PotEng')[-1], 
-                                lmp.style.unit(potential.units)['energy'])
-    e_ptd_f = d_pot_eng - e_coh * system.natoms
+    output = lmp.run(lammps_command, lammps_script, mpi_command)
     
-    #rename final dump file
-    try:
-        os.rename('atom.'+str(int(data.finds('Step')[-1])), 'ptd.dump')
-    except:
-        os.remove('ptd.dump')
-        os.rename('atom.'+str(int(data.finds('Step')[-1])), 'ptd.dump')
-    
+    #rename log and dump files
+    shutil.move('log.lammps', 'min-defect-log.lammps')
+    shutil.move('atom.'+str(int(output.finds('Step')[-1])), results_dict['defect_system_dump_file'])
     os.remove('atom.0')
-    
-    return {'e_coh':e_coh, 'e_ptd_f': e_ptd_f}
 
-def check_config(dump_file, ptd, cutoff, results_dict={}):
+    #extract lammps thermo data
+    results_dict['defect_system_total_energy'] = uc.set_in_units(output.finds('PotEng')[-1], lammps_units['energy'])
+    
+    #compute defect formation energy as difference between total potential energy of defect system
+    #and the cohesive energy of the perfect system times the number of atoms in the defect system
+    results_dict['defect_system_natoms'] = system.natoms
+    results_dict['defect_formation_energy'] = results_dict['defect_system_total_energy'] - results_dict['cohesive_energy'] * system.natoms
+
+    return results_dict
+
+def check_config(results_dict, ptd, cutoff):
     #Extract the parameter sets
     params = deepcopy(ptd.finds('atomman-defect-point-parameters'))
     
@@ -133,7 +148,7 @@ def check_config(dump_file, ptd, cutoff, results_dict={}):
     
     pos = params['pos']
     
-    system = lmp.atom_dump.load(dump_file)
+    system = lmp.atom_dump.load(results_dict['defect_system_dump_file'])
     
     #Compute centrosummation of atoms near defect.
     #Calculate distance of all atoms from pos

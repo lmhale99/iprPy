@@ -129,7 +129,11 @@ def prepare(inline_terms, global_variables):
                     #Check that defect's system_family matches
                     if system_family != input_dict['point_defect_model']['point-defect-parameters']['system-family']:
                         continue
-                
+                    
+                    #Check that the same potential is being used
+                    if 'system_potential' in input_dict and input_dict['system_potential'] != potential.uuid:
+                        continue
+                    
                     #Loop over all symbols combinations
                     for symbols in atomman_input.yield_symbols(load, load_options, load_elements, global_variables, potential):
 

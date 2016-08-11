@@ -102,6 +102,11 @@ def process_common_terms(input_dict, UUID=None):
         #generate new system_family name using the load_file 
         except:
             input_dict['system_family'] = os.path.splitext(os.path.basename(load_file))[0]
+        #find if it is associated with a specific potential
+        try:
+            input_dict['system_potential'] = model.find('potential')['key']
+        except:
+            pass
     #Other load_styles won't have a system family, so generate one using the load_file 
     else:
         input_dict['system_family'] = os.path.splitext(os.path.basename(load_file))[0]
@@ -109,8 +114,9 @@ def process_common_terms(input_dict, UUID=None):
     #load_options
     kwargs= {}
     if input_dict['load_options'] is not None:
-        load_options_keys = ['key', 'data_set', 'pbc', 'atom_style', 'units', 'prop_info']
+        load_options_keys = ['key', 'index', 'data_set', 'pbc', 'atom_style', 'units', 'prop_info']
         kwargs = term_extractor(input_dict['load_options'], {}, load_options_keys)
+        if 'index' in kwargs: kwargs['index'] = int(kwargs['index']) 
         
     #ucell and symbols
     ucell = am.System()
@@ -173,9 +179,9 @@ def process_common_terms(input_dict, UUID=None):
         #x-axis, y-axis, z-axis
         axes = np.array([input_dict['x-axis'], input_dict['y-axis'], input_dict['z-axis']], dtype='float64')
 
-        if True:
+        try:
             input_dict['initial_system'] = am.tools.rotate_cubic(input_dict['initial_system'], axes)
-        else:
+        except:
             input_dict['initial_system'] = lmp.normalize(am.tools.rotate(input_dict['initial_system'], axes))
             
         #atom_shift

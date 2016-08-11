@@ -1,0 +1,12 @@
+#LAMMPS input script that performs a simple energy minimization
+
+<atomman_system_info>
+
+<atomman_pair_info>
+
+variable peatom equal pe/atoms
+                  
+thermo_style custom step lx ly lz pxx pyy pzz pe v_peatom
+thermo_modify format float %.13e
+
+run 0

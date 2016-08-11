@@ -71,15 +71,17 @@ def equilibrum(lammps_command, system, potential, symbols, sys_units, size_mults
                                      units=potential.units, 
                                      atom_style=potential.atom_style)
 
+    lammps_units = lmp.style.unit(potential.units)
+    lammps_press = uc.get_in_units(press, lammps_units['pressure'])                                 
     #create LAMMPS input script
     if integration == 'nph':
-        min_in = min_script('min_nph_langevin.template', system_info, pair_info, t_steps=t_steps, press=press, d_every=d_every, r_steps=r_steps, rand=rand, temp=temp)
+        min_in = min_script('min_nph_langevin.template', system_info, pair_info, t_steps=t_steps, press=lammps_press, d_every=d_every, r_steps=r_steps, rand=rand, temp=temp)
         with open('perfect_min.in', 'w') as f:
             f.write(min_in)
     elif integration == 'npt':
         if temp == 0.0:
             raise ValueError('temperature cannot be 0 for npt calculation')
-        min_in = min_script('min_npt.template', system_info, pair_info, t_steps=t_steps, press=press, d_every=d_every, r_steps=r_steps, rand=rand, temp=temp)
+        min_in = min_script('min_npt.template', system_info, pair_info, t_steps=t_steps, press=lammps_press, d_every=d_every, r_steps=r_steps, rand=rand, temp=temp)
         with open('perfect_min.in', 'w') as f:
             f.write(min_in)
 

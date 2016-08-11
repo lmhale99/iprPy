@@ -9,14 +9,10 @@ mpi_command
 potential_file              C:/Users/lmh1/Documents/iprPy/reference-libraries/potentials/2006--Chamati-M--Fe.json
 potential_dir               C:/Users/lmh1/Documents/iprPy/reference-libraries/potentials/2006--Chamati-M--Fe
 
-#Initial system configuration to load
-load                        system_model 522c8437-eceb-480d-8f0c-77f83cdb3125.json
-load_options                key relaxed-atomic-system
-symbols                     Fe
-
-#System manipulations
-size_mults                  -12 12 -20 20 0 1
-box_parameters              
+#File systems to load
+base_file
+disl_file
+symbols
 
 #Units that input/output values are in
 length_unit                 
@@ -24,14 +20,10 @@ pressure_unit
 energy_unit                 
 force_unit                  
 
-#Defect parameters
-dislocation_model           bcc/111-screw.json
-elastic_constants_model     
-anneal_temperature          100.0
-boundary_width              3.0
-boundary_shape              rect
-
 #Run parameters
+radial_distance
+z_slice_width
+anneal_temperature
 energy_tolerance            
 force_tolerance             
 maximum_iterations          

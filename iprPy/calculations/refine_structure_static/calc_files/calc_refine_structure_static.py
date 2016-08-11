@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import uuid
 from copy import deepcopy
+import shutil
 
 import iprPy
 from DataModelDict import DataModelDict as DM
@@ -41,17 +42,6 @@ def main(*args):
     results = iprPy.calculation_data_model(__calc_type__, input_dict, results_dict)
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)
-
-def cij_script(template_file, system_info, pair_info, delta = 1e-5, steps = 2):
-    """Create lammps script that strains a crystal in each direction x,y,z and shear yz,xz,xy independently."""    
-    
-    with open(template_file) as f:
-        template = f.read()
-    variable = {'atomman_system_info': system_info,
-                'atomman_pair_info':   pair_info,
-                'delta': delta, 
-                'steps': steps}
-    return '\n'.join(iprPy.tools.fill_template(template, variable, '<', '>'))
         
 def quick_a_Cij(lammps_exe, cell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=0.0, tol=1e-10, diverge_scale=3., delta = 1e-5):
     """
@@ -77,7 +67,7 @@ def quick_a_Cij(lammps_exe, cell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=0
     for cycle in xrange(100):
         
         #Run LAMMPS and evaluate results based on cell_old
-        results = calc_cij(lammps_exe, cell_current, potential, symbols, p_xx, p_yy, p_zz, delta)
+        results = calc_cij(lammps_exe, cell_current, potential, symbols, p_xx, p_yy, p_zz, delta, cycle)
         cell_new = results['cell_new']
         
         #Test if box has converged to a single size
@@ -92,7 +82,7 @@ def quick_a_Cij(lammps_exe, cell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=0
                          b = (cell_new.box.b + cell_old.box.b) / 2.,
                          c = (cell_new.box.c + cell_old.box.c) / 2.)
             cell_current.box_set(vects=box.vects, scale=True)
-            results = calc_cij(lammps_exe, cell_current, potential, symbols, p_xx, p_yy, p_zz, delta)                 
+            results = calc_cij(lammps_exe, cell_current, potential, symbols, p_xx, p_yy, p_zz, delta, cycle+1)                 
             
             converged = True
             break
@@ -117,44 +107,51 @@ def quick_a_Cij(lammps_exe, cell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=0
     else:
         raise RuntimeError('Failed to converge after 100 cycles')
 
-def calc_cij(lammps_exe, cell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=0.0, delta=1e-5):
+def calc_cij(lammps_command, cell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=0.0, delta=1e-5, cycle=0):
     """Runs cij_script and returns current Cij, stress, Ecoh, and new cell guess."""
     
-    #setup system and pair info
-    system_info = lmp.sys_gen(units =       potential.units,
-                              atom_style =  potential.atom_style,
-                              ucell =       cell,
-                              size =        np.array([[0,3], [0,3], [0,3]]))
-
-    pair_info = potential.pair_info(symbols)
+    #Get lammps units
+    lammps_units = lmp.style.unit(potential.units)
     
-    #create script and run
-    with open('cij.in','w') as f:
-        f.write(cij_script('cij.template', system_info, pair_info, delta=delta, steps=2))
-    data = lmp.run(lammps_exe, 'cij.in')
+    #Define lammps variables
+    lammps_variables = {}
+    lammps_variables['atomman_system_info'] = lmp.sys_gen(units =       potential.units,
+                                                          atom_style =  potential.atom_style,
+                                                          ucell =       cell,
+                                                          size =        np.array([[0,3], [0,3], [0,3]]))
+    lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
+    lammps_variables['delta'] = delta
+    lammps_variables['steps'] = 2
     
-    #get units for pressure and energy used by LAMMPS simulation
-    lmp_units = lmp.style.unit(potential.units)
-    p_unit = lmp_units['pressure']
-    e_unit = lmp_units['energy']
+    #Write lammps input script
+    template_file = 'cij.template'
+    lammps_script = 'cij.in'
+    with open(template_file) as f:
+        template = f.read()
+    with open(lammps_script, 'w') as f:
+        f.write('\n'.join(iprPy.tools.fill_template(template, lammps_variables, '<', '>')))
     
-    #Extract thermo values. Each term ranges i=0-12 where i=0 is undeformed
+    #Run lammps 
+    output = lmp.run(lammps_command, lammps_script)
+    shutil.move('log.lammps', 'cij-'+str(cycle)+'-log.lammps')
+    
+    #Extract LAMMPS thermo data. Each term ranges i=0-12 where i=0 is undeformed
     #The remaining values are for -/+ strain pairs in the six unique directions
-    lx = np.array(data.finds('Lx'))
-    ly = np.array(data.finds('Ly'))
-    lz = np.array(data.finds('Lz'))
-    xy = np.array(data.finds('Xy'))
-    xz = np.array(data.finds('Xz'))
-    yz = np.array(data.finds('Yz'))
+    lx = uc.set_in_units(np.array(output.finds('Lx')), lammps_units['length'])
+    ly = uc.set_in_units(np.array(output.finds('Ly')), lammps_units['length'])
+    lz = uc.set_in_units(np.array(output.finds('Lz')), lammps_units['length'])
+    xy = uc.set_in_units(np.array(output.finds('Xy')), lammps_units['length'])
+    xz = uc.set_in_units(np.array(output.finds('Xz')), lammps_units['length'])
+    yz = uc.set_in_units(np.array(output.finds('Yz')), lammps_units['length'])
     
-    pxx = uc.set_in_units(np.array(data.finds('Pxx')), p_unit)
-    pyy = uc.set_in_units(np.array(data.finds('Pyy')), p_unit)
-    pzz = uc.set_in_units(np.array(data.finds('Pzz')), p_unit)
-    pxy = uc.set_in_units(np.array(data.finds('Pxy')), p_unit)
-    pxz = uc.set_in_units(np.array(data.finds('Pxz')), p_unit)
-    pyz = uc.set_in_units(np.array(data.finds('Pyz')), p_unit)
+    pxx = uc.set_in_units(np.array(output.finds('Pxx')), lammps_units['pressure'])
+    pyy = uc.set_in_units(np.array(output.finds('Pyy')), lammps_units['pressure'])
+    pzz = uc.set_in_units(np.array(output.finds('Pzz')), lammps_units['pressure'])
+    pxy = uc.set_in_units(np.array(output.finds('Pxy')), lammps_units['pressure'])
+    pxz = uc.set_in_units(np.array(output.finds('Pxz')), lammps_units['pressure'])
+    pyz = uc.set_in_units(np.array(output.finds('Pyz')), lammps_units['pressure'])
     
-    pe = uc.set_in_units(np.array(data.finds('peatom')), e_unit)
+    pe = uc.set_in_units(np.array(output.finds('peatom')), lammps_units['energy'])
     
     #Set the six non-zero strain values
     strains = np.array([ (lx[2] -  lx[1])  / lx[0],

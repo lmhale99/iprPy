@@ -26,6 +26,8 @@ def main(*args):
     with open(args[0]) as f:
         input_dict = iprPy.calculation_read_input(__calc_type__, f, *args[1:])
 
+    assert input_dict['system_family'] == 'A2--W--bcc', 'initial system must be in the A2--W--bcc family'    
+        
     results_dict = {}
     results_dict['initial'] = bain_run_calcs(input_dict,__calc_type__,'initial')    
     results_dict['bain'] = bain_run_calcs(input_dict,__calc_type__,'bain')
