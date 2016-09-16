@@ -1,6 +1,4 @@
-from DataModelDict import DataModelDict as DM
 from iprPy.tools import input
-import atomman as am
 
 def read_input(f, UUID=None):
     """Reads the calc_*.in input commands for this calculation."""

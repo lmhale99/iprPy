@@ -66,9 +66,9 @@ def data_model(input_dict, results_dict=None):
         b_mult = input_dict['size_mults'][1][1] - input_dict['size_mults'][1][0]
         c_mult = input_dict['size_mults'][2][1] - input_dict['size_mults'][2][0]
         relaxed_ucell = deepcopy(input_dict['ucell'])
-        relaxed_ucell.box_set(a = results_dict['cell_new'].box.a / a_mult,
-                              b = results_dict['cell_new'].box.b / b_mult,
-                              c = results_dict['cell_new'].box.c / c_mult,
+        relaxed_ucell.box_set(a = results_dict['system_new'].box.a / a_mult,
+                              b = results_dict['system_new'].box.b / b_mult,
+                              c = results_dict['system_new'].box.c / c_mult,
                               scale = True)
         
         #Save data model of the relaxed ucell                      

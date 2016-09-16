@@ -1,15 +1,12 @@
 #!/usr/bin/env python
 import os
 import sys
-import random
-import matplotlib.pyplot as plt
-import numpy as np
-import uuid
 from copy import deepcopy
 import shutil
 
 import iprPy
-from DataModelDict import DataModelDict as DM
+
+import numpy as np
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
@@ -43,16 +40,19 @@ def main(*args):
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)
         
-def quick_a_Cij(lammps_exe, cell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=0.0, tol=1e-10, diverge_scale=3., delta = 1e-5):
+def quick_a_Cij(lammps_command, system, potential, symbols, mpi_command=None, p_xx=0.0, p_yy=0.0, p_zz=0.0, delta = 1e-5, tol=1e-10, diverge_scale=3.):
     """
-    Quickly refines static orthorhombic cell by evaluating the elastic constants and the virial pressure.
+    Quickly refines static orthorhombic system by evaluating the elastic constants and the virial pressure.
     
-    Keyword Arguments:
-    lammps_exe -- directory location for lammps executable
+    Arguments:
+    lammps_command -- directory location for lammps executable
     system -- atomman.System to statically deform and evaluate a,b,c and Cij at a given pressure
     potential -- atomman.lammps.Potential representation of a LAMMPS implemented potential
     symbols -- list of element-model symbols for the Potential that correspond to the System's atypes
-    pxx, pyy, pzz -- tensile pressures to equilibriate to.  Default is 0.0 for all.  
+    
+    Keyword Arguments:
+    pxx, pyy, pzz -- tensile pressures to equilibriate to.  Default is 0.0 for all. 
+    delta -- the strain range to use in calculating the elastic constants. Default is 1e-5.    
     tol -- the relative tolerance criterion for identifying box size convergence. Default is 1e-10.
     diverge_scale -- identifies a divergent system if x / diverge_scale < x < x * diverge_scale is not True for x = a,b,c.
     """
@@ -61,45 +61,45 @@ def quick_a_Cij(lammps_exe, cell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=0
     converged = False                   #flag for if values have converged
     
     #define boxes for iterating
-    cell_current = deepcopy(cell)       #cell with box parameters being evaluated
-    cell_old = None                     #cell with previous box parameters evaluated
+    system_current = deepcopy(system)       #system with box parameters being evaluated
+    system_old = None                     #system with previous box parameters evaluated
     
     for cycle in xrange(100):
         
-        #Run LAMMPS and evaluate results based on cell_old
-        results = calc_cij(lammps_exe, cell_current, potential, symbols, p_xx, p_yy, p_zz, delta, cycle)
-        cell_new = results['cell_new']
+        #Run LAMMPS and evaluate results based on system_old
+        results = calc_cij(lammps_command, system_current, potential, symbols, p_xx, p_yy, p_zz, delta, cycle)
+        system_new = results['system_new']
         
         #Test if box has converged to a single size
-        if np.allclose(cell_new.box.vects, cell_current.box.vects, rtol=tol):
+        if np.allclose(system_new.box.vects, system_current.box.vects, rtol=tol):
             converged = True
             break
         
         #Test if box has converged to two sizes
-        elif cell_old is not None and np.allclose(cell_new.box.vects, cell_old.box.vects, rtol=tol):
+        elif system_old is not None and np.allclose(system_new.box.vects, system_old.box.vects, rtol=tol):
             #Run LAMMPS Cij script using average between alat0 and alat1
-            box = am.Box(a = (cell_new.box.a + cell_old.box.a) / 2.,
-                         b = (cell_new.box.b + cell_old.box.b) / 2.,
-                         c = (cell_new.box.c + cell_old.box.c) / 2.)
-            cell_current.box_set(vects=box.vects, scale=True)
-            results = calc_cij(lammps_exe, cell_current, potential, symbols, p_xx, p_yy, p_zz, delta, cycle+1)                 
+            box = am.Box(a = (system_new.box.a + system_old.box.a) / 2.,
+                         b = (system_new.box.b + system_old.box.b) / 2.,
+                         c = (system_new.box.c + system_old.box.c) / 2.)
+            system_current.box_set(vects=box.vects, scale=True)
+            results = calc_cij(lammps_command, system_current, potential, symbols, p_xx, p_yy, p_zz, delta, cycle+1)                 
             
             converged = True
             break
         
         #Test if values have diverged from initial guess
-        elif cell_new.box.a < cell.box.a / diverge_scale or cell_new.box.a > cell.box.a * diverge_scale:
+        elif system_new.box.a < system.box.a / diverge_scale or system_new.box.a > system.box.a * diverge_scale:
             raise RuntimeError('Divergence of box dimensions')
-        elif cell_new.box.b < cell.box.b / diverge_scale or cell_new.box.b > cell.box.b * diverge_scale:
+        elif system_new.box.b < system.box.b / diverge_scale or system_new.box.b > system.box.b * diverge_scale:
             raise RuntimeError('Divergence of box dimensions')
-        elif cell_new.box.c < cell.box.c / diverge_scale or cell_new.box.c > cell.box.c * diverge_scale:
+        elif system_new.box.c < system.box.c / diverge_scale or system_new.box.c > system.box.c * diverge_scale:
             raise RuntimeError('Divergence of box dimensions')  
         elif results['ecoh'] == 0.0:
             raise RuntimeError('Divergence: cohesive energy is 0')
                 
-        #if not converged or diverged, update cell_old and cell_current
+        #if not converged or diverged, update system_old and system_current
         else:
-            cell_old, cell_current = cell_current, cell_new
+            system_old, system_current = system_current, system_new
     
     #Return values if converged
     if converged:        
@@ -107,8 +107,8 @@ def quick_a_Cij(lammps_exe, cell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=0
     else:
         raise RuntimeError('Failed to converge after 100 cycles')
 
-def calc_cij(lammps_command, cell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=0.0, delta=1e-5, cycle=0):
-    """Runs cij_script and returns current Cij, stress, Ecoh, and new cell guess."""
+def calc_cij(lammps_command, system, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=0.0, delta=1e-5, cycle=0):
+    """Runs cij_script and returns current Cij, stress, Ecoh, and new system guess."""
     
     #Get lammps units
     lammps_units = lmp.style.unit(potential.units)
@@ -117,7 +117,7 @@ def calc_cij(lammps_command, cell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=
     lammps_variables = {}
     lammps_variables['atomman_system_info'] = lmp.sys_gen(units =       potential.units,
                                                           atom_style =  potential.atom_style,
-                                                          ucell =       cell,
+                                                          ucell =       system,
                                                           size =        np.array([[0,3], [0,3], [0,3]]))
     lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
     lammps_variables['delta'] = delta
@@ -177,7 +177,7 @@ def calc_cij(lammps_command, cell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=
         for j in xrange(i):
             cij[i,j] = cij[j,i] = (cij[i,j] + cij[j,i]) / 2
 
-    C = am.tools.ElasticConstants(Cij=cij)
+    C = am.ElasticConstants(Cij=cij)
     
     if np.allclose(C.Cij, 0.0):
         raise RuntimeError('Divergence of elastic constants to <= 0')
@@ -196,18 +196,18 @@ def calc_cij(lammps_command, cell, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=
     s_yy = stress[1,1] + p_yy
     s_zz = stress[2,2] + p_zz
     
-    new_a = cell.box.a / (S[0,0]*s_xx + S[0,1]*s_yy + S[0,2]*s_zz + 1)
-    new_b = cell.box.b / (S[1,0]*s_xx + S[1,1]*s_yy + S[1,2]*s_zz + 1)
-    new_c = cell.box.c / (S[2,0]*s_xx + S[2,1]*s_yy + S[2,2]*s_zz + 1)
+    new_a = system.box.a / (S[0,0]*s_xx + S[0,1]*s_yy + S[0,2]*s_zz + 1)
+    new_b = system.box.b / (S[1,0]*s_xx + S[1,1]*s_yy + S[1,2]*s_zz + 1)
+    new_c = system.box.c / (S[2,0]*s_xx + S[2,1]*s_yy + S[2,2]*s_zz + 1)
     
     if new_a <= 0 or new_b <= 0 or new_c <=0:
         raise RuntimeError('Divergence of box dimensions to <= 0')
     
     newbox = am.Box(a=new_a, b=new_b, c=new_c)
-    cell_new = deepcopy(cell)
-    cell_new.box_set(vects=newbox.vects, scale=True)
+    system_new = deepcopy(system)
+    system_new.box_set(vects=newbox.vects, scale=True)
     
-    return {'C':C, 'stress':stress, 'ecoh':pe[0], 'cell_new':cell_new}
+    return {'C':C, 'stress':stress, 'ecoh':pe[0], 'system_new':system_new}
     
 if __name__ == '__main__':
     main(*sys.argv[1:])    

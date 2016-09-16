@@ -56,7 +56,7 @@ def data_model(input_dict, results_dict=None):
         calc['cohesive-energy-relation']['cohesive-energy']['unit'] = input_dict['energy_unit']      
 
         if 'min_cell' in results_dict:
-            for cell in results_dict.iteraslist('min_cell'):
+            for cell in results_dict['min_cell']:
                 calc.append('minimum-atomic-system', cell.model(symbols = input_dict['symbols'], box_unit = input_dict['length_unit'])['atomic-system'])
 
     return output

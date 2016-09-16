@@ -180,9 +180,9 @@ def process_common_terms(input_dict, UUID=None):
         axes = np.array([input_dict['x-axis'], input_dict['y-axis'], input_dict['z-axis']], dtype='float64')
 
         try:
-            input_dict['initial_system'] = am.tools.rotate_cubic(input_dict['initial_system'], axes)
+            input_dict['initial_system'] = am.rotate_cubic(input_dict['initial_system'], axes)
         except:
-            input_dict['initial_system'] = lmp.normalize(am.tools.rotate(input_dict['initial_system'], axes))
+            input_dict['initial_system'] = lmp.normalize(am.rotate(input_dict['initial_system'], axes))
             
         #atom_shift
         shift = (input_dict['atom_shift'][0] * input_dict['initial_system'].box.avect +

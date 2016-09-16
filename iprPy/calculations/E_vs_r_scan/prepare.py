@@ -18,7 +18,7 @@ __calc_name__ = 'calc_' + __calc_type__
 
 def description():
     """Returns a description for the calculation."""
-    return "The refine_structure_static calculation uses molecular statics to find the equilibrium box size and elastic constants of a system using a specific potential and at a specific pressure."
+    return "The E_vs_r_scan calculation uses molecular statics to evaluate a system's cohesive for a range of interatomic spacing values."
     
 def keywords():
     """Return the list of keywords used by this calculation that are searched for from the inline inline_terms and pre-defined global_variables."""
