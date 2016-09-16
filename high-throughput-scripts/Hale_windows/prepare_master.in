@@ -9,10 +9,10 @@ copy_files              add True
 #ALL TERMS IN THIS SECTION ARE SPECIFIC TO YOUR COMPUTER!!!! 
 
 #Set library directory
-lib_directory           set C:/Users/lmh1/Documents/calculations/ipr/Kittel-testing
+lib_directory           set E:/calculations/ipr/library_2016_09_07
 
 #Set run directories
-run_directory_1         set C:/Users/lmh1/Documents/calculations/ipr/torun/1-testing
+run_directory_1         set C:/Users/lmh1/Documents/calculations/ipr/torun/1
 run_directory_2         set C:/Users/lmh1/Documents/calculations/ipr/torun/2
 run_directory_3         set C:/Users/lmh1/Documents/calculations/ipr/torun/3
 run_directory_4         set C:/Users/lmh1/Documents/calculations/ipr/torun/4

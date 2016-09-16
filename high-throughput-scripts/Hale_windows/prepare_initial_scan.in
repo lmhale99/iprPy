@@ -9,7 +9,7 @@ copy_files              add True
 #ALL TERMS IN THIS SECTION ARE SPECIFIC TO YOUR COMPUTER!!!! 
 
 #Set library directory
-lib_directory           set C:/Users/lmh1/Documents/calculations/ipr/library_2016_08_02
+lib_directory           set C:/Users/lmh1/Documents/calculations/ipr/library_2016_09_15
 
 #Set run directories
 run_directory_1         set C:/Users/lmh1/Documents/calculations/ipr/torun/1
@@ -36,19 +36,12 @@ mpi_command_4           set mpiexec -localonly 4
 potential_path          add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/potentials
 prototype_path          add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/prototypes
 
-point_defect_dir        add C:/users/lmh1/documents/Python-packages/iprPy/reference-libraries/point/A1--Cu--fcc
-point_defect_dir        add C:/users/lmh1/documents/Python-packages/iprPy/reference-libraries/point/A2--W--bcc
-point_defect_dir        add C:/users/lmh1/documents/Python-packages/iprPy/reference-libraries/point/A3--Mg--hcp
-point_defect_dir        add C:/users/lmh1/documents/Python-packages/iprPy/reference-libraries/point/A4--C--dc
-
 #################
 #Load Potentials#
 #################
 
 #specify limiters
-#potential_name          add 2015--Mendelev-M-I--Al-Sm
-#potential_name          add 1997--Ackland-G-J--Fe
-#potential_name          add 2010--Fellinger-M-R--Nb
+
 
 #generate potential_file and potential_dir for LAMMPS potentials in potential_path
 function                lammps_potentials  
@@ -58,7 +51,6 @@ function                lammps_potentials
 #################
 
 #specify limiters
-#prototype_name          adds A1--Cu--fcc A2--W--bcc
 
 #generate load, load_options, load_elements, box_parameters for prototypes in prototype_path with lattice parameters in prototype_reference  
 function                load_from_prototypes2
@@ -107,18 +99,3 @@ strain_range            set 1e-7
 
 #Run calculation
 calculation             refine_structure_static 
-
-#########################
-#Load Refined Structures#
-#########################
-
-#Clear system information
-load                    clear
-load_options            clear
-load_elements           clear
-box_parameters          clear
-
-#Find all refine_structure_static results and fill in system information
-function                load_from_library calc_name refine_structure_static load_key relaxed-atomic-system
-
-
