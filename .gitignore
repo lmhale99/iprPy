@@ -5,13 +5,8 @@
 *.egg-info/
 *.egg
 
-#PyPI dist and build
-dist/
-build/
-
 #Notebook checkpoints and data
-demo-Notebooks/.ipynb_checkpoints/
-demo-Notebooks/*/*/
+docs/*/*/
 
 #non-IPR potentials
 reference-libraries/potentials/2015--Thompson-A-P--Ta.json
