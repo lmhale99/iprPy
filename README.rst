@@ -27,12 +27,15 @@ Setup
 
 #. Install Python 2.7. Common scientific libraries like numpy are heavily used, 
    so it is often easiest to use a distributed package such as Anaconda. 
+   
 #. Install `atomman`_. All of the calculations currently implemented use the 
    atomman package for providing a wrapper around LAMMPS simulations.
+   
 #. Download iprPy.
     - `https://github.com/usnistgov/iprPy`_ hosts the current stable release 
       version.
     - `https://github.com/lmhale99/iprPy`_ hosts developmental version(s).
+    
 #. In a terminal, go into the iprPy root directory add the iprPy package to 
    Python with the command::
     
