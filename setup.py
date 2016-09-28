@@ -6,7 +6,7 @@ def readme():
     
 
 setup(name='iprPy',
-      version='0.5',
+      version='0.6',
       description='Interatomic Potential Repository Python Property Calculations and Tools',
       long_description=readme(),
       classifiers=[
