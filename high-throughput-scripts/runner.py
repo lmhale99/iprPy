@@ -37,7 +37,7 @@ def main(*args):
                 log.write('%s\n' % sim)
                 #Check that the calculation has calc_*.py, calc_*.in and record in the library
                 try:
-                    record = get_file(os.path.join(lib_directory, '*', '*', '*', '*', sim+'.json'))
+                    record = get_file(os.path.join(lib_directory, '*', '*', '*', '*', sim+'.xml'))
                     calc_py = get_file('calc_*.py')
                     calc_in = get_file('calc_*.in')
                 
@@ -137,7 +137,7 @@ def main(*args):
                 with open('results.json') as f:
                     model = DM(f)
                 with open(record, 'w') as f:
-                    model.json(fp=f, indent=2)
+                    model.xml(fp=f, indent=2)
                 
                 #Zip and move calculation folder to the library
                 os.chdir(run_directory)

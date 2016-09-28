@@ -171,8 +171,8 @@ def prepare(inline_terms, global_variables):
                             os.chdir(working_dir)
                             
                             #Save the record to the library
-                            with open(os.path.join(record_dir, UUID + '.json'), 'w') as f:
-                                record.json(fp=f, indent=2)
+                            with open(os.path.join(record_dir, UUID + '.xml'), 'w') as f:
+                                record.xml(fp=f, indent=2)
                         
 def __initial_setup(inline_terms, global_variables):
     """
