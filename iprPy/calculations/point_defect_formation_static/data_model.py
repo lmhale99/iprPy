@@ -52,29 +52,29 @@ def data_model(input_dict, results_dict=None):
     else:
         calc['defect-free-system'] = DM()
         calc['defect-free-system']['artifact'] = DM()
-        calc['defect-free-system']['artifact']['file'] = results_dict['perfect_system_dump_file']
+        calc['defect-free-system']['artifact']['file'] = results_dict['dump_file_base']
         calc['defect-free-system']['artifact']['format'] = 'atom_dump'
         calc['defect-free-system']['symbols'] = input_dict['symbols']
-        calc['defect-free-system']['potential-energy'] = DM([('value', uc.get_in_units(results_dict['perfect_system_total_energy'], 
+        calc['defect-free-system']['potential-energy'] = DM([('value', uc.get_in_units(results_dict['E_total_base'], 
                                                                                         input_dict['energy_unit'])), 
                                                              ('unit', input_dict['energy_unit'])])
         
         calc['defect-system'] = DM()
         calc['defect-system']['artifact'] = DM()
-        calc['defect-system']['artifact']['file'] = results_dict['defect_system_dump_file']
+        calc['defect-system']['artifact']['file'] = results_dict['dump_file_ptd']
         calc['defect-system']['artifact']['format'] = 'atom_dump'
         calc['defect-system']['symbols'] = input_dict['symbols']
-        calc['defect-system']['potential-energy'] = DM([('value', uc.get_in_units(results_dict['defect_system_total_energy'], 
+        calc['defect-system']['potential-energy'] = DM([('value', uc.get_in_units(results_dict['E_total_ptd'], 
                                                                                   input_dict['energy_unit'])), 
                                                         ('unit', input_dict['energy_unit'])])
         
         #Save the calculation results
-        calc['cohesive-energy'] = DM([('value', uc.get_in_units(results_dict['cohesive_energy'], 
+        calc['cohesive-energy'] = DM([('value', uc.get_in_units(results_dict['E_coh'], 
                                                                 input_dict['energy_unit'])), 
                                       ('unit', input_dict['energy_unit'])])
         
-        calc['number-of-atoms'] = results_dict['defect_system_natoms']
-        calc['defect-formation-energy'] = DM([('value', uc.get_in_units(results_dict['defect_formation_energy'], 
+        calc['number-of-atoms'] = results_dict['system_ptd'].natoms
+        calc['defect-formation-energy'] = DM([('value', uc.get_in_units(results_dict['E_ptd_f'], 
                                                                         input_dict['energy_unit'])), 
                                               ('unit', input_dict['energy_unit'])])
         
@@ -85,6 +85,5 @@ def data_model(input_dict, results_dict=None):
             r_c['position_shift'] = list(results_dict['position_shift'])
         elif 'db_vect_shift' in results_dict:
             r_c['db_vect_shift'] = list(results_dict['db_vect_shift'])
-
 
     return output
