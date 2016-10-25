@@ -67,7 +67,7 @@ def process_common_terms(input_dict, UUID=None):
     input_dict['y-axis'] =         input_dict.get('y-axis',         [0, 1, 0])
     input_dict['z-axis'] =         input_dict.get('z-axis',         [0, 0, 1])
     input_dict['atom_shift'] =     input_dict.get('atom_shift',     [0, 0, 0])   
-    input_dict['size_mults'] =     input_dict.get('size_mults',     [(0,1), (0,1), (0,1)])
+    input_dict['size_mults'] =     input_dict.get('size_mults',     '1 1 1')
 
     #Convert strings to number lists
     if isinstance(input_dict['x-axis'], (str, unicode)): 
@@ -192,5 +192,6 @@ def process_common_terms(input_dict, UUID=None):
         input_dict['initial_system'].atoms_prop(key='pos', value=pos+shift)
        
         #Multiply system
+        
         input_dict['initial_system'].supersize(input_dict['size_mults'][0], input_dict['size_mults'][1], input_dict['size_mults'][2])
         
