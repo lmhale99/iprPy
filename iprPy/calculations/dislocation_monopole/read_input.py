@@ -55,7 +55,7 @@ def read_input(f, uuid=None):
     if len(Cdict) > 0:
         assert 'elastic_constants_model' not in input_dict, 'Cij values and elastic_constants_model cannot both be specified.'
         input_dict['elastic_constants_model'] = None 
-        input_dict['C'] = am.tools.ElasticConstants(**Cdict)
+        input_dict['C'] = am.ElasticConstants(**Cdict)
     
     #If no Cij elastic constants defined check for elastic_constants_model
     else:
@@ -67,7 +67,7 @@ def read_input(f, uuid=None):
             
         try:
             input_dict['elastic_constants_model'] = DM([('elastic-constants', C_model.find('elastic-constants'))])
-            input_dict['C'] = am.tools.ElasticConstants(model=input_dict['elastic_constants_model'])
+            input_dict['C'] = am.ElasticConstants(model=input_dict['elastic_constants_model'])
         except:
             input_dict['elastic_constants_model'] = None 
             input_dict['C'] = None 

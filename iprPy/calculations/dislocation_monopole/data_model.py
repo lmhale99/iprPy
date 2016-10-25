@@ -68,23 +68,19 @@ def data_model(input_dict, results_dict=None):
     
         calc['defect-free-system'] = DM()
         calc['defect-free-system']['artifact'] = DM()
-        calc['defect-free-system']['artifact']['file'] = 'base.dat'
-        calc['defect-free-system']['artifact']['format'] = 'atom_data'
-        old_symbols = input_dict['symbols'][:len(input_dict['symbols'])/2]
-        if len(old_symbols) == 1: old_symbols = old_symbols[0]
-        calc['defect-free-system']['symbols'] = old_symbols
+        calc['defect-free-system']['artifact']['file'] = results_dict['dump_file_base']
+        calc['defect-free-system']['artifact']['format'] = 'atom_dump'
+        calc['defect-free-system']['symbols'] = input_dict['symbols']
         
         calc['defect-system'] = DM()
         calc['defect-system']['artifact'] = DM()
-        calc['defect-system']['artifact']['file'] = 'disl.dump'
+        calc['defect-system']['artifact']['file'] = results_dict['dump_file_disl']
         calc['defect-system']['artifact']['format'] = 'atom_dump'
-        calc['defect-system']['symbols'] = input_dict['symbols']
-        #calc['defect-system']['atomic-system'] = results_dict['defect_system'].model(symbols=input_dict['symbols'])['atomic-system']
-        
-        #Save the final cohesive energy
-        calc['potential-energy'] = DM([('value', uc.get_in_units(results_dict['potential_energy'], 
-                                                input_dict['energy_unit'])), 
-                                       ('unit', input_dict['energy_unit'])])
+        calc['defect-system']['symbols'] = results_dict['symbols_disl']
+        calc['defect-system']['potential-energy'] = DM([('value', uc.get_in_units(results_dict['E_total_disl'], 
+                                                                                  input_dict['energy_unit'])), 
+                                                        ('unit', input_dict['energy_unit'])])
+                                                        
         calc['pre-ln-factor'] = DM([('value', uc.get_in_units(results_dict['pre-ln_factor'], 
                                              input_dict['energy_unit']+'/'+input_dict['length_unit'])), 
                                     ('unit', input_dict['energy_unit']+'/'+input_dict['length_unit'])])
