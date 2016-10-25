@@ -1,0 +1,71 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "key": "78d3b4a7-7778-4b5c-8fd7-eb164a7a82b5",
+            "id": "2008--Chenoweth-K--C-H-O"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "C",
+                "mass": 12.0000
+            },
+            {
+                "element": "H",
+                "mass": 1.0080
+            },
+            {
+                "element": "O",
+                "mass": 15.9990
+            }
+        ],            
+        "pair_style": {
+            "type": "reax/c",
+            "term": {
+                "option": "NULL"
+            }
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "ffield.reax.CHO_2008"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        },
+        "command": {
+            "term": [
+                {
+                    "option": "fix"
+                },
+                {
+                    "option": "qeq_fix"
+                },
+                {
+                    "option": "all"
+                },
+                {
+                    "option": "qeq/reax"
+                },
+                {
+                    "parameter": "1"
+                },
+                {
+                    "parameter": "0.0"
+                },
+                {
+                    "parameter": "10.0"
+                },
+                {
+                    "parameter": "1.0e-6"
+                },
+                {
+                    "option": "reax/c"
+                }
+            ]
+        }
+    }
+}

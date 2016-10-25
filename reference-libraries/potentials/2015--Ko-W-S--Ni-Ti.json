@@ -1,0 +1,39 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "key": "904676a4-1559-4205-bc31-b64d5ac26d79", 
+            "id": "2015--Ko-W-S--Ni-Ti"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ni", 
+                "mass": 58.690
+            },
+            {
+                "element": "Ti", 
+                "mass": 47.880
+            }
+        ], 
+        "pair_style": {
+            "type": "meam"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "library.meam"
+                }, 
+                {
+                    "symbolsList": "True"
+                }, 
+                {
+                    "file": "NiTi.meam"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

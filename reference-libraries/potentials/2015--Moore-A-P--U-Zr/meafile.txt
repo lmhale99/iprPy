@@ -1,0 +1,24 @@
+$meacard
+        ntypes=2,
+        enames(1)='U','Zr'
+        kodes(1)='library','library',
+        rcut=5.5,
+        legend=0.6
+        cmin(1,1,1)=1.00,cmax(1,1,1)=1.9
+        cmin(2,2,2)=0.70,cmax(2,2,2)=0.99
+        nn=.t.
+        xncut=2.0,xmcut=6.0
+        repuls(1,1)=0.105,attrac(1,1)=0.105
+        repuls(2,2)=-0.03,attrac(2,2)=-0.03
+       res(1,2)=2.85,deltas(1,2)=0.80,all(1,2)='B1'
+        alphas(1,2)=4.800000
+        ialloy=1
+        repuls(1,2)=0.05,attrac(1,2)=0.05
+        rozros=1.20,0.8
+        cmin(1,2,1)=0.8,cmin(2,1,2)=0.5
+        cmax(1,2,1)=2.5,cmax(2,1,2)=2.8
+        cmin(1,2,2)=0.5,cmin(1,1,2)=0.5
+        cmax(1,2,2)=2.8,cmax(1,1,2)=2.0
+        ezbl(1,1)=1000,ezbl(2,2)=1000,ezbl(1,2)=1000,ezbl(2,1)=1000
+ /
+
