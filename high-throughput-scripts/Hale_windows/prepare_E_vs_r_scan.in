@@ -1,0 +1,73 @@
+#Set if files are to be copied (default is true)
+#NOTE: The current version of runner.py will not properly handle calculation heierarchy if False
+copy_files              add True
+
+#################
+#Run Information#
+#################
+
+#ALL TERMS IN THIS SECTION ARE SPECIFIC TO YOUR COMPUTER!!!! 
+
+#Set library directory
+lib_directory           set C:/Users/lmh1/Documents/calculations/ipr/library_2016_10_25
+
+#Set run directories
+run_directory_1         set C:/Users/lmh1/Documents/calculations/ipr/torun/1
+run_directory_2         set C:/Users/lmh1/Documents/calculations/ipr/torun/2
+run_directory_3         set C:/Users/lmh1/Documents/calculations/ipr/torun/3
+run_directory_4         set C:/Users/lmh1/Documents/calculations/ipr/torun/4
+
+#Set the lammps command to use
+lammps_command          set lmp_mpi
+
+#Set the mpi_commands to use
+mpi_command_1           set 
+mpi_command_2           set mpiexec -localonly 2
+mpi_command_3           set mpiexec -localonly 3
+mpi_command_4           set mpiexec -localonly 4
+
+#######################
+#Reference Information#
+#######################
+
+#ALL TERMS IN THIS SECTION ARE SPECIFIC TO YOUR COMPUTER!!!!
+
+#Set paths to the various reference libraries
+potential_path          add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/potentials
+prototype_path          add C:/Users/lmh1/Documents/Python-packages/iprPy/reference-libraries/prototypes
+
+#################
+#Load Potentials#
+#################
+
+#specify limiters
+
+
+#generate potential_file and potential_dir for LAMMPS potentials in potential_path
+function                lammps_potentials  
+
+#################
+#Load Prototypes#
+#################
+
+#specify limiters
+
+#generate load, load_options, load_elements, box_parameters for prototypes in prototype_path with lattice parameters in prototype_reference  
+function                load_from_prototypes2
+
+###################
+#Scan for Minimums#
+###################
+
+#Run directory and mpi command information
+run_directory           set run_directory_1
+mpi_command             set mpi_command_1
+
+#Define calculation variables
+size_mults              set 3 3 3
+minimum_r               set 2.0
+maximum_r               set 6.0
+number_of_steps_r       set 100
+
+#Run calculation
+calculation             E_vs_r_scan 
