@@ -31,7 +31,7 @@ def fill_template(template, variable, s_delimiter, e_delimiter):
             try:
                 value = variable[name]
                 if isinstance(value, (int, long, float)): 
-                    value = repr(value)
+                    value = str(value)
             except:
                 raise ValueError('No value for ' + name + ' found')
             line = line.replace(var, value)
