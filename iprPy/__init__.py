@@ -1,6 +1,7 @@
 import calculations
 import prepare_functions
 import tools
+import prepare
 
 def calculation_names():
     """Returns a list of the names of the loaded calculations."""
@@ -36,7 +37,7 @@ def calculation_prepare(name, terms, variables):
     
     return calc_prepare(terms, variables)
     
-def calculation_data_model(name, input_dict, results_dict):
+def calculation_data_model(name, input_dict, results_dict=None):
     """Generates a data model for the named calculation."""
     try:
         calc = calculations.calc[name]
