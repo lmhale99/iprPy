@@ -1,5 +1,3 @@
-
-
 def fill_template(template, variable, s_delimiter, e_delimiter):
     """
     Takes a template and fills in values for delimited template variable names.

@@ -3,7 +3,7 @@ import glob
 
 import numpy as np
 
-from . import as_list, iter_as_list
+from ..tools import as_list, iter_as_list
 
 def get_files_in_library(lib_directory, potential=['*'], symbols=['*'], prototype=['*'], calc_type=['*'], calc_id=['*'], ext=['*']):
     """Get the file paths of all matching records"""

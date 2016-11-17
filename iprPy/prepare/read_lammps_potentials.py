@@ -2,7 +2,8 @@ import os
 import atomman.lammps as lmp
 from DataModelDict import DataModelDict as DM
 
-from . import as_list, get_files_in_directory
+from . import get_files_in_directory
+from ..tools import as_list
     
 def read_lammps_potentials(directory, element=None, name=None):
     """

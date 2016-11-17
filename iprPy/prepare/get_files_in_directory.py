@@ -1,7 +1,7 @@
 import os
 import glob
 
-from . import as_list, iter_as_list
+from ..tools import as_list, iter_as_list
 
 def get_files_in_directory(directory_path, ext=None):
     """

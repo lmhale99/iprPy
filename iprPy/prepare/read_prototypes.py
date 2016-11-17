@@ -2,7 +2,8 @@ import os
 import atomman as am
 from DataModelDict import DataModelDict as DM
 
-from . import as_list, get_files_in_directory
+from . import get_files_in_directory
+from ..tools import as_list
     
 def read_prototypes(directory, natypes=None, name=None):
     """
@@ -24,19 +25,19 @@ def read_prototypes(directory, natypes=None, name=None):
         prototype_name = os.path.splitext(os.path.basename(file))[0]
         
         #Load prototype
-        if True:
+        try:
             with open(file) as f:
                 model = DM(f)
             ids = model['crystal-prototype']['identifier']
             prototype = am.load('system_model', model)[0]
-        else:
+        except:
             continue
         
         #Check that prototype is in name
         if name is not None and prototype_name not in as_list(name):
             match = False
-            for name in ids.values():
-                if name in as_list(name):
+            for n in ids.values():
+                if n in as_list(name):
                     match = True
                     break
             if not match:

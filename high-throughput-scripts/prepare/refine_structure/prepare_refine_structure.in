@@ -1,0 +1,22 @@
+#### Calculation run and records library paths ####
+run_directory           C:/Users/lmh1/Documents/calculations/ipr/torun/1
+lib_directory           C:/Users/lmh1/Documents/calculations/ipr/library_2016_11_10
+
+#### Commands ####
+lammps_command          lmp_serial
+#mpi_command            
+
+#### Reference library paths ####
+potential_directory     ../../../reference-libraries/potentials
+
+#### Run condition limiters ####
+potential_name          2004--Zhou-X-W--W
+#symbol_name
+prototype_name          A2--W--bcc
+
+#### Run parameters ####
+#size_mults              
+#pressure_xx             
+#pressure_yy             
+#pressure_zz             
+#strain_range            

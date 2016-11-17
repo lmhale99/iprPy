@@ -1,0 +1,22 @@
+21b986b3-50d5-4303-afaa-0f26eeda531d
+error: Traceback (most recent call last):
+  File "calc_refine_structure.py", line 346, in <module>
+    main(*sys.argv[1:])    
+  File "calc_refine_structure.py", line 46, in main
+    results = data_model(input_dict, results_dict)
+  File "calc_refine_structure.py", line 288, in data_model
+    calc['potential'] = input_dict['potential']['LAMMPS-potential']['potential']
+TypeError: 'Potential' object has no attribute '__getitem__'
+
+
+48e0dce5-0f4d-4fed-9320-44e17c277dba
+error: Traceback (most recent call last):
+  File "calc_refine_structure.py", line 346, in <module>
+    main(*sys.argv[1:])    
+  File "calc_refine_structure.py", line 46, in main
+    results = data_model(input_dict, results_dict)
+  File "calc_refine_structure.py", line 288, in data_model
+    calc['potential'] = input_dict['potential']['LAMMPS-potential']['potential']
+TypeError: 'Potential' object has no attribute '__getitem__'
+
+

@@ -1,5 +1,5 @@
 import os
-from calc_E_vs_r_scan import data_model, read_input
+from calc_grain_boundary import data_model, read_input
 
 __calc_dir__ = os.path.dirname(os.path.abspath(__file__))
 __calc_type__ = os.path.basename(__calc_dir__)
@@ -11,8 +11,8 @@ def template():
 
 def files():
     file_names = [__calc_name__+'.py',
-                  'run0.template']
+                  'grain_boundary.template']
                       
     for i in xrange(len(file_names)):
         yield os.path.join(__calc_dir__, file_names[i])
-
+        

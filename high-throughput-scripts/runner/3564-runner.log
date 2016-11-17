@@ -1,0 +1,25 @@
+48dd2f9e-ca66-4530-a027-1ed31a6b93df
+error: Traceback (most recent call last):
+  File "calc_refine_structure.py", line 349, in <module>
+    main(*sys.argv[1:])    
+  File "calc_refine_structure.py", line 33, in main
+    input_dict = read_input(f, *args[1:])
+  File "calc_refine_structure.py", line 257, in read_input
+    input_dict['pressure_xx'] = input.value_unit(input_dict, 'pressure_xx', 
+AttributeError: 'builtin_function_or_method' object has no attribute 'value_unit'
+
+
+fb4a1520-563b-4ed7-ae1d-d5762477d00e
+error: Traceback (most recent call last):
+  File "calc_refine_structure.py", line 349, in <module>
+    main(*sys.argv[1:])    
+  File "calc_refine_structure.py", line 33, in main
+    input_dict = read_input(f, *args[1:])
+  File "calc_refine_structure.py", line 257, in read_input
+    input_dict['pressure_xx'] = input.value_unit(input_dict, 'pressure_xx', 
+AttributeError: 'builtin_function_or_method' object has no attribute 'value_unit'
+
+
+4f5eef0e-49fa-4afa-b4bf-211db773775f
+Incomplete simulation: moved to orphan directory
+

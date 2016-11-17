@@ -1,5 +1,4 @@
 import os
-import sys
 import importlib
 
 def __load_calc():
@@ -8,23 +7,22 @@ def __load_calc():
     dir = os.path.dirname(__file__)
 
     for name in os.listdir(dir):
+        if os.path.isdir(os.path.join(dir, name)):
+            names.append(name)
+            
+        elif os.path.isfile(os.path.join(dir, name)):
+            name, ext = os.path.splitext(name)
+            
+            if ext.lower() in ('.py', '.pyc') and name != '__init__' and name not in names:
+                names.append(name)
         
-        if '.' in name:
-            name, type = name.split('.')
-            if type.lower() not in ('py', 'pyc') or name == '__init__':
-                continue
-        names.append(name)
-          
-    path = list(sys.path)
-    sys.path.insert(0, dir)
-    try:
-        for name in names:
-            try:
-                calc[name] = importlib.import_module(name)
-            except:
-                print 'Failed to load', name
-    finally:
-        sys.path[:] = path # restore path
+    for name in names:
+        #try:
+        if True:
+            calc[name] = importlib.import_module('.'+name, 'iprPy.calculations')
+        #except:
+        else:
+            print 'Failed to load', name
 
     return calc
     
