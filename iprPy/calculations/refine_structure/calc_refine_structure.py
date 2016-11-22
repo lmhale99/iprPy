@@ -3,9 +3,9 @@
 #Standard library imports
 import os
 import sys
-from copy import deepcopy
 import uuid
 import shutil
+from copy import deepcopy
 
 #http://www.numpy.org/
 import numpy as np  
@@ -58,7 +58,7 @@ def quick_a_Cij(lammps_command, system, potential, symbols, mpi_command=None, p_
     symbols -- list of element-model symbols for the Potential that correspond to the System's atypes
     
     Keyword Arguments:
-    pxx, pyy, pzz -- tensile pressures to equilibriate to.  Default is 0.0 for all. 
+    p_xx, p_yy, p_zz -- tensile pressures to equilibriate to.  Default is 0.0 for all. 
     delta -- the strain range to use in calculating the elastic constants. Default is 1e-5.    
     tol -- the relative tolerance criterion for identifying box size convergence. Default is 1e-10.
     diverge_scale -- identifies a divergent system if x / diverge_scale < x < x * diverge_scale is not True for x = a,b,c.

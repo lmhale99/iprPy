@@ -72,7 +72,7 @@ def main(*args):
                 record_dict['uuid'] =                  calc_id
                 record_dict['strain_range'] =          strain
                 record_dict['size_mults'] =            size_mults_array
-                record_dict['potential_model'] =             potential['model']
+                record_dict['potential_model'] =       potential['model']
                 record_dict['load'] =                  'system_model ' + record['file']
                 record_dict['load_options'] =          load_options
                 record_dict['system_family'] =         prototype_name
@@ -114,7 +114,7 @@ def main(*args):
                 calculation_dict['pressure_unit'] =    prepare_dict['pressure_unit']
                 calculation_dict['energy_unit'] =      prepare_dict['energy_unit']
                 calculation_dict['force_unit'] =       prepare_dict['force_unit']
-                calculation_dict['strain_range'] =     prepare_dict['strain_range']
+                calculation_dict['strain_range'] =     strain
                 calculation_dict['pressure_xx'] =      prepare_dict['pressure_xx']
                 calculation_dict['pressure_yy']=       prepare_dict['pressure_yy']
                 calculation_dict['pressure_zz']=       prepare_dict['pressure_zz']
