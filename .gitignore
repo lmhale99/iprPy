@@ -26,3 +26,9 @@ test.py
 
 #High-throughput log files
 high-throughput-scripts/runner/*-runner.log
+
+#Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+*/*/.ipynb_checkpoints/
+*/*/*/.ipynb_checkpoints/

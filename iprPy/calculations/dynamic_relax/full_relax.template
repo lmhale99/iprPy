@@ -1,0 +1,21 @@
+#LAMMPS input script that performs a simple energy minimization
+
+<atomman_system_info>
+
+<atomman_pair_info>
+
+compute pe all pe/atom
+compute ke all ke/atom
+compute stress all stress/atom NULL
+
+thermo <thermo_steps>
+thermo_style custom step temp pe ke etotal lx ly lz pxx pyy pzz pyz pxz pxy
+thermo_modify format float %.13e
+timestep 0.001
+
+<integrator_info>
+
+dump dump_chkpt all custom <dump_steps> dump.* id type xu yu zu c_pe c_ke & 
+c_stress[1] c_stress[2] c_stress[3] c_stress[4] c_stress[5] c_stress[6]
+
+run <run_steps>

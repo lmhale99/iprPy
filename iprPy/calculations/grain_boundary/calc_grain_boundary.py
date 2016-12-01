@@ -134,8 +134,8 @@ def gb_energy(lammps_command, potential, symbols, alat, axes_1, axes_2, E_coh,
     output = lmp.run(lammps_command, lammps_input, mpi_command)
     
     #Extract output values
-    E_total = uc.set_in_units(output.finds('eatoms')[-1], lammps_units['energy'])
-    natoms = output.finds('natoms')[-1]
+    E_total = uc.set_in_units(output.finds('c_eatoms')[-1], lammps_units['energy'])
+    natoms = output.finds('v_natoms')[-1]
    
     #Compute grain boundary energy
     E_gb = (E_total - E_coh*natoms) / (lx * lz)

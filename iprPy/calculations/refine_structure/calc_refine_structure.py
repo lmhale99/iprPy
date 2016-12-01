@@ -158,7 +158,7 @@ def calc_cij(lammps_command, system, potential, symbols, p_xx=0.0, p_yy=0.0, p_z
     pxz = uc.set_in_units(np.array(output.finds('Pxz')), lammps_units['pressure'])
     pyz = uc.set_in_units(np.array(output.finds('Pyz')), lammps_units['pressure'])
     
-    pe = uc.set_in_units(np.array(output.finds('peatom')), lammps_units['energy'])
+    pe = uc.set_in_units(np.array(output.finds('v_peatom')), lammps_units['energy'])
     
     #Set the six non-zero strain values
     strains = np.array([ (lx[2] -  lx[1])  / lx[0],

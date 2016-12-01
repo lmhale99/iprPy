@@ -121,7 +121,8 @@ def e_vs_r(lammps_command, system, potential, symbols, mpi_command=None, ucell=N
 
         #Run lammps and extract data
         output = lmp.run(lammps_command, lammps_script, mpi_command)
-        Ecoh_values[i] = uc.set_in_units(output.finds('peatom')[-1], lammps_units['energy'])
+        
+        Ecoh_values[i] = uc.set_in_units(output.finds('v_peatom')[-1], lammps_units['energy'])
         shutil.move('log.lammps', 'run0-'+str(i)+'-log.lammps')
            
     #Find unit cell systems at the energy minimums

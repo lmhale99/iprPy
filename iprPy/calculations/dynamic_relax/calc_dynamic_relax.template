@@ -1,0 +1,41 @@
+#Run script for calc_equilibrium.py
+
+#Command lines for LAMMPS (and MPI).
+#For lammps_command, exclude passing in a script, i.e. no "-in term" or "< term"
+lammps_command              <lammps_command>
+mpi_command                 <mpi_command>
+
+#Paths to the potential data model file, and directory containing potential parameters
+potential_file              <potential_file>
+potential_dir               <potential_dir>
+
+#Initial system configuration to load
+load                        <load>
+load_options                <load_options>
+symbols                     <symbols>
+box_parameters              <box_parameters>
+
+#System manipulations
+x-axis                      <x-axis>
+y-axis                      <y-axis>
+z-axis                      <z-axis>
+shift                       <shift>
+size_mults                  <size_mults>
+
+#Units that input/output values are in
+length_unit                 <length_unit>
+pressure_unit               <pressure_unit>
+energy_unit                 <energy_unit>
+force_unit                  <force_unit>
+
+#Run parameters
+temperature                 <temperature>
+pressure_xx                 <pressure_xx>
+pressure_yy                 <pressure_yy>
+pressure_zz                 <pressure_zz>
+integrator                  <integrator>
+thermo_steps                <thermo_steps>
+dump_steps                  <dump_steps>
+run_steps                   <run_steps>
+equil_steps                 <equil_steps>
+random_seed                 <random_seed>
