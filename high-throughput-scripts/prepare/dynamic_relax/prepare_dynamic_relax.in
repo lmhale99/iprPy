@@ -1,0 +1,43 @@
+#### Calculation run and records library paths ####
+run_directory           C:/Users/lmh1/Documents/calculations/ipr/torun/4
+lib_directory           C:/Users/lmh1/Documents/calculations/ipr/library_2016_10_26
+
+#### Commands ####
+lammps_command          lmp_mpi
+mpi_command            mpiexec -localonly 4 
+
+#### Reference library paths ####
+potential_directory     ../../../reference-libraries/potentials
+
+#### Run condition limiters ####
+#potential_name          2004--Zhou-X-W--W
+#symbol_name
+#prototype_name          A2--W--bcc
+
+#### Run parameters ####
+#size_mults              3 3 3
+#size_mults              4 4 4
+#size_mults              5 5 5
+#size_mults              6 6 6
+#size_mults              7 7 7
+#size_mults              8 8 8
+#size_mults              9 9 9
+size_mults              10 10 10 
+
+temperature             0.0
+#temperature             50.0
+#temperature             100.0
+#temperature             150.0
+#temperature             200.0
+#temperature             250.0
+#temperature             300.0
+#temperature             350.0
+#temperature             400.0
+
+thermo_steps                 1
+run_steps               220000
+equil_steps              20000
+#pressure_xx             
+#pressure_yy             
+#pressure_zz             
+
