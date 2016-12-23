@@ -1,0 +1,40 @@
+{
+    "crystal-prototype": {
+        "key": "ceb6d7cc-b20e-4878-8b2b-1e62185d16af",
+        "id": "Ah--alpha-Po--sc",
+        "name": "simple cubic", 
+        "prototype": "a-Po", 
+        "Pearson-symbol": "cP1", 
+        "Strukturbericht": "Ah",
+        "space-group": {
+            "number": 221, 
+            "Hermann-Maguin": "P m -3 m", 
+            "Schoenflies": "Oh^1", 
+            "Wykoff": {
+                "letter": "a", 
+                "multiplicity": 1
+            }
+        }, 
+        "atomic-system": {
+            "cell": {
+                "cubic": {
+                    "a": {
+                        "value": 1.0, 
+                        "unit": "scaled"
+                    }
+                }
+            }, 
+            "atom": {
+                "component": 1, 
+                "position": {
+                    "value": [
+                        0.0, 
+                        0.0, 
+                        0.0
+                    ], 
+                    "unit": "scaled"
+                }
+            }
+        }
+    }
+}

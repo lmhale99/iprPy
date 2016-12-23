@@ -1,0 +1,28 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "key": "d1e36148-f138-4ee0-ab7d-1fb5442805d8", 
+            "id": "1989--Adams-J-B--Ag"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ag", 
+            "mass": 107.87
+        }, 
+        "pair_style": {
+            "type": "eam"
+        }, 
+        "pair_coeff": {
+            "interaction": {
+                "symbol": [
+                    "Ag", 
+                    "Ag"
+                ]
+            }, 
+            "term": {
+                "file": "agu6.txt"
+            }
+        }
+    }
+}

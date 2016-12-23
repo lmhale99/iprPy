@@ -1,0 +1,28 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "key": "6f92bdbe-0eea-4865-ac81-888e522b6a90", 
+            "id": "1989--Adams-J-B--Pt"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Pt", 
+            "mass": 195.09
+        }, 
+        "pair_style": {
+            "type": "eam"
+        }, 
+        "pair_coeff": {
+            "interaction": {
+                "symbol": [
+                    "Pt", 
+                    "Pt"
+                ]
+            }, 
+            "term": {
+                "file": "ptu6.txt"
+            }
+        }
+    }
+}

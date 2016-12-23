@@ -1,0 +1,123 @@
+{
+    "crystal-prototype": {
+        "key": "154d1a2b-04da-4477-8962-a0ca0c17c8fc",
+        "id": "A3'--alpha-La--double-hcp",
+        "name": "double hcp", 
+        "prototype": "La", 
+        "Pearson-symbol": "hP4", 
+        "Strukturbericht": "A3'", 
+        "space-group": {
+            "number": 194, 
+            "Hermann-Maguin": "P 63/m m c", 
+            "Schoenflies": "D6h^4"
+        }, 
+        "atomic-system": {
+            "cell": {
+                "orthorhombic": {
+                    "a": {
+                        "value": 1.0, 
+                        "unit": "scaled"
+                    }, 
+                    "b": {
+                        "value": 1.7320508075689, 
+                        "unit": "scaled"
+                    }, 
+                    "c": {
+                        "value": 3.265986323711, 
+                        "unit": "scaled"
+                    }
+                }
+            }, 
+            "atom": [
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.0, 
+                            0.0
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.5, 
+                            0.0
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.8333333333333, 
+                            0.25
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.3333333333333, 
+                            0.25
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.1666666666667, 
+                            0.5
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.6666666666667, 
+                            0.5
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.8333333333333, 
+                            0.75
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.3333333333333, 
+                            0.75
+                        ], 
+                        "unit": "scaled"
+                    }
+                }
+            ]
+        }
+    }
+}

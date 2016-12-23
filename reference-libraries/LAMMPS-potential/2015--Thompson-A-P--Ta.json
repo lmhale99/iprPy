@@ -1,0 +1,55 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "key": "92dfd6c7-21ec-4357-927f-acf3d7ad896c", 
+            "id": "2015--Thompson-A-P--Ta"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ta"
+            }
+        ], 
+        "pair_style": {
+            "type": "hybrid/overlay", 
+            "term": {
+                "option": "zbl 4 4.8 snap"
+            }
+        }, 
+        "pair_coeff": [
+            {
+                "term": [
+                    {
+                        "option": "zbl"
+                    }, 
+                    {
+                        "parameter": "73"
+                    },
+                    {
+                        "parameter": "73"
+                    }
+                ]
+            }, 
+            {
+                "term": [
+                    {
+                        "option": "snap"
+                    }, 
+                    {
+                        "file": "Ta06A.snapcoeff"
+                    }, 
+                    {
+                        "symbolsList": "True"
+                    }, 
+                    {
+                        "file": "Ta06A.snapparam"
+                    }, 
+                    {
+                        "symbols": "True"
+                    }
+                ]
+            }
+        ]
+    }
+}

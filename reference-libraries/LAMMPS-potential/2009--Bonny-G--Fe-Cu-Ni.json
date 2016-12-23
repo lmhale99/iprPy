@@ -1,0 +1,37 @@
+{
+    "LAMMPS-potential": {
+        "potential": {
+            "key": "38d0b8d9-5e5d-426a-9d70-b5a7e501528b", 
+            "id": "2009--Bonny-G--Fe-Cu-Ni"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Fe", 
+                "mass": 55.845
+            }, 
+            {
+                "element": "Cu", 
+                "mass": 63.546
+            }, 
+            {
+                "element": "Ni", 
+                "mass": 58.6934
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "FeCuNi.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

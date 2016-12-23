@@ -1,0 +1,59 @@
+{
+    "crystal-prototype": {
+        "key": "7398b231-fd55-4378-b6b2-6607262d3090",
+        "id": "B2--CsCl",
+        "name": "cesium chloride", 
+        "prototype": "CsCl", 
+        "Pearson-symbol": "cP2", 
+        "Strukturbericht": "B2",
+        "space-group": {
+            "number": 221, 
+            "Hermann-Maguin": "P m -3 m", 
+            "Schoenflies": "Oh^1", 
+            "Wykoff": [
+                {
+                    "letter": "a", 
+                    "multiplicity": 1
+                }, 
+                {
+                    "letter": "b", 
+                    "multiplicity": 1
+                }
+            ]
+        }, 
+        "atomic-system": {
+            "cell": {
+                "cubic": {
+                    "a": {
+                        "value": 1.0, 
+                        "unit": "scaled"
+                    }
+                }
+            }, 
+            "atom": [
+                {
+                    "component": 1, 
+                    "position": {
+                        "value": [
+                            0.0, 
+                            0.0, 
+                            0.0
+                        ], 
+                        "unit": "scaled"
+                    }
+                }, 
+                {
+                    "component": 2, 
+                    "position": {
+                        "value": [
+                            0.5, 
+                            0.5, 
+                            0.5
+                        ], 
+                        "unit": "scaled"
+                    }
+                }
+            ]
+        }
+    }
+}
