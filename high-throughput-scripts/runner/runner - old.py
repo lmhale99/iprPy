@@ -6,17 +6,17 @@ import random
 import shutil
 import time
 import glob
-
 from DataModelDict import DataModelDict as DM
 
-import iprPy
 
 def main(*args):
     
     #Read in input script terms
-    run_directory, orphan_directory, dbase = __read_input_file(args[0])
+    run_directory, lib_directory = __initial_setup(*args)
     
-    #Start runner log file
+    #The orphan dir is where incomplete calculations or calculations without records are placed
+    orphan_dir = os.path.join(lib_directory, 'orphan')
+    
     log_file = str(os.getpid()) + '-runner.log'
     with open(log_file, 'a') as log:
         
@@ -35,9 +35,9 @@ def main(*args):
             if bid(sim):
                 os.chdir(sim)
                 log.write('%s\n' % sim)
-                #Check that the calculation has calc_*.py, calc_*.in and record in the database
+                #Check that the calculation has calc_*.py, calc_*.in and record in the library
                 try:
-                    record = dbase.get_record(key=sim)
+                    record = get_file(os.path.join(lib_directory, '*', '*', '*', '*', sim+'.xml'))
                     calc_py = get_file('calc_*.py')
                     calc_in = get_file('calc_*.in')
                 
@@ -45,9 +45,9 @@ def main(*args):
                 except:
                     log.write('Incomplete simulation: moved to orphan directory\n\n')
                     os.chdir(run_directory)
-                    if not os.path.isdir(orphan_directory):
-                        os.makedirs(orphan_directory)
-                    shutil.make_archive(os.path.join(orphan_directory, sim), 'gztar', root_dir=run_directory, base_dir=sim)
+                    if not os.path.isdir(orphan_dir):
+                        os.makedirs(orphan_dir)
+                    shutil.make_archive(os.path.join(orphan_dir, sim), 'gztar', root_dir=run_directory, base_dir=sim)
                     shutil.rmtree(os.path.join(run_directory, sim))
                     flist = os.listdir(run_directory)
                     continue
@@ -57,42 +57,37 @@ def main(*args):
                 ready_flag = True
 
                 for fname in glob.iglob('*'):
-                    parent_sim, ext = os.path.splitext(os.path.basename(fname))
-                    if ext in ('.json', '.xml'):
+                    if os.path.splitext(fname)[1] in ('.json', '.xml'):
                         with open(fname) as f:
                             parent = DM(f)
                         try:
                             status = parent.find('status')
                             
-                            #Check parent record in database to see if it has completed
+                            #Check parent record in library to see if it has completed
                             if status == 'not calculated':
-                                parent_record = dbase.get_record(key=parent_sim)
-                                parent = DM(parent_record)
+                                parent_record = get_file(os.path.join(lib_directory, '*', '*', '*', '*', fname))
+                                with open(parent_record) as f:
+                                    parent = DM(f)
                                 try:
                                     status = parent.find('status')
                                     
                                     #Mark flag if still incomplete
                                     if status == 'not calculated':
                                         ready_flag = False
+                                        parent_key = os.path.splitext(fname)[0]
                                         break
                                     
                                     #skip if parent calculation failed
                                     elif status == 'error':
-                                        with open(os.path.basename(fname), 'w') as f:
-                                            f.write(parent_record)
+                                        shutil.copy(parent_record, fname)
                                         error_flag = True
                                         error_message = 'parent calculation issued an error'
                                         break
-                                    
-                                    #Ignore if unknown status
-                                    else:
-                                        raise ValueError('unknown status')
-                                        
+                                
                                 #Copy parent record to calculation folder if it is now complete
                                 except:
-                                    with open(os.path.basename(fname), 'w') as f:
-                                        f.write(parent_record)
-                                    log.write('parent %s copied to sim folder\n' % parent_sim)
+                                    shutil.copy(parent_record, fname)
+                                    log.write('parent %s copied to sim folder\n' % parent_key)
                             
                             #skip if parent calculation failed
                             elif status == 'error':
@@ -108,8 +103,8 @@ def main(*args):
                     os.chdir(run_directory)
                     for bid_file in bid_files:
                         os.remove(os.path.join(sim, bid_file))
-                    flist = [parent_sim]              
-                    log.write('parent %s not ready\n\n' % parent_sim)
+                    flist = [parent_key]              
+                    log.write('parent %s not ready\n\n' % parent_key)
                     continue
                 
                 #Run the calculation
@@ -129,24 +124,25 @@ def main(*args):
                 
                 #Catch any errors and add them to results.json
                 except:
-                    model = DM(record)
-                    record_type = model.keys()[0]
-                    model[record_type]['status'] = 'error'
-                    model[record_type]['error'] = str(sys.exc_info()[1])
+                    with open(record) as f:
+                        model = DM(f)
+                    key = model.keys()[0]
+                    model[key]['status'] = 'error'
+                    model[key]['error'] = str(sys.exc_info()[1])
                     with open('results.json', 'w') as f:
                         model.json(fp=f, indent=4)
-                    log.write('error: %s\n\n' % model[record_type]['error'])
+                    log.write('error: %s\n\n' % model[key]['error'])
 
-                #Update record in the database
+                #Update record in the library
                 with open('results.json') as f:
                     model = DM(f)
-                dbase.update_record(model.xml(), sim)
-                                
-                #Archive calculation and add to database
-                dbase.add_archive(run_directory, sim)
+                with open(record, 'w') as f:
+                    model.xml(fp=f, indent=2)
                 
-                #Remove simulation directory
+                #Zip and move calculation folder to the library
                 os.chdir(run_directory)
+                record_dir = os.path.dirname(record)
+                shutil.make_archive(os.path.join(record_dir, sim), 'gztar', root_dir=run_directory, base_dir=sim)
                 try:
                     shutil.rmtree(os.path.join(run_directory, sim))    
                 except:
@@ -159,7 +155,7 @@ def main(*args):
 def bid(sim):
     try:
         #wait to make sure sim is not being deleted
-        time.sleep(1)
+        time.sleep(0.25)
         
         #check if bid already exists
         for fname in os.listdir(sim):
@@ -172,7 +168,7 @@ def bid(sim):
             f.write('bid for pid: %i' % pid)
         
         #wait to make sure all bids are in
-        time.sleep(1)
+        time.sleep(0.75)
 
         #check bids
         bids = []
@@ -196,18 +192,23 @@ def get_file(path_string):
         raise ValueError('Multiple files found matching '+ path_string)
     
         
-def __read_input_file(fname):            
-    """Read runner input file"""
-
-    with open(fname) as f:
-        runner_dict = iprPy.prepare.read_variable_script(f)
-    
-    run_directory = os.path.abspath(runner_dict['run_directory'])
-    orphan_directory = runner_dict.get('orphan_directory', os.path.join(os.path.dirname(run_directory), 'orphan'))
-    dbase = iprPy.database_from_dict(runner_dict)
-    
-    return run_directory, orphan_directory, dbase
-    
+def __initial_setup(*args):            
+    run_directory = None
+    lib_directory = None
+    with open(args[0]) as f:
+        for line in f:
+            terms = line.split()
+            if len(terms) > 0 and terms[0][0] != '#':
+                if terms[0] == 'run_directory' and run_directory is None:
+                    run_directory = ' '.join(terms[1:])
+                elif terms[0] == 'lib_directory' and lib_directory is None:
+                    lib_directory = ' '.join(terms[1:])
+                else:
+                    raise ValueError('Invalid runner.py input line')
+    if run_directory is not None and lib_directory is not None:
+        return run_directory, lib_directory
+    else:
+        raise ValueError('runner.py input requires both run_directory and lib_directory')
     
 if __name__ == '__main__':
     main(*sys.argv[1:])

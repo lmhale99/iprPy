@@ -1,10 +1,10 @@
 import os
 import importlib
 
-failed_calculations = []
+failed_records = []
 
-def __load_calculations():
-    calculations_dict = {}
+def __load_records():
+    records_dict = {}
     names = []
     dir = os.path.dirname(__file__)
 
@@ -20,10 +20,10 @@ def __load_calculations():
         
     for name in names:
         try:
-            calculations_dict[name] = importlib.import_module('.'+name, 'iprPy.calculations')
+            records_dict[name] = importlib.import_module('.'+name, 'iprPy.records')
         except:
-            failed_calculations.append(name)
+            failed_records.append(name)
 
-    return calculations_dict
-
-calculations_dict = __load_calculations()
+    return records_dict
+    
+records_dict = __load_records()

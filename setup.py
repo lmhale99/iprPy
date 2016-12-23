@@ -27,6 +27,7 @@ setup(name='iprPy',
         'numpy', 
         'matplotlib',
         'scipy',
+        'pandas',
         'numericalunits',
         'atomman'
       ],

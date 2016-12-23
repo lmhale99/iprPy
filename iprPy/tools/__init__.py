@@ -1,4 +1,5 @@
-from as_list import as_list, iter_as_list
-from fill_template import fill_template
-from term_extractor import term_extractor
+from .aslist import aslist, iaslist
+from .filltemplate import filltemplate
+from .parseinput import parseinput
+from .termtodict import termtodict
 

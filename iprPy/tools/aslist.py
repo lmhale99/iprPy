@@ -1,4 +1,4 @@
-def iter_as_list(term):
+def iaslist(term):
     """Iterate over list representation of term"""
     if isinstance(term, (str, unicode)):
         yield term
@@ -9,6 +9,6 @@ def iter_as_list(term):
         except:
             yield term
             
-def as_list(term):
+def aslist(term):
     """Return list representation of term"""
-    return [t for t in iter_as_list(term)]
+    return [t for t in iaslist(term)]

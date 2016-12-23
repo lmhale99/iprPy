@@ -5,17 +5,6 @@
 *.egg-info/
 *.egg
 
-#Notebook checkpoints and data
-docs/*/*/
-
-#non-IPR potentials
-reference-libraries/potentials/2015--Thompson-A-P--Ta.json
-reference-libraries/potentials/2015--Thompson-A-P--Ta/
-reference-libraries/potentials/2006--Chamati-H--Fe.json
-reference-libraries/potentials/2006--Chamati-H--Fe/Fe_cham-mishin.eam.alloy
-reference-libraries/potentials/2012--Proville-L--Fe.json
-reference-libraries/potentials/2012--Proville-L--Fe/
-
 #test scripts
 test/
 test.py

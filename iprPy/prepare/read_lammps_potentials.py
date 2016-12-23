@@ -3,7 +3,7 @@ import atomman.lammps as lmp
 from DataModelDict import DataModelDict as DM
 
 from . import get_files_in_directory
-from ..tools import as_list
+from ..tools import aslist
     
 def read_lammps_potentials(directory, element=None, name=None):
     """
@@ -35,14 +35,14 @@ def read_lammps_potentials(directory, element=None, name=None):
             continue
 
         #Check if potential id is in name
-        if name is not None and potential.id not in as_list(name):
+        if name is not None and potential.id not in aslist(name):
             continue
             
         #Check if potential has an element in element    
         if element is not None:
             match = False
             for el in potential.elements():
-                if el in as_list(element):
+                if el in aslist(element):
                     match = True
                     break
             if not match:

@@ -121,8 +121,10 @@ def e_vs_r(lammps_command, system, potential, symbols, mpi_command=None, ucell=N
 
         #Run lammps and extract data
         output = lmp.run(lammps_command, lammps_script, mpi_command)
-        
-        Ecoh_values[i] = uc.set_in_units(output.finds('v_peatom')[-1], lammps_units['energy'])
+        try:
+            Ecoh_values[i] = uc.set_in_units(output.finds('v_peatom')[-1], lammps_units['energy'])
+        except:
+            Ecoh_values[i] = uc.set_in_units(output.finds('peatom')[-1], lammps_units['energy'])
         shutil.move('log.lammps', 'run0-'+str(i)+'-log.lammps')
            
     #Find unit cell systems at the energy minimums
@@ -159,8 +161,8 @@ def read_input(f, UUID=None):
     input_dict = iprPy.input.file_to_dict(f)
     
     #set calculation UUID
-    if UUID is not None: input_dict['uuid'] = UUID
-    else: input_dict['uuid'] = input_dict.get('uuid', str(uuid.uuid4()))
+    if UUID is not None: input_dict['calc_key'] = UUID
+    else: input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
     #Process command lines
     assert 'lammps_command' in input_dict, 'lammps_command value not supplied'
@@ -202,8 +204,8 @@ def data_model(input_dict, results_dict=None):
     output['calculation-cohesive-energy-relation'] = calc = DM()
     
     #Assign uuid
+    calc['key'] = input_dict['calc_key']
     calc['calculation'] = DM()
-    calc['calculation']['id'] = input_dict['uuid']
     calc['calculation']['script'] = __calc_name__
     
     calc['calculation']['run-parameter'] = run_params = DM()
@@ -221,7 +223,9 @@ def data_model(input_dict, results_dict=None):
     run_params['number_of_steps_r'] = input_dict['number_of_steps_r']
     
     #Copy over potential data model info
-    calc['potential'] = input_dict['potential_model']['LAMMPS-potential']['potential']
+    calc['potential'] = DM()
+    calc['potential']['key'] = input_dict['potential_key']
+    calc['potential']['id'] = input_dict['potential_id']
     
     #Save info on system file loaded
     system_load = input_dict['load'].split(' ')    

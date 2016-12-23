@@ -3,7 +3,7 @@ import atomman as am
 from DataModelDict import DataModelDict as DM
 
 from . import get_files_in_directory
-from ..tools import as_list
+from ..tools import aslist
     
 def read_prototypes(directory, natypes=None, name=None):
     """
@@ -34,17 +34,17 @@ def read_prototypes(directory, natypes=None, name=None):
             continue
         
         #Check that prototype is in name
-        if name is not None and prototype_name not in as_list(name):
+        if name is not None and prototype_name not in aslist(name):
             match = False
             for n in ids.values():
-                if n in as_list(name):
+                if n in aslist(name):
                     match = True
                     break
             if not match:
                 continue
         
         #Check that prototype has the right number of natypes
-        if natypes is not None and prototype.natypes not in as_list(natypes):
+        if natypes is not None and prototype.natypes not in aslist(natypes):
             continue
         
         prototypes.append({'model':model, 'prototype':prototype, 'file':file})

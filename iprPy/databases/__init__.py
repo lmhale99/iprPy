@@ -1,10 +1,10 @@
 import os
 import importlib
 
-failed_calculations = []
+failed_databases = []
 
-def __load_calculations():
-    calculations_dict = {}
+def __load_databases():
+    databases_dict = {}
     names = []
     dir = os.path.dirname(__file__)
 
@@ -19,11 +19,13 @@ def __load_calculations():
                 names.append(name)
         
     for name in names:
-        try:
-            calculations_dict[name] = importlib.import_module('.'+name, 'iprPy.calculations')
-        except:
-            failed_calculations.append(name)
+        if True:
+        #try:
+            databases_dict[name] = importlib.import_module('.'+name, 'iprPy.databases')
+        else:
+        #except:
+            failed_databases.append(name)
 
-    return calculations_dict
+    return databases_dict
 
-calculations_dict = __load_calculations()
+databases_dict = __load_databases()

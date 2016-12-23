@@ -4,46 +4,51 @@ import numpy as np
 from DataModelDict import DataModelDict as DM
 import atomman as am
 import atomman.unitconvert as uc
-from ..tools import term_extractor
+from ..tools import termtodict
 
-def system_load(input_dict, load='load', load_options='load_options', 
-                box_parameters='box_parameters', symbols='symbols', 
-                system_family='system_family', system_potential='system_potential', 
-                ucell='ucell'):
+def system_load(input_dict, **kwargs):
     """
-    Process input terms associated with a system to be loaded.
-    
-    Arguments:
-    input_dict -- dictionary of input terms to process.
+    Handles input parameters associated with the initial loading of an atomic 
+    system.
+    1. Checks that 'load' is given in input file
+    2. Sets default value of None to 'load_options' term if needed.
+    3. Sets default value of None to 'box_parameters' term if needed.
+    4. Sets default value of None to 'symbols' term if needed.
+    5. Identifies 'system_family' value from the 'load' file if needed.
+    6. Sets 'system_potential' value if listed in 'load' file.
+    7. Constructs unit cell system 'ucell' by opening 'load' file and applying 
+       'box_parameters' if needed.
+       
+    Argument:
+    input_dict -- dictionary containing input parameter key-value pairs
     
     Keyword Arguments:
-    load -- key in input_dict where a load command is stored.
-            Default value is 'load'.
-    load_options -- key in input_dict for the load_options associated with load is stored.
-                    Default value is 'load_options'.
-    box_parameters -- key in input_dict for the box_parameters associated with load is stored.
-                      Default value is 'box_parameters'.
-    symbols -- key in input_dict where the list of symbols associated with load is stored.
-               Default value is 'symbols'.
-    system_family -- key in input_dict where load's system family will be saved.
-                     Default value is 'system_family'.
-    system_potential -- key in input_dict where load's system potential will be saved (if it has one).
-                        Default value is 'system_potential'.                        
-    ucell -- key in input_dict where the loaded unit cell system will be saved.
-                     Default value is 'ucell'.
-    """
-    
+    load -- replacement parameter key name for 'load'
+    load_options -- replacement parameter key name for 'load_options'
+    box_parameters -- replacement parameter key name for 'box_parameters'
+    symbols -- replacement parameter key name for 'symbols'
+    system_family -- replacement parameter key name for 'system_family'
+    system_potential -- replacement parameter key name for 'system_potential'
+    ucell -- replacement parameter key name for 'ucell'
+    """   
+       
+    #Set default keynames
+    keynames = ['load', 'load_options', 'box_parameters', 'symbols', 
+                'system_family', 'system_potential', 'ucell']
+    for keyname in keynames:
+        kwargs[keyname] = kwargs.get(keyname, keyname)
+
     #Check for load command
-    assert load in input_dict, load + ' value not supplied'
+    assert kwargs['load'] in input_dict, kwargs['load'] + ' value not supplied'
     
     #Set default values to optional keys
-    input_dict[load_options] =   input_dict.get(load_options,   None)
-    input_dict[box_parameters] = input_dict.get(box_parameters, None)
-    input_dict[symbols] =        input_dict.get(symbols,        None)
+    input_dict[kwargs['load_options']] =   input_dict.get(kwargs['load_options'],   None)
+    input_dict[kwargs['box_parameters']] = input_dict.get(kwargs['box_parameters'], None)
+    input_dict[kwargs['symbols']] =        input_dict.get(kwargs['symbols'],        None)
     
     #split load command into style and file
-    load_terms = input_dict[load].split(' ')
-    assert len(load_terms) > 1, 'load value must specify both style and file'
+    load_terms = input_dict[kwargs['load']].split(' ')
+    assert len(load_terms) > 1, kwargs['load'] + ' value must specify both style and file'
     load_style = load_terms[0]
     load_file =  ' '.join(load_terms[1:])    
    
@@ -53,40 +58,40 @@ def system_load(input_dict, load='load', load_options='load_options',
             model = DM(f)
         
         #pass existing system_family name onto next generation
-        try: input_dict[system_family] = model.find('system-info')['artifact']['family']
+        try: input_dict[kwargs['system_family']] = model.find('system-info')['artifact']['family']
         #generate new system_family name using the load_file 
-        except: input_dict[system_family] = os.path.splitext(os.path.basename(load_file))[0]
+        except: input_dict[kwargs['system_family']] = os.path.splitext(os.path.basename(load_file))[0]
         
         #find if it is associated with a specific potential
-        try: input_dict[system_potential] = model.find('potential')['key']
+        try: input_dict[kwargs['system_potential']] = model.find('potential')['key']
         except: pass
     
     #Other load_styles won't have a system family, so generate one using the load_file's name
-    else: input_dict[system_family] = os.path.splitext(os.path.basename(load_file))[0]
+    else: input_dict[kwargs['system_family']] = os.path.splitext(os.path.basename(load_file))[0]
     
     #Extract load_options terms
     kwargs= {}
-    if input_dict[load_options] is not None:
+    if input_dict[kwargs['load_options']] is not None:
         load_options_keys = ['key', 'index', 'data_set', 'pbc', 'atom_style', 'units', 'prop_info']
-        kwargs = term_extractor(input_dict[load_options], {}, load_options_keys)
+        kwargs = termtodict(input_dict[kwargs['load_options']], load_options_keys)
         if 'index' in kwargs: kwargs['index'] = int(kwargs['index']) 
         
     #Load ucell and symbols
     try:
-        input_dict[ucell], load_symbols = am.load(load_style, load_file, **kwargs)
+        input_dict[kwargs['ucell']], load_symbols = am.load(load_style, load_file, **kwargs)
     except:
-        input_dict[ucell] = None
+        input_dict[kwargs['ucell']] = None
         load_symbols = None
 
     #If symbols not given in calc input, save the symbols list from the loaded file
-    if input_dict[symbols] is None: input_dict[symbols] = load_symbols
+    if input_dict[kwargs['symbols']] is None: input_dict[kwargs['symbols']] = load_symbols
     
     #If symbols is given in calc input, use it
-    else: input_dict[symbols] = input_dict[symbols].split(' ')    
+    else: input_dict[kwargs['symbols']] = input_dict[kwargs['symbols']].split(' ')    
        
     #Scale ucell by box_parameters
-    if input_dict[ucell] is not None and input_dict[box_parameters] is not None:
-        box_params = input_dict[box_parameters].split(' ')
+    if input_dict[kwargs['ucell']] is not None and input_dict[kwargs['box_parameters']] is not None:
+        box_params = input_dict[kwargs['box_parameters']].split(' ')
         
         #len of 4 or 7 indicates that last term is a length unit
         if len(box_params) == 4 or len(box_params) == 7:
@@ -101,11 +106,11 @@ def system_load(input_dict, load='load', load_options='load_options',
         
         #Three box_parameters means a, b, c
         if len(box_params) == 3:
-            input_dict[ucell].box_set(a=box_params[0], b=box_params[1], c=box_params[2], scale=True) 
+            input_dict[kwargs['ucell']].box_set(a=box_params[0], b=box_params[1], c=box_params[2], scale=True) 
             
         #Six box_parameters means a, b, c, alpha, beta, gamma
         elif len(box_params) == 6:
-            input_dict[ucell].box_set(a=box_params[0], b=box_params[1], c=box_params[2],
+            input_dict[kwargs['ucell']].box_set(a=box_params[0], b=box_params[1], c=box_params[2],
                                       alpha=box_params[0], beta=box_params[1], gamma=box_params[2], 
                                       scale=True) 
         else:
