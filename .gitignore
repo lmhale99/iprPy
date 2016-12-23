@@ -5,6 +5,9 @@
 *.egg-info/
 *.egg
 
+#Notebook checkpoints and data
+docs/calculations/*/
+
 #test scripts
 test/
 test.py
