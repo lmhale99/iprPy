@@ -3,42 +3,49 @@ from io import BytesIO
 
 from .records import records_dict
 
-#Utility functions
-def record_names():
-    """Returns a list of the names of the loaded calculations."""
+def record_styles():
+    """Returns a list of the styles of the loaded calculations."""
     return records_dict.keys()
-
-def get_record(record_type):
-    """Returns record module if it exists"""
-    try:
-        return records_dict[record_type]
-    except:
-        raise KeyError('No record ' + record_type + ' imported')
+    
+class Record(object):
+    """Class for handling different record styles in the same fashion"""
+    
+    def __init__(self, style, name, content):
+        #Check if calculation style exists
+        try:
+            self.__r_module = records_dict[style]
+        except KeyError:
+            raise KeyError('No record style ' + style + ' imported')
         
-#Method specific functions    
-def record_todict(record_data, record_type=None, **kwargs):
-    """Converts an xml record to a flat dictionary"""
+        self.__style = style
+        self.__name = name
+        self.__content = content
+        
+    @property
+    def style(self):
+        return self.__style
+        
+    @property
+    def name(self):
+        return self.__name
     
-    if record_type is None:
-        record_type = DM(record_data).keys()[0]
+    @property
+    def content(self):
+        return self.__content        
+          
+    def todict(self, **kwargs):
+        """Converts an xml record to a flat dictionary"""
+        
+        try: 
+            return self.__r_module.todict(self.content, **kwargs)
+        except:
+            raise AttributeError('Record style ' + self.__style + ' has no attribute todict')
     
-    record = get_record(record_type)
-    try: todict = record.todict
-    except:
-        raise AttributeError('Record ' + record_type + ' has no attribute todict') 
-    
-    return todict(record_data, **kwargs)
-    
-def record_schema(record_type):
-    """Returns the path to the .xsd file for the named record."""
-    
-    record = get_record(record_type)
-    try: schema = record.schema
-    except:
-        raise AttributeError('Record ' + record_type + ' has no attribute schema') 
-    
-    return schema()
-
-    
-    
-    
+    @property
+    def schema(self):
+        """Returns the path to the .xsd file for the named record."""
+        
+        try: 
+            return self.__r_module.schema()
+        except AttributeError:
+            raise AttributeError('Record style ' + self.__style + ' has no attribute schema') 

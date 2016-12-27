@@ -1,54 +1,56 @@
 from .calculations import calculations_dict
 
-#Utility functions
-def calculation_names():
-    """Returns a list of the names of the loaded calculations."""
+def calculation_styles():
+    """Returns a list of the styles of the loaded calculations."""
     return calculations_dict.keys()
-    
-def get_calculation(name):
-    """Returns calculation module if it exists"""
-    try:
-        return calculations_dict[name]
-    except:
-        raise KeyError('No calculation ' + name + ' imported')
         
-#Method specific functions        
-def calculation_data_model(name, input_dict, results_dict=None):
-    """Generates a data model for the named calculation."""
+class Calculation(object):
+    """Class for handling different calculations in the same fashion"""        
     
-    calculation = get_calculation(name)
-    try: data_model = calculation.data_model
-    except:
-        raise AttributeError('Calculation ' + name + ' has no attribute data_model') 
+    def __init__(self, style):
+        
+        #Check if calculation style exists
+        try:
+            self.__calc_module = calculations_dict[style]
+        except KeyError:
+            raise KeyError('No calculation style ' + style + ' imported')
+        
+        self.__style = style
     
-    return data_model(input_dict, results_dict)
+    @property
+    def style(self):
+        return self.__style
     
-def calculation_read_input(name, fp, *args):
-    """Reads the calc_*.in input commands for the named calculation."""
-    
-    calculation = get_calculation(name)
-    try: read_input = calculation.read_input
-    except:
-        raise AttributeError('Calculation ' + name + ' has no attribute read_input') 
-    
-    return read_input(fp, *args)   
+    def data_model(self, input_dict, results_dict=None):
+        """Generates a data model for the named calculation."""
+        
+        try: 
+            return self.__calc_module.data_model(input_dict, results_dict)
+        except AttributeError:
+            raise AttributeError('Calculation ' + self.__style + ' has no attribute data_model') 
+        
+    def read_input(self, fp, *args):
+        """Reads the calc_*.in input commands for the named calculation."""
+        
+        try: 
+            return self.__calc_module.read_input(fp, *args)   
+        except AttributeError:
+            raise AttributeError('Calculation ' + self.__style + ' has no attribute read_input') 
 
-def calculation_template(name):
-    """Reads the calc_*.in input commands for the named calculation."""
-    
-    calculation = get_calculation(name)
-    try: template = calculation.template
-    except:
-        raise AttributeError('Calculation ' + name + ' has no attribute template') 
-    
-    return template()
+    @property
+    def template(self):
+        """Reads the calc_*.in input commands for the named calculation."""
+        
+        try: 
+            return self.__calc_module.template()  
+        except AttributeError:
+            raise AttributeError('Calculation ' + self.__style + ' has no attribute template')
 
-def calculation_files(name):
-    """Yields the list of files necessary for a calculation to run"""
-    
-    calculation = get_calculation(name)
-    try: files = calculation.files
-    except:
-        raise AttributeError('Calculation ' + name + ' has no attribute files') 
-    
-    return files()
+    @property
+    def files(self):
+        """Yields the list of files necessary for a calculation to run"""
+        
+        try: 
+            return self.__calc_module.files()  
+        except AttributeError:
+            raise AttributeError('Calculation ' + self.__style + ' has no attribute files')

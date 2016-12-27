@@ -4,128 +4,175 @@ import shutil
 import tarfile
 
 from iprPy.tools import iaslist
+from iprPy import Record
 
-def initialize(path):
+def initialize(host):
     """Initializes access to a local database by checking that the supplied path is or can be a directory"""
     
-    database_info = os.path.abspath(path)
+    #database_info is simply a local directory path
+    database_info = os.path.abspath(host)
     
+    #Make the directory path if needed
     if not os.path.isdir(database_info):
         os.makedirs(database_info)
         
     return database_info    
     
-def iget_records(database_info, record_type=None, key=None):
+def iget_records(database_info, name=None, style=None):
     """Iterates through matching records in the database"""
     
-    if record_type is None: record_type = ['*']
-    if key is None: key = ['*']
-    ext = ['.xml']
+    #Set default search parameters
+    if style is None: style = ['*']
+    if name is None: name = ['*']
     
-    record_paths = []
+    #iterate through all files matching style, name, ext values
+    for s in iaslist(style):
+        for n in iaslist(name):
+            for ext in iaslist(['.xml']):
+                for rfile in glob.iglob(os.path.join(database_info, s, n+ext)):
+                    
+                    #Open record file and yield an iprPy.Record object
+                    with open(rfile) as f:
+                        yield Record(s, n, f.read())
     
-    for rtype in iaslist(record_type):
-        for k in iaslist(key):
-            for e in iaslist(ext):
-                for record in glob.iglob(os.path.join(database_info, rtype, k+e)):
-                    with open(record) as f:
-                        yield f.read()
-    
-def get_records(database_info, record_type=None, key=None):
+def get_records(database_info, name=None, style=None):
     """Retrieves records from a database"""
     
-    return [i for i in iget_records(database_info, record_type, key)]
+    #Transform iterator into list
+    return [i for i in iget_records(database_info, name=name, style=style)]
+
+def get_record(self, name=None, style=None):
+    """Returns a single record matching given conditions. Issues an error if none or multiple matches are found."""
     
-def add_record(database_info, record_data, record_type, key):
-    """Adds a new record to a database"""
+    #get records
+    record = get_records(name=name, style=style)
     
-    if not os.path.isdir(os.path.join(database_info, record_type)):
-        os.mkdir(os.path.join(database_info, record_type))
-    
-    if len(get_records(database_info, key=key)) > 0:
-        raise ValueError('Record ' + key + ' already exists')
-    
-    with open(os.path.join(database_info, record_type, key+'.xml'), 'w') as f:
-        f.write(record_data)    
-       
-def update_record(database_info, record_data, key):
-    """Updates an existing record in a database"""
-    
-    record_path = glob.glob(os.path.join(database_info, '*', key+'.xml'))
-    
-    if len(record_path) == 1:
-        record_path = record_path[0]
-        with open(record_path, 'w') as f:
-            f.write(record_data)
-    
-    elif len(record_path) == 0:
-        raise ValueError('Record ' + key + ' not found')
+    #Verify that there is only one matching record
+    if len(record) == 1:
+        return record[0]
+    elif len(record) == 0:
+        raise ValueError('Cannot find matching record')
     else:
-        raise ValueError('Multiple records for ' + key + ' found')       
+        raise ValueError('Multiple matching records found')
     
-def delete_record(database_info, key):
+def add_record(database_info, record=None, style=None, name=None, content=None):
+    """Adds a new record to a database"""    
+    
+    #Create Record object if not given
+    if record is None:
+        record = Record(style, name, content)
+    
+    #Issue a TypeError for competing kwargs
+    elif style is not None or name is not None or content is not None:
+        raise TypeError('kwargs style, name, and content cannot be given with kwarg record')
+    
+    #Verify that there isn't already a record with a matching name
+    if len(get_records(database_info, name=record.name)) > 0:
+        raise ValueError('Record ' + record.name + ' already exists')
+    
+    #Make record style directory if needed
+    if not os.path.isdir(os.path.join(database_info, record.style)):
+        os.mkdir(os.path.join(database_info, record.style))
+    
+    #Save content to an .xml file 
+    with open(os.path.join(database_info, record.style, record.name+'.xml'), 'w') as f:
+        f.write(record.content)
+        
+    return record
+       
+def update_record(database_info, record=None, style=None, name=None, content=None):
+    """Updates the content of an existing record in the database"""
+    
+    #Create Record object if not given
+    if record is None:
+        if content is None:
+            raise TypeError('no new content given')
+        oldrecord = self.get_record(name=name, style=style)
+        record = Record(oldrecord.style, oldrecord.name, content)
+    
+    #Issue a TypeError for competing kwargs
+    elif style is not None or name is not None:
+        raise TypeError('kwargs style and name cannot be given with kwarg record')
+    
+    #Replace content in record object
+    elif content is not None:
+        oldrecord = record
+        record = Record(oldrecord.style, oldrecord.name, content)
+        
+    #Find oldrecord matching record
+    else:
+        oldrecord = self.get_record(name=record.name, style=record.style)
+    
+    #Delete oldrecord
+    delete_record(database_info, record=oldrecord)
+
+    #Add new record
+    add_record(database_info, record=record)
+    
+    return record
+    
+def delete_record(database_info, record=None, name=None, style=None):
     """deletes an existing record in a database"""
     
-    #Find path to record
-    record_path = glob.glob(os.path.join(database_info, '*', key+'.xml'))
+    #Create Record object if not given
+    if record is None:
+        record = get_record(name=name, style=style)
     
-    #If exactly one match is found, delete the file
-    if len(record_path) == 1:
-        record_path = record_path[0]
-        os.remove(record_path)
+    #Issue a TypeError for competing kwargs
+    elif style is not None or name is not None:
+        raise TypeError('kwargs style and name cannot be given with kwarg record')
     
-    
-    elif len(record_path) == 0:
-        raise ValueError('Record for' + key + ' not found')
-    
+    #Verify that record exists
     else:
-        raise ValueError('Multiple records for ' + key + ' found') 
-        
-def add_archive(database_info, root_directory, key):
-    """Archives calculation folder and saves to the database"""
+        record = get_record(name=record.name, style=record.style)
+    
+    #build path to record
+    record_path = os.path.join(database_info, record.style, record.name)
 
-    #Find path to record
-    record_path = glob.glob(os.path.join(database_info, '*', key+'.xml'))
-    
-    #If exactly one match is found, add archive with matching name
-    if len(record_path) == 1:
-        record_path = record_path[0]
-        archive_path = os.path.splitext(record_path)[0]
+    #Delete record file
+    os.remove(record_path+'.xml')
         
-        #Check if an archive already exists
-        assert not os.path.isfile(archive_path+'.tar.gz'), 'Record already has an archive'
-        
-        #Make archive
-        shutil.make_archive(archive_path, 'gztar', root_dir=root_directory, base_dir=key)        
+def add_tar(database_info, record=None, name=None, style=None, root_dir=None):
+    """Archives calculation folder as a tar file and saves to the database"""
+
+    #Create Record object if not given
+    if record is None:
+        record = get_record(name=name, style=style)
     
-    elif len(record_path) == 0:
-        raise ValueError('Record for ' + key + ' not found')
+    #Issue a TypeError for competing kwargs
+    elif style is not None or name is not None:
+        raise TypeError('kwargs style and name cannot be given with kwarg record')
+    
+    #Verify that record exists
     else:
-        raise ValueError('Multiple records for ' + key + ' found') 
-    
-    
-    
-    
-
-def get_archive(database_info, key):
-    """Retrives a stored calculation archive"""
-
-    #Find path to archive
-    archive_path = glob.glob(os.path.join(database_info, '*', key+'.tar.gz'))
-    
-    #If exactly one match is found, return it
-    if len(archive_path) == 1:
-        archive_path = archive_path[0]
+        record = get_record(name=record.name, style=record.style)
         
-        return tarfile.open(archive_path)
+    #build path to record
+    record_path = os.path.join(database_info, record.style, record.name)
+
+    #Check if an archive already exists
+    if os.path.isfile(record_path+'.tar.gz'):
+        raise ValueError('Record already has an archive')
+        
+    #Make archive
+    shutil.make_archive(record_path, 'gztar', root_dir=root_dir, base_dir=record.name)         
+
+def get_tar(database_info, record=None, name=None, style=None):
+    """Retrives a stored calculation tar archive"""
+
+    #Create Record object if not given
+    if record is None:
+        record = get_record(name=name, style=style)
     
+    #Issue a TypeError for competing kwargs
+    elif style is not None or name is not None:
+        raise TypeError('kwargs style and name cannot be given with kwarg record')
     
-    elif len(archive_path) == 0:
-        raise ValueError('Archive for ' + key + ' not found')
-    
+    #Verify that record exists
     else:
-        raise ValueError('Multiple archives for ' + key + ' found') 
-
-
-
-
+        record = get_record(name=record.name, style=record.style)
+    
+    #build path to record
+    record_path = os.path.join(database_info, record.style, record.name)
+    
+    return tarfile.open(record_path+'.tar.gz')
