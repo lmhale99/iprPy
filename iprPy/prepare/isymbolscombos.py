@@ -1,12 +1,10 @@
 import numpy as np
 import atomman.lammps as lmp
 
-from .. import record_todict
-
 def isymbolscombos(prototype, potential):
     
-    symbols = lmp.Potential(potential).symbols
-    natypes = record_todict(prototype)['natypes']
+    symbols = lmp.Potential(potential.content).symbols
+    natypes = prototype.todict()['natypes']
             
     for ivals in iterbox(len(symbols), natypes):
         yield list(np.asarray(symbols)[ivals])

@@ -12,7 +12,11 @@ def sizemults(input_dict, **kwargs):
     Keyword Arguments:
     sizemults -- replacement parameter key name for 'sizemults'
     """
-    
+    #Set default keynames
+    keynames = ['sizemults']
+    for keyname in keynames:
+        kwargs[keyname] = kwargs.get(keyname, keyname)
+        
     #Convert string to integer terms
     if isinstance(input_dict[kwargs['sizemults']], (str, unicode)): 
         newmults = list(np.array(input_dict[kwargs['sizemults']].strip().split(), dtype=int))

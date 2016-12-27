@@ -1,11 +1,9 @@
-from .. import record_todict
 from ..tools import aslist
 
 import pandas as pd
 import numpy as np
 
-
-def ipotentials(database, element=None, name=None, pair_style=None, record_type='LAMMPS-potential'):
+def ipotentials(database, element=None, name=None, pair_style=None, record_style='LAMMPS-potential'):
     """
     Iterates over potentials in a database that match limiting conditions.
     
@@ -22,16 +20,15 @@ def ipotentials(database, element=None, name=None, pair_style=None, record_type=
     pair_style -- single string LAMMPS pair_style type or list of pair_style 
                   types that the potentials must be to be returned. Default
                   value is None (i.e. no selection by pair_style).
-    record_type -- string name for the record type (i.e. template) to use.
+    record_style -- string name for the record type (i.e. template) to use.
                    Default value is 'LAMMPS-potential'.
     
-    Returns the potential's name, the potential's record as a string and the 
-    potential's archives as an open Tarfile object.    
+    Yields iprPy.Record objects for the associated potentials.    
     """
     
     df = []
-    for record in database.iget_records(record_type):
-        df.append(record_todict(record, record_type=record_type))
+    for record in database.iget_records(style=record_style):
+        df.append(record.todict())
     df = pd.DataFrame(df)
     
     if name is not None:
@@ -47,7 +44,4 @@ def ipotentials(database, element=None, name=None, pair_style=None, record_type=
         df = df[check]
         
     for pot_id in df.pot_id.tolist():
-        record = database.get_records(key=pot_id)[0]
-        archive = database.get_archive(key=pot_id)
-        
-        yield pot_id, record, archive
+        yield database.get_record(name=pot_id, style=record_style)

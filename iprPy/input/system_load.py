@@ -37,7 +37,7 @@ def system_load(input_dict, **kwargs):
                 'system_family', 'system_potential', 'ucell']
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
-
+        
     #Check for load command
     assert kwargs['load'] in input_dict, kwargs['load'] + ' value not supplied'
     
@@ -70,15 +70,15 @@ def system_load(input_dict, **kwargs):
     else: input_dict[kwargs['system_family']] = os.path.splitext(os.path.basename(load_file))[0]
     
     #Extract load_options terms
-    kwargs= {}
+    load_options_kwargs= {}
     if input_dict[kwargs['load_options']] is not None:
         load_options_keys = ['key', 'index', 'data_set', 'pbc', 'atom_style', 'units', 'prop_info']
-        kwargs = termtodict(input_dict[kwargs['load_options']], load_options_keys)
-        if 'index' in kwargs: kwargs['index'] = int(kwargs['index']) 
+        load_options_kwargs = termtodict(input_dict[kwargs['load_options']], load_options_keys)
+        if 'index' in load_options_kwargs: load_options_kwargs['index'] = int(load_options_kwargs['index']) 
         
     #Load ucell and symbols
     try:
-        input_dict[kwargs['ucell']], load_symbols = am.load(load_style, load_file, **kwargs)
+        input_dict[kwargs['ucell']], load_symbols = am.load(load_style, load_file, **load_options_kwargs)
     except:
         input_dict[kwargs['ucell']] = None
         load_symbols = None

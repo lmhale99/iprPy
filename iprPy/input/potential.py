@@ -30,8 +30,5 @@ def potential(input_dict, **kwargs):
     input_dict[kwargs['potential_dir']] = input_dict.get(kwargs['potential_dir'], '')
     
     #load potential data model and Potential object
-    try:
-        with open(kwargs['potential_file']) as f:
-            input_dict[kwargs['potential']] = lmp.Potential(f, input_dict[kwargs['potential_dir']])
-    except:
-        raise ValueError(kwargs['potential_file'] + ' not a valid LAMMPS potential data model file')
+    with open(input_dict[kwargs['potential_file']]) as f:
+        input_dict[kwargs['potential']] = lmp.Potential(f, input_dict[kwargs['potential_dir']])

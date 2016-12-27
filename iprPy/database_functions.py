@@ -88,17 +88,17 @@ class Database(object):
         except AttributeError:
             raise AttributeError('Database style ' + self.__style + ' has no attribute delete_record')
         
-    def add_archive(self, record=None, name=None, style=None, root_dir=None):
-        """Archives a folder and saves it to the database"""
+    def add_tar(self, record=None, name=None, style=None, root_dir=None):
+        """Archives a folder as a tar file and saves to a record in the database"""
         try: 
-            return self.__db_module.add_archive(self.__db_info, record=record, name=name, style=style, root_dir=root_dir)
+            return self.__db_module.add_tar(self.__db_info, record=record, name=name, style=style, root_dir=root_dir)
         except AttributeError:
-            raise AttributeError('Database style ' + self.__style + ' has no attribute add_archive')
+            raise AttributeError('Database style ' + self.__style + ' has no attribute add_tar')
         
-    def get_archive(self, record=None, name=None, style=None):
-        """Retrives a stored calculation archive"""
+    def get_tar(self, record=None, name=None, style=None):
+        """Retrives a stored tar archive"""
         try: 
-            return self.__db_module.get_archive(self.__db_info, record=record, name=name, style=style)
+            return self.__db_module.get_tar(self.__db_info, record=record, name=name, style=style)
         except AttributeError:
-            raise AttributeError('Database style ' + self.__style + ' has no attribute get_archive')
+            raise AttributeError('Database style ' + self.__style + ' has no attribute get_tar')
         

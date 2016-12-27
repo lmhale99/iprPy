@@ -1,11 +1,11 @@
-from .. import record_todict
 from ..tools import aslist
 
 import pandas as pd
 
-def iprototypes(database, natypes=None, name=None, spacegroup=None, crystalfamily=None, pearson=None, record_type='crystal-prototype'):
+def iprototypes(database, natypes=None, name=None, spacegroup=None, crystalfamily=None, pearson=None, record_style='crystal-prototype'):
     """
-    Iterates over potentials in a database that match limiting conditions.
+    Iterates over crystal prototype records in a database that match limiting 
+    conditions.
     
     Arguments:
     database -- an iprPy.Database object for the database being accessed
@@ -27,15 +27,15 @@ def iprototypes(database, natypes=None, name=None, spacegroup=None, crystalfamil
     pearson -- single string or list of strings for Pearson symbols to limit 
                search by. Default value is None (i.e. no selection by Pearson 
                symbol).
-    record_type -- string name for the record type (i.e. template) to use.
-                   Default value is 'crystal-prototype'.
+    record_style -- string name for the record style (i.e. template) to use.
+                    Default value is 'crystal-prototype'.
     
-    Returns the prototype's id and the prototype's record as a string.    
+    Yields iprPy.Record objects for the associated crystal prototypes.    
     """
     
     df = []
-    for record in database.iget_records(record_type):
-        df.append(record_todict(record, record_type=record_type))
+    for record in database.iget_records(style=record_style):
+        df.append(record.todict())
     df = pd.DataFrame(df)
     
     if natypes is not None:
@@ -59,6 +59,4 @@ def iprototypes(database, natypes=None, name=None, spacegroup=None, crystalfamil
                 (df.sg_number.isin(aslist(spacegroup)))]
         
     for proto_id in df.id.tolist():
-        record = database.get_records(key=proto_id)[0]
-        
-        yield proto_id, record
+        yield database.get_record(name=proto_id, style=record_style)

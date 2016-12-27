@@ -1,5 +1,5 @@
 #from .file_to_dict import file_to_dict
-from .value_unit import value_unit
+from .value import value
 from .sizemults import sizemults
 from .potential import potential
 from .system_load import system_load

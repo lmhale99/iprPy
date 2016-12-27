@@ -1,6 +1,6 @@
 import atomman.unitconvert as uc
 
-def value_unit(input_dict, key, default_unit=None, default_term=None):
+def value(input_dict, key, default_unit=None, default_term=None):
     """
     Converts a string dictionary value into a float with proper unit conversion.
     

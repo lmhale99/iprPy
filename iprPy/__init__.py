@@ -14,8 +14,8 @@ from .database_functions import *
 #Import check_modules function
 from .check_modules import check_modules
 
-#from . import prepare
-#from . import input
+from . import prepare
+from . import input
 
 import os
 rootdir = os.path.dirname(os.path.abspath(__file__))

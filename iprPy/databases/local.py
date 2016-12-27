@@ -30,10 +30,11 @@ def iget_records(database_info, name=None, style=None):
         for n in iaslist(name):
             for ext in iaslist(['.xml']):
                 for rfile in glob.iglob(os.path.join(database_info, s, n+ext)):
-                    
+                    rstyle = os.path.basename(os.path.dirname(rfile))
+                    rname = os.path.splitext(os.path.basename(rfile))[0]
                     #Open record file and yield an iprPy.Record object
                     with open(rfile) as f:
-                        yield Record(s, n, f.read())
+                        yield Record(rstyle, rname, f.read())
     
 def get_records(database_info, name=None, style=None):
     """Retrieves records from a database"""
@@ -41,11 +42,11 @@ def get_records(database_info, name=None, style=None):
     #Transform iterator into list
     return [i for i in iget_records(database_info, name=name, style=style)]
 
-def get_record(self, name=None, style=None):
+def get_record(database_info, name=None, style=None):
     """Returns a single record matching given conditions. Issues an error if none or multiple matches are found."""
     
     #get records
-    record = get_records(name=name, style=style)
+    record = get_records(database_info, name=name, style=style)
     
     #Verify that there is only one matching record
     if len(record) == 1:
@@ -87,7 +88,7 @@ def update_record(database_info, record=None, style=None, name=None, content=Non
     if record is None:
         if content is None:
             raise TypeError('no new content given')
-        oldrecord = self.get_record(name=name, style=style)
+        oldrecord = get_record(database_info, name=name, style=style)
         record = Record(oldrecord.style, oldrecord.name, content)
     
     #Issue a TypeError for competing kwargs
@@ -101,7 +102,7 @@ def update_record(database_info, record=None, style=None, name=None, content=Non
         
     #Find oldrecord matching record
     else:
-        oldrecord = self.get_record(name=record.name, style=record.style)
+        oldrecord = get_record(database_info, name=record.name, style=record.style)
     
     #Delete oldrecord
     delete_record(database_info, record=oldrecord)
@@ -116,7 +117,7 @@ def delete_record(database_info, record=None, name=None, style=None):
     
     #Create Record object if not given
     if record is None:
-        record = get_record(name=name, style=style)
+        record = get_record(database_info, name=name, style=style)
     
     #Issue a TypeError for competing kwargs
     elif style is not None or name is not None:
@@ -124,7 +125,7 @@ def delete_record(database_info, record=None, name=None, style=None):
     
     #Verify that record exists
     else:
-        record = get_record(name=record.name, style=record.style)
+        record = get_record(database_info, name=record.name, style=record.style)
     
     #build path to record
     record_path = os.path.join(database_info, record.style, record.name)
@@ -137,7 +138,7 @@ def add_tar(database_info, record=None, name=None, style=None, root_dir=None):
 
     #Create Record object if not given
     if record is None:
-        record = get_record(name=name, style=style)
+        record = get_record(database_info, name=name, style=style)
     
     #Issue a TypeError for competing kwargs
     elif style is not None or name is not None:
@@ -145,7 +146,7 @@ def add_tar(database_info, record=None, name=None, style=None, root_dir=None):
     
     #Verify that record exists
     else:
-        record = get_record(name=record.name, style=record.style)
+        record = get_record(database_info, name=record.name, style=record.style)
         
     #build path to record
     record_path = os.path.join(database_info, record.style, record.name)
@@ -162,7 +163,7 @@ def get_tar(database_info, record=None, name=None, style=None):
 
     #Create Record object if not given
     if record is None:
-        record = get_record(name=name, style=style)
+        record = get_record(database_info, name=name, style=style)
     
     #Issue a TypeError for competing kwargs
     elif style is not None or name is not None:
@@ -170,7 +171,7 @@ def get_tar(database_info, record=None, name=None, style=None):
     
     #Verify that record exists
     else:
-        record = get_record(name=record.name, style=record.style)
+        record = get_record(database_info, name=record.name, style=record.style)
     
     #build path to record
     record_path = os.path.join(database_info, record.style, record.name)
