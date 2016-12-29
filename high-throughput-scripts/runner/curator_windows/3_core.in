@@ -1,0 +1,7 @@
+#### Run directory location ####
+run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\curator\3
+
+#### Database information ####
+database                    curator http://127.0.0.1:8000/
+database_user               admin
+database_pswd               admin

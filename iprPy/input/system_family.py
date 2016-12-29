@@ -3,7 +3,7 @@ from DataModelDict import DataModelDict as DM
 
 def system_family(input_dict, **kwargs):
     """
-    Sets system_family (and system_potential) input terms based on a load file.
+    Sets system_family input terms based on a load file.
     
     The input_dict keys used by this function (which can be renamed using the 
     function's keyword arguments):
@@ -15,9 +15,6 @@ def system_family(input_dict, **kwargs):
     system_family -- if the load file contains a system_family term, then it is
                      passed on. Otherwise, a new system_family is created based 
                      on the load file's name.
-    system_potential -- if the load file is associated with a particular 
-                        potential (i.e. is a calculation record) then a 
-                        system_potential term is assigned that potential's id.
        
     Argument:
     input_dict -- dictionary containing input parameter key-value pairs
@@ -26,11 +23,10 @@ def system_family(input_dict, **kwargs):
     load -- replacement parameter key name for 'load'
     load_file -- replacement parameter key name for 'load_file'
     system_family -- replacement parameter key name for 'system_family'
-    system_potential -- replacement parameter key name for 'system_potential'
     """
     
     #Set default keynames
-    keynames = ['load', 'load_file', 'system_family', 'system_potential']
+    keynames = ['load', 'load_file', 'system_family']
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
     
@@ -47,12 +43,12 @@ def system_family(input_dict, **kwargs):
     if kwargs['load_file'] in input_dict:
         load_file = input_dict[kwargs['load_file']]
    
-    #If load_style is system_model, check for system_family and system_potential
+    #If load_style is system_model, check for system_family
     if load_style == 'system_model':
         
         #Replace load_file if indicated by input_dict terms
         if kwargs['load_file'] in input_dict:
-            model = input_dict[kwargs['load_file']]
+            model = DM(input_dict[kwargs['load_file']])
         else:
             with open(load_file) as f:
                 model = DM(f)
@@ -63,11 +59,6 @@ def system_family(input_dict, **kwargs):
         #generate new system_family name using load_file_name 
         except: 
             input_dict[kwargs['system_family']] = load_file_name
-        
-        #find if it is associated with a specific potential
-        try: 
-            input_dict[kwargs['system_potential']] = model.find('potential')['key']
-        except: pass
     
     #Other load_styles won't have a system_family, so generate one using load_file_name
     else: 

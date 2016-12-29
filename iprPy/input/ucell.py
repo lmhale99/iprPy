@@ -37,6 +37,11 @@ def ucell(input_dict, **kwargs):
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
     
+    #Set default values
+    input_dict[kwargs['load_options']] =   input_dict.get(kwargs['load_options'],   None)
+    input_dict[kwargs['box_parameters']] = input_dict.get(kwargs['box_parameters'], None)
+    input_dict[kwargs['symbols']] =        input_dict.get(kwargs['symbols'],        None)
+    
     #split load command into style and file
     load_terms = input_dict[kwargs['load']].split(' ')
     assert len(load_terms) > 1, kwargs['load'] + ' value must specify both style and file'

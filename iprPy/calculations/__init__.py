@@ -19,8 +19,10 @@ def __load_calculations():
                 names.append(name)
         
     for name in names:
+        #if True:
         try:
             calculations_dict[name] = importlib.import_module('.'+name, 'iprPy.calculations')
+        #else:
         except:
             failed_calculations.append(name)
 

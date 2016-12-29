@@ -32,15 +32,17 @@ def main(*args):
     with open(args[0]) as f:
         input_dict = read_input(f, *args[1:])      
     
+    interpret_input(input_dict)
+    
     #Run quick_a_Cij to refine values
     results_dict = quick_a_Cij(input_dict['lammps_command'], 
-                               input_dict['initial_system'], 
+                               input_dict['initialsystem'], 
                                input_dict['potential'],
                                input_dict['symbols'], 
                                p_xx = input_dict['pressure_xx'], 
                                p_yy = input_dict['pressure_yy'], 
                                p_zz = input_dict['pressure_zz'],
-                               delta = input_dict['strain_range'])
+                               delta = input_dict['strainrange'])
     
     #Save data model of results 
     results = data_model(input_dict, results_dict)
@@ -136,7 +138,7 @@ def calc_cij(lammps_command, system, potential, symbols, p_xx=0.0, p_yy=0.0, p_z
     with open(template_file) as f:
         template = f.read()
     with open(lammps_script, 'w') as f:
-        f.write('\n'.join(iprPy.tools.fill_template(template, lammps_variables, '<', '>')))
+        f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
     
     #Run lammps 
     output = lmp.run(lammps_command, lammps_script)
@@ -157,8 +159,11 @@ def calc_cij(lammps_command, system, potential, symbols, p_xx=0.0, p_yy=0.0, p_z
     pxy = uc.set_in_units(np.array(output.finds('Pxy')), lammps_units['pressure'])
     pxz = uc.set_in_units(np.array(output.finds('Pxz')), lammps_units['pressure'])
     pyz = uc.set_in_units(np.array(output.finds('Pyz')), lammps_units['pressure'])
-    
-    pe = uc.set_in_units(np.array(output.finds('v_peatom')), lammps_units['energy'])
+    try:
+        pe = uc.set_in_units(np.array(output.finds('v_peatom')), lammps_units['energy'])
+        assert len(pe) > 0
+    except:
+        pe = uc.set_in_units(np.array(output.finds('peatom')), lammps_units['energy'])
     
     #Set the six non-zero strain values
     strains = np.array([ (lx[2] -  lx[1])  / lx[0],
@@ -220,48 +225,61 @@ def read_input(f, UUID=None):
     """Reads the calc_*.in input commands for this calculation."""
     
     #Read input file in as dictionary    
-    input_dict = iprPy.input.file_to_dict(f)
+    input_dict = iprPy.tools.parseinput(f, allsingular=True)
     
     #set calculation UUID
-    if UUID is not None: input_dict['uuid'] = UUID
-    else: input_dict['uuid'] = input_dict.get('uuid', str(uuid.uuid4()))
+    if UUID is not None: input_dict['calc_key'] = UUID
+    else: input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
-    #Process command lines
+    #Verify required terms are defined
     assert 'lammps_command' in input_dict, 'lammps_command value not supplied'
-    input_dict['mpi_command'] = input_dict.get('mpi_command', None)
+    assert 'potential_file' in input_dict, 'potential_file value not supplied'
+    assert 'load'           in input_dict, 'load value not supplied'
     
-    #Process potential
-    iprPy.input.lammps_potential(input_dict)
-    
-    #Process default units
+    #Assign default values to undefined terms
     iprPy.input.units(input_dict)
     
-    #Process system information
-    iprPy.input.system_load(input_dict)
+    input_dict['mpi_command'] =    input_dict.get('mpi_command',    None)
+    input_dict['potential_dir'] =  input_dict.get('potential_dir',  '')
     
-    #Process system manipulations
-    if input_dict['ucell'] is not None:
-        iprPy.input.system_manipulate(input_dict)
+    input_dict['load_options'] =   input_dict.get('load_options',   None)
+    input_dict['box_parameters'] = input_dict.get('box_parameters', None)
+    input_dict['symbols'] =        input_dict.get('symbols',        None)
     
-    #Process run parameters
+    iprPy.input.axes(input_dict)
+    iprPy.input.atomshift(input_dict)
+    
+    input_dict['sizemults'] =      input_dict.get('sizemults',     '3 3 3')
+    iprPy.input.sizemults(input_dict)
+    
     #these are integer terms
     input_dict['number_of_steps_r'] = int(input_dict.get('number_of_steps_r', 200))
     
     #these are unitless float terms
-    input_dict['strain_range'] = float(input_dict.get('strain_range', 1e-5))
+    input_dict['strainrange'] = float(input_dict.get('strainrange', 1e-5))
     
     #these are terms with units
-    input_dict['pressure_xx'] = iprPy.input.value_unit(input_dict, 'pressure_xx', 
+    input_dict['pressure_xx'] = iprPy.input.value(input_dict, 'pressure_xx', 
                                     default_unit=input_dict['pressure_unit'], 
                                     default_term='0.0 GPa')
-    input_dict['pressure_yy'] = iprPy.input.value_unit(input_dict, 'pressure_yy', 
+    input_dict['pressure_yy'] = iprPy.input.value(input_dict, 'pressure_yy', 
                                     default_unit=input_dict['pressure_unit'], 
                                     default_term='0.0 GPa')
-    input_dict['pressure_zz'] = iprPy.input.value_unit(input_dict, 'pressure_zz', 
+    input_dict['pressure_zz'] = iprPy.input.value(input_dict, 'pressure_zz', 
                                     default_unit=input_dict['pressure_unit'], 
                                     default_term='0.0 GPa')    
     
     return input_dict
+
+def interpret_input(input_dict):
+    with open(input_dict['potential_file']) as f:
+        input_dict['potential'] = lmp.Potential(f, input_dict['potential_dir'])
+        
+    iprPy.input.system_family(input_dict)
+    
+    iprPy.input.ucell(input_dict)
+    
+    iprPy.input.initialsystem(input_dict)
     
 def data_model(input_dict, results_dict=None):
     """Creates a DataModelDict containing the input and results data""" 
@@ -271,21 +289,24 @@ def data_model(input_dict, results_dict=None):
     output['calculation-system-relax'] = calc = DM()
     
     #Assign uuid
+    calc['key'] = input_dict['calc_key']
     calc['calculation'] = DM()
-    calc['calculation']['id'] = input_dict['uuid']
     calc['calculation']['script'] = __calc_name__
     
     calc['calculation']['run-parameter'] = run_params = DM()
-    run_params['strain-range'] = input_dict['strain_range']
-    run_params['load_options'] = input_dict['load_options']
     
     run_params['size-multipliers'] = DM()
-    run_params['size-multipliers']['a'] = list(input_dict['size_mults'][0])
-    run_params['size-multipliers']['b'] = list(input_dict['size_mults'][1])
-    run_params['size-multipliers']['c'] = list(input_dict['size_mults'][2])
+    run_params['size-multipliers']['a'] = list(input_dict['sizemults'][0])
+    run_params['size-multipliers']['b'] = list(input_dict['sizemults'][1])
+    run_params['size-multipliers']['c'] = list(input_dict['sizemults'][2])
+    
+    run_params['strain-range'] = input_dict['strainrange']
+    run_params['load_options'] = input_dict['load_options']
     
     #Copy over potential data model info
-    calc['potential'] = input_dict['potential_model']['LAMMPS-potential']['potential']
+    calc['potential'] = DM()
+    calc['potential']['key'] = input_dict['potential'].key
+    calc['potential']['id'] = input_dict['potential'].id
     
     #Save info on system file loaded
     system_load = input_dict['load'].split(' ')    
@@ -317,9 +338,9 @@ def data_model(input_dict, results_dict=None):
                                                                          box_unit = input_dict['length_unit'])['atomic-system']
         
         #Update ucell to relaxed lattice parameters
-        a_mult = input_dict['size_mults'][0][1] - input_dict['size_mults'][0][0]
-        b_mult = input_dict['size_mults'][1][1] - input_dict['size_mults'][1][0]
-        c_mult = input_dict['size_mults'][2][1] - input_dict['size_mults'][2][0]
+        a_mult = input_dict['sizemults'][0][1] - input_dict['sizemults'][0][0]
+        b_mult = input_dict['sizemults'][1][1] - input_dict['sizemults'][1][0]
+        c_mult = input_dict['sizemults'][2][1] - input_dict['sizemults'][2][0]
         relaxed_ucell = deepcopy(input_dict['ucell'])
         relaxed_ucell.box_set(a = results_dict['system_new'].box.a / a_mult,
                               b = results_dict['system_new'].box.b / b_mult,

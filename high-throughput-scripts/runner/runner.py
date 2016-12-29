@@ -67,7 +67,7 @@ def main(*args):
                             #Check parent record in database to see if it has completed
                             if status == 'not calculated':
                                 parent_record = dbase.get_record(name=parent_sim)
-                                parent = DM(parent_record)
+                                parent = DM(parent_record.content)
                                 try:
                                     status = parent.find('status')
                                     
@@ -79,7 +79,7 @@ def main(*args):
                                     #skip if parent calculation failed
                                     elif status == 'error':
                                         with open(os.path.basename(fname), 'w') as f:
-                                            f.write(parent_record)
+                                            f.write(parent_record.content)
                                         error_flag = True
                                         error_message = 'parent calculation issued an error'
                                         break
@@ -91,7 +91,7 @@ def main(*args):
                                 #Copy parent record to calculation folder if it is now complete
                                 except:
                                     with open(os.path.basename(fname), 'w') as f:
-                                        f.write(parent_record)
+                                        f.write(parent_record.content)
                                     log.write('parent %s copied to sim folder\n' % parent_sim)
                             
                             #skip if parent calculation failed
@@ -129,7 +129,7 @@ def main(*args):
                 
                 #Catch any errors and add them to results.json
                 except:
-                    model = DM(record)
+                    model = DM(record.content)
                     record_type = model.keys()[0]
                     model[record_type]['status'] = 'error'
                     model[record_type]['error'] = str(sys.exc_info()[1])

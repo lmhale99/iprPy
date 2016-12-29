@@ -15,12 +15,15 @@ class Record(object):
         try:
             self.__r_module = records_dict[style]
         except KeyError:
-            raise KeyError('No record style ' + style + ' imported')
+            raise KeyError('No record style ' + style + ' imported')           
         
         self.__style = style
         self.__name = name
         self.__content = content
-        
+    
+    def __str__(self):
+        return self.name + ' (' + self.style + ')'
+    
     @property
     def style(self):
         return self.__style
@@ -37,15 +40,19 @@ class Record(object):
         """Converts an xml record to a flat dictionary"""
         
         try: 
-            return self.__r_module.todict(self.content, **kwargs)
+            todict = self.__r_module.todict
         except:
-            raise AttributeError('Record style ' + self.__style + ' has no attribute todict')
+            raise AttributeError('Record (' + self.style + ') has no attribute todict')
+        else:
+            return todict(self.content, **kwargs)
     
     @property
     def schema(self):
         """Returns the path to the .xsd file for the named record."""
         
         try: 
-            return self.__r_module.schema()
+            schema = self.__r_module.schema
         except AttributeError:
-            raise AttributeError('Record style ' + self.__style + ' has no attribute schema') 
+            raise AttributeError('Record (' + self.style + ') has no attribute schema') 
+        else:
+            return schema()

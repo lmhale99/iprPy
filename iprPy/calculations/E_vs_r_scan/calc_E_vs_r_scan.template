@@ -1,7 +1,7 @@
-#Run script for calc_refine_structure_static.py
+#Run script for calc_E_vs_r_scan.py
 
 #Command lines for LAMMPS (and MPI).
-#For lammps_command, exclude passing in a script, i.e. no "-in term"
+#For lammps_command, exclude passing in a script, i.e. no "-in term", etc.
 lammps_command              <lammps_command>
 mpi_command                 <mpi_command>
 

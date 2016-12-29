@@ -4,6 +4,8 @@ import numpy as np
 import atomman as am
 import atomman.lammps as lmp
 
+from .axes import axes
+from .atomshift import atomshift
 from .sizemults import sizemults
 
 def initialsystem(input_dict, **kwargs):
@@ -39,6 +41,15 @@ def initialsystem(input_dict, **kwargs):
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
     
+    #Set default values
+
+    if kwargs['atomshift'] not in input_dict or isinstance(input_dict[kwargs['atomshift']], (str, unicode)):
+        atomshift(input_dict)
+    if kwargs['sizemults'] not in input_dict or isinstance(input_dict[kwargs['sizemults']], (str, unicode)):
+        sizemults(input_dict)   
+    if kwargs['x_axis'] not in input_dict or isinstance(input_dict[kwargs['x_axis']], (str, unicode)):
+        axes(input_dict)        
+    
     #Check for ucell system
     assert kwargs['ucell'] in input_dict, kwargs['ucell'] + ' value not supplied'
         
@@ -46,13 +57,13 @@ def initialsystem(input_dict, **kwargs):
     input_dict[kwargs['initialsystem']] = deepcopy(input_dict[kwargs['ucell']])
     
     #Build axes from x_axis, y_axis and z_axis
-    axes = np.array([input_dict[kwargs['x_axis']], input_dict[kwargs['y_axis']], input_dict[kwargs['z_axis']]])
+    axes_array = np.array([input_dict[kwargs['x_axis']], input_dict[kwargs['y_axis']], input_dict[kwargs['z_axis']]])
 
-    #Rotate using axes
+    #Rotate using axes_array
     try: 
-        input_dict[kwargs['initialsystem']] = am.rotate_cubic(input_dict[kwargs['initialsystem']], axes)
+        input_dict[kwargs['initialsystem']] = am.rotate_cubic(input_dict[kwargs['initialsystem']], axes_array)
     except: 
-        input_dict[kwargs['initialsystem']] = lmp.normalize(am.rotate(input_dict[kwargs['initialsystem']], axes))
+        input_dict[kwargs['initialsystem']] = lmp.normalize(am.rotate(input_dict[kwargs['initialsystem']], axes_array))
         
     #apply atomshift
     shift = (input_dict[kwargs['atomshift']][0] * input_dict[kwargs['initialsystem']].box.avect +

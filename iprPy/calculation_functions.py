@@ -17,6 +17,9 @@ class Calculation(object):
         
         self.__style = style
     
+    def __str__(self):
+        return 'iprPy.Calculation (' + self.style + ')' 
+    
     @property
     def style(self):
         return self.__style
@@ -25,32 +28,40 @@ class Calculation(object):
         """Generates a data model for the named calculation."""
         
         try: 
-            return self.__calc_module.data_model(input_dict, results_dict)
+            data_model = self.__calc_module.data_model
         except AttributeError:
-            raise AttributeError('Calculation ' + self.__style + ' has no attribute data_model') 
+            raise AttributeError('Calculation (' + self.style + ') has no attribute data_model') 
+        else:
+            return data_model(input_dict, results_dict)
         
     def read_input(self, fp, *args):
         """Reads the calc_*.in input commands for the named calculation."""
         
         try: 
-            return self.__calc_module.read_input(fp, *args)   
+            read_input = self.__calc_module.read_input
         except AttributeError:
-            raise AttributeError('Calculation ' + self.__style + ' has no attribute read_input') 
-
+            raise AttributeError('Calculation (' + self.style + ') has no attribute read_input') 
+        else:
+            return read_input(fp, *args)   
+            
     @property
     def template(self):
         """Reads the calc_*.in input commands for the named calculation."""
         
         try: 
-            return self.__calc_module.template()  
+            template = self.__calc_module.template  
         except AttributeError:
-            raise AttributeError('Calculation ' + self.__style + ' has no attribute template')
+            raise AttributeError('Calculation (' + self.style + ') has no attribute template')
+        else:
+            return template()
 
     @property
     def files(self):
         """Yields the list of files necessary for a calculation to run"""
         
         try: 
-            return self.__calc_module.files()  
+            files = self.__calc_module.files
         except AttributeError:
-            raise AttributeError('Calculation ' + self.__style + ' has no attribute files')
+            raise AttributeError('Calculation (' + self.style + ') has no attribute files')
+        else:
+            return files()

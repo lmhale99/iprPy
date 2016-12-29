@@ -3,9 +3,9 @@
 #Standard library imports
 import os
 import sys
-from copy import deepcopy
 import uuid
 import shutil
+from copy import deepcopy
 
 #http://www.numpy.org/
 import numpy as np      
@@ -224,11 +224,12 @@ def data_model(input_dict, results_dict=None):
     calc['calculation']['script'] = __calc_name__
     
     calc['calculation']['run-parameter'] = run_params = DM()
+    
     run_params['size-multipliers'] = DM()
-
     run_params['size-multipliers']['a'] = list(input_dict['sizemults'][0])
     run_params['size-multipliers']['b'] = list(input_dict['sizemults'][1])
     run_params['size-multipliers']['c'] = list(input_dict['sizemults'][2])
+    
     run_params['minimum_r'] = DM()
     run_params['minimum_r']['value'] = uc.get_in_units(input_dict['minimum_r'], input_dict['length_unit'])
     run_params['minimum_r']['unit'] = input_dict['length_unit']

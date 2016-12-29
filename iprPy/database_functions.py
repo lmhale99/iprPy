@@ -31,13 +31,19 @@ class Database(object):
         
         #Check if database style has initialize method
         try: 
-            self.__db_info = self.__db_module.initialize(host, *args, **kwargs)
+            initialize = self.__db_module.initialize
         except AttributeError:
-            raise AttributeError('Database style ' + style + ' has no attribute initialize')  
+            raise AttributeError('Database (' + style + ') has no attribute initialize')  
+        else:
+            self.__db_info = initialize(host, *args, **kwargs)
         
+        #Set property values
         self.__style = style
         self.__host = host
-            
+    
+    def __str__(self):
+        return 'iprPy.Database (' + self.style + ') at ' + self.host 
+    
     @property
     def style(self):
         return self.__style
@@ -49,56 +55,71 @@ class Database(object):
     def iget_records(self, name=None, style=None):
         """Iterates through records matching given conditions"""
         try: 
-            return self.__db_module.iget_records(self.__db_info, name, style)
+            iget_records = self.__db_module.iget_records
         except AttributeError:
-            raise AttributeError('Database style ' + self.__style + ' has no attribute iget_records')  
+            raise AttributeError('Database (' + self.style + ') has no attribute iget_records')
+        else:
+            return iget_records(self.__db_info, name, style)
 
     def get_records(self, name=None, style=None):
         """Returns a list of records matching given conditions"""
         try: 
-            return self.__db_module.get_records(self.__db_info, name, style)
+            get_records = self.__db_module.get_records
         except AttributeError:
-            raise AttributeError('Database style ' + self.__style + ' has no attribute get_records')
+            raise AttributeError('Database (' + self.style + ') has no attribute get_records')
+        else:
+            return get_records(self.__db_info, name, style)
     
     def get_record(self, name=None, style=None):
         """Returns a single record matching given conditions. Issues an error if none or multiple matches are found."""
         try: 
-            return self.__db_module.get_record(self.__db_info, name, style)
+            get_record = self.__db_module.get_record
         except AttributeError:
-            raise AttributeError('Database style ' + self.__style + ' has no attribute get_record')
+            raise AttributeError('Database (' + self.style + ') has no attribute get_record')
+        else:
+            return get_record(self.__db_info, name, style)
     
     def add_record(self, record=None, name=None, style=None, content=None):
         """Adds a new record to the database"""
         try: 
-            return self.__db_module.add_record(self.__db_info, record=record, name=name, style=style, content=content)
+            add_record = self.__db_module.add_record
         except AttributeError:
-            raise AttributeError('Database style ' + self.__style + ' has no attribute add_record')
+            raise AttributeError('Database (' + self.style + ') has no attribute add_record')
+        else:
+            return add_record(self.__db_info, record=record, name=name, style=style, content=content)
         
     def update_record(self, record=None, name=None, style=None, content=None):
         """Updates an existing record in the database"""
         try: 
-            return self.__db_module.update_record(self.__db_info, record=record, name=name, style=style, content=content)
+            update_record = self.__db_module.update_record
         except AttributeError:
-            raise AttributeError('Database style ' + self.__style + ' has no attribute update_record')
-            
+            raise AttributeError('Database (' + self.style + ') has no attribute update_record')
+        else:
+            return update_record(self.__db_info, record=record, name=name, style=style, content=content)
+          
     def delete_record(self, record=None, name=None, style=None):
         """Deletes a record from the database"""
         try: 
-            return self.__db_module.delete_record(self.__db_info, record=record, name=name, style=style)
+            delete_record = self.__db_module.delete_record
         except AttributeError:
-            raise AttributeError('Database style ' + self.__style + ' has no attribute delete_record')
+            raise AttributeError('Database (' + self.style + ') has no attribute delete_record')
+        else:
+            delete_record(self.__db_info, record=record, name=name, style=style)
         
     def add_tar(self, record=None, name=None, style=None, root_dir=None):
         """Archives a folder as a tar file and saves to a record in the database"""
         try: 
-            return self.__db_module.add_tar(self.__db_info, record=record, name=name, style=style, root_dir=root_dir)
+            add_tar = self.__db_module.add_tar
         except AttributeError:
-            raise AttributeError('Database style ' + self.__style + ' has no attribute add_tar')
+            raise AttributeError('Database (' + self.style + ') has no attribute add_tar')
+        else:
+            add_tar(self.__db_info, record=record, name=name, style=style, root_dir=root_dir)
         
     def get_tar(self, record=None, name=None, style=None):
         """Retrives a stored tar archive"""
         try: 
-            return self.__db_module.get_tar(self.__db_info, record=record, name=name, style=style)
+            get_tar = self.__db_module.get_tar
         except AttributeError:
-            raise AttributeError('Database style ' + self.__style + ' has no attribute get_tar')
-        
+            raise AttributeError('Database (' + self.style + ') has no attribute get_tar')
+        else:
+            return get_tar(self.__db_info, record=record, name=name, style=style)

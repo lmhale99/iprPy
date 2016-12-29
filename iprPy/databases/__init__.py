@@ -19,11 +19,11 @@ def __load_databases():
                 names.append(name)
         
     for name in names:
-        if True:
-        #try:
+        #if True:
+        try:
             databases_dict[name] = importlib.import_module('.'+name, 'iprPy.databases')
-        else:
-        #except:
+        #else:
+        except:
             failed_databases.append(name)
 
     return databases_dict

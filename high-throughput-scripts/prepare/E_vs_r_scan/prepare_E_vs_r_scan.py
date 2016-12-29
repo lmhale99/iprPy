@@ -28,7 +28,7 @@ def main(*args):
     calculation = iprPy.Calculation(__calc_style__)
     
     with open(args[0]) as f:
-        prepare_dict = read_variable_script(f)
+        prepare_dict = read_input(f)
 
     #open database
     dbase = iprPy.database_fromdict(prepare_dict)
@@ -85,10 +85,10 @@ def main(*args):
                 inputfile = iprPy.tools.filltemplate(calculation.template, calc_dict, '<', '>')
                 
                 #Read inputfile to build input_dict
-                input_dict = calculation.read_input(inputfile)
+                input_dict = calculation.read_input(inputfile, calc_key)
                 
                 #Define additional input_dict terms
-                input_dict['potential'] = lmp.Potential(pot_record.content)
+                input_dict['potential'] = potential
                 input_dict['load_file'] = proto_record.content
                 iprPy.input.system_family(input_dict)
                 
@@ -162,8 +162,8 @@ def is_new(record_df, record):
     else:
         return True  
  
-def read_variable_script(f):
-    """Read the given variable script, make assertions and assign default values to key terms"""
+def read_input(f):
+    """Read the given input file, assign default values and check lengths of multiple terms"""
     
     prepare_dict = iprPy.tools.parseinput(f, singularkeys=singularkeys())
     

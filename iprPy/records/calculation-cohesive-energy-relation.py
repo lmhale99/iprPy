@@ -5,6 +5,8 @@ import atomman.unitconvert as uc
 import numpy as np
 import pandas as pd
 
+from iprPy.tools import aslist
+
 def schema():
     dir = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(dir, 'record-calculation-cohesive-energy-relation.xsd')
@@ -29,21 +31,21 @@ def todict(record, full=True):
     params['load'] =          '%s %s' % (calc['system-info']['artifact']['format'],
                                          calc['system-info']['artifact']['file'])
     params['prototype'] =     calc['system-info']['artifact']['family']
-    params['symbols'] =       calc['system-info']['symbols']
+    params['symbols'] =       aslist(calc['system-info']['symbols'])
     
     if full is True:
-        if 'status' in calc:
+        if 'error' in calc:
             params['status'] = calc['status']
-            params['error'] = np.nan
-            params['e_vs_r_plot'] = np.nan
-            params['number_min_states'] = np.nan
-            
-        elif 'error' in calc:
-            params['status'] = np.nan
             params['error'] = calc['error']
             params['e_vs_r_plot'] = np.nan
             params['number_min_states'] = np.nan
             
+        elif 'status' in calc:
+            params['status'] = calc['status']
+            params['error'] = np.nan
+            params['e_vs_r_plot'] = np.nan
+            params['number_min_states'] = 1
+
         else:
             params['status'] = np.nan
             params['error'] = np.nan
