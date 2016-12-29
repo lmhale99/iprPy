@@ -21,111 +21,114 @@ import atomman.unitconvert as uc
 #https://github.com/usnistgov/iprPy
 import iprPy
 
-__calc_type__ = 'E_vs_r_scan'
-__record_type__ = 'calculation-cohesive-energy-relation'
+__calc_style__ = 'E_vs_r_scan'
+__record_style__ = 'calculation-cohesive-energy-relation'
 
 def main(*args):
+    calculation = iprPy.Calculation(__calc_style__)
+    
     with open(args[0]) as f:
         prepare_dict = read_variable_script(f)
 
     #open database
-    dbase = iprPy.database_from_dict(prepare_dict)
+    dbase = iprPy.database_fromdict(prepare_dict)
     
     #Build record_df
-    record_df = build_record_df(dbase, __record_type__)
+    record_df = build_record_df(dbase, __record_style__)
         
     #Loop over all potentials
-    for pot_id, pot_record, pot_archive in iprPy.prepare.yield_potentials(dbase,
-                                                                          element =    prepare_dict['potential_element'],
-                                                                          name =       prepare_dict['potential_name'],
-                                                                          pair_style = prepare_dict['potential_pair_style']):
-        potential = lmp.Potential(pot_record)
+    for pot_record in iprPy.prepare.ipotentials(dbase,
+                                                element =    prepare_dict['potential_element'],
+                                                name =       prepare_dict['potential_name'],
+                                                pair_style = prepare_dict['potential_pair_style']):
+        potential = lmp.Potential(pot_record.content)
+        pot_tar = dbase.get_tar(pot_record)
         
         #Loop over all prototypes
-        for proto_id, proto_record in iprPy.prepare.yield_prototypes(dbase,
-                                                                     natypes =        prepare_dict['prototype_natypes'], 
-                                                                     name =           prepare_dict['prototype_name'], 
-                                                                     space_group =    prepare_dict['prototype_space_group'], 
-                                                                     crystal_family = prepare_dict['prototype_crystal_family'], 
-                                                                     pearson =        prepare_dict['prototype_Pearson_symbol']):
+        for proto_record in iprPy.prepare.iprototypes(dbase,
+                                                      natypes =        prepare_dict['prototype_natypes'], 
+                                                      name =           prepare_dict['prototype_name'], 
+                                                      spacegroup =     prepare_dict['prototype_spacegroup'], 
+                                                      crystalfamily =  prepare_dict['prototype_crystalfamily'], 
+                                                      pearson =        prepare_dict['prototype_Pearsonsymbol']):
 
             #Iterate over all combinations of potentials, prototypes and symbols
-            for symbols in iprPy.prepare.yield_symbols_for_prototype(proto_record, potential):    
+            for symbols in iprPy.prepare.isymbolscombos(proto_record, pot_record):    
                 
                 #Create calc_key
                 calc_key = str(uuid.uuid4())
                 
-                #parameter conversions
-                size_mults_array = iprPy.input.parse_size_mults(prepare_dict)
-                
-                #Define values for incomplete record
-                record_dict = {}
-                record_dict['calc_key'] =              calc_key
-                record_dict['size_mults'] =            size_mults_array
-                record_dict['minimum_r'] =             uc.set_literal(prepare_dict['minimum_r'])
-                record_dict['maximum_r'] =             uc.set_literal(prepare_dict['maximum_r'])
-                record_dict['number_of_steps_r'] =     int(prepare_dict['number_of_steps_r'])
-                record_dict['potential_key'] =         potential.key
-                record_dict['potential_id'] =          potential.id
-                record_dict['load'] =                  'system_model ' + proto_id+'.xml'
-                record_dict['system_family'] =         proto_id
-                record_dict['symbols'] =               symbols
-                record_dict['length_unit'] =           prepare_dict['length_unit']
-                
-                #Create incomplete record and save to record_directory
-                new_record = iprPy.calculation_data_model(__calc_type__, record_dict)
-                if not is_new(record_df, new_record):
-                    continue
-                dbase.add_record(new_record.xml(), __record_type__, calc_key)
-                
-                #Generate calculation folder    
-                calc_directory = os.path.join(prepare_dict['run_directory'], calc_key)
-                os.makedirs(calc_directory)
-                
-                #Add files to calculation folder
-                for calc_file in iprPy.calculation_files(__calc_type__):
-                    shutil.copy(calc_file, calc_directory)  
-                
-                with open(os.path.join(calc_directory, pot_id+'.xml'), 'w') as f:
-                    f.write(pot_record)
-                pot_archive.extractall(calc_directory)
-                with open(os.path.join(calc_directory, proto_id+'.xml'), 'w') as f:
-                    f.write(proto_record)
-                    
                 #Define values for calc_*.in file
-                calculation_dict = {}
-                calculation_dict['lammps_command'] =   prepare_dict['lammps_command']
-                calculation_dict['mpi_command'] =      prepare_dict['mpi_command']
-                calculation_dict['potential_file'] =   pot_id + '.xml'
-                calculation_dict['potential_dir'] =    pot_id
-                calculation_dict['load'] =             'system_model ' + proto_id+'.xml'
-                calculation_dict['load_options'] =     ''
-                calculation_dict['symbols'] =          ' '.join(symbols)
-                calculation_dict['box_parameters'] =   ''
-                calculation_dict['x-axis'] =           ''
-                calculation_dict['y-axis'] =           ''
-                calculation_dict['z-axis'] =           ''
-                calculation_dict['shift'] =            ''
-                calculation_dict['size_mults'] =       prepare_dict['size_mults']
-                calculation_dict['length_unit'] =      prepare_dict['length_unit']
-                calculation_dict['pressure_unit'] =    prepare_dict['pressure_unit']
-                calculation_dict['energy_unit'] =      prepare_dict['energy_unit']
-                calculation_dict['force_unit'] =       prepare_dict['force_unit']
-                calculation_dict['minimum_r'] =        prepare_dict['minimum_r']
-                calculation_dict['maximum_r'] =        prepare_dict['maximum_r']
-                calculation_dict['number_of_steps_r']= prepare_dict['number_of_steps_r']
+                calc_dict = {}
+                calc_dict['lammps_command'] =   prepare_dict['lammps_command']
+                calc_dict['mpi_command'] =      prepare_dict['mpi_command']
+                calc_dict['potential_file'] =   pot_record.name + '.xml'
+                calc_dict['potential_dir'] =    pot_record.name
+                calc_dict['load'] =             'system_model ' + proto_record.name+'.xml'
+                calc_dict['load_options'] =     ''
+                calc_dict['symbols'] =          ' '.join(symbols)
+                calc_dict['box_parameters'] =   ''
+                calc_dict['x_axis'] =           ''
+                calc_dict['y_axis'] =           ''
+                calc_dict['z_axis'] =           ''
+                calc_dict['shift'] =            ''
+                calc_dict['sizemults'] =        prepare_dict['sizemults']
+                calc_dict['length_unit'] =      prepare_dict['length_unit']
+                calc_dict['pressure_unit'] =    prepare_dict['pressure_unit']
+                calc_dict['energy_unit'] =      prepare_dict['energy_unit']
+                calc_dict['force_unit'] =       prepare_dict['force_unit']
+                calc_dict['minimum_r'] =        prepare_dict['minimum_r']
+                calc_dict['maximum_r'] =        prepare_dict['maximum_r']
+                calc_dict['number_of_steps_r']= prepare_dict['number_of_steps_r']
                 
-                #Create calc_*.in by filling in calculation's template
-                template = iprPy.calculation_template(__calc_type__)
-                calc_in = iprPy.tools.fill_template(template, calculation_dict, '<', '>')
-                with open(os.path.join(calc_directory, 'calc_' + __calc_type__ + '.in'), 'w') as f:
-                    f.write('\n'.join(calc_in))
+                #Build inputfile by filling in calculation's template
+                inputfile = iprPy.tools.filltemplate(calculation.template, calc_dict, '<', '>')
+                
+                #Read inputfile to build input_dict
+                input_dict = calculation.read_input(inputfile)
+                
+                #Define additional input_dict terms
+                input_dict['potential'] = lmp.Potential(pot_record.content)
+                input_dict['load_file'] = proto_record.content
+                iprPy.input.system_family(input_dict)
+                
+                #Build incomplete record
+                new_record = iprPy.Record(name=calc_key, content=calculation.data_model(input_dict).xml(), style=__record_style__)
+                
+                #Check if record is new
+                if is_new(record_df, new_record):
+                
+                    #Add record to database
+                    dbase.add_record(record=new_record)
+                    
+                    #Generate calculation folder    
+                    calc_directory = os.path.join(prepare_dict['run_directory'], calc_key)
+                    os.makedirs(calc_directory)
+                    
+                    #Save inputfile to calculation folder
+                    with open(os.path.join(calc_directory, 'calc_' + __calc_style__ + '.in'), 'w') as f:
+                        f.write(inputfile)
 
-def build_record_df(dbase, record_type):
+                    #Add calculation files to calculation folder
+                    for calc_file in calculation.files:
+                        shutil.copy(calc_file, calc_directory)  
+                    
+                    #Add potential record file to calculation folder
+                    with open(os.path.join(calc_directory, pot_record.name+'.xml'), 'w') as f:
+                        f.write(pot_record.content)
+                        
+                    #Extract potential's tar files to calculation folder    
+                    pot_tar.extractall(calc_directory)
+                    
+                    #Add prototype record file to calculation folder
+                    with open(os.path.join(calc_directory, proto_record.name+'.xml'), 'w') as f:
+                        f.write(proto_record.content)
+                    
+def build_record_df(dbase, record_style):
     """Constructs a pandas.DataFrame for all records in a database of a given record_type"""
     df = []
-    for record in dbase.iget_records(record_type):
-        df.append(iprPy.record_to_dict(record, full=False))
+    for record in dbase.iget_records(style=record_style):
+        df.append(record.todict(full=False))
     return pd.DataFrame(df)
     
 def is_new(record_df, record):
@@ -134,7 +137,7 @@ def is_new(record_df, record):
     if len(record_df) == 0:
         return True
     
-    record_dict = iprPy.record_to_dict(record, full=False)
+    record_dict = record.todict(full=False)
 
     #compare simple terms
     test_df = record_df[(record_df['calc_script'] ==       record_dict['calc_script']) &
@@ -149,8 +152,8 @@ def is_new(record_df, record):
     test = np.empty(len(test_df), dtype=bool)
     for i in xrange(len(test_df)):
         
-        test[i] = (iprPy.tools.as_list(test_df.iloc[i].symbols) == iprPy.tools.as_list(record_dict['symbols']) and
-                   np.all(test_df.iloc[i].size_mults == record_dict['size_mults']))
+        test[i] = (iprPy.tools.aslist(test_df.iloc[i].symbols) == iprPy.tools.aslist(record_dict['symbols']) and
+                   np.all(test_df.iloc[i].sizemults == record_dict['sizemults']))
 
     test_df = test_df[test]
    
@@ -162,7 +165,7 @@ def is_new(record_df, record):
 def read_variable_script(f):
     """Read the given variable script, make assertions and assign default values to key terms"""
     
-    prepare_dict = iprPy.prepare.read_variable_script(f)
+    prepare_dict = iprPy.tools.parseinput(f, singularkeys=singularkeys())
     
     #Assign default values
     prepare_dict['mpi_command'] = prepare_dict.get('mpi_command', '')
@@ -171,38 +174,34 @@ def read_variable_script(f):
     prepare_dict['potential_element'] =    prepare_dict.get('potential_element',    None)
     prepare_dict['potential_pair_style'] = prepare_dict.get('potential_pair_style', None)
     
-    prepare_dict['prototype_name'] =           prepare_dict.get('prototype_name',           None)
-    prepare_dict['prototype_space_group'] =    prepare_dict.get('prototype_space_group',    None)
-    prepare_dict['prototype_crystal_family'] = prepare_dict.get('prototype_crystal_family', None)
-    prepare_dict['prototype_Pearson_symbol'] = prepare_dict.get('prototype_Pearson_symbol', None)
-    prepare_dict['prototype_natypes'] =        prepare_dict.get('prototype_natypes',        None)
+    prepare_dict['prototype_name'] =          prepare_dict.get('prototype_name',           None)
+    prepare_dict['prototype_spacegroup'] =    prepare_dict.get('prototype_spacegroup',    None)
+    prepare_dict['prototype_crystalfamily'] = prepare_dict.get('prototype_crystalfamily', None)
+    prepare_dict['prototype_Pearsonsymbol'] = prepare_dict.get('prototype_Pearsonsymbol', None)
+    prepare_dict['prototype_natypes'] =       prepare_dict.get('prototype_natypes',        None)
     
-    prepare_dict['length_unit'] =   prepare_dict.get('length_unit',   'angstrom')
-    prepare_dict['pressure_unit'] = prepare_dict.get('pressure_unit', 'GPa')
-    prepare_dict['energy_unit'] =   prepare_dict.get('energy_unit',   'eV')
-    prepare_dict['force_unit'] =    prepare_dict.get('force_unit',    'eV/angstrom')
+    prepare_dict['length_unit'] =   prepare_dict.get('length_unit',   '')
+    prepare_dict['pressure_unit'] = prepare_dict.get('pressure_unit', '')
+    prepare_dict['energy_unit'] =   prepare_dict.get('energy_unit',   '')
+    prepare_dict['force_unit'] =    prepare_dict.get('force_unit',    '')
     
-    prepare_dict['size_mults'] =        prepare_dict.get('size_mults',        '0 3 0 3 0 3')
-    prepare_dict['minimum_r'] =         prepare_dict.get('minimum_r',         '2 angstrom')
-    prepare_dict['maximum_r'] =         prepare_dict.get('maximum_r',         '6 angstrom')
-    prepare_dict['number_of_steps_r'] = prepare_dict.get('number_of_steps_r', '200')
-    
-    #Check singular terms
-    for key in singular_keys():
-        assert not isinstance(prepare_dict[key], list)
+    prepare_dict['sizemults'] =         prepare_dict.get('sizemults',         '')
+    prepare_dict['minimum_r'] =         prepare_dict.get('minimum_r',         '')
+    prepare_dict['maximum_r'] =         prepare_dict.get('maximum_r',         '')
+    prepare_dict['number_of_steps_r'] = prepare_dict.get('number_of_steps_r', '')
 
     #Check multiple terms
     #None for this calculation
     
     return prepare_dict
     
-def singular_keys():
+def singularkeys():
     """List the prepare_*.in key terms that are restricted to having only one value."""
     return ['database', 
             'run_directory',
             'lammps_command',
             'mpi_command',
-            'size_mults',
+            'sizemults',
             'minimum_r',
             'maximum_r',
             'number_of_steps_r',

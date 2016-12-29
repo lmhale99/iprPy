@@ -20,10 +20,10 @@ def todict(record, full=True):
     params['minimum_r'] =           uc.value_unit(calc['calculation']['run-parameter']['minimum_r'])
     params['maximum_r'] =           uc.value_unit(calc['calculation']['run-parameter']['maximum_r'])
     params['number_of_steps_r'] =   calc['calculation']['run-parameter']['number_of_steps_r']
-    params['size_mults'] =    calc['calculation']['run-parameter']['size-multipliers']
-    params['size_mults'] =    np.array([params['size_mults']['a'], 
-                                        params['size_mults']['b'], 
-                                        params['size_mults']['c']])
+    params['sizemults'] =    calc['calculation']['run-parameter']['size-multipliers']
+    params['sizemults'] =    np.array([params['sizemults']['a'], 
+                                       params['sizemults']['b'], 
+                                       params['sizemults']['c']])
     params['potential_key'] = calc['potential']['key']
     params['potential_id'] =  calc['potential']['id']
     params['load'] =          '%s %s' % (calc['system-info']['artifact']['format'],

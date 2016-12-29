@@ -25,7 +25,10 @@ def iget_records(database_info, name=None, style=None):
             for i, row in database_info.records.iterrows():
                 
                 #yield an iprPy.Record object
-                yield Record(s, n, row.content.encode('utf-8'))
+                style = database_info.get_template(row.schema).title
+                name = row.title
+                content = row.content.encode('utf-8')
+                yield Record(style=style, name=name, content=content)
     
 def get_records(database_info, name=None, style=None):
     """Retrieves records from a database"""
@@ -33,11 +36,11 @@ def get_records(database_info, name=None, style=None):
     #Transform iterator into list
     return [i for i in iget_records(database_info, name=name, style=style)]
 
-def get_record(self, name=None, style=None):
+def get_record(database_info, name=None, style=None):
     """Returns a single record matching given conditions. Issues an error if none or multiple matches are found."""
     
     #Get records
-    record = get_records(name=name, style=style)
+    record = get_records(database_info, name=name, style=style)
     
     #Verify that there is only one matching record
     if len(record) == 1:
@@ -74,7 +77,7 @@ def update_record(database_info, record=None, style=None, name=None, content=Non
     if record is None:
         if content is None:
             raise TypeError('no new content given')
-        oldrecord = self.get_record(name=name, style=style)
+        oldrecord = get_record(database_info, name=name, style=style)
         record = Record(oldrecord.style, oldrecord.name, content)
     
     #Issue a TypeError for competing kwargs
@@ -88,7 +91,7 @@ def update_record(database_info, record=None, style=None, name=None, content=Non
         
     #Find oldrecord matching record
     else:
-        oldrecord = self.get_record(name=record.name, style=record.style)
+        oldrecord = get_record(database_info, name=record.name, style=record.style)
     
     database_info.update_record(oldrecord.name, record.content, refresh=False)
     
@@ -99,7 +102,7 @@ def delete_record(database_info, record=None, name=None, style=None):
     
     #Create Record object if not given
     if record is None:
-        record = get_record(name=name, style=style)
+        record = get_record(database_info, name=name, style=style)
     
     #Issue a TypeError for competing kwargs
     elif style is not None or name is not None:
@@ -107,7 +110,7 @@ def delete_record(database_info, record=None, name=None, style=None):
     
     #Verify that record exists
     else:
-        record = get_record(name=record.name, style=record.style)
+        record = get_record(database_info, name=record.name, style=record.style)
     
     #Delete record
     database_info.delete_record(record.name, refresh=False)
@@ -117,7 +120,7 @@ def add_tar(database_info, record=None, name=None, style=None, root_dir=None):
 
     #Create Record object if not given
     if record is None:
-        record = get_record(name=name, style=style)
+        record = get_record(database_info, name=name, style=style)
     
     #Issue a TypeError for competing kwargs
     elif style is not None or name is not None:
@@ -125,14 +128,11 @@ def add_tar(database_info, record=None, name=None, style=None, root_dir=None):
     
     #Verify that record exists
     else:
-        record = get_record(name=record.name, style=record.style)
-    
-    #build path to record
-    record_path = os.path.join(database_info, record.style, record.name)
+        record = get_record(database_info, name=record.name, style=record.style)
     
     #Check if an archive already exists
     model = DM(record.content)
-    if len(record.finds('archive')) == 0:
+    if len(model.finds('archive')) > 0:
         raise ValueError('Record already has an archive')
     
     #Make archive
@@ -154,7 +154,7 @@ def get_tar(database_info, record=None, name=None, style=None):
 
     #Create Record object if not given
     if record is None:
-        record = get_record(name=name, style=style)
+        record = get_record(database_info, name=name, style=style)
     
     #Issue a TypeError for competing kwargs
     elif style is not None or name is not None:
@@ -162,7 +162,7 @@ def get_tar(database_info, record=None, name=None, style=None):
     
     #Verify that record exists
     else:
-        record = get_record(name=record.name, style=record.style)
+        record = get_record(database_info, name=record.name, style=record.style)
     
     #Extract url to tar file
     model = DM(record.content)

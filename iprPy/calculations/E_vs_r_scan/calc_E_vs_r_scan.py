@@ -32,8 +32,10 @@ def main(*args):
     with open(args[0]) as f:
         input_dict = read_input(f, *args[1:])     
     
+    interpret_input(input_dict)
+    
     results_dict = e_vs_r(input_dict['lammps_command'], 
-                          input_dict['initial_system'], 
+                          input_dict['initialsystem'], 
                           input_dict['potential'], 
                           input_dict['symbols'], 
                           mpi_command = input_dict['mpi_command'],
@@ -117,7 +119,7 @@ def e_vs_r(lammps_command, system, potential, symbols, mpi_command=None, ucell=N
         with open(template_file) as f:
             template = f.read()
         with open(lammps_script, 'w') as f:
-            f.write('\n'.join(iprPy.tools.fill_template(template, lammps_variables, '<', '>')))
+            f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
 
         #Run lammps and extract data
         output = lmp.run(lammps_command, lammps_script, mpi_command)
@@ -155,47 +157,60 @@ def r_a_ratio(ucell):
     return r_a/ucell.box.a
     
 def read_input(f, UUID=None):
-    """Reads the calc_*.in input commands for this calculation."""
+    """Reads the calc_*.in input commands for this calculation and sets default values if needed."""
     
     #Read input file in as dictionary    
-    input_dict = iprPy.input.file_to_dict(f)
+    input_dict = iprPy.tools.parseinput(f, allsingular=True)
     
     #set calculation UUID
     if UUID is not None: input_dict['calc_key'] = UUID
     else: input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
-    #Process command lines
+    #Verify required terms are defined
     assert 'lammps_command' in input_dict, 'lammps_command value not supplied'
-    input_dict['mpi_command'] = input_dict.get('mpi_command', None)
+    assert 'potential_file' in input_dict, 'potential_file value not supplied'
+    assert 'load'           in input_dict, 'load value not supplied'
     
-    #Process potential
-    iprPy.input.lammps_potential(input_dict)
-    
-    #Process default units
+    #Assign default values to undefined terms
     iprPy.input.units(input_dict)
     
-    #Process system information
-    iprPy.input.system_load(input_dict)
+    input_dict['mpi_command'] =    input_dict.get('mpi_command',    None)
+    input_dict['potential_dir'] =  input_dict.get('potential_dir',  '')
     
-    #Process system manipulations
-    if input_dict['ucell'] is not None:
-        iprPy.input.system_manipulate(input_dict)
+    input_dict['load_options'] =   input_dict.get('load_options',   None)
+    input_dict['box_parameters'] = input_dict.get('box_parameters', None)
+    input_dict['symbols'] =        input_dict.get('symbols',        None)
     
-    #Process run parameters
+    iprPy.input.axes(input_dict)
+    iprPy.input.atomshift(input_dict)
+    
+    input_dict['sizemults'] =      input_dict.get('sizemults',     '3 3 3')
+    iprPy.input.sizemults(input_dict)
+    
     #these are integer terms
     input_dict['number_of_steps_r'] = int(input_dict.get('number_of_steps_r', 200))
     
     #these are terms with units
-    input_dict['minimum_r'] = iprPy.input.value_unit(input_dict, 'minimum_r', 
+    input_dict['minimum_r'] = iprPy.input.value(input_dict, 'minimum_r', 
                                                default_unit=input_dict['length_unit'], 
                                                default_term='2.0 angstrom')
-    input_dict['maximum_r'] = iprPy.input.value_unit(input_dict, 'maximum_r', 
+    input_dict['maximum_r'] = iprPy.input.value(input_dict, 'maximum_r', 
                                                default_unit=input_dict['length_unit'], 
                                                default_term='6.0 angstrom')
     
     
     return input_dict
 
+def interpret_input(input_dict):
+    with open(input_dict['potential_file']) as f:
+        input_dict['potential'] = lmp.Potential(f, input_dict['potential_dir'])
+        
+    iprPy.input.system_family(input_dict)
+    
+    iprPy.input.ucell(input_dict)
+    
+    iprPy.input.initialsystem(input_dict)
+    
 def data_model(input_dict, results_dict=None):
     """Creates a DataModelDict containing the input and results data""" 
     
@@ -211,9 +226,9 @@ def data_model(input_dict, results_dict=None):
     calc['calculation']['run-parameter'] = run_params = DM()
     run_params['size-multipliers'] = DM()
 
-    run_params['size-multipliers']['a'] = list(input_dict['size_mults'][0])
-    run_params['size-multipliers']['b'] = list(input_dict['size_mults'][1])
-    run_params['size-multipliers']['c'] = list(input_dict['size_mults'][2])
+    run_params['size-multipliers']['a'] = list(input_dict['sizemults'][0])
+    run_params['size-multipliers']['b'] = list(input_dict['sizemults'][1])
+    run_params['size-multipliers']['c'] = list(input_dict['sizemults'][2])
     run_params['minimum_r'] = DM()
     run_params['minimum_r']['value'] = uc.get_in_units(input_dict['minimum_r'], input_dict['length_unit'])
     run_params['minimum_r']['unit'] = input_dict['length_unit']
@@ -224,8 +239,8 @@ def data_model(input_dict, results_dict=None):
     
     #Copy over potential data model info
     calc['potential'] = DM()
-    calc['potential']['key'] = input_dict['potential_key']
-    calc['potential']['id'] = input_dict['potential_id']
+    calc['potential']['key'] = input_dict['potential'].key
+    calc['potential']['id'] = input_dict['potential'].id
     
     #Save info on system file loaded
     system_load = input_dict['load'].split(' ')    

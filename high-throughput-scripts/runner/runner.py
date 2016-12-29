@@ -37,7 +37,7 @@ def main(*args):
                 log.write('%s\n' % sim)
                 #Check that the calculation has calc_*.py, calc_*.in and record in the database
                 try:
-                    record = dbase.get_record(key=sim)
+                    record = dbase.get_record(name=sim)
                     calc_py = get_file('calc_*.py')
                     calc_in = get_file('calc_*.in')
                 
@@ -66,7 +66,7 @@ def main(*args):
                             
                             #Check parent record in database to see if it has completed
                             if status == 'not calculated':
-                                parent_record = dbase.get_record(key=parent_sim)
+                                parent_record = dbase.get_record(name=parent_sim)
                                 parent = DM(parent_record)
                                 try:
                                     status = parent.find('status')
@@ -140,10 +140,10 @@ def main(*args):
                 #Update record in the database
                 with open('results.json') as f:
                     model = DM(f)
-                dbase.update_record(model.xml(), sim)
+                dbase.update_record(content=model.xml(), name=sim)
                                 
                 #Archive calculation and add to database
-                dbase.add_archive(run_directory, sim)
+                dbase.add_tar(root_dir=run_directory, name=sim)
                 
                 #Remove simulation directory
                 os.chdir(run_directory)
@@ -200,11 +200,11 @@ def __read_input_file(fname):
     """Read runner input file"""
 
     with open(fname) as f:
-        runner_dict = iprPy.prepare.read_variable_script(f)
+        runner_dict = iprPy.tools.parseinput(f, allsingular=True)
     
     run_directory = os.path.abspath(runner_dict['run_directory'])
     orphan_directory = runner_dict.get('orphan_directory', os.path.join(os.path.dirname(run_directory), 'orphan'))
-    dbase = iprPy.database_from_dict(runner_dict)
+    dbase = iprPy.database_fromdict(runner_dict)
     
     return run_directory, orphan_directory, dbase
     

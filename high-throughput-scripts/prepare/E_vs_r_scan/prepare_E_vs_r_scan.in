@@ -4,33 +4,33 @@ run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\1
 #### Database information ####
 #database                    local C:\Users\lmh1\Documents\calculations\ipr\library_test
 
-#database                    curator http://127.0.0.1:8000/
-#database_user               admin
-#database_pswd               admin        
+database                    curator http://127.0.0.1:8000/
+database_user               admin
+database_pswd               admin        
 
-database                    curator https://iprhub.nist.gov/
-database_user               lmh1
-database_pswd               C:/users/lmh1/documents/iprhub/iprhub_password.txt
-database_cert               C:/users/lmh1/documents/iprhub/iprhub-ca.pem
+#database                    curator https://iprhub.nist.gov/
+#database_user               lmh1
+#database_pswd               C:/users/lmh1/documents/iprhub/iprhub_password.txt
+#database_cert               C:/users/lmh1/documents/iprhub/iprhub-ca.pem
 
 #### Commands ####
 lammps_command              lmp_serial
 #mpi_command            
 
 #### Potential limiters ####
-potential_name              2004--Zhou-X-W--W
+potential_name              2004--Zhou-X-W--Fe
 #potential_element
 #potential_pair_style
 
 #### Crystal prototype limiters ####
 #prototype_name              A2--W--bcc
-#prototype_space_group
-#prototype_crystal_family
-#prototype_Pearson_symbol
+#prototype_spacegroup
+#prototype_crystalfamily
+#prototype_Pearsonsymbol
 #prototype_natypes
             
 #### Run parameters ####
-size_mults                  0 3 0 3 0 3
-minimum_r                   2.0 angstrom
-maximum_r                   6.0 angstrom
-number_of_steps_r           100
+#sizemults                   0 3 0 3 0 3
+#minimum_r                   2.0 angstrom
+#maximum_r                   6.0 angstrom
+#number_of_steps_r           100
