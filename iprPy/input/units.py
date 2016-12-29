@@ -1,10 +1,13 @@
 def units(input_dict, **kwargs):
     """
-    Handles input parameters associated with the input/output units.
-    1. Sets default value of 'angstrom' to 'length_unit' term if needed.
-    2. Sets default value of 'eV' to 'energy_unit' term if needed.
-    3. Sets default value of 'GPa' to 'pressure_unit' term if needed.
-    4. Sets default value of 'eV/angstrom' to 'force_unit' term if needed.
+    Defines default input/output units if needed.
+    
+    The input_dict keys used by this function (which can be renamed using the 
+    function's keyword arguments):
+    length_unit -- the unit of length to use. Default is angstrom.
+    energy_unit -- the unit of energy to use. Default is eV.
+    pressure_unit -- the unit of pressure to use. Default is GPa.
+    force_unit -- the unit of force to use. Default is eV/angstrom.
     
     Argument:
     input_dict -- dictionary containing input parameter key-value pairs
