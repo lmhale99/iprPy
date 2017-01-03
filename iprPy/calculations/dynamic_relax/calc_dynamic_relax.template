@@ -1,7 +1,7 @@
-#Run script for calc_equilibrium.py
+#Run script for calc_dynamic_relax.py
 
 #Command lines for LAMMPS (and MPI).
-#For lammps_command, exclude passing in a script, i.e. no "-in term" or "< term"
+#For lammps_command, exclude passing in a script, i.e. no "-in term"
 lammps_command              <lammps_command>
 mpi_command                 <mpi_command>
 
@@ -16,11 +16,11 @@ symbols                     <symbols>
 box_parameters              <box_parameters>
 
 #System manipulations
-x-axis                      <x-axis>
-y-axis                      <y-axis>
-z-axis                      <z-axis>
-shift                       <shift>
-size_mults                  <size_mults>
+x_axis                      <x_axis>
+y_axis                      <y_axis>
+z_axis                      <z_axis>
+atomshift                   <atomshift>
+sizemults                   <sizemults>
 
 #Units that input/output values are in
 length_unit                 <length_unit>
@@ -34,8 +34,8 @@ pressure_xx                 <pressure_xx>
 pressure_yy                 <pressure_yy>
 pressure_zz                 <pressure_zz>
 integrator                  <integrator>
-thermo_steps                <thermo_steps>
-dump_steps                  <dump_steps>
-run_steps                   <run_steps>
-equil_steps                 <equil_steps>
-random_seed                 <random_seed>
+thermosteps                 <thermosteps>
+dumpsteps                   <dumpsteps>
+runsteps                    <runsteps>
+equilsteps                  <equilsteps>
+randomseed                  <randomseed>

@@ -1,7 +1,7 @@
 #### Information for local database ####
-run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\local\1
+#run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\local\1
 
-database                    local C:\Users\lmh1\Documents\calculations\ipr\library_test
+#database                    local C:\Users\lmh1\Documents\calculations\ipr\library_test
 
 #### Information for personally hosted curator ####
 #run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\curator\1
@@ -12,12 +12,12 @@ database                    local C:\Users\lmh1\Documents\calculations\ipr\libra
 
 #### Information for remotely hosted curator ####
 
-#run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\iprhub\1
+run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\iprhub\1
 
-#database                    curator https://iprhub.nist.gov/
-#database_user               lmh1
-#database_pswd               C:/users/lmh1/documents/iprhub/iprhub_password.txt
-#database_cert               C:/users/lmh1/documents/iprhub/iprhub-ca.pem
+database                    curator https://iprhub.nist.gov/
+database_user               lmh1
+database_pswd               C:/users/lmh1/documents/iprhub/iprhub_password.txt
+database_cert               C:/users/lmh1/documents/iprhub/iprhub-ca.pem
 
 #########################################################################################
 
@@ -31,7 +31,7 @@ potential_element
 potential_pair_style
 
 #### Crystal prototype limiters ####
-prototype_name              A1--Cu--fcc          
+prototype_name              
 prototype_spacegroup
 prototype_crystalfamily
 prototype_Pearsonsymbol

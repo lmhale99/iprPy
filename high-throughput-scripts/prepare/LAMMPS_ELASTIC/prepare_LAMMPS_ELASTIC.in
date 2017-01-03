@@ -1,24 +1,40 @@
-#### Calculation run and records library paths ####
-run_directory           C:/Users/lmh1/Documents/calculations/ipr/torun/1
-lib_directory           C:/Users/lmh1/Documents/calculations/ipr/library_2016_11_10
+#### Information for local database ####
+run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\local\1
+
+database                    local C:\Users\lmh1\Documents\calculations\ipr\library_test
+
+#### Information for personally hosted curator ####
+#run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\curator\1
+
+#database                    curator http://127.0.0.1:8000/
+#database_user               admin
+#database_pswd               admin  
+
+#### Information for remotely hosted curator ####
+
+#run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\iprhub\1
+
+#database                    curator https://iprhub.nist.gov/
+#database_user               lmh1
+#database_pswd               C:/users/lmh1/documents/iprhub/iprhub_password.txt
+#database_cert               C:/users/lmh1/documents/iprhub/iprhub-ca.pem
+
+#########################################################################################
 
 #### Commands ####
 lammps_command          lmp_serial
-#mpi_command            
-
-#### Reference library paths ####
-potential_directory     ../../../reference-libraries/potentials
+mpi_command            
             
 #### Run condition limiters ####
-potential_name          2004--Zhou-X-W--W
-#symbol_name
-prototype_name          A2--W--bcc
+potential_name          
+symbol_name
+prototype_name          
 
 #### Run parameters ####
-#size_mults 
-#energy_tolerance 
-#force_tolerance 
-#maximum_iterations
-#maximum_evaluations
-#maximum_atomic_motion
-#strain_range 
+sizemults 
+energytolerance 
+forcetolerance 
+maxiterations
+maxevaluations
+maxatommotion
+strainrange 

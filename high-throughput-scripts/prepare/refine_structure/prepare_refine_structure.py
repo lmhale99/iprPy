@@ -75,7 +75,7 @@ def main(*args):
                 calc_dict['x_axis'] =           ''
                 calc_dict['y_axis'] =           ''
                 calc_dict['z_axis'] =           ''
-                calc_dict['shift'] =            ''
+                calc_dict['atomshift'] =        ''
                 calc_dict['sizemults'] =        prepare_dict['sizemults']
                 calc_dict['length_unit'] =      prepare_dict['length_unit']
                 calc_dict['pressure_unit'] =    prepare_dict['pressure_unit']
@@ -83,8 +83,8 @@ def main(*args):
                 calc_dict['force_unit'] =       prepare_dict['force_unit']
                 calc_dict['strainrange'] =      strain
                 calc_dict['pressure_xx'] =      prepare_dict['pressure_xx']
-                calc_dict['pressure_yy']=       prepare_dict['pressure_yy']
-                calc_dict['pressure_zz']=       prepare_dict['pressure_zz']
+                calc_dict['pressure_yy'] =      prepare_dict['pressure_yy']
+                calc_dict['pressure_zz'] =      prepare_dict['pressure_zz']
                 
                 #Build inputfile by filling in calculation's template
                 inputfile = iprPy.tools.filltemplate(calculation.template, calc_dict, '<', '>')
@@ -191,7 +191,6 @@ def read_input(f):
     prepare_dict['pressure_zz'] =       prepare_dict.get('pressure_zz', '')
     prepare_dict['strainrange'] =       prepare_dict.get('strainrange', '')
     
-
     #Check multiple terms
     #assert len(iprPy.as_list(prepare_dict['pressure_xx'])) == len(aslist(prepare_dict['pressure_yy']))
     #assert len(iprPy.as_list(prepare_dict['pressure_xx'])) == len(aslist(prepare_dict['pressure_zz']))
@@ -215,4 +214,3 @@ def singularkeys():
 if __name__ == '__main__':
     main(*sys.argv[1:])                         
             
-        

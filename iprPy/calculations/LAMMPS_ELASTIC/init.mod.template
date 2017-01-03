@@ -4,7 +4,7 @@
 
 # Define the finite deformation size. Try several values of this
 # variable to verify that results do not depend on it.
-variable up equal <strain_range>
+variable up equal <strainrange>
  
 # pressure unit scaling factor and string
 variable cfac equal 1.0e-4

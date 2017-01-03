@@ -26,13 +26,13 @@ region whole block 0.000000 ${xdim} ${ydimmin} ${ydimmax} 0.000000 ${zdim} units
 create_box 3 whole 
 
 region upper block INF INF -0.05 ${ydimmax} INF INF units box 
-lattice bcc ${alat} orient x <x-axis_1> orient y <y-axis_1> orient z <z-axis_1>
+lattice bcc ${alat} orient x <x_axis_1> orient y <y_axis_1> orient z <z_axis_1>
 
 create_atoms 1 region upper 
 
 
 region lower block INF INF ${ydimmin} 0.05 INF INF units box 
-lattice bcc ${alat} orient x <x-axis_2> orient y <y-axis_2> orient z <z-axis_2>
+lattice bcc ${alat} orient x <x_axis_2> orient y <y_axis_2> orient z <z_axis_2>
 
 create_atoms 2 region lower 
 

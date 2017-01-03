@@ -4,8 +4,8 @@
 import os
 import sys
 import glob
-import shutil
 import uuid
+import shutil
 
 #http://www.numpy.org/
 import numpy as np
@@ -71,7 +71,7 @@ def main(*args):
                 calc_dict['x_axis'] =           ''
                 calc_dict['y_axis'] =           ''
                 calc_dict['z_axis'] =           ''
-                calc_dict['shift'] =            ''
+                calc_dict['atomshift'] =        ''
                 calc_dict['sizemults'] =        prepare_dict['sizemults']
                 calc_dict['length_unit'] =      prepare_dict['length_unit']
                 calc_dict['pressure_unit'] =    prepare_dict['pressure_unit']

@@ -6,6 +6,7 @@ import random
 import shutil
 import time
 import glob
+import requests
 
 from DataModelDict import DataModelDict as DM
 
@@ -40,6 +41,10 @@ def main(*args):
                     record = dbase.get_record(name=sim)
                     calc_py = get_file('calc_*.py')
                     calc_in = get_file('calc_*.in')
+                
+                #Pass ConnectionErrors forward killing runner
+                except requests.ConnectionError as e:
+                    raise requests.ConnectionError(e)
                 
                 #If not complete, zip and move to the orphan directory
                 except:

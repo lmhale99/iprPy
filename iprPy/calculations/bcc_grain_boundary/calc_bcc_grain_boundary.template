@@ -1,7 +1,7 @@
-# Run script for calc_refine_structure_static.py
+# Run script for calc_grain_boundary.py
 
 # Command lines for LAMMPS (and MPI).
-# For lammps_command, exclude passing in a script, i.e. no "-in term" or "< term"
+# For lammps_command, exclude passing in a script, i.e. no "-in term"
 lammps_command                  <lammps_command>
 mpi_command                     <mpi_command>
 
@@ -15,18 +15,18 @@ alat                            <alat>
 E_coh                           <E_coh>
 
 # Upper grain orientation
-x-axis_1                        <x-axis_1>
-y-axis_1                        <y-axis_1>
-z-axis_1                        <z-axis_1>
+x_axis_1                        <x_axis_1>
+y_axis_1                        <y_axis_1>
+z_axis_1                        <z_axis_1>
 
 # Lower grain orientation
-x-axis_2                        <x-axis_2>
-y-axis_2                        <y-axis_2>
-z-axis_2                        <z-axis_2>
+x_axis_2                        <x_axis_2>
+y_axis_2                        <y_axis_2>
+z_axis_2                        <z_axis_2>
 
 # Run paramters
-x_step_size                     <x_step_size>
-z_step_size                     <z_step_size>
+x_stepsize                      <x_stepsize>
+z_stepsize                      <z_stepsize>
 
 # Units that input/output values are in
 length_unit                     <length_unit>

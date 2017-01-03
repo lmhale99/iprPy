@@ -1,10 +1,14 @@
-#!/usr/bin/env python
+dzx#!/usr/bin/env python
 
 #Standard library imports
 import os
 import sys
-from copy import deepcopy
 import uuid
+import shutil
+from copy import deepcopy
+
+#http://www.numpy.org/
+import numpy as np  
 
 #https://github.com/usnistgov/DataModelDict 
 from DataModelDict import DataModelDict as DM
@@ -27,28 +31,66 @@ def main(*args):
     #Read in parameters from input file
     with open(args[0]) as f:
         input_dict = read_input(f, *args[1:])  
-        
-    results_dict = lammps_ELASTIC(input_dict['lammps_command'], 
-                                  input_dict['initial_system'],
-                                  input_dict['potential'],
-                                  input_dict['symbols'],
-                                  mpi_command =   input_dict['mpi_command'],
-                                  strain_range =  input_dict['strain_range'],
-                                  etol =          input_dict['energy_tolerance'],
-                                  ftol =          input_dict['force_tolerance'],
-                                  maxiter =       input_dict['maximum_iterations'],
-                                  maxeval =       input_dict['maximum_evaluations'],
-                                  dmax =          input_dict['maximum_atomic_motion'],
-                                  pressure_unit = input_dict['pressure_unit'])
+    
+    interpret_input(input_dict)
+    
+    results_dict = lammps_ELASTIC_refine(input_dict['lammps_command'], 
+                                         input_dict['initialsystem'],
+                                         input_dict['potential'],
+                                         input_dict['symbols'],
+                                         mpi_command =   input_dict['mpi_command'],
+                                         strainrange =   input_dict['strainrange'],
+                                         etol =          input_dict['energytolerance'],
+                                         ftol =          input_dict['forcetolerance'],
+                                         maxiter =       input_dict['maxiterations'],
+                                         maxeval =       input_dict['maxevaluations'],
+                                         dmax =          input_dict['maxatommotion'],
+                                         pressure_unit = input_dict['pressure_unit'])
                                   
     #Save data model of results 
     results = data_model(input_dict, results_dict)
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)        
 
+def lammps_ELASTIC_refine(lammps_command, system, potential, symbols, mpi_command=None, 
+                          strainrange=1e-6, etol=0.0, ftol=0.0, maxiter=100, maxeval=1000, 
+                          dmax=0.01, pressure_unit='GPa', tol=1e-10):
+    """Repeatedly runs the ELASTIC example distributed with LAMMPS until box dimensions converge"""
+    
+    old_results = lammps_ELASTIC(lammps_command, system, potential, symbols, mpi_command=mpi_command, 
+                                 strainrange=strainrange, etol=etol, ftol=ftol, 
+                                 maxiter=maxiter, maxeval=maxeval, 
+                                 dmax=dmax, pressure_unit=pressure_unit)
+    shutil.move('log.lammps', 'elastic-0-log.lammps')
+    
+    converged = False
+    for cycle in xrange(1, 100):
+        new_results = lammps_ELASTIC(lammps_command, system, potential, symbols, mpi_command=mpi_command, 
+                                     strainrange=strainrange, etol=etol, ftol=ftol, 
+                                     maxiter=maxiter, maxeval=maxeval, 
+                                     dmax=dmax, pressure_unit=pressure_unit)
+        shutil.move('log.lammps', 'elastic-'+str(cycle)+'-log.lammps')
+        
+        #Test if box dimensions have converged
+        if (np.isclose(old_results['lx'], new_results['lx'], rtol=tol, atol=0) and
+            np.isclose(old_results['ly'], new_results['ly'], rtol=tol, atol=0) and
+            np.isclose(old_results['lz'], new_results['lz'], rtol=tol, atol=0)):
+            converged = True
+            break
+        else:
+            old_results = new_results    
+    
+    #Return values if converged
+    if converged:
+        return new_results
+    else:
+        raise RuntimeError('Failed to converge after 100 cycles')
+        
+        
 def lammps_ELASTIC(lammps_command, system, potential, symbols, mpi_command=None, 
-                   strain_range=1e-6, etol=0.0, ftol=0.0, maxiter=100, maxeval=1000, 
+                   strainrange=1e-6, etol=0.0, ftol=0.0, maxiter=100, maxeval=1000, 
                    dmax=0.01, pressure_unit='GPa'):
+    """Sets up and runs the ELASTIC example distributed with LAMMPS"""
 
     #Get lammps units
     lammps_units = lmp.style.unit(potential.units)
@@ -58,7 +100,7 @@ def lammps_ELASTIC(lammps_command, system, potential, symbols, mpi_command=None,
     
     lammps_variables['atomman_system_info'] = lmp.atom_data.dump(system, 'init.dat', units=potential.units, atom_style=potential.atom_style)
     lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
-    lammps_variables['strain_range'] = strain_range
+    lammps_variables['strainrange'] = strainrange
     lammps_variables['pressure_unit_scaling'] = uc.get_in_units(uc.set_in_units(1.0, lammps_units['pressure']), pressure_unit)
     lammps_variables['pressure_unit'] = pressure_unit
     lammps_variables['etol'] = etol
@@ -71,11 +113,11 @@ def lammps_ELASTIC(lammps_command, system, potential, symbols, mpi_command=None,
     with open('init.mod.template') as template_file:
         template = template_file.read()
     with open('init.mod', 'w') as in_file:
-        in_file.write('\n'.join(iprPy.tools.fill_template(template, lammps_variables, '<', '>')))
+        in_file.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
     with open('potential.mod.template') as template_file:
         template = template_file.read()
     with open('potential.mod', 'w') as in_file:
-        in_file.write('\n'.join(iprPy.tools.fill_template(template, lammps_variables, '<', '>')))    
+        in_file.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))    
     
     output = lmp.run(lammps_command, 'in.elastic', mpi_command)
     
@@ -107,49 +149,62 @@ def lammps_ELASTIC(lammps_command, system, potential, symbols, mpi_command=None,
 def read_input(f, UUID=None):
     """Reads the calc_*.in input commands for this calculation."""
     
-    #Read input file in as dictionary
-    input_dict = iprPy.input.file_to_dict(f)
+    #Read input file in as dictionary    
+    input_dict = iprPy.tools.parseinput(f, allsingular=True)
     
     #set calculation UUID
-    if UUID is not None: input_dict['uuid'] = UUID
-    else: input_dict['uuid'] = input_dict.get('uuid', str(uuid.uuid4()))
+    if UUID is not None: input_dict['calc_key'] = UUID
+    else: input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
-    #Process command lines
+    #Verify required terms are defined
     assert 'lammps_command' in input_dict, 'lammps_command value not supplied'
-    input_dict['mpi_command'] = input_dict.get('mpi_command', None)
+    assert 'potential_file' in input_dict, 'potential_file value not supplied'
+    assert 'load'           in input_dict, 'load value not supplied'
     
-    #Process potential
-    iprPy.input.lammps_potential(input_dict)
-    
-    #Process default units
+    #Assign default values to undefined terms
     iprPy.input.units(input_dict)
     
-    #Process system information
-    iprPy.input.system_load(input_dict)
+    input_dict['mpi_command'] =    input_dict.get('mpi_command',    None)
+    input_dict['potential_dir'] =  input_dict.get('potential_dir',  '')
     
-    #Process system manipulations
-    if input_dict['ucell'] is not None:
-        iprPy.input.system_manipulate(input_dict)
+    input_dict['load_options'] =   input_dict.get('load_options',   None)
+    input_dict['box_parameters'] = input_dict.get('box_parameters', None)
+    input_dict['symbols'] =        input_dict.get('symbols',        None)
     
-    #Process run parameters
+    iprPy.input.axes(input_dict)
+    iprPy.input.atomshift(input_dict)
+    
+    input_dict['sizemults'] =      input_dict.get('sizemults',     '3 3 3')
+    iprPy.input.sizemults(input_dict)
+    
     #these are integer terms
-    input_dict['maximum_iterations'] =  int(input_dict.get('maximum_iterations',  100))
-    input_dict['maximum_evaluations'] = int(input_dict.get('maximum_evaluations', 1000))
+    input_dict['maxiterations'] =  int(input_dict.get('maxiterations',  100))
+    input_dict['maxevaluations'] = int(input_dict.get('maxevaluations', 1000))
     
-    #these are unitless floating point terms
-    input_dict['strain_range'] =     float(input_dict.get('strain_range',     1e-6))
-    input_dict['energy_tolerance'] = float(input_dict.get('energy_tolerance', 0.0))
+    #these are unitless float terms
+    input_dict['strainrange'] =     float(input_dict.get('strainrange',     1e-6))
+    input_dict['energytolerance'] = float(input_dict.get('energytolerance', 0.0))
     
     #these are terms with units
-    input_dict['force_tolerance'] =       iprPy.input.value_unit(input_dict, 'force_tolerance',
-                                                           default_unit=input_dict['force_unit'],  
-                                                           default_term='1.0e-10 eV/angstrom')             
-    input_dict['maximum_atomic_motion'] = iprPy.input.value_unit(input_dict, 'maximum_atomic_motion', 
-                                                           default_unit=input_dict['length_unit'], 
-                                                           default_term='0.01 angstrom')
+    input_dict['forcetolerance'] = iprPy.input.value(input_dict, 'forcetolerance',
+                                                     default_unit=input_dict['force_unit'],  
+                                                     default_term='1.0e-10 eV/angstrom')             
+    input_dict['maxatommotion'] = iprPy.input.value(input_dict, 'maxatommotion', 
+                                                    default_unit=input_dict['length_unit'], 
+                                                    default_term='0.01 angstrom')
     
     return input_dict
 
+def interpret_input(input_dict):
+    with open(input_dict['potential_file']) as f:
+        input_dict['potential'] = lmp.Potential(f, input_dict['potential_dir'])
+        
+    iprPy.input.system_family(input_dict)
+    
+    iprPy.input.ucell(input_dict)
+    
+    iprPy.input.initialsystem(input_dict)    
+    
 def data_model(input_dict, results_dict=None):
     """Creates a DataModelDict containing the input and results data""" 
     
@@ -158,21 +213,24 @@ def data_model(input_dict, results_dict=None):
     output['calculation-system-relax'] = calc = DM()
     
     #Assign uuid
+    calc['key'] = input_dict['calc_key']
     calc['calculation'] = DM()
-    calc['calculation']['id'] = input_dict['uuid']
     calc['calculation']['script'] = __calc_name__
     
     calc['calculation']['run-parameter'] = run_params = DM()
-    run_params['strain-range'] = input_dict['strain_range']
-    run_params['load_options'] = input_dict['load_options']
     
     run_params['size-multipliers'] = DM()
-    run_params['size-multipliers']['a'] = list(input_dict['size_mults'][0])
-    run_params['size-multipliers']['b'] = list(input_dict['size_mults'][1])
-    run_params['size-multipliers']['c'] = list(input_dict['size_mults'][2])
+    run_params['size-multipliers']['a'] = list(input_dict['sizemults'][0])
+    run_params['size-multipliers']['b'] = list(input_dict['sizemults'][1])
+    run_params['size-multipliers']['c'] = list(input_dict['sizemults'][2])
+    
+    run_params['strain-range'] = input_dict['strainrange']
+    run_params['load_options'] = input_dict['load_options']
     
     #Copy over potential data model info
-    calc['potential'] = input_dict['potential_model']['LAMMPS-potential']['potential']
+    calc['potential'] = DM()
+    calc['potential']['key'] = input_dict['potential'].key
+    calc['potential']['id'] = input_dict['potential'].id
     
     #Save info on system file loaded
     system_load = input_dict['load'].split(' ')    
@@ -198,9 +256,9 @@ def data_model(input_dict, results_dict=None):
                                                                          box_unit = input_dict['length_unit'])['atomic-system']
         
         #Update ucell to relaxed lattice parameters
-        a_mult = input_dict['size_mults'][0][1] - input_dict['size_mults'][0][0]
-        b_mult = input_dict['size_mults'][1][1] - input_dict['size_mults'][1][0]
-        c_mult = input_dict['size_mults'][2][1] - input_dict['size_mults'][2][0]
+        a_mult = input_dict['sizemults'][0][1] - input_dict['sizemults'][0][0]
+        b_mult = input_dict['sizemults'][1][1] - input_dict['sizemults'][1][0]
+        c_mult = input_dict['sizemults'][2][1] - input_dict['sizemults'][2][0]
         relaxed_ucell = deepcopy(input_dict['ucell'])
         relaxed_ucell.box_set(a = results_dict['lx'] / a_mult,
                               b = results_dict['ly'] / b_mult,

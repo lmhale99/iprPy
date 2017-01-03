@@ -2,7 +2,7 @@
     "LAMMPS-potential": {
         "potential": {
             "key": "3837b6da-05c4-4148-97cd-90b26a2092df", 
-            "id": "2006--Chamati-M--Fe"
+            "id": "2006--Chamati-H--Fe"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

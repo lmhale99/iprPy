@@ -38,7 +38,7 @@ def todict(record, full=True):
             params['status'] = calc['status']
             params['error'] = calc['error']
             params['e_vs_r_plot'] = np.nan
-            params['number_min_states'] = np.nan
+            params['number_min_states'] = 0
             
         elif 'status' in calc:
             params['status'] = calc['status']

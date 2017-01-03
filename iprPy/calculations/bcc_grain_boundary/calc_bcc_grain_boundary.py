@@ -3,9 +3,9 @@
 #Standard library imports
 import os
 import sys
+import uuid
 import shutil
 from multiprocessing import Pool
-import uuid
 
 #http://www.numpy.org/
 import numpy as np
@@ -32,12 +32,14 @@ def main(pool, *args):
     #Read in parameters from input file
     with open(args[0]) as f:
         input_dict = read_input(f, *args[1:])
+        
+    interpret_input(input_dict)
     
     #Identify number of steps to take in each direction
     Lx =     input_dict['alat'] * np.linalg.norm(input_dict['axes_1'][0])
     Lz = 2 * input_dict['alat'] * np.linalg.norm(input_dict['axes_1'][2])
-    max_x = int(Lx / input_dict['x_step_size'])
-    max_z = int(Lz / input_dict['z_step_size'])
+    max_x = int(Lx / input_dict['x_stepsize'])
+    max_z = int(Lz / input_dict['z_stepsize'])
     
     #Initialize lists for results
     energies = []
@@ -57,8 +59,8 @@ def main(pool, *args):
                          input_dict['axes_2'],
                          input_dict['E_coh'])
             calc_kwargs = {'mpi_command': input_dict['mpi_command'],
-                           'xshift':      input_dict['x_step_size'] * i,
-                           'zshift':      input_dict['z_step_size'] * j}
+                           'xshift':      input_dict['x_stepsize'] * i,
+                           'zshift':      input_dict['z_stepsize'] * j}
             xshifts.append(calc_kwargs['xshift'])
             zshifts.append(calc_kwargs['zshift'])
             
@@ -116,12 +118,12 @@ def gb_energy(lammps_command, potential, symbols, alat, axes_1, axes_2, E_coh,
     lammps_variables['zsize'] =             uc.get_in_units(lz,     lammps_units['length'])
     lammps_variables['xshift'] =            uc.get_in_units(xshift, lammps_units['length'])
     lammps_variables['zshift'] =            uc.get_in_units(zshift, lammps_units['length'])
-    lammps_variables['x-axis_1'] =          str(axes_1[0]).strip('[] ')
-    lammps_variables['y-axis_1'] =          str(axes_1[1]).strip('[] ')
-    lammps_variables['z-axis_1'] =          str(axes_1[2]).strip('[] ')
-    lammps_variables['x-axis_2'] =          str(axes_2[0]).strip('[] ')
-    lammps_variables['y-axis_2'] =          str(axes_2[1]).strip('[] ')
-    lammps_variables['z-axis_2'] =          str(axes_2[2]).strip('[] ')
+    lammps_variables['x_axis_1'] =          str(axes_1[0]).strip('[] ')
+    lammps_variables['y_axis_1'] =          str(axes_1[1]).strip('[] ')
+    lammps_variables['z_axis_1'] =          str(axes_1[2]).strip('[] ')
+    lammps_variables['x_axis_2'] =          str(axes_2[0]).strip('[] ')
+    lammps_variables['y_axis_2'] =          str(axes_2[1]).strip('[] ')
+    lammps_variables['z_axis_2'] =          str(axes_2[2]).strip('[] ')
     lammps_variables['mesh_dir'] =          'mesh-%.8f-%.8f' %(xshift, zshift) 
     
     #Fill in mod.template files
@@ -129,63 +131,74 @@ def gb_energy(lammps_command, potential, symbols, alat, axes_1, axes_2, E_coh,
         template = template_file.read()
     lammps_input = os.path.join(mesh_dir, 'grain_boundary.in')
     with open(lammps_input, 'w') as in_file:
-        in_file.write('\n'.join(iprPy.tools.fill_template(template, lammps_variables, '<', '>')))
+        in_file.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
         
     output = lmp.run(lammps_command, lammps_input, mpi_command)
     
     #Extract output values
-    E_total = uc.set_in_units(output.finds('c_eatoms')[-1], lammps_units['energy'])
-    natoms = output.finds('v_natoms')[-1]
-   
+    try:
+        E_total = uc.set_in_units(output.finds('c_eatoms')[-1], lammps_units['energy'])
+        natoms = output.finds('v_natoms')[-1]
+    except:
+        E_total = uc.set_in_units(output.finds('eatoms')[-1], lammps_units['energy'])
+        natoms = output.finds('natoms')[-1]
+        
     #Compute grain boundary energy
     E_gb = (E_total - E_coh*natoms) / (lx * lz)
     
     return E_gb
 
-
 def read_input(f, UUID=None):
     """Reads the calc_*.in input commands for this calculation."""
     
     #Read input file in as dictionary
-    input_dict = iprPy.input.file_to_dict(f)
+    input_dict = iprPy.tools.parseinput(f, allsingular=True)
     
     #set calculation UUID
-    if UUID is not None: input_dict['uuid'] = UUID
-    else: input_dict['uuid'] = input_dict.get('uuid', str(uuid.uuid4()))
+    if UUID is not None: input_dict['calc_key'] = UUID
+    else: input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
-    #Process command lines
+    #Verify required terms are defined
     assert 'lammps_command' in input_dict, 'lammps_command value not supplied'
-    input_dict['mpi_command'] = input_dict.get('mpi_command', None)
+    assert 'potential_file' in input_dict, 'potential_file value not supplied'
+    assert 'symbols' in input_dict,        'symbols value not supplied'
+    assert 'x_stepsize' in input_dict,     'x_stepsize value not supplied'
+    assert 'z_stepsize' in input_dict,     'z_stepsize value not supplied'
+    assert 'alat' in input_dict,           'alat value not supplied'
+    assert 'E_coh' in input_dict,          'E_coh value not supplied'
     
-    #Process potential
-    iprPy.input.lammps_potential(input_dict)
-    
-    #Process default units
+    #Assign default values to undefined terms
     iprPy.input.units(input_dict)
+
+    input_dict['mpi_command'] = input_dict.get('mpi_command', None)
+    input_dict['potential_dir'] =  input_dict.get('potential_dir',  '')
     
-    #Process symbols
-    input_dict['symbols'] = input_dict['symbols'].strip().split()
+    input_dict['symbols'] = input_dict['symbols'].split()
     
-    #Process axes
-    input_dict['x-axis_1'] = list(np.array(input_dict['x-axis_1'].strip().split(), dtype=int))
-    input_dict['y-axis_1'] = list(np.array(input_dict['y-axis_1'].strip().split(), dtype=int))
-    input_dict['z-axis_1'] = list(np.array(input_dict['z-axis_1'].strip().split(), dtype=int))
-    input_dict['x-axis_2'] = list(np.array(input_dict['x-axis_2'].strip().split(), dtype=int))
-    input_dict['y-axis_2'] = list(np.array(input_dict['y-axis_2'].strip().split(), dtype=int))
-    input_dict['z-axis_2'] = list(np.array(input_dict['z-axis_2'].strip().split(), dtype=int))
+    iprPy.input.axes(input_dict, x_axis='x_axis_1', y_axis='y_axis_1', z_axis='z_axis_1')
+    iprPy.input.axes(input_dict, x_axis='x_axis_2', y_axis='y_axis_2', z_axis='z_axis_2')
     
-    input_dict['axes_1'] = np.array([input_dict['x-axis_1'], input_dict['y-axis_1'], input_dict['z-axis_1']])
-    input_dict['axes_2'] = np.array([input_dict['x-axis_2'], input_dict['y-axis_2'], input_dict['z-axis_2']])
+    input_dict['axes_1'] = np.array([input_dict['x_axis_1'], input_dict['y_axis_1'], input_dict['z_axis_1']])
+    input_dict['axes_2'] = np.array([input_dict['x_axis_2'], input_dict['y_axis_2'], input_dict['z_axis_2']])
     input_dict['gb_angle'] = am.tools.vect_angle(input_dict['axes_1'][0], input_dict['axes_2'][0])
     
-    #Process run parameters
     #these are terms with units
-    input_dict['x_step_size'] = iprPy.input.value_unit(input_dict, 'x_step_size', default_unit=input_dict['length_unit'])
-    input_dict['z_step_size'] = iprPy.input.value_unit(input_dict, 'z_step_size', default_unit=input_dict['length_unit'])
-    input_dict['alat'] =        iprPy.input.value_unit(input_dict, 'alat',        default_unit=input_dict['length_unit'])
-    input_dict['E_coh'] =       iprPy.input.value_unit(input_dict, 'E_coh',       default_unit=input_dict['energy_unit'])
+    input_dict['x_stepsize'] = iprPy.input.value(input_dict, 'x_stepsize', default_unit=input_dict['length_unit'])
+    input_dict['z_stepsize'] = iprPy.input.value(input_dict, 'z_stepsize', default_unit=input_dict['length_unit'])
+    input_dict['alat'] =       iprPy.input.value(input_dict, 'alat',       default_unit=input_dict['length_unit'])
+    input_dict['E_coh'] =      iprPy.input.value(input_dict, 'E_coh',      default_unit=input_dict['energy_unit'])
     
     return input_dict
+     
+def interpret_input(input_dict):
+    with open(input_dict['potential_file']) as f:
+        input_dict['potential'] = lmp.Potential(f, input_dict['potential_dir'])
+        
+    iprPy.input.system_family(input_dict)
+    
+    iprPy.input.ucell(input_dict)
+    
+    iprPy.input.initialsystem(input_dict)
     
 def data_model(input_dict, results_dict=None):
     """Creates a DataModelDict containing the input and results data""" 
@@ -195,34 +208,37 @@ def data_model(input_dict, results_dict=None):
     output['calculation-grain-boundary-search'] = calc = DM()
     
     #Assign uuid
+    calc['key'] = input_dict['calc_key']
     calc['calculation'] = DM()
-    calc['calculation']['id'] = input_dict['uuid']
     calc['calculation']['script'] = __calc_name__
     
     calc['calculation']['run-parameter'] = run_params = DM()
+    
     run_params['grain-boundary-angle'] = input_dict['gb_angle']
     run_params['x-step-size'] = DM()
-    run_params['x-step-size']['value'] = uc.get_in_units(input_dict['x_step_size'], input_dict['length_unit'])
+    run_params['x-step-size']['value'] = uc.get_in_units(input_dict['x_stepsize'], input_dict['length_unit'])
     run_params['x-step-size']['unit']  = input_dict['length_unit']
     run_params['z-step-size'] = DM()
-    run_params['z-step-size']['value'] = uc.get_in_units(input_dict['z_step_size'], input_dict['length_unit'])
+    run_params['z-step-size']['value'] = uc.get_in_units(input_dict['z_stepsize'], input_dict['length_unit'])
     run_params['z-step-size']['unit']  = input_dict['length_unit']
     
     #Copy over potential data model info
-    calc['potential'] = input_dict['potential_model']['LAMMPS-potential']['potential']
+    calc['potential'] = DM()
+    calc['potential']['key'] = input_dict['potential'].key
+    calc['potential']['id'] = input_dict['potential'].id
     
     #Save info on system file loaded
     calc['grain-1'] = DM()
     calc['grain-1']['crystallographic-axes'] = DM()
-    calc['grain-1']['crystallographic-axes']['x-axis'] = input_dict['x-axis_1']
-    calc['grain-1']['crystallographic-axes']['y-axis'] = input_dict['y-axis_1']
-    calc['grain-1']['crystallographic-axes']['z-axis'] = input_dict['z-axis_1']
+    calc['grain-1']['crystallographic-axes']['x-axis'] = input_dict['x_axis_1']
+    calc['grain-1']['crystallographic-axes']['y-axis'] = input_dict['y_axis_1']
+    calc['grain-1']['crystallographic-axes']['z-axis'] = input_dict['z_axis_1']
     
     calc['grain-2'] = DM()
     calc['grain-2']['crystallographic-axes'] = DM()
-    calc['grain-2']['crystallographic-axes']['x-axis'] = input_dict['x-axis_2']
-    calc['grain-2']['crystallographic-axes']['y-axis'] = input_dict['y-axis_2']
-    calc['grain-2']['crystallographic-axes']['z-axis'] = input_dict['z-axis_2']
+    calc['grain-2']['crystallographic-axes']['x-axis'] = input_dict['x_axis_2']
+    calc['grain-2']['crystallographic-axes']['y-axis'] = input_dict['y_axis_2']
+    calc['grain-2']['crystallographic-axes']['z-axis'] = input_dict['z_axis_2']
     
     if results_dict is None:
         calc['status'] = 'not calculated'

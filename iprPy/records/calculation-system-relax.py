@@ -61,6 +61,8 @@ def todict(record, full=True):
             params['C'] = np.nan
             
         else:
+            params['status'] = np.nan
+            params['error'] = np.nan
             init = calc['as-constructed-atomic-system']
             params['initial_a'] = uc.value_unit(init.find('a'))
             try:    params['initial_b'] = uc.value_unit(init.find('b'))

@@ -80,12 +80,12 @@ def quick_a_Cij(lammps_command, system, potential, symbols, mpi_command=None, p_
         system_new = results['system_new']
         
         #Test if box has converged to a single size
-        if np.allclose(system_new.box.vects, system_current.box.vects, rtol=tol):
+        if np.allclose(system_new.box.vects, system_current.box.vects, rtol=tol, atol=0):
             converged = True
             break
         
         #Test if box has converged to two sizes
-        elif system_old is not None and np.allclose(system_new.box.vects, system_old.box.vects, rtol=tol):
+        elif system_old is not None and np.allclose(system_new.box.vects, system_old.box.vects, rtol=tol, atol=0):
             #Run LAMMPS Cij script using average between alat0 and alat1
             box = am.Box(a = (system_new.box.a + system_old.box.a) / 2.,
                          b = (system_new.box.b + system_old.box.b) / 2.,
@@ -256,7 +256,7 @@ def read_input(f, UUID=None):
     input_dict['number_of_steps_r'] = int(input_dict.get('number_of_steps_r', 200))
     
     #these are unitless float terms
-    input_dict['strainrange'] = float(input_dict.get('strainrange', 1e-5))
+    input_dict['strainrange'] = float(input_dict.get('strainrange', 1e-6))
     
     #these are terms with units
     input_dict['pressure_xx'] = iprPy.input.value(input_dict, 'pressure_xx', 
