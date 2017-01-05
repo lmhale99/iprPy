@@ -1,4 +1,4 @@
-dzx#!/usr/bin/env python
+#!/usr/bin/env python
 
 #Standard library imports
 import os

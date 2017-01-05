@@ -26,8 +26,10 @@ def icalculations(database, symbol=None, prototype=None, potential=None, record_
     """
     
     df = []
+    records = {}
     for record in database.iget_records(style=record_style):
         df.append(record.todict(full=False))
+        records[record.name] = record
     df = pd.DataFrame(df)
     
     if prototype is not None:
@@ -43,4 +45,5 @@ def icalculations(database, symbol=None, prototype=None, potential=None, record_
         df = df[check]
         
     for calc_key in df.calc_key.tolist():
-        yield database.get_record(name=calc_key, style=record_style)
+        yield records[calc_key]
+        #yield database.get_record(name=calc_key, style=record_style)

@@ -35,7 +35,13 @@ def main(*args):
     
     #Build record_df
     record_df = build_record_df(dbase, __record_style__)
-        
+    
+    #Build potential dictionaries (single dbase access)
+    pot_record_dict = {}
+    pot_tar_dict = {}
+    for pot_record in dbase.iget_records(style='LAMMPS-potential'):
+        pot_record_dict[pot_record.name] = pot_record
+    
     #Load E_vs_r_scan records
     for parent_record in iprPy.prepare.icalculations(dbase, 
                                                      record_style = 'calculation-cohesive-energy-relation',
@@ -44,11 +50,17 @@ def main(*args):
                                                      potential =    prepare_dict['potential_name']):
         parent_dict = parent_record.todict()
         
-        #Load potential and symbols
-        pot_record = dbase.get_record(name=parent_dict['potential_id'], style='LAMMPS-potential')
+        #Load potential
+        pot_record = pot_record_dict[parent_dict['potential_id']]
         potential = lmp.Potential(pot_record.content)
-        pot_tar = dbase.get_tar(pot_record)
         
+        #Get pot_tar from dbase only once per potential
+        if parent_dict['potential_id'] in pot_tar_dict:
+            pot_tar = pot_tar_dict[parent_dict['potential_id']]
+        else:
+            pot_tar = dbase.get_tar(pot_record)
+            pot_tar_dict[parent_dict['potential_id']] = pot_tar
+            
         #Loop over number_min_states
         for i in xrange(parent_dict['number_min_states']):    
             if i == 0:

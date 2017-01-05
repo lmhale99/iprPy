@@ -1,7 +1,7 @@
 #### Information for local database ####
-run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\local\1
+#run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\local\1
 
-database                    local C:\Users\lmh1\Documents\calculations\ipr\library_test
+#database                    local C:\Users\lmh1\Documents\calculations\ipr\library_test
 
 #### Information for personally hosted curator ####
 #run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\curator\1
@@ -12,12 +12,12 @@ database                    local C:\Users\lmh1\Documents\calculations\ipr\libra
 
 #### Information for remotely hosted curator ####
 
-#run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\iprhub\1
+run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\iprhub\1
 
-#database                    curator https://iprhub.nist.gov/
-#database_user               lmh1
-#database_pswd               C:/users/lmh1/documents/iprhub/iprhub_password.txt
-#database_cert               C:/users/lmh1/documents/iprhub/iprhub-ca.pem
+database                    curator https://iprhub.nist.gov/
+database_user               lmh1
+database_pswd               C:/users/lmh1/documents/iprhub/iprhub_password.txt
+database_cert               C:/users/lmh1/documents/iprhub/iprhub-ca.pem
 
 #########################################################################################
 
@@ -30,9 +30,19 @@ potential_name
 symbol_name
 prototype_name              
 
+#### Unit specifications ####
+length_unit
+pressure_unit
+energy_unit
+force_unit
+
 #### Run parameters ####
-size_mults              
+sizemults              
 pressure_xx             
 pressure_yy             
 pressure_zz             
-strain_range            
+strainrange                1e-4
+strainrange                1e-5
+strainrange                1e-6
+strainrange                1e-7
+strainrange                1e-8

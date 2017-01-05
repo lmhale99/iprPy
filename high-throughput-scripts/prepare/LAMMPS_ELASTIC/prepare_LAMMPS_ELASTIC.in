@@ -1,28 +1,28 @@
 #### Information for local database ####
-run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\local\1
+#run_directory              C:\Users\lmh1\Documents\calculations\ipr\torun\local\1
 
-database                    local C:\Users\lmh1\Documents\calculations\ipr\library_test
+#database                   local C:\Users\lmh1\Documents\calculations\ipr\library_test
 
 #### Information for personally hosted curator ####
-#run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\curator\1
+#run_directory              C:\Users\lmh1\Documents\calculations\ipr\torun\curator\1
 
-#database                    curator http://127.0.0.1:8000/
-#database_user               admin
-#database_pswd               admin  
+#database                   curator http://127.0.0.1:8000/
+#database_user              admin
+#database_pswd              admin  
 
 #### Information for remotely hosted curator ####
 
-#run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\iprhub\1
+run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\iprhub\1
 
-#database                    curator https://iprhub.nist.gov/
-#database_user               lmh1
-#database_pswd               C:/users/lmh1/documents/iprhub/iprhub_password.txt
-#database_cert               C:/users/lmh1/documents/iprhub/iprhub-ca.pem
+database                    curator https://iprhub.nist.gov/
+database_user               lmh1
+database_pswd               C:/users/lmh1/documents/iprhub/iprhub_password.txt
+database_cert               C:/users/lmh1/documents/iprhub/iprhub-ca.pem
 
 #########################################################################################
 
 #### Commands ####
-lammps_command          lmp_serial
+lammps_command              lmp_serial
 mpi_command            
             
 #### Run condition limiters ####
@@ -37,4 +37,8 @@ forcetolerance
 maxiterations
 maxevaluations
 maxatommotion
-strainrange 
+strainrange                 1e-4
+strainrange                 1e-5
+strainrange                 1e-6
+strainrange                 1e-7
+strainrange                 1e-8 
