@@ -1,41 +1,56 @@
-#### Information for local database ####
-run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\local\1
+#### Information for local database (prepare on Windows) ####
+#run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\local\4
 
-database                    local C:\Users\lmh1\Documents\calculations\ipr\library_test
+#database                    local C:\Users\lmh1\Documents\calculations\ipr\library_test
 
-#### Information for personally hosted curator ####
-#run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\curator\1
+#### Information for personally hosted curator (prepare on Windows) ####
+#run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\curator\4
 
 #database                    curator http://127.0.0.1:8000/
 #database_user               admin
 #database_pswd               admin  
 
-#### Information for remotely hosted curator ####
+#### Information for remotely hosted curator (prepare on Windows) ####
 
-#run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\iprhub\1
+#run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\iprhub\4
 
 #database                    curator https://iprhub.nist.gov/
 #database_user               lmh1
 #database_pswd               C:/users/lmh1/documents/iprhub/iprhub_password.txt
 #database_cert               C:/users/lmh1/documents/iprhub/iprhub-ca.pem
 
+#### Information for remotely hosted curator (prepare on Linux) ####
+
+run_directory               /data/lmh1/calculations/ipr/torun/iprhub/8
+
+database                    curator https://iprhub.nist.gov/
+database_user               lmh1
+database_pswd               /users/lmh1/iprhub/iprhub_password.txt
+database_cert               /users/lmh1/iprhub/iprhub-ca.pem
+
 #########################################################################################
 
-#### Commands ####
-lammps_command               lmp_mpi
-mpi_command                  mpiexec -localonly 4 
+#### Commands (prepare on Windows) ####
+#lammps_command               lmp_mpi
+#mpi_command                  mpiexec -localonly 4
+
+#### Commands (prepare on Linux) ####
+lammps_command               /users/lmh1/MEAM/lammps-1Feb14-fathom
+mpi_command                  mpirun -np 8
+
+#########################################################################################
 
 #### Run condition limiters ####
-potential_name             
+potential_name               1985--Foiles-S-M--Ni-Cu
 symbol_name
-prototype_name             
+prototype_name               A1--Cu--fcc
 
 #### Run parameters ####
-sizemults                   
+sizemults                    10 10 10                   
 temperature
-thermosteps                 
-runsteps                    
-equilsteps                  
+thermosteps                  1
+runsteps                     220000
+equilsteps                   20000
 pressure_xx             
 pressure_yy             
 pressure_zz             
