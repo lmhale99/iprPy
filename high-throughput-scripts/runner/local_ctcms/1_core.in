@@ -1,5 +1,5 @@
 #### Run directory location ####
-run_directory               /data/lmh1/calculations/ipr/torun/local/1
+run_directory               /data/lmh1/calculations/ipr/torun/scratch/local/1
 
 #### Database information ####
-database                    /data/lmh1/calculations/ipr/library_test
+database                    /data/lmh1/calculations/ipr/library

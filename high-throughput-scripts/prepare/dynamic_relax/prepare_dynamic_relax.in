@@ -21,12 +21,12 @@
 
 #### Information for remotely hosted curator (prepare on Linux) ####
 
-run_directory               /data/lmh1/calculations/ipr/torun/iprhub/8
+run_directory               /data/lmh1/calculations/ipr/torun/scratch/iprhub/8
 
 database                    curator https://iprhub.nist.gov/
 database_user               lmh1
-database_pswd               /users/lmh1/iprhub/iprhub_password.txt
-database_cert               /users/lmh1/iprhub/iprhub-ca.pem
+database_pswd               /data/lmh1/iprhub/iprhub_password.txt
+database_cert               /data/lmh1/iprhub/iprhub-ca.pem
 
 #########################################################################################
 
@@ -35,15 +35,26 @@ database_cert               /users/lmh1/iprhub/iprhub-ca.pem
 #mpi_command                  mpiexec -localonly 4
 
 #### Commands (prepare on Linux) ####
-lammps_command               /users/lmh1/MEAM/lammps-1Feb14-fathom
+lammps_command               /users/lmh1/LAMMPS/lammps-17Nov16/src/lmp_mpi
 mpi_command                  mpirun -np 8
 
 #########################################################################################
 
 #### Run condition limiters ####
-potential_name               1985--Foiles-S-M--Ni-Cu
+potential_name               2009--Kim-H-K--Fe-Ti-C
+potential_name               2012--Jelinek-B--Al-Si-Mg-Cu-Fe
+potential_name               2012--Park-H--Mo
+potential_name               2013--Gao-H--AgTaO3
+potential_name               2014--Fernandez-J-R--U
+potential_name               2014--Liyanage-L-S-I--Fe-C
+potential_name               2015--Ko-W-S--Ni-Ti
+potential_name               2015--Pascuet-M-I--Al-U
+potential_name               2015--Pascuet-M-I--Al
+potential_name               2015--Purja-Pun-G-P--Cu-Ta
+potential_name               2015--Thompson-A-P--Ta
+potential_name               2016--Zhang-P--Ti-O
 symbol_name
-prototype_name               A1--Cu--fcc
+prototype_name               
 
 #### Run parameters ####
 sizemults                    10 10 10                   
