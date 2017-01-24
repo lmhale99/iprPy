@@ -1,0 +1,9 @@
+#Cohesive energy (eV) vs. nearest neighbor radial distance (A) for various crystal structures
+#Data presented for interatomic potential <potential> and composition <composition>
+
+#NOTE: These values are for static, unrelaxed structures and use the ideal b/a and c/a ratios for the crystal structure, not the potential-specific values
+
+#Calculations from the NIST Interatomic Potential Repository Project
+#http://www.ctcms.nist.gov/potentials/
+
+#Table generated <day>
