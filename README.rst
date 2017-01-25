@@ -25,29 +25,40 @@ The design principles for iprPy are:
 Setup
 =====
 
-1. Install Python 2.7. Common scientific libraries like numpy are heavily used, 
-   so it is often easiest to use a distributed package such as Anaconda. 
-2. Install `atomman`_. All of the calculations currently implemented use the 
-   atomman package for providing a wrapper around LAMMPS simulations.
-3. Download iprPy.
-    - `https://github.com/usnistgov/iprPy`_ hosts the current stable release 
-      version.
-    - `https://github.com/lmhale99/iprPy`_ hosts developmental version(s).
-4. In a terminal, go into the iprPy root directory add the iprPy package to 
-   Python with the command::
+1. Install Python 2.7
+   
+   a. Using an Anaconda Python distribution is preferred as the scipy family 
+      of tools is heavily used.
+   
+   b. The package 'xmltodict'_ needs to be manually installed beforehand. This 
+      can easily be done with the terminal command::
+
+    pip install xmltodict
+
+   c. All other requirements should come with Anaconda or will automatically 
+      install during step 4 (let me know if not true).
+
+2. All of the files for iprPy can be found at:
+    - `https://github.com/usnistgov/iprPy`_ for the stable release.
+    - `https://github.com/lmhale99/iprPy`_ for the development version(s).
+    
+3. Download or clone the whole project to a local directory. 
+    
+4. In a terminal, go into the iprPy root directory and add the iprPy package 
+   to Python with the command::
     
     python setup.py develop
 
 Getting Started
 ===============
 
-The best place to start is to look at the Jupyter Notebooks in the docs 
-directory. The docs/methods directory contains Notebooks describing the 
-underlying routines used by each calculation and provides an example 
-demonstration. The docs/reference directory contains Notebooks that describe 
-how to run the calculation scripts and use the high-throughput tools to prepare 
-multiple instances of the calculations. 
+The iprPy guide document provides an overview of the different parts of the 
+iprPy framework. This document is meant to introduce new users to the designing
+principles used by the framework.
 
-.. _atomman: https://github.com/usnistgov/atomman
+More detailed documentation related to specific functions and components of the
+framework can be found in the form of Jupyter Notebooks in the docs directory. 
+
+.. _xmltodict: https://github.com/martinblech/xmltodict
 .. _https://github.com/usnistgov/iprPy: https://github.com/usnistgov/iprPy
 .. _https://github.com/lmhale99/iprPy: https://github.com/lmhale99/iprPy
