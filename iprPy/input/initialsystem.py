@@ -55,22 +55,23 @@ def initialsystem(input_dict, **kwargs):
         
     #copy ucell to initialsystem
     input_dict[kwargs['initialsystem']] = deepcopy(input_dict[kwargs['ucell']])
-    
+
     #Build axes from x_axis, y_axis and z_axis
     axes_array = np.array([input_dict[kwargs['x_axis']], input_dict[kwargs['y_axis']], input_dict[kwargs['z_axis']]])
 
     #Rotate using axes_array
     try: 
         input_dict[kwargs['initialsystem']] = am.rotate_cubic(input_dict[kwargs['initialsystem']], axes_array)
+
     except: 
         input_dict[kwargs['initialsystem']] = lmp.normalize(am.rotate(input_dict[kwargs['initialsystem']], axes_array))
-        
+
     #apply atomshift
     shift = (input_dict[kwargs['atomshift']][0] * input_dict[kwargs['initialsystem']].box.avect +
              input_dict[kwargs['atomshift']][1] * input_dict[kwargs['initialsystem']].box.bvect +
              input_dict[kwargs['atomshift']][2] * input_dict[kwargs['initialsystem']].box.cvect)
     pos = input_dict[kwargs['initialsystem']].atoms_prop(key='pos')
     input_dict[kwargs['initialsystem']].atoms_prop(key='pos', value=pos+shift)
-   
+
     #apply sizemults
     input_dict[kwargs['initialsystem']].supersize(tuple(input_dict[kwargs['sizemults']][0]), tuple(input_dict[kwargs['sizemults']][1]), tuple(input_dict[kwargs['sizemults']][2]))

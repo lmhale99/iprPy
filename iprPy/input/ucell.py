@@ -86,6 +86,6 @@ def ucell(input_dict, **kwargs):
         #Six box_parameters means a, b, c, alpha, beta, gamma
         elif len(box_params) == 6:
             input_dict[kwargs['ucell']].box_set(a=box_params[0], b=box_params[1], c=box_params[2],
-                                      alpha=box_params[0], beta=box_params[1], gamma=box_params[2], 
+                                      alpha=box_params[3], beta=box_params[4], gamma=box_params[5], 
                                       scale=True) 
         else: ValueError('Invalid box_parameters command')
