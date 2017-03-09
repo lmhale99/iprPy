@@ -1,0 +1,179 @@
+#### Information for local database (prepare on Windows) ####
+#run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\local\4
+
+#database                    local C:\Users\lmh1\Documents\calculations\ipr\library_test
+
+#### Information for personally hosted curator (prepare on Windows) ####
+#run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\curator\4
+
+#database                    curator http://127.0.0.1:8000/
+#database_user               admin
+#database_pswd               admin  
+
+#### Information for remotely hosted curator (prepare on Windows) ####
+
+run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\iprhub\4
+
+database                    curator https://iprhub.nist.gov/
+database_user               lmh1
+database_pswd               C:/users/lmh1/documents/iprhub/iprhub_password.txt
+database_cert               C:/users/lmh1/documents/iprhub/iprhub-ca.pem
+
+#### Information for remotely hosted curator (prepare on Linux) ####
+
+#run_directory               /data/lmh1/calculations/ipr/torun/scratch/iprhub/8
+
+#database                    curator https://iprhub.nist.gov/
+#database_user               lmh1
+#database_pswd               /data/lmh1/iprhub/iprhub_password.txt
+#database_cert               /data/lmh1/iprhub/iprhub-ca.pem
+
+#########################################################################################
+
+#### Commands (prepare on Windows) ####
+lammps_command               lmp_mpi
+mpi_command                  mpiexec -localonly 4
+
+#### Commands (prepare on Linux) ####
+#lammps_command               /users/lmh1/LAMMPS/lammps-17Nov16/src/lmp_mpi
+#mpi_command                  mpirun -np 8
+
+#########################################################################################
+
+#### Run condition limiters ####
+
+potential_name               1985--Foiles-S-M--Ni-Cu
+potential_name               1987--Ackland-G-J--Ag
+potential_name               1987--Ackland-G-J--Au
+potential_name               1987--Ackland-G-J--Cu
+potential_name               1987--Ackland-G-J--Mo
+potential_name               1987--Ackland-G-J--Ni
+potential_name               1989--Adams-J-B--Ag
+potential_name               1989--Adams-J-B--Au
+potential_name               1989--Adams-J-B--Cu
+potential_name               1989--Adams-J-B--Ni
+potential_name               1989--Adams-J-B--Pd
+potential_name               1989--Adams-J-B--Pt
+potential_name               1992--Ackland-G-J--Ti
+#potential_name               1995--Angelo-J-E--Ni-Al-H
+#potential_name               1996--Farkas-D--Nb-Ti-Al
+potential_name               1997--Ackland-G-J--Fe
+potential_name               1997--Liu-X-Y--Al-Mg
+potential_name               1998--Liu-X-Y--Al-Mg
+potential_name               1999--Liu-X-Y--Al-Cu
+potential_name               1999--Mishin-Y--Al
+potential_name               1999--Mishin-Y--Ni
+potential_name               2000--Landa-A--Al-Pb
+potential_name               2000--Sturgeon-J-B--Al
+potential_name               2001--Mishin-Y--Cu-1
+potential_name               2002--Mishin-Y--Ni-Al
+potential_name               2003--Han-S--Cs
+potential_name               2003--Han-S--K
+potential_name               2003--Han-S--Li
+potential_name               2003--Han-S--Na
+potential_name               2003--Han-S--Rb
+potential_name               2003--Han-S--W
+potential_name               2003--Hoyt-J-J--Cu-Pb
+potential_name               2003--Li-Y-H--Ta
+potential_name               2003--Mendelev-M-I--Fe-2
+potential_name               2003--Mendelev-M-I--Fe-5
+potential_name               2003--Zope-R-R--Al
+potential_name               2003--Zope-R-R--Ti-Al
+potential_name               2004--Ackland-G-J--Fe-P
+potential_name               2004--Liu-X-Y--Al
+potential_name               2004--Mishin-Y--Ni-Al
+potential_name               2004--Zhou-X-W--Ag
+potential_name               2004--Zhou-X-W--Al
+potential_name               2004--Zhou-X-W--Au
+potential_name               2004--Zhou-X-W--Co
+potential_name               2004--Zhou-X-W--Cu
+potential_name               2004--Zhou-X-W--Fe
+potential_name               2004--Zhou-X-W--Mg
+potential_name               2004--Zhou-X-W--Mo
+potential_name               2004--Zhou-X-W--Ni
+potential_name               2004--Zhou-X-W--Pb
+potential_name               2004--Zhou-X-W--Pd
+potential_name               2004--Zhou-X-W--Pt
+potential_name               2004--Zhou-X-W--Ta
+potential_name               2004--Zhou-X-W--Ti
+potential_name               2004--Zhou-X-W--W
+potential_name               2004--Zhou-X-W--Zr
+potential_name               2005--Grochola-G--Au
+potential_name               2005--Mendelev-M-I--Al-Fe
+potential_name               2006--Chamati-H--Fe
+potential_name               2006--Sun-D-Y--Mg
+potential_name               2006--Williams-P-L--Ag
+potential_name               2006--Williams-P-L--Cu-Ag
+potential_name               2007--Mendelev-M-I--Cu-Zr
+potential_name               2007--Mendelev-M-I--V-Fe
+potential_name               2007--Mendelev-M-I--Zr-1
+potential_name               2007--Mendelev-M-I--Zr-2
+potential_name               2007--Mendelev-M-I--Zr-3
+#potential_name               2008--Chenoweth-K--C-H-O
+potential_name               2008--Fortini-A--Ru
+potential_name               2008--Hepburn-D-J--Fe-C
+potential_name               2008--Mendelev-M-I--Al
+potential_name               2008--Mendelev-M-I--Cu
+potential_name               2008--Zhou-X-W--Pd-H
+#potential_name               2009--Bonny-G--Fe-Cu-Ni
+potential_name               2009--Bonny-G--Fe-Ni
+#potential_name               2009--Kim-H-K--Fe-Ti-C
+potential_name               2009--Mendelev-M-I--Al-Mg
+potential_name               2009--Mendelev-M-I--Cu-Zr
+potential_name               2009--Purja-Pun-G-P--Ni-Al
+potential_name               2009--Wu-H-H--Cu-Ag
+potential_name               2010--Fellinger-M-R--Nb
+potential_name               2010--Olsson-P-A-T--Au
+potential_name               2010--Winey-J-M--Al
+#potential_name               2011--Bonny-G--Fe-Ni-Cr
+#potential_name               2012--Jelinek-B--Al-Si-Mg-Cu-Fe
+potential_name               2012--Mendelev-M-I--Cu
+potential_name               2012--Mendelev-M-I--Ni
+potential_name               2012--Mendelev-M-I--Ni-Zr
+potential_name               2012--Park-H--Mo
+potential_name               2012--Proville-L--Fe
+potential_name               2012--Purja-Pun-G-P--Co
+#potential_name               2012--Schopf-D--Al-Mn-Pd
+potential_name               2012--Smirnova-D-E--U
+potential_name               2013--Agrawal-A--Be
+#potential_name               2013--Bonny-G--Fe-Ni-Cr
+#potential_name               2013--Gao-H--AgTaO3
+#potential_name               2013--Hale-L-M--Pd-Ag-H-Hybrid
+#potential_name               2013--Hale-L-M--Pd-Ag-H-Morse
+#potential_name               2013--Henriksson-K-O-E--Fe-C
+potential_name               2013--Ravelo-R--Ta-1
+potential_name               2013--Ravelo-R--Ta-2
+#potential_name               2013--Smirnova-D-E--U-Mo-Xe
+#potential_name               2013--Zhou-X-W--Zn-Cd-Hg-S-Se-Te
+potential_name               2014--Fernandez-J-R--U
+potential_name               2014--Liyanage-L-S-I--Fe-C
+potential_name               2015--Ko-W-S--Ni-Ti
+potential_name               2015--Mendelev-M-I--Al-Sm
+potential_name               2015--Mendelev-M-I--Mg
+potential_name               2015--Pascuet-M-I--Al
+potential_name               2015--Pascuet-M-I--Al-U
+potential_name               2015--Purja-Pun-G-P--Al-Co
+potential_name               2015--Purja-Pun-G-P--Cu-Ta
+#potential_name               2015--Purja-Pun-G-P--Ni-Al-Co
+potential_name               2015--Purja-Pun-G-P--Ni-Co
+potential_name               2015--Thompson-A-P--Ta
+potential_name               2015--Wilson-S-R--Na
+potential_name               2015--Wilson-S-R--Ni-Zr
+potential_name               2016--Mendelev-M-I--Ti-1
+potential_name               2016--Mendelev-M-I--Ti-2
+potential_name               2016--Mendelev-M-I--Ti-3
+potential_name               2016--Zhang-P--Ti-O
+
+symbol_name
+prototype_name               
+
+#### Run parameters ####
+sizemults                    10 10 10                   
+temperature
+thermosteps                  1
+runsteps                     220000
+equilsteps                   20000
+pressure_xx             
+pressure_yy             
+pressure_zz             
+

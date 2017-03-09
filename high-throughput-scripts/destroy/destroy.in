@@ -1,0 +1,17 @@
+#### Database information for iprhub from Windows computer ####
+database                    curator https://iprhub.nist.gov/
+database_user               lmh1
+database_pswd               C:/users/lmh1/documents/iprhub/iprhub_password.txt
+database_cert               C:/users/lmh1/documents/iprhub/iprhub-ca.pem
+
+#### Database information for iprhub from ctcms cluster ####
+#database                    curator https://iprhub.nist.gov/
+#database_user               lmh1
+#database_pswd               /data/lmh1/iprhub/iprhub_password.txt
+#database_cert               /data/lmh1/iprhub/iprhub-ca.pem
+
+#### Database information for local directory on Windows computer ####
+#database                    local C:\Users\lmh1\Documents\calculations\ipr\library_test
+
+#record_list                 calculation-dynamic-relax-names.txt
+record_style                calculation-dynamic-relax
