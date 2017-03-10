@@ -11,7 +11,7 @@
                 "y-axis": [ 0, 1, 0], 
                 "z-axis": [ 0, 0, 1]
             }, 
-            "cutting-axis": "z", 
+            "cutboxvector": "c", 
             "atomshift": [0.0, 0.0, 0.1]
         }
     }

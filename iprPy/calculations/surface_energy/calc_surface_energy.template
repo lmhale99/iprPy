@@ -1,4 +1,4 @@
-#Run script for calc_surface_energy_static.py
+#Run script for calc_surface_energy.py
 
 #Command lines for LAMMPS (and MPI).
 #For lammps_command, exclude passing in a script, i.e. no "-in term" or "< term"
@@ -24,7 +24,7 @@ sizemults                   <sizemults>
 
 #Defect parameters
 surface_model               <surface_model>
-surface_cuttingaxis         <surface_cuttingaxis>
+surface_cutboxvector        <surface_cutboxvector>
 
 #Units that input/output values are in
 length_unit                 <length_unit>

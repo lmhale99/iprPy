@@ -1,5 +1,5 @@
 import os
-from calc_surface_energy_static import data_model, read_input
+from calc_surface_energy import data_model, read_input
 
 __calc_dir__ = os.path.dirname(os.path.abspath(__file__))
 __calc_type__ = os.path.basename(__calc_dir__)

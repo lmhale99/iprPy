@@ -47,7 +47,7 @@ def main(*args):
                                   maxiter =     input_dict['maxiterations'], 
                                   maxeval =     input_dict['maxevaluations'], 
                                   dmax =        input_dict['maxatommotion'],
-                                  cuttingaxis = input_dict['surface_cuttingaxis'])
+                                  cuttingaxis = input_dict['surface_cutboxvector'])
     
     #Save data model of results 
     results = data_model(input_dict, results_dict)
@@ -62,15 +62,7 @@ def surface_energy(lammps_command, system, potential, symbols, mpi_command=None,
     all periodic boundaries to the same system with one non-periodic boundary,
     effectively cutting along that atomic plane.
     """
-   
-    #Test that system is orthorhombic
-    try:
-        assert system.box.xy == 0.0
-        assert system.box.xz == 0.0
-        assert system.box.yz == 0.0
-    except:
-        raise ValueError('This function currently only works with orthorhombic systems')
-    
+      
     #Initialize results dictionary
     results_dict = {}
     
@@ -86,17 +78,18 @@ def surface_energy(lammps_command, system, potential, symbols, mpi_command=None,
     results_dict['Ecoh'] = perfect['potentialenergy'] / system.natoms    
 
     #Set up defect system
-    if   cuttingaxis == 'x':
+    #surfacearea is area of parallelogram defined by the two box vectors not along the cuttingaxis
+    if   cuttingaxis == 'a':
         system.pbc[0] = False
-        surfacearea = system.box.ly * system.box.lz
+        surfacearea = 2 * np.linalg.norm(np.cross(system.box.bvect, system.box.cvect))
         
-    elif cuttingaxis == 'y':
+    elif cuttingaxis == 'b':
         system.pbc[1] = False
-        surfacearea = system.box.lx * system.box.lz
+        surfacearea = 2 * np.linalg.norm(np.cross(system.box.avect, system.box.cvect))
         
-    elif cuttingaxis == 'z':
+    elif cuttingaxis == 'c':
         system.pbc[2] = False
-        surfacearea = system.box.lx * system.box.ly
+        surfacearea = 2 * np.linalg.norm(np.cross(system.box.avect, system.box.bvect))
         
     else:
         raise ValueError('Invalid cuttingaxis')
@@ -129,7 +122,7 @@ def relax_system(lammps_command, system, potential, symbols, mpi_command=None,
     lammps_variables = {}
     
     #Generate system and pair info
-    lammps_variables['atomman_system_info'] = lmp.atom_data.dump(system, 'stacking_fault.dat', 
+    lammps_variables['atomman_system_info'] = lmp.atom_data.dump(system, 'system.dat', 
                                                                  units=potential.units, 
                                                                  atom_style=potential.atom_style)
     lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
@@ -154,7 +147,10 @@ def relax_system(lammps_command, system, potential, symbols, mpi_command=None,
     
     #Extract output values
     results = {}
-    results['finaldumpfile'] = 'atom.%i' % output.simulations[-1]['thermo'].Step.tolist()[-1] 
+    results['logfile'] =         'log.lammps'
+    results['initialdatafile'] = 'system.dat'
+    results['initialdumpfile'] = 'atom.0'
+    results['finaldumpfile'] =   'atom.%i' % output.simulations[-1]['thermo'].Step.tolist()[-1] 
     results['potentialenergy'] = uc.set_in_units(output.simulations[-1]['thermo'].PotEng.tolist()[-1], lammps_units['energy'])
     
     return results
@@ -214,11 +210,11 @@ def read_surface_model(input_dict):
     if 'surface_model' in input_dict:
         
         #Verify competing parameters are not defined
-        assert 'atomshift'           not in input_dict, 'atomshift and surface_model cannot both be supplied'
-        assert 'x_axis'              not in input_dict, 'x_axis and surface_model cannot both be supplied'
-        assert 'y_axis'              not in input_dict, 'y_axis and surface_model cannot both be supplied'
-        assert 'z_axis'              not in input_dict, 'z_axis and surface_model cannot both be supplied'
-        assert 'surface_cuttingaxis' not in input_dict, 'surface_cuttingaxis and surface_model cannot both be supplied'
+        assert 'atomshift'            not in input_dict, 'atomshift and surface_model cannot both be supplied'
+        assert 'x_axis'               not in input_dict, 'x_axis and surface_model cannot both be supplied'
+        assert 'y_axis'               not in input_dict, 'y_axis and surface_model cannot both be supplied'
+        assert 'z_axis'               not in input_dict, 'z_axis and surface_model cannot both be supplied'
+        assert 'surface_cutboxvector' not in input_dict, 'surface_cutboxvector and surface_model cannot both be supplied'
         
         #Load surface_model
         try:
@@ -232,7 +228,7 @@ def read_surface_model(input_dict):
         input_dict['x_axis'] = params['crystallographic-axes']['x-axis']
         input_dict['y_axis'] = params['crystallographic-axes']['y-axis']
         input_dict['z_axis'] = params['crystallographic-axes']['z-axis']
-        input_dict['surface_cuttingaxis'] = params['cutting-axis']
+        input_dict['surface_cutboxvector'] = params['cutboxvector']
         input_dict['atomshift'] = params['atomshift']
     
     #If surface_model is not defined
@@ -241,8 +237,8 @@ def read_surface_model(input_dict):
         input_dict['surface_model'] = None
         iprPy.input.axes(input_dict)
         iprPy.input.atomshift(input_dict)
-        input_dict['surface_cuttingaxis'] = input_dict.get('surface_cuttingaxis', 'z')
-        assert input_dict['surface_cuttingaxis'] in ['x', 'y', 'z'], 'invalid surface_cuttingaxis'
+        input_dict['surface_cutboxvector'] = input_dict.get('surface_cutboxvector', 'c')
+        assert input_dict['surface_cutboxvector'] in ['a', 'b', 'c'], 'invalid surface_cutboxvector'
         
 
 def interpret_input(input_dict):
@@ -309,7 +305,7 @@ def data_model(input_dict, results_dict=None):
     asp['crystallographic-axes']['x-axis'] = input_dict['x_axis']
     asp['crystallographic-axes']['y-axis'] = input_dict['y_axis']
     asp['crystallographic-axes']['z-axis'] = input_dict['z_axis']
-    asp['cutting-axis'] = input_dict['surface_cuttingaxis']
+    asp['cutboxvector'] = input_dict['surface_cutboxvector']
     asp['atomshift'] = input_dict['atomshift']
         
     if results_dict is None:
