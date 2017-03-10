@@ -1,0 +1,18 @@
+{
+    "surface-parameters": {
+        "surface": {
+            "key": "a549a4c4-b55a-4cfd-96ac-23dda56af8f0", 
+            "id": "[110]"
+        }, 
+        "system-family": "A1--Cu--fcc", 
+        "atomman-surface-parameters": {
+            "crystallographic-axes": {
+                "x-axis": [ 0, 0, 1],
+                "y-axis": [ 1,-1, 0],
+                "z-axis": [ 1, 1, 0]
+            }, 
+            "cutting-axis": "z", 
+            "atomshift": [0.0, 0.0, 0.1]
+        }
+    }
+}
