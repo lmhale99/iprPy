@@ -47,7 +47,7 @@ def main(*args):
                                   maxiter =     input_dict['maxiterations'], 
                                   maxeval =     input_dict['maxevaluations'], 
                                   dmax =        input_dict['maxatommotion'],
-                                  cuttingaxis = input_dict['surface_cutboxvector'])
+                                  cutboxvector = input_dict['surface_cutboxvector'])
     
     #Save data model of results 
     results = data_model(input_dict, results_dict)
@@ -56,7 +56,7 @@ def main(*args):
     
 def surface_energy(lammps_command, system, potential, symbols, mpi_command=None, 
                    etol=0.0, ftol=0.0, maxiter=100, maxeval=1000, dmax=0.01,
-                   cuttingaxis='z'):
+                   cutboxvector='c'):
     """
     This calculates surface energies by comparing the energy of a system with 
     all periodic boundaries to the same system with one non-periodic boundary,
@@ -78,21 +78,21 @@ def surface_energy(lammps_command, system, potential, symbols, mpi_command=None,
     results_dict['Ecoh'] = perfect['potentialenergy'] / system.natoms    
 
     #Set up defect system
-    #surfacearea is area of parallelogram defined by the two box vectors not along the cuttingaxis
-    if   cuttingaxis == 'a':
+    #surfacearea is area of parallelogram defined by the two box vectors not along the cutboxvector
+    if   cutboxvector == 'a':
         system.pbc[0] = False
         surfacearea = 2 * np.linalg.norm(np.cross(system.box.bvect, system.box.cvect))
         
-    elif cuttingaxis == 'b':
+    elif cutboxvector == 'b':
         system.pbc[1] = False
         surfacearea = 2 * np.linalg.norm(np.cross(system.box.avect, system.box.cvect))
         
-    elif cuttingaxis == 'c':
+    elif cutboxvector == 'c':
         system.pbc[2] = False
         surfacearea = 2 * np.linalg.norm(np.cross(system.box.avect, system.box.bvect))
         
     else:
-        raise ValueError('Invalid cuttingaxis')
+        raise ValueError('Invalid cutboxvector')
         
     #Evaluate system with free surface
     surface = relax_system(lammps_command, system, potential, symbols, mpi_command=mpi_command, 
@@ -204,7 +204,7 @@ def read_input(f, UUID=None):
     return input_dict
 
 def read_surface_model(input_dict):
-    """Read/handle parameters associated with the surface model (axes, cuttingaxis, and atomshift)"""
+    """Read/handle parameters associated with the surface model (axes, cutboxvector, and atomshift)"""
     
     #Check if surface_model was defined
     if 'surface_model' in input_dict:

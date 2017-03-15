@@ -6,3 +6,4 @@ from .system_family import system_family
 from .ucell import ucell
 from .units import units
 from .value import value
+from .boolean import boolean
