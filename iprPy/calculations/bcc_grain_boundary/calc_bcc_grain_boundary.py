@@ -77,7 +77,7 @@ def main(pool, *args):
     results_dict = {}
     results_dict['E_gb'] = energies
     results_dict['xshifts'] = xshifts
-    results_dict['zshifts'] = xshifts
+    results_dict['zshifts'] = zshifts
     
     #Find minimum energy
     energies = np.array(energies)

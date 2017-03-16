@@ -6,7 +6,7 @@
 
 compute pe all pe/atom
 compute ke all ke/atom
-compute stress all stress/atom NULL
+compute stress all stress/atom <stressterm>
 
 thermo <thermosteps>
 thermo_style custom step temp pe ke etotal lx ly lz pxx pyy pzz pyz pxz pxy
@@ -15,7 +15,7 @@ timestep 0.001
 
 <integrator_info>
 
-restart <restart_info>
+restart <restartsteps> *.restart
 
 dump dump_chkpt all custom <dumpsteps> dump.* id type xu yu zu c_pe c_ke & 
 c_stress[1] c_stress[2] c_stress[3] c_stress[4] c_stress[5] c_stress[6]

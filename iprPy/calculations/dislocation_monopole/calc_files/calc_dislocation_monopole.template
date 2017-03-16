@@ -1,0 +1,56 @@
+#Run script for calc_refine_structure_static.py
+
+#Command lines for LAMMPS (and MPI).
+#For lammps_command, exclude passing in a script, i.e. no "-in term" or "< term"
+lammps_command              <lammps_command>
+mpi_command                 <mpi_command>
+
+#Paths to the potential data model file, and directory containing potential parameters
+potential_file              <potential_file>
+potential_dir               <potential_dir>
+
+#Initial system configuration to load
+load                        <load>
+load_options                <load_options>
+symbols                     <symbols>
+box_parameters              <box_parameters>
+
+#System manipulations
+x-axis                      <x-axis>
+y-axis                      <y-axis>
+z-axis                      <z-axis>
+shift                       <shift>
+size_mults                  <size_mults>
+
+#Dislocation model (contains axes, shift, and burgers_vector terms)
+dislocation_model           <dislocation_model>
+
+#Elastic constants model (contains all Cij terms)
+elastic_constants_model     <elastic_constants_model>
+
+#Dislocation parameters
+burgers_vector              <burgers_vector>
+boundary_width              <boundary_width>
+boundary_shape              <boundary_shape>
+C11                         <C11>
+C22                         <C22>
+C33                         <C33>
+C12                         <C12>
+C13                         <C13>
+C23                         <C23>
+C44                         <C44>
+C55                         <C55>   
+C66                         <C66>
+
+#Units that input/output values are in
+length_unit                 <length_unit>
+pressure_unit               <pressure_unit>
+energy_unit                 <energy_unit>
+force_unit                  <force_unit>
+
+#Run parameters
+anneal_temperature          <anneal_temperature>
+energy_tolerance            <energy_tolerance>
+force_tolerance             <force_tolerance>
+maximum_iterations          <maximum_iterations>
+maximum_evaluations         <maximum_evaluations>
