@@ -1,0 +1,18 @@
+#LAMMPS input script that performs a simple energy minimization
+
+<atomman_system_info>
+
+<atomman_pair_info>
+
+thermo_style custom step lx ly lz pxx pyy pzz pe
+thermo_modify format float %.13e
+
+compute peatom all pe/atom 
+
+min_modify dmax <dmax>
+
+dump dumpit all custom <maxeval> <run_directory>atom.* id type x y z c_peatom
+dump_modify dumpit format "%d %d %.13e %.13e %.13e %.13e"
+#dump_modify dumpit format float %.13e
+
+minimize <etol> <ftol> <maxiter> <maxeval>
