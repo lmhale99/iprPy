@@ -4,10 +4,10 @@ def atomshift(input_dict, **kwargs):
     """
     Converts the atomshift input term string into a list of floats.
     
-    The input_dict keys used by this function (which can be renamed using the 
+    The input_dict keys used by this function (which can be renamed using the
     function's keyword arguments):
-    atomshift -- a string of space-delimited numbers. This function converts it
-                 to a list of floats.
+    atomshift -- a string of space-delimited numbers. This function
+    converts it to a list of floats.
        
     Argument:
     input_dict -- dictionary containing input parameter key-value pairs
