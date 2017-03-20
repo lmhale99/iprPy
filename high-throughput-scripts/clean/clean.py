@@ -24,7 +24,7 @@ def main(*args):
     for biddy in glob.iglob(os.path.join(run_directory, '*', '*.bid')):
         os.remove(biddy)
     for result in glob.iglob(os.path.join(run_directory, '*', 'results.json')):
-	os.remove(result)
+    os.remove(result)
 
     for record in glob.iglob(os.path.join(run_directory, '*', '*.json')):
         with open(record) as f:    

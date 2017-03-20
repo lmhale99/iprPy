@@ -20,7 +20,7 @@ def main(*args):
     if 'record_style' in input_dict:
         check_record_style(input_dict['dbase'], input_dict['record_style'])
     else:
-        raise ValueError('No records specified to be deleted')
+        raise ValueError('No records specified')
     
 
 def check_record_style(dbase, record_style):
