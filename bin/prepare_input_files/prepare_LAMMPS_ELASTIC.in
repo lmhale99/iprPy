@@ -1,0 +1,18 @@
+#### Commands ####
+lammps_command              lmp_serial
+mpi_command            
+            
+#### Run condition limiters ####
+potential_name          
+symbol_name
+prototype_name          
+
+#### Run parameters ####
+sizemults 
+energytolerance 
+forcetolerance 
+maxiterations
+maxevaluations
+maxatommotion
+strainrange                 1e-5
+strainrange                 1e-8 

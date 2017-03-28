@@ -1,3 +1,7 @@
+#Define rootdir
+import os
+rootdir = os.path.dirname(os.path.abspath(__file__))
+
 #Basic submodule imports
 from . import tools 
 
@@ -17,5 +21,4 @@ from .check_modules import check_modules
 from . import prepare
 from . import input
 
-import os
-rootdir = os.path.dirname(os.path.abspath(__file__))
+from . import highthroughput

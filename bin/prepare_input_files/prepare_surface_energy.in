@@ -1,0 +1,17 @@
+#### Commands ####
+lammps_command              lmp_serial
+mpi_command            
+
+#### Run condition limiters ####
+potential_name              
+symbol_name
+prototype_name              
+
+#### Unit specifications ####
+length_unit
+pressure_unit
+energy_unit
+force_unit
+
+#### Run parameters ####
+sizemults              5 5 5

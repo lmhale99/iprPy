@@ -5,8 +5,8 @@
 *.egg-info/
 *.egg
 
-#Notebook checkpoints and data
-#docs/calculations/*/
+#Local iprPy settings
+iprPy/.iprPy
 
 #test scripts
 test/
@@ -17,8 +17,8 @@ test.py
 */*/*/*/test.py
 
 #High-throughput log files
-high-throughput-scripts/runner/*-runner.log
-high-throughput-scripts/runner/iprPy_runner.*
+runner-logs/
+bin/iprPy_runner.*
 
 #Jupyter Notebook checkpoints
 .ipynb_checkpoints/
@@ -26,3 +26,4 @@ high-throughput-scripts/runner/iprPy_runner.*
 */*/.ipynb_checkpoints/
 */*/*/.ipynb_checkpoints/
 */*/*/*/.ipynb_checkpoints/
+

@@ -1,8 +1,0 @@
-#### Run directory location ####
-run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\iprhub\3
-
-#### Database information ####
-database                    curator https://iprhub.nist.gov/
-database_user               lmh1
-database_pswd               C:/users/lmh1/documents/iprhub/iprhub_password.txt
-database_cert               C:/users/lmh1/documents/iprhub/iprhub-ca.pem

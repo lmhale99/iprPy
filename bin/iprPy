@@ -1,0 +1,113 @@
+#!/usr/bin/env python
+from __future__ import print_function
+import os
+import sys
+import argparse
+
+import iprPy
+
+
+
+parser = argparse.ArgumentParser(description='iprPy high-throughput commands')
+subparsers = parser.add_subparsers(title='actions', dest='action')
+
+#define subparser for build
+parser_build = subparsers.add_parser('build', help='add library reference records to a database')
+parser_build.add_argument('database', nargs='?', default=None, help='database name')
+
+#define subparser for check
+parser_check = subparsers.add_parser('check', help='checks status of a run_directory or database')
+parser_check.add_argument('type', choices=['database', 'run_directory'], help='select database or run_directory')
+parser_check.add_argument('name', nargs='?', default=None, help='name of the database or run_directory to check')
+parser_check.add_argument('record_style', nargs='?', default=None, help='optional record style to limit by')
+
+#define subparser for check_modules
+parser_check_modules = subparsers.add_parser('check_modules', help='prints load status of all modules in iprPy')
+
+#define subparser for clean
+parser_clean = subparsers.add_parser('clean', help='resets prepared calculations for running again')
+#parser_clean.add_argument('database', help='database name')
+parser_clean.add_argument('run_directory', help='run_directory name')
+
+#define subparser for copy
+parser_copy = subparsers.add_parser('copy', help='copy records of a given style from one database to another')
+parser_copy.add_argument('database1', help='database name to copy from')
+parser_copy.add_argument('database2', help='database name to copy to')
+parser_copy.add_argument('record_style', help='record style')
+
+#define subparser for destroy
+parser_destroy = subparsers.add_parser('destroy', help='delete all records of a given style from a database')
+parser_destroy.add_argument('database', nargs='?', default=None, help='database name')
+parser_destroy.add_argument('record_style', nargs='?', default=None, help='record style')
+
+#define subparser for prepare
+parser_prepare = subparsers.add_parser('prepare', help='prepare calculations')
+parser_prepare.add_argument('database', help='database name')
+parser_prepare.add_argument('run_directory', help='run_directory name')
+parser_prepare.add_argument('calc_style', help='calculation name')
+parser_prepare.add_argument('input_file', help='prepare parameter file')
+
+#define subparser for runner
+parser_runner = subparsers.add_parser('runner', help='start runner working on prepared calculations')
+parser_runner.add_argument('database', help='database name')
+parser_runner.add_argument('run_directory', help='run_directory name')
+
+#define subparser for set
+parser_set = subparsers.add_parser('set', help='define a database or run_directory')
+parser_set.add_argument('type', choices=['database', 'run_directory'], help='select database or run_directory')
+parser_set.add_argument('name', nargs='?', default=None, help='name for the object')
+
+#Parse command line arguments
+args = parser.parse_args()
+
+#Actions for subcommand build
+if   args.action == 'build':
+    dbase = iprPy.highthroughput.get_database(args.database)
+    iprPy.highthroughput.build(dbase)
+
+#Actions for subcommand check
+elif args.action == 'check':
+    if args.type == 'database':
+        dbase = iprPy.highthroughput.get_database(args.name)
+        iprPy.highthroughput.check(dbase=dbase, record_style=args.record_style)
+    elif args.type == 'run_directory':
+        run_directory = iprPy.highthroughput.get_run_directory(args.name)
+        iprPy.highthroughput.check(run_directory=run_directory, record_style=args.record_style)
+
+#Actions for subcommand check
+elif args.action == 'check_modules':
+    iprPy.check_modules()
+        
+#Actions for subcommand clean
+elif args.action == 'clean':
+    run_directory = iprPy.highthroughput.get_run_directory(args.run_directory)
+    iprPy.highthroughput.clean(run_directory)
+
+#Actions for subcommand copy
+elif args.action == 'copy':
+    print('copy started')
+
+#Actions for subcommand destroy    
+elif args.action == 'destroy':
+    dbase = iprPy.highthroughput.get_database(args.database)
+    iprPy.highthroughput.destroy(dbase, args.record_style)
+
+#Actions for subcommand prepare
+elif args.action == 'prepare':
+    dbase = iprPy.highthroughput.get_database(args.database)
+    run_directory = iprPy.highthroughput.get_run_directory(args.run_directory)
+    iprPy.highthroughput.prepare(args.calc_style, dbase, run_directory, args.input_file)    
+ 
+#Actions for subcommand runner
+elif args.action == 'runner':
+    dbase = iprPy.highthroughput.get_database(args.database)
+    run_directory = iprPy.highthroughput.get_run_directory(args.run_directory)
+    iprPy.highthroughput.runner(dbase, run_directory)
+
+#Actions for subcommand set
+elif args.action == 'set':
+    if args.type == 'database':
+        iprPy.highthroughput.set_database(args.name)
+    elif args.type == 'run_directory':
+        iprPy.highthroughput.set_run_directory(args.name)
+    
