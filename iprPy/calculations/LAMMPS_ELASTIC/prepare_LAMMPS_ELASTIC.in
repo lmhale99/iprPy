@@ -1,0 +1,41 @@
+#### Information for local database ####
+run_directory              C:\Users\lmh1\Documents\calculations\ipr\torun\test\1
+
+database                   local C:\Users\lmh1\Documents\calculations\ipr\library_test
+
+#### Information for personally hosted curator ####
+#run_directory              C:\Users\lmh1\Documents\calculations\ipr\torun\curator\1
+
+#database                   curator http://127.0.0.1:8000/
+#database_user              admin
+#database_pswd              admin  
+
+#### Information for remotely hosted curator ####
+
+#run_directory               C:\Users\lmh1\Documents\calculations\ipr\torun\iprhub\1
+
+#database                    curator https://iprhub.nist.gov/
+#database_user               lmh1
+#database_pswd               C:/users/lmh1/documents/iprhub/iprhub_password.txt
+#database_cert               C:/users/lmh1/documents/iprhub/iprhub-ca.pem
+
+#########################################################################################
+
+#### Commands ####
+lammps_command              lmp_serial
+mpi_command            
+            
+#### Run condition limiters ####
+potential_name          
+symbol_name
+prototype_name              A1--Cu--fcc
+
+#### Run parameters ####
+sizemults 
+energytolerance 
+forcetolerance 
+maxiterations
+maxevaluations
+maxatommotion
+strainrange                 1e-5
+strainrange                 1e-8 

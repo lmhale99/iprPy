@@ -24,9 +24,9 @@ import atomman.unitconvert as uc
 #https://github.com/usnistgov/iprPy
 import iprPy
 
-__calc_name__ = os.path.splitext(os.path.basename(__file__))[0]
-assert __calc_name__[:5] == 'calc_', 'Calculation file name must start with "calc_"'
-__calc_type__ = __calc_name__[5:]
+calc_name = os.path.splitext(os.path.basename(__file__))[0]
+assert calc_name[:5] == 'calc_', 'Calculation file name must start with "calc_"'
+calc_type = calc_name[5:]
 
 def main(*args):
     """Main function for running calculation"""
@@ -161,9 +161,6 @@ def read_input(f, UUID=None):
     #Read input file in as dictionary    
     input_dict = iprPy.tools.parseinput(f, allsingular=True)
     
-    #Read input values from surface model (if given)
-    read_surface_model(input_dict)
-    
     #set calculation UUID
     if UUID is not None: input_dict['calc_key'] = UUID
     else: input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
@@ -201,25 +198,31 @@ def read_input(f, UUID=None):
                                                     default_unit=input_dict['length_unit'], 
                                                     default_term='0.01 angstrom')
     
-    return input_dict
-
-def read_surface_model(input_dict):
-    """Read/handle parameters associated with the surface model (axes, cutboxvector, and atomshift)"""
-    
     #Check if surface_model was defined
     if 'surface_model' in input_dict:
-        
         #Verify competing parameters are not defined
         assert 'atomshift'            not in input_dict, 'atomshift and surface_model cannot both be supplied'
         assert 'x_axis'               not in input_dict, 'x_axis and surface_model cannot both be supplied'
         assert 'y_axis'               not in input_dict, 'y_axis and surface_model cannot both be supplied'
         assert 'z_axis'               not in input_dict, 'z_axis and surface_model cannot both be supplied'
         assert 'surface_cutboxvector' not in input_dict, 'surface_cutboxvector and surface_model cannot both be supplied'
+    else:
+        input_dict['surface_model'] = None
+        input_dict['surface_cutboxvector'] = input_dict.get('surface_cutboxvector', 'c')
+        assert input_dict['surface_cutboxvector'] in ['a', 'b', 'c'], 'invalid surface_cutboxvector'
+    
+    return input_dict
+
+def interpret_surface_model(input_dict):
+    """Read/handle parameters associated with the surface model (axes, cutboxvector, and atomshift)"""
+    
+    #Check if surface_model was defined
+    if input_dict['surface_model'] is not None:
         
         #Load surface_model
         try:
             with open(input_dict['surface_model']) as f:
-                input_dict['surface_model'] = DM(f).find('surface-parameters')
+                input_dict['surface_model'] = DM(f).find('free-surface')
         except:
             raise ValueError('Invalid surface_model')
             
@@ -233,18 +236,15 @@ def read_surface_model(input_dict):
     
     #If surface_model is not defined
     else:
-        #Extract parameter values from input_dict
-        input_dict['surface_model'] = None
         iprPy.input.axes(input_dict)
         iprPy.input.atomshift(input_dict)
-        input_dict['surface_cutboxvector'] = input_dict.get('surface_cutboxvector', 'c')
-        assert input_dict['surface_cutboxvector'] in ['a', 'b', 'c'], 'invalid surface_cutboxvector'
         
-
 def interpret_input(input_dict):
     with open(input_dict['potential_file']) as f:
         input_dict['potential'] = lmp.Potential(f, input_dict['potential_dir'])
-        
+    
+    interpret_surface_model(input_dict)
+    
     iprPy.input.system_family(input_dict)
     
     iprPy.input.ucell(input_dict)
@@ -256,12 +256,12 @@ def data_model(input_dict, results_dict=None):
     
     #Create the root of the DataModelDict
     output = DM()
-    output['calculation-free-surface'] = calc = DM()
+    output['calculation-surface-energy'] = calc = DM()
     
     #Assign uuid
     calc['key'] = input_dict['calc_key']
     calc['calculation'] = DM()
-    calc['calculation']['script'] = __calc_name__
+    calc['calculation']['script'] = calc_name
     
     calc['calculation']['run-parameter'] = run_params = DM()
     
@@ -293,14 +293,13 @@ def data_model(input_dict, results_dict=None):
     calc['system-info']['symbols'] = input_dict['symbols']
     
     
-    calc['surface-parameters'] = DM()
-    if input_dict['surface_model'] is not None and 'surface' in input_dict['surface_model']:
-        calc['surface-parameters']['surface'] = surf = DM()
-        surf['key'] = input_dict['surface_model']['surface']['key']
-        surf['id'] =  input_dict['surface_model']['surface']['id']
+    calc['free-surface'] = surf = DM()
+    if input_dict['surface_model'] is not None:
+        surf['key'] = input_dict['surface_model']['key']
+        surf['id'] =  input_dict['surface_model']['id']
     
-    calc['surface-parameters']['system-family'] = input_dict['system_family']
-    calc['surface-parameters']['atomman-surface-parameters'] = asp = DM()    
+    surf['system-family'] = input_dict['system_family']
+    surf['atomman-surface-parameters'] = asp = DM()    
     asp['crystallographic-axes'] = DM()
     asp['crystallographic-axes']['x-axis'] = input_dict['x_axis']
     asp['crystallographic-axes']['y-axis'] = input_dict['y_axis']

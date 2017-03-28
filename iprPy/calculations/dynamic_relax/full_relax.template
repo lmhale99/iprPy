@@ -15,8 +15,6 @@ timestep 0.001
 
 <integrator_info>
 
-restart <restart_info>
-
 dump dump_chkpt all custom <dumpsteps> dump.* id type xu yu zu c_pe c_ke & 
 c_stress[1] c_stress[2] c_stress[3] c_stress[4] c_stress[5] c_stress[6]
 

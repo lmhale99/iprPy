@@ -27,9 +27,9 @@ import atomman.unitconvert as uc
 #https://github.com/usnistgov/iprPy
 import iprPy
 
-__calc_name__ = os.path.splitext(os.path.basename(__file__))[0]
-assert __calc_name__[:5] == 'calc_', 'Calculation file name must start with "calc_"'
-__calc_type__ = __calc_name__[5:]
+calc_name = os.path.splitext(os.path.basename(__file__))[0]
+assert calc_name[:5] == 'calc_', 'Calculation file name must start with "calc_"'
+calc_type = calc_name[5:]
 
 def main(pool, *args):
     """Main function for running calculation"""
@@ -354,9 +354,6 @@ def read_input(f, UUID=None):
     #Read input file in as dictionary    
     input_dict = iprPy.tools.parseinput(f, allsingular=True)
     
-    #Read input values from surface model (if given)
-    read_stackingfault_model(input_dict)
-    
     #set calculation UUID
     if UUID is not None: input_dict['calc_key'] = UUID
     else: input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
@@ -399,14 +396,8 @@ def read_input(f, UUID=None):
                                                     default_unit=input_dict['length_unit'], 
                                                     default_term='0.01 angstrom')
     
-    return input_dict
-
-def read_stackingfault_model(input_dict):
-    """Read/handle parameters associated with the stacking fault"""
-    
     #Check if stackingfault_model was defined
     if 'stackingfault_model' in input_dict:
-        
         #Verify competing parameters are not defined
         assert 'atomshift' not in input_dict, 'atomshift and stackingfault_model cannot both be supplied'
         assert 'x_axis'    not in input_dict, 'x_axis and stackingfault_model cannot both be supplied'
@@ -416,11 +407,26 @@ def read_stackingfault_model(input_dict):
         assert 'stackingfault_planepos'     not in input_dict, 'stackingfault_planepos and stackingfault_model cannot both be supplied'
         assert 'stackingfault_shiftvector1' not in input_dict, 'stackingfault_shiftvector1 and stackingfault_model cannot both be supplied'
         assert 'stackingfault_shiftvector2' not in input_dict, 'stackingfault_shiftvector2 and stackingfault_model cannot both be supplied'
+    else:
+        input_dict['stackingfault_model'] = None
+        input_dict['stackingfault_planeaxis'] = input_dict.get('stackingfault_planeaxis', 'z')
+        input_dict['stackingfault_planepos'] = float(input_dict.get('stackingfault_planepos', 0.5))
+        input_dict['stackingfault_shiftvector1'] = list(np.array(input_dict['stackingfault_shiftvector1'].strip().split(), dtype=float))
+        input_dict['stackingfault_shiftvector2'] = list(np.array(input_dict['stackingfault_shiftvector2'].strip().split(), dtype=float))
+        
+        
+    return input_dict
+
+def interpret_stackingfault_model(input_dict):
+    """Read/handle parameters associated with the stacking fault"""
+    
+    #Check if stackingfault_model was defined
+    if input_dict['stackingfault_model'] is not None:
         
         #Load stackingfault_model
         try:
             with open(input_dict['stackingfault_model']) as f:
-                input_dict['stackingfault_model'] = DM(f).find('stacking-fault-parameters')
+                input_dict['stackingfault_model'] = DM(f).find('stacking-fault')
         except:
             raise ValueError('Invalid stackingfault_model')
             
@@ -437,19 +443,15 @@ def read_stackingfault_model(input_dict):
     
     #If stackingfault_model is not defined
     else:
-        #Extract parameter values from input_dict
-        input_dict['stackingfault_model'] = None
         iprPy.input.axes(input_dict)
         iprPy.input.atomshift(input_dict)
-        input_dict['stackingfault_planeaxis'] = input_dict.get('stackingfault_planeaxis', 'z')
-        input_dict['stackingfault_planepos'] = float(input_dict.get('stackingfault_planepos', 0.5))
-        input_dict['stackingfault_shiftvector1'] = list(np.array(input_dict['stackingfault_shiftvector1'].strip().split(), dtype=float))
-        input_dict['stackingfault_shiftvector2'] = list(np.array(input_dict['stackingfault_shiftvector2'].strip().split(), dtype=float))
         
 def interpret_input(input_dict):
     with open(input_dict['potential_file']) as f:
         input_dict['potential'] = lmp.Potential(f, input_dict['potential_dir'])
-        
+    
+    interpret_stackingfault_model(input_dict)
+    
     iprPy.input.system_family(input_dict)
     
     iprPy.input.ucell(input_dict)
@@ -514,13 +516,14 @@ def data_model(input_dict, results_dict=None):
     
     #Create the root of the DataModelDict
     output = DM()
-    output['calculation-stacking-fault'] = calc = DM()
+    output['calculation-generalized-stacking-fault'] = calc = DM()
     
     #Assign uuid
     calc['key'] = input_dict['calc_key']
     calc['calculation'] = DM()
-    calc['calculation']['script'] = __calc_name__
+    calc['calculation']['script'] = calc_name
     
+    #Save run parameters
     calc['calculation']['run-parameter'] = run_params = DM()
     
     run_params['size-multipliers'] = DM()
@@ -530,11 +533,14 @@ def data_model(input_dict, results_dict=None):
     
     run_params['load_options'] = input_dict['load_options']
     
-    run_params['energytolerance']    = input_dict['energytolerance']
-    run_params['forcetolerance']     = input_dict['forcetolerance']
-    run_params['maxiterations']  = input_dict['maxiterations']
-    run_params['maxevaluations'] = input_dict['maxevaluations']
-    run_params['maxatommotion']      = input_dict['maxatommotion']
+    run_params['energytolerance']          = input_dict['energytolerance']
+    run_params['forcetolerance']           = input_dict['forcetolerance']
+    run_params['maxiterations']            = input_dict['maxiterations']
+    run_params['maxevaluations']           = input_dict['maxevaluations']
+    run_params['maxatommotion']            = input_dict['maxatommotion']
+    run_params['stackingfault_numshifts1'] = input_dict['stackingfault_numshifts1']
+    run_params['stackingfault_numshifts2'] = input_dict['stackingfault_numshifts2']
+    
     
     #Copy over potential data model info
     calc['potential'] = DM()
@@ -550,15 +556,18 @@ def data_model(input_dict, results_dict=None):
     calc['system-info']['artifact']['family'] = input_dict['system_family']
     calc['system-info']['symbols'] = input_dict['symbols']
     
+    #Save defect model information
+    calc['stacking-fault'] = sf = DM()
     
-    calc['stacking-fault-parameters'] = DM()
-    if input_dict['stackingfault_model'] is not None and 'stacking-fault' in input_dict['stackingfault_model']:
-        calc['stacking-fault-parameters']['stacking-fault'] = sf = DM()
-        sf['key'] = input_dict['stackingfault_model']['stacking-fault']['key']
-        sf['id'] =  input_dict['stackingfault_model']['stacking-fault']['id']
+    if input_dict['stackingfault_model'] is not None:
+        sf['key'] = input_dict['stackingfault_model']['key']
+        sf['id'] =  input_dict['stackingfault_model']['id']
+    else:
+        sf['key'] = None
+        sf['id'] =  None
     
-    calc['stacking-fault-parameters']['system-family'] = input_dict['system_family']
-    calc['stacking-fault-parameters']['atomman-stacking-fault-parameters'] = asfp = DM()    
+    sf['system-family'] = input_dict['system_family']
+    sf['atomman-stacking-fault-parameters'] = asfp = DM()    
     asfp['crystallographic-axes'] = DM()
     asfp['crystallographic-axes']['x-axis'] = input_dict['x_axis']
     asfp['crystallographic-axes']['y-axis'] = input_dict['y_axis']
@@ -569,17 +578,10 @@ def data_model(input_dict, results_dict=None):
     asfp['shift-vector-1'] = input_dict['stackingfault_shiftvector1']
     asfp['shift-vector-2'] = input_dict['stackingfault_shiftvector2']
     
-    #calc['stacking-fault-shift'] = DM()
-    #calc['stacking-fault-shift']['shift-vector-fraction'] = input_dict['stackingfault_shift']
-    #calc['stacking-fault-shift']['Cartesian-vector'] = DM()
-    #calc['stacking-fault-shift']['Cartesian-vector']['value'] = list(uc.get_in_units(input_dict['planeshift'], 
-    #                                                            input_dict['length_unit']))
-    #calc['stacking-fault-shift']['Cartesian-vector']['unit'] =  input_dict['length_unit']
-    
     if results_dict is None:
         calc['status'] = 'not calculated'
     else:        
-        #Save the stacking fault energy
+        #Save the stacking fault energy map
         calc['stacking-fault-relation'] = DM()
         calc['stacking-fault-relation']['shift-vector-1-fraction'] = results_dict['shift1']
         calc['stacking-fault-relation']['shift-vector-2-fraction'] = results_dict['shift2']

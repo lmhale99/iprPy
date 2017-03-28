@@ -28,19 +28,18 @@ def todict(record, full=True):
     params['y_axis_2'] =      calc['grain-2']['crystallographic-axes']['y-axis']
     params['z_axis_2'] =      calc['grain-2']['crystallographic-axes']['z-axis']
     
+    params['status'] = calc.get('status', 'finished')
+    
     if full is True:
-        if 'error' in calc:
-            params['status'] = calc['status']
+        if params['status'] == 'error':
             params['error'] = calc['error']
             params['E_gb'] = np.nan
         
-        elif 'status' in calc:
-            params['status'] = calc['status']
+        elif params['status'] == 'not calculated':
             params['error'] = np.nan
             params['E_gb'] = np.nan
             
         else:
-            params['status'] = np.nan
             params['error'] = np.nan
             params['E_gb'] = uc.value_unit(calc['lowest-energy']['E_gb'])
         

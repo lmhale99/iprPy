@@ -65,3 +65,22 @@ class Calculation(object):
             raise AttributeError('Calculation (' + self.style + ') has no attribute files')
         else:
             return files()
+            
+    @property
+    def prepare_keys(self):
+        """Yields the list of keys recognized by the prepare script"""
+        try: 
+            prepare_keys = self.__calc_module.prepare_keys
+        except AttributeError:
+            raise AttributeError('Calculation (' + self.style + ') has no attribute prepare_keys')
+        else:
+            return prepare_keys
+        
+    def prepare(self, dbase, run_directory, *args, **kwargs):
+        """Calls the calculation's prepare function"""
+        try: 
+            prepare = self.__calc_module.prepare
+        except AttributeError:
+            raise AttributeError('Calculation (' + self.style + ') has no attribute prepare') 
+        else:
+            return prepare(dbase, run_directory, *args, **kwargs) 

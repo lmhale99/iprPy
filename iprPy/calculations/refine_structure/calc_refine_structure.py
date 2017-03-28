@@ -21,9 +21,9 @@ import atomman.unitconvert as uc
 #https://github.com/usnistgov/iprPy
 import iprPy
 
-__calc_name__ = os.path.splitext(os.path.basename(__file__))[0]
-assert __calc_name__[:5] == 'calc_', 'Calculation file name must start with "calc_"'
-__calc_type__ = __calc_name__[5:]
+calc_name = os.path.splitext(os.path.basename(__file__))[0]
+assert calc_name[:5] == 'calc_', 'Calculation file name must start with "calc_"'
+calc_type = calc_name[5:]
 
 def main(*args):    
     """Main function for running calculation"""
@@ -291,7 +291,7 @@ def data_model(input_dict, results_dict=None):
     #Assign uuid
     calc['key'] = input_dict['calc_key']
     calc['calculation'] = DM()
-    calc['calculation']['script'] = __calc_name__
+    calc['calculation']['script'] = calc_name
     
     calc['calculation']['run-parameter'] = run_params = DM()
     

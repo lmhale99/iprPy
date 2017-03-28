@@ -35,9 +35,10 @@ def todict(record, full=True):
     params['pressure_yy'] =   uc.value_unit(calc['phase-state']['pressure-yy'])
     params['pressure_zz'] =   uc.value_unit(calc['phase-state']['pressure-zz'])
     
+    params['status'] = calc.get('status', 'finished')
+    
     if full is True:
-        if 'error' in calc:
-            params['status'] = calc['status']
+        if params['status'] == 'error':
             params['error'] = calc['error']
             params['initial_a'] = np.nan
             params['initial_b'] = np.nan
@@ -48,8 +49,7 @@ def todict(record, full=True):
             params['E_cohesive'] = np.nan
             params['C'] = np.nan
         
-        elif 'status' in calc:
-            params['status'] = calc['status']
+        elif params['status'] == 'not calculated':
             params['error'] = np.nan
             params['initial_a'] = np.nan
             params['initial_b'] = np.nan
@@ -61,7 +61,6 @@ def todict(record, full=True):
             params['C'] = np.nan
             
         else:
-            params['status'] = np.nan
             params['error'] = np.nan
             init = calc['as-constructed-atomic-system']
             params['initial_a'] = uc.value_unit(init.find('a'))

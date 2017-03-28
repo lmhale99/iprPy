@@ -1,7 +1,7 @@
-#Run script for calc_stacking_fault.py
+#Run script for calc_stacking_fault_multi.py
 
 #Command lines for LAMMPS (and MPI).
-#For lammps_command, exclude passing in a script, i.e. no "-in term" or "< term"
+#For lammps_command, exclude passing in a script, i.e. no "-in term"
 lammps_command              <lammps_command>
 mpi_command                 <mpi_command>
 

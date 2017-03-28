@@ -46,4 +46,3 @@ def icalculations(database, symbol=None, prototype=None, potential=None, record_
         
     for calc_key in df.calc_key.tolist():
         yield records[calc_key]
-        #yield database.get_record(name=calc_key, style=record_style)

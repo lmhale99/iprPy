@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style TYPE="text/css">
+code.has-jax {font: inherit; font-size: 100%; background: inherit; border: inherit;}
+</style>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$']],
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] // removed 'code' entry
+    }
+  });
+MathJax.Hub.Queue(function() {
+  var all = MathJax.Hub.getAllJax(), i;
+  for(i = 0; i < all.length; i += 1) {
+    all[i].SourceElement().parentNode.className += ' has-jax';
+  }
+});
+</script>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>,    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" id="Description" content="iprPy Calculation Framework">
+    <meta name="dcterms.description" id="Description" content="iprPy Calculation Framework">
+    <meta name="dcterms.creator" content="U.S. Department of Commerce, National Institute of Standards and Technology">
+    <title>iprPy Calculation Framework</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head><body>
+<!-- Content -->
+<div id="content" class="colM">
+ <div id="content-wrapper">
+  <div class="center-wrapper">
+   <div class="content">
+    <div id="featured-wrapper">
+     <div id="featured">
+      <div class="left">
+<h1>Calculations</h1>
+<hr>
+<p><strong>Lucas M. Hale</strong>, 
+<a href="mailto:lucas.hale@nist.gov?Subject=ipr-demo">lucas.hale@nist.gov</a>, 
+<em>Materials Science and Engineering Division, NIST</em>.</p>
+<p><strong>Chandler A. Becker</strong>, 
+<a href="mailto:chandler.becker@nist.gov?Subject=ipr-demo">chandler.becker@nist.gov</a>, 
+<em>Office of Data and Informatics, NIST</em>.</p>
+<p><strong>Zachary T. Trautt</strong>, 
+<a href="mailto:zachary.trautt@nist.gov?Subject=ipr-demo">zachary.trautt@nist.gov</a>, 
+<em>Materials Measurement Science Division, NIST</em>.</p>
+<p>Version: 2017-03-23</p>
+<p><a href="http://www.nist.gov/public_affairs/disclaimer.cfm">Disclaimers</a> </p>
+<hr>
+<h2>Contents</h2>
+<ul>
+<li>
+<p><a href="#introduction">Introduction</a></p>
+</li>
+<li>
+<p><a href="#folders">Calculation folders</a></p>
+<ul>
+<li>
+<p><a href="#location">Location</a></p>
+</li>
+<li>
+<p><a href="#contents">Contents</a></p>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="#run">How to run</a></p>
+<ul>
+<li>
+<p><a href="#single">Single calculation</a></p>
+</li>
+<li>
+<p><a href="#high-throughput">High-throughput prepare</a></p>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="#input">Input parameter files</a></p>
+<ul>
+<li>
+<p><a href="#input-rules">Formatting rules</a></p>
+</li>
+<li>
+<p><a href="#input-example">Formatting example</a></p>
+</li>
+<li>
+<p><a href="#input-easy">Easy creation</a></p>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2><a name="introduction"></a>Introduction</h2>
+<p>The iprPy framework was designed with the intent of allowing for easy 
+implementation of a wide variety of calculations. The structure and format of 
+the calculations allows for the following features:</p>
+<ul>
+<li>
+<p>The calculation constitutes a unit of work independent from all other 
+  calculations.</p>
+</li>
+<li>
+<p>The calculation exists as a Python script that can executed outside the iprPy 
+  framework.</p>
+</li>
+<li>
+<p>The calculation script reads in parameters from a simple input parameter file, 
+  and produces a structured results record.</p>
+</li>
+<li>
+<p>The calculation's methodology is documented using a demonstration Jupyter 
+  Notebook containing the same functions as the calculation script.</p>
+</li>
+<li>
+<p>Components of the calculation can be accessed from Python through the 
+  iprPy.Calculation class. </p>
+</li>
+<li>
+<p>Calculations are modular: new calculations are automatically recognized by 
+  iprPy if they are placed in the appropriate directory.</p>
+</li>
+<li>
+<p>The calculations can be prepared for high-throughput runs using parameter 
+  combinations unique to each calculation.</p>
+</li>
+<li>
+<p>Preparing high-throughput runs can be done either using the iprPy.Calculation 
+  class, a stand-alone Python script, or from the command line.</p>
+</li>
+</ul>
+<hr>
+<h2><a name="folders"></a>Calculation folders</h2>
+<p>Each calculation exists as a folder containing all of the relevant files. In 
+this way, the treatment of the calculations is modular allowing for the easy 
+addition, removal and modification of one or more without affecting the others.</p>
+<p>The name of the folder is the calculation's name, calcname, which is how it is 
+referred to when loaded by the iprPy Python package.</p>
+<h3><a name="location"></a>Location</h3>
+<p>The calculation folders can be found in the iprPy/calculations directory. </p>
+<p>The demonstration Notebook versions of the calculations can be found in the 
+docs/calculation-demonstration directory.</p>
+<h3><a name="location"></a>Contents</h3>
+<p>The contents of each calculation folder are similar:</p>
+<ul>
+<li>
+<p><strong>README.md</strong>: A Markdown formatted text file that describes what the 
+  calculation does and outlines all of the input parameters recognized by the 
+  calc_[calcname].py and the prepare_[calcname].py scripts.</p>
+</li>
+<li>
+<p><strong>calc_[calcname].py</strong>: The Python script for the calculation.</p>
+</li>
+<li>
+<p><strong>calc_[calcname].template</strong>: A template version of the calculation input 
+  parameter file. </p>
+</li>
+<li>
+<p><strong>prepare_[calcname].py</strong>: The Python script for high-throughput preparing 
+  of the calculation.</p>
+</li>
+<li>
+<p><strong>__init__.py</strong>: Tells the iprPy package to load the calculation folder 
+  as a submodule, and defines the necessary functions for the iprPy.Calculation
+  class.</p>
+</li>
+<li>
+<p>Any other files that the calculation script needs in order to run properly, 
+  such as LAMMPS input script templates. </p>
+</li>
+</ul>
+<p>For the calculations with corresponding demonstration notebooks, the 
+docs/calculation-demonstration directory contains:</p>
+<ul>
+<li>
+<p><strong>calc_[calcname].ipynb</strong>: The Jupyter Notebook demonstration version of the
+  calculation. This is where to look if you want to understand a calculation's 
+  methodology.</p>
+</li>
+<li>
+<p><strong>calc_[calcname]</strong>: Subdirectory for the files used or created by the 
+  calculation Notebook.</p>
+</li>
+</ul>
+<hr>
+<h2><a name="run"></a>How to run</h2>
+<p>The design supports calculations being executed either individually or en mass 
+for high-throughput investigations.</p>
+<h3><a name="single"></a>Single calculation</h3>
+<p>Running a single calculation is easy!</p>
+<ol>
+<li>
+<p>Copy the calculation folder to another location (this keeps the original 
+   folder from becoming cluttered).</p>
+</li>
+<li>
+<p>Create an <a href="#input">input parameter file</a> "calc_[calcname].in" using a text 
+   editor. Save it in the copy of the calculation folder.</p>
+</li>
+<li>
+<p>In a terminal, cd to the calculation folder you created, and enter:</p>
+<pre><code>python calc_[calcname].py calc_[calcname].in
+</code></pre>
+</li>
+<li>
+<p>When the calculation finishes successfully, a "record.json" record file will 
+   be created containing the processed results.</p>
+</li>
+</ol>
+<h3><a name="high-throughput"></a>High-throughput prepare</h3>
+<p>The cool thing is that running multiple instances of the calculation is almost 
+as easy as running a single calculation.</p>
+<ol>
+<li>
+<p>Set up a database and access parameters for loading it as an 
+   <a href="">iprPy.Database</a>.</p>
+</li>
+<li>
+<p>Create an <a href="#input">input parameter file</a> "prepare_[calcname].in" using a 
+   text editor.</p>
+</li>
+<li>
+<p>Place (copies of) the prepare_[calcname].py and prepare_[calcname].in in 
+   the same directory. This can be anywhere, including the original calculation 
+   folder.</p>
+</li>
+<li>
+<p>In a terminal, cd to the directory containing the two prepare files, and 
+   enter:</p>
+<pre><code>python prepare_[calcname].py prepare_[calcname].in
+</code></pre>
+</li>
+<li>
+<p>When the script finishes, check that there are copies of the calculation in 
+   your run_directory, and incomplete calculation records in your database.</p>
+</li>
+<li>
+<p>Start one or more <a href="">runner</a> scripts to perform the calculations.</p>
+</li>
+</ol>
+<p>Alternatively, calculations can be prepared either from another Python script 
+using the iprPy.Calculation class, or in a slightly more streamlined manner 
+using the iprPy command line options.</p>
+<hr>
+<h2><a name="input"></a>Input parameter files</h2>
+<p>For both the calc_[calcname].py and prepare_[calcname].py scripts, all variable 
+parameters are read in from input parameter files. These files are simple text 
+files that provide values to parameter names in a simple key-value manner. Each 
+script has its own set of recognized variable names, which are listed in the 
+calculation folder's README.md documentation file. </p>
+<h3>a name="input-rules"&gt;</a>Formating rules</h3>
+<p>The input parameter files follow some very simple rules.</p>
+<ol>
+<li>
+<p>Each line is read separately, and divided into whitespace-delimited terms.</p>
+</li>
+<li>
+<p>Blank lines are allowed.</p>
+</li>
+<li>
+<p>Comments are allowed by starting terms with #. The # term and any subsequent 
+   terms on the line are ignored. </p>
+</li>
+<li>
+<p>The first term in each line is a variable name.</p>
+</li>
+<li>
+<p>All remaining (non-comment) terms are collected together as a complete value
+   that is assigned to that variable name.</p>
+</li>
+<li>
+<p>Any variable names without values are ignored.</p>
+</li>
+<li>
+<p>For calculation input parameter files, each variable name can appear at most
+   one time. This is because each variable is allowed only one value.</p>
+</li>
+<li>
+<p>For prepare input parameter files, some variables are allowed to have 
+   multiple values. This can be accomplished by listing a parameter name with a
+   value on separate lines. Which parameters are limited to singular values and 
+   which can be assigned multiple values is indicated in the calculation's 
+   README.md file.</p>
+</li>
+</ol>
+<h3><a name="input-example"></a>Formatting example</h3>
+<p>Script:</p>
+<pre><code>#This is a comment and will be ignored
+
+firstvariable    singleterm
+
+secondvariable   multiple terms   using    spaces
+thirdvariable    term #with comments
+thirdvariable    again!
+
+fourthvariable
+</code></pre>
+<p>Gets interpreted as a Python dictionary:</p>
+<pre><code>{'firstvariable': 'singleterm',
+ 'secondvariable': 'multiple terms using spaces',
+ 'thirdvariable': ['term', 'again!']}
+</code></pre>
+<h3><a name="input-easy"></a>Easy creation</h3>
+<p>Here's a helpful tip for running single instances of a calculation. Instead of 
+creating an input parameter file from scratch, copy the 
+calc_[calcname].template and then fill in values. The template files were 
+designed for the prepare scripts, and list all of the parameter names recognized
+by the calculation divided into meaningful categories. Each non-comment line 
+looks something like</p>
+<pre><code>parametername     &lt;parametername&gt;
+</code></pre>
+<p>Simply replace &lt;parametername&gt; with the value to assign parametername (or 
+delete it to use the calculation's default value) for every line in the file. </p>
+      </div>
+      <div class="clearer">&nbsp;</div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+<!-- END Content -->
+</body>
+</html>
