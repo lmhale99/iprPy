@@ -1,0 +1,19 @@
+{
+    "stacking-fault": {
+        "key": "e92a955f-dcc9-43b9-95bb-2c413d082972", 
+        "id": "A2--W--bcc--112sf",
+        "system-family": "A2--W--bcc", 
+        "atomman-stacking-fault-parameters": {
+            "crystallographic-axes": {
+                "x-axis": [ 1, 1, 1], 
+                "y-axis": [ 1,-1, 0], 
+                "z-axis": [ 1, 1,-2]
+            }, 
+            "atomshift": [ 0.01, 0.01, 0.01], 
+            "plane-axis": "z", 
+            "plane-position": 0.5, 
+            "shift-vector-1": [ 1, 1, 1], 
+            "shift-vector-2": [ 1,-1, 0]
+        }
+    }
+}

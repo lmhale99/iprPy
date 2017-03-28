@@ -1,0 +1,16 @@
+{
+    "free-surface": {
+        "key": "8aeab983-633e-40e2-a649-82ce8736082b", 
+        "id": "A1--Cu--fcc--111",
+        "system-family": "A1--Cu--fcc", 
+        "atomman-surface-parameters": {
+            "crystallographic-axes": {
+                "x-axis": [ 1, 0,-1],
+                "y-axis": [-1, 2,-1],
+                "z-axis": [ 1, 1, 1]
+            }, 
+            "cutboxvector": "c", 
+            "atomshift": [0.0, 0.0, 0.1]
+        }
+    }
+}

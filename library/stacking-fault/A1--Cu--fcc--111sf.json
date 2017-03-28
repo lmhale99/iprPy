@@ -1,0 +1,19 @@
+{
+    "stacking-fault": {
+        "key": "dfb2cdad-46b0-4164-8cb2-4eb55a84f0ba", 
+        "id": "A1--Cu--fcc--111sf",
+        "system-family": "A1--Cu--fcc", 
+        "atomman-stacking-fault-parameters": {
+            "crystallographic-axes": {
+                "x-axis": [ 1,-1, 0], 
+                "y-axis": [ 1, 1,-2], 
+                "z-axis": [ 1, 1, 1]
+            }, 
+            "atomshift": [ 0.01, 0.01, 0.01], 
+            "plane-axis": "z", 
+            "plane-position": 0.5, 
+            "shift-vector-1": [ 0.5,-0.5, 0.0], 
+            "shift-vector-2": [ 0.5, 0.5,-1.0]
+        }
+    }
+}
