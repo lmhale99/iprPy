@@ -106,15 +106,6 @@ class Database(object):
         else:
             delete_record(self.__db_info, record=record, name=name, style=style)
         
-    def add_tar(self, record=None, name=None, style=None, root_dir=None):
-        """Archives a folder as a tar file and saves to a record in the database"""
-        try: 
-            add_tar = self.__db_module.add_tar
-        except AttributeError:
-            raise AttributeError('Database (' + self.style + ') has no attribute add_tar')
-        else:
-            add_tar(self.__db_info, record=record, name=name, style=style, root_dir=root_dir)
-        
     def get_tar(self, record=None, name=None, style=None):
         """Retrives a stored tar archive"""
         try: 
@@ -123,3 +114,30 @@ class Database(object):
             raise AttributeError('Database (' + self.style + ') has no attribute get_tar')
         else:
             return get_tar(self.__db_info, record=record, name=name, style=style)
+    
+    def add_tar(self, record=None, name=None, style=None, root_dir=None):
+        """Archives a folder as a tar file and saves to a record in the database"""
+        try: 
+            add_tar = self.__db_module.add_tar
+        except AttributeError:
+            raise AttributeError('Database (' + self.style + ') has no attribute add_tar')
+        else:
+            add_tar(self.__db_info, record=record, name=name, style=style, root_dir=root_dir)
+    
+    def update_tar(self, record=None, name=None, style=None, root_dir=None):
+        """Updates an existing tar file in the database"""
+        try: 
+            update_tar = self.__db_module.update_tar
+        except AttributeError:
+            raise AttributeError('Database (' + self.style + ') has no attribute update_tar')
+        else:
+            return update_tar(self.__db_info, record=record, name=name, style=style, root_dir=root_dir)
+    
+    def delete_tar(self, record=None, name=None, style=None):
+        """Deletes a tar file from the database"""
+        try: 
+            delete_tar = self.__db_module.delete_tar
+        except AttributeError:
+            raise AttributeError('Database (' + self.style + ') has no attribute delete_tar')
+        else:
+            delete_tar(self.__db_info, record=record, name=name, style=style)

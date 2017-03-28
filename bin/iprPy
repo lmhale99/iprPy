@@ -26,8 +26,9 @@ parser_check_modules = subparsers.add_parser('check_modules', help='prints load 
 
 #define subparser for clean
 parser_clean = subparsers.add_parser('clean', help='resets prepared calculations for running again')
-#parser_clean.add_argument('database', help='database name')
+parser_clean.add_argument('database', help='database name')
 parser_clean.add_argument('run_directory', help='run_directory name')
+parser_clean.add_argument('record_style', nargs='?', default=None, help='optional record style')
 
 #define subparser for copy
 parser_copy = subparsers.add_parser('copy', help='copy records of a given style from one database to another')
@@ -74,14 +75,18 @@ elif args.action == 'check':
         run_directory = iprPy.highthroughput.get_run_directory(args.name)
         iprPy.highthroughput.check(run_directory=run_directory, record_style=args.record_style)
 
-#Actions for subcommand check
+#Actions for subcommand check_modules
 elif args.action == 'check_modules':
     iprPy.check_modules()
         
 #Actions for subcommand clean
 elif args.action == 'clean':
+    if args.database != 'None':
+        dbase = iprPy.highthroughput.get_database(args.database)
+    else:
+        dbase = None
     run_directory = iprPy.highthroughput.get_run_directory(args.run_directory)
-    iprPy.highthroughput.clean(run_directory)
+    iprPy.highthroughput.clean(dbase, args.record_style, run_directory)
 
 #Actions for subcommand copy
 elif args.action == 'copy':

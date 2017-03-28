@@ -177,3 +177,25 @@ def get_tar(database_info, record=None, name=None, style=None):
     record_path = os.path.join(database_info, record.style, record.name)
     
     return tarfile.open(record_path+'.tar.gz')
+    
+def delete_tar(database_info, record=None, name=None, style=None):
+    """Deletes a stored calculation tar archive"""
+
+    #Create Record object if not given
+    if record is None:
+        record = get_record(database_info, name=name, style=style)
+    
+    #Issue a TypeError for competing kwargs
+    elif style is not None or name is not None:
+        raise TypeError('kwargs style and name cannot be given with kwarg record')
+    
+    #Verify that record exists
+    else:
+        record = get_record(database_info, name=record.name, style=record.style)
+    
+    #build path to tar file
+    record_path = os.path.join(database_info, record.style, record.name)
+    
+    #Delete record if it exists
+    if os.path.isfile(record_path+'.tar.gz'):
+        os.remove(record_path+'.tar.gz')
