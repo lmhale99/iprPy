@@ -1,0 +1,2 @@
+dump dumpit all atom 1 atom.* 
+dump_modify dumpit format float %.13e
