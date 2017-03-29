@@ -6,8 +6,7 @@ mpi_command
 potential_name              
 symbol_name
 prototype_name              
-stackingfault_name          A1--Cu--fcc--111sf
-stackingfault_name          A2--W--bcc--110sf
+stackingfault_name          
 
 #### Unit specifications ####
 length_unit
@@ -16,7 +15,7 @@ energy_unit
 force_unit
 
 #### Run parameters ####
-sizemults                   20 20 20
+sizemults                   3 3 9
 
 keepatomfiles               False
 stackingfault_numshifts1    51

@@ -18,5 +18,4 @@ sizemults
 pressure_xx             
 pressure_yy             
 pressure_zz             
-strainrange                1e-5
 strainrange                1e-8

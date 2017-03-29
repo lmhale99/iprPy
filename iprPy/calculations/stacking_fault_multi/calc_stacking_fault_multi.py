@@ -177,7 +177,10 @@ def stackingfault_map(lammps_command, system, potential, symbols,
         raise ValueError('shiftvector1 must be in cut plane')
     if shiftvector2[cutindex] != 0.0:
         raise ValueError('shiftvector2 must be in cut plane')
-    
+
+    #Test for lammps dump_modify version to use
+    dump_modify_version = iprPy.tools.lammps_version.dump_modify(lammps_command)
+        
     #Create free surface parallel to cut plane
     system.pbc = [True, True, True]
     system.pbc[cutindex] = False
@@ -186,10 +189,15 @@ def stackingfault_map(lammps_command, system, potential, symbols,
     results_list = []
 
     #Build calc_kwargs dictionary (these don't change)
-    calc_kwargs = {'mpi_command': mpi_command, 'keepatomfiles':keepatomfiles,
-                   'etol':etol, 'ftol':ftol, 
-                   'maxiter':maxiter, 'maxeval':maxeval, 
-                   'dmax':dmax, 'planeaxis':planeaxis}
+    calc_kwargs = {'mpi_command': mpi_command, 
+                   'keepatomfiles':keepatomfiles,
+                   'etol':etol, 
+                   'ftol':ftol, 
+                   'maxiter':maxiter, 
+                   'maxeval':maxeval, 
+                   'dmax':dmax, 
+                   'planeaxis':planeaxis,
+                   'dump_modify_version':dump_modify_version}
     
     #Loop over all shift combinations
     shifts1, shifts2 = np.meshgrid(np.linspace(0, 1, numshifts1), 
@@ -234,7 +242,7 @@ def sfworker(lammps_command, system, potential, symbols,
              shiftvector1, shiftvector2, shift1, shift2, topmap,
              mpi_command=None, keepatomfiles=True,
              etol=0.0, ftol=0.0, maxiter=100, maxeval=1000, dmax=0.01,
-             planeaxis='z'):
+             planeaxis='z', dump_modify_version=0):
     """Workers for running relax_sfsystem"""
     
     if   planeaxis == 'x': cutindex = 0
@@ -261,21 +269,22 @@ def sfworker(lammps_command, system, potential, symbols,
     stackingfault = relax_sfsystem(lammps_command, isystem, potential, symbols, 
                                    run_directory=dirname, mpi_command=mpi_command,
                                    etol=etol, ftol=ftol, maxiter=maxiter, 
-                                   maxeval=maxeval,dmax=dmax, planeaxis=planeaxis)
+                                   maxeval=maxeval,dmax=dmax, planeaxis=planeaxis,
+                                   dump_modify_version=dump_modify_version)
     
     #Extract results from system with stacking fault
     stackingfaultsystem = am.load('atom_dump', stackingfault['finaldumpfile'])[0]
     results_dict['potentialenergy'] = stackingfault['potentialenergy']
-    os.remove(os.path.join(dirname, 'atom.0'))
-    os.remove(stackingfault['finaldumpfile']+'.json')
+    remove_file(os.path.join(dirname, 'atom.0'))
+    remove_file(stackingfault['finaldumpfile']+'.json')
     
     if keepatomfiles is True:
         shutil.move(stackingfault['finaldumpfile'], os.path.join(dirname, 'stackingfault.dump'))
     elif keepatomfiles is False:
-        os.remove(os.path.join(dirname, 'system.dat'))
-        os.remove(stackingfault['finaldumpfile'])
-        
-    
+        remove_file(os.path.join(dirname, 'system.dat'))
+        remove_file(stackingfault['finaldumpfile'])
+
+                
     #Find center of mass difference in top/bottom planes
     if   planeaxis == 'x': cutindex = 0
     elif planeaxis == 'y': cutindex = 1  
@@ -284,11 +293,21 @@ def sfworker(lammps_command, system, potential, symbols,
                                     stackingfaultsystem.atoms.view['pos'][~topmap, cutindex].mean())
     
     return results_dict
+
+def remove_file(fname):
+    """Add retry capability to remove these files (after seeing issues)"""
+    for retry in xrange(100):
+        try:
+            os.remove(fname)
+            break
+        except:
+            pass
+
     
 def relax_sfsystem(lammps_command, system, potential, symbols, 
                    run_directory='', mpi_command=None, 
                    etol=0.0, ftol=0.0, maxiter=100, maxeval=1000, dmax=0.01,
-                   planeaxis=None):
+                   planeaxis=None, dump_modify_version=0):
     """
     Sets up and runs the min LAMMPS script for statically relaxing a system
     """
@@ -326,6 +345,12 @@ def relax_sfsystem(lammps_command, system, potential, symbols,
     lammps_variables['maxeval'] = maxeval
     lammps_variables['dmax'] = uc.get_in_units(dmax, lammps_units['length'])
     
+    #Set dump_modify format based on dump_modify_version
+    if dump_modify_version == 0:
+        lammps_variables['dump_modify_format'] = 'float %.13e'
+    elif dump_modify_version == 1:
+        lammps_variables['dump_modify_format'] = '"%i %i %.13e %.13e %.13e %.13e"'
+        
     #Write lammps input script
     template_file = 'sfmin.template'
     lammps_script = os.path.join(run_directory, 'sfmin.in')

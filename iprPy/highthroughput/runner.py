@@ -27,8 +27,10 @@ def runner(dbase, run_directory, orphan_directory=None):
     
     #Define runner log file
     d = datetime.datetime.now()
-    log_file = os.path.join(os.path.dirname(iprPy.rootdir), 'runner-logs', 
-               '%04i-%02i-%02i-%02i-%02i-%06i.log' % (d.year, d.month, d.day, d.minute, d.second, d.microsecond))
+    runner_log_dir = os.path.join(os.path.dirname(iprPy.rootdir), 'runner-logs')
+    if not os.path.isdir(runner_log_dir):
+        os.makedirs(runner_log_dir)
+    log_file = os.path.join(runner_log_dir, '%04i-%02i-%02i-%02i-%02i-%06i.log' % (d.year, d.month, d.day, d.minute, d.second, d.microsecond))
     
     #Set default orphan_directory
     if orphan_directory is None:

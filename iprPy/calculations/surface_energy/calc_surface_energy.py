@@ -134,6 +134,13 @@ def relax_system(lammps_command, system, potential, symbols, mpi_command=None,
     lammps_variables['maxeval'] = maxeval
     lammps_variables['dmax'] = uc.get_in_units(dmax, lammps_units['length'])
     
+    #Set dump_modify format based on dump_modify_version
+    dump_modify_version = iprPy.tools.lammps_version.dump_modify(lammps_command)
+    if dump_modify_version == 0:
+        lammps_variables['dump_modify_format'] = 'float %.13e'
+    elif dump_modify_version == 1:
+        lammps_variables['dump_modify_format'] = '"%i %i %.13e %.13e %.13e %.13e"'    
+    
     #Write lammps input script
     template_file = 'min.template'
     lammps_script = 'min.in'

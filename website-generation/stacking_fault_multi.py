@@ -27,7 +27,7 @@ for record in dbase.iget_records(style='calculation-generalized-stacking-fault')
     record_df.append(record.todict())
 record_df = pd.DataFrame(record_df)
 
-condition1 = record_df.stackingfault_id == 'A1--Cu--fcc--111sf'
+condition1 = record_df.stackingfault_id == 'A2--W--bcc--112sf'
 condition2 = record_df.status == 'finished'
 
 lookie_record_df = record_df[condition1 & condition2]
