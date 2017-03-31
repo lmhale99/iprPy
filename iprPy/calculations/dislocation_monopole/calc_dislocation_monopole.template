@@ -1,7 +1,7 @@
-#Run script for calc_refine_structure_static.py
+#Run script for calc_dislocation_monopole.py
 
 #Command lines for LAMMPS (and MPI).
-#For lammps_command, exclude passing in a script, i.e. no "-in term" or "< term"
+#For lammps_command, exclude passing in a script, i.e. no "-in term"
 lammps_command              <lammps_command>
 mpi_command                 <mpi_command>
 
@@ -16,22 +16,20 @@ symbols                     <symbols>
 box_parameters              <box_parameters>
 
 #System manipulations
-x-axis                      <x-axis>
-y-axis                      <y-axis>
-z-axis                      <z-axis>
-shift                       <shift>
-size_mults                  <size_mults>
+x_axis                      <x_axis>
+y_axis                      <y_axis>
+z_axis                      <z_axis>
+atomshift                   <atomshift>
+sizemults                   <sizemults>
 
-#Dislocation model (contains axes, shift, and burgers_vector terms)
+#Defect parameters
 dislocation_model           <dislocation_model>
+burgers                     <burgers>
+boundarywidth               <boundarywidth>
+boundaryshape               <boundaryshape>
 
-#Elastic constants model (contains all Cij terms)
-elastic_constants_model     <elastic_constants_model>
-
-#Dislocation parameters
-burgers_vector              <burgers_vector>
-boundary_width              <boundary_width>
-boundary_shape              <boundary_shape>
+#Elastic constants model 
+elasticconstants_model      <elasticconstants_model>
 C11                         <C11>
 C22                         <C22>
 C33                         <C33>
@@ -49,8 +47,10 @@ energy_unit                 <energy_unit>
 force_unit                  <force_unit>
 
 #Run parameters
-anneal_temperature          <anneal_temperature>
-energy_tolerance            <energy_tolerance>
-force_tolerance             <force_tolerance>
-maximum_iterations          <maximum_iterations>
-maximum_evaluations         <maximum_evaluations>
+annealtemperature           <annealtemperature>
+energytolerance             <energytolerance>
+forcetolerance              <forcetolerance>
+maxiterations               <maxiterations>
+maxevaluations              <maxevaluations>
+maxatommotion               <maxatommotion>
+randomseed                  <randomseed>

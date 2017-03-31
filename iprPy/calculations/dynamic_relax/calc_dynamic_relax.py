@@ -175,7 +175,7 @@ def integrator_info(integrator=None, p_xx=0.0, p_yy=0.0, p_zz=0.0,
     temperature -- temperature to relax at. Default value is 0. 
     randomseed -- random number seed used by LAMMPS for velocity creation and Langevin
                    thermostat. Default value generates a new random integer every time.
-    units = LAMMPS units style to use.
+    units -- LAMMPS units style to use.
     """
     
     #Get lammps units
@@ -307,7 +307,8 @@ def read_input(f, UUID=None):
     #these are integer terms
     input_dict['runsteps'] =    int(input_dict.get('runsteps',    100000))
     input_dict['thermosteps'] = int(input_dict.get('thermosteps', input_dict['runsteps']/1000))
-    if input_dict['thermosteps'] == 0 : input_dict['thermosteps'] = 1
+    if input_dict['thermosteps'] == 0 : 
+        input_dict['thermosteps'] = 1
     input_dict['dumpsteps'] =   int(input_dict.get('dumpsteps',   input_dict['runsteps']))
     input_dict['equilsteps'] =  int(input_dict.get('equilsteps',  10000))
     input_dict['randomseed'] =  int(input_dict.get('randomseed',  

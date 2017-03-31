@@ -10,9 +10,13 @@ group hold subtract all move
 compute peatom all pe/atom
 
 dump first all custom 100000 atom.* id type x y z c_peatom
-dump_modify first format "%d %d %.13e %.13e %.13e %.13e"
+dump_modify first format <dump_modify_format>
 thermo_style custom step pe
 
 fix nomove hold setforce 0.0 0.0 0.0
 
-minimize <energy_tolerance> <force_tolerance> <maximum_iterations> <maximum_evaluations>
+<anneal_info>
+
+min_modify dmax <dmax>
+
+minimize <etol> <ftol> <maxiter> <maxeval>

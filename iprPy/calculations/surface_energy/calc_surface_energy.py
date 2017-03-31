@@ -299,7 +299,7 @@ def data_model(input_dict, results_dict=None):
     calc['system-info']['artifact']['family'] = input_dict['system_family']
     calc['system-info']['symbols'] = input_dict['symbols']
     
-    
+    #Save defect parameters
     calc['free-surface'] = surf = DM()
     if input_dict['surface_model'] is not None:
         surf['key'] = input_dict['surface_model']['key']

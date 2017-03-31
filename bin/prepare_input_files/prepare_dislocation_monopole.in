@@ -1,0 +1,19 @@
+#### Commands ####
+lammps_command              lmp_mpi
+mpi_command                 mpiexec -localonly 4
+
+#### Run condition limiters ####
+potential_name              
+symbol_name
+prototype_name              
+dislocation_name            A1--Cu--fcc--111-edge
+
+#### Unit specifications ####
+length_unit
+pressure_unit
+energy_unit
+force_unit
+
+#### Run parameters ####
+sizemults                   -49 49 -40 40 0 2
+annealtemperature           50

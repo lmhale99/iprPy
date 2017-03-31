@@ -1,0 +1,20 @@
+{
+    "dislocation-monopole": {    
+        "key": "17d4954d-4832-4997-9a39-fa084c64c105", 
+        "id": "A2--W--bcc--111-screw",
+        "character": "screw",
+        "Burgers-vector": "a/2[ 1, 1, 1]",
+        "slip-plane": [-1, 0, 1],
+        "line-direction": [ 1, 1, 1],
+        "system-family": "A2--W--bcc",
+        "atomman-defect-Stroh-parameters": {
+            "burgers": [ 0.5, 0.5, 0.5],
+            "crystallographic-axes": {
+                "x-axis": [-1, 2,-1],
+                "y-axis": [-1, 0, 1],
+                "z-axis": [ 1, 1, 1]
+            },
+            "atomshift": [ 0.0, 0.66666666666667, 0.0]
+        }
+    }
+}
