@@ -63,7 +63,13 @@ def prepare(dbase, run_directory, **kwargs):
         defect_record_dict[defect_record.name] = defect_record
         defect_record_df.append(defect_record.todict())
     defect_record_df = pd.DataFrame(defect_record_df)
-        
+    
+    #Limit by defect name
+    if 'surface_name' in kwargs:
+        defect_names = iprPy.tools.aslist(kwargs['surface_name'])
+        defect_selection = defect_record_df.id.isin(defect_names)
+        defect_record_df = defect_record_df[defect_selection]
+    
     if 'parent_records' in kwargs:
         parent_records = kwargs['parent_records']
     else:
@@ -249,7 +255,8 @@ def multikeys():
     """List the prepare_*.in key terms that can have multiple values."""
     return ['potential_name',
             'symbol_name',
-            'prototype_name']
+            'prototype_name',
+            'surface_name']
             
 if __name__ == '__main__':
     main(*sys.argv[1:])         

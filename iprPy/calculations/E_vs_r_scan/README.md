@@ -195,10 +195,11 @@ This is a list of the input parameter names recognized by the prepare script.
 
 ### Database and run_directory
 
-These terms define the access parameters for the database to get/save records, 
+These terms define the access parameters for the database to get/save records,
 and the location of the run_directory where the prepared calculation folders are
-to be added. Note that these parameters are not needed when preparing from the 
-iprPy inline command or from iprPy.Calculation.prepare().
+to be added. These parameters are necessary when running a calculation's prepare 
+script, but are not needed when preparing from the iprPy inline command or from 
+the calculation's prepare method.
 
 - __database__: database style and host name.
 
