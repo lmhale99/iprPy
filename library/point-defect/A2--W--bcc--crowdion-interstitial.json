@@ -1,0 +1,13 @@
+{
+    "point-defect": {
+        "key": "93c04e36-fcbd-4bb8-b604-c2fc92cdbbd0",
+        "id": "A2--W--bcc--crowdion-interstitial", 
+        "system-family": "A2--W--bcc", 
+        "atomman-defect-point-parameters": {
+            "ptd_type": "i", 
+            "atype": 1, 
+            "pos": [0.25, 0.25, 0.25], 
+            "scale": true
+        }
+    }
+}

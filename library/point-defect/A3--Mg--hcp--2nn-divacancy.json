@@ -1,0 +1,19 @@
+{
+    "point-defect": {
+        "key": "2e2480da-56d2-49e7-b921-0806ffe240ab",
+        "id": "A3--Mg--hcp--2nn-divacancy", 
+        "system-family": "A3--Mg--hcp", 
+        "atomman-defect-point-parameters": [
+            {
+                "ptd_type": "v", 
+                "pos": [0.0, 0.0, 0.0], 
+                "scale": true
+            }, 
+            {
+                "ptd_type": "v", 
+                "pos": [1.0, 0.3333333333333, 0.5], 
+                "scale": true
+            }
+        ]
+    }
+}

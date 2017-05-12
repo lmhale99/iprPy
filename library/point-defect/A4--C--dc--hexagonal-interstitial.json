@@ -1,0 +1,13 @@
+{
+    "point-defect": {
+        "key": "ebeea811-3c17-48b3-9005-ed2b58a46beb",
+        "id": "A4--C--dc--hexagonal-interstitial", 
+        "system-family": "A4--C--dc", 
+        "atomman-defect-point-parameters": {
+            "ptd_type": "i", 
+            "atype": 1, 
+            "pos": [0.625, 0.625, 0.625], 
+            "scale": true
+        }
+    }
+}

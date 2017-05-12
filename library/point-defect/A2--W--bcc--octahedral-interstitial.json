@@ -1,0 +1,13 @@
+{
+    "point-defect": {
+        "key": "6caf473f-1ce0-4af2-9aff-48ca263ff521",
+        "id": "A2--W--bcc--octahedral-interstitial", 
+        "system-family": "A2--W--bcc", 
+        "atomman-defect-point-parameters": {
+            "ptd_type": "i", 
+            "atype": 1, 
+            "pos": [0.0, 0.5, 0.5], 
+            "scale": true
+        }
+    }
+}
