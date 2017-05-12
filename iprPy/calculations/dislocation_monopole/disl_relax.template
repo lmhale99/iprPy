@@ -9,7 +9,7 @@ group hold subtract all move
 
 compute peatom all pe/atom
 
-dump first all custom 100000 atom.* id type x y z c_peatom
+dump first all custom <maxeval> atom.* id type x y z c_peatom
 dump_modify first format <dump_modify_format>
 thermo_style custom step pe
 

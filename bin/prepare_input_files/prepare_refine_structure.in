@@ -3,7 +3,7 @@ lammps_command              lmp_serial
 mpi_command            
 
 #### Run condition limiters ####
-potential_name              
+potential_name              2006--Chamati-H--Fe
 symbol_name
 prototype_name              
 

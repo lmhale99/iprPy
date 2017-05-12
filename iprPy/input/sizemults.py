@@ -32,9 +32,9 @@ def sizemults(input_dict, **kwargs):
         if (newmults[0] <= 0 and newmults[0] < newmults[1] and newmults[1] >= 0 and
             newmults[2] <= 0 and newmults[2] < newmults[3] and newmults[3] >= 0 and
             newmults[4] <= 0 and newmults[4] < newmults[5] and newmults[5] >= 0):
-            input_dict['sizemults'] =  [[newmults[0], newmults[1]], 
-                                        [newmults[2], newmults[3]],
-                                        [newmults[4], newmults[5]]]
+            input_dict[kwargs['sizemults']] =  [[newmults[0], newmults[1]], 
+                                                [newmults[2], newmults[3]],
+                                                [newmults[4], newmults[5]]]
         
         else: raise ValueError('Invalid sizemults command')     
     
@@ -52,6 +52,6 @@ def sizemults(input_dict, **kwargs):
             
             else: raise ValueError('Invalid sizemults command') 
 
-        input_dict['sizemults'] = newmults
+        input_dict[kwargs['sizemults']] = newmults
         
     else: raise ValueError('Invalid sizemults command') 

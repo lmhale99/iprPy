@@ -20,10 +20,9 @@ def main(*args):
     input_dict = __read_input_file(args[0])
 
     check(dbase =         input_dict['dbase'], 
-          run_directory = input_dict['run_directory'], 
           record_style =  input_dict['record_style'])
 
-def check(dbase=None, record_style=None, run_directory=None):
+def check(dbase=None, record_style=None):
     
     if record_style is None:
         #Build list of calculation records
@@ -38,19 +37,6 @@ def check(dbase=None, record_style=None, run_directory=None):
         try:    choice = int(choice)
         except: record_style = choice
         else:   record_style = styles[choice-1]
-        print()
-        
-    if run_directory is not None:
-        #Display data about run_directory calculations
-        count = len(glob.glob(os.path.join(run_directory, '*')))
-        print('In run_directory:')
-        print(run_directory)
-        print('-', count, 'total calculations')
-        sys.stdout.flush()
-        if record_style is not None:
-            count = len(glob.glob(os.path.join(run_directory, '*', 'calc_'+record_style+'.py')))
-            print(' -', count, 'of style', record_style)
-            sys.stdout.flush()
         print()
         
     if dbase is not None and record_style is not None:
@@ -80,7 +66,6 @@ def check(dbase=None, record_style=None, run_directory=None):
             sys.stdout.flush()
             
             
-    
 def __read_input_file(fname):
     """Read check input file"""
 
@@ -91,7 +76,6 @@ def __read_input_file(fname):
     else: 
         input_dict['dbase'] = None
         
-    input_dict['run_directory'] = input_dict.get('run_directory', None)
     input_dict['record_style'] = input_dict.get('record_style', None)
     
     return input_dict

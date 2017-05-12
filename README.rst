@@ -52,12 +52,17 @@ Setup
 Getting Started
 ===============
 
-The iprPy guide document provides an overview of the different parts of the 
-iprPy framework. This document is meant to introduce new users to the designing
-principles used by the framework.
+Updated documentation is currently in the process. For now, you can check out 
+the iprPy Guide in the docs directory for a general overview. Otherwise, send 
+me an email if you have questions (lmh1 at nist.gov).
 
-More detailed documentation related to specific functions and components of the
-framework can be found in the form of Jupyter Notebooks in the docs directory. 
+Specific capabilities and functions are outlined in the docs/reference 
+directory.
+
+Introduction tutorials are coming soon.
+
+Demonstration Jupyter Notebooks for each implemented calculation are coming 
+soon.
 
 .. _xmltodict: https://github.com/martinblech/xmltodict
 .. _https://github.com/usnistgov/iprPy: https://github.com/usnistgov/iprPy

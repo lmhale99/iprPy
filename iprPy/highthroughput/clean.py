@@ -22,7 +22,7 @@ def main(*args):
           input_dict['record_style'],
           input_dict['run_directory'])
             
-def clean(dbase=None, record_style=None, run_directory=None):
+def clean(dbase=None, run_directory=None, record_style=None):
 
     if record_style is None:
         #Build list of calculation records

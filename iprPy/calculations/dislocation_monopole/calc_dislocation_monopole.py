@@ -256,6 +256,7 @@ def read_input(f, UUID=None):
     input_dict['box_parameters'] = input_dict.get('box_parameters', None)
     input_dict['symbols'] =        input_dict.get('symbols',        None)
        
+    input_dict['atomshift'] =      input_dict.get('atomshift',     '0.0 0.1 0.0')
     input_dict['sizemults'] =      input_dict.get('sizemults',     '-10 10 -10 10 0 3')
     iprPy.input.sizemults(input_dict)
     
