@@ -38,8 +38,10 @@ Setup
    c. All other requirements should come with Anaconda or will automatically 
       install during step 4 (let me know if not true).
 
-2. All of the files for iprPy can be found at:
+2. All of the files for iprPy can be found at
+
     - `https://github.com/usnistgov/iprPy`_ for the stable release.
+    
     - `https://github.com/lmhale99/iprPy`_ for the development version(s).
     
 3. Download or clone the whole project to a local directory. 
