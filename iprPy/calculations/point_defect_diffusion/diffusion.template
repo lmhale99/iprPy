@@ -1,0 +1,26 @@
+#LAMMPS input script that performs a simple energy minimization
+
+<atomman_system_info>
+
+<atomman_pair_info>
+
+variable temperature equal <temperature>
+
+velocity all create 2*${temperature} <randomseed>
+compute msd all msd com yes
+
+thermo <thermosteps>
+thermo_style custom step temp pxx pyy pzz pe c_msd[1] c_msd[2] c_msd[3] c_msd[4]
+thermo_modify format float %.13e
+
+timestep <timestep>
+
+dump dumpit all custom <dumpsteps> atom.* id type x y z c_peatom
+dump_modify dumpit format "%d %d %.13e %.13e %.13e %.13e"
+
+fix 1 all nvt temp ${temperature} ${temperature} 100*${timestep}
+run <equilsteps>
+unfix 1
+
+fix 2 all nve
+run <runsteps>
