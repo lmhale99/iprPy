@@ -1,0 +1,19 @@
+{
+    "point-defect": {
+        "key": "06b54f7d-e8de-4ba7-9898-e479d3ec33ce",
+        "id": "A4--C--dc--2nn-divacancy", 
+        "system-family": "A4--C--dc", 
+        "atomman-defect-point-parameters": [
+            {
+                "ptd_type": "v", 
+                "pos": [0.0, 0.0, 0.0], 
+                "scale": true
+            }, 
+            {
+                "ptd_type": "v", 
+                "pos": [0.0, 0.5, 0.5], 
+                "scale": true
+            }
+        ]
+    }
+}

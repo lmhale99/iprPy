@@ -1,0 +1,13 @@
+{
+    "point-defect": {
+        "key": "7cbace6d-735c-4cff-8f4f-a99b54236fa7",
+        "id": "A3--Mg--hcp--tetrahedral-interstitial", 
+        "system-family": "A3--Mg--hcp", 
+        "atomman-defect-point-parameters": {
+            "ptd_type": "i", 
+            "atype": 1, 
+            "pos": [0.5, -0.1666666666666666666667, 0.125], 
+            "scale": true
+        }
+    }
+}

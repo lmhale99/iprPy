@@ -2,7 +2,7 @@ from ..tools import aslist
 
 import pandas as pd
 
-def iprototypes(database, natypes=None, name=None, spacegroup=None, crystalfamily=None, pearson=None, record_style='crystal-prototype'):
+def iprototypes(database, record_style='crystal-prototype', natypes=None, name=None, spacegroup=None, crystalfamily=None, pearson=None):
     """
     Iterates over crystal prototype records in a database that match limiting 
     conditions.

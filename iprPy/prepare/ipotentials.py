@@ -3,7 +3,7 @@ from ..tools import aslist
 import pandas as pd
 import numpy as np
 
-def ipotentials(database, element=None, name=None, pair_style=None, record_style='LAMMPS-potential'):
+def ipotentials(database, record_style='LAMMPS-potential', element=None, name=None, pair_style=None):
     """
     Iterates over potentials in a database that match limiting conditions.
     

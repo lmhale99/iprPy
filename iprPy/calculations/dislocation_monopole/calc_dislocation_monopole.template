@@ -28,7 +28,7 @@ burgers                     <burgers>
 boundarywidth               <boundarywidth>
 boundaryshape               <boundaryshape>
 
-#Elastic constants model 
+#Elastic constants parameters 
 elasticconstants_model      <elasticconstants_model>
 C11                         <C11>
 C22                         <C22>
@@ -37,7 +37,7 @@ C12                         <C12>
 C13                         <C13>
 C23                         <C23>
 C44                         <C44>
-C55                         <C55>   
+C55                         <C55>
 C66                         <C66>
 
 #Units that input/output values are in

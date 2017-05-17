@@ -3,7 +3,7 @@ lammps_command              lmp_serial
 mpi_command            
 
 #### Potential limiters ####
-potential_name              1987--Ackland-G-J--Ag
+potential_name              2006--Chamati-H--Fe
 potential_element
 potential_pair_style
 

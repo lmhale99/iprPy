@@ -17,8 +17,7 @@ parser_build.add_argument('database', nargs='?', default=None, help='database na
 
 #define subparser for check
 parser_check = subparsers.add_parser('check', help='checks status of a run_directory or database')
-parser_check.add_argument('type', choices=['database', 'run_directory'], help='select database or run_directory')
-parser_check.add_argument('name', nargs='?', default=None, help='name of the database or run_directory to check')
+parser_check.add_argument('database', nargs='?', default=None, help='database name')
 parser_check.add_argument('record_style', nargs='?', default=None, help='optional record style to limit by')
 
 #define subparser for check_modules
@@ -26,15 +25,15 @@ parser_check_modules = subparsers.add_parser('check_modules', help='prints load 
 
 #define subparser for clean
 parser_clean = subparsers.add_parser('clean', help='resets prepared calculations for running again')
-parser_clean.add_argument('database', help='database name')
-parser_clean.add_argument('run_directory', help='run_directory name')
+parser_clean.add_argument('database', nargs='?', default=None, help='database name')
+parser_clean.add_argument('run_directory', nargs='?', default=None, help='run_directory name')
 parser_clean.add_argument('record_style', nargs='?', default=None, help='optional record style')
 
 #define subparser for copy
 parser_copy = subparsers.add_parser('copy', help='copy records of a given style from one database to another')
-parser_copy.add_argument('database1', help='database name to copy from')
-parser_copy.add_argument('database2', help='database name to copy to')
-parser_copy.add_argument('record_style', help='record style')
+parser_copy.add_argument('database1', nargs='?', default=None, help='database name to copy from')
+parser_copy.add_argument('database2', nargs='?', default=None, help='database name to copy to')
+parser_copy.add_argument('record_style', nargs='?', default=None, help='optional record style')
 
 #define subparser for destroy
 parser_destroy = subparsers.add_parser('destroy', help='delete all records of a given style from a database')
@@ -50,11 +49,16 @@ parser_prepare.add_argument('input_file', help='prepare parameter file')
 
 #define subparser for runner
 parser_runner = subparsers.add_parser('runner', help='start runner working on prepared calculations')
-parser_runner.add_argument('database', help='database name')
-parser_runner.add_argument('run_directory', help='run_directory name')
+parser_runner.add_argument('database', nargs='?', default=None, help='database name')
+parser_runner.add_argument('run_directory', nargs='?', default=None, help='run_directory name')
 
 #define subparser for set
 parser_set = subparsers.add_parser('set', help='define a database or run_directory')
+parser_set.add_argument('type', choices=['database', 'run_directory'], help='select database or run_directory')
+parser_set.add_argument('name', nargs='?', default=None, help='name for the object')
+
+#define subparser for unset
+parser_set = subparsers.add_parser('unset', help='remove defined database or run_directory')
 parser_set.add_argument('type', choices=['database', 'run_directory'], help='select database or run_directory')
 parser_set.add_argument('name', nargs='?', default=None, help='name for the object')
 
@@ -68,12 +72,8 @@ if   args.action == 'build':
 
 #Actions for subcommand check
 elif args.action == 'check':
-    if args.type == 'database':
-        dbase = iprPy.highthroughput.get_database(args.name)
-        iprPy.highthroughput.check(dbase=dbase, record_style=args.record_style)
-    elif args.type == 'run_directory':
-        run_directory = iprPy.highthroughput.get_run_directory(args.name)
-        iprPy.highthroughput.check(run_directory=run_directory, record_style=args.record_style)
+    dbase = iprPy.highthroughput.get_database(args.database)
+    iprPy.highthroughput.check(dbase=dbase, record_style=args.record_style)
 
 #Actions for subcommand check_modules
 elif args.action == 'check_modules':
@@ -90,7 +90,9 @@ elif args.action == 'clean':
 
 #Actions for subcommand copy
 elif args.action == 'copy':
-    print('copy started')
+    dbase1 = iprPy.highthroughput.get_database(args.database1)
+    dbase2 = iprPy.highthroughput.get_database(args.database2)
+    iprPy.highthroughput.copy(dbase1, dbase2, record_style=args.record_style)
 
 #Actions for subcommand destroy    
 elif args.action == 'destroy':
@@ -115,4 +117,10 @@ elif args.action == 'set':
         iprPy.highthroughput.set_database(args.name)
     elif args.type == 'run_directory':
         iprPy.highthroughput.set_run_directory(args.name)
-    
+
+#Actions for subcommand unset
+elif args.action == 'unset':
+    if args.type == 'database':
+        iprPy.highthroughput.unset_database(args.name)
+    elif args.type == 'run_directory':
+        iprPy.highthroughput.unset_run_directory(args.name)        

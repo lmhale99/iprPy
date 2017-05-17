@@ -38,8 +38,10 @@ Setup
    c. All other requirements should come with Anaconda or will automatically 
       install during step 4 (let me know if not true).
 
-2. All of the files for iprPy can be found at:
+2. All of the files for iprPy can be found at
+
     - `https://github.com/usnistgov/iprPy`_ for the stable release.
+    
     - `https://github.com/lmhale99/iprPy`_ for the development version(s).
     
 3. Download or clone the whole project to a local directory. 
@@ -52,12 +54,17 @@ Setup
 Getting Started
 ===============
 
-The iprPy guide document provides an overview of the different parts of the 
-iprPy framework. This document is meant to introduce new users to the designing
-principles used by the framework.
+Updated documentation is currently in the process. For now, you can check out 
+the iprPy Guide in the docs directory for a general overview. Otherwise, send 
+me an email if you have questions (lmh1 at nist.gov).
 
-More detailed documentation related to specific functions and components of the
-framework can be found in the form of Jupyter Notebooks in the docs directory. 
+Specific capabilities and functions are outlined in the docs/reference 
+directory.
+
+Introduction tutorials are coming soon.
+
+Demonstration Jupyter Notebooks for each implemented calculation are coming 
+soon.
 
 .. _xmltodict: https://github.com/martinblech/xmltodict
 .. _https://github.com/usnistgov/iprPy: https://github.com/usnistgov/iprPy

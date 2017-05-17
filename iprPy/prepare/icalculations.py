@@ -3,7 +3,7 @@ from ..tools import aslist
 import pandas as pd
 import numpy as np
 
-def icalculations(database, symbol=None, prototype=None, potential=None, record_style=None):
+def icalculations(database, record_style=None, symbol=None, prototype=None, potential=None):
     """
     Iterates over calculation records in a database that match limiting conditions.
     
@@ -11,6 +11,7 @@ def icalculations(database, symbol=None, prototype=None, potential=None, record_
     database -- an iprPy.Database object for the database being accessed
     
     Keyword Arguments:
+    record_style -- string name for the record style (i.e. template) to use.
     symbol -- single string element tag or list of element symbols. Only 
               potentials that contain models for at least one of the listed
               symbols will be returned. Default value is None (i.e. no 
@@ -20,7 +21,7 @@ def icalculations(database, symbol=None, prototype=None, potential=None, record_
                  prototype).
     potential -- single string name or list of names for the prototypes to 
                  include.
-    record_style -- string name for the record style (i.e. template) to use.
+
     
     Yields iprPy.Record objects for the associated calculations.    
     """

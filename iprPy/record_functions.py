@@ -34,7 +34,11 @@ class Record(object):
     
     @property
     def content(self):
-        return self.__content        
+        return self.__content
+        
+    @content.setter
+    def content(self, value):
+        self.__content = value
           
     def todict(self, **kwargs):
         """Converts an xml record to a flat dictionary"""

@@ -1,0 +1,13 @@
+{
+    "point-defect": {
+        "key": "610f3964-c647-45ce-a62e-31941ff007b5",
+        "id": "A1--Cu--fcc--tetrahedral-interstitial", 
+        "system-family": "A1--Cu--fcc", 
+        "atomman-defect-point-parameters": {
+            "ptd_type": "i", 
+            "atype": 1, 
+            "pos": [0.25, 0.25, 0.25], 
+            "scale": true
+        }
+    }
+}

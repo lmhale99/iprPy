@@ -1,0 +1,13 @@
+{
+    "point-defect": {
+        "key": "0b6d419e-4c27-4143-8e87-58824980c4f8",
+        "id": "A1--Cu--fcc--crowdion-interstitial", 
+        "system-family": "A1--Cu--fcc", 
+        "atomman-defect-point-parameters": {
+            "ptd_type": "i", 
+            "atype": 1, 
+            "pos": [0.25, 0.25, 0.00], 
+            "scale": true
+        }
+    }
+}

@@ -4,15 +4,15 @@ def database_styles():
     """Returns a list of the styles of the loaded databases."""
     return databases_dict.keys()
     
-def database_fromdict(input_dict):
+def database_fromdict(input_dict, database_key='database'):
     """Takes a dictionary from an input file and returns a Database object"""
     
-    db = input_dict['database'].split()
+    db = input_dict[database_key].split()
     db_type = db[0]
     db_name = ' '.join(db[1:])
     db_terms = {}
     for key in input_dict:
-        if key[:9] == 'database_':
+        if key[:9] == database_key + '_':
             db_terms[key[9:]] = input_dict[key]
 
     return Database(db_type, db_name, **db_terms)   

@@ -34,12 +34,12 @@ def parseinput(infile, singularkeys=[], allsingular=False):
     if isinstance(infile, (str, unicode)):
         infile = infile.splitlines()
 
-    params = {}    
+    params = {}
     
     #iterate over all lines in infile
     for line in infile:
         terms = line.split()
-        
+
         #remove comments
         i = 0
         while i < len(terms):
@@ -47,14 +47,13 @@ def parseinput(infile, singularkeys=[], allsingular=False):
                 break
             i += 1
         terms = terms[:i]
-        
+
         #skip empty (and comment) lines        
         if len(terms) > 1:
             
             #Split into key and value
             key = terms[0]
-            value = line[len(key):].strip()
-            
+            value = ' '.join(terms[1:])            
         
             #First time key is called save as is
             if key not in params:

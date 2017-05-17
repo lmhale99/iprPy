@@ -141,7 +141,7 @@ def calc_cij(lammps_command, system, potential, symbols, p_xx=0.0, p_yy=0.0, p_z
         f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
     
     #Run lammps 
-    output = lmp.run(lammps_command, lammps_script)
+    output = lmp.run(lammps_command, lammps_script, return_style='model')
     shutil.move('log.lammps', 'cij-'+str(cycle)+'-log.lammps')
     
     #Extract LAMMPS thermo data. Each term ranges i=0-12 where i=0 is undeformed
@@ -191,12 +191,12 @@ def calc_cij(lammps_command, system, potential, symbols, p_xx=0.0, p_yy=0.0, p_z
 
     C = am.ElasticConstants(Cij=cij)
     
-    if np.allclose(C.Cij, 0.0):
-        raise RuntimeError('Divergence of elastic constants to <= 0')
-    try:
-        S = C.Sij
-    except:
-        raise RuntimeError('singular C:\n'+str(C.Cij))
+    #if np.allclose(C.Cij, 0.0):
+    #    raise RuntimeError('Divergence of elastic constants to <= 0')
+    #try:
+    S = C.Sij
+    #except:
+    #    raise RuntimeError('singular C:\n'+str(C.Cij))
 
     
     #extract the current stress state
