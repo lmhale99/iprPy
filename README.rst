@@ -56,15 +56,15 @@ Getting Started
 
 Updated documentation is currently in the process. For now, you can check out 
 the iprPy Guide in the docs directory for a general overview. Otherwise, send 
-me an email if you have questions (lmh1 at nist.gov).
+me an email if you have questions (lucas.hale at nist.gov).
 
 Specific capabilities and functions are outlined in the docs/reference 
 directory.
 
 Introduction tutorials are coming soon.
 
-Demonstration Jupyter Notebooks for each implemented calculation are coming 
-soon.
+Demonstration Jupyter Notebooks for each implemented calculation are in the 
+docs/demonstrations directory.
 
 .. _xmltodict: https://github.com/martinblech/xmltodict
 .. _https://github.com/usnistgov/iprPy: https://github.com/usnistgov/iprPy
