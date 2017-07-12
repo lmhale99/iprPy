@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "b40b32b7-a4a2-4417-a85d-293e4c137aa8", 
+        "id": "1999--Mishin-Y--Al--LAMMPS--ipr1", 
+        "potential": {
+            "key": "0c2ddffb-e644-4e5c-8e53-9bf722bb5dee", 
+            "id": "1999--Mishin-Y--Al"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Al", 
+            "mass": 26.982
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Al99.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

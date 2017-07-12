@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "71d1f717-285f-49d9-bbc4-95fcc8322ff1", 
+        "id": "2003--Han-S--Cs--LAMMPS--ipr1", 
+        "potential": {
+            "key": "ca73cf4e-aaae-40f6-9592-6f28abc18029", 
+            "id": "2003--Han-S--Cs"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Cs", 
+            "mass": 132.9
+        }, 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Cs.eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

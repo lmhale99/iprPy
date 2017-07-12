@@ -1,11 +1,11 @@
 {
     "point-defect": {
-        "key": "7f0beccd-63bb-4862-a264-50ae50f6d837",
+        "key": "7f0beccd-63bb-4862-a264-50ae50f6d837", 
         "id": "A3--Mg--hcp--vacancy", 
         "system-family": "A3--Mg--hcp", 
-        "atomman-defect-point-parameters": {
+        "calculation-parameter": {
             "ptd_type": "v", 
-            "pos": [0.0, 0.0, 0.0], 
+            "pos": "0.0000000000000 0.0000000000000 0.0000000000000", 
             "scale": true
         }
     }

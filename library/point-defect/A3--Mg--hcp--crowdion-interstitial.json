@@ -1,12 +1,12 @@
 {
     "point-defect": {
-        "key": "4b8b3c39-a759-4892-87e4-f4b5cd3ad4fb",
+        "key": "4b8b3c39-a759-4892-87e4-f4b5cd3ad4fb", 
         "id": "A3--Mg--hcp--crowdion-interstitial", 
         "system-family": "A3--Mg--hcp", 
-        "atomman-defect-point-parameters": {
+        "calculation-parameter": {
             "ptd_type": "i", 
             "atype": 1, 
-            "pos": [0.0, 0.1666666666666666666667, 0.25], 
+            "pos": "0.0000000000000 0.1666666666667 0.2500000000000", 
             "scale": true
         }
     }

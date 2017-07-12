@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "d8dc01ec-7e50-48f2-92a7-a3b670f28037", 
+        "id": "1987--Ackland-G-J--Au--LAMMPS--ipr1", 
+        "potential": {
+            "key": "25899e46-6992-460a-b1c7-fb2704629e9f", 
+            "id": "1987--Ackland-G-J--Au"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Au", 
+            "mass": 196.96655
+        }, 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Au.eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

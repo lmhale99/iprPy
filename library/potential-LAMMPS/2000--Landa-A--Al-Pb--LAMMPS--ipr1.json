@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "6aa30d73-b21a-4e1d-8126-cb5901ca4716", 
+        "id": "2000--Landa-A--Al-Pb--LAMMPS--ipr1", 
+        "potential": {
+            "key": "df6401e2-2541-484c-bf5d-1b0ff4b1ac39", 
+            "id": "2000--Landa-A--Al-Pb"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Al", 
+                "mass": 26.982
+            }, 
+            {
+                "element": "Pb", 
+                "mass": 207.2
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "alpb-setfl.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

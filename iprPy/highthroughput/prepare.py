@@ -31,7 +31,7 @@ def prepare(calc_style, dbase, run_directory, input_file=None, input_dict=None):
     
     elif input_dict is None:
         raise ValueError('Either input_file or input_dict must be given')
-    
+
     calc.prepare(dbase, run_directory, **input_dict)
     
 if __name__ == '__main__':

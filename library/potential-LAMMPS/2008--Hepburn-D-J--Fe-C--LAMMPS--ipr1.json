@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "736631ad-9de2-4707-a291-de9b1358f2d5", 
+        "id": "2008--Hepburn-D-J--Fe-C--LAMMPS--ipr1", 
+        "potential": {
+            "key": "88820775-7b63-43bb-8c1c-026a5264b351", 
+            "id": "2008--Hepburn-D-J--Fe-C"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Fe", 
+                "mass": 55.845
+            }, 
+            {
+                "element": "C", 
+                "mass": 12.0107
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Fe-C_Hepburn_Ackland.eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

@@ -8,18 +8,18 @@ def todict(record, full=True, flat=False):
 
     proto = model['stacking-fault']
     params = {}
-    params['key'] =       proto['key']
-    params['id'] =        proto['id']
-    params['prototype'] = proto['system-family']
+    params['key'] =    proto['key']
+    params['id'] =     proto['id']
+    params['family'] = proto['system-family']
     
-    asp = proto['atomman-stacking-fault-parameters']
-    params['x_axis'] =         np.array(asp['crystallographic-axes']['x-axis'])
-    params['y_axis'] =         np.array(asp['crystallographic-axes']['y-axis'])
-    params['z_axis'] =         np.array(asp['crystallographic-axes']['z-axis'])
-    params['atomshift'] =      np.array(asp['atomshift'])
-    params['plane_axis'] =     asp['plane-axis']
-    params['plane_position'] = float(asp['plane-position'])
-    params['shift_vector_1'] = np.array(asp['shift-vector-1'])
-    params['shift_vector_2'] = np.array(asp['shift-vector-2'])
+    calcparam = proto['calculation-parameter']
+    params['x_axis'] =        calcparam['x_axis']
+    params['y_axis'] =        calcparam['y_axis']
+    params['z_axis'] =        calcparam['z_axis']
+    params['atomshift'] =     calcparam['atomshift']
+    params['cutboxvector'] =  calcparam['cutboxvector']
+    params['faultpos'] =      calcparam['faultpos']
+    params['shiftvector1'] =  calcparam['shiftvector1']
+    params['shiftvector2'] =  calcparam['shiftvector2']
     
     return params 

@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "19b06879-fe19-414e-a7a0-f0bbf62a94e6", 
+        "id": "2006--Williams-P-L--Ag--LAMMPS--ipr1", 
+        "potential": {
+            "key": "ce32faaf-5d57-4861-a2ec-efbfc63f07e6", 
+            "id": "2006--Williams-P-L--Ag"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ag", 
+            "mass": 107.868
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Ag.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "bee3e3d7-13ea-44cb-bb9d-7dd230732d20", 
+        "id": "2004--Zhou-X-W--Ti--LAMMPS--ipr1", 
+        "potential": {
+            "key": "8d877089-5fc2-418e-a2b3-a1b468483690", 
+            "id": "2004--Zhou-X-W--Ti"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ti", 
+            "mass": 47.88
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Ti.set"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

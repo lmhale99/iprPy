@@ -9,7 +9,7 @@ mpi_command                  mpiexec -localonly 4
 #### Run condition limiters ####
 potential_name               
 symbol_name
-prototype_name               
+family_name               
 
 #### Run parameters ####
 sizemults                    10 10 10

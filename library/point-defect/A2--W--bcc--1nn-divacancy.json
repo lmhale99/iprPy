@@ -1,17 +1,17 @@
 {
     "point-defect": {
-        "key": "8aa31e4c-2ca8-42ad-ab31-ae852e912cb9",
+        "key": "8aa31e4c-2ca8-42ad-ab31-ae852e912cb9", 
         "id": "A2--W--bcc--1nn-divacancy", 
         "system-family": "A2--W--bcc", 
-        "atomman-defect-point-parameters": [
+        "calculation-parameter": [
             {
                 "ptd_type": "v", 
-                "pos": [0.0, 0.0, 0.0], 
+                "pos": "0.0000000000000 0.0000000000000 0.0000000000000", 
                 "scale": true
             }, 
             {
                 "ptd_type": "v", 
-                "pos": [0.5, 0.5, 0.5], 
+                "pos": "0.5000000000000 0.5000000000000 0.5000000000000", 
                 "scale": true
             }
         ]

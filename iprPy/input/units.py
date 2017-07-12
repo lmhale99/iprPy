@@ -19,12 +19,12 @@ def units(input_dict, **kwargs):
     force_unit -- replacement parameter key name for 'force_unit'
     """
     
-    #Set default keynames
+    # Set default keynames
     keynames = ['length_unit', 'energy_unit', 'pressure_unit', 'force_unit']
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
     
-    #Set default unit styles to any terms not given
+    # Set default unit styles to any terms not given
     input_dict[kwargs['length_unit']] =   input_dict.get(kwargs['length_unit'],   'angstrom')
     input_dict[kwargs['energy_unit']] =   input_dict.get(kwargs['energy_unit'],   'eV')
     input_dict[kwargs['pressure_unit']] = input_dict.get(kwargs['pressure_unit'], 'GPa')

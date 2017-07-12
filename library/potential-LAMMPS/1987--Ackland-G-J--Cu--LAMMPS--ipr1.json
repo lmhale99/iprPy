@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "e879eafc-5f54-4c71-8488-719fe2f6d9ad", 
+        "id": "1987--Ackland-G-J--Cu--LAMMPS--ipr1", 
+        "potential": {
+            "key": "41ea33df-5737-4c25-b94c-a708f063f26f", 
+            "id": "1987--Ackland-G-J--Cu"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Cu", 
+            "mass": 63.546
+        }, 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Cu.eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

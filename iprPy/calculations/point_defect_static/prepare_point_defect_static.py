@@ -1,62 +1,67 @@
 #!/usr/bin/env python
 
-#Standard library imports
+# Standard library imports
+from __future__ import print_function, division
 import os
 import sys
 import glob
 import uuid
 import shutil
+from copy import deepcopy
 
-#http://www.numpy.org/
+# http://www.numpy.org/
 import numpy as np
 
-#http://pandas.pydata.org/
+# http://pandas.pydata.org/
 import pandas as pd
 
+# https://github.com/usnistgov/DataModelDict 
 from DataModelDict import DataModelDict as DM
 
-#https://github.com/usnistgov/atomman
+# https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
-#https://github.com/usnistgov/iprPy
+# https://github.com/usnistgov/iprPy
 import iprPy
 
+# Define calc_style and record_style
 calc_style = 'point_defect_static'
 record_style = 'calculation-point-defect-formation'
 
 def main(*args):
     """main function called when script is executed directly"""
     
+    # Read input script
     with open(args[0]) as f:
-        input_dict = read_input(f)
+        input_dict = iprPy.tools.parseinput(f, singularkeys=singularkeys())
 
-    #open database
+    # Open database
     dbase = iprPy.database_fromdict(input_dict)
     
-    #Pull out run_directory
+    # Pull out run_directory
     run_directory = input_dict.pop('run_directory')
     
-    #Call prepare
+    # Call prepare
     prepare(dbase, run_directory, **input_dict)
     
 def prepare(dbase, run_directory, **kwargs):
     """high-throughput prepare function for the calculation"""
     
-    #Initialize Calculation instance
+    # Initialize Calculation instance
     calculation = iprPy.Calculation(calc_style)
     
-    #Build record_df
+    # Build record_df
     record_df = build_record_df(dbase, record_style)
 
-    #Build potential dictionaries (single dbase access)
+    # Build potential dictionaries (single dbase access)
     pot_record_dict = {}
     pot_tar_dict = {}
-    for pot_record in dbase.iget_records(style='LAMMPS-potential'):
+    for pot_record in dbase.iget_records(style='potential-LAMMPS'):
         pot_record_dict[pot_record.name] = pot_record
         
-    #Build defect model record dictionary and df (single dbase access)
+    # Build defect model record dictionary and df (single dbase access)
     defect_record_dict = {}
     defect_record_df = []
     for defect_record in dbase.iget_records(style='point-defect'):
@@ -64,134 +69,111 @@ def prepare(dbase, run_directory, **kwargs):
         defect_record_df.append(defect_record.todict())
     defect_record_df = pd.DataFrame(defect_record_df)
     
-    #Limit by defect name
+    # Limit by defect name
     if 'pointdefect_name' in kwargs:
         defect_names = iprPy.tools.aslist(kwargs['pointdefect_name'])
         defect_selection = defect_record_df.id.isin(defect_names)
         defect_record_df = defect_record_df[defect_selection]
     
+    # Get parent records
     if 'parent_records' in kwargs:
         parent_records = kwargs['parent_records']
     else:
         parent_records = iprPy.prepare.icalculations(dbase, 
                                                      record_style = 'calculation-system-relax',
                                                      symbol =       kwargs.get('symbol_name', None), 
-                                                     prototype =    kwargs.get('prototype_name', None),
+                                                     family =       kwargs.get('family_name', None),
                                                      potential =    kwargs.get('potential_name', None))
+    # Loop over parent records
     for parent_record in parent_records:
         parent_dict = parent_record.todict()
     
-        #Load potential
-        pot_record = pot_record_dict[parent_dict['potential_id']]
+        # Load potential
+        pot_record = pot_record_dict[parent_dict['potential_LAMMPS_id']]
         potential = lmp.Potential(pot_record.content)
         
-        #Get pot_tar from dbase only once per potential
-        if parent_dict['potential_id'] in pot_tar_dict:
-            pot_tar = pot_tar_dict[parent_dict['potential_id']]
+        # Get pot_tar from dbase only once per potential
+        if parent_dict['potential_LAMMPS_id'] in pot_tar_dict:
+            pot_tar = pot_tar_dict[parent_dict['potential_LAMMPS_id']]
         else:
             pot_tar = dbase.get_tar(pot_record)
-            pot_tar_dict[parent_dict['potential_id']] = pot_tar
+            pot_tar_dict[parent_dict['potential_LAMMPS_id']] = pot_tar
     
-        #Loop over defect model records with prototype matching parent record
-        matches = defect_record_df['prototype'] == parent_dict['prototype']
+        # Loop over defect model records with family name matching parent record
+        matches = defect_record_df['family'] == parent_dict['family']
         defect_keys = defect_record_df[matches].id.tolist()
         for defect_key in defect_keys:
             defect_record = defect_record_dict[defect_key]
             
-            #Loop over sizemults
+            # Loop over sizemults
             for sizemults in iprPy.tools.aslist(kwargs.get('sizemults', '')):
             
-                #Create calc_key
+                # Create calc_key
                 calc_key = str(uuid.uuid4())
                 
-                #Define values for calc_*.in file
+                # Define values for calc_*.in file
                 calc_dict = {}
-                
-                calc_dict['lammps_command'] =       kwargs['lammps_command']
-                calc_dict['mpi_command'] =          kwargs.get('mpi_command', '')
                 
                 calc_dict['potential_file'] =       pot_record.name + '.xml'
                 calc_dict['potential_dir'] =        pot_record.name
+                calc_dict['potential_content'] =    pot_record.content
                 
-                calc_dict['load'] =                 'system_model ' + parent_record.name+'.xml'
+                calc_dict['load_file'] =            parent_record.name+'.xml'
+                calc_dict['load_style'] =           'system_model'
+                calc_dict['load_content'] =         parent_record.content
                 calc_dict['load_options'] =         'key relaxed-atomic-system'
-                calc_dict['symbols'] =              ''
-                calc_dict['box_parameters'] =       ''
+
+                calc_dict['pointdefect_model'] =    defect_record.name+'.xml'
+                calc_dict['pointdefect_content'] =  defect_record.content
                 
-                calc_dict['x_axis'] =               ''
-                calc_dict['y_axis'] =               ''
-                calc_dict['z_axis'] =               ''
-                calc_dict['atomshift'] =            ''
                 calc_dict['sizemults'] =            sizemults
                 
-                calc_dict['pointdefect_model'] =         defect_record.name+'.xml'
-                calc_dict['pointdefect_type'] =          ''
-                calc_dict['pointdefect_atype'] =         ''
-                calc_dict['pointdefect_pos'] =           ''
-                calc_dict['pointdefect_dumbbell_vect'] = ''
-                calc_dict['pointdefect_scale'] =         ''
-
-                calc_dict['length_unit'] =          kwargs.get('length_unit', '')
-                calc_dict['pressure_unit'] =        kwargs.get('pressure_unit', '')
-                calc_dict['energy_unit'] =          kwargs.get('energy_unit', '')
-                calc_dict['force_unit'] =           kwargs.get('force_unit', '')
+                for key in singularkeys():
+                    if key in kwargs:
+                        calc_dict[key] = kwargs[key]
                 
-                calc_dict['energytolerance'] =      kwargs.get('energytolerance', '')
-                calc_dict['forcetolerance'] =       kwargs.get('forcetolerance', '')
-                calc_dict['maxiterations'] =        kwargs.get('maxiterations', '')
-                calc_dict['maxevaluations'] =       kwargs.get('maxevaluations', '')
-                calc_dict['maxatommotion'] =        kwargs.get('maxatommotion', '')
-        
-                #Build inputfile by filling in calculation's template
-                inputfile = iprPy.tools.filltemplate(calculation.template, calc_dict, '<', '>')
+                # Build incomplete record
+                input_dict = deepcopy(calc_dict)
+                calculation.process_input(input_dict, calc_key, build=False)
+                model = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict)
+                new_record = iprPy.Record(name=calc_key, content=model.xml(), style=record_style)
                 
-                #Read inputfile to build input_dict
-                input_dict = calculation.read_input(inputfile, calc_key)
+                # Check if record is new
+                if new_record.isnew(record_df=record_df):
                 
-                #Define additional input_dict terms
-                input_dict['potential'] = potential
-                input_dict['load_file'] = parent_record.content
-                iprPy.input.system_family(input_dict)
-                
-                #Define defect model input_dict terms
-                input_dict['pointdefect_model'] = DM(defect_record.content).find('point-defect')
-                input_dict['point_kwargs'] = input_dict['pointdefect_model']['atomman-defect-point-parameters']
-                
-                #Build incomplete record
-                new_record = iprPy.Record(name=calc_key, 
-                                          content=calculation.data_model(input_dict).xml(), 
-                                          style=record_style)
-                
-                #Check if record is new
-                if is_new(record_df, new_record):
-                
-                    #Add record to database
+                    # Assign '' to any unassigned keys
+                    for key in unusedkeys()+singularkeys()+multikeys():
+                        if key not in calc_dict:
+                            calc_dict[key] = ''
+                        
+                    # Add record to database
                     dbase.add_record(record=new_record)
                     
-                    #Generate calculation folder    
+                    # Generate calculation folder    
                     calc_directory = os.path.join(run_directory, calc_key)
                     os.makedirs(calc_directory)
                     
-                    #Save inputfile to calculation folder
+                    # Save inputfile to calculation folder
+                    inputfile = iprPy.tools.filltemplate(calculation.template, calc_dict, '<', '>')
                     with open(os.path.join(calc_directory, 'calc_' + calc_style + '.in'), 'w') as f:
                         f.write(inputfile)
 
-                    #Add calculation files to calculation folder
+                    # Add calculation files to calculation folder
                     for calc_file in calculation.files:
                         shutil.copy(calc_file, calc_directory)  
                     
-                    #Add potential record file to calculation folder
+                    # Add potential record file to calculation folder
                     with open(os.path.join(calc_directory, pot_record.name+'.xml'), 'w') as f:
                         f.write(pot_record.content)
                         
-                    #Extract potential's tar files to calculation folder    
+                    # Extract potential's tar files to calculation folder    
                     pot_tar.extractall(calc_directory)
                     
-                    #Add parent record file to calculation folder
+                    # Add parent record file to calculation folder
                     with open(os.path.join(calc_directory, parent_record.name+'.xml'), 'w') as f:
                         f.write(parent_record.content)
                         
-                    #Add defect record file to calculation folder
+                    # Add defect record file to calculation folder
                     with open(os.path.join(calc_directory, defect_record.name+'.xml'), 'w') as f:
                         f.write(defect_record.content)
     
@@ -199,48 +181,22 @@ def build_record_df(dbase, record_style):
     """Constructs a pandas.DataFrame for all records in a database of a given record_type"""
     df = []
     for record in dbase.iget_records(style=record_style):
-        df.append(record.todict(full=False))
+        df.append(record.todict(full=False, flat=True))
     return pd.DataFrame(df)
     
-def is_new(record_df, record):
-    """Checks if a matching calculation record already exists"""
-    
-    if len(record_df) == 0:
-        return True
-    
-    record_dict = record.todict(full=False)
-
-    #compare simple terms
-    test_df = record_df[(record_df['calc_script'] ==     record_dict['calc_script']) &
-                        (record_df['load'] ==            record_dict['load']) &
-                        (record_df['load_options'] ==    record_dict['load_options']) &
-                        (record_df['pointdefect_key'] == record_dict['pointdefect_key'])]
-
-    #Compare complex terms
-    test = np.empty(len(test_df), dtype=bool)
-    for i in xrange(len(test_df)):
-        
-        test[i] = (np.all(test_df.iloc[i].sizemults == record_dict['sizemults']))
-
-    test_df = test_df[test]
-   
-    if len(test_df) > 0:
-        return False
-    else:
-        return True  
-                        
-def read_input(f):
-    """Read the given input file, assign default values and check lengths of multiple terms"""
-    
-    prepare_dict = iprPy.tools.parseinput(f, singularkeys=singularkeys())
-    
-    #Assign default values
-    #Handled inside prepare
-
-    #Check multiple terms
-    #None for this calculation
-    
-    return prepare_dict
+def unusedkeys():
+    """List the calc_*.in key terms that are ignored by the prepare function."""
+    return ['symbols',
+            'box_parameters',
+            'x_axis',
+            'y_axis',
+            'z_axis',
+            'atomshift',
+            'pointdefect_type',
+            'pointdefect_atype',
+            'pointdefect_pos',
+            'pointdefect_dumbbell_vect',
+            'pointdefect_scale']
     
 def singularkeys():
     """List the prepare_*.in key terms that are restricted to having only one value."""
@@ -262,7 +218,7 @@ def multikeys():
     """List the prepare_*.in key terms that can have multiple values."""
     return ['potential_name',
             'symbol_name',
-            'prototype_name', 
+            'family_name', 
             'pointdefect_name',
             'sizemults']
             

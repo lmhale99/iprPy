@@ -10,7 +10,8 @@ potential_file              <potential_file>
 potential_dir               <potential_dir>
 
 #Initial system configuration to load
-load                        <load>
+load_file                   <load_file>
+load_style                  <load_style>
 load_options                <load_options>
 symbols                     <symbols>
 box_parameters              <box_parameters>

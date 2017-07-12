@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "cd194d31-b32a-4296-84d0-b5cd08f871d1", 
+        "id": "2004--Zhou-X-W--Cu--LAMMPS--ipr1", 
+        "potential": {
+            "key": "2b5389d5-0313-43be-a7c7-ce9130ba51b8", 
+            "id": "2004--Zhou-X-W--Cu"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Cu", 
+            "mass": 63.546
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Cu.set"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

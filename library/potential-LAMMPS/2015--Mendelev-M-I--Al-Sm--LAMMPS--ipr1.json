@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "5551afde-8e3f-41a4-93f7-f56d9a6a7044", 
+        "id": "2015--Mendelev-M-I--Al-Sm--LAMMPS--ipr1", 
+        "potential": {
+            "key": "82be9397-2466-47ee-89d5-6f8b55dd7b5d", 
+            "id": "2015--Mendelev-M-I--Al-Sm"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Al", 
+                "mass": 26.9815
+            }, 
+            {
+                "element": "Sm", 
+                "mass": 150.36
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Al90Sm10_MendelevM_2014.eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

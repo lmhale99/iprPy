@@ -1,0 +1,34 @@
+{
+    "potential-LAMMPS": {
+        "key": "5bfb351e-ef91-4305-9f60-bb9637a2701a", 
+        "id": "2015--Asadi-E--Cu--LAMMPS--ipr1", 
+        "potential": {
+            "key": "68561e5b-0d66-454b-9bf5-379f34026015", 
+            "id": "2015--Asadi-E--Cu"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Cu"
+        }, 
+        "pair_style": {
+            "type": "meam"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "library.Cu.meam"
+                }, 
+                {
+                    "symbolsList": "True"
+                }, 
+                {
+                    "file": "Cu.meam"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

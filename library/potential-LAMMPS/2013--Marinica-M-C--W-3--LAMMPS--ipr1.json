@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "c7e30b10-19e4-431e-95bf-116a2e63381f", 
+        "id": "2013--Marinica-M-C--W-3--LAMMPS--ipr1", 
+        "potential": {
+            "key": "1d38de3b-e3c6-482f-a97c-84acf5042046", 
+            "id": "2013--Marinica-M-C--W-3"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "W", 
+            "mass": 183.84
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "w_eam3.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

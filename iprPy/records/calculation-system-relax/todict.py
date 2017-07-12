@@ -12,18 +12,26 @@ def todict(record, full=True, flat=False):
 
     calc = model['calculation-system-relax']
     params = {}
-    params['calc_key'] =     calc['key']
-    params['calc_script'] =  calc['calculation']['script']
+    params['calc_key'] =            calc['key']
+    params['calc_script'] =         calc['calculation']['script']
+    params['iprPy_version'] =       calc['calculation']['iprPy-version']
+    params['LAMMPS_version'] =      calc['calculation']['LAMMPS-version']
+    
     params['strainrange'] =  calc['calculation']['run-parameter']['strain-range']
-    params['load_options'] = calc['calculation']['run-parameter']['load_options']
+    
     sizemults =              calc['calculation']['run-parameter']['size-multipliers']
     
-    params['potential_key'] = calc['potential']['key']
-    params['potential_id'] =  calc['potential']['id']
-    params['load'] =          '%s %s' % (calc['system-info']['artifact']['format'],
-                                         calc['system-info']['artifact']['file'])
-    params['prototype'] =     calc['system-info']['artifact']['family']
-    symbols           =       aslist(calc['system-info']['symbols'])
+    params['potential_LAMMPS_key'] =    calc['potential-LAMMPS']['key']
+    params['potential_LAMMPS_id'] =     calc['potential-LAMMPS']['id']
+    params['potential_key'] =           calc['potential-LAMMPS']['potential']['key']
+    params['potential_id'] =            calc['potential-LAMMPS']['potential']['id']
+    
+    params['load_file'] =       calc['system-info']['artifact']['file']
+    params['load_style'] =      calc['system-info']['artifact']['format']
+    params['load_options'] =    calc['system-info']['artifact']['load_options']
+    params['family'] =          calc['system-info']['family']
+    symbols =                   aslist(calc['system-info']['symbol'])
+    
     params['temperature'] =   calc['phase-state']['temperature']['value']
     params['pressure_xx'] =   uc.value_unit(calc['phase-state']['pressure-xx'])
     params['pressure_yy'] =   uc.value_unit(calc['phase-state']['pressure-yy'])
@@ -36,12 +44,10 @@ def todict(record, full=True, flat=False):
         params['b_mult2'] = sizemults['b'][1]
         params['c_mult1'] = sizemults['c'][0]
         params['c_mult2'] = sizemults['c'][1]
-        for i, symbol in enumerate(symbols):
-            params['symbol'+str(i+1)] = symbol
+        params['symbols'] = ' '.join(symbols)
     else:
         params['sizemults'] = np.array([sizemults['a'], sizemults['b'], sizemults['c']])
         params['symbols'] = symbols
-    
     
     params['status'] = calc.get('status', 'finished')
     
@@ -66,6 +72,7 @@ def todict(record, full=True, flat=False):
             except: params['final_b'] = params['final_a']
             try:    params['final_c'] = uc.value_unit(final.find('c'))
             except: params['final_c'] = params['final_a']    
+            
             params['E_cohesive'] = uc.value_unit(calc['cohesive-energy'])    
             
             if flat is True:

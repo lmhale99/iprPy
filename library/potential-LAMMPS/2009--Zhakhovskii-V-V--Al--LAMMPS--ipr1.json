@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "9174349d-fca6-439b-999e-155164201a1b", 
+        "id": "2009--Zhakhovskii-V-V--Al--LAMMPS--ipr1", 
+        "potential": {
+            "key": "3facf2af-9356-4264-b887-06049430defa", 
+            "id": "2009--Zhakhovskii-V-V--Al"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Al", 
+            "mass": 26.9815384
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Al-2009.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

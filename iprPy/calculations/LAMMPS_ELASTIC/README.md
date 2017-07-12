@@ -173,6 +173,10 @@ Provides parameters specific to the calculation at hand.
   to evaluate the elastic constants. Changing the strain_range can affect the 
   resulting elastic constant values. Default value is 1e-5.
 
+- __convergevalues__: boolean flag indicating if the LAMMPS elastic routine is 
+  to be executed once (False) or iterated until the lattice parameters converge 
+  (True). Default value is True. 
+  
 - __energytolerance__: specifies the energy tolerance to use for the 
   minimization. This value is unitless and corresponds to the etol term for the
   [LAMMPS minimize command.](http://lammps.sandia.gov/doc/minimize.html) Default

@@ -1,0 +1,33 @@
+{
+    "potential-LAMMPS": {
+        "key": "3b1b8700-6259-476d-9ff3-8e5cb874d06b", 
+        "id": "2013--Henriksson-K-O-E--Fe-C--LAMMPS--ipr1", 
+        "potential": {
+            "key": "5eaad52e-ca4d-4859-b01b-13f70c3c6b54", 
+            "id": "2013--Henriksson-K-O-E--Fe-C"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Fe"
+            }, 
+            {
+                "element": "C"
+            }
+        ], 
+        "pair_style": {
+            "type": "tersoff/zbl"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "FeC_Henriksson_2013.tersoff.zbl"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

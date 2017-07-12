@@ -1,0 +1,45 @@
+{
+    "potential-LAMMPS": {
+        "key": "b61dec76-c838-4883-92c2-480122e3471c", 
+        "id": "2013--Zhou-X-W--Zn-Cd-Hg-S-Se-Te--LAMMPS--ipr1", 
+        "potential": {
+            "key": "95fe0b68-f5a1-4bb6-9a11-f446b361d12b", 
+            "id": "2013--Zhou-X-W--Zn-Cd-Hg-S-Se-Te"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Zn"
+            }, 
+            {
+                "element": "Cd"
+            }, 
+            {
+                "element": "Hg"
+            }, 
+            {
+                "element": "S"
+            }, 
+            {
+                "element": "Se"
+            }, 
+            {
+                "element": "Te"
+            }
+        ], 
+        "pair_style": {
+            "type": "sw"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "CdTeZnSeHgS0.sw"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

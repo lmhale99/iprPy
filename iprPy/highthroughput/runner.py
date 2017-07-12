@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import os
 import sys
 import subprocess
@@ -25,57 +26,66 @@ def main(*args):
 def runner(dbase, run_directory, orphan_directory=None):
     """High-throughput calculation runner"""
     
-    #Define runner log file
+    # Define runner log file
     d = datetime.datetime.now()
     runner_log_dir = os.path.join(os.path.dirname(iprPy.rootdir), 'runner-logs')
     if not os.path.isdir(runner_log_dir):
         os.makedirs(runner_log_dir)
     log_file = os.path.join(runner_log_dir, '%04i-%02i-%02i-%02i-%02i-%06i.log' % (d.year, d.month, d.day, d.minute, d.second, d.microsecond))
     
-    #Set default orphan_directory
+    # Set default orphan_directory
     if orphan_directory is None:
         orphan_directory = os.path.join(os.path.dirname(run_directory), 'orphan')
     
-    #Start runner log file
+    # Start runner log file
     with open(log_file, 'a') as log:
         
-        #Change to the run directory
+        # Change to the run directory
         os.chdir(run_directory)
         
-        #flist is the running list of calculations
+        # Initialize bidfailcount counter
+        bidfailcount = 0
+        
+        # flist is the running list of calculations
         flist = os.listdir(run_directory)
         while len(flist) > 0:
             
-            #Pick a random calculation from the list
+            # Pick a random calculation from the list
             index = random.randint(0, len(flist)-1)
             sim = flist[index]
             
-            #Submit a bid
+            # Submit a bid and check if it succeeded
             if bid(sim):
+                
+                # Reset bidfailcount
+                bidfailcount = 0
+                
+                # Move to simulation directory
                 os.chdir(sim)
                 log.write('%s\n' % sim)
-                #Check that the calculation has calc_*.py, calc_*.in and record in the database
+                
+                # Check that the calculation has calc_*.py, calc_*.in and record in the database
                 try:
                     record = dbase.get_record(name=sim)
                     calc_py = get_file('calc_*.py')
                     calc_in = get_file('calc_*.in')
                 
-                #Pass ConnectionErrors forward killing runner
+                # Pass ConnectionErrors forward killing runner
                 except requests.ConnectionError as e:
                     raise requests.ConnectionError(e)
                 
-                #If not complete, zip and move to the orphan directory
+                # If not complete, zip and move to the orphan directory
                 except:
                     log.write('Incomplete simulation: moved to orphan directory\n\n')
                     os.chdir(run_directory)
                     if not os.path.isdir(orphan_directory):
                         os.makedirs(orphan_directory)
                     shutil.make_archive(os.path.join(orphan_directory, sim), 'gztar', root_dir=run_directory, base_dir=sim)
-                    shutil.rmtree(os.path.join(run_directory, sim))
+                    removecalc(os.path.join(run_directory, sim))
                     flist = os.listdir(run_directory)
                     continue
                 
-                #Check if any files in the calculation folder are incomplete records 
+                # Check if any files in the calculation folder are incomplete records 
                 error_flag = False
                 ready_flag = True
 
@@ -87,19 +97,19 @@ def runner(dbase, run_directory, orphan_directory=None):
                         try:
                             status = parent.find('status')
                             
-                            #Check parent record in database to see if it has completed
+                            # Check parent record in database to see if it has completed
                             if status == 'not calculated':
                                 parent_record = dbase.get_record(name=parent_sim)
                                 parent = DM(parent_record.content)
                                 try:
                                     status = parent.find('status')
                                     
-                                    #Mark flag if still incomplete
+                                    # Mark flag if still incomplete
                                     if status == 'not calculated':
                                         ready_flag = False
                                         break
                                     
-                                    #skip if parent calculation failed
+                                    # Skip if parent calculation failed
                                     elif status == 'error':
                                         with open(os.path.basename(fname), 'w') as f:
                                             f.write(parent_record.content)
@@ -107,17 +117,17 @@ def runner(dbase, run_directory, orphan_directory=None):
                                         error_message = 'parent calculation issued an error'
                                         break
                                     
-                                    #Ignore if unknown status
+                                    # Ignore if unknown status
                                     else:
                                         raise ValueError('unknown status')
                                         
-                                #Copy parent record to calculation folder if it is now complete
+                                # Copy parent record to calculation folder if it is now complete
                                 except:
                                     with open(os.path.basename(fname), 'w') as f:
                                         f.write(parent_record.content)
                                     log.write('parent %s copied to sim folder\n' % parent_sim)
                             
-                            #skip if parent calculation failed
+                            # skip if parent calculation failed
                             elif status == 'error':
                                 error_flag = True
                                 error_message = 'parent calculation issued an error'
@@ -125,7 +135,7 @@ def runner(dbase, run_directory, orphan_directory=None):
                         except:
                             continue
 
-                #Handle calculations that have unfinished parents
+                # Handle calculations that have unfinished parents
                 if not ready_flag:
                     bid_files = glob.glob('*.bid')
                     os.chdir(run_directory)
@@ -135,22 +145,23 @@ def runner(dbase, run_directory, orphan_directory=None):
                     log.write('parent %s not ready\n\n' % parent_sim)
                     continue
                 
-                #Run the calculation
+                # Run the calculation
                 try:   
                     assert not error_flag, error_message
                     run = subprocess.Popen(['python', calc_py, calc_in, sim], stderr=subprocess.PIPE)
                     error_message = run.stderr.read()
                     
-                    #Check for results.json file
+                    # Load results.json
                     try:
                         with open('results.json') as f:
                             model = DM(f)
+                    # Throw errors if no results.json
                     except:
                         error_flag = True
                     assert not error_flag, error_message
                     log.write('sim calculated successfully\n\n')
                 
-                #Catch any errors and add them to results.json
+                # Catch any errors and build results.json
                 except:
                     model = DM(record.content)
                     record_type = model.keys()[0]
@@ -160,44 +171,54 @@ def runner(dbase, run_directory, orphan_directory=None):
                         model.json(fp=f, indent=4)
                     log.write('error: %s\n\n' % model[record_type]['error'])
 
-                #Update record in the database
+                # Update record in the database
                 with open('results.json') as f:
                     model = DM(f)
                 dbase.update_record(content=model.xml(), name=sim)
                                 
-                #Archive calculation and add to database
+                # Archive calculation and add to database
                 dbase.add_tar(root_dir=run_directory, name=sim)
                 
-                #Remove simulation directory
+                # Remove simulation directory
                 os.chdir(run_directory)
-                try:
-                    shutil.rmtree(os.path.join(run_directory, sim))    
-                except:
-                    pass
+                removecalc(os.path.join(run_directory, sim))
+            
+            # Else if bid(sim) failed
+            else:
+                bidfailcount += 1
+                
+                # Stop unproductive worker after 10 consecutive bid fails
+                if bidfailcount > 10:
+                    sys.exit(0)
+                
+                # Pause for 10 seconds before trying again
+                time.sleep(10)
+            
+            # Regenerate flist and flush log file
             flist = os.listdir(run_directory)
             log.flush()
             os.fsync(log.fileno())
         
-#Bids for chance to run simulation        
 def bid(sim):
+    """Bids for chance to run simulation"""
     try:
-        #wait to make sure sim is not being deleted
+        # Wait to make sure sim is not being deleted
         time.sleep(1)
         
-        #check if bid already exists
+        # Check if bid already exists
         for fname in os.listdir(sim):
             if fname[-4:] == '.bid':
                 return False
 
-        #place a bid
+        # Place a bid
         pid = os.getpid()
         with open(os.path.join(sim, str(pid)+'.bid'), 'w') as f:
             f.write('bid for pid: %i' % pid)
         
-        #wait to make sure all bids are in
+        # Wait to make sure all bids are in
         time.sleep(1)
 
-        #check bids
+        # Check bids
         bids = []
         for fname in os.listdir(sim):
             if fname[-4:] == '.bid':
@@ -207,10 +228,15 @@ def bid(sim):
         else:
             return False
     except:
-        return False                
+        return False
 
 def get_file(path_string):
+    """Uniquely find file accoring to wildcard string"""
+    
+    # glob any file matching path string (with wildcards)
     file = glob.glob(path_string)
+    
+    # Return if exactly 1 match found, otherwise issue an error
     if len(file) == 1:
         return file[0]
     elif len(file) == 0:
@@ -230,10 +256,36 @@ def __read_input_file(fname):
     input_dict['run_directory'] = os.path.abspath(input_dict['run_directory'])
     input_dict['orphan_directory'] = input_dict.get('orphan_directory', None)
                                         
-    
-    
     return run_directory, orphan_directory, dbase
     
+def removecalc(dir):
+    """Removes calculation instance directories leaving .bid files for last"""
+    
+    # Loop over all files and directories in dir
+    for fname in glob.iglob(os.path.join(dir, '*')):
+        
+        # If fname is a directory, try rmtree up to 10 times
+        if os.path.isdir(fname):
+            tries = 0
+            while tries < 10:
+                try:
+                    shutil.rmtree(fname)
+                    break
+                except:
+                    tries += 1
+        
+        # If fname is a non-.bid file, try remove up to 10 times
+        elif os.path.isfile(fname) and fname[-4:] != '.bid':
+            tries = 0
+            while tries < 10:
+                try:
+                    os.remove(fname)
+                    break
+                except:
+                    tries += 1
+    
+    # Use rmtree on remaining content (hopefully only *.bid and the dir folder)
+    shutil.rmtree(dir)
     
 if __name__ == '__main__':
     main(*sys.argv[1:])

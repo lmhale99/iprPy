@@ -1,7 +1,7 @@
 #Run script for calc_stacking_fault.py
 
 #Command lines for LAMMPS (and MPI).
-#For lammps_command, exclude passing in a script, i.e. no "-in term" or "< term"
+#For lammps_command, exclude passing in a script, i.e. no "-in term"
 lammps_command              <lammps_command>
 mpi_command                 <mpi_command>
 
@@ -10,7 +10,8 @@ potential_file              <potential_file>
 potential_dir               <potential_dir>
 
 #Initial system configuration to load
-load                        <load>
+load_file                   <load_file>
+load_style                  <load_style>
 load_options                <load_options>
 symbols                     <symbols>
 box_parameters              <box_parameters>
@@ -23,13 +24,13 @@ atomshift                   <atomshift>
 sizemults                   <sizemults>
 
 #Defect parameters
-stackingfault_shift         <stackingfault_shift>
+stackingfault_shiftfraction1 <stackingfault_shiftfraction1>
+stackingfault_shiftfraction2 <stackingfault_shiftfraction2>
 stackingfault_model         <stackingfault_model>
-stackingfault_planeaxis     <stackingfault_planeaxis>
-stackingfault_planepos      <stackingfault_planepos>
+stackingfault_cutboxvector  <stackingfault_cutboxvector>
+stackingfault_faultpos      <stackingfault_faultpos>
 stackingfault_shiftvector1  <stackingfault_shiftvector1>
 stackingfault_shiftvector2  <stackingfault_shiftvector2>
-
 
 #Units that input/output values are in
 length_unit                 <length_unit>

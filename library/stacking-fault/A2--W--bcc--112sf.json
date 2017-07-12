@@ -3,17 +3,15 @@
         "key": "e92a955f-dcc9-43b9-95bb-2c413d082972", 
         "id": "A2--W--bcc--112sf",
         "system-family": "A2--W--bcc", 
-        "atomman-stacking-fault-parameters": {
-            "crystallographic-axes": {
-                "x-axis": [ 1, 1, 1], 
-                "y-axis": [ 1,-1, 0], 
-                "z-axis": [ 1, 1,-2]
-            }, 
-            "atomshift": [ 0.01, 0.01, 0.01], 
-            "plane-axis": "z", 
-            "plane-position": 0.5, 
-            "shift-vector-1": [ 0.5, 0.5, 0.5], 
-            "shift-vector-2": [ 1.0,-1.0, 0.0]
+        "calculation-parameter": {
+            "x_axis": " 1  1  1", 
+            "y_axis": " 1 -1  0", 
+            "z_axis": " 1  1 -2", 
+            "atomshift": " 0.01  0.01  0.01", 
+            "cutboxvector": "c",
+            "faultpos": 0.5, 
+            "shiftvector1": " 0.5  0.5  0.5", 
+            "shiftvector2": " 1.0 -1.0  0.0"
         }
     }
 }

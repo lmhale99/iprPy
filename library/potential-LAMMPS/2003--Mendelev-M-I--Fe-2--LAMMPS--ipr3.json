@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "274c2811-3b80-4aa6-82ca-d2bdfecbd442", 
+        "id": "2003--Mendelev-M-I--Fe-2--LAMMPS--ipr3", 
+        "potential": {
+            "key": "06bf7ccd-ea6a-4744-bfbc-adefa5bcdd60", 
+            "id": "2003--Mendelev-M-I--Fe-2"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Fe", 
+            "mass": 55.85
+        }, 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Fe_2.eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

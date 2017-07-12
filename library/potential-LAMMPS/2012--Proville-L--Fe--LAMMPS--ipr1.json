@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "98713310-57ee-4917-93b5-af7f9ece7b3f", 
+        "id": "2012--Proville-L--Fe--LAMMPS--ipr1", 
+        "potential": {
+            "key": "8d55ef4d-6451-453e-b636-5ff1e2552d18", 
+            "id": "2012--Proville-L--Fe"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Fe", 
+            "mass": 55.84
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "MCM2011_eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

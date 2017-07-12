@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "90168db6-c0e0-43ee-8d24-529111513c15", 
+        "id": "2010--Olsson-P-A-T--Au--LAMMPS--ipr1", 
+        "potential": {
+            "key": "5b382441-b1b6-4734-aaa8-bdffe573b55e", 
+            "id": "2010--Olsson-P-A-T--Au"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Au", 
+            "mass": 196.96655
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Au_Olsson_JAP2010.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

@@ -3,9 +3,9 @@ lammps_command              lmp_serial
 mpi_command                 
 
 #### Run condition limiters ####
-potential_name              1987--Ackland-G-J--Ag
+#potential_name              1987--Ackland-G-J--Ag
 symbol_name
-prototype_name              A1--Cu--fcc
+family_name              A2--W--bcc
 pointdefect_name            
 
 #### Unit specifications ####

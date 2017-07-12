@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "784d3863-5c64-4ab8-9323-3009f907bd45", 
+        "id": "2010--Malerba-L--Fe--LAMMPS--ipr1", 
+        "potential": {
+            "key": "9155f279-c246-4108-bfe4-1db2fcf21959", 
+            "id": "2010--Malerba-L--Fe"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Fe", 
+            "mass": 55.84
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "M07_eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

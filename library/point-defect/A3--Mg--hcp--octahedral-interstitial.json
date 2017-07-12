@@ -1,12 +1,12 @@
 {
     "point-defect": {
-        "key": "c3d90c47-4e64-441f-83dd-1ca3ef8e3457",
+        "key": "c3d90c47-4e64-441f-83dd-1ca3ef8e3457", 
         "id": "A3--Mg--hcp--octahedral-interstitial", 
         "system-family": "A3--Mg--hcp", 
-        "atomman-defect-point-parameters": {
+        "calculation-parameter": {
             "ptd_type": "i", 
             "atype": 1, 
-            "pos": [0.5, 0.1666666666666666666667, 0.25], 
+            "pos": "0.5000000000000 0.1666666666667 0.2500000000000", 
             "scale": true
         }
     }

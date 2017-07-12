@@ -1,9 +1,18 @@
-from .atomshift import atomshift
-from .axes import axes
-from .initialsystem import initialsystem
-from .sizemults import sizemults
-from .system_family import system_family
-from .ucell import ucell
-from .units import units
+# General inputs
 from .value import value
 from .boolean import boolean
+
+# Common atomman-iprPy inputs
+from .units import units
+from .commands import commands
+from .potential import potential
+from .systemload import systemload
+from .systemmanipulate import systemmanipulate
+from .elasticconstants import elasticconstants
+
+# Defect inputs
+from .pointdefect import pointdefect
+from .freesurface import freesurface
+from .dislocationmonopole import dislocationmonopole
+from .stackingfault import stackingfault1, stackingfault2
+

@@ -1,30 +1,30 @@
-#LAMMPS input script that evaluates the Virial pressure of a system both as
-#it was given, and with small strains applied.
-#This can be used to estimate the 0 K elastic constants of the system.
+# LAMMPS input script that evaluates the Virial pressure of a system both as
+# it was given, and with small strains applied.
+# This can be used to estimate the 0 K elastic constants of the system.
 
 <atomman_system_info>
 
 <atomman_pair_info>
 
-#Specify strain range and number of points to examine in the range
+# Specify strain range and number of points to examine in the range
 variable delta equal <delta>
 variable steps equal <steps>
 variable deltax equal ${delta}/(${steps}-1)
 
-#Specify variables of the initial configuration's dimensions
+# Specify variables of the initial configuration's dimensions
 variable lx0 equal $(lx)
 variable ly0 equal $(ly)
 variable lz0 equal $(lz)
 
-#Specify the thermo properties to calculate
+# Specify the thermo properties to calculate
 variable peatom equal pe/atoms
 thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe
 thermo_modify format float %.13e
 
-#Compute properties for the initial configuration
+# Compute properties for the initial configuration
 run 0
 
-#Compute properties for normal x-direction strains
+# Compute properties for normal x-direction strains
 variable aratio equal 1-${delta}/2.+(v_a-1)*${deltax}
 variable xmax equal v_aratio*${lx0}
 label loopa
@@ -35,7 +35,7 @@ next a
 jump cij.in loopa
 change_box all x final 0 ${lx0} remap units box
 
-#Compute properties for normal y-direction strains
+# Compute properties for normal y-direction strains
 variable bratio equal 1-${delta}/2.+(v_b-1)*${deltax}
 variable ymax equal v_bratio*${ly0}
 label loopb
@@ -46,7 +46,7 @@ next b
 jump cij.in loopb
 change_box all y final 0 ${ly0} remap units box
 
-#Compute properties for normal z-direction strains
+# Compute properties for normal z-direction strains
 variable cratio equal 1-${delta}/2.+(v_c-1)*${deltax}
 variable zmax equal v_cratio*${lz0}
 label loopc
@@ -59,7 +59,7 @@ change_box all z final 0 ${lz0} remap units box
 
 change_box all triclinic
 
-#Compute properties for yz shear strains
+# Compute properties for yz shear strains
 variable eyz equal (-${delta}/2.+(v_d-1)*${deltax})*${lz0}
 label loopd
 variable d loop ${steps}
@@ -69,7 +69,7 @@ next d
 jump cij.in loopd
 change_box all yz final 0 remap units box
 
-#Compute properties for xz shear strains
+# Compute properties for xz shear strains
 variable exz equal (-${delta}/2.+(v_e-1)*${deltax})*${lz0}
 label loope
 variable e loop ${steps}
@@ -79,7 +79,7 @@ next e
 jump cij.in loope
 change_box all xz final 0 remap units box
 
-#Compute properties for xy shear strains
+# Compute properties for xy shear strains
 variable exy equal (-${delta}/2.+(v_f-1)*${deltax})*${ly0}
 label loopf
 variable f loop ${steps}

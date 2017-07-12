@@ -1,4 +1,4 @@
-#LAMMPS input script that performs a simple energy minimization
+#LAMMPS input script that evaluates a system's energy and pressure without relaxing
 
 <atomman_system_info>
 

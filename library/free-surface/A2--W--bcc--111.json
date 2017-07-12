@@ -3,14 +3,12 @@
         "key": "02c39f38-4234-4303-945d-032a34f5bc73", 
         "id": "A2--W--bcc--111",
         "system-family": "A2--W--bcc", 
-        "atomman-surface-parameters": {
-            "crystallographic-axes": {
-                "x-axis": [ 1, 0,-1],
-                "y-axis": [-1, 2,-1],
-                "z-axis": [ 1, 1, 1]
-            }, 
+        "calculation-parameter": {
+            "x_axis": " 1  0 -1", 
+            "y_axis": "-1  2 -1", 
+            "z_axis": " 1  1  1",
             "cutboxvector": "c", 
-            "atomshift": [0.0, 0.0, 0.1]
+            "atomshift": "0.0 0.0 0.1"
         }
     }
 }

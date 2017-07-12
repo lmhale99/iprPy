@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "bb816367-0ae2-41fa-9659-5c22014bce5d", 
+        "id": "2015--Wilson-S-R--Ni-Zr--LAMMPS--ipr1", 
+        "potential": {
+            "key": "ee7b64fc-4e6e-4b43-8de1-082b8f85bd91", 
+            "id": "2015--Wilson-S-R--Ni-Zr"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ni", 
+                "mass": 58.6934
+            }, 
+            {
+                "element": "Zr", 
+                "mass": 91.224
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Ni-Zr_Mendelev_2014.eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

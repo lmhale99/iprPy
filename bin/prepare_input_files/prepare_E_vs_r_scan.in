@@ -4,8 +4,10 @@ mpi_command
 
 #### Potential limiters ####
 potential_name              2006--Chamati-H--Fe
+potential_name              
 potential_element
 potential_pair_style
+potential_currentIPR        
 
 #### Crystal prototype limiters ####
 prototype_name

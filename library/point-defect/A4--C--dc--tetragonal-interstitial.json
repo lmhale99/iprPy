@@ -1,12 +1,12 @@
 {
     "point-defect": {
-        "key": "0eb2c11b-fd51-42b2-aca3-e8876727e55d",
+        "key": "0eb2c11b-fd51-42b2-aca3-e8876727e55d", 
         "id": "A4--C--dc--tetragonal-interstitial", 
         "system-family": "A4--C--dc", 
-        "atomman-defect-point-parameters": {
+        "calculation-parameter": {
             "ptd_type": "i", 
             "atype": 1, 
-            "pos": [0.5, 0.5, 0.5], 
+            "pos": "0.5000000000000 0.5000000000000 0.5000000000000", 
             "scale": true
         }
     }

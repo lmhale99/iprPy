@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "08f33381-2a48-4149-86cd-08dac34319a5", 
+        "id": "2004--Zhou-X-W--Pd--LAMMPS--ipr1", 
+        "potential": {
+            "key": "5ea5dd6c-a901-4acd-b036-9c33a0acd5b0", 
+            "id": "2004--Zhou-X-W--Pd"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Pd", 
+            "mass": 106.42
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Pd.set"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

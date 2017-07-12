@@ -1,0 +1,23 @@
+#### Commands ####
+lammps_command              lmp_serial
+mpi_command            
+
+#### Run condition limiters ####
+potential_name              2006--Chamati-H--Fe
+symbol_name
+family_name              A2--W--bcc
+stackingfault_name          
+
+#### Unit specifications ####
+length_unit
+pressure_unit
+energy_unit
+force_unit
+
+#### Run parameters ####
+sizemults                   3 3 9
+
+stackingfault_shiftfraction1    0
+stackingfault_shiftfraction1    0.5
+stackingfault_shiftfraction2    0
+stackingfault_shiftfraction2    0.5

@@ -5,7 +5,7 @@ mpi_command
 #### Run condition limiters ####
 potential_name              2006--Chamati-H--Fe
 symbol_name
-prototype_name              
+family_name              A2--W--bcc
 stackingfault_name          
 
 #### Unit specifications ####
@@ -17,6 +17,5 @@ force_unit
 #### Run parameters ####
 sizemults                   3 3 9
 
-keepatomfiles               False
-stackingfault_numshifts1    51
-stackingfault_numshifts2    51
+stackingfault_numshifts1    3
+stackingfault_numshifts2    3

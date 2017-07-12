@@ -1,0 +1,39 @@
+{
+    "potential-LAMMPS": {
+        "key": "bb69cb78-f906-476f-866a-8411864e5130", 
+        "id": "1996--Farkas-D--Nb-Ti-Al--LAMMPS--ipr1", 
+        "potential": {
+            "key": "0856888b-57ec-4005-828d-d1b0c331f120", 
+            "id": "1996--Farkas-D--Nb-Ti-Al"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Nb", 
+                "mass": 92.90638
+            }, 
+            {
+                "element": "Ti", 
+                "mass": 47.88
+            }, 
+            {
+                "element": "Al", 
+                "mass": 26.981539
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Farkas_Nb-Ti-Al_1996.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "78941f85-4ef8-4826-ac4d-2e1459834703", 
+        "id": "2004--Zhou-X-W--Zr--LAMMPS--ipr1", 
+        "potential": {
+            "key": "6ccabaad-9825-4d97-9f9d-3058fca15806", 
+            "id": "2004--Zhou-X-W--Zr"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Zr", 
+            "mass": 91.224
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Zr.set"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

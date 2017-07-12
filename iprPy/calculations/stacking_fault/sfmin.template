@@ -14,7 +14,7 @@ compute peatom all pe/atom
 
 min_modify dmax <dmax>
 
-dump dumpit all custom <maxeval> <run_directory>atom.* id type x y z c_peatom
-dump_modify dumpit format float %.13e
+dump dumpit all custom <maxeval> <sim_directory>*.dump id type x y z c_peatom
+dump_modify dumpit format <dump_modify_format>
 
 minimize <etol> <ftol> <maxiter> <maxeval>

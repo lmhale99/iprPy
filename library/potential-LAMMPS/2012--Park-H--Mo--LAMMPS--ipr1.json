@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "060ea747-f653-44fd-99e4-07a000efa6de", 
+        "id": "2012--Park-H--Mo--LAMMPS--ipr1", 
+        "potential": {
+            "key": "522a71ba-bcde-4014-9b84-0b92a28efbc1", 
+            "id": "2012--Park-H--Mo"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Mo", 
+            "mass": 95.96
+        }, 
+        "pair_style": {
+            "type": "meam/spline"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Park_MEAM_Mo_2012.spline"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

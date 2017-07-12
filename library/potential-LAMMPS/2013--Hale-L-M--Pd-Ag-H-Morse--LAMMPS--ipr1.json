@@ -1,0 +1,39 @@
+{
+    "potential-LAMMPS": {
+        "key": "5a2a7008-a8b7-42d8-a53d-ddb018172c1e", 
+        "id": "2013--Hale-L-M--Pd-Ag-H-Morse--LAMMPS--ipr1", 
+        "potential": {
+            "key": "abef3818-788d-4173-aa8d-62265deeec2b", 
+            "id": "2013--Hale-L-M--Pd-Ag-H-Morse"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Pd", 
+                "mass": 106.42
+            }, 
+            {
+                "element": "Ag", 
+                "mass": 107.87
+            }, 
+            {
+                "element": "H", 
+                "mass": 1.01
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "PdAgH_MorsePd3Ag.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

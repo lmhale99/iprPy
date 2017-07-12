@@ -3,7 +3,7 @@ from ..tools import aslist
 import pandas as pd
 import numpy as np
 
-def icalculations(database, record_style=None, symbol=None, prototype=None, potential=None):
+def icalculations(database, record_style=None, symbol=None, family=None, potential=None):
     """
     Iterates over calculation records in a database that match limiting conditions.
     
@@ -16,9 +16,8 @@ def icalculations(database, record_style=None, symbol=None, prototype=None, pote
               potentials that contain models for at least one of the listed
               symbols will be returned. Default value is None (i.e. no 
               selection by element).
-    prototype -- single string name or list of names for the prototypes to 
-                 include. Default value is None (i.e. no selection by 
-                 prototype).
+    family -- single string name or list of names for the system families to 
+              include. Default value is None (i.e. no selection by family).
     potential -- single string name or list of names for the prototypes to 
                  include.
 
@@ -33,8 +32,8 @@ def icalculations(database, record_style=None, symbol=None, prototype=None, pote
         records[record.name] = record
     df = pd.DataFrame(df)
     
-    if prototype is not None:
-        df = df[df.prototype.isin(aslist(prototype))]
+    if family is not None:
+        df = df[df.family.isin(aslist(family))]
     
     if potential is not None:
         df = df[df.potential_id.isin(aslist(potential))]

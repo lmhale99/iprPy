@@ -86,7 +86,7 @@ elif args.action == 'clean':
     else:
         dbase = None
     run_directory = iprPy.highthroughput.get_run_directory(args.run_directory)
-    iprPy.highthroughput.clean(dbase, args.record_style, run_directory)
+    iprPy.highthroughput.clean(dbase=dbase, run_directory=run_directory, record_style=args.record_style)
 
 #Actions for subcommand copy
 elif args.action == 'copy':
