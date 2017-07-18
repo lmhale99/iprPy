@@ -62,7 +62,7 @@ def add_record(database_info, record=None, style=None, name=None, content=None):
         raise TypeError('kwargs style, name, and content cannot be given with kwarg record')
         
     #Verify that there isn't already a record with a matching name
-    if len(get_records(database_info, name=record.name)) > 0:
+    if len(get_records(database_info, name=record.name, style=record.style)) > 0:
         raise ValueError('Record ' + record.name + ' already exists')
     
     #upload record to database
