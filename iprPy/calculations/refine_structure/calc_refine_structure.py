@@ -200,10 +200,10 @@ def calc_cij(lammps_command, system, potential, symbols,
     pxz = uc.set_in_units(np.array(output.finds('Pxz')), lammps_units['pressure'])
     pyz = uc.set_in_units(np.array(output.finds('Pyz')), lammps_units['pressure'])
     
-    if output.lammps_date < datetime.date(2016, 8, 1):
-        pe = uc.set_in_units(np.array(output.finds('peatom')), lammps_units['energy'])
-    else:
-        pe = uc.set_in_units(np.array(output.finds('v_peatom')), lammps_units['energy'])
+    #if output.lammps_date < datetime.date(2016, 8, 1):
+    pe = uc.set_in_units(np.array(output.finds('PotEng')), lammps_units['energy']) / system.natoms
+    #else:
+    #    pe = uc.set_in_units(np.array(output.finds('v_peatom')), lammps_units['energy'])
     
     # Set the six non-zero strain values
     strains = np.array([ (lx[2] -  lx[1])  / lx[0],

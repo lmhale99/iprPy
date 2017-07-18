@@ -55,7 +55,6 @@ include potential.mod
 # Compute initial state
 fix 3 all box/relax  aniso 0.0
 dump config all custom ${maxiter} atom.* id type x y z
-dump_modify config format float %.13e
 minimize ${etol} ${ftol} ${maxiter} ${maxeval}
 undump config
 
