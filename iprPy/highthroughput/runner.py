@@ -16,8 +16,12 @@ import iprPy
 
 def main(*args):
     
-    #Read in input script terms
-    input_dict = __read_input_file(args[0])
+    # Read input file in as dictionary
+    with open(args[0]) as f:
+        input_dict = iprPy.tools.parseinput(f, allsingular=True)
+    
+    # Interpret and process input parameters 
+    process_input(input_dict)
     
     runner(input_dict['dbase'], 
            input_dict['run_directory'],
@@ -245,18 +249,12 @@ def get_file(path_string):
         raise ValueError('Multiple files found matching '+ path_string)
     
         
-def __read_input_file(fname):            
-    """Read runner input file"""
-
-    with open(fname) as f:
-        input_dict = iprPy.tools.parseinput(f, allsingular=True)
+def process_input(input_dict):
+    """Processes the runner.in input commands"""
     
-    dbase = iprPy.database_fromdict(input_dict['run_directory'])
-    
+    input_dict['dbase'] = iprPy.database_fromdict(input_dict)
     input_dict['run_directory'] = os.path.abspath(input_dict['run_directory'])
     input_dict['orphan_directory'] = input_dict.get('orphan_directory', None)
-                                        
-    return run_directory, orphan_directory, dbase
     
 def removecalc(dir):
     """Removes calculation instance directories leaving .bid files for last"""
@@ -289,9 +287,3 @@ def removecalc(dir):
     
 if __name__ == '__main__':
     main(*sys.argv[1:])
-            
-
-
-
-            
-            
