@@ -8,6 +8,7 @@ import os
 import sys
 import uuid
 import shutil
+import datetime
 from copy import deepcopy
 
 # http://www.numpy.org/
@@ -130,7 +131,10 @@ def relax_system(lammps_command, system, potential, symbols, mpi_command=None,
     
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
-   
+      
+    #Get lammps version date
+    lammps_date = iprPy.tools.check_lammps_version(lammps_command)['lammps_date']
+    
     # Define lammps variables
     lammps_variables = {}
     
@@ -148,11 +152,10 @@ def relax_system(lammps_command, system, potential, symbols, mpi_command=None,
     lammps_variables['dmax'] = uc.get_in_units(dmax, lammps_units['length'])
     
     # Set dump_modify format based on dump_modify_version
-    dump_modify_version = iprPy.tools.lammps_version.dump_modify(lammps_command)
-    if dump_modify_version == 0:
-        lammps_variables['dump_modify_format'] = 'float %.13e'
-    elif dump_modify_version == 1:
-        lammps_variables['dump_modify_format'] = '"%i %i %.13e %.13e %.13e %.13e"'    
+    if lammps_date < datetime.date(2016, 8, 3):
+        lammps_variables['dump_modify_format'] = '"%i %i %.13e %.13e %.13e %.13e"'
+    else:
+        lammps_variables['dump_modify_format'] = 'float %.13e'            
     
     # Write lammps input script
     template_file = 'min.template'
@@ -166,12 +169,13 @@ def relax_system(lammps_command, system, potential, symbols, mpi_command=None,
     output = lmp.run(lammps_command, lammps_script, mpi_command, return_style='object')
     
     # Extract output values
+    thermo = output.simulations[-1]['thermo']
     results = {}
     results['logfile'] =         'log.lammps'
     results['initialdatafile'] = 'system.dat'
     results['initialdumpfile'] = 'atom.0'
-    results['finaldumpfile'] =   'atom.%i' % output.simulations[-1]['thermo'].Step.tolist()[-1] 
-    results['potentialenergy'] = uc.set_in_units(output.simulations[-1]['thermo'].PotEng.tolist()[-1], lammps_units['energy'])
+    results['finaldumpfile'] =   'atom.%i' % thermo.Step.values[-1] 
+    results['potentialenergy'] = uc.set_in_units(thermo.PotEng.values[-1], lammps_units['energy'])
     
     return results
 

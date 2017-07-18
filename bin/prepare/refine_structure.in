@@ -1,6 +1,13 @@
-#### Commands ####
-lammps_command              lmp_serial
-mpi_command            
+#### Calculation Style ####
+calculation_style           refine_structure
+
+#### Commands (prepare on Windows) ####
+lammps_command               lmp_mpi
+mpi_command                  
+
+#### Commands (prepare on Linux) ####
+#lammps_command               /users/lmh1/LAMMPS/lammps-30Jul16/src/lmp_mpi
+#mpi_command                  
 
 #### Run condition limiters ####
 potential_name              

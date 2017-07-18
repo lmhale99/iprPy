@@ -8,6 +8,7 @@ import os
 import sys
 import uuid
 import random
+import datetime
 from copy import deepcopy
 
 # http://www.numpy.org/
@@ -113,6 +114,9 @@ def full_relax(lammps_command, system, potential, symbols,
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
     
+    #Get lammps version date
+    lammps_date = iprPy.tools.check_lammps_version(lammps_command)['lammps_date']
+    
     # Handle default values
     if dumpsteps is None:       dumpsteps = runsteps
     
@@ -131,12 +135,11 @@ def full_relax(lammps_command, system, potential, symbols,
     lammps_variables['runsteps'] = runsteps
     lammps_variables['dumpsteps'] = dumpsteps
     
-    # Check LAMMPS compute stress version
-    compute_stress_version = iprPy.tools.lammps_version.compute_stress(lammps_command)
-    if compute_stress_version == 0:
-        lammps_variables['stressterm'] = 'NULL'
-    elif compute_stress_version == 1:
+    # Set compute stress/atom based on LAMMPS version
+    if lammps_date < datetime.date(2014, 2, 12):
         lammps_variables['stressterm'] = ''
+    else:
+        lammps_variables['stressterm'] = 'NULL'
     
     # Write lammps input script
     template_file = 'full_relax.template'

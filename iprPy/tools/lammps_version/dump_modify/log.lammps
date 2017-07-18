@@ -1,6 +1,0 @@
-LAMMPS (27 Aug 2016-ICMS)
-WARNING: OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (../comm.cpp:90)
-  using 1 OpenMP thread(s) per MPI task
-dump dumpit all atom 1 atom.*
-dump_modify dumpit format "%i %i %.13e %.13e %.13e"
-ERROR: Illegal dump_modify command (../dump.cpp:882)

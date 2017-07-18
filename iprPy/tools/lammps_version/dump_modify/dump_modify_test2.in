@@ -1,2 +1,0 @@
-dump dumpit all atom 1 atom.* 
-dump_modify dumpit format "%i %i %.13e %.13e %.13e"

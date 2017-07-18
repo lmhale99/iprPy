@@ -9,6 +9,7 @@ import sys
 import uuid
 import glob
 import shutil
+import datetime
 from copy import deepcopy
 
 # http://www.numpy.org/
@@ -100,6 +101,9 @@ def pointdefect(lammps_command, system, potential, symbols, point_kwargs, mpi_co
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
     
+    #Get lammps version date
+    lammps_date = iprPy.tools.check_lammps_version(lammps_command)['lammps_date']
+    
     # Define lammps variables
     lammps_variables = {}
     lammps_variables['atomman_system_info'] = lmp.atom_data.dump(system, 'perfect.dat', 
@@ -113,11 +117,10 @@ def pointdefect(lammps_command, system, potential, symbols, point_kwargs, mpi_co
     lammps_variables['dmax'] =                dmax
     
     # Set dump_modify format based on dump_modify_version
-    dump_modify_version = iprPy.tools.lammps_version.dump_modify(lammps_command)
-    if dump_modify_version == 0:
-        lammps_variables['dump_modify_format'] = 'float %.13e'
-    elif dump_modify_version == 1:
+    if lammps_date < datetime.date(2016, 8, 3):
         lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e"'
+    else:
+        lammps_variables['dump_modify_format'] = 'float %.13e'
     
     # Write lammps input script
     template_file = 'min.template'

@@ -1,9 +1,12 @@
+#### Calculation Style ####
+calculation_style           dynamic_relax
+
 #### Commands (prepare on Windows) ####
 lammps_command               lmp_mpi
 mpi_command                  mpiexec -localonly 4
 
 #### Commands (prepare on Linux) ####
-#lammps_command               /users/lmh1/LAMMPS/lammps-17Nov16/src/lmp_mpi
+#lammps_command               /users/lmh1/LAMMPS/lammps-30Jul16/src/lmp_mpi
 #mpi_command                  mpirun -np 8
 
 #### Run condition limiters ####

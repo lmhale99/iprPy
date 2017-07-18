@@ -44,7 +44,6 @@ parser_destroy.add_argument('record_style', nargs='?', default=None, help='recor
 parser_prepare = subparsers.add_parser('prepare', help='prepare calculations')
 parser_prepare.add_argument('database', help='database name')
 parser_prepare.add_argument('run_directory', help='run_directory name')
-parser_prepare.add_argument('calc_style', help='calculation name')
 parser_prepare.add_argument('input_file', help='prepare parameter file')
 
 #define subparser for runner
@@ -103,7 +102,7 @@ elif args.action == 'destroy':
 elif args.action == 'prepare':
     dbase = iprPy.highthroughput.get_database(args.database)
     run_directory = iprPy.highthroughput.get_run_directory(args.run_directory)
-    iprPy.highthroughput.prepare(args.calc_style, dbase, run_directory, args.input_file)    
+    iprPy.highthroughput.prepare(dbase, run_directory, input_file=args.input_file)
  
 #Actions for subcommand runner
 elif args.action == 'runner':

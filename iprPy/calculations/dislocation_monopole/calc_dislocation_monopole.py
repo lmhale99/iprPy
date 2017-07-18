@@ -10,6 +10,7 @@ import uuid
 import glob
 import shutil
 import random
+import datetime
 from copy import deepcopy
 
 # http://www.numpy.org/
@@ -154,6 +155,9 @@ def disl_relax(lammps_command, system, potential, symbols,
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
     
+    #Get lammps version date
+    lammps_date = iprPy.tools.check_lammps_version(lammps_command)['lammps_date']
+    
     # Define lammps variables
     lammps_variables = {}
     lammps_variables['atomman_system_info'] = lmp.atom_data.dump(system, 'system.dat', 
@@ -170,11 +174,10 @@ def disl_relax(lammps_command, system, potential, symbols,
     lammps_variables['group_move'] =          ' '.join(np.array(range(1, system.natypes//2+1), dtype=str))
     
     # Set dump_modify format based on dump_modify_version
-    dump_modify_version = iprPy.tools.lammps_version.dump_modify(lammps_command)
-    if dump_modify_version == 0:
-        lammps_variables['dump_modify_format'] = 'float %.13e'
-    elif dump_modify_version == 1:
+    if lammps_date < datetime.date(2016, 8, 3):
         lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e"'
+    else:
+        lammps_variables['dump_modify_format'] = 'float %.13e'
     
     # Write lammps input script
     template_file = 'disl_relax.template'

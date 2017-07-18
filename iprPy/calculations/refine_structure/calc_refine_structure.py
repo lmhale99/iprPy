@@ -8,6 +8,7 @@ import os
 import sys
 import uuid
 import shutil
+import datetime
 from copy import deepcopy
 
 # http://www.numpy.org/
@@ -198,11 +199,11 @@ def calc_cij(lammps_command, system, potential, symbols,
     pxy = uc.set_in_units(np.array(output.finds('Pxy')), lammps_units['pressure'])
     pxz = uc.set_in_units(np.array(output.finds('Pxz')), lammps_units['pressure'])
     pyz = uc.set_in_units(np.array(output.finds('Pyz')), lammps_units['pressure'])
-    try:
-        pe = uc.set_in_units(np.array(output.finds('v_peatom')), lammps_units['energy'])
-        assert len(pe) > 0
-    except:
+    
+    if output.lammps_date < datetime.date(2016, 8, 1):
         pe = uc.set_in_units(np.array(output.finds('peatom')), lammps_units['energy'])
+    else:
+        pe = uc.set_in_units(np.array(output.finds('v_peatom')), lammps_units['energy'])
     
     # Set the six non-zero strain values
     strains = np.array([ (lx[2] -  lx[1])  / lx[0],

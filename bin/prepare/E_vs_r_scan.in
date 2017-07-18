@@ -1,9 +1,13 @@
 #### Calculation Style ####
 calculation_style           E_vs_r_scan
 
-#### Commands ####
-lammps_command              /users/lmh1/LAMMPS/lammps-30Jul16/src/lmp_mpi
-mpi_command            
+#### Commands (prepare on Windows) ####
+lammps_command               lmp_mpi
+mpi_command                  
+
+#### Commands (prepare on Linux) ####
+#lammps_command               /users/lmh1/LAMMPS/lammps-30Jul16/src/lmp_mpi
+#mpi_command                  
 
 #### Potential limiters ####
 potential_name              2006--Chamati-H--Fe

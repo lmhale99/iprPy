@@ -81,15 +81,6 @@ def e_vs_r(lammps_command, system, potential, symbols,
     rsteps -- the number of r spacing steps to evaluate. Default value is 200.    
     """
     
-    # Get lammps version date
-    lammpsdate = iprPy.tools.check_lammps_version(lammps_command)['lammps_date']
-    
-    # Set thermo keys based on lammpsdate
-    if lammpsdate < datetime.date(2016, 8, 1):
-        peatom_key = 'peatom'
-    else:
-        peatom_key = 'v_peatom'
-    
     # Make system a deepcopy of itself (protect original from changes)
     system = deepcopy(system)
     
@@ -143,8 +134,12 @@ def e_vs_r(lammps_command, system, potential, symbols,
         output = lmp.run(lammps_command, lammps_script, mpi_command)
         
         thermo = output.simulations[0]['thermo']
-        Ecoh_values[i] = uc.set_in_units(thermo[peatom_key].values[-1], lammps_units['energy'])
         
+        if output.lammps_date < datetime.date(2016, 8, 1):
+            Ecoh_values[i] = uc.set_in_units(thermo.peatom.values[-1], lammps_units['energy'])
+        else:
+            Ecoh_values[i] = uc.set_in_units(thermo.v_peatom.values[-1], lammps_units['energy'])
+            
         # Rename log.lammps
         shutil.move('log.lammps', 'run0-'+str(i)+'-log.lammps')
            

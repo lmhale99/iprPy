@@ -1,2 +1,0 @@
-dump dumpit all custom 1 atom.* id x
-dump_modify dumpit format float %.13e
