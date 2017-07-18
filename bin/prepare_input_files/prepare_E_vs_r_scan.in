@@ -1,5 +1,5 @@
 #### Commands ####
-lammps_command              lmp_serial
+lammps_command              /users/lmh1/LAMMPS/lammps-30Jul16/src/lmp_mpi
 mpi_command            
 
 #### Potential limiters ####
