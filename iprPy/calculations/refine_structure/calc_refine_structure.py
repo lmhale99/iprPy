@@ -1,55 +1,64 @@
 #!/usr/bin/env python
 
-#Standard library imports
+# Python script created by Lucas Hale
+
+# Standard library imports
+from __future__ import print_function, division
 import os
 import sys
 import uuid
 import shutil
+import datetime
 from copy import deepcopy
 
-#http://www.numpy.org/
+# http://www.numpy.org/
 import numpy as np  
 
-#https://github.com/usnistgov/DataModelDict 
+# https://github.com/usnistgov/DataModelDict 
 from DataModelDict import DataModelDict as DM
 
-#https://github.com/usnistgov/atomman 
+# https://github.com/usnistgov/atomman 
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
-#https://github.com/usnistgov/iprPy
+# https://github.com/usnistgov/iprPy
 import iprPy
 
-calc_name = os.path.splitext(os.path.basename(__file__))[0]
-assert calc_name[:5] == 'calc_', 'Calculation file name must start with "calc_"'
-calc_type = calc_name[5:]
+# Define calc_style and record_style
+calc_style = 'refine_structure'
+record_style = 'calculation-system-relax'
 
-def main(*args):    
+def main(*args):
     """Main function for running calculation"""
 
-    #Read in parameters from input file
+    # Read input file in as dictionary
     with open(args[0]) as f:
-        input_dict = read_input(f, *args[1:])      
+        input_dict = iprPy.tools.parseinput(f, allsingular=True)
     
-    interpret_input(input_dict)
+    # Interpret and process input parameters 
+    process_input(input_dict, *args[1:])
     
-    #Run quick_a_Cij to refine values
+    # Run quick_a_Cij to refine values
     results_dict = quick_a_Cij(input_dict['lammps_command'], 
                                input_dict['initialsystem'], 
                                input_dict['potential'],
                                input_dict['symbols'], 
+                               mpi_command = input_dict['mpi_command'],
+                               ucell = input_dict['ucell'],
                                p_xx = input_dict['pressure_xx'], 
                                p_yy = input_dict['pressure_yy'], 
                                p_zz = input_dict['pressure_zz'],
                                delta = input_dict['strainrange'])
     
-    #Save data model of results 
-    results = data_model(input_dict, results_dict)
+    # Save data model of results 
+    results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict, results_dict)
+
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)
         
-def quick_a_Cij(lammps_command, system, potential, symbols, mpi_command=None, p_xx=0.0, p_yy=0.0, p_zz=0.0, delta = 1e-5, tol=1e-10, diverge_scale=3.):
+def quick_a_Cij(lammps_command, system, potential, symbols, mpi_command=None, ucell=None,
+                p_xx=0.0, p_yy=0.0, p_zz=0.0, delta = 1e-5, tol=1e-10, diverge_scale=3.):
     """
     Quickly refines static orthorhombic system by evaluating the elastic constants and the virial pressure.
     
@@ -60,79 +69,110 @@ def quick_a_Cij(lammps_command, system, potential, symbols, mpi_command=None, p_
     symbols -- list of element-model symbols for the Potential that correspond to the System's atypes
     
     Keyword Arguments:
+    mpi_command -- MPI command for running LAMMPS in parallel. Default value 
+                   is None (serial run).  
+    ucell -- an atomman.System representing a fundamental unit cell of the 
+             system. If not given, ucell will be taken as system.
     p_xx, p_yy, p_zz -- tensile pressures to equilibriate to.  Default is 0.0 for all. 
     delta -- the strain range to use in calculating the elastic constants. Default is 1e-5.    
     tol -- the relative tolerance criterion for identifying box size convergence. Default is 1e-10.
     diverge_scale -- identifies a divergent system if x / diverge_scale < x < x * diverge_scale is not True for x = a,b,c.
     """
     
-    #initial parameter setup
-    converged = False                   #flag for if values have converged
+    # Initial parameter setup
+    converged = False                   # flag for if values have converged
     
-    #define boxes for iterating
-    system_current = deepcopy(system)       #system with box parameters being evaluated
-    system_old = None                     #system with previous box parameters evaluated
+    # Set ucell = system if ucell not given
+    if ucell is None:
+        ucell = system
+    
+    # Get ratios of lx, ly, and lz of system relative to a of ucell
+    lx_a = system.box.a / ucell.box.a
+    ly_b = system.box.b / ucell.box.b
+    lz_c = system.box.c / ucell.box.c
+    alpha = system.box.alpha
+    beta =  system.box.beta
+    gamma = system.box.gamma
+    
+    # Define boxes for iterating
+    system_current = deepcopy(system)       # system with box parameters being evaluated
+    system_old = None                       # system with previous box parameters evaluated
     
     for cycle in xrange(100):
         
-        #Run LAMMPS and evaluate results based on system_old
-        results = calc_cij(lammps_command, system_current, potential, symbols, p_xx, p_yy, p_zz, delta, cycle)
+        # Run LAMMPS and evaluate results based on system_old
+        results = calc_cij(lammps_command, system_current, potential, symbols, 
+                           mpi_command=mpi_command, 
+                           p_xx=p_xx, p_yy=p_yy, p_zz=p_zz, 
+                           delta=delta, cycle=cycle)
         system_new = results['system_new']
         
-        #Test if box has converged to a single size
+        # Test if box has converged to a single size
         if np.allclose(system_new.box.vects, system_current.box.vects, rtol=tol, atol=0):
             converged = True
             break
         
-        #Test if box has converged to two sizes
+        # Test if box has converged to two sizes
         elif system_old is not None and np.allclose(system_new.box.vects, system_old.box.vects, rtol=tol, atol=0):
-            #Run LAMMPS Cij script using average between alat0 and alat1
-            box = am.Box(a = (system_new.box.a + system_old.box.a) / 2.,
-                         b = (system_new.box.b + system_old.box.b) / 2.,
-                         c = (system_new.box.c + system_old.box.c) / 2.)
-            system_current.box_set(vects=box.vects, scale=True)
-            results = calc_cij(lammps_command, system_current, potential, symbols, p_xx, p_yy, p_zz, delta, cycle+1)                 
-            
+            # Update current box to average of old and new lattice constants
+            system_current.box_set(a = (system_new.box.a + system_old.box.a) / 2.,
+                                   b = (system_new.box.b + system_old.box.b) / 2.,
+                                   c = (system_new.box.c + system_old.box.c) / 2., 
+                                   scale=True)
+            results = calc_cij(lammps_command, system_current, potential, symbols, 
+                               mpi_command=mpi_command, 
+                               p_xx=p_xx, p_yy=p_yy, p_zz=p_zz, 
+                               delta=delta, cycle=cycle+1)                 
             converged = True
             break
         
-        #Test if values have diverged from initial guess
+        # Test if values have diverged from initial guess
         elif system_new.box.a < system.box.a / diverge_scale or system_new.box.a > system.box.a * diverge_scale:
             raise RuntimeError('Divergence of box dimensions')
         elif system_new.box.b < system.box.b / diverge_scale or system_new.box.b > system.box.b * diverge_scale:
             raise RuntimeError('Divergence of box dimensions')
         elif system_new.box.c < system.box.c / diverge_scale or system_new.box.c > system.box.c * diverge_scale:
             raise RuntimeError('Divergence of box dimensions')  
-        elif results['ecoh'] == 0.0:
+        elif results['E_coh'] == 0.0:
             raise RuntimeError('Divergence: cohesive energy is 0')
                 
-        #if not converged or diverged, update system_old and system_current
+        # If not converged or diverged, update system_old and system_current
         else:
             system_old, system_current = system_current, system_new
     
-    #Return values if converged
-    if converged:        
+    # Return values when converged
+    if converged:  
+        # Extract final ucell parameters
+        results['a_lat'] = system_new.box.a / lx_a
+        results['b_lat'] = system_new.box.b / ly_b
+        results['c_lat'] = system_new.box.c / lz_c
+        results['alpha_lat'] = alpha
+        results['beta_lat']  = beta
+        results['gamma_lat'] = gamma    
+        
+        # Rename system_new to system_relaxed
+        results['system_relaxed'] = results.pop('system_new')
         return results
     else:
         raise RuntimeError('Failed to converge after 100 cycles')
 
-def calc_cij(lammps_command, system, potential, symbols, p_xx=0.0, p_yy=0.0, p_zz=0.0, delta=1e-5, cycle=0):
+def calc_cij(lammps_command, system, potential, symbols, 
+             mpi_command=None, p_xx=0.0, p_yy=0.0, p_zz=0.0, delta=1e-5, cycle=0):
     """Runs cij_script and returns current Cij, stress, Ecoh, and new system guess."""
     
-    #Get lammps units
+    # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
     
-    #Define lammps variables
+    # Define lammps variables
     lammps_variables = {}
-    lammps_variables['atomman_system_info'] = lmp.sys_gen(units =       potential.units,
-                                                          atom_style =  potential.atom_style,
-                                                          ucell =       system,
-                                                          size =        np.array([[0,3], [0,3], [0,3]]))
+    lammps_variables['atomman_system_info'] = lmp.atom_data.dump(system, 'init'+str(cycle)+'.dat', 
+                                                                 units=potential.units, 
+                                                                 atom_style=potential.atom_style)
     lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
     lammps_variables['delta'] = delta
     lammps_variables['steps'] = 2
     
-    #Write lammps input script
+    # Write lammps input script
     template_file = 'cij.template'
     lammps_script = 'cij.in'
     with open(template_file) as f:
@@ -140,12 +180,12 @@ def calc_cij(lammps_command, system, potential, symbols, p_xx=0.0, p_yy=0.0, p_z
     with open(lammps_script, 'w') as f:
         f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
     
-    #Run lammps 
-    output = lmp.run(lammps_command, lammps_script, return_style='model')
+    # Run lammps 
+    output = lmp.run(lammps_command, lammps_script, mpi_command=mpi_command, return_style='model')
     shutil.move('log.lammps', 'cij-'+str(cycle)+'-log.lammps')
     
-    #Extract LAMMPS thermo data. Each term ranges i=0-12 where i=0 is undeformed
-    #The remaining values are for -/+ strain pairs in the six unique directions
+    # Extract LAMMPS thermo data. Each term ranges i=0-12 where i=0 is undeformed
+    # The remaining values are for -/+ strain pairs in the six unique directions
     lx = uc.set_in_units(np.array(output.finds('Lx')), lammps_units['length'])
     ly = uc.set_in_units(np.array(output.finds('Ly')), lammps_units['length'])
     lz = uc.set_in_units(np.array(output.finds('Lz')), lammps_units['length'])
@@ -159,13 +199,13 @@ def calc_cij(lammps_command, system, potential, symbols, p_xx=0.0, p_yy=0.0, p_z
     pxy = uc.set_in_units(np.array(output.finds('Pxy')), lammps_units['pressure'])
     pxz = uc.set_in_units(np.array(output.finds('Pxz')), lammps_units['pressure'])
     pyz = uc.set_in_units(np.array(output.finds('Pyz')), lammps_units['pressure'])
-    try:
-        pe = uc.set_in_units(np.array(output.finds('v_peatom')), lammps_units['energy'])
-        assert len(pe) > 0
-    except:
-        pe = uc.set_in_units(np.array(output.finds('peatom')), lammps_units['energy'])
     
-    #Set the six non-zero strain values
+    #if output.lammps_date < datetime.date(2016, 8, 1):
+    pe = uc.set_in_units(np.array(output.finds('PotEng')), lammps_units['energy']) / system.natoms
+    #else:
+    #    pe = uc.set_in_units(np.array(output.finds('v_peatom')), lammps_units['energy'])
+    
+    # Set the six non-zero strain values
     strains = np.array([ (lx[2] -  lx[1])  / lx[0],
                          (ly[4] -  ly[3])  / ly[0],
                          (lz[6] -  lz[5])  / lz[0],
@@ -173,7 +213,7 @@ def calc_cij(lammps_command, system, potential, symbols, p_xx=0.0, p_yy=0.0, p_z
                          (xz[10] - xz[9])  / lz[0],
                          (xy[12] - xy[11]) / ly[0] ])
 
-    #calculate cij using stress changes associated with each non-zero strain
+    # Calculate cij using stress changes associated with each non-zero strain
     cij = np.empty((6,6))
     for i in xrange(6):
         delta_stress = np.array([ pxx[2*i+1]-pxx[2*i+2],
@@ -191,15 +231,9 @@ def calc_cij(lammps_command, system, potential, symbols, p_xx=0.0, p_yy=0.0, p_z
 
     C = am.ElasticConstants(Cij=cij)
     
-    #if np.allclose(C.Cij, 0.0):
-    #    raise RuntimeError('Divergence of elastic constants to <= 0')
-    #try:
     S = C.Sij
-    #except:
-    #    raise RuntimeError('singular C:\n'+str(C.Cij))
-
     
-    #extract the current stress state
+    # Extract the current stress state
     stress = -1 * np.array([[pxx[0], pxy[0], pxz[0]],
                             [pxy[0], pyy[0], pyz[0]],
                             [pxz[0], pyz[0], pzz[0]]])
@@ -215,50 +249,37 @@ def calc_cij(lammps_command, system, potential, symbols, p_xx=0.0, p_yy=0.0, p_z
     if new_a <= 0 or new_b <= 0 or new_c <=0:
         raise RuntimeError('Divergence of box dimensions to <= 0')
     
-    newbox = am.Box(a=new_a, b=new_b, c=new_c)
     system_new = deepcopy(system)
-    system_new.box_set(vects=newbox.vects, scale=True)
+    system_new.box_set(a=new_a, b=new_b, c=new_c, scale=True)
     
-    return {'C':C, 'stress':stress, 'ecoh':pe[0], 'system_new':system_new}
+    return {'C_elastic':C, 'stress':stress, 'E_coh':pe[0], 'system_new':system_new}
 
-def read_input(f, UUID=None):
-    """Reads the calc_*.in input commands for this calculation."""
+def process_input(input_dict, UUID=None, build=True):
+    """Reads the calc_*.in input commands for this calculation and sets default values if needed."""
     
-    #Read input file in as dictionary    
-    input_dict = iprPy.tools.parseinput(f, allsingular=True)
+    # Set calculation UUID
+    if UUID is not None: 
+        input_dict['calc_key'] = UUID
+    else: 
+        input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
-    #set calculation UUID
-    if UUID is not None: input_dict['calc_key'] = UUID
-    else: input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
-    
-    #Verify required terms are defined
-    assert 'lammps_command' in input_dict, 'lammps_command value not supplied'
-    assert 'potential_file' in input_dict, 'potential_file value not supplied'
-    assert 'load'           in input_dict, 'load value not supplied'
-    
-    #Assign default values to undefined terms
+    # Set default input/output units
     iprPy.input.units(input_dict)
     
-    input_dict['mpi_command'] =    input_dict.get('mpi_command',    None)
-    input_dict['potential_dir'] =  input_dict.get('potential_dir',  '')
+    # These are calculation-specific default strings
+    input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
     
-    input_dict['load_options'] =   input_dict.get('load_options',   None)
-    input_dict['box_parameters'] = input_dict.get('box_parameters', None)
-    input_dict['symbols'] =        input_dict.get('symbols',        None)
+    # These are calculation-specific default booleans
+    # None for this calculation
     
-    iprPy.input.axes(input_dict)
-    iprPy.input.atomshift(input_dict)
+    # These are calculation-specific default integers
+    # None for this calculation
     
-    input_dict['sizemults'] =      input_dict.get('sizemults',     '3 3 3')
-    iprPy.input.sizemults(input_dict)
-    
-    #these are integer terms
-    input_dict['number_of_steps_r'] = int(input_dict.get('number_of_steps_r', 200))
-    
-    #these are unitless float terms
+    # These are calculation-specific default unitless floats
     input_dict['strainrange'] = float(input_dict.get('strainrange', 1e-6))
+    input_dict['temperature'] = 0.0
     
-    #these are terms with units
+    # These are calculation-specific default floats with units
     input_dict['pressure_xx'] = iprPy.input.value(input_dict, 'pressure_xx', 
                                     default_unit=input_dict['pressure_unit'], 
                                     default_term='0.0 GPa')
@@ -269,99 +290,17 @@ def read_input(f, UUID=None):
                                     default_unit=input_dict['pressure_unit'], 
                                     default_term='0.0 GPa')    
     
-    return input_dict
-
-def interpret_input(input_dict):
-    with open(input_dict['potential_file']) as f:
-        input_dict['potential'] = lmp.Potential(f, input_dict['potential_dir'])
-        
-    iprPy.input.system_family(input_dict)
+    # Check lammps_command and mpi_command
+    iprPy.input.commands(input_dict)
     
-    iprPy.input.ucell(input_dict)
+    # Load potential
+    iprPy.input.potential(input_dict)
     
-    iprPy.input.initialsystem(input_dict)
+    # Load ucell system
+    iprPy.input.systemload(input_dict, build=build)
     
-def data_model(input_dict, results_dict=None):
-    """Creates a DataModelDict containing the input and results data""" 
-    
-    #Create the root of the DataModelDict
-    output = DM()
-    output['calculation-system-relax'] = calc = DM()
-    
-    #Assign uuid
-    calc['key'] = input_dict['calc_key']
-    calc['calculation'] = DM()
-    calc['calculation']['script'] = calc_name
-    
-    calc['calculation']['run-parameter'] = run_params = DM()
-    
-    run_params['size-multipliers'] = DM()
-    run_params['size-multipliers']['a'] = list(input_dict['sizemults'][0])
-    run_params['size-multipliers']['b'] = list(input_dict['sizemults'][1])
-    run_params['size-multipliers']['c'] = list(input_dict['sizemults'][2])
-    
-    run_params['strain-range'] = input_dict['strainrange']
-    run_params['load_options'] = input_dict['load_options']
-    
-    #Copy over potential data model info
-    calc['potential'] = DM()
-    calc['potential']['key'] = input_dict['potential'].key
-    calc['potential']['id'] = input_dict['potential'].id
-    
-    #Save info on system file loaded
-    system_load = input_dict['load'].split(' ')    
-    calc['system-info'] = DM()
-    calc['system-info']['artifact'] = DM()
-    calc['system-info']['artifact']['file'] = os.path.basename(' '.join(system_load[1:]))
-    calc['system-info']['artifact']['format'] = system_load[0]
-    calc['system-info']['artifact']['family'] = input_dict['system_family']
-    calc['system-info']['symbols'] = input_dict['symbols']
-    
-    #Save phase-state info
-    calc['phase-state'] = DM()
-    calc['phase-state']['temperature'] = DM([('value', 0.0), ('unit', 'K')])
-    calc['phase-state']['pressure-xx'] = DM([('value', uc.get_in_units(input_dict['pressure_xx'],
-                                                                       input_dict['pressure_unit'])), 
-                                                       ('unit', input_dict['pressure_unit'])])
-    calc['phase-state']['pressure-yy'] = DM([('value', uc.get_in_units(input_dict['pressure_yy'],
-                                                                       input_dict['pressure_unit'])),
-                                                       ('unit', input_dict['pressure_unit'])])
-    calc['phase-state']['pressure-zz'] = DM([('value', uc.get_in_units(input_dict['pressure_zz'],
-                                                                       input_dict['pressure_unit'])),
-                                                       ('unit', input_dict['pressure_unit'])])                                                       
-    
-    if results_dict is None:
-        calc['status'] = 'not calculated'
-    else:
-        #Save data model of the initial ucell
-        calc['as-constructed-atomic-system'] = input_dict['ucell'].model(symbols = input_dict['symbols'], 
-                                                                         box_unit = input_dict['length_unit'])['atomic-system']
-        
-        #Update ucell to relaxed lattice parameters
-        a_mult = input_dict['sizemults'][0][1] - input_dict['sizemults'][0][0]
-        b_mult = input_dict['sizemults'][1][1] - input_dict['sizemults'][1][0]
-        c_mult = input_dict['sizemults'][2][1] - input_dict['sizemults'][2][0]
-        relaxed_ucell = deepcopy(input_dict['ucell'])
-        relaxed_ucell.box_set(a = results_dict['system_new'].box.a / a_mult,
-                              b = results_dict['system_new'].box.b / b_mult,
-                              c = results_dict['system_new'].box.c / c_mult,
-                              scale = True)
-        
-        #Save data model of the relaxed ucell                      
-        calc['relaxed-atomic-system'] = relaxed_ucell.model(symbols = input_dict['symbols'], 
-                                                            box_unit = input_dict['length_unit'])['atomic-system']
-        
-        #Save the final cohesive energy
-        calc['cohesive-energy'] = DM([('value', uc.get_in_units(results_dict['ecoh'], 
-                                                                           input_dict['energy_unit'])), 
-                                                 ('unit', input_dict['energy_unit'])])
-        
-        #Save the final elastic constants
-        c_family = calc['relaxed-atomic-system']['cell'].keys()[0]
-        calc['elastic-constants'] = results_dict['C'].model(unit = input_dict['pressure_unit'], 
-                                                            crystal_system = c_family)['elastic-constants']
-
-    return output
+    # Construct initialsystem by manipulating ucell system
+    iprPy.input.systemmanipulate(input_dict, build=build)
     
 if __name__ == '__main__':
-    main(*sys.argv[1:])    
+    main(*sys.argv[1:])

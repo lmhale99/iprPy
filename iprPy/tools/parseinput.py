@@ -48,12 +48,12 @@ def parseinput(infile, singularkeys=[], allsingular=False):
             i += 1
         terms = terms[:i]
 
-        #skip empty (and comment) lines        
+        #skip empty (and comment) lines
         if len(terms) > 1:
             
             #Split into key and value
             key = terms[0]
-            value = ' '.join(terms[1:])            
+            value = ' '.join(terms[1:])
         
             #First time key is called save as is
             if key not in params:

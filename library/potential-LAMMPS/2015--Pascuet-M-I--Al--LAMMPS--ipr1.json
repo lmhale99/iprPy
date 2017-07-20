@@ -1,0 +1,37 @@
+{
+    "potential-LAMMPS": {
+        "key": "83ca7343-12d3-4644-b85b-2b3a839f884e", 
+        "id": "2015--Pascuet-M-I--Al--LAMMPS--ipr1", 
+        "potential": {
+            "key": "b5fb2f1f-a582-4f81-9445-f002ce31e66e", 
+            "id": "2015--Pascuet-M-I--Al"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Al", 
+                "mass": 26.9815
+            }
+        ], 
+        "pair_style": {
+            "type": "meam"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "library-Al.meam"
+                }, 
+                {
+                    "symbolsList": "True"
+                }, 
+                {
+                    "file": "Al.meam"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

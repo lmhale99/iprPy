@@ -43,7 +43,17 @@ class Calculation(object):
             raise AttributeError('Calculation (' + self.style + ') has no attribute read_input') 
         else:
             return read_input(fp, *args)   
-            
+    
+    def process_input(self, input_dict, UUID=None, build=True):
+        """Reads the calc_*.in input commands for the named calculation."""
+        
+        try: 
+            process_input = self.__calc_module.process_input
+        except AttributeError:
+            raise AttributeError('Calculation (' + self.style + ') has no attribute process_input') 
+        else:
+            process_input(input_dict, UUID=UUID, build=build)
+    
     @property
     def template(self):
         """Reads the calc_*.in input commands for the named calculation."""

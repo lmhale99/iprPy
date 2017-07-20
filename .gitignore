@@ -27,3 +27,5 @@ bin/iprPy_runner.*
 */*/*/.ipynb_checkpoints/
 */*/*/*/.ipynb_checkpoints/
 
+#Demonstration Notebook working directories
+docs/demonstrations/*/

@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "be717c03-4f3f-4d93-a138-84cc821c46a3", 
+        "id": "1998--Liu-X-Y--Al-Mg--LAMMPS--ipr1", 
+        "potential": {
+            "key": "471c5c9d-fe61-4bbb-a088-a88be016d78d", 
+            "id": "1998--Liu-X-Y--Al-Mg"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Al", 
+                "mass": 26.982
+            }, 
+            {
+                "element": "Mg", 
+                "mass": 24.305
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "almg.liu.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

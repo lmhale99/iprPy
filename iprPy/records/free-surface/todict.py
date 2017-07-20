@@ -8,15 +8,15 @@ def todict(record, full=True, flat=False):
 
     proto = model['free-surface']
     params = {}
-    params['key'] =       proto['key']
-    params['id'] =        proto['id']
-    params['prototype'] = proto['system-family']
+    params['key'] =    proto['key']
+    params['id'] =     proto['id']
+    params['family'] = proto['system-family']
     
-    asp = proto['atomman-surface-parameters']
-    params['x_axis'] =       np.array(asp['crystallographic-axes']['x-axis'])
-    params['y_axis'] =       np.array(asp['crystallographic-axes']['y-axis'])
-    params['z_axis'] =       np.array(asp['crystallographic-axes']['z-axis'])
-    params['cutboxvector'] = asp['cutboxvector']
-    params['atomshift'] =    np.array(asp['atomshift'])
+    calcparam = proto['calculation-parameter']
+    params['x_axis'] =       calcparam['x_axis']
+    params['y_axis'] =       calcparam['y_axis']
+    params['z_axis'] =       calcparam['z_axis']
+    params['atomshift'] =    calcparam['atomshift']
+    params['cutboxvector'] = calcparam['cutboxvector']
     
     return params 

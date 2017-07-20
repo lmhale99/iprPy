@@ -1,13 +1,13 @@
 {
     "point-defect": {
-        "key": "310fe823-0a7c-4a90-a771-e75e5dedeaa7",
+        "key": "310fe823-0a7c-4a90-a771-e75e5dedeaa7", 
         "id": "A2--W--bcc--110-dumbbell", 
         "system-family": "A2--W--bcc", 
-        "atomman-defect-point-parameters": {
+        "calculation-parameter": {
             "ptd_type": "db", 
             "atype": 1, 
-            "pos": [0.0, 0.0, 0.0], 
-            "db_vect": [0.00, 0.25, 0.25], 
+            "pos": "0.0000000000000 0.0000000000000 0.0000000000000", 
+            "db_vect": "0.0000000000000 0.2500000000000 0.2500000000000", 
             "scale": true
         }
     }

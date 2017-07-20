@@ -1,0 +1,45 @@
+{
+    "potential-LAMMPS": {
+        "key": "8bb0770d-dd20-4e03-ade3-d2dd22374751", 
+        "id": "2013--Gao-H--AgTaO3--LAMMPS--ipr1", 
+        "potential": {
+            "key": "fe333ad8-fd35-4b4d-9eb2-e293806c4d02", 
+            "id": "2013--Gao-H--AgTaO3"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ag", 
+                "mass": 107.8682
+            }, 
+            {
+                "element": "Ta", 
+                "mass": 180.9479
+            }, 
+            {
+                "element": "O", 
+                "mass": 15.9994
+            }
+        ], 
+        "pair_style": {
+            "type": "meam"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "library_AgTaO3.meam"
+                }, 
+                {
+                    "symbolsList": "True"
+                }, 
+                {
+                    "file": "AgTaO3.meam"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

@@ -1,17 +1,17 @@
 {
     "point-defect": {
-        "key": "6a811ef7-6ec9-4570-8079-6e407742ca31",
+        "key": "6a811ef7-6ec9-4570-8079-6e407742ca31", 
         "id": "A1--Cu--fcc--2nn-divacancy", 
         "system-family": "A1--Cu--fcc", 
-        "atomman-defect-point-parameters": [
+        "calculation-parameter": [
             {
                 "ptd_type": "v", 
-                "pos": [0.0, 0.0, 0.0], 
+                "pos": "0.0000000000000 0.0000000000000 0.0000000000000", 
                 "scale": true
             }, 
             {
                 "ptd_type": "v", 
-                "pos": [0.0, 0.0, 1.0], 
+                "pos": "0.0000000000000 0.0000000000000 1.0000000000000", 
                 "scale": true
             }
         ]

@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "86ec8a7a-667a-4f0f-88e2-67188fbdd906", 
+        "id": "2012--Proville-L--Fe--LAMMPS--Hale", 
+        "potential": {
+            "key": "8d55ef4d-6451-453e-b636-5ff1e2552d18", 
+            "id": "2012--Proville-L--Fe"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Fe", 
+            "mass": 55.845
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Fe_Proville.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

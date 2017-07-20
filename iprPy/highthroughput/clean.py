@@ -76,7 +76,7 @@ def clean(dbase=None, run_directory=None, record_style=None):
             else:
                 model_root = model.keys()[0]
                 del(model[model_root]['error'])
-                del(model[model_root]['status'])
+                model[model_root]['status'] = 'not calculated'
                 dbase.update_record(name=record_name, style=record_style, content=model.xml())
             
     

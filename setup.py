@@ -1,14 +1,18 @@
+import os
 from setuptools import setup, find_packages
 
-def readme():
-    with open('README.rst') as f:
-        return f.read()
-    
+def getversion():
+    with open(os.path.join('iprPy', 'VERSION')) as version_file:
+        version = version_file.read().strip()
 
-setup(name='iprPy',
-      version='0.6',
-      description='Interatomic Potential Repository Python Property Calculations and Tools',
-      long_description=readme(),
+def getreadme():
+    with open('README.rst') as readme_file:
+        return readme_file.read()
+   
+setup(name = 'iprPy',
+      version = getversion(),
+      description = 'Interatomic Potential Repository Python Property Calculations and Tools',
+      long_description = getreadme(),
       classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',
@@ -16,12 +20,19 @@ setup(name='iprPy',
         'Programming Language :: Python :: 2.7',
         'Topic :: Scientific/Engineering :: Physics'
       ],
-      keywords=['atom', 'atomic', 'atomistic', 'molecular dynamics', 'high-throughput', 'interatomic'], 
-      url='https://github.com/usnistgov/iprPy',
-      author='Lucas Hale',
-      author_email='lucas.hale@nist.gov',
-      packages=find_packages(),
-      install_requires=[
+      keywords = [
+        'atom', 
+        'atomic', 
+        'atomistic', 
+        'molecular dynamics', 
+        'high-throughput', 
+        'interatomic'
+      ], 
+      url = 'https://github.com/usnistgov/iprPy',
+      author = 'Lucas Hale',
+      author_email = 'lucas.hale@nist.gov',
+      packages = find_packages(),
+      install_requires = [
         'xmltodict',
         'DataModelDict',
         'numpy', 
@@ -31,5 +42,5 @@ setup(name='iprPy',
         'numericalunits',
         'atomman'
       ],
-      include_package_data=True,
-      zip_safe=False)
+      include_package_data = True,
+      zip_safe = False)

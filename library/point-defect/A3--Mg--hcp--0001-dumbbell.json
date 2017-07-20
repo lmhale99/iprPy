@@ -1,13 +1,13 @@
 {
     "point-defect": {
-        "key": "404e779e-8c27-4d31-8fb2-ec51c604fb75",
+        "key": "404e779e-8c27-4d31-8fb2-ec51c604fb75", 
         "id": "A3--Mg--hcp--0001-dumbbell", 
         "system-family": "A3--Mg--hcp", 
-        "atomman-defect-point-parameters": {
+        "calculation-parameter": {
             "ptd_type": "db", 
             "atype": 1, 
-            "pos": [0.0, 0.0, 0.0], 
-            "db_vect": [0.0, 0.0, 0.16666666666667], 
+            "pos": "0.0000000000000 0.0000000000000 0.0000000000000", 
+            "db_vect": "0.0000000000000 0.0000000000000 0.1666666666667", 
             "scale": true
         }
     }

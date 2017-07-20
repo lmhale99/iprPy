@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "6800fe50-fc4f-43ed-950b-1f243006523b", 
+        "id": "1999--Liu-X-Y--Al-Cu--LAMMPS--ipr1", 
+        "potential": {
+            "key": "92e1a9a3-8124-4808-9fd9-fa5e4abef227", 
+            "id": "1999--Liu-X-Y--Al-Cu"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Al", 
+                "mass": 26.982
+            }, 
+            {
+                "element": "Cu", 
+                "mass": 63.546
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "al-cu-set.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

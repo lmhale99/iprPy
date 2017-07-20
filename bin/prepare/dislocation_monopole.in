@@ -1,0 +1,30 @@
+#### Calculation Style ####
+calculation_style           dislocation_monopole
+
+#### Commands (prepare on Windows) ####
+lammps_command               lmp_mpi
+mpi_command                  mpiexec -localonly 4
+
+#### Commands (prepare on Linux) ####
+#lammps_command               /users/lmh1/LAMMPS/lammps-30Jul16/src/lmp_mpi
+#mpi_command                  mpirun -np 8
+
+#### Run condition limiters ####
+potential_name              2006--Chamati-H--Fe
+symbol_name
+#family_name              
+#dislocation_name            A1--Cu--fcc--111-edge
+#dislocation_name            A2--W--bcc--110-edge
+dislocation_name            A2--W--bcc--112-edge
+
+#### Unit specifications ####
+length_unit
+pressure_unit
+energy_unit
+force_unit
+
+#### Run parameters ####
+#sizemults                   -49 49 -40 40 0 2
+#sizemults                   -40 40 -28 28 0 2
+sizemults                   -20 20 -24 24 0 2
+annealtemperature           0

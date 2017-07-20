@@ -1,0 +1,39 @@
+{
+    "potential-LAMMPS": {
+        "key": "7e1cbe71-de45-4ac4-8302-254673261341", 
+        "id": "2012--Schopf-D--Al-Mn-Pd--LAMMPS--ipr1", 
+        "potential": {
+            "key": "bdd76724-0693-4e46-8a9a-39e1bc2204ce", 
+            "id": "2012--Schopf-D--Al-Mn-Pd"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Al", 
+                "mass": 26.98154
+            }, 
+            {
+                "element": "Mn", 
+                "mass": 54.938
+            }, 
+            {
+                "element": "Pd", 
+                "mass": 106.4
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "AlMnPd_Schopf_2012.lammps.EAM_CORRECT"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}
