@@ -1,4 +1,5 @@
-from __future__ import print_function
+from __future__ import division, absolute_import, print_function
+
 from io import BytesIO
 
 from DataModelDict import DataModelDict as DM
@@ -9,12 +10,45 @@ import pandas as pd
 
 from .records import records_dict
 
+__all__ = ['record_styles', 'buildmodel', 'Record']
+
 def record_styles():
-    """Returns a list of the styles of the loaded calculations."""
+    """
+    Returns
+    -------
+    list of str
+        All record styles successfully loaded.
+    """
     return records_dict.keys()
     
 def buildmodel(style, script, input_dict, results_dict=None):
-    """Generates a DataModelDict instance of the record style"""
+    """
+    Builds a data model of the specified record style based on input (and
+    results) parameters.
+    
+    Parameters
+    ----------
+    style : str
+        The record style to use.
+    script : str
+        The name of the calculation script used.
+    input_dict : dict
+        Dictionary of all input parameter terms.
+    results_dict : dict, optional
+        Dictionary containing any results produced by the calculation.
+        
+    Returns
+    -------
+    DataModelDict
+        Data model consistent with the record's schema format.
+    
+    Raises
+    ------
+    KeyError
+        If the record style is not available.
+    AttributeError
+        If buildmodel is not defined for record style.
+    """
     
     try:
         r_module = records_dict[style]
@@ -23,15 +57,40 @@ def buildmodel(style, script, input_dict, results_dict=None):
     try:        
         buildmodel = r_module.buildmodel
     except:
-        raise AttributeError('buildmodel not defined for record style ' + style)
+        raise AttributeError('buildmodel not defined for record style '
+                             + style)
     else:
         return buildmodel(script, input_dict, results_dict=results_dict)
     
 class Record(object):
-    """Class for handling different record styles in the same fashion"""
+    """
+    Class for handling different record styles in the same fashion.  The
+    class defines the common methods and attributes, which are then uniquely
+    implemented for each style.  The available styles are loaded from the
+    iprPy.records submodule.
+    """
     
     def __init__(self, style, name, content):
-        #Check if calculation style exists
+        """
+        Initializes a Record object for a given style.
+        
+        Parameters
+        ----------
+        style : str
+            The record style.
+        name : str
+            The unique name to assign to the record.
+        content : str
+            The content of the record as an XML formatted str.
+        
+        Raises
+        ------
+        KeyError
+            If the record style is not available.
+        """
+        
+        
+        # Check if record style exists
         try:
             self.__r_module = records_dict[style]
         except KeyError:
@@ -42,96 +101,175 @@ class Record(object):
         self.__content = content
     
     def __str__(self):
+        """
+        Returns
+        -------
+        str
+            The string representation of the record: <name> (<style>).
+        """
         return self.name + ' (' + self.style + ')'
     
     @property
     def style(self):
+        """str: The records's style."""
         return self.__style
         
     @property
     def name(self):
+        """str: The records's name."""
         return self.__name
     
     @property
     def content(self):
+        """
+        str: The record's XML-formatted content. Can be set directly.
+        """
         return self.__content
         
     @content.setter
     def content(self, value):
         self.__content = value
           
-    def todict(self, **kwargs):
-        """Converts an xml record to a flat dictionary"""
+    def todict(self, full=True, flat=False):
+        """
+        Converts the XML content to a dictionary.
+        
+        Parameters
+        ----------
+        full : bool, optional
+            Flag used by the calculation records.  A True value will include
+            terms for both the calculation's input and results, while a value
+            of False will only include input terms (Default is True).
+        flat : bool, optional
+            Flag affecting the format of the dictionary terms.  If True, the
+            dictionary terms are limited to having only str, int, and float
+            values, which is useful for comparisons.  If False, the term
+            values can be of any data type, which is convenient for analysis.
+            (Default is False).
+            
+        Returns
+        -------
+        dict
+            A dictionary representation of the record's content.
+        
+        Raises
+        ------
+        AttributeError
+            If todict is not defined for record style.
+        """
         
         try: 
             todict = self.__r_module.todict
         except:
-            raise AttributeError('Record (' + self.style + ') has no attribute todict')
+            raise AttributeError('Record (' + self.style 
+                                 + ') has no attribute todict')
         else:
-            return todict(self.content, **kwargs)    
+            return todict(self.content, full=full, flat=flat)
     
     @property
     def schema(self):
-        """Returns the path to the .xsd file for the named record."""
+        """
+        str: The absolute directory path to the .xsd file associated with the
+             record style.
+        """
         
         try: 
             schema = self.__r_module.schema
         except AttributeError:
-            raise AttributeError('Record (' + self.style + ') has no attribute schema') 
+            raise AttributeError('Record (' + self.style 
+                                 + ') has no attribute schema')
         else:
             return schema()
-            
+
     @property
     def compare_terms(self):
-        """Returns the list of default string and int terms used for comparisons."""
+        """
+        list of str: The default terms used by isnew() for comparisons.
+        """
         
         try: 
             compare_terms = self.__r_module.compare_terms
         except AttributeError:
-            raise AttributeError('Record (' + self.style + ') has no attribute compare_terms') 
+            raise AttributeError('Record (' + self.style
+                                 + ') has no attribute compare_terms')
         else:
             return compare_terms()
             
     @property
     def compare_fterms(self):
-        """Returns the list of default float terms used for comparisons."""
+        """
+        list of str: The default fterms used by isnew() for comparisons.
+        """
         
         try: 
             compare_fterms = self.__r_module.compare_fterms
         except AttributeError:
-            raise AttributeError('Record (' + self.style + ') has no attribute compare_fterms') 
+            raise AttributeError('Record (' + self.style
+                                 + ') has no attribute compare_fterms')
         else:
             return compare_fterms()
             
-    def isnew(self, record_df=None, record_list=None, database=None, terms=None, fterms=None, atol=0.0, rtol=1e-8):
+    def isnew(self, record_df=None, record_list=None, database=None,
+              terms=None, fterms=None, atol=0.0, rtol=1e-8):
         """
-        Determine if a matching record already exists in a database, list, or 
-        DataFrame of records.
+        Checks the record versus a database, list of records, or DataFrame of
+        records to see if any records exists with matching terms and fterms.
         
-        Keyword Arguments:
-        record_df -- pandas.DataFrame of records of the record's style. This should 
-                     be built by using the Record.todict(full=False, flat=True) 
-                     method on every record contained within.
-        record_list -- list of records of the record's style.
-        database -- iprPy.Database containing records of record's style.
-        terms -- list of integer and string terms to include in comparison. If not 
-                 given, will use default compare_terms list for the record style.
-        fterms -- list of float terms to include in comparison. If not given, will 
-                  use default compare_fterms list for the record style.
-        atol -- absolute tolerance to use in comparing fterms. Default value is 0.0.
-        rtol -- relative tolerance to use in comparing fterms. Default value is 1e-8.
+        Parameters
+        ----------
+        record_df : pandas.DataFrame, optional
+            DataFrame to compare record againts.  record_df must be built by
+            converting records to dictionaries using Record.todict(full=False,
+            flat=True), then converting the list of dictionaries to a
+            DataFrame.  Either record_df, record_list or database must be given.
+        record_list : list of iprPy.Records, optional
+            List of Records to compare against.  Either record_df, record_list
+            or database must be given.
+        database : iprPy.Database, optional
+            Database containing records of record.style to compare against.
+            All records of record.style contained in the database will be
+            checked.  Either record_df, record_list or database must be given.
+        terms : list of str, optional
+            The keys of the dictionary produced by Record.todict(full=False,
+            flat=True) to check for equivalency, i.e. use == comparisons for
+            terms with str and int values. If not given, will use the record
+            style's compare_terms.
+        fterms : list of str, optional
+            The keys of the dictionary produced by Record.todict(full=False,
+            flat=True) to check for approximately equal values, i.e. use
+            numpy.isclose() for terms with float values. If not given, will
+            use the record style's compare_fterms.
+        atol : float, optional
+            The absolute tolerance to use in numpy.isclose() for comparing
+            fterms (Default value is 0.0).
+        rtol : float, optional
+            The relative tolerance to use in numpy.isclose() for comparing
+            fterms (Default value is 1e-8).
+        
+        Returns
+        -------
+        bool
+        
+        Raises
+        ------
+        ValueError
+            If more than one of record_df, record_list, and database are 
+            given.
         """
         
         # Convert database to record_list
         if database is not None:
-            assert record_df is None, 'record_df and database cannot both be provided'
-            assert record_list is None, 'record_list and database cannot both be provided'
+            if record_df is not None:
+                raise ValueError('record_df and database cannot both be provided')
+            if record_list is not None:
+                raise ValueError('record_list and database cannot both be provided')
             
             record_list = database.get_records(style=self.style)
         
         # Convert record_list to record_df
         if record_list is not None:
-            assert record_df is None, 'record_df and record_list cannot both be provided'
+            if record_df is not None:
+                raise ValueError('record_df and record_list cannot both be provided')
             
             record_df = []
             for r in record_list:
@@ -177,7 +315,8 @@ class Record(object):
         for fterm in fterms:
             # Compare non-NaN terms
             if fterm in record_dict and pd.notnull(record_dict[fterm]):
-                test_df = test_df[np.isclose(test_df[fterm], record_dict[fterm])]
+                test_df = test_df[np.isclose(test_df[fterm],
+                                  record_dict[fterm])]
        
             # Return True if no matching records remain
             if len(test_df) == 0:

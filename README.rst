@@ -30,7 +30,7 @@ Setup
    a. Using an Anaconda Python distribution is preferred as the scipy family 
       of tools is heavily used.
    
-   b. The package 'xmltodict'_ needs to be manually installed beforehand. This 
+   b. The package `xmltodict`_ needs to be manually installed beforehand. This 
       can easily be done with the terminal command::
 
     pip install xmltodict

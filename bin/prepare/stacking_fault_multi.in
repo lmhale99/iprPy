@@ -12,7 +12,7 @@ mpi_command
 #### Run condition limiters ####
 potential_name              
 symbol_name
-family_name                 A2--W--bcc
+family_name                 A1--Cu--fcc
 stackingfault_name          
 
 #### Unit specifications ####
@@ -24,5 +24,5 @@ force_unit
 #### Run parameters ####
 sizemults                   3 3 9
 
-stackingfault_numshifts1    3
-stackingfault_numshifts2    3
+stackingfault_numshifts1    51
+stackingfault_numshifts2    51

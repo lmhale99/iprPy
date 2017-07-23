@@ -3,7 +3,7 @@
 # Python script created by Lucas Hale
 
 # Standard library imports
-from __future__ import print_function, division
+from __future__ import division, absolute_import, print_function
 import os
 import sys
 import uuid
@@ -17,7 +17,8 @@ import numpy as np
 # https://github.com/usnistgov/DataModelDict 
 from DataModelDict import DataModelDict as DM
 
-# https://github.com/usnistgov/atomman 
+# https://github.com/usnistgov/atomman
+import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
@@ -26,31 +27,32 @@ import iprPy
 
 # Define calc_style and record_style
 calc_style = 'E_vs_r_scan'
-record_style = 'calculation-cohesive-energy-relation'
+record_style = 'calculation_cohesive_energy_relation'
 
 def main(*args):
-    """Main function for running calculation"""
+    """Main function called when script is executed directly."""
 
     # Read input file in as dictionary
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, allsingular=True)
     
-    # Interpret and process input parameters 
+    # Interpret and process input parameters
     process_input(input_dict, *args[1:])
     
     # Run e_vs_r
-    results_dict = e_vs_r(input_dict['lammps_command'], 
-                          input_dict['initialsystem'], 
-                          input_dict['potential'], 
-                          input_dict['symbols'], 
+    results_dict = e_vs_r(input_dict['lammps_command'],
+                          input_dict['initialsystem'],
+                          input_dict['potential'],
+                          input_dict['symbols'],
                           mpi_command = input_dict['mpi_command'],
                           ucell = input_dict['ucell'],
-                          rmin = input_dict['minimum_r'], 
-                          rmax = input_dict['maximum_r'], 
+                          rmin = input_dict['minimum_r'],
+                          rmax = input_dict['maximum_r'],
                           rsteps = input_dict['number_of_steps_r'])
     
-    # Save data model of results 
-    results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict, results_dict)
+    # Save data model of results
+    results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict,
+                               results_dict)
 
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)
@@ -62,23 +64,44 @@ def e_vs_r(lammps_command, system, potential, symbols,
     """
     Performs a cohesive energy scan over a range of interatomic spaces, r.
     
-    Arguments:
-    lammps_command -- command for running LAMMPS.
-    system -- atomman.System to perform the scan on.
-    potential -- atomman.lammps.Potential representation of a LAMMPS 
-                 implemented potential.
-    symbols -- list of element-model symbols for the Potential that 
-               correspond to system's atypes.
+    Parameters
+    ----------
+    lammps_command :str
+        Command for running LAMMPS.
+    system : atomman.System
+        The system to perform the calculation on.
+    potential : atomman.lammps.Potential
+        The LAMMPS implemented potential to use.
+    symbols : list of str
+        The list of element-model symbols for the Potential that correspond to
+        system's atypes.
+    mpi_command : str, optional
+        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+        will run serially.
+    ucell : atomman.System, optional
+        The fundamental unit cell correspodning to system.  This is used to
+        convert system dimensions to cell dimensions. If not given, ucell will
+        be taken as system.
+    rmin : float, optional
+        The minimum r spacing to use (default value is 2.0 angstroms).
+    rmax : float, optional
+        The maximum r spacing to use (default value is 6.0 angstroms).
+    rsteps : int, optional
+        The number of r spacing steps to evaluate (default value is 200).
     
-    Keyword Arguments:
-    
-    mpi_command -- MPI command for running LAMMPS in parallel. Default value 
-                   is None (serial run).  
-    ucell -- an atomman.System representing a fundamental unit cell of the 
-             system. If not given, ucell will be taken as system. 
-    rmin -- the minimum r spacing to use. Default value is 2.0 angstroms.
-    rmax -- the maximum r spacing to use. Default value is 6.0 angstroms.
-    rsteps -- the number of r spacing steps to evaluate. Default value is 200.    
+    Returns
+    -------
+    dict
+        Dictionary of results consisting of keys:
+        
+        - **'r_values'** (*numpy.array of float*) - All interatomic spacings,
+          r, explored.
+        - **'a_values'** (*numpy.array of float*) - All unit cell a lattice
+          constants corresponding to the values explored.
+        - **'Ecoh_values'** (*numpy.array of float*) - The computed cohesive
+          energies for each r value.
+        - **'min_cell'** (*list of atomman.System*) - Systems corresponding to
+          the minima identified in the Ecoh_values.
     """
     
     # Make system a deepcopy of itself (protect original from changes)
@@ -119,7 +142,10 @@ def e_vs_r(lammps_command, system, potential, symbols,
         
         # Define lammps variables
         lammps_variables = {}
-        lammps_variables['atomman_system_info'] = lmp.atom_data.dump(system, 'atom.dat', units=potential.units, atom_style=potential.atom_style)
+        system_info = lmp.atom_data.dump(system, 'atom.dat',
+                                         units=potential.units,
+                                         atom_style=potential.atom_style)
+        lammps_variables['atomman_system_info'] = system_info
         lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
         
         # Write lammps input script
@@ -128,7 +154,8 @@ def e_vs_r(lammps_command, system, potential, symbols,
         with open(template_file) as f:
             template = f.read()
         with open(lammps_script, 'w') as f:
-            f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
+            f.write(iprPy.tools.filltemplate(template, lammps_variables,
+                                             '<', '>'))
 
         # Run lammps and extract data
         output = lmp.run(lammps_command, lammps_script, mpi_command)
@@ -136,9 +163,11 @@ def e_vs_r(lammps_command, system, potential, symbols,
         thermo = output.simulations[0]['thermo']
         
         if output.lammps_date < datetime.date(2016, 8, 1):
-            Ecoh_values[i] = uc.set_in_units(thermo.peatom.values[-1], lammps_units['energy'])
+            Ecoh_values[i] = uc.set_in_units(thermo.peatom.values[-1],
+                                             lammps_units['energy'])
         else:
-            Ecoh_values[i] = uc.set_in_units(thermo.v_peatom.values[-1], lammps_units['energy'])
+            Ecoh_values[i] = uc.set_in_units(thermo.v_peatom.values[-1],
+                                             lammps_units['energy'])
             
         # Rename log.lammps
         shutil.move('log.lammps', 'run0-'+str(i)+'-log.lammps')
@@ -146,22 +175,41 @@ def e_vs_r(lammps_command, system, potential, symbols,
     # Find unit cell systems at the energy minimums
     min_cells = []
     for i in xrange(1, rsteps - 1):
-        if Ecoh_values[i] < Ecoh_values[i-1] and Ecoh_values[i] < Ecoh_values[i+1]:
+        if (Ecoh_values[i] < Ecoh_values[i-1]
+            and Ecoh_values[i] < Ecoh_values[i+1]):
             a = a_values[i]
             cell = deepcopy(ucell)
             cell.box_set(a = a,
                          b = a * ucell.box.b / ucell.box.a,
                          c = a * ucell.box.c / ucell.box.a, 
                          alpha=alpha, beta=beta, gamma=gamma, scale=True)
-            min_cells.append(cell)        
-            
-    return {'r_values':    r_values, 
-            'a_values':    a_values, 
-            'Ecoh_values': Ecoh_values, 
-            'min_cell':    min_cells}
+            min_cells.append(cell)
+    
+    # Collect results
+    results_dict = {}
+    results_dict['r_values'] = r_values
+    results_dict['a_values'] = a_values
+    results_dict['Ecoh_values'] = Ecoh_values
+    results_dict['min_cell'] = min_cells
+    
+    return results_dict
     
 def r_a_ratio(ucell):
-    """Calculates the shortest interatomic spacing, r, for a system wrt to box.a."""
+    """
+    Calculates the r/a ratio by identifying the shortest interatomic spacing, r,
+    for a unit cell.
+    
+    Parameters
+    ----------
+    ucell : atomman.System
+        The unit cell system to evaluate.
+        
+    Returns
+    -------
+    float
+        The shortest interatomic spacing, r, divided by the unit cell's a
+        lattice parameter.
+    """
     r_a = ucell.box.a
     for i in xrange(ucell.natoms):
         for j in xrange(i):
@@ -171,36 +219,54 @@ def r_a_ratio(ucell):
     return r_a/ucell.box.a
     
 def process_input(input_dict, UUID=None, build=True):
-    """Reads the calc_*.in input commands for this calculation and sets default values if needed."""
+    """
+    Processes str input parameters, assigns default values if needed, and
+    generates new, more complex terms as used by the calculation.
+    
+    Parameters
+    ----------
+    input_dict :  dict
+        Dictionary containing the calculation input parameters with string
+        values.  The allowed keys depends on the calculation style.
+    UUID : str, optional
+        Unique identifier to use for the calculation instance.  If not 
+        given and a 'UUID' key is not in input_dict, then a random UUID4 
+        hash tag will be assigned.
+    build : bool, optional
+        Indicates if all complex terms are to be built.  A value of False
+        allows for default values to be assigned even if some inputs 
+        required by the calculation are incomplete.  (Default is True.)
+    """
     
     # Set calculation UUID
-    if UUID is not None: 
+    if UUID is not None:
         input_dict['calc_key'] = UUID
-    else: 
+    else:
         input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
     # Set default input/output units
     iprPy.input.units(input_dict)
     
     # These are calculation-specific default strings
-    input_dict['sizemults'] = input_dict.get('sizemults',     '3 3 3')
+    input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
     
     # These are calculation-specific default booleans
     # None for this calculation
     
     # These are calculation-specific default integers
-    input_dict['number_of_steps_r'] = int(input_dict.get('number_of_steps_r', 200))
+    input_dict['number_of_steps_r'] = int(input_dict.get('number_of_steps_r',
+                                                         200))
     
     # These are calculation-specific default unitless floats
     # None for this calculation
     
     # These are calculation-specific default floats with units
-    input_dict['minimum_r'] = iprPy.input.value(input_dict, 'minimum_r', 
-                                               default_unit=input_dict['length_unit'], 
-                                               default_term='2.0 angstrom')
-    input_dict['maximum_r'] = iprPy.input.value(input_dict, 'maximum_r', 
-                                               default_unit=input_dict['length_unit'], 
-                                               default_term='6.0 angstrom')
+    input_dict['minimum_r'] = iprPy.input.value(input_dict, 'minimum_r',
+                                      default_unit=input_dict['length_unit'],
+                                      default_term='2.0 angstrom')
+    input_dict['maximum_r'] = iprPy.input.value(input_dict, 'maximum_r',
+                                      default_unit=input_dict['length_unit'],
+                                      default_term='6.0 angstrom')
     
     # Check lammps_command and mpi_command
     iprPy.input.commands(input_dict)

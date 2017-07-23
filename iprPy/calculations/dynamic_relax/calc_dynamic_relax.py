@@ -3,7 +3,7 @@
 # Python script created by Lucas Hale and Karina Stetsyuk
 
 # Standard library imports
-from __future__ import print_function, division
+from __future__ import division, absolute_import, print_function
 import os
 import sys
 import uuid
@@ -27,76 +27,128 @@ import iprPy
 
 # Define calc_style and record_style
 calc_style = 'dynamic_relax'
-record_style = 'calculation-dynamic-relax'
+record_style = 'calculation_dynamic_relax'
 
 def main(*args):
-    """Main function for running calculation"""
+    """Main function called when script is executed directly."""
 
     # Read input file in as dictionary
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, allsingular=True)
     
-    # Interpret and process input parameters 
+    # Interpret and process input parameters
     process_input(input_dict, *args[1:])
 
     # Run full_Relax to refine values
     results_dict = full_relax(input_dict['lammps_command'],
-                              input_dict['initialsystem'], 
+                              input_dict['initialsystem'],
                               input_dict['potential'],
                               input_dict['symbols'],
-                              mpi_command =  input_dict['mpi_command'],
-                              ucell =        input_dict['ucell'],
-                              p_xx =         input_dict['pressure_xx'], 
-                              p_yy =         input_dict['pressure_yy'], 
-                              p_zz =         input_dict['pressure_zz'],
-                              temperature =  input_dict['temperature'],
-                              runsteps =     input_dict['runsteps'],
-                              integrator =   input_dict['integrator'],
-                              thermosteps =  input_dict['thermosteps'],
-                              dumpsteps =    input_dict['dumpsteps'],
-                              equilsteps =   input_dict['equilsteps'],
-                              randomseed =   input_dict['randomseed'])
+                              mpi_command = input_dict['mpi_command'],
+                              ucell = input_dict['ucell'],
+                              p_xx = input_dict['pressure_xx'],
+                              p_yy = input_dict['pressure_yy'],
+                              p_zz = input_dict['pressure_zz'],
+                              temperature = input_dict['temperature'],
+                              runsteps = input_dict['runsteps'],
+                              integrator = input_dict['integrator'],
+                              thermosteps = input_dict['thermosteps'],
+                              dumpsteps = input_dict['dumpsteps'],
+                              equilsteps = input_dict['equilsteps'],
+                              randomseed = input_dict['randomseed'])
 
-    # Save data model of results 
-    results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict, results_dict)
+    # Save data model of results
+    results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict,
+                               results_dict)
 
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)
 
-def full_relax(lammps_command, system, potential, symbols, 
-               mpi_command=None, ucell=None,
-               p_xx=0.0, p_yy=0.0, p_zz=0.0, temperature=0.0, integrator=None,
-               runsteps=220000, thermosteps=100, dumpsteps=None, equilsteps=20000, 
+def full_relax(lammps_command, system, potential, symbols,
+               mpi_command=None, ucell=None, p_xx=0.0, p_yy=0.0, p_zz=0.0,
+               temperature=0.0, integrator=None, runsteps=220000,
+               thermosteps=100, dumpsteps=None, equilsteps=20000,
                randomseed=None):
     """
-    Performs a full dynamic relax on a given system at the given temperature 
-    to the specified pressure state. 
+    Performs a full dynamic relax on a given system at the given temperature
+    to the specified pressure state.
     
-    Arguments:
-    lammps_command -- directory location for lammps executable
-    system -- atomman.System to dynamically relax
-    potential -- atomman.lammps.Potential representation of a LAMMPS implemented potential
-    symbols -- list of element-model symbols for the Potential that correspond to the System's atypes
+    Parameters
+    ----------
+    lammps_command :str
+        Command for running LAMMPS.
+    system : atomman.System
+        The system to perform the calculation on.
+    potential : atomman.lammps.Potential
+        The LAMMPS implemented potential to use.
+    symbols : list of str
+        The list of element-model symbols for the Potential that correspond to
+        system's atypes.
+    mpi_command : str, optional
+        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+        will run serially.
+    ucell : atomman.System, optional
+        The fundamental unit cell correspodning to system.  This is used to
+        convert system dimensions to cell dimensions. If not given, ucell will
+        be taken as system.
+    p_xx : float, optional
+        The value to relax the x tensile pressure component to (default is
+        0.0).
+    p_yy : float, optional
+        The value to relax the y tensile pressure component to (default is
+        0.0).
+    p_zz : float, optional
+        The value to relax the z tensile pressure component to (default is
+        0.0).
+    temperature : float, optional
+        The temperature to relax at (default is 0.0).
+    runsteps : int, optional
+        The number of integration steps to perform (default is 220000).
+    integrator : str or None, optional
+        The integration method to use. Options are 'npt', 'nvt', 'nph',
+        'nve', 'nve+l', 'nph+l'. The +l options use Langevin thermostat.
+        (Default is None, which will use 'nph+l' for temperature == 0, and
+        'npt' otherwise.)
+    thermosteps : int, optional
+        Thermo values will be reported every this many steps (default is
+        100).
+    dumpsteps : int or None, optional
+        Dump files will be saved every this many steps (default is None,
+        which sets dumpsteps equal to runsteps).
+    equilsteps : int, optional
+        The number of timesteps at the beginning of the simulation to
+        exclude when computing average values (default is 20000).
+    randomseed : int or None, optional
+        Random number seed used by LAMMPS in creating velocities and with
+        the Langevin thermostat.  (Default is None which will select a
+        random int between 1 and 900000000.)
     
-    Keyword Arguments:
-    mpi_command -- MPI command for running LAMMPS in parallel. Default value is None (serial run)
-    ucell -- is an atomman.System representing a fundamental unit cell of the system. If not given, 
-             ucell will be taken as system
-    p_xx, p_yy, p_zz -- tensile pressures to equilibriate to.  Default value is 0.0 for all. 
-    temperature -- temperature to relax at. Default value is 0.
-    runsteps -- number of integration steps to perform. Default value is 220000.
-    integrator -- string giving the integration method to use. Options are 'npt', 'nvt',
-                  'nph', 'nve', 'nve+l', 'nph+l'. The +l options use Langevin thermostat.
-                  Default value is 'nph+l' for temperature = 0, and 'npt' otherwise.    
-    thermosteps -- output thermo values every this many steps. Default value is 
-                    100.
-    dumpsteps -- output dump files every this many steps. Default value is runsteps
-                  (only first and last steps are outputted as dump files).
-    equilsteps -- the number of timesteps to equilibriate the system for. Only thermo values 
-                  associated with timesteps greater than equilsteps will be included in the 
-                  mean and standard deviation calculations. Default value is 20000.                   
-    randomseed -- random number seed used by LAMMPS for velocity creation and Langevin
-                   thermostat. Default value generates a new random integer every time.
+    Returns
+    -------
+    dict
+        Dictionary of results consisting of keys:
+        
+        - **'a_lat'** (*float*) - The mean measured a lattice constant.
+        - **'b_lat'** (*float*) - The mean measured b lattice constant.
+        - **'c_lat'** (*float*) - The mean measured c lattice constant.
+        - **'alpha_lat'** (*float*) - The alpha lattice angle.
+        - **'beta_lat'** (*float*) - The beta lattice angle.
+        - **'gamma_lat'** (*float*) - The gamma lattice angle.
+        - **'E_coh'** (*float*) - The mean measured cohesive energy.
+        - **'stress'** (*numpy.array*) - The mean measured stress state.
+        - **'temp'** (*float*) - The mean measured temperature.
+        - **'a_lat_std'** (*float*) - The standard deviation in the measured
+          a lattice constant values.
+        - **'b_lat_std'** (*float*) - The standard deviation in the measured
+          b lattice constant values.
+        - **'c_lat_std'** (*float*) - The standard deviation in the measured
+          c lattice constant values.
+        - **'E_coh_std'** (*float*) - The standard deviation in the measured
+          cohesive energy values.
+        - **'stress_std'** (*numpy.array*) - The standard deviation in the
+          measured stress state values.
+        - **'temp_std'** (*float*) - The standard deviation in the measured
+          temperature values.
     """
     
     # Set ucell = system if ucell not given
@@ -109,7 +161,7 @@ def full_relax(lammps_command, system, potential, symbols,
     lz_c = system.box.c / ucell.box.c
     alpha = system.box.alpha
     beta =  system.box.beta
-    gamma = system.box.gamma        
+    gamma = system.box.gamma
     
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
@@ -118,19 +170,22 @@ def full_relax(lammps_command, system, potential, symbols,
     lammps_date = iprPy.tools.check_lammps_version(lammps_command)['lammps_date']
     
     # Handle default values
-    if dumpsteps is None:       dumpsteps = runsteps
+    if dumpsteps is None:
+        dumpsteps = runsteps
     
     # Define lammps variables
     lammps_variables = {}
-    lammps_variables['atomman_system_info'] = lmp.atom_data.dump(system, 'init.dat', 
-                                                                 units=potential.units, 
-                                                                 atom_style=potential.atom_style)
+    system_info = lmp.atom_data.dump(system, 'init.dat',
+                                     units=potential.units,
+                                     atom_style=potential.atom_style)
+    lammps_variables['atomman_system_info'] = system_info
     lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
-    lammps_variables['integrator_info'] = integrator_info(integrator=integrator, 
-                                                          p_xx=p_xx, p_yy=p_yy, p_zz=p_zz, 
-                                                          temperature=temperature, 
-                                                          randomseed=randomseed, 
-                                                          units=potential.units)
+    integ_info = integrator_info(integrator=integrator,
+                                 p_xx=p_xx, p_yy=p_yy, p_zz=p_zz,
+                                 temperature=temperature,
+                                 randomseed=randomseed,
+                                 units=potential.units)
+    lammps_variables['integrator_info'] = integ_info
     lammps_variables['thermosteps'] = thermosteps
     lammps_variables['runsteps'] = runsteps
     lammps_variables['dumpsteps'] = dumpsteps
@@ -147,7 +202,8 @@ def full_relax(lammps_command, system, potential, symbols,
     with open(template_file) as f:
         template = f.read()
     with open(lammps_script, 'w') as f:
-        f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
+        f.write(iprPy.tools.filltemplate(template, lammps_variables,
+                                         '<', '>'))
     
     # Run lammps 
     output = lmp.run(lammps_command, lammps_script, mpi_command)
@@ -158,7 +214,7 @@ def full_relax(lammps_command, system, potential, symbols,
     
     # Load relaxed system from dump file
     last_dump_file = str(thermo.Step.values[-1])+'.dump'
-    results['system_relaxed'] = lmp.atom_dump.load(last_dump_file) 
+    results['system_relaxed'] = lmp.atom_dump.load(last_dump_file)
     
     # Only consider values where Step >= equilsteps
     thermo = thermo[thermo.Step >= equilsteps]
@@ -166,16 +222,24 @@ def full_relax(lammps_command, system, potential, symbols,
     
     # Get cohesive energy estimates
     natoms = results['system_relaxed'].natoms
-    results['E_coh'] = uc.set_in_units(thermo.PotEng.mean(), lammps_units['energy']) / natoms
-    results['E_coh_std'] = uc.set_in_units(thermo.PotEng.std(), lammps_units['energy']) / natoms
+    results['E_coh'] = uc.set_in_units(thermo.PotEng.mean() / natoms,
+                                       lammps_units['energy'])
+    results['E_coh_std'] = uc.set_in_units(thermo.PotEng.std() / natoms,
+                                           lammps_units['energy'])
     
     # Get lattice constant estimates
-    results['a_lat'] = uc.set_in_units(thermo.Lx.mean(), lammps_units['length']) / lx_a
-    results['b_lat'] = uc.set_in_units(thermo.Ly.mean(), lammps_units['length']) / ly_b
-    results['c_lat'] = uc.set_in_units(thermo.Lz.mean(), lammps_units['length']) / lz_c
-    results['a_lat_std'] = uc.set_in_units(thermo.Lx.std(), lammps_units['length']) / lx_a
-    results['b_lat_std'] = uc.set_in_units(thermo.Ly.std(), lammps_units['length']) / ly_b
-    results['c_lat_std'] = uc.set_in_units(thermo.Lz.std(), lammps_units['length']) / lz_c
+    results['a_lat'] = uc.set_in_units(thermo.Lx.mean() / lx_a,
+                                      lammps_units['length'])
+    results['b_lat'] = uc.set_in_units(thermo.Ly.mean() / ly_b,
+                                      lammps_units['length'])
+    results['c_lat'] = uc.set_in_units(thermo.Lz.mean() / lz_c,
+                                       lammps_units['length'])
+    results['a_lat_std'] = uc.set_in_units(thermo.Lx.std() / lx_a,
+                                           lammps_units['length'])
+    results['b_lat_std'] = uc.set_in_units(thermo.Ly.std() / ly_b,
+                                           lammps_units['length'])
+    results['c_lat_std'] = uc.set_in_units(thermo.Lz.std() / lz_c,
+                                           lammps_units['length'])
     results['alpha_lat'] = alpha
     results['beta_lat'] =  beta
     results['gamma_lat'] = gamma
@@ -211,15 +275,36 @@ def integrator_info(integrator=None, p_xx=0.0, p_yy=0.0, p_zz=0.0,
     """
     Generates LAMMPS commands for velocity creation and fix integrators. 
     
-    Keyword Arguments:
-    integrator -- string giving the integration method to use. Options are 'npt', 'nvt',
-                  'nph', 'nve', 'nve+l', 'nph+l'. The +l options use Langevin thermostat.
-                  Default value is 'nph+l' for temperature = 0, and 'npt' otherwise. 
-    p_xx, p_yy, p_zz -- tensile pressures to equilibriate to.  Default value is 0.0 for all. 
-    temperature -- temperature to relax at. Default value is 0. 
-    randomseed -- random number seed used by LAMMPS for velocity creation and Langevin
-                   thermostat. Default value generates a new random integer every time.
-    units -- LAMMPS units style to use.
+    Parameters
+    ----------
+    integrator : str or None, optional
+        The integration method to use. Options are 'npt', 'nvt', 'nph',
+        'nve', 'nve+l', 'nph+l'. The +l options use Langevin thermostat.
+        (Default is None, which will use 'nph+l' for temperature == 0, and
+        'npt' otherwise.)
+    p_xx : float, optional
+        The value to relax the x tensile pressure component to (default is
+        0.0).
+    p_yy : float, optional
+        The value to relax the y tensile pressure component to (default is
+        0.0).
+    p_zz : float, optional
+        The value to relax the z tensile pressure component to (default is
+        0.0).
+    temperature : float, optional
+        The temperature to relax at (default is 0.0).
+    randomseed : int or None, optional
+        Random number seed used by LAMMPS in creating velocities and with
+        the Langevin thermostat.  (Default is None which will select a
+        random int between 1 and 900000000.)
+    units : str, optional
+        The LAMMPS units style to use (default is 'metal').
+    
+    Returns
+    -------
+    str
+        The generated LAMMPS input lines for velocity create and fix
+        integration commands.
     """
     
     # Get lammps units
@@ -245,23 +330,29 @@ def integrator_info(integrator=None, p_xx=0.0, p_yy=0.0, p_zz=0.0,
         start_temp = T*2.+1
         Tdamp = 100 * lmp.style.timestep(units)
         Pdamp = 1000 * lmp.style.timestep(units)
-        int_info = '\n'.join(['velocity all create %f %i' % (start_temp, randomseed),
-                              'fix npt all npt temp %f %f %f &' % (T, T, Tdamp),
-                              '                x %f %f %f &' % (Px, Px, Pdamp),
-                              '                y %f %f %f &' % (Py, Py, Pdamp),
-                              '                z %f %f %f' % (Pz, Pz, Pdamp)])
+        int_info = '\n'.join([
+                'velocity all create %f %i' % (start_temp, randomseed),
+                'fix npt all npt temp %f %f %f &' % (T, T, Tdamp),
+                '                x %f %f %f &' % (Px, Px, Pdamp),
+                '                y %f %f %f &' % (Py, Py, Pdamp),
+                '                z %f %f %f' % (Pz, Pz, Pdamp),
+                ])
     
     elif integrator == 'nvt':
         start_temp = T*2.+1
         Tdamp = 100 * lmp.style.timestep(units)
-        int_info = '\n'.join(['velocity all create %f %i' % (start_temp, randomseed),
-                              'fix nvt all nvt temp %f %f %f' % (T, T, Tdamp)])
+        int_info = '\n'.join([
+                'velocity all create %f %i' % (start_temp, randomseed),
+                'fix nvt all nvt temp %f %f %f' % (T, T, Tdamp),
+                ])
     
     elif integrator == 'nph':
         Pdamp = 1000 * lmp.style.timestep(units)
-        int_info = '\n'.join(['fix nph all nph x %f %f %f &' % (Px, Px, Pdamp),
-                              '                y %f %f %f &' % (Py, Py, Pdamp),
-                              '                z %f %f %f' % (Pz, Pz, Pdamp)])
+        int_info = '\n'.join([
+                'fix nph all nph x %f %f %f &' % (Px, Px, Pdamp),
+                '                y %f %f %f &' % (Py, Py, Pdamp),
+                '                z %f %f %f' % (Pz, Pz, Pdamp),
+                ])
     
     elif integrator == 'nve':
         int_info = 'fix nve all nve'
@@ -269,26 +360,48 @@ def integrator_info(integrator=None, p_xx=0.0, p_yy=0.0, p_zz=0.0,
     elif integrator == 'nve+l':
         start_temp = T*2.+1
         Tdamp = 100 * lmp.style.timestep(units)
-        int_info = '\n'.join(['velocity all create %f %i' % (start_temp, randomseed),
-                              'fix nve all nve',
-                              'fix langevin all langevin %f %f %f %i' % (T, T, Tdamp, randomseed)])
-                              
+        int_info = '\n'.join([
+                'velocity all create %f %i' % (start_temp, randomseed),
+                'fix nve all nve',
+                'fix langevin all langevin %f %f %f %i' % (T, T, Tdamp,
+                                                           randomseed),
+                ])
+
     elif integrator == 'nph+l':
         start_temp = T*2.+1
         Tdamp = 100 * lmp.style.timestep(units)
         Pdamp = 1000 * lmp.style.timestep(units)
-        int_info = '\n'.join([#'velocity all create %f %i' % (start_temp, randomseed),
-                              'fix nph all nph x %f %f %f &' % (Px, Px, Pdamp),
-                              '                y %f %f %f &' % (Py, Py, Pdamp),
-                              '                z %f %f %f' % (Pz, Pz, Pdamp),
-                              'fix langevin all langevin %f %f %f %i' % (T, T, Tdamp, randomseed)])                              
+        int_info = '\n'.join([
+                'fix nph all nph x %f %f %f &' % (Px, Px, Pdamp),
+                '                y %f %f %f &' % (Py, Py, Pdamp),
+                '                z %f %f %f' % (Pz, Pz, Pdamp),
+                'fix langevin all langevin %f %f %f %i' % (T, T, Tdamp,
+                                                           randomseed),
+                ])
     else:
         raise ValueError('Invalid integrator style')
     
     return int_info
 
 def process_input(input_dict, UUID=None, build=True):
-    """Reads the calc_*.in input commands for this calculation and sets default values if needed."""
+    """
+    Processes str input parameters, assigns default values if needed, and
+    generates new, more complex terms as used by the calculation.
+    
+    Parameters
+    ----------
+    input_dict :  dict
+        Dictionary containing the calculation input parameters with string
+        values.  The allowed keys depends on the calculation style.
+    UUID : str, optional
+        Unique identifier to use for the calculation instance.  If not 
+        given and a 'UUID' key is not in input_dict, then a random UUID4 
+        hash tag will be assigned.
+    build : bool, optional
+        Indicates if all complex terms are to be built.  A value of False
+        allows for default values to be assigned even if some inputs 
+        required by the calculation are incomplete.  (Default is True.)
+    """
     
     # Set calculation UUID
     if UUID is not None: 
@@ -307,29 +420,31 @@ def process_input(input_dict, UUID=None, build=True):
     # None for this calculation
     
     # These are calculation-specific default integers
-    input_dict['runsteps'] =    int(input_dict.get('runsteps',    220000))
+    input_dict['runsteps'] = int(input_dict.get('runsteps', 220000))
     input_dict['thermosteps'] = int(input_dict.get('thermosteps', 100))
-    input_dict['dumpsteps'] =   int(input_dict.get('dumpsteps',   input_dict['runsteps']))
-    input_dict['equilsteps'] =  int(input_dict.get('equilsteps',  20000))
-    input_dict['randomseed'] =  int(input_dict.get('randomseed',  random.randint(1, 900000000)))
+    input_dict['dumpsteps'] = int(input_dict.get('dumpsteps',
+                                                 input_dict['runsteps']))
+    input_dict['equilsteps'] = int(input_dict.get('equilsteps', 20000))
+    input_dict['randomseed'] = int(input_dict.get('randomseed',
+                                      random.randint(1, 900000000)))
     
     # These are calculation-specific default unitless floats
     input_dict['temperature'] = float(input_dict.get('temperature', 0.0))
     
     # These are calculation-specific default floats with units
-    input_dict['pressure_xx'] = iprPy.input.value(input_dict, 'pressure_xx', 
-                                    default_unit=input_dict['pressure_unit'], 
+    input_dict['pressure_xx'] = iprPy.input.value(input_dict, 'pressure_xx',
+                                    default_unit=input_dict['pressure_unit'],
                                     default_term='0.0 GPa')
-    input_dict['pressure_yy'] = iprPy.input.value(input_dict, 'pressure_yy', 
-                                    default_unit=input_dict['pressure_unit'], 
+    input_dict['pressure_yy'] = iprPy.input.value(input_dict, 'pressure_yy',
+                                    default_unit=input_dict['pressure_unit'],
                                     default_term='0.0 GPa')
-    input_dict['pressure_zz'] = iprPy.input.value(input_dict, 'pressure_zz', 
-                                    default_unit=input_dict['pressure_unit'], 
+    input_dict['pressure_zz'] = iprPy.input.value(input_dict, 'pressure_zz',
+                                    default_unit=input_dict['pressure_unit'],
                                     default_term='0.0 GPa')
     
     # Set default integrator based on temperature
     if input_dict['integrator'] is None:
-        if input_dict['temperature'] == 0.0: 
+        if input_dict['temperature'] == 0.0:
             input_dict['integrator'] = 'nph+l'
         else:
             input_dict['integrator'] = 'npt'

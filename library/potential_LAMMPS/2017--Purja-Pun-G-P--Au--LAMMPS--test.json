@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "8bfd0a48-8558-46f9-9d20-cd9e92cb83ae", 
+        "id": "2017--Purja-Pun-G-P--Au--LAMMPS--test", 
+        "potential": {
+            "key": "ef908258-25d1-439e-8223-3bf4df924ed0", 
+            "id": "2017--Purja-Pun-G-P--Au"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Au", 
+            "mass": 196.96654
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Au_GLJ10_2.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

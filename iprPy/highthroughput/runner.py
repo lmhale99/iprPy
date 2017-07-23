@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-from __future__ import print_function
+from __future__ import division, absolute_import, print_function
+
 import os
 import sys
 import subprocess
@@ -15,6 +16,7 @@ from DataModelDict import DataModelDict as DM
 import iprPy
 
 def main(*args):
+    """Main function called when script is executed directly."""
     
     # Read input file in as dictionary
     with open(args[0]) as f:
@@ -145,7 +147,7 @@ def runner(dbase, run_directory, orphan_directory=None):
                     os.chdir(run_directory)
                     for bid_file in bid_files:
                         os.remove(os.path.join(sim, bid_file))
-                    flist = [parent_sim]              
+                    flist = [parent_sim]
                     log.write('parent %s not ready\n\n' % parent_sim)
                     continue
                 
@@ -204,7 +206,20 @@ def runner(dbase, run_directory, orphan_directory=None):
             os.fsync(log.fileno())
         
 def bid(sim):
-    """Bids for chance to run simulation"""
+    """
+    Bids for the chance to run a calculation instance. Used to help avoid
+    runner collisions.
+    
+    Parameters
+    ----------
+    sim : str
+        The path to the calculation to try bidding on.
+        
+    Returns
+    -------
+    bool
+        True if bidding is successful, False if bidding fails.
+    """
     try:
         # Wait to make sure sim is not being deleted
         time.sleep(1)
@@ -234,30 +249,61 @@ def bid(sim):
     except:
         return False
 
-def get_file(path_string):
-    """Uniquely find file accoring to wildcard string"""
+def get_file(path):
+    """
+    Uniquely find a single file accoring to a wildcard string.
+    
+    Parameters
+    ----------
+    path : str
+        The str path with wildcards to use for identifying the file.
+        
+    Returns
+    -------
+    str
+        The actual str path to the matching file.
+    
+    Raises
+    ------
+    ValueError
+        If multiple or no matching files found.
+    """
     
     # glob any file matching path string (with wildcards)
-    file = glob.glob(path_string)
+    file = glob.glob(path)
     
     # Return if exactly 1 match found, otherwise issue an error
     if len(file) == 1:
         return file[0]
     elif len(file) == 0:
-        raise ValueError('Cannot find file matching ' + path_string)
+        raise ValueError('Cannot find file matching ' + path)
     else:
-        raise ValueError('Multiple files found matching '+ path_string)
+        raise ValueError('Multiple files found matching '+ path)
     
-        
 def process_input(input_dict):
-    """Processes the runner.in input commands"""
+    """
+    Processes the input parameter terms.
+    
+    Parameters
+    ----------
+    input_dict : dict
+        Dictionary of input parameter terms.
+    """
     
     input_dict['dbase'] = iprPy.database_fromdict(input_dict)
     input_dict['run_directory'] = os.path.abspath(input_dict['run_directory'])
     input_dict['orphan_directory'] = input_dict.get('orphan_directory', None)
     
 def removecalc(dir):
-    """Removes calculation instance directories leaving .bid files for last"""
+    """
+    Removes the specified calculation instance directory leaving .bid files
+    for last to help avoid runner collisions.
+    
+    Parameters
+    ----------
+    dir : str
+        The path to the calculation instance directory to delete.
+    """
     
     # Loop over all files and directories in dir
     for fname in glob.iglob(os.path.join(dir, '*')):

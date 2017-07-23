@@ -1,3 +1,5 @@
+from __future__ import division, absolute_import, print_function
+
 import numpy as np
 
 from DataModelDict import DataModelDict as DM
@@ -6,54 +8,67 @@ import atomman as am
 
 def stackingfault1(input_dict, **kwargs):
     """
-    Reads in calculation parameters associated with a stacking-fault record.
-    stackingfault1 must be called prior to systemmanipulate 
+    Interprets calculation parameters associated with a stacking-fault record.
+    This function should be called before iprPy.input.systemmanupulate.
     
-    The input_dict keys used by this function (which can be renamed using the 
+    The input_dict keys used by this function (which can be renamed using the
     function's keyword arguments):
-    stackingfault_model -- a stacking-fault record to load.
-    stackingfault_content -- alternate file or content to load instead of specified 
-                       stackingfault_model. This is used by prepare functions.
-    x_axis, y_axis, z_axis -- the orientation axes. This function only reads in
-                              values from the stackingfault_model.
-    atomshift -- the atomic shift to apply to all atoms. This function only 
-                 reads in values from the stackingfault_model.
-    stackingfault_cutboxvector -- the cutboxvector parameter for the stackingfault model. 
-                            Default value is 'c' if neither stackingfault_model nor 
-                            stackingfault_cutboxvector are given.
-    stackingfault_faultpos -- the relative position within a unit cell where the 
-                              stackingfault is to be placed.
-    stackingfault_shiftvector1 -- one of the two fault shifting vectors as a 
-                                  crystallographic vector
-    stackingfault_shiftvector2 -- one of the two fault shifting vectors as a 
-                                  crystallographic vector
-       
-    Argument:
-    input_dict -- dictionary containing input parameter key-value pairs
     
-    Keyword Arguments:
-    stackingfault_model -- replacement parameter key name for 'stackingfault_model'
-    stackingfault_content -- replacement parameter key name for 'stackingfault_content'
-    x_axis -- replacement parameter key name for 'x_axis'
-    y_axis -- replacement parameter key name for 'y_axis'
-    z_axis -- replacement parameter key name for 'z_axis'
-    atomshift -- replacement parameter key name for 'atomshift'
-    stackingfault_cutboxvector -- replacement parameter key name for 'stackingfault_cutboxvector'
-    stackingfault_faultpos -- replacement parameter key name for 'stackingfault_faultpos'
-    stackingfault_shiftvector1 -- replacement parameter key name for 'stackingfault_shiftvector1'
-    stackingfault_shiftvector2 -- replacement parameter key name for 'stackingfault_shiftvector2'
+    - **'stackingfault_model'** a stacking-fault record to load.
+    - **'stackingfault_content'** alternate file or content to load instead of
+      specified stackingfault_model.  This is used by prepare functions.
+    - **'x_axis, y_axis, z_axis'** the orientation axes.  This function only
+      reads in values from the stackingfault_model.
+    - **'atomshift'** the atomic shift to apply to all atoms.  This function
+      only reads in values from the stackingfault_model.
+    - **'stackingfault_cutboxvector'** the cutboxvector parameter for the
+      stackingfault model.  Default value is 'c' if neither
+      stackingfault_model nor stackingfault_cutboxvector are given.
+    - **'stackingfault_faultpos'** the relative position within a unit cell
+      where the stackingfault is to be placed.
+    - **'stackingfault_shiftvector1'** one of the two fault shifting vectors
+      as a crystallographic vector.
+    - **'stackingfault_shiftvector2'** one of the two fault shifting vectors
+      as a crystallographic vector.
+       
+    Parameters
+    ----------
+    input_dict : dict
+        Dictionary containing input parameter key-value pairs.
+    stackingfault_model : str
+        Replacement parameter key name for 'stackingfault_model'.
+    stackingfault_content : str
+        Replacement parameter key name for 'stackingfault_content'.
+    x_axis : str
+        Replacement parameter key name for 'x_axis'.
+    y_axis : str
+        Replacement parameter key name for 'y_axis'.
+    z_axis : str
+        Replacement parameter key name for 'z_axis'.
+    atomshift : str
+        Replacement parameter key name for 'atomshift'.
+    stackingfault_cutboxvector : str
+        Replacement parameter key name for 'stackingfault_cutboxvector'.
+    stackingfault_faultpos : str
+        Replacement parameter key name for 'stackingfault_faultpos'.
+    stackingfault_shiftvector1 : str
+        Replacement parameter key name for 'stackingfault_shiftvector1'.
+    stackingfault_shiftvector2 : str
+        Replacement parameter key name for 'stackingfault_shiftvector2'.
     """
     
     # Set default keynames
-    keynames = ['stackingfault_model', 'stackingfault_content', 'x_axis', 'y_axis', 'z_axis', 
-                'atomshift', 'stackingfault_cutboxvector', 'stackingfault_faultpos', 
-                'stackingfault_shiftvector1', 'stackingfault_shiftvector2']
+    keynames = ['stackingfault_model', 'stackingfault_content', 'x_axis',
+                'y_axis', 'z_axis', 'atomshift', 'stackingfault_cutboxvector',
+                'stackingfault_faultpos', 'stackingfault_shiftvector1',
+                'stackingfault_shiftvector2']
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
     
     # Extract input values and assign default values
-    stackingfault_model =   input_dict.get(kwargs['stackingfault_model'],   None)
-    stackingfault_content = input_dict.get(kwargs['stackingfault_content'], None)
+    stackingfault_model = input_dict.get(kwargs['stackingfault_model'], None)
+    stackingfault_content = input_dict.get(kwargs['stackingfault_content'],
+                                           None)
     
     # Replace defect model with defect content if given
     if stackingfault_content is not None:
@@ -63,10 +78,13 @@ def stackingfault1(input_dict, **kwargs):
     if stackingfault_model is not None:
         
         # Verify competing parameters are not defined
-        for key in ('atomshift', 'x_axis', 'y_axis', 'z_axis', 'stackingfault_cutboxvector',
-                    'stackingfault_faultpos', 'stackingfault_shiftvector1', 'stackingfault_shiftvector2'):
-            assert kwargs[key] not in input_dict, (kwargs[key] + ' and '+ kwargs['dislocation_model'] + 
-                                                   ' cannot both be supplied')
+        for key in ('atomshift', 'x_axis', 'y_axis', 'z_axis',
+                    'stackingfault_cutboxvector', 'stackingfault_faultpos',
+                    'stackingfault_shiftvector1',
+                    'stackingfault_shiftvector2'):
+            assert kwargs[key] not in input_dict, (kwargs[key] + ' and '
+                                                   + kwargs['dislocation_model']
+                                                   + ' cannot both be supplied')
         
         # Load defect model
         stackingfault_model = DM(stackingfault_model).find('stacking-fault')
@@ -93,44 +111,57 @@ def stackingfault1(input_dict, **kwargs):
     
 def stackingfault2(input_dict, build=True, **kwargs):
     """
-    Performs conversions on stackingfault_* terms
-    stackingfault1 must be called after systemmanipulate 
+    Interprets calculation parameters associated with a stacking-fault record.
+    This function should be called after iprPy.input.systemmanupulate.
     
     The input_dict keys used by this function (which can be renamed using the 
     function's keyword arguments):
     
-    stackingfault_faultpos -- the relative position within a unit cell where the 
-                              stackingfault is to be placed.
-    stackingfault_shiftvector1 -- one of the two fault shifting vectors as a 
-                                  crystallographic vector
-    stackingfault_shiftvector2 -- one of the two fault shifting vectors as a 
-                                  crystallographic vector
-    sizemults -- the system size multipliers. Only accessed here
-    ucell -- the unit cell system. Only accessed here.
-    axes -- the 3x3 matrix of axes. Only accessed here.
-    faultpos -- the absolute fault position relative to the initial system
-    shiftvector1 -- one of the two fault shifting vectors as a Cartesian vector
-    shiftvector2 -- one of the two fault shifting vectors as a Cartesian vector
+    - **'stackingfault_faultpos'** the relative position within a unit cell
+      where the stackingfault is to be placed.
+    - **'stackingfault_shiftvector1'** one of the two fault shifting vectors
+      as a crystallographic vector.
+    - **'stackingfault_shiftvector2'** one of the two fault shifting vectors
+      as a crystallographic vector.
+    - **'sizemults'** the system size multipliers. Only accessed here.
+    - **'ucell'** the unit cell system. Only accessed here.
+    - **'axes'** the 3x3 matrix of axes. Only accessed here.
+    - **'faultpos'** the absolute fault position relative to the initial
+      system.
+    - **'shiftvector1'** one of the two fault shifting vectors as a Cartesian
+      vector.
+    - **'shiftvector2'** one of the two fault shifting vectors as a Cartesian
+      vector.
        
-    Argument:
-    input_dict -- dictionary containing input parameter key-value pairs
-    
-    Keyword Arguments:
-    stackingfault_faultpos -- replacement parameter key name for 'stackingfault_faultpos'
-    stackingfault_shiftvector1 -- replacement parameter key name for 'stackingfault_shiftvector1'
-    stackingfault_shiftvector2 -- replacement parameter key name for 'stackingfault_shiftvector2'
-    sizemults -- replacement parameter key name for 'sizemults'
-    ucell -- replacement parameter key name for 'ucell'
-    axes -- replacement parameter key name for 'axes'
-    faultpos -- replacement parameter key name for 'faultpos'
-    shiftvector1 -- replacement parameter key name for 'shiftvector1'
-    shiftvector2 -- replacement parameter key name for 'shiftvector2'
+    Parameters
+    ----------
+    input_dict : dict
+        Dictionary containing input parameter key-value pairs.
+    stackingfault_faultpos : str
+        Replacement parameter key name for 'stackingfault_faultpos'.
+    stackingfault_shiftvector1 : str
+        Replacement parameter key name for 'stackingfault_shiftvector1'.
+    stackingfault_shiftvector2 : str
+        Replacement parameter key name for 'stackingfault_shiftvector2'.
+    sizemults : str
+        Replacement parameter key name for 'sizemults'.
+    ucell : str
+        Replacement parameter key name for 'ucell'.
+    axes : str
+        Replacement parameter key name for 'axes'.
+    faultpos : str
+        Replacement parameter key name for 'faultpos'.
+    shiftvector1 : str
+        Replacement parameter key name for 'shiftvector1'.
+    shiftvector2 : str
+        Replacement parameter key name for 'shiftvector2'.
     """
     
     # Set default keynames
-    keynames = ['stackingfault_faultpos', 'stackingfault_shiftvector1', 'stackingfault_shiftvector2',
-                'stackingfault_cutboxvector', 'sizemults', 'ucell', 'axes', 'faultpos', 
-                'shiftvector1', 'shiftvector2']
+    keynames = ['stackingfault_faultpos', 'stackingfault_shiftvector1',
+                'stackingfault_shiftvector2', 'stackingfault_cutboxvector',
+                'sizemults', 'ucell', 'axes', 'faultpos', 'shiftvector1',
+                'shiftvector2']
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
     
@@ -141,21 +172,23 @@ def stackingfault2(input_dict, build=True, **kwargs):
         stackingfault_shiftvector1 = input_dict[kwargs['stackingfault_shiftvector1']]
         stackingfault_shiftvector2 = input_dict[kwargs['stackingfault_shiftvector2']]
         stackingfault_cutboxvector = input_dict[kwargs['stackingfault_cutboxvector']]
-        sizemults =                  input_dict[kwargs['sizemults']]
-        ucell =                      input_dict[kwargs['ucell']]
-        axes =                       input_dict[kwargs['axes']]
+        sizemults = input_dict[kwargs['sizemults']]
+        ucell = input_dict[kwargs['ucell']]
+        axes = input_dict[kwargs['axes']]
         
         # Convert string terms to arrays
-        stackingfault_shiftvector1 = np.array(stackingfault_shiftvector1.strip().split(), dtype=float)
-        stackingfault_shiftvector2 = np.array(stackingfault_shiftvector2.strip().split(), dtype=float)
+        stackingfault_shiftvector1 = np.array(stackingfault_shiftvector1.strip().split(),
+                                              dtype=float)
+        stackingfault_shiftvector2 = np.array(stackingfault_shiftvector2.strip().split(),
+                                              dtype=float)
         
         # Convert crystallographic vectors to Cartesian vectors
-        shiftvector1 = (stackingfault_shiftvector1[0] * ucell.box.avect + 
-                        stackingfault_shiftvector1[1] * ucell.box.bvect + 
+        shiftvector1 = (stackingfault_shiftvector1[0] * ucell.box.avect +
+                        stackingfault_shiftvector1[1] * ucell.box.bvect +
                         stackingfault_shiftvector1[2] * ucell.box.cvect)
         
-        shiftvector2 = (stackingfault_shiftvector2[0] * ucell.box.avect + 
-                        stackingfault_shiftvector2[1] * ucell.box.bvect + 
+        shiftvector2 = (stackingfault_shiftvector2[0] * ucell.box.avect +
+                        stackingfault_shiftvector2[1] * ucell.box.bvect +
                         stackingfault_shiftvector2[2] * ucell.box.cvect)
         
         # Transform using axes
@@ -190,6 +223,3 @@ def stackingfault2(input_dict, build=True, **kwargs):
     input_dict[kwargs['faultpos']] = faultpos
     input_dict[kwargs['shiftvector1']] = shiftvector1
     input_dict[kwargs['shiftvector2']] = shiftvector2
-    
-
-        
