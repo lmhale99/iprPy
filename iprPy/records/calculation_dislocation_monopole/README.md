@@ -1,4 +1,4 @@
-# calculation-dislocation-monopole Record style
+# calculation_dislocation_monopole Record style
 
 --------------------------------------------------------------------------------
 
@@ -20,7 +20,9 @@ Version: 2017-05-01
  
 --------------------------------------------------------------------------------
 
-The calculation-dislocation-monopole Record style is for a calculation that 
+## Introduction
+
+The calculation_dislocation_monopole Record style is for a calculation that 
 generates a dislocation monopole system.
 
 Calculation styles that use this Record style:

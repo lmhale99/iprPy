@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Prepare functions &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Runner" href="runner.html" />
+    <link rel="prev" title="iprPy Classes" href="classes.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="runner.html" title="Runner"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="classes.html" title="iprPy Classes"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >iprPy Tutorial</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">High-Throughput Calculations</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="prepare-functions">
+<h1>Prepare functions<a class="headerlink" href="#prepare-functions" title="Permalink to this headline">¶</a></h1>
+<p>The cool thing is that running multiple instances of the calculation is almost as easy as running a single calculation.</p>
+<ol class="arabic">
+<li><p class="first">Set up a database and access parameters for loading it as an iprPy.Database.</p>
+</li>
+<li><p class="first">Create an input parameter file &#8220;prepare_[calcname].in&#8221; using a text editor.</p>
+</li>
+<li><p class="first">Place (copies of) the prepare_[calcname].py and prepare_[calcname].in in the same directory. This can be anywhere, including the original calculation folder.</p>
+</li>
+<li><p class="first">In a terminal, cd to the directory containing the two prepare files, and enter:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">prepare_</span><span class="p">[</span><span class="n">calcname</span><span class="p">]</span><span class="o">.</span><span class="n">py</span> <span class="n">prepare_</span><span class="p">[</span><span class="n">calcname</span><span class="p">]</span><span class="o">.</span><span class="ow">in</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">When the script finishes, check that there are copies of the calculation in your run_directory, and incomplete calculation records in your database.</p>
+</li>
+<li><p class="first">Start one or more <a class="reference internal" href="runner.html"><span class="doc">runner</span></a> scripts to perform the calculations.</p>
+</li>
+</ol>
+<p>Alternatively, calculations can be prepared either from another Python script using the <a class="reference internal" href="classes.html"><span class="doc">Calculation class</span></a>, or in a slightly more streamlined manner using the <a class="reference internal" href="inline.html"><span class="doc">command line options</span></a>.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="classes.html"
+                        title="previous chapter">iprPy Classes</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="runner.html"
+                        title="next chapter">Runner</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/tutorial/highthroughput/prepare.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="runner.html" title="Runner"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="classes.html" title="iprPy Classes"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >iprPy Tutorial</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >High-Throughput Calculations</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

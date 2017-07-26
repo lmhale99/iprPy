@@ -1,4 +1,4 @@
-# potential-LAMMPS Record style
+# potential_LAMMPS Record style
 
 --------------------------------------------------------------------------------
 
@@ -20,6 +20,8 @@ Version: 2017-07-05
  
 --------------------------------------------------------------------------------
 
-The potential-LAMMPS Record style is for collecting the parameters associated 
+## Introduction
+
+The potential_LAMMPS Record style is for collecting the parameters associated 
 with a LAMMPS implemented interatomic potential. It can be read in and 
 interpreted using the atomman.lammps.Potential class.

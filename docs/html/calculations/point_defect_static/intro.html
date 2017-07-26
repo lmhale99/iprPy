@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Method and Theory" href="theory.html" />
+    <link rel="prev" title="point_defect_static" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="theory.html" title="Method and Theory"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="point_defect_static"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">point_defect_static</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="introduction">
+<span id="introduction"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>The point_defect_static calculation computes the formation energy of a point defect by comparing the energies of a system before and after a point defect is inserted. The resulting defect system is analyzed using a few different metrics to help characterize if the defect reconfigures to a different structure upon relaxation.</p>
+<p><strong>Disclaimer #1</strong>: Point defect formation values are sensitive to the size of the system. Larger systems minimize the interaction between the defects, and the affect that the defects have on the system&#8217;s pressure. Infinite system formation energies can be estimated by measuring the formation energy for multiple system sizes, and extrapolating to 1/natoms = 0.</p>
+<p><strong>Disclaimer #2</strong>: Because only a static relaxation is performed, the final configuration might not be the true stable configuration. Additionally, the stable configuration may not correspond to any of the standard configurations characterized by the point-defect records in the iprPy/library. Running multiple configurations increases the likelihood of finding the true stable state, but it does not guarantee it. Alternatively, a dynamic simulation or a genetic algorithm may be more thorough.</p>
+<p><strong>Disclaimer #3</strong>: The reconfiguration metrics should be considered as guidelines, not as absolute. Because most standard sites for point defects are positions of high-symmetry, they will likely work well for most simple cases.</p>
+<p><strong>Disclaimer #4</strong>: The current version assumes that the initial defect-free base system is an elemental crystal structure. The formation energy expression will have to updated to handle multi-component crystals.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">point_defect_static</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="theory.html"
+                        title="next chapter">Method and Theory</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/calculations/point_defect_static/intro.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="theory.html" title="Method and Theory"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="point_defect_static"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >point_defect_static</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

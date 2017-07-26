@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction to iprPy &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Install iprPy" href="setup.html" />
+    <link rel="prev" title="iprPy High-Throughput Computational Framework" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="setup.html" title="Install iprPy"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="iprPy High-Throughput Computational Framework"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="contents.html">iprPy 0.7.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="introduction-to-iprpy">
+<h1>Introduction to iprPy<a class="headerlink" href="#introduction-to-iprpy" title="Permalink to this headline">¶</a></h1>
+<p>The iprPy framework consists of tools created to help researchers design and
+run scientific calculations in a better and smarter manner. In particular,
+there is built-in functionality and guiding principles that support the
+development of calculations to be reproducible, reusable, adaptable, and
+sharable. All data produced by the calculations is in a format that can be
+easily understood and interpreted by both humans and computers. Additional
+tools are included that make it possible to perform any implemented
+calculation in a high-throughput manner allowing for comparative studies of
+methods and models, parameter investigations, and full statistical
+verifications.</p>
+<p>Why is all of this important? A simple way to outline this is by walking
+through the typical steps that a computational scientist goes through during a
+molecular dynamics (MD) research project.</p>
+<ol class="arabic simple">
+<li>The researcher begins by selecting appropriate interatomic potentials.</li>
+<li>Atomic configurations of interest are constructed.</li>
+<li>Simulations are performed using the potentials and configurations of
+interest.</li>
+<li>The data is extracted from the simulation results and analyzed.</li>
+<li>Models are developed to explain the data and a publication is produced.</li>
+<li>The researcher moves onto a new project and all files for this work are
+archived.</li>
+</ol>
+<p>The ultimate question is does this produce high-quality, meaningful results?
+Answering this question requires asking a number of other questions. Why were
+the particular potentials used selected? Will the results change with a
+different potential? Were enough configurations used to identify true trends?
+Are the results sensitive to other parameters not explored? Since MD is
+deterministic, are the behaviors observed statistically reliable? Can this
+work be easily validated and reproduced by other researchers?</p>
+<p>Other questions also emerge that are of particular interest during subsequent
+research projects. Can the original researcher locate and understand the
+scripts and data files that they had created? Are those files and the
+knowledge for using them easily transferable to other researchers, or will
+they have to reconstruct the methods themselves? How easy is it to adapt the
+old calculation methods to new studies? Is the data open and available, or
+does it need to be reproduced as well?</p>
+<p>The structure and tools of iprPy are meant to address most if not all of these
+questions. Calculation methods are implemented in Python allowing for single
+scripts to fully describe steps 2-4 described above. This makes the
+calculation scripts a complete representation of the methodology. Each
+calculation reads in a structured input file, and produces data in a format
+that is both human and machine readable. Built-in tools are used that allow
+for the interatomic potential to be easily swapped, making comparison
+simulations trivial. The Python scripts can be copied into Jupyter Notebooks
+allowing for full documentation of the underlying functions such that the
+process can be easily learned or relearned after step 6. Finally, having the
+ability to run high-throughput calculations makes it possible to investigate
+if the data is meaningful and reproducible.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">iprPy High-Throughput Computational Framework</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="setup.html"
+                        title="next chapter">Install iprPy</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/intro.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="setup.html" title="Install iprPy"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="iprPy High-Throughput Computational Framework"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="contents.html">iprPy 0.7.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

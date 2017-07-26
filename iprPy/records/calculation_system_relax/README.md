@@ -1,4 +1,4 @@
-# calculation-system-relax Record style
+# calculation_system_relax Record style
 
 --------------------------------------------------------------------------------
 
@@ -20,7 +20,9 @@ Version: 2017-05-01
  
 --------------------------------------------------------------------------------
 
-The calculation-system-relax Record style is for a calculation that 
+## Introduction
+
+The calculation_system_relax Record style is for a calculation that 
 relaxes a crystal system and evaluates bulk materials properties.
 
 Calculation styles that use this Record style:

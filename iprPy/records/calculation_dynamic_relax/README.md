@@ -1,4 +1,4 @@
-# calculation-dynamic-relax Record style
+# calculation_dynamic_relax Record style
 
 --------------------------------------------------------------------------------
 
@@ -20,9 +20,10 @@ Version: 2017-05-01
  
 --------------------------------------------------------------------------------
 
-The calculation-dynamic-relax Record style is for a calculation that 
-dynamically relaxes a crystal system (should be merged with 
-calculation-system-relax in the future).
+## Introduction
+
+The calculation_dynamic_relax Record style is for a calculation that 
+dynamically relaxes a crystal system.
 
 Calculation styles that use this Record style:
 

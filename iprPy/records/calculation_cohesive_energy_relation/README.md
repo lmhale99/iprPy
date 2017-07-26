@@ -1,4 +1,4 @@
-# calculation-cohesive-energy-relation Record style
+# calculation_cohesive_energy_relation Record style
 
 --------------------------------------------------------------------------------
 
@@ -20,7 +20,9 @@ Version: 2017-05-01
  
 --------------------------------------------------------------------------------
 
-The calculation-cohesive-energy-relation Record style is for a calculation that 
+## Introduction
+
+The calculation_cohesive_energy_relation Record style is for a calculation that 
 finds the relationship between the cohesive energy and lattice constants or 
 interatomic spacing of a crystal.
 

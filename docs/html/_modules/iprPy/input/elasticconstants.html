@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>iprPy.input.elasticconstants &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for iprPy.input.elasticconstants</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="kn">from</span> <span class="nn">DataModelDict</span> <span class="k">import</span> <span class="n">DataModelDict</span> <span class="k">as</span> <span class="n">DM</span>
+<span class="kn">import</span> <span class="nn">atomman</span> <span class="k">as</span> <span class="nn">am</span>
+
+<div class="viewcode-block" id="elasticconstants"><a class="viewcode-back" href="../../../modules/iprPy.input.html#iprPy.input.elasticconstants">[docs]</a><span class="k">def</span> <span class="nf">elasticconstants</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interprets calculation parameters associated with elastic constants.</span>
+<span class="sd">    </span>
+<span class="sd">    The input_dict keys used by this function (which can be renamed using the</span>
+<span class="sd">    function&#39;s keyword arguments):</span>
+<span class="sd">    </span>
+<span class="sd">    - **&#39;elasticconstants_model&#39;** a record containing elastic constants to</span>
+<span class="sd">      load.</span>
+<span class="sd">    - **&#39;elasticconstants_content&#39;** alternate file or content to load instead</span>
+<span class="sd">      of specified elasticconstants_model.  This is used by prepare functions.</span>
+<span class="sd">    - **&#39;C11&#39;, &#39;C12&#39;, ..., &#39;C66&#39;** individually specified elastic constant</span>
+<span class="sd">      terms.</span>
+<span class="sd">    - **&#39;C&#39;** atomman.ElasticConstants object.</span>
+<span class="sd">    - **&#39;load_file&#39;** the system load file, which is searched for elastic</span>
+<span class="sd">      constants if neither elasticconstants_model nor Cij terms are specified.</span>
+<span class="sd">    - **&#39;load_content&#39;** alternate file or content to load instead of</span>
+<span class="sd">      the specified load_file.</span>
+<span class="sd">    - **&#39;pressure_unit&#39;** default unit of pressure to use for reading in</span>
+<span class="sd">      elastic constants.</span>
+<span class="sd">       </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_dict : dict</span>
+<span class="sd">        Dictionary containing input parameter key-value pairs.</span>
+<span class="sd">    build : bool</span>
+<span class="sd">        If False, parameters will be interpreted, but objects won&#39;t be built</span>
+<span class="sd">        from them (Default is True).</span>
+<span class="sd">    elasticconstants_model : str</span>
+<span class="sd">        Replacement parameter key name for &#39;elasticconstants_model&#39;.</span>
+<span class="sd">    elasticconstants_content : str</span>
+<span class="sd">        Replacement parameter key name for &#39;elasticconstants_content&#39;.</span>
+<span class="sd">    Ckey : str</span>
+<span class="sd">        Replacement parameter key name for for identifying the C11, C12, etc.</span>
+<span class="sd">        terms.</span>
+<span class="sd">    load_file : str</span>
+<span class="sd">        Replacement parameter key name for &#39;load_file&#39;.</span>
+<span class="sd">    load_content : str</span>
+<span class="sd">        Replacement parameter key name for &#39;load_content&#39;.</span>
+<span class="sd">    C : str</span>
+<span class="sd">        Replacement parameter key name for &#39;C&#39;.</span>
+<span class="sd">    pressure_unit : str</span>
+<span class="sd">        Replacement parameter key name for &#39;pressure_unit&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Set default keynames</span>
+    <span class="n">keynames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;elasticconstants_model&#39;</span><span class="p">,</span> <span class="s1">&#39;elasticconstants_content&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;pressure_unit&#39;</span><span class="p">,</span> <span class="s1">&#39;load_file&#39;</span><span class="p">,</span> <span class="s1">&#39;load_content&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">keyname</span> <span class="ow">in</span> <span class="n">keynames</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="n">keyname</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keyname</span><span class="p">,</span> <span class="n">keyname</span><span class="p">)</span>
+
+    <span class="c1"># Extract input values and assign default values</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">Ckey</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Ckey&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">)</span>
+    <span class="n">elasticconstants_model</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;elasticconstants_model&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">elasticconstants_content</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;elasticconstants_content&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">load_file</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;load_file&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">load_content</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;load_content&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">pressure_unit</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;pressure_unit&#39;</span><span class="p">]]</span>
+    
+    <span class="c1"># Replace model with content if given</span>
+    <span class="k">if</span> <span class="n">elasticconstants_content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">elasticconstants_model</span> <span class="o">=</span> <span class="n">elasticconstants_content</span>
+    
+    <span class="c1"># Pull out any single elastic constant terms</span>
+    <span class="n">Cdict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">input_dict</span><span class="p">:</span>
+        <span class="n">keyhead</span> <span class="o">=</span> <span class="n">key</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">Ckey</span><span class="p">)]</span>
+        <span class="n">keytail</span> <span class="o">=</span> <span class="n">key</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">Ckey</span><span class="p">):]</span>
+        <span class="k">if</span> <span class="n">keyhead</span> <span class="o">==</span> <span class="n">Ckey</span><span class="p">:</span>
+            <span class="n">Cdict</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="o">+</span><span class="n">keytail</span><span class="p">]</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span>
+                                                   <span class="n">default_unit</span><span class="o">=</span><span class="n">pressure_unit</span><span class="p">)</span>
+    
+    <span class="c1"># If model is given</span>
+    <span class="k">if</span> <span class="n">elasticconstants_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">Cdict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">keyhead</span> <span class="o">+</span> <span class="s1">&#39;ij values and &#39;</span>
+                                 <span class="o">+</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;elasticconstants_model&#39;</span><span class="p">]</span>
+                                 <span class="o">+</span> <span class="s1">&#39; cannot both be specified.&#39;</span><span class="p">)</span>
+                                 
+        <span class="k">if</span> <span class="n">build</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">C</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">ElasticConstants</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">DM</span><span class="p">(</span><span class="n">elasticconstants_model</span><span class="p">))</span>
+            
+    <span class="c1"># Else if individual Cij terms are given</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">Cdict</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">build</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">C</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">ElasticConstants</span><span class="p">(</span><span class="o">**</span><span class="n">Cdict</span><span class="p">)</span>
+    
+    <span class="c1"># Else check load_file for elastic constants</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">build</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">load_content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">load_file</span> <span class="o">=</span> <span class="n">load_content</span>
+                
+            <span class="n">C</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">ElasticConstants</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">DM</span><span class="p">(</span><span class="n">load_file</span><span class="p">))</span>
+                    
+    <span class="c1"># Save processed terms</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">C</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

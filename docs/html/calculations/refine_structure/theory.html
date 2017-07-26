@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Method and Theory &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="calc_refine_structure.py" href="calc.html" />
+    <link rel="prev" title="Introduction" href="intro.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="calc.html" title="calc_refine_structure.py"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">refine_structure</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="method-and-theory">
+<span id="method-and-theory"></span><h1>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this headline">¶</a></h1>
+<p>The math in this section uses Voigt notation, where indicies i,j correspond to 1=xx, 2=yy, 3=zz, 4=yz, 5=xz, and 6=xy, and x, y and z are orthogonal box vectors.</p>
+<p>An initial system (and corresponding unit cell system) is supplied with box dimensions, <span class="math">\(a_i^0\)</span>, close to the equilibrium values. A LAMMPS simulation is performed that evaluates the system&#8217;s pressures, <span class="math">\(P_{i}\)</span>, for the initial system as given, and subjected to twelve different strain states corresponding to one of <span class="math">\(\epsilon_{i}\)</span> being given a value of <span class="math">\(\frac{\Delta \epsilon}{2}\)</span>, where <span class="math">\(\Delta \epsilon\)</span> is the strain range parameter. Using the <span class="math">\(P_{i}\)</span> values obtained from the strained states, the <span class="math">\(C_{ij}\)</span> matrix for the system is estimated as</p>
+<p>$$ C_{ij} \approx - \frac{P_i(\epsilon_j=\frac{\Delta \epsilon}{2}) - P_i(\epsilon_j=-\frac{\Delta \epsilon}{2})}{\Delta \epsilon}.$$</p>
+<p>The negative out front comes from the fact that the system-wide stress state is <span class="math">\(\sigma_i = -P_i\)</span>. Using <span class="math">\(C_{ij}\)</span>, an attempt is made to compute the elastic compliance matrix as <span class="math">\(S_{ij} = C_{ij}^{-1}\)</span>. If successful, new box dimensions are estimated using <span class="math">\(S_{ij}\)</span>, <span class="math">\(a_i^0\)</span>, and <span class="math">\(P_i\)</span> for the unstrained system</p>
+<p>$$ a_i = \frac{a_i^0}{1 - (\sum_{j=1}^3{S_{ij} P_j})}.$$</p>
+<p>The system is updated using the new box dimensions. The process is repeated until either <span class="math">\(a_i\)</span> converge less than a specified tolerance, <span class="math">\(a_i\)</span> diverge from <span class="math">\(a_i^0\)</span> greater than some limit, or convergence is not reached after 100 iterations. If the calculation is successful, the final <span class="math">\(a_i\)</span> and corresponding <span class="math">\(C_{ij}\)</span> are reported.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="intro.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="calc.html"
+                        title="next chapter">calc_refine_structure.py</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/calculations/refine_structure/theory.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="calc.html" title="calc_refine_structure.py"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >refine_structure</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

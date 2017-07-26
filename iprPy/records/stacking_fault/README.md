@@ -1,4 +1,4 @@
-# stacking-fault Record style
+# stacking_fault Record style
 
 --------------------------------------------------------------------------------
 
@@ -20,7 +20,9 @@ Version: 2017-05-01
  
 --------------------------------------------------------------------------------
 
-The stacking-fault Record style is used for representing a specific 
+## Introduction
+
+The stacking_fault Record style is used for representing a specific 
 fault plane as stored in the iprPy reference library. Each record is
 associated with a specific stacking fault plane and contains characterization 
 metadata and parameters associated with generating the defect in a simulation.

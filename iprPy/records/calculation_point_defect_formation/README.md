@@ -1,4 +1,4 @@
-# calculation-point-defect-formation Record style
+# calculation_point_defect_formation Record style
 
 --------------------------------------------------------------------------------
 
@@ -20,7 +20,9 @@ Version: 2017-05-01
  
 --------------------------------------------------------------------------------
 
-The calculation-point-defect-formation Record style is for a calculation that 
+## Introduction
+
+The calculation_point_defect_formation Record style is for a calculation that 
 generates a point defect.
 
 Calculation styles that use this Record style:

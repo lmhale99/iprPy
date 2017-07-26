@@ -1,0 +1,569 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>iprPy.calculations.dislocation_monopole.calc_dislocation_monopole &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for iprPy.calculations.dislocation_monopole.calc_dislocation_monopole</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="c1"># Python script created by Lucas Hale</span>
+
+<span class="c1"># Standard library imports</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+
+<span class="c1"># http://www.numpy.org/</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+
+<span class="c1"># https://github.com/usnistgov/DataModelDict </span>
+<span class="kn">from</span> <span class="nn">DataModelDict</span> <span class="k">import</span> <span class="n">DataModelDict</span> <span class="k">as</span> <span class="n">DM</span>
+
+<span class="c1"># https://github.com/usnistgov/atomman </span>
+<span class="kn">import</span> <span class="nn">atomman</span> <span class="k">as</span> <span class="nn">am</span>
+<span class="kn">import</span> <span class="nn">atomman.lammps</span> <span class="k">as</span> <span class="nn">lmp</span>
+<span class="kn">import</span> <span class="nn">atomman.unitconvert</span> <span class="k">as</span> <span class="nn">uc</span>
+
+<span class="c1"># https://github.com/usnistgov/iprPy</span>
+<span class="kn">import</span> <span class="nn">iprPy</span>
+
+<span class="c1"># Define calc_style and record_style</span>
+<span class="n">calc_style</span> <span class="o">=</span> <span class="s1">&#39;dislocation_monopole&#39;</span>
+<span class="n">record_style</span> <span class="o">=</span> <span class="s1">&#39;calculation_dislocation_monopole&#39;</span>
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../calculations/dislocation_monopole/calc.html#iprPy.calculations.dislocation_monopole.calc_dislocation_monopole.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Main function called when script is executed directly.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Read input file in as dictionary</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">input_dict</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">parseinput</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">allsingular</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    <span class="c1"># Interpret and process input parameters</span>
+    <span class="n">process_input</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+   
+    <span class="n">results_dict</span> <span class="o">=</span> <span class="n">dislocationmonopole</span><span class="p">(</span><span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;lammps_command&#39;</span><span class="p">],</span>
+                                       <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;initialsystem&#39;</span><span class="p">],</span>
+                                       <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;potential&#39;</span><span class="p">],</span>
+                                       <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;symbols&#39;</span><span class="p">],</span>
+                                       <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;burgersvector&#39;</span><span class="p">],</span>
+                                       <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">],</span>
+                                       <span class="n">axes</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;axes&#39;</span><span class="p">],</span>
+                                       <span class="n">mpi_command</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;mpi_command&#39;</span><span class="p">],</span>
+                                       <span class="n">etol</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;energytolerance&#39;</span><span class="p">],</span>
+                                       <span class="n">ftol</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;forcetolerance&#39;</span><span class="p">],</span>
+                                       <span class="n">maxiter</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;maxiterations&#39;</span><span class="p">],</span>
+                                       <span class="n">maxeval</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;maxevaluations&#39;</span><span class="p">],</span>
+                                       <span class="n">dmax</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;maxatommotion&#39;</span><span class="p">],</span>
+                                       <span class="n">annealtemp</span> <span class="o">=</span>  <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;annealtemperature&#39;</span><span class="p">],</span>
+                                       <span class="n">randomseed</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;randomseed&#39;</span><span class="p">],</span>
+                                       <span class="n">bshape</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;dislocation_boundaryshape&#39;</span><span class="p">],</span>
+                                       <span class="n">bwidth</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;boundarywidth&#39;</span><span class="p">])</span>
+    
+    <span class="c1"># Save data model of results</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">buildmodel</span><span class="p">(</span><span class="n">record_style</span><span class="p">,</span> <span class="s1">&#39;calc_&#39;</span> <span class="o">+</span> <span class="n">calc_style</span><span class="p">,</span> <span class="n">input_dict</span><span class="p">,</span>
+                               <span class="n">results_dict</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;results.json&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="n">fp</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="dislocationmonopole"><a class="viewcode-back" href="../../../../calculations/dislocation_monopole/calc.html#iprPy.calculations.dislocation_monopole.calc_dislocation_monopole.dislocationmonopole">[docs]</a><span class="k">def</span> <span class="nf">dislocationmonopole</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">burgers</span><span class="p">,</span>
+                        <span class="n">C</span><span class="p">,</span> <span class="n">mpi_command</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">randomseed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">etol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">maxeval</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
+                        <span class="n">dmax</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">),</span>
+                        <span class="n">annealtemp</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">bshape</span><span class="o">=</span><span class="s1">&#39;circle&#39;</span><span class="p">,</span>
+                        <span class="n">bwidth</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates and relaxes a dislocation monopole system.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lammps_command :str</span>
+<span class="sd">        Command for running LAMMPS.</span>
+<span class="sd">    system : atomman.System</span>
+<span class="sd">        The bulk system to add the defect to.</span>
+<span class="sd">    potential : atomman.lammps.Potential</span>
+<span class="sd">        The LAMMPS implemented potential to use.</span>
+<span class="sd">    symbols : list of str</span>
+<span class="sd">        The list of element-model symbols for the Potential that correspond to</span>
+<span class="sd">        system&#39;s atypes.</span>
+<span class="sd">    burgers : list or numpy.array of float</span>
+<span class="sd">        The burgers vector for the dislocation being added.</span>
+<span class="sd">    C : atomman.ElasticConstants</span>
+<span class="sd">        The system&#39;s elastic constants.</span>
+<span class="sd">    mpi_command : str or None, optional</span>
+<span class="sd">        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS</span>
+<span class="sd">        will run serially.</span>
+<span class="sd">    axes : numpy.array of float or None, optional</span>
+<span class="sd">        The 3x3 axes used to rotate the system by during creation.  If given,</span>
+<span class="sd">        will be used to transform burgers and C from the standard</span>
+<span class="sd">        crystallographic orientations to the system&#39;s Cartesian units.</span>
+<span class="sd">    randomseed : int or None, optional</span>
+<span class="sd">        Random number seed used by LAMMPS in creating velocities and with</span>
+<span class="sd">        the Langevin thermostat.  (Default is None which will select a</span>
+<span class="sd">        random int between 1 and 900000000.)</span>
+<span class="sd">    etol : float, optional</span>
+<span class="sd">        The energy tolerance for the structure minimization. This value is</span>
+<span class="sd">        unitless. (Default is 0.0).</span>
+<span class="sd">    ftol : float, optional</span>
+<span class="sd">        The force tolerance for the structure minimization. This value is in</span>
+<span class="sd">        units of force. (Default is 0.0).</span>
+<span class="sd">    maxiter : int, optional</span>
+<span class="sd">        The maximum number of minimization iterations to use (default is </span>
+<span class="sd">        10000).</span>
+<span class="sd">    maxeval : int, optional</span>
+<span class="sd">        The maximum number of minimization evaluations to use (default is </span>
+<span class="sd">        100000).</span>
+<span class="sd">    dmax : float, optional</span>
+<span class="sd">        The maximum distance in length units that any atom is allowed to relax</span>
+<span class="sd">        in any direction during a single minimization iteration (default is</span>
+<span class="sd">        0.01 Angstroms).</span>
+<span class="sd">    annealtemp : float, optional</span>
+<span class="sd">        The temperature to perform a dynamic relaxation at. (Default is 0.0,</span>
+<span class="sd">        which will skip the dynamic relaxation.)</span>
+<span class="sd">    bshape : str, optional</span>
+<span class="sd">        The shape to make the boundary region.  Options are &#39;circle&#39; and</span>
+<span class="sd">        &#39;rect&#39; (default is &#39;circle&#39;).</span>
+<span class="sd">    bwidth : float, optional</span>
+<span class="sd">        The minimum thickness of the boundary region (default is 10</span>
+<span class="sd">        Angstroms).</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Dictionary of results consisting of keys:</span>
+<span class="sd">        </span>
+<span class="sd">        - **&#39;dumpfile_base&#39;** (*str*) - The filename of the LAMMPS dump file</span>
+<span class="sd">          for the relaxed base system.</span>
+<span class="sd">        - **&#39;symbols_base&#39;** (*list of str*) - The list of element-model</span>
+<span class="sd">          symbols for the Potential that correspond to the base system&#39;s</span>
+<span class="sd">          atypes.</span>
+<span class="sd">        - **&#39;Stroh_preln&#39;** (*float*) - The pre-logarithmic factor in the </span>
+<span class="sd">          dislocation&#39;s self-energy expression.</span>
+<span class="sd">        - **&#39;Stroh_K_tensor&#39;** (*numpy.array of float*) - The energy</span>
+<span class="sd">          coefficient tensor based on the dislocation&#39;s Stroh solution.</span>
+<span class="sd">        - **&#39;dumpfile_disl&#39;** (*str*) - The filename of the LAMMPS dump file</span>
+<span class="sd">          for the relaxed dislocation monopole system.</span>
+<span class="sd">        - **&#39;symbols_disl&#39;** (*list of str*) - The list of element-model</span>
+<span class="sd">          symbols for the Potential that correspond to the dislocation</span>
+<span class="sd">          monopole system&#39;s atypes.</span>
+<span class="sd">        - **&#39;E_total_disl&#39;** (*float*) - The total potential energy of the</span>
+<span class="sd">          dislocation monopole system.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Initialize results dict</span>
+    <span class="n">results_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    
+    <span class="c1"># Save initial perfect system</span>
+    <span class="n">am</span><span class="o">.</span><span class="n">lammps</span><span class="o">.</span><span class="n">atom_dump</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="s1">&#39;base.dump&#39;</span><span class="p">)</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;dumpfile_base&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;base.dump&#39;</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;symbols_base&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">symbols</span>
+
+    <span class="c1"># Solve Stroh method for dislocation</span>
+    <span class="n">stroh</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">defect</span><span class="o">.</span><span class="n">Stroh</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">burgers</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;Stroh_preln&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stroh</span><span class="o">.</span><span class="n">preln</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;Stroh_K_tensor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stroh</span><span class="o">.</span><span class="n">K_tensor</span>
+    
+    <span class="c1"># Generate dislocation system by displacing atoms</span>
+    <span class="n">disp</span> <span class="o">=</span> <span class="n">stroh</span><span class="o">.</span><span class="n">displacement</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">view</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">])</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">view</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">disp</span>
+
+    <span class="n">system</span><span class="o">.</span><span class="n">wrap</span><span class="p">()</span>
+    
+    <span class="c1"># Apply fixed boundary conditions</span>
+    <span class="n">system</span><span class="p">,</span> <span class="n">symbols</span> <span class="o">=</span> <span class="n">disl_boundary_fix</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">bwidth</span><span class="p">,</span> <span class="n">bshape</span><span class="p">)</span>
+    
+    <span class="c1"># Relax system</span>
+    <span class="n">relaxed</span> <span class="o">=</span> <span class="n">disl_relax</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span>
+                         <span class="n">mpi_command</span> <span class="o">=</span> <span class="n">mpi_command</span><span class="p">,</span> 
+                         <span class="n">annealtemp</span> <span class="o">=</span> <span class="n">annealtemp</span><span class="p">,</span>
+                         <span class="n">etol</span> <span class="o">=</span> <span class="n">etol</span><span class="p">,</span> 
+                         <span class="n">ftol</span> <span class="o">=</span> <span class="n">ftol</span><span class="p">,</span> 
+                         <span class="n">maxiter</span> <span class="o">=</span> <span class="n">maxiter</span><span class="p">,</span> 
+                         <span class="n">maxeval</span> <span class="o">=</span> <span class="n">maxeval</span><span class="p">)</span>
+    
+    <span class="c1"># Save relaxed dislocation system with original box vects</span>
+    <span class="n">system_disl</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;atom_dump&#39;</span><span class="p">,</span> <span class="n">relaxed</span><span class="p">[</span><span class="s1">&#39;dumpfile&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">system_disl</span><span class="o">.</span><span class="n">box_set</span><span class="p">(</span><span class="n">vects</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">vects</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">origin</span><span class="p">)</span>
+    <span class="n">lmp</span><span class="o">.</span><span class="n">atom_dump</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">system_disl</span><span class="p">,</span> <span class="s1">&#39;disl.dump&#39;</span><span class="p">)</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;dumpfile_disl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;disl.dump&#39;</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;symbols_disl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">symbols</span>
+    
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_total_disl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">relaxed</span><span class="p">[</span><span class="s1">&#39;E_total&#39;</span><span class="p">]</span>
+    
+    <span class="c1"># Cleanup files</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;0.dump&#39;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">relaxed</span><span class="p">[</span><span class="s1">&#39;dumpfile&#39;</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">dumpjsonfile</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">iglob</span><span class="p">(</span><span class="s1">&#39;*.dump.json&#39;</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">dumpjsonfile</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">results_dict</span></div>
+
+<div class="viewcode-block" id="disl_boundary_fix"><a class="viewcode-back" href="../../../../calculations/dislocation_monopole/calc.html#iprPy.calculations.dislocation_monopole.calc_dislocation_monopole.disl_boundary_fix">[docs]</a><span class="k">def</span> <span class="nf">disl_boundary_fix</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">bwidth</span><span class="p">,</span> <span class="n">bshape</span><span class="o">=</span><span class="s1">&#39;circle&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a boundary region by changing atom types.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    system : atomman.System</span>
+<span class="sd">        The system to add the boundary region to.</span>
+<span class="sd">    symbols : list of str</span>
+<span class="sd">        The list of element-model symbols for the Potential that correspond to</span>
+<span class="sd">        system&#39;s atypes.</span>
+<span class="sd">    bwidth : float</span>
+<span class="sd">        The minimum thickness of the boundary region.</span>
+<span class="sd">    bshape : str, optional</span>
+<span class="sd">        The shape to make the boundary region.  Options are &#39;circle&#39; and</span>
+<span class="sd">        &#39;rect&#39; (default is &#39;circle&#39;).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">natypes</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">natypes</span>
+    <span class="n">atypes</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">atoms_prop</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s1">&#39;atype&#39;</span><span class="p">)</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">atoms_prop</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s1">&#39;pos&#39;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">bshape</span> <span class="o">==</span> <span class="s1">&#39;circle&#39;</span><span class="p">:</span>
+        <span class="c1"># Find x or y bound closest to 0</span>
+        <span class="n">smallest_xy</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">xlo</span><span class="p">),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">xhi</span><span class="p">),</span>
+                           <span class="nb">abs</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">ylo</span><span class="p">),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">yhi</span><span class="p">)])</span>
+        
+        <span class="n">radius</span> <span class="o">=</span> <span class="n">smallest_xy</span> <span class="o">-</span> <span class="n">bwidth</span>
+        <span class="n">xy_mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">atoms_prop</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s1">&#39;pos&#39;</span><span class="p">)[:,:</span><span class="mi">2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>        
+        <span class="n">atypes</span><span class="p">[</span><span class="n">xy_mag</span> <span class="o">&gt;</span> <span class="n">radius</span><span class="p">]</span> <span class="o">+=</span> <span class="n">natypes</span>
+    
+    <span class="k">elif</span> <span class="n">bshape</span> <span class="o">==</span> <span class="s1">&#39;rect&#39;</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pos</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">xlo</span> <span class="o">+</span> <span class="n">bwidth</span><span class="p">),</span>
+                                     <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pos</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">xhi</span> <span class="o">-</span> <span class="n">bwidth</span><span class="p">),</span>
+                                     <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pos</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">ylo</span> <span class="o">+</span> <span class="n">bwidth</span><span class="p">),</span>
+                                     <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pos</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">yhi</span> <span class="o">-</span> <span class="n">bwidth</span><span class="p">))))</span>
+        <span class="n">atypes</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">+=</span> <span class="n">natypes</span>
+           
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown boundary shape type! Enter &#39;circle&#39; or &#39;rect&#39;&quot;</span><span class="p">)</span>
+
+    <span class="n">new_system</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+    <span class="n">new_system</span><span class="o">.</span><span class="n">atoms_prop</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s1">&#39;atype&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">atypes</span><span class="p">)</span>
+    <span class="n">symbols</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">new_system</span><span class="p">,</span> <span class="n">symbols</span></div>
+        
+<div class="viewcode-block" id="disl_relax"><a class="viewcode-back" href="../../../../calculations/dislocation_monopole/calc.html#iprPy.calculations.dislocation_monopole.calc_dislocation_monopole.disl_relax">[docs]</a><span class="k">def</span> <span class="nf">disl_relax</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span> 
+               <span class="n">mpi_command</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">annealtemp</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">randomseed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">etol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">maxeval</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
+               <span class="n">dmax</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sets up and runs the disl_relax.in LAMMPS script for relaxing a</span>
+<span class="sd">    dislocation monopole system.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lammps_command :str</span>
+<span class="sd">        Command for running LAMMPS.</span>
+<span class="sd">    system : atomman.System</span>
+<span class="sd">        The system to perform the calculation on.</span>
+<span class="sd">    potential : atomman.lammps.Potential</span>
+<span class="sd">        The LAMMPS implemented potential to use.</span>
+<span class="sd">    symbols : list of str</span>
+<span class="sd">        The list of element-model symbols for the Potential that correspond to</span>
+<span class="sd">        system&#39;s atypes.</span>
+<span class="sd">    mpi_command : str, optional</span>
+<span class="sd">        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS</span>
+<span class="sd">        will run serially.</span>
+<span class="sd">    annealtemp : float, optional</span>
+<span class="sd">        The temperature to perform a dynamic relaxation at. (Default is 0.0,</span>
+<span class="sd">        which will skip the dynamic relaxation.)</span>
+<span class="sd">    randomseed : int or None, optional</span>
+<span class="sd">        Random number seed used by LAMMPS in creating velocities and with</span>
+<span class="sd">        the Langevin thermostat.  (Default is None which will select a</span>
+<span class="sd">        random int between 1 and 900000000.)</span>
+<span class="sd">    etol : float, optional</span>
+<span class="sd">        The energy tolerance for the structure minimization. This value is</span>
+<span class="sd">        unitless. (Default is 0.0).</span>
+<span class="sd">    ftol : float, optional</span>
+<span class="sd">        The force tolerance for the structure minimization. This value is in</span>
+<span class="sd">        units of force. (Default is 0.0).</span>
+<span class="sd">    maxiter : int, optional</span>
+<span class="sd">        The maximum number of minimization iterations to use (default is </span>
+<span class="sd">        10000).</span>
+<span class="sd">    maxeval : int, optional</span>
+<span class="sd">        The maximum number of minimization evaluations to use (default is </span>
+<span class="sd">        100000).</span>
+<span class="sd">    dmax : float, optional</span>
+<span class="sd">        The maximum distance in length units that any atom is allowed to relax</span>
+<span class="sd">        in any direction during a single minimization iteration (default is</span>
+<span class="sd">        0.01 Angstroms).</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Dictionary of results consisting of keys:</span>
+<span class="sd">        </span>
+<span class="sd">        - **&#39;logfile&#39;** (*str*) - The name of the LAMMPS log file.</span>
+<span class="sd">        - **&#39;dumpfile&#39;** (*str*) - The name of the LAMMPS dump file</span>
+<span class="sd">          for the relaxed system.</span>
+<span class="sd">        - **&#39;E_total&#39;** (*float*) - The total potential energy for the</span>
+<span class="sd">          relaxed system.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Get lammps units</span>
+    <span class="n">lammps_units</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+    
+    <span class="c1">#Get lammps version date</span>
+    <span class="n">lammps_date</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">check_lammps_version</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">)[</span><span class="s1">&#39;lammps_date&#39;</span><span class="p">]</span>
+    
+    <span class="c1"># Define lammps variables</span>
+    <span class="n">lammps_variables</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">system_info</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">atom_data</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="s1">&#39;system.dat&#39;</span><span class="p">,</span>
+                                     <span class="n">units</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">,</span>
+                                     <span class="n">atom_style</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">atom_style</span><span class="p">)</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_system_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_info</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_pair_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">potential</span><span class="o">.</span><span class="n">pair_info</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span>
+    <span class="n">ann_info</span> <span class="o">=</span> <span class="n">anneal_info</span><span class="p">(</span><span class="n">annealtemp</span><span class="p">,</span> <span class="n">randomseed</span><span class="p">,</span> <span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;anneal_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ann_info</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;etol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">etol</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;ftol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">ftol</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;force&#39;</span><span class="p">])</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxiter</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;maxeval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxeval</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dmax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dmax</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;group_move&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span>
+                                                       <span class="n">system</span><span class="o">.</span><span class="n">natypes</span><span class="o">//</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span>
+                                              <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">))</span>
+    
+    <span class="c1"># Set dump_modify format based on dump_modify_version</span>
+    <span class="k">if</span> <span class="n">lammps_date</span> <span class="o">&lt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+        <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&quot;</span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1">&quot;&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;float </span><span class="si">%.13e</span><span class="s1">&#39;</span>
+    
+    <span class="c1"># Write lammps input script</span>
+    <span class="n">template_file</span> <span class="o">=</span> <span class="s1">&#39;disl_relax.template&#39;</span>
+    <span class="n">lammps_script</span> <span class="o">=</span> <span class="s1">&#39;disl_relax.in&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">template_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lammps_script</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">filltemplate</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">lammps_variables</span><span class="p">,</span>
+                                         <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
+
+    <span class="c1"># Run LAMMPS</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">lammps_script</span><span class="p">,</span> <span class="n">mpi_command</span><span class="p">,</span>
+                     <span class="n">return_style</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+    <span class="n">thermo</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">simulations</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;thermo&#39;</span><span class="p">]</span>
+    
+    <span class="c1"># Extract output values</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;logfile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;log.lammps&#39;</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;dumpfile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%i</span><span class="s1">.dump&#39;</span> <span class="o">%</span> <span class="n">thermo</span><span class="o">.</span><span class="n">Step</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> 
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;E_total&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">PotEng</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                         <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;energy&#39;</span><span class="p">])</span>
+    
+    <span class="k">return</span> <span class="n">results</span></div>
+
+<div class="viewcode-block" id="anneal_info"><a class="viewcode-back" href="../../../../calculations/dislocation_monopole/calc.html#iprPy.calculations.dislocation_monopole.calc_dislocation_monopole.anneal_info">[docs]</a><span class="k">def</span> <span class="nf">anneal_info</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">randomseed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;metal&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates LAMMPS commands for thermo anneal.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    temperature : float, optional</span>
+<span class="sd">        The temperature to relax at (default is 0.0).</span>
+<span class="sd">    randomseed : int or None, optional</span>
+<span class="sd">        Random number seed used by LAMMPS in creating velocities and with</span>
+<span class="sd">        the Langevin thermostat.  (Default is None which will select a</span>
+<span class="sd">        random int between 1 and 900000000.)</span>
+<span class="sd">    units : str, optional</span>
+<span class="sd">        The LAMMPS units style to use (default is &#39;metal&#39;).</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The generated LAMMPS input lines for performing a dynamic relax.</span>
+<span class="sd">        Will be &#39;&#39; if temperature==0.0.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get lammps units</span>
+    <span class="n">lammps_units</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
+    
+    <span class="c1"># Return nothing if temperature is 0.0 (don&#39;t do thermo anneal)</span>
+    <span class="k">if</span> <span class="n">temperature</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+    
+    <span class="c1"># Generate velocity, fix nvt, and run LAMMPS command lines</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">randomseed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">randomseed</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">900000000</span><span class="p">)</span>
+            
+        <span class="n">start_temp</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">temperature</span>
+        <span class="n">tdamp</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">timestep</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
+        <span class="n">timestep</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">timestep</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="s1">&#39;velocity move create </span><span class="si">%f</span><span class="s1"> </span><span class="si">%i</span><span class="s1"> mom yes rot yes dist gaussian&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">start_temp</span><span class="p">,</span> <span class="n">randomseed</span><span class="p">),</span>
+            <span class="s1">&#39;fix nvt all nvt temp </span><span class="si">%f</span><span class="s1"> </span><span class="si">%f</span><span class="s1"> </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span>
+                                               <span class="n">tdamp</span><span class="p">),</span>
+            <span class="s1">&#39;timestep </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">timestep</span><span class="p">),</span>
+            <span class="s1">&#39;thermo 10000&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;run 10000&#39;</span><span class="p">,</span>
+            <span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">info</span></div>
+    
+<div class="viewcode-block" id="process_input"><a class="viewcode-back" href="../../../../calculations/dislocation_monopole/calc.html#iprPy.calculations.dislocation_monopole.calc_dislocation_monopole.process_input">[docs]</a><span class="k">def</span> <span class="nf">process_input</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">UUID</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Processes str input parameters, assigns default values if needed, and</span>
+<span class="sd">    generates new, more complex terms as used by the calculation.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_dict :  dict</span>
+<span class="sd">        Dictionary containing the calculation input parameters with string</span>
+<span class="sd">        values.  The allowed keys depends on the calculation style.</span>
+<span class="sd">    UUID : str, optional</span>
+<span class="sd">        Unique identifier to use for the calculation instance.  If not </span>
+<span class="sd">        given and a &#39;UUID&#39; key is not in input_dict, then a random UUID4 </span>
+<span class="sd">        hash tag will be assigned.</span>
+<span class="sd">    build : bool, optional</span>
+<span class="sd">        Indicates if all complex terms are to be built.  A value of False</span>
+<span class="sd">        allows for default values to be assigned even if some inputs </span>
+<span class="sd">        required by the calculation are incomplete.  (Default is True.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Set calculation UUID</span>
+    <span class="k">if</span> <span class="n">UUID</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
+        <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;calc_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UUID</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;calc_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;calc_key&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
+    
+    <span class="c1"># Set default input/output units</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">units</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+    
+    <span class="c1"># These are calculation-specific default strings</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;sizemults&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sizemults&#39;</span><span class="p">,</span> <span class="s1">&#39;-10 10 -10 10 0 3&#39;</span><span class="p">)</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;boundaryshape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dislocation_boundaryshape&#39;</span><span class="p">,</span>
+                                                  <span class="s1">&#39;circle&#39;</span><span class="p">)</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;forcetolerance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;forcetolerance&#39;</span><span class="p">,</span>
+                                                  <span class="s1">&#39;1.0e-6 eV/angstrom&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># These are calculation-specific default booleans</span>
+    <span class="c1"># None for this calculation</span>
+    
+    <span class="c1"># These are calculation-specific default integers</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;randomseed&#39;</span><span class="p">]</span> <span class="o">=</span>     <span class="nb">int</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;randomseed&#39;</span><span class="p">,</span>
+                                       <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">900000000</span><span class="p">)))</span>
+    
+    <span class="c1"># These are calculation-specific default unitless floats</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;annealtemperature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;annealtemperature&#39;</span><span class="p">,</span>
+                                                           <span class="mf">0.0</span><span class="p">))</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;boundarywidth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dislocation_boundarywidth&#39;</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">))</span>
+    
+    <span class="c1"># These are calculation-specific default floats with units</span>
+    <span class="c1"># None for this calculation</span>
+    
+    <span class="c1"># Check lammps_command and mpi_command</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">commands</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+    
+    <span class="c1"># Set default system minimization parameters</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+    
+    <span class="c1"># Load potential</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">potential</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+    
+    <span class="c1"># Load ucell system</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">systemload</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">)</span>
+    
+    <span class="c1"># Load dislocation parameters</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">dislocationmonopole</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+    
+    <span class="c1"># Load elastic constants</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">elasticconstants</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">)</span>
+    
+    <span class="c1"># Construct initialsystem by manipulating ucell system</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">systemmanipulate</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">(</span><span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

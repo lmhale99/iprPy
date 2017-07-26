@@ -18,6 +18,9 @@
 #
 import os
 import sys
+import recommonmark
+from recommonmark.parser import CommonMarkParser
+from recommonmark.transform import AutoStructify
 sys.path.insert(0, os.path.abspath('..'))
 
 
@@ -35,7 +38,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
-    'sphinx.ext.napoleon',
+    'sphinx.ext.napoleon'
     ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -45,13 +48,13 @@ templates_path = ['_templates']
 # You can specify multiple suffix as a list of string:
 #
 source_parsers = {
-   '.md': 'recommonmark.parser.CommonMarkParser',
+   '.md': CommonMarkParser,
 }
 
 source_suffix = ['.rst', '.md']
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = 'contents'
 
 # General information about the project.
 project = u'iprPy'
@@ -86,7 +89,7 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
-
+add_module_names = False
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -184,4 +187,10 @@ epub_copyright = copyright
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
 
-
+# At the bottom of conf.py
+def setup(app):
+    app.add_config_value('recommonmark_config', {
+            'url_resolver': lambda url: github_doc_root + url,
+            'auto_toc_tree_section': 'Contents',
+            }, True)
+    app.add_transform(AutoStructify)

@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Method and Theory" href="theory.html" />
+    <link rel="prev" title="dislocation_monopole" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="theory.html" title="Method and Theory"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="dislocation_monopole"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">dislocation_monopole</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="introduction">
+<span id="introduction"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>The <strong>dislocation_monopole</strong> calculation calculation inserts a dislocation monopole into an atomic system using the anisotropic elasticity solution for a straight perfect dislocation, and relaxes the atomic configuration. The atoms within the active region of the system are then relaxed statically or dynamically. The relaxed dislocation system and corresponding dislocation-free base systems are retained in the calculation&#8217;s archived record. Various properties associated with the dislocation&#8217;s elasticity solution are recorded in the calculation&#8217;s results record.</p>
+<p><strong>Disclaimer #1</strong>: In principle, the theory should allow for a straight dislocation monopole to be added to any crystal structure. In practice, the methodology is currently only fully compatible for cubic systems. First, atomman is currently limited to applying rotations to cubic systems. Second, the methodology currently limits the dislocation to being inserted along the z-axis. See Method and Theory for more details.</p>
+<p><strong>Disclaimer #2</strong>: Only performing a static relaxation is considerably faster than performing a dynamic relaxation, but it may not fully relax the configuration.</p>
+<p><strong>Disclaimer #3</strong>: The sizes of the system and boundary region should be selected to place the dislocation far from the boundary region to reduce the effect of the boundary region on the dislocation.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">dislocation_monopole</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="theory.html"
+                        title="next chapter">Method and Theory</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/calculations/dislocation_monopole/intro.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="theory.html" title="Method and Theory"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="dislocation_monopole"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >dislocation_monopole</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

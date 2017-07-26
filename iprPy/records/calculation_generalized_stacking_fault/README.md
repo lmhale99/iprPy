@@ -1,4 +1,4 @@
-# calculation-generalized-stacking-fault Record style
+# calculation_generalized_stacking_fault Record style
 
 --------------------------------------------------------------------------------
 
@@ -20,11 +20,11 @@ Version: 2017-05-01
  
 --------------------------------------------------------------------------------
 
-The calculation-generalized-stacking-fault Record style is for a calculation 
+## Introduction
+
+The calculation_generalized_stacking_fault Record style is for a calculation 
 that generates one or more planar faults. 
 
 Calculation styles that use this Record style:
-
-- stacking_fault
 
 - stacking_fault_multi

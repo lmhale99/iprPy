@@ -29,4 +29,3 @@ bin/iprPy_runner.*
 
 #Demonstration Notebook working directories
 docs/demonstrations/*/
-docs/html/

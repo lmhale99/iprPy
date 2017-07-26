@@ -58,18 +58,21 @@ def parseinput(infile, singularkeys=[], allsingular=False):
 
         # Remove comments
         i = 0
+        index = len(line)
         while i < len(terms):
             if len(terms[i]) > 0 and terms[i][0] == '#':
+                index = line.index(terms[i])
                 break
             i += 1
         terms = terms[:i]
+        line = line[:index]
 
-        # Skip empty (and comment) lines
+        # Skip empty, comment, and valueless lines
         if len(terms) > 1:
             
             # Split into key and value
             key = terms[0]
-            value = ' '.join(terms[1:])
+            value = line.replace(key, '', 1).strip()
         
             # First time key is called save as is
             if key not in params:
