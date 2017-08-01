@@ -2,22 +2,34 @@
 High-Throughput Calculations
 ============================
 
-(OLD...)
+Introduction
+============
 
-A number of scripts for running calculations in a high-throughput manner can be found in the ‘iprPy/high-throughput-scripts’ directory. This directory has subdirectories
-- ‘prepare’ contains scripts that create multiple instances of different calculations
-- ‘runner’ contains a script for automatically running the calculations, and other associated files.
-prepare scripts
+Designing the calculations to be independent units of work that read standard
+input files makes performing the calculations in high-throughput incredibly
+simple.  All you have to do is execute the same calculation scripts with
+different input files.  And with the calculation results being reported in
+XML/JSON, the accumulated data can automatically be uploaded into a database.
 
-Each calculation currently has its own prepare script associated with it. Initially, one master prepare script was planned, but it ended up having too much overhead and complexity to effectively work.
+With iprPy, performing calculations in high-throughput is a two-step process.
 
-All the prepare scripts are contained in subdirectories named after the calculations themselves. They can be executed by calling the script as a command with an input file as an argument. While each prepare script has its own unique combinatorial logic and input parameters, numerous utility functions are built into iprPy to allow for common feels and behaviors.
-
+1. You :any:`prepared <prepare>` a calculation.  This creates multiple
+   instances of the calculation within a specified "run_directory".  Each
+   instance is a folder containing a copy of the calculation's script, a
+   unique input parameter file, and any other files required to perform the
+   calculation.  Additionally, an incomplete record associated with each
+   calculation instance is added to a database.
+2. You start one or more :any:`runners <runner>`.  Each runner operates on a
+   single "run_directory" systematically performing one prepared calculation
+   instance after another.  When each calculation finishes, successfully or
+   unsuccessfully, the corresponding record in the database is updated and the
+   calculation instance’s folder is archived and added to the database.
 
 .. toctree::
     :maxdepth: 2
     :caption: Contents:
 
+    quickstart
     classes
     prepare
     runner

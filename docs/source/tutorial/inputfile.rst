@@ -10,7 +10,7 @@ which are described in the associated documentation for the calculation or
 script method.
 
 Formating rules
----------------
+===============
 
 The iprPy.tools.parseinput function is used for reading in the input
 parameter files.  The parseinput function follows these simple rules for
@@ -35,7 +35,7 @@ interpreting the files
    variables can be multi-valued.
 
 Formatting example
-------------------
+==================
 
 Script::
     
@@ -56,7 +56,7 @@ Gets interpreted as a Python dictionary::
     'thirdvariable': ['term', 'again!']}
      
 Easy creation
--------------
+=============
 
 Generating a calculation script input file from scratch can be challenging
 as the calculation scripts take numerous parameters.  But, there is an easy

@@ -10,6 +10,7 @@ This section describes the basics for using iprPy to perform calculations.
 
     calculation
     inputfile
+    recordformat
     library
     highthroughput/index
     design/index

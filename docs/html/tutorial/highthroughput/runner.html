@@ -27,8 +27,8 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Inline Commands" href="inline.html" />
-    <link rel="prev" title="Prepare functions" href="prepare.html" /> 
+    <link rel="next" title="Other High-Throughput Tools" href="inline.html" />
+    <link rel="prev" title="Prepare" href="prepare.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -41,10 +41,10 @@
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="inline.html" title="Inline Commands"
+          <a href="inline.html" title="Other High-Throughput Tools"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="prepare.html" title="Prepare functions"
+          <a href="prepare.html" title="Prepare"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >iprPy Tutorial</a> &#187;</li>
@@ -59,17 +59,153 @@
             
   <div class="section" id="runner">
 <h1>Runner<a class="headerlink" href="#runner" title="Permalink to this headline">¶</a></h1>
-<p>(old...)</p>
-<p>Once calculations have been prepared, they can be executed individually or through the use of the runner.py script. All runner.py needs is an input file listing run_directory and lib_directory variables and values. Here are some features of runner:</p>
-<ol class="arabic simple">
-<li>Each instance of runner picks a calculation in run_directory at random and begins to execute it if no other runner has claimed it.</li>
-<li>Automatically checks if results from another calculation are needed to perform the current calculation. If so, the runner tries to execute the required calculation first. NOTE: the current prepare scripts are NOT supporting this (yet).</li>
-<li>If a calculation fails, the error message is collected without stopping the runner.</li>
-<li>Results or errors are collected and saved into an xml record and saved to the lib_directory record library.</li>
-<li>The simulation directory is archived as a tar.gz file and moved to the lib_directory.</li>
-<li>Multiple runners can simultaneously work on calculations in the same run_directory. They can also work on calculations in different run_directories and feed results to the same lib_directory.</li>
-<li>When submitting on a cluster queue, each runner is assigned a particular number of cores to use. Therefore, running the calculations optimally can be done by collecting the jobs into run_directories based on the number of processors used by the calculation.</li>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Prepared calculations can be systematically executed by starting one or more
+runners. Each runner operates over a single run_directory and database.</p>
+</div>
+<div class="section" id="starting-runners">
+<h2>Starting runners<a class="headerlink" href="#starting-runners" title="Permalink to this headline">¶</a></h2>
+<p>There are multiple ways that a runner can be started.  <strong>Note</strong>: With all of
+these methods, do <em>not</em> start the runner using an MPI command!  If a
+calculation is to use multiprocessing, it should be specified by parameters in
+the calculation’s input file.</p>
+<div class="section" id="runner-script">
+<h3>Runner script<a class="headerlink" href="#runner-script" title="Permalink to this headline">¶</a></h3>
+<p>The runner.py script in the iprPy/highthroughput folder/module can be executed
+directly as:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">runner</span><span class="o">.</span><span class="n">py</span> <span class="o">&lt;</span><span class="n">runner</span><span class="o">.</span><span class="ow">in</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">runner</span><span class="o">.</span><span class="n">py</span> <span class="o">&lt;</span><span class="n">runner</span><span class="o">.</span><span class="ow">in</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>where &lt;runner.in&gt; is the name/path for an input parameter file used by the
+runner. The runner’s input file should only specify a “run_directory” term, a
+“database” term and any “database_*” access terms necessary to define the
+run_directory and database to interact with.</p>
+</div>
+<div class="section" id="inline-command">
+<h3>Inline command<a class="headerlink" href="#inline-command" title="Permalink to this headline">¶</a></h3>
+<p>A runner can be started by entering iprPy’s bin directory and using the inline
+terminal command:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">iprPy</span> <span class="n">runner</span> <span class="o">&lt;</span><span class="n">database</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">run_directory</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>where &lt;database&gt; and &lt;run_directory&gt; are the names associated with a database
+and a run_directory that have been set using the iprPy set inline command.</p>
+</div>
+<div class="section" id="call-from-python">
+<h3>Call from Python<a class="headerlink" href="#call-from-python" title="Permalink to this headline">¶</a></h3>
+<p>A runner can be started from a Python script or a Jupyter Notebook by
+calling:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">iprPy</span><span class="o">.</span><span class="n">highthroughput</span><span class="o">.</span><span class="n">runner</span><span class="p">(</span><span class="o">&lt;</span><span class="n">dbase</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">run_directory</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where &lt;dbase&gt; is an iprPy.Database object, and &lt;run_directory&gt; is the string
+path to the run_directory to use.</p>
+</div>
+<div class="section" id="submitting-to-a-queue">
+<h3>Submitting to a queue<a class="headerlink" href="#submitting-to-a-queue" title="Permalink to this headline">¶</a></h3>
+<p>The bin/ directory of iprPy also contains simple example bash scripts that
+can be used for submitting jobs to a queue:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">submission_command</span><span class="o">&gt;</span> <span class="n">iprPy_runner</span> <span class="o">&lt;</span><span class="n">runner</span><span class="o">.</span><span class="ow">in</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">submission_command</span><span class="o">&gt;</span> <span class="n">iprPy_script</span> <span class="n">runner</span> <span class="o">&lt;</span><span class="n">database</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">run_directory</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>The difference between these two is that iprPy_runner uses the runner.py
+script, whereas iprPy_script uses the iprPy inline command. The advantage of
+iprPy_script is that it can take advantage of the pre-defined databases and
+run_directories, and can be used to submit other high-throughput commands as
+jobs.</p>
+<p><strong>Note</strong>: The &lt;submission_command&gt; should specify the number of cores assigned
+to the runner. To be most efficient, this should correspond to the number of
+cores that the calculation instances in the run_directory will try to use (as
+specified in the instances’ input files).</p>
+</div>
+</div>
+<div class="section" id="full-process">
+<h2>Full process<a class="headerlink" href="#full-process" title="Permalink to this headline">¶</a></h2>
+<p>This is a full description of the process that a runner uses:</p>
+<ol class="arabic">
+<li><p class="first">A calculation folder in the run_directory is selected at random.</p>
+</li>
+<li><p class="first">The runner attempts to bid on the calculation instance. This step is done
+to help ensure that only one runner operates on any calculation instance.</p>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li>If the calculation folder already contains a <a href="#id1"><span class="problematic" id="id2">*</span></a>.bid file, then the bid
+fails.</li>
+<li>The runner creates a <a href="#id3"><span class="problematic" id="id4">*</span></a>.bid file using the runner’s pid number.</li>
+<li>After waiting one second, the runner checks all <a href="#id5"><span class="problematic" id="id6">*</span></a>.bid files in the
+folder. If the runner’s pid corresponds to the minimum <a href="#id7"><span class="problematic" id="id8">*</span></a>.bid, then the
+bid succeeds. Otherwise it fails.</li>
 </ol>
+</div></blockquote>
+</li>
+<li><p class="first">If the bid is successful, it checks all files in the calculation instance’s
+folder. For any XML or JSON records, it checks for a “status” element.</p>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li>“status” == “not calculated” indicates that a necessary parent
+calculation had not been performed at the time that the current
+calculation instance was prepared. The runner will update the record
+with the database’s copy. If “status” is still “not calculated”, the
+runner will remove its bid from the current calculation instance and
+try to bid on the parent calculation instance.</li>
+<li>“status” == “error” indicates that a necessary parent calculation
+failed. The current calculation instance will raise an error to reflect
+this.</li>
+</ol>
+</div></blockquote>
+</li>
+<li><p class="first">The calculation instance is checked to ensure that it is valid and
+complete. The folder must contain exactly one each of calc_*.py and
+calc_*.in files, and there must be a corresponding record in the database.
+If not, the calculation instance is moved to an orphan directory.</p>
+</li>
+<li><p class="first">The calculation instance is executed as a subprocess by running the
+identified calc_*.py script and passing it the calc_*.in file and the
+calculation instance’s unique key as arguments.</p>
+</li>
+<li><p class="first">If the calculation successfully finishes, then the generated results.json
+file is uploaded to the database.</p>
+</li>
+<li><p class="first">If the calculation issues an error, then the record for the calculation
+instance is updated by changing “status” to “error” and saving the Python
+error message to an “error” element.</p>
+</li>
+<li><p class="first">The folder for the finished calculation instance is archived as a .tar.gz
+file and uploaded to the database. The calculation instance is deleted from
+the run_directory, with the <a href="#id9"><span class="problematic" id="id10">*</span></a>.bid file being deleted last to help prevent
+runner collisions.</p>
+</li>
+<li><p class="first">Steps 1-8 are repeated until either the run_directory is empty or the
+runner fails ten bids in a row.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="runner-log-files">
+<h2>Runner log files<a class="headerlink" href="#runner-log-files" title="Permalink to this headline">¶</a></h2>
+<p>When a runner is started, it will create a .log file in the runner-logs/
+directory of iprPy. Each runner log file will be uniquely named based on the
+date and time that the runner was started. As the runner proceeds, it will
+append information to the log file, flushing after each line to ensure that
+the log files are up to date. The information listed in the log file includes:</p>
+<ul class="simple">
+<li>The key for any calculation instance that the runner succeeds at bidding
+for.</li>
+<li>Information about if any parent records needed to be updated or if any
+parent calculation instances needed to be performed.</li>
+<li>A message if the calculation instance was successful, moved to the orphan
+directory, or issued an error. For the errors, the corresponding Python
+error message is also added.</li>
+</ul>
+</div>
 </div>
 
 
@@ -78,12 +214,29 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Runner</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#starting-runners">Starting runners</a><ul>
+<li><a class="reference internal" href="#runner-script">Runner script</a></li>
+<li><a class="reference internal" href="#inline-command">Inline command</a></li>
+<li><a class="reference internal" href="#call-from-python">Call from Python</a></li>
+<li><a class="reference internal" href="#submitting-to-a-queue">Submitting to a queue</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#full-process">Full process</a></li>
+<li><a class="reference internal" href="#runner-log-files">Runner log files</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="prepare.html"
-                        title="previous chapter">Prepare functions</a></p>
+                        title="previous chapter">Prepare</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="inline.html"
-                        title="next chapter">Inline Commands</a></p>
+                        title="next chapter">Other High-Throughput Tools</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -115,10 +268,10 @@
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="inline.html" title="Inline Commands"
+          <a href="inline.html" title="Other High-Throughput Tools"
              >next</a> |</li>
         <li class="right" >
-          <a href="prepare.html" title="Prepare functions"
+          <a href="prepare.html" title="Prepare"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >iprPy Tutorial</a> &#187;</li>

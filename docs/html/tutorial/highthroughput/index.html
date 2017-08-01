@@ -27,7 +27,7 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="iprPy Classes" href="classes.html" />
+    <link rel="next" title="Quick Start" href="quickstart.html" />
     <link rel="prev" title="Reference Library" href="../library.html" /> 
   </head>
   <body role="document">
@@ -41,7 +41,7 @@
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="classes.html" title="iprPy Classes"
+          <a href="quickstart.html" title="Quick Start"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="../library.html" title="Reference Library"
@@ -58,26 +58,64 @@
             
   <div class="section" id="high-throughput-calculations">
 <h1>High-Throughput Calculations<a class="headerlink" href="#high-throughput-calculations" title="Permalink to this headline">¶</a></h1>
-<p>(OLD...)</p>
-<p>A number of scripts for running calculations in a high-throughput manner can be found in the ‘iprPy/high-throughput-scripts’ directory. This directory has subdirectories
-- ‘prepare’ contains scripts that create multiple instances of different calculations
-- ‘runner’ contains a script for automatically running the calculations, and other associated files.
-prepare scripts</p>
-<p>Each calculation currently has its own prepare script associated with it. Initially, one master prepare script was planned, but it ended up having too much overhead and complexity to effectively work.</p>
-<p>All the prepare scripts are contained in subdirectories named after the calculations themselves. They can be executed by calling the script as a command with an input file as an argument. While each prepare script has its own unique combinatorial logic and input parameters, numerous utility functions are built into iprPy to allow for common feels and behaviors.</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Designing the calculations to be independent units of work that read standard
+input files makes performing the calculations in high-throughput incredibly
+simple.  All you have to do is execute the same calculation scripts with
+different input files.  And with the calculation results being reported in
+XML/JSON, the accumulated data can automatically be uploaded into a database.</p>
+<p>With iprPy, performing calculations in high-throughput is a two-step process.</p>
+<ol class="arabic simple">
+<li>You <a class="reference internal" href="prepare.html"><span class="doc">prepared</span></a> a calculation.  This creates multiple
+instances of the calculation within a specified &#8220;run_directory&#8221;.  Each
+instance is a folder containing a copy of the calculation&#8217;s script, a
+unique input parameter file, and any other files required to perform the
+calculation.  Additionally, an incomplete record associated with each
+calculation instance is added to a database.</li>
+<li>You start one or more <a class="reference internal" href="runner.html"><span class="doc">runners</span></a>.  Each runner operates on a
+single &#8220;run_directory&#8221; systematically performing one prepared calculation
+instance after another.  When each calculation finishes, successfully or
+unsuccessfully, the corresponding record in the database is updated and the
+calculation instance’s folder is archived and added to the database.</li>
+</ol>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="classes.html">iprPy Classes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="classes.html#calculations">Calculations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classes.html#records">Records</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classes.html#databases">Databases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classes.html#calculation">Calculation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classes.html#record">Record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classes.html#database">Database</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="prepare.html">Prepare functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="runner.html">Runner</a></li>
-<li class="toctree-l1"><a class="reference internal" href="inline.html">Inline Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prepare.html">Prepare</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="prepare.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prepare.html#notes-on-run-directory-naming">Notes on run_directory naming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prepare.html#how-to-prepare">How to prepare</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prepare.html#prepare-parameters">Prepare parameters</a></li>
 </ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="runner.html">Runner</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="runner.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="runner.html#starting-runners">Starting runners</a></li>
+<li class="toctree-l2"><a class="reference internal" href="runner.html#full-process">Full process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="runner.html#runner-log-files">Runner log files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="inline.html">Other High-Throughput Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="inline.html#build">build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inline.html#check">check</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inline.html#check-modules">check_modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inline.html#clean">clean</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inline.html#copy">copy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inline.html#destroy">destroy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inline.html#set">set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inline.html#unset">unset</a></li>
+</ul>
+</li>
+</ul>
+</div>
 </div>
 </div>
 
@@ -87,12 +125,20 @@ prepare scripts</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">High-Throughput Calculations</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="../library.html"
                         title="previous chapter">Reference Library</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="classes.html"
-                        title="next chapter">iprPy Classes</a></p>
+  <p class="topless"><a href="quickstart.html"
+                        title="next chapter">Quick Start</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -124,7 +170,7 @@ prepare scripts</p>
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="classes.html" title="iprPy Classes"
+          <a href="quickstart.html" title="Quick Start"
              >next</a> |</li>
         <li class="right" >
           <a href="../library.html" title="Reference Library"
