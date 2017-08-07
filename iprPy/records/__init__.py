@@ -1,5 +1,20 @@
+"""
+Attributes
+----------
+
+failed_records : list of str
+    List of all of the record styles that failed to load.
+records_dict : dict
+    Dictionary of the record styles that successfully loaded. The
+    dictionary keys are the record style names, and the values are the
+    loaded modules.
+"""
+from __future__ import division, absolute_import, print_function
+
 import os
 import importlib
+
+__all__ = ['failed_records', 'records_dict']
 
 failed_records = []
 

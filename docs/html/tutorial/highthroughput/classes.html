@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>iprPy Classes &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Prepare" href="prepare.html" />
+    <link rel="prev" title="Quick Start" href="quickstart.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="prepare.html" title="Prepare"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quick Start"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >iprPy Tutorial</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">High-Throughput Calculations</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="iprpy-classes">
+<h1>iprPy Classes<a class="headerlink" href="#iprpy-classes" title="Permalink to this headline">¶</a></h1>
+<p>The iprPy framework handles high-throughput calculations through the
+interaction three different classes.  Each class specifies common interaction
+methods that are then defined for different styles that can be modularly
+added.</p>
+<p>The current methods and attributes for the classes can be found in the
+<code class="xref any docutils literal"><span class="pre">../modules/iprPy</span></code> documentation.</p>
+<div class="section" id="calculation">
+<h2>Calculation<a class="headerlink" href="#calculation" title="Permalink to this headline">¶</a></h2>
+<p>The iprPy.Calculation class allows for information from the implemented
+calculations to be accessed by the iprPy package codebase.  The
+<code class="xref any docutils literal"><span class="pre">../calcuations/index</span></code> correspond to the names of the implemented
+calculations.</p>
+<p>The methods and attributes of the Calculation class are primarily centered
+around the high-throughput <a class="reference internal" href="prepare.html"><span class="doc">prepare</span></a> step.  In particular, each
+calculation defines its own prepare method, and that prepare method requires
+information and metadata associated with the calculation script.</p>
+</div>
+<div class="section" id="record">
+<h2>Record<a class="headerlink" href="#record" title="Permalink to this headline">¶</a></h2>
+<p>Objects of the iprPy.Record class represent a single XML/JSON record used or
+produced by the framework.  Each record features three primary attributes:
+<em>style</em>, <em>content</em>, and <em>name</em>.  Each unique schema is implemented as a
+different Record style. The Record’s content is the XML string representation
+of the underlying record. Finally, the Record’s name is used in saving the
+content to a database and should correspond to the primary “key” or “id” field
+in the content.</p>
+<p>By making a Record style for each schema, it is possible to define specific
+actions in creating and comparing Records, and in converting the multi-tiered
+structure to a simpler, flatter structure.</p>
+<p><strong>Note</strong>: Each Calculation style is associated with a single Record style to
+represent it, but each Record style does not have to be exclusive to a
+particular Calculation style.  As an example, both the LAMMPS_ELASTIC and
+refine_structure Calculation styles produce their results as Records of the
+calculation_relax_structure style.</p>
+</div>
+<div class="section" id="database">
+<h2>Database<a class="headerlink" href="#database" title="Permalink to this headline">¶</a></h2>
+<p>The iprPy.Database class provides commonly-named database interaction methods
+for different styles of databases.  This includes adding, retrieving,
+deleting, and modifying records and tar archives to/from a given database. In
+the case of record interactions, the Database methods take or return Record
+objects.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">iprPy Classes</a><ul>
+<li><a class="reference internal" href="#calculation">Calculation</a></li>
+<li><a class="reference internal" href="#record">Record</a></li>
+<li><a class="reference internal" href="#database">Database</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="quickstart.html"
+                        title="previous chapter">Quick Start</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="prepare.html"
+                        title="next chapter">Prepare</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/tutorial/highthroughput/classes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="prepare.html" title="Prepare"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quick Start"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >iprPy Tutorial</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >High-Throughput Calculations</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

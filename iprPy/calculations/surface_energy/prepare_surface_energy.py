@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Standard library imports
-from __future__ import print_function, division
+from __future__ import division, absolute_import, print_function
 import os
 import sys
 import glob
@@ -28,10 +28,10 @@ import iprPy
 
 # Define calc_style and record_style
 calc_style = 'surface_energy'
-record_style = 'calculation-surface-energy'
+record_style = 'calculation_surface_energy'
 
 def main(*args):
-    """main function called when script is executed directly"""
+    """Main function called when script is executed directly."""
     
     # Read input script
     with open(args[0]) as f:
@@ -47,24 +47,36 @@ def main(*args):
     prepare(dbase, run_directory, **input_dict)
     
 def prepare(dbase, run_directory, **kwargs):
-    """high-throughput prepare function for the calculation"""
+    """
+    High-throughput prepare function for the calculation.
+    
+    Parameters
+    ----------
+    dbase : iprPy.Database
+        The database to access and create new records for.
+    run_directory : str
+        The path to the local directory where the prepared calculation
+        instances will be placed.
+    **kwargs
+        Arbitrary keyword arguments.
+    """
     
     # Initialize Calculation instance
     calculation = iprPy.Calculation(calc_style)
     
     # Build record_df
-    record_df = build_record_df(dbase, record_style)
+    record_df = dbase.get_records_df(record_style, full=False, flat=True)
     
     # Build potential dictionaries (single dbase access)
     pot_record_dict = {}
     pot_tar_dict = {}
-    for pot_record in dbase.iget_records(style='potential-LAMMPS'):
+    for pot_record in dbase.iget_records(style='potential_LAMMPS'):
         pot_record_dict[pot_record.name] = pot_record
         
     # Build defect model record dictionary and df (single dbase access)
     defect_record_dict = {}
     defect_record_df = []
-    for defect_record in dbase.iget_records(style='free-surface'):
+    for defect_record in dbase.iget_records(style='free_surface'):
         defect_record_dict[defect_record.name] = defect_record
         defect_record_df.append(defect_record.todict())
     defect_record_df = pd.DataFrame(defect_record_df)
@@ -79,11 +91,12 @@ def prepare(dbase, run_directory, **kwargs):
     if 'parent_records' in kwargs:
         parent_records = kwargs['parent_records']
     else:
-        parent_records = iprPy.prepare.icalculations(dbase, 
-                                                     record_style = 'calculation-system-relax',
-                                                     symbol =       kwargs.get('symbol_name', None), 
-                                                     family =       kwargs.get('family_name', None),
-                                                     potential =    kwargs.get('potential_name', None))
+        parent_records = iprPy.prepare.icalculations(dbase,
+                            record_style = 'calculation_system_relax',
+                            symbol = kwargs.get('symbol_name', None),
+                            family = kwargs.get('family_name', None),
+                            potential = kwargs.get('potential_name', None))
+    
     # Loop over parent records
     for parent_record in parent_records:
         parent_dict = parent_record.todict()
@@ -111,17 +124,17 @@ def prepare(dbase, run_directory, **kwargs):
             # Define values for calc_*.in file
             calc_dict = {}
             
-            calc_dict['potential_file'] =       pot_record.name + '.xml'
-            calc_dict['potential_dir'] =        pot_record.name
-            calc_dict['potential_content'] =    pot_record.content
+            calc_dict['potential_file'] = pot_record.name + '.xml'
+            calc_dict['potential_dir'] = pot_record.name
+            calc_dict['potential_content'] = pot_record.content
             
-            calc_dict['load_file'] =            parent_record.name+'.xml'
-            calc_dict['load_style'] =           'system_model'
-            calc_dict['load_content'] =         parent_record.content
-            calc_dict['load_options'] =         'key relaxed-atomic-system'
+            calc_dict['load_file'] = parent_record.name+'.xml'
+            calc_dict['load_style'] = 'system_model'
+            calc_dict['load_content'] = parent_record.content
+            calc_dict['load_options'] = 'key relaxed-atomic-system'
 
-            calc_dict['surface_model'] =    defect_record.name+'.xml'
-            calc_dict['surface_content'] =  defect_record.content
+            calc_dict['surface_model'] = defect_record.name+'.xml'
+            calc_dict['surface_content'] = defect_record.content
             
             for key in singularkeys():
                 if key in kwargs:
@@ -130,8 +143,12 @@ def prepare(dbase, run_directory, **kwargs):
             # Build incomplete record
             input_dict = deepcopy(calc_dict)
             calculation.process_input(input_dict, calc_key, build=False)
-            model = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict)
-            new_record = iprPy.Record(name=calc_key, content=model.xml(), style=record_style)
+            model = iprPy.buildmodel(record_style,
+                                     'calc_' + calc_style,
+                                     input_dict)
+            new_record = iprPy.Record(name=calc_key,
+                                      content=model.xml(),
+                                      style=record_style)
             
             # Check if record is new
             if new_record.isnew(record_df=record_df):
@@ -144,7 +161,7 @@ def prepare(dbase, run_directory, **kwargs):
                 # Add record to database
                 dbase.add_record(record=new_record)
                 
-                # Generate calculation folder    
+                # Generate calculation folder
                 calc_directory = os.path.join(run_directory, calc_key)
                 os.makedirs(calc_directory)
                 
@@ -155,7 +172,7 @@ def prepare(dbase, run_directory, **kwargs):
 
                 # Add calculation files to calculation folder
                 for calc_file in calculation.files:
-                    shutil.copy(calc_file, calc_directory)  
+                    shutil.copy(calc_file, calc_directory)
                 
                 # Add potential record file to calculation folder
                 with open(os.path.join(calc_directory, pot_record.name+'.xml'), 'w') as f:
@@ -171,27 +188,37 @@ def prepare(dbase, run_directory, **kwargs):
                 # Add defect record file to calculation folder
                 with open(os.path.join(calc_directory, defect_record.name+'.xml'), 'w') as f:
                     f.write(defect_record.content)
-                    
-def build_record_df(dbase, record_style):
-    """Constructs a pandas.DataFrame for all records in a database of a given record_type"""
-    df = []
-    for record in dbase.iget_records(style=record_style):
-        df.append(record.todict(full=False, flat=True))
-    return pd.DataFrame(df)
     
 def unusedkeys():
-    """List the calc_*.in key terms that are ignored by the prepare function."""
-    return ['symbols',
+    """
+    The calculation input parameters that are not prepare input parameters.
+    
+    Returns
+    -------
+    list of str
+        The list of input parameter keys ignored by prepare.
+    """
+    return [
+            'symbols',
             'box_parameters',
             'x_axis',
             'y_axis',
             'z_axis',
             'atomshift',
-            'surface_cutboxvector']
+            'surface_cutboxvector',
+           ]
             
 def singularkeys():
-    """List the prepare_*.in key terms that are restricted to having only one value."""
-    return ['database',
+    """
+    The prepare input parameters that can be assigned only one value.
+    
+    Returns
+    -------
+    list of str
+        The list of input parameter keys that are limited to singular values.
+    """
+    return [
+            'database',
             'run_directory',
             'lammps_command',
             'mpi_command',
@@ -204,14 +231,24 @@ def singularkeys():
             'length_unit',
             'pressure_unit',
             'energy_unit',
-            'force_unit']
+            'force_unit',
+           ]
 
 def multikeys():
-    """List the prepare_*.in key terms that can have multiple values."""
-    return ['potential_name',
+    """
+    The prepare input parameters that can be assigned multiple values.
+    
+    Returns
+    -------
+    list of str
+        The list of input parameter keys that can have multiple values.
+    """
+    return [
+            'potential_name',
             'symbol_name',
             'family_name',
-            'surface_name']
+            'surface_name',
+           ]
             
 if __name__ == '__main__':
     main(*sys.argv[1:])

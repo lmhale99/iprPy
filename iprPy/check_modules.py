@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import division, absolute_import, print_function
 
 from .calculations import failed_calculations
 from .records import failed_records
@@ -8,8 +8,13 @@ from . import calculation_styles
 from . import record_styles
 from . import database_styles
 
+__all__ = ['check_modules']
+
 def check_modules():
-    """Prints lists of sucessful and failed importing of modular components of iprPy."""
+    """
+    Prints lists of the calculation, record, and database styles that were
+    sucessfully and unsucessfully loaded when iprPy was initialized.
+    """
     
     print('calculations that passed import:')
     for calculation in calculation_styles():

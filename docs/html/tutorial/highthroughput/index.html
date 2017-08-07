@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>High-Throughput Calculations &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Quick Start" href="quickstart.html" />
+    <link rel="prev" title="Reference Library" href="../library.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quick Start"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../library.html" title="Reference Library"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">iprPy Tutorial</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="high-throughput-calculations">
+<h1>High-Throughput Calculations<a class="headerlink" href="#high-throughput-calculations" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Designing the calculations to be independent units of work that read standard
+input files makes performing the calculations in high-throughput incredibly
+simple.  All you have to do is execute the same calculation scripts with
+different input files.  And with the calculation results being reported in
+XML/JSON, the accumulated data can automatically be uploaded into a database.</p>
+<p>With iprPy, performing calculations in high-throughput is a two-step process.</p>
+<ol class="arabic simple">
+<li>You <a class="reference internal" href="prepare.html"><span class="doc">prepared</span></a> a calculation.  This creates multiple
+instances of the calculation within a specified &#8220;run_directory&#8221;.  Each
+instance is a folder containing a copy of the calculation&#8217;s script, a
+unique input parameter file, and any other files required to perform the
+calculation.  Additionally, an incomplete record associated with each
+calculation instance is added to a database.</li>
+<li>You start one or more <a class="reference internal" href="runner.html"><span class="doc">runners</span></a>.  Each runner operates on a
+single &#8220;run_directory&#8221; systematically performing one prepared calculation
+instance after another.  When each calculation finishes, successfully or
+unsuccessfully, the corresponding record in the database is updated and the
+calculation instance’s folder is archived and added to the database.</li>
+</ol>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classes.html">iprPy Classes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="classes.html#calculation">Calculation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classes.html#record">Record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classes.html#database">Database</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="prepare.html">Prepare</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="prepare.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prepare.html#notes-on-run-directory-naming">Notes on run_directory naming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prepare.html#how-to-prepare">How to prepare</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prepare.html#prepare-parameters">Prepare parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="runner.html">Runner</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="runner.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="runner.html#starting-runners">Starting runners</a></li>
+<li class="toctree-l2"><a class="reference internal" href="runner.html#full-process">Full process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="runner.html#runner-log-files">Runner log files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="inline.html">Other High-Throughput Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="inline.html#build">build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inline.html#check">check</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inline.html#check-modules">check_modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inline.html#clean">clean</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inline.html#copy">copy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inline.html#destroy">destroy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inline.html#set">set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inline.html#unset">unset</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">High-Throughput Calculations</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../library.html"
+                        title="previous chapter">Reference Library</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="quickstart.html"
+                        title="next chapter">Quick Start</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/tutorial/highthroughput/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quick Start"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../library.html" title="Reference Library"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >iprPy Tutorial</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

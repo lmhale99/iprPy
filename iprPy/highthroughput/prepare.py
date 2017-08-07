@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-from __future__ import print_function
+from __future__ import division, absolute_import, print_function
 import sys
 
 import iprPy
 
 def main(*args):
-    """main function called when script is executed directly"""
+    """Main function called when script is executed directly."""
     
     # Read input file in as dictionary
     with open(args[0]) as f:
@@ -19,7 +19,7 @@ def main(*args):
     run_directory = input_dict.pop('run_directory')
     calc_style = input_dict.pop('calculation_style')
     
-    #Call prepare
+    # Call prepare
     prepare(dbase, run_directory, calc_style=calc_style, input_dict=input_dict)
     
 def prepare(dbase, run_directory, input_file=None, calc_style=None, input_dict=None):
@@ -49,7 +49,14 @@ def prepare(dbase, run_directory, input_file=None, calc_style=None, input_dict=N
     calc.prepare(dbase, run_directory, **input_dict)
     
 def process_input(input_dict):
-    """Processes the prepare_*.in input commands"""
+    """
+    Processes the input parameter terms.
+    
+    Parameters
+    ----------
+    input_dict : dict
+        Dictionary of input parameter terms.
+    """
     
     input_dict['dbase'] = iprPy.database_fromdict(input_dict)
     input_dict['run_directory'] = os.path.abspath(input_dict['run_directory'])

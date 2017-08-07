@@ -1,0 +1,572 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>iprPy.database_functions &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for iprPy.database_functions</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="kn">from</span> <span class="nn">.databases</span> <span class="k">import</span> <span class="n">databases_dict</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;database_styles&#39;</span><span class="p">,</span> <span class="s1">&#39;database_fromdict&#39;</span><span class="p">,</span> <span class="s1">&#39;Database&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="database_styles"><a class="viewcode-back" href="../../modules/iprPy.html#iprPy.database_styles">[docs]</a><span class="k">def</span> <span class="nf">database_styles</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of str</span>
+<span class="sd">        All database styles successfully loaded.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">databases_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+    
+<div class="viewcode-block" id="database_fromdict"><a class="viewcode-back" href="../../modules/iprPy.html#iprPy.database_fromdict">[docs]</a><span class="k">def</span> <span class="nf">database_fromdict</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">database_key</span><span class="o">=</span><span class="s1">&#39;database&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initializes a Database object based on &#39;database_*&#39; terms contained within</span>
+<span class="sd">    a dictionary.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_dict : dict</span>
+<span class="sd">        Dictionary of input parameter terms including &#39;database&#39; and any other</span>
+<span class="sd">        necessary &#39;database_*&#39; keys to fully initialize a Database object.</span>
+<span class="sd">    database_key : str, optional</span>
+<span class="sd">        Defines the base string for identifying the database keys.  Useful if</span>
+<span class="sd">        multiple database definitions are needed.  (Default is &#39;database&#39;).</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    iprPy.Database</span>
+<span class="sd">        Database object initialized from input_dict database keys.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Split &#39;database&#39; into style and name </span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="n">database_key</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">db_style</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">db_name</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">db_style</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    
+    <span class="c1"># Extract all &#39;database_*&#39; terms</span>
+    <span class="n">db_terms</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">input_dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span><span class="p">[:</span><span class="mi">9</span><span class="p">]</span> <span class="o">==</span> <span class="n">database_key</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span><span class="p">:</span>
+            <span class="n">db_terms</span><span class="p">[</span><span class="n">key</span><span class="p">[</span><span class="mi">9</span><span class="p">:]]</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">Database</span><span class="p">(</span><span class="n">db_style</span><span class="p">,</span> <span class="n">db_name</span><span class="p">,</span> <span class="o">**</span><span class="n">db_terms</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="Database"><a class="viewcode-back" href="../../modules/iprPy.html#iprPy.Database">[docs]</a><span class="k">class</span> <span class="nc">Database</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for handling different database styles in the same fashion.  The</span>
+<span class="sd">    class defines the common methods and attributes, which are then uniquely</span>
+<span class="sd">    implemented for each style.  The available styles are loaded from the</span>
+<span class="sd">    iprPy.databases submodule.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a connection to a database.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        style : str</span>
+<span class="sd">            The database style.</span>
+<span class="sd">        host : str</span>
+<span class="sd">            The host name (path, url, etc.) for the database.</span>
+<span class="sd">        *args, **kwargs : optional</span>
+<span class="sd">            Any additional terms necessary to gain access to the host</span>
+<span class="sd">            database.  See the specific styles for allowed terms.</span>
+<span class="sd">            </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            If the database style is not available.</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            If initialize is not defined for database style.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="c1">#Check if database style exists</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__db_module</span> <span class="o">=</span> <span class="n">databases_dict</span><span class="p">[</span><span class="n">style</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;No database style &#39;</span> <span class="o">+</span> <span class="n">style</span> <span class="o">+</span> <span class="s1">&#39; imported&#39;</span><span class="p">)</span>
+        
+        <span class="c1">#Check if database style has initialize method</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">initialize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__db_module</span><span class="o">.</span><span class="n">initialize</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Database (&#39;</span> <span class="o">+</span> <span class="n">style</span> 
+                                 <span class="o">+</span> <span class="s1">&#39;) has no attribute initialize&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__db_info</span> <span class="o">=</span> <span class="n">initialize</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="c1">#Set property values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__style</span> <span class="o">=</span> <span class="n">style</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__host</span> <span class="o">=</span> <span class="n">host</span>
+    
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The string representation of the database: </span>
+<span class="sd">            iprPy.Database (&lt;style&gt;) at &lt;host&gt;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;iprPy.Database (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span> <span class="o">+</span> <span class="s1">&#39;) at &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">style</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;str: The database&#39;s style.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__style</span>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">host</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;str: The database&#39;s host.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__host</span>
+    
+<div class="viewcode-block" id="Database.iget_records"><a class="viewcode-back" href="../../modules/iprPy.html#iprPy.Database.iget_records">[docs]</a>    <span class="k">def</span> <span class="nf">iget_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Iterates through matching records in the database.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str, optional</span>
+<span class="sd">            The record name or id to limit the search by.</span>
+<span class="sd">        style : str, optional</span>
+<span class="sd">            The record style to limit the search by.</span>
+<span class="sd">            </span>
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        iprPy.Record</span>
+<span class="sd">            Each record from the database matching the given parameters.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            If iget_records is not defined for database style.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">iget_records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__db_module</span><span class="o">.</span><span class="n">iget_records</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Database (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span> 
+                                 <span class="o">+</span> <span class="s1">&#39;) has no attribute iget_records&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">iget_records</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__db_info</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Database.get_records"><a class="viewcode-back" href="../../modules/iprPy.html#iprPy.Database.get_records">[docs]</a>    <span class="k">def</span> <span class="nf">get_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Produces a list of all matching records in the database.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str, optional</span>
+<span class="sd">            The record name or id to limit the search by.</span>
+<span class="sd">        style : str, optional</span>
+<span class="sd">            The record style to limit the search by.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        ------</span>
+<span class="sd">        list of iprPy.Records</span>
+<span class="sd">            All records from the database matching the given parameters.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            If get_records is not defined for database style.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">get_records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__db_module</span><span class="o">.</span><span class="n">get_records</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Database (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span> 
+                                 <span class="o">+</span> <span class="s1">&#39;) has no attribute get_records&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">get_records</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__db_info</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="Database.get_record"><a class="viewcode-back" href="../../modules/iprPy.html#iprPy.Database.get_record">[docs]</a>    <span class="k">def</span> <span class="nf">get_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a single matching record from the database.  Issues an error</span>
+<span class="sd">        if multiple or no matching records are found.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str, optional</span>
+<span class="sd">            The record name or id to limit the search by.</span>
+<span class="sd">        style : str, optional</span>
+<span class="sd">            The record style to limit the search by.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        ------</span>
+<span class="sd">        iprPy.Record</span>
+<span class="sd">            The single record from the database matching the given parameters.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            If get_record is not defined for database style.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">get_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__db_module</span><span class="o">.</span><span class="n">get_record</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Database (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span>
+                                 <span class="o">+</span> <span class="s1">&#39;) has no attribute get_record&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">get_record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__db_info</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="Database.get_records_df"><a class="viewcode-back" href="../../modules/iprPy.html#iprPy.Database.get_records_df">[docs]</a>    <span class="k">def</span> <span class="nf">get_records_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Produces a pandas.DataFrame of all matching records in the database.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        style : str</span>
+<span class="sd">            The record style to collect records of.</span>
+<span class="sd">        full : bool, optional</span>
+<span class="sd">            Flag used by the calculation records.  A True value will include</span>
+<span class="sd">            terms for both the calculation&#39;s input and results, while a value</span>
+<span class="sd">            of False will only include input terms (Default is True).</span>
+<span class="sd">        flat : bool, optional</span>
+<span class="sd">            Flag affecting the format of the dictionary terms.  If True, the</span>
+<span class="sd">            dictionary terms are limited to having only str, int, and float</span>
+<span class="sd">            values, which is useful for comparisons.  If False, the term</span>
+<span class="sd">            values can be of any data type, which is convenient for analysis.</span>
+<span class="sd">            (Default is False).</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        ------</span>
+<span class="sd">        pandas.DataFrame</span>
+<span class="sd">            All records from the database of the given record style.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">df</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iget_records</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">):</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">todict</span><span class="p">(</span><span class="n">full</span><span class="o">=</span><span class="n">full</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="n">flat</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="Database.add_record"><a class="viewcode-back" href="../../modules/iprPy.html#iprPy.Database.add_record">[docs]</a>    <span class="k">def</span> <span class="nf">add_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a new record to the database.  Will issue an error if a</span>
+<span class="sd">        matching record already exists in the database.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        record : iprPy.Record, optional</span>
+<span class="sd">            The new record to add to the database.  If not given, then name,</span>
+<span class="sd">            style and content are required.</span>
+<span class="sd">        name : str, optional</span>
+<span class="sd">            The name to assign to the new record.  Required if record is not</span>
+<span class="sd">            given.</span>
+<span class="sd">        style : str, optional</span>
+<span class="sd">            The record style for the new record.  Required if record is not</span>
+<span class="sd">            given.</span>
+<span class="sd">        content : str, optional</span>
+<span class="sd">            The xml content of the new record.  Required if record is not</span>
+<span class="sd">            given.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        ------</span>
+<span class="sd">        iprPy.Record</span>
+<span class="sd">            Either the given record or a record composed of the name, style,</span>
+<span class="sd">            and content.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            If add_record is not defined for database style.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">add_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__db_module</span><span class="o">.</span><span class="n">add_record</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Database (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span>
+                                 <span class="o">+</span> <span class="s1">&#39;) has no attribute add_record&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">add_record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__db_info</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                              <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="Database.update_record"><a class="viewcode-back" href="../../modules/iprPy.html#iprPy.Database.update_record">[docs]</a>    <span class="k">def</span> <span class="nf">update_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Replaces an existing record with a new record of matching name and</span>
+<span class="sd">        style, but new content.  Will issue an error if exactly one</span>
+<span class="sd">        matching record is not found in the databse.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        record : iprPy.Record, optional</span>
+<span class="sd">            The record with new content to update in the database.  If not</span>
+<span class="sd">            given, content is required along with name and/or style to</span>
+<span class="sd">            uniquely define a record to update.</span>
+<span class="sd">        name : str, optional</span>
+<span class="sd">            The name to uniquely identify the record to update.</span>
+<span class="sd">        style : str, optional</span>
+<span class="sd">            The style of the record to update.</span>
+<span class="sd">        content : str, optional</span>
+<span class="sd">            The new xml content to use for the record.  Required if record is</span>
+<span class="sd">            not given.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        ------</span>
+<span class="sd">        iprPy.Record</span>
+<span class="sd">            Either the given record or a record composed of the name, style,</span>
+<span class="sd">            and content.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            If update_record is not defined for database style.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">update_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__db_module</span><span class="o">.</span><span class="n">update_record</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Database (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span>
+                                 <span class="o">+</span> <span class="s1">&#39;) has no attribute update_record&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">update_record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__db_info</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                                 <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span></div>
+          
+<div class="viewcode-block" id="Database.delete_record"><a class="viewcode-back" href="../../modules/iprPy.html#iprPy.Database.delete_record">[docs]</a>    <span class="k">def</span> <span class="nf">delete_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Permanently deletes a record from the database.  Will issue an error</span>
+<span class="sd">        if exactly one matching record is not found in the database.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        record : iprPy.Record, optional</span>
+<span class="sd">            The record to delete from the database.  If not given, name and/or</span>
+<span class="sd">            style are needed to uniquely define the record to delete.</span>
+<span class="sd">        name : str, optional</span>
+<span class="sd">            The name of the record to delete.</span>
+<span class="sd">        style : str, optional</span>
+<span class="sd">            The style of the record to delete.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            If delete_record is not defined for database style.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">delete_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__db_module</span><span class="o">.</span><span class="n">delete_record</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Database (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span>
+                                 <span class="o">+</span> <span class="s1">&#39;) has no attribute delete_record&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">delete_record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__db_info</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                          <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="Database.get_tar"><a class="viewcode-back" href="../../modules/iprPy.html#iprPy.Database.get_tar">[docs]</a>    <span class="k">def</span> <span class="nf">get_tar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrives the tar archive associated with a record in the database.</span>
+<span class="sd">        Issues an error if exactly one matching record is not found in the</span>
+<span class="sd">        database.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        record : iprPy.Record, optional</span>
+<span class="sd">            The record to retrive the associated tar archive for.</span>
+<span class="sd">        name : str, optional</span>
+<span class="sd">            .The name to use in uniquely identifying the record.</span>
+<span class="sd">        style : str, optional</span>
+<span class="sd">            .The style to use in uniquely identifying the record.</span>
+<span class="sd">        raw : bool, optional</span>
+<span class="sd">            If True, return the archive as raw binary content. If</span>
+<span class="sd">            False, return as an open tarfile. (Default is False)</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tarfile or str</span>
+<span class="sd">            The tar archive as an open tarfile if raw=False, or as a binary</span>
+<span class="sd">            str if raw=True.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            If get_tar is not defined for database style.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">get_tar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__db_module</span><span class="o">.</span><span class="n">get_tar</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Database (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span>
+                                 <span class="o">+</span> <span class="s1">&#39;) has no attribute get_tar&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">get_tar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__db_info</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                           <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="n">raw</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="Database.add_tar"><a class="viewcode-back" href="../../modules/iprPy.html#iprPy.Database.add_tar">[docs]</a>    <span class="k">def</span> <span class="nf">add_tar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Archives and stores a folder associated with a record.  Issues an</span>
+<span class="sd">        error if exactly one matching record is not found in the database, or</span>
+<span class="sd">        the associated record already has a tar archive. The record&#39;s name</span>
+<span class="sd">        must match the name of the directory being archived.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        record : iprPy.Record, optional</span>
+<span class="sd">            The record to associate the tar archive with.  If not given, then</span>
+<span class="sd">            name and/or style necessary to uniquely identify the record are</span>
+<span class="sd">            needed.</span>
+<span class="sd">        name : str, optional</span>
+<span class="sd">            .The name to use in uniquely identifying the record.</span>
+<span class="sd">        style : str, optional</span>
+<span class="sd">            .The style to use in uniquely identifying the record.</span>
+<span class="sd">        root_dir : str, optional</span>
+<span class="sd">            Specifies the root directory for finding the directory to archive.</span>
+<span class="sd">            The directory to archive is at &lt;root_dir&gt;/&lt;name&gt;.  (Default is to</span>
+<span class="sd">            set root_dir to the current working directory.)</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            If add_tar is not defined for database style.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">add_tar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__db_module</span><span class="o">.</span><span class="n">add_tar</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Database (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span>
+                                 <span class="o">+</span> <span class="s1">&#39;) has no attribute add_tar&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">add_tar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__db_info</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+                    <span class="n">root_dir</span><span class="o">=</span><span class="n">root_dir</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="Database.update_tar"><a class="viewcode-back" href="../../modules/iprPy.html#iprPy.Database.update_tar">[docs]</a>    <span class="k">def</span> <span class="nf">update_tar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Replaces an existing tar archive for a record with a new one.  Issues</span>
+<span class="sd">        an error if exactly one matching record is not found in the database.</span>
+<span class="sd">        The record&#39;s name must match the name of the directory being archived.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        record : iprPy.Record, optional</span>
+<span class="sd">            The record to associate the tar archive with.  If not given, then </span>
+<span class="sd">            name and/or style necessary to uniquely identify the record are </span>
+<span class="sd">            needed.</span>
+<span class="sd">        name : str, optional</span>
+<span class="sd">            .The name to use in uniquely identifying the record.</span>
+<span class="sd">        style : str, optional</span>
+<span class="sd">            .The style to use in uniquely identifying the record.</span>
+<span class="sd">        root_dir : str, optional</span>
+<span class="sd">            Specifies the root directory for finding the directory to archive.</span>
+<span class="sd">            The directory to archive is at &lt;root_dir&gt;/&lt;name&gt;.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            If update_tar is not defined for database style.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">update_tar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__db_module</span><span class="o">.</span><span class="n">update_tar</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Database (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span>
+                                 <span class="o">+</span> <span class="s1">&#39;) has no attribute update_tar&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">update_tar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__db_info</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                              <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span> <span class="n">root_dir</span><span class="o">=</span><span class="n">root_dir</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="Database.delete_tar"><a class="viewcode-back" href="../../modules/iprPy.html#iprPy.Database.delete_tar">[docs]</a>    <span class="k">def</span> <span class="nf">delete_tar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deletes a tar file from the database.  Issues an error if exactly one</span>
+<span class="sd">        matching record is not found in the database.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        record : iprPy.Record, optional</span>
+<span class="sd">            The record associated with the tar archive to delete.  If not</span>
+<span class="sd">            given, then name and/or style necessary to uniquely identify</span>
+<span class="sd">            the record are needed.</span>
+<span class="sd">        name : str, optional</span>
+<span class="sd">            .The name to use in uniquely identifying the record.</span>
+<span class="sd">        style : str, optional</span>
+<span class="sd">            .The style to use in uniquely identifying the record.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            If delete_tar is not defined for database style.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">delete_tar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__db_module</span><span class="o">.</span><span class="n">delete_tar</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Database (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span>
+                                 <span class="o">+</span> <span class="s1">&#39;) has no attribute delete_tar&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">delete_tar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__db_info</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

@@ -1,4 +1,13 @@
-from __future__ import print_function
+"""
+iprPy.highthroughput.settings
+-----------------------------
+
+Collects functions that interact with the .iprPy settings file allowing
+database and run_directory information to be stored and easily accessed.
+"""
+
+from __future__ import division, absolute_import, print_function
+
 import os
 import sys
 from DataModelDict import DataModelDict as DM
@@ -6,10 +15,13 @@ from DataModelDict import DataModelDict as DM
 from iprPy import Database, rootdir
 from iprPy.tools import screen_input
 
+__all__ = ['get_database', 'set_database', 'unset_database',
+           'get_run_directory', 'set_run_directory', 'unset_run_directory']
+
 settingsfile = os.path.join(rootdir, '.iprPy')
 
 def load_settings():
-    """Loads the .iprPy settings file"""
+    """Loads the .iprPy settings file."""
     
     #Load settings file if it exists
     try:
@@ -25,7 +37,7 @@ def load_settings():
     return settings
 
 def save_settings(settings):
-    """Saves settings to the .iprPy settings file"""
+    """Saves to the .iprPy settings file."""
     
     #Verify settings is appropriate
     if not isinstance(settings, DM) or settings.keys()[0] != 'iprPy-defined-parameters':
@@ -36,7 +48,19 @@ def save_settings(settings):
         settings.json(fp=f, indent=4)
     
 def get_database(name=None):
-    """Loads a pre-defined database from the settings file"""
+    """
+    Loads a pre-defined database from the settings file.
+    
+    Parameters
+    ----------
+    name : str
+        The name assigned to a pre-defined database.
+    
+    Returns
+    -------
+    iprPy.Database
+        The identified database.
+    """
     
     #Get information from settings file
     settings = load_settings()
@@ -77,7 +101,23 @@ def get_database(name=None):
     return Database(style, host, **params)
         
 def set_database(name=None, style=None, host=None):
-    """Allows for database access information to be saved in a settings file"""
+    """
+    Allows for database information to be defined in the settings file. Screen
+    prompts will be given to allow any necessary database parameters to be
+    entered.
+    
+    Parameters
+    ----------
+    name : str, optional
+        The name to assign to the database. If not given, the user will be
+        prompted to enter one.
+    style : str, optional
+        The database style associated with the database. If not given, the
+        user will be prompted to enter one.
+    host : str, optional
+        The database host (directory path or url) where the database is
+        located. If not given, the user will be prompted to enter one.
+    """
     
     #Get information from the settings file
     settings = load_settings()
@@ -90,28 +130,35 @@ def set_database(name=None, style=None, host=None):
         name = screen_input('Enter a name for the database:')
         
     #Load database if it exists
-    try: database_settings = settings.find('database', yes={'name':name})
-    
-    #Create new database entry if it doesn't exist    
+    try: 
+        database_settings = settings.find('database', yes={'name':name})
+
+    #Create new database entry if it doesn't exist
     except: 
         database_settings = DM()
-        settings['iprPy-defined-parameters'].append('database', database_settings)
-        database_settings['name'] = name        
+        settings['iprPy-defined-parameters'].append('database',
+                                                    database_settings)
+        database_settings['name'] = name
     
-    #Ask if existing database should be overwritten    
+    #Ask if existing database should be overwritten
     else: 
         print('Database', name, 'already defined.')
         option = screen_input('Overwrite? (yes or no):')
-        if option in ['yes', 'y']:  pass
-        elif option in ['no', 'n']: return None
-        else: raise ValueError('Invalid choice')
+        if option in ['yes', 'y']:
+            pass
+        elif option in ['no', 'n']: 
+            return None
+        else: 
+            raise ValueError('Invalid choice')
             
     #Ask for style if not given
-    if style is None: style = screen_input("Enter the database's style:")
+    if style is None: 
+        style = screen_input("Enter the database's style:")
     database_settings['style'] = style
     
     #Ask for host if not given
-    if host is None:  host = screen_input("Enter the database's host:")
+    if host is None:
+        host = screen_input("Enter the database's host:")
     database_settings['host'] = host
     
     print('Enter any other database parameters as key, value')
@@ -119,15 +166,22 @@ def set_database(name=None, style=None, host=None):
     
     while True:
         key = screen_input('key:')
-        if key == '': break
+        if key == '': 
+            break
         value = screen_input('value:')
         database_settings.append('params', DM([(key, value)]))
         
     save_settings(settings)
 
 def unset_database(name=None):
-    """Removes a pre-defined database from the settings file"""
+    """
+    Deletes the settings for a pre-defined database from the settings file.
     
+    Parameters
+    ----------
+    name : str
+        The name assigned to a pre-defined database.
+    """
     #Get information from settings file
     settings = load_settings()
     
@@ -174,7 +228,19 @@ def unset_database(name=None):
         print('Settings for database', name, 'successfully deleted')
     
 def get_run_directory(name=None):
-    """Loads a pre-defined run_directory from the settings file"""
+    """
+    Loads a pre-defined run_directory from the settings file.
+    
+    Parameters
+    ----------
+    name : str
+        The name assigned to a pre-defined run_directory.
+    
+    Returns
+    -------
+    str
+        The path to the identified run_directory.
+    """
     
     #Get information from settings file
     settings = load_settings()
@@ -207,7 +273,18 @@ def get_run_directory(name=None):
     return run_directory_settings['path']
         
 def set_run_directory(name=None, path=None):
-    """Allows for run_directory information to be saved in a settings file"""
+    """
+    Allows for run_directory information to be defined in the settings file.
+    
+    Parameters
+    ----------
+    name : str, optional
+        The name to assign to the run_directory.  If not given, the user will
+        be prompted to enter one.
+    path : str, optional
+        The directory path for the run_directory.  If not given, the user will
+        be prompted to enter one.
+    """
     
     #Get information from the settings file
     settings = load_settings()
@@ -243,7 +320,15 @@ def set_run_directory(name=None, path=None):
     save_settings(settings)
     
 def unset_run_directory(name=None):
-    """Removes a pre-defined run_directory from the settings file"""
+    """
+    Deletes the settings for a pre-defined run_directory from the settings
+    file.
+    
+    Parameters
+    ----------
+    name : str
+        The name assigned to a pre-defined run_directory.
+    """
     
     #Get information from settings file
     settings = load_settings()

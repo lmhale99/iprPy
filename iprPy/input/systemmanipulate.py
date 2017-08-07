@@ -1,3 +1,5 @@
+from __future__ import division, absolute_import, print_function
+
 from copy import deepcopy
 
 import numpy as np
@@ -5,46 +7,56 @@ import atomman as am
 
 def systemmanipulate(input_dict, build=True, **kwargs):
     """
-    Creates an initialsystem by manipulating a ucell system with the rotation 
-    specified by axes terms, atomic shift specified by atomshift, and 
-    system supersizing by sizemults.
+    Interprets calculation parameters associated with manupulating a ucell
+    system to produce an initialsystem system.
     
-    The input_dict keys used by this function (which can be renamed using the 
+    The input_dict keys used by this function (which can be renamed using the
     function's keyword arguments):
-    ucell -- unmodified system to manipulate
-    x_axis, y_axis, z_axis -- three orthogonal axes vectors by which to rotate
-    atomshift -- scaled vector to shift all atoms by
-    sizemults -- 3x2 array of ints indicating how to create a supercell
-    axes -- a 3x3 array containing all three axis terms
-    initialsystem -- the resulting system after manipulation is saved here
-       
-    Argument:
-    input_dict -- dictionary containing input parameter key-value pairs
     
-    Keyword Arguments:
-    build -- boolean indicating if initialsystem should be built. If False,
-             parameters will be interpreted, but the system won't be created. 
-             Default value is True.
-    ucell -- replacement parameter key name for 'ucell'
-    x_axis -- replacement parameter key name for 'x_axis'
-    y_axis -- replacement parameter key name for 'y_axis'
-    z_axis -- replacement parameter key name for 'z_axis'
-    atomshift -- replacement parameter key name for 'atomshift'
-    sizemults -- replacement parameter key name for 'sizemults'
-    axes -- replacement parameter key name for 'axes'
-    initialsystem -- replacement parameter key name for 'initialsystem'
-    """   
+    - **'ucell'** unmodified system to manipulate
+    - **'x_axis', 'y_axis', z_axis'** three orthogonal axes vectors by which
+      to rotate.
+    - **'atomshift'** scaled vector to shift all atoms by.
+    - **'sizemults'** 3x2 array of ints indicating how to create a supercell.
+    - **'axes'** a 3x3 array containing all three axis terms.
+    - **'initialsystem'** the resulting system after manipulation is saved
+      here.
+       
+    Parameters
+    ----------
+    input_dict : dict
+        Dictionary containing input parameter key-value pairs.
+    build : bool
+        If False, parameters will be interpreted, but objects won't be built
+        from them (Default is True).
+    ucell : str
+        Replacement parameter key name for 'ucell'.
+    x_axis : str
+        Replacement parameter key name for 'x_axis'.
+    y_axis : str
+        Replacement parameter key name for 'y_axis'.
+    z_axis : str
+        Replacement parameter key name for 'z_axis'.
+    atomshift : str
+        Replacement parameter key name for 'atomshift'.
+    sizemults : str
+        Replacement parameter key name for 'sizemults'.
+    axes : str
+        Replacement parameter key name for 'axes'.
+    initialsystem : str
+        Replacement parameter key name for 'initialsystem'.
+    """
     
     #Set default keynames
-    keynames = ['ucell', 'x_axis', 'y_axis', 'z_axis', 'axes',
-                'atomshift', 'sizemults', 'initialsystem']
+    keynames = ['ucell', 'x_axis', 'y_axis', 'z_axis', 'axes','atomshift',
+                'sizemults', 'initialsystem']
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
     
     # Extract input values and assign default values
-    x_axis =    input_dict.get(kwargs['x_axis'],    None)
-    y_axis =    input_dict.get(kwargs['y_axis'],    None)
-    z_axis =    input_dict.get(kwargs['z_axis'],    None)
+    x_axis = input_dict.get(kwargs['x_axis'], None)
+    y_axis = input_dict.get(kwargs['y_axis'], None)
+    z_axis = input_dict.get(kwargs['z_axis'], None)
     atomshift = input_dict.get(kwargs['atomshift'], '0 0 0')
     sizemults = input_dict.get(kwargs['sizemults'], '1 1 1')
     
@@ -69,17 +81,23 @@ def systemmanipulate(input_dict, build=True, **kwargs):
     
     # Properly divide up sizemults if 6 terms given
     if len(sizemults) == 6:
-        if (sizemults[0] <= 0 and sizemults[0] < sizemults[1] and sizemults[1] >= 0 and
-            sizemults[2] <= 0 and sizemults[2] < sizemults[3] and sizemults[3] >= 0 and
-            sizemults[4] <= 0 and sizemults[4] < sizemults[5] and sizemults[5] >= 0):
+        if (sizemults[0] <= 0 
+            and sizemults[0] < sizemults[1]
+            and sizemults[1] >= 0
+            and sizemults[2] <= 0
+            and sizemults[2] < sizemults[3]
+            and sizemults[3] >= 0
+            and sizemults[4] <= 0
+            and sizemults[4] < sizemults[5]
+            and sizemults[5] >= 0):
             
-            sizemults =  [[sizemults[0], sizemults[1]], 
+            sizemults =  [[sizemults[0], sizemults[1]],
                           [sizemults[2], sizemults[3]],
                           [sizemults[4], sizemults[5]]]
         
         else: 
-            raise ValueError('Invalid sizemults command')     
-    
+            raise ValueError('Invalid sizemults command')
+            
     # Properly divide up sizemults if 3 terms given
     elif len(sizemults) == 3:
         for i in xrange(3):
@@ -122,7 +140,8 @@ def systemmanipulate(input_dict, build=True, **kwargs):
         initialsystem.atoms_prop(key='pos', value=pos+shift)
 
         # Apply sizemults
-        initialsystem.supersize(tuple(sizemults[0]), tuple(sizemults[1]), tuple(sizemults[2]))
+        initialsystem.supersize(tuple(sizemults[0]), tuple(sizemults[1]),
+                                tuple(sizemults[2]))
     
     else:
         initialsystem = None

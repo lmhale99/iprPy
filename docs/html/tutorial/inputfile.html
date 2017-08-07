@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Input Parameter File &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="XML/JSON Records" href="recordformat.html" />
+    <link rel="prev" title="Calculations" href="calculation.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="recordformat.html" title="XML/JSON Records"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="calculation.html" title="Calculations"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">iprPy Tutorial</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="input-parameter-file">
+<h1>Input Parameter File<a class="headerlink" href="#input-parameter-file" title="Permalink to this headline">¶</a></h1>
+<p>The executable scripts contained within the iprPy framework all read in
+input parameters from similarly formatted input parameter fies.  These files
+are simple text files that provide values to parameter names in a simple
+key-value manner. Each script has its own set of recognized variable names,
+which are described in the associated documentation for the calculation or
+script method.</p>
+<div class="section" id="formating-rules">
+<h2>Formating rules<a class="headerlink" href="#formating-rules" title="Permalink to this headline">¶</a></h2>
+<p>The iprPy.tools.parseinput function is used for reading in the input
+parameter files.  The parseinput function follows these simple rules for
+interpreting the files</p>
+<ol class="arabic simple">
+<li>Each line is read separately, and divided into whitespace-delimited terms.</li>
+<li>Comments are allowed by starting terms with #. The # term and any
+subsequent terms on the same line are ignored.</li>
+<li>The first term in each line is a variable name.</li>
+<li>All lines with less than two terms are skipped.  This means that blank
+lines are allowed, and variable names without values are ignored.</li>
+<li>All content after the variable&#8217;s name is taken as the variable&#8217;s value
+(with leading and trailing whitespace stripped away).</li>
+<li>For prepare scripts and methods, some variables can be given multiple
+values by listing the variable name followed by a value on more than one
+line.  See a given calculation&#8217;s documentation to learn which prepare
+variables can be multi-valued.</li>
+</ol>
+</div>
+<div class="section" id="formatting-example">
+<h2>Formatting example<a class="headerlink" href="#formatting-example" title="Permalink to this headline">¶</a></h2>
+<p>Script:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span># This is a comment and will be ignored
+
+firstvariable    singleterm
+
+secondvariable   multiple terms   using    spaces
+thirdvariable    term #with comments
+thirdvariable    again!
+
+fourthvariable
+</pre></div>
+</div>
+<p>Gets interpreted as a Python dictionary:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;firstvariable&#39;</span><span class="p">:</span> <span class="s1">&#39;singleterm&#39;</span><span class="p">,</span>
+<span class="s1">&#39;secondvariable&#39;</span><span class="p">:</span> <span class="s1">&#39;multiple terms   using    spaces&#39;</span><span class="p">,</span>
+<span class="s1">&#39;thirdvariable&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;term&#39;</span><span class="p">,</span> <span class="s1">&#39;again!&#39;</span><span class="p">]}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="easy-creation">
+<h2>Easy creation<a class="headerlink" href="#easy-creation" title="Permalink to this headline">¶</a></h2>
+<p>Generating a calculation script input file from scratch can be challenging
+as the calculation scripts take numerous parameters.  But, there is an easy
+way to build an input parameter file: use the &#8220;calc_[calcname].template&#8221;
+file!  The templates are used by the prepare functions and list all input
+parameters allowed by a calculation.  All you have to do is</p>
+<ol class="arabic simple">
+<li>Copy &#8220;calc_[calcname].template&#8221; to &#8220;calc_[calcname].in&#8221;, or some other
+name.</li>
+<li>Open the input file in a text editor and delete all the &lt;terms&gt;.</li>
+<li>Fill in values for the necessary parameters.</li>
+</ol>
+<p>As for prepare script input files, there are no templates to build from, but
+there are examples in the bin directory.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Input Parameter File</a><ul>
+<li><a class="reference internal" href="#formating-rules">Formating rules</a></li>
+<li><a class="reference internal" href="#formatting-example">Formatting example</a></li>
+<li><a class="reference internal" href="#easy-creation">Easy creation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="calculation.html"
+                        title="previous chapter">Calculations</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="recordformat.html"
+                        title="next chapter">XML/JSON Records</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/inputfile.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="recordformat.html" title="XML/JSON Records"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="calculation.html" title="Calculations"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >iprPy Tutorial</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>
