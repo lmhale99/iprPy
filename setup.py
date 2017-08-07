@@ -2,8 +2,9 @@ import os
 from setuptools import setup, find_packages
 
 def getversion():
-    with open(os.path.join('iprPy', 'VERSION')) as version_file:
-        version = version_file.read().strip()
+    """Reads version from VERSION file"""
+    with open(os.path.join(os.path.dirname(__file__), 'iprPy', 'VERSION')) as f:
+        return f.read().strip()
 
 def getreadme():
     with open('README.rst') as readme_file:
@@ -42,5 +43,5 @@ setup(name = 'iprPy',
         'numericalunits',
         'atomman'
       ],
-      include_package_data = True,
+      package_data={'': ['*']},
       zip_safe = False)

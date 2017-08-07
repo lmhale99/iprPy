@@ -1,26 +1,45 @@
+from __future__ import division, absolute_import, print_function
+
 def filltemplate(template, variable, s_delimiter, e_delimiter):
     """
-    Takes a template and fills in values for delimited template variable names.
+    Takes a template and fills in values for delimited template variables.
     
-    Arguments:
-    template -- string or file-like object representing a template file.
-    variable -- dictionary giving the values to fill in for each tempate variable name.
-    s_delimiter -- leading delimiter for identifying the template variable names.
-    s_delimiter -- trailing delimiter for identifying the template variable names.
+    Parameters
+    ----------
+    template : string or file-like object
+        The template file or file content to fill in.
+    variable : dict 
+        Dictionary with keys defining the delimited template variable terms,
+        and values the values to replace the variable terms with.
+    s_delimiter : str
+        The leading delimiter for identifying the template variable terms.
+    e_delimiter : str 
+        The trailing delimiter for identifying the template variable terms.
     
-    Returns a string of the template with all indicated values replaced.
+    Returns
+    -------
+    str
+        The template with all delimited variable terms replaced with their
+        corresponding defined values from variable.
+        
+    Raises
+    ------
+    KeyError
+        If delimited term found in template that has no value in variable.
+    ValueError
+        If parsing of s_delimiter, e_delimiter pairs fails.
     """
     
-    #Convert to string if a file-like object
+    # Convert to string if a file-like object
     try:
         template = template.read()
     except AttributeError:
         pass
     
-    #Loop until done
+    # Loop until done
     while True:
         
-        #Search for starting delimiter
+        # Search for starting delimiter
         try:
             s = template.index(s_delimiter)
         except ValueError: 
@@ -28,13 +47,13 @@ def filltemplate(template, variable, s_delimiter, e_delimiter):
         else:
             s = s + len(s_delimiter)
         
-        #search for ending delimiter
+        # Search for ending delimiter
         try:
             e = template.index(e_delimiter)
         except ValueError:
             e = None        
         
-        #Replace delimited string with value
+        # Replace delimited string with value
         if s is not None and e is not None and s < e:
             name = template[s: e]
             var = s_delimiter + name + e_delimiter
@@ -44,11 +63,11 @@ def filltemplate(template, variable, s_delimiter, e_delimiter):
                 raise KeyError(name + ' not found in variable dictionary')
             template = template.replace(var, value)
         
-        #Finish if no delimiters remain
+        # Finish if no delimiters remain
         elif s is None and e is None:
             break
             
-        #Issue errors
+        # Issue errors
         elif s is None:
             raise ValueError('ending delimiter found without starting delimiter')
         elif e is None:
@@ -57,5 +76,3 @@ def filltemplate(template, variable, s_delimiter, e_delimiter):
             raise ValueError('ending delimiter found before starting delimiter')
             
     return template
-        
-        

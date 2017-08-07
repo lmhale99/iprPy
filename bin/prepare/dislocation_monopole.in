@@ -10,12 +10,15 @@ mpi_command                  mpiexec -localonly 4
 #mpi_command                  mpirun -np 8
 
 #### Run condition limiters ####
-potential_name              2006--Chamati-H--Fe
+potential_name              
 symbol_name
-#family_name              
+family_name                 A1--Cu--fcc
+dislocation_name            A1--Cu--fcc--110-screw
 #dislocation_name            A1--Cu--fcc--111-edge
 #dislocation_name            A2--W--bcc--110-edge
-dislocation_name            A2--W--bcc--112-edge
+#dislocation_name            A2--W--bcc--111-screw
+#dislocation_name            A2--W--bcc--112-edge
+
 
 #### Unit specifications ####
 length_unit
@@ -24,7 +27,10 @@ energy_unit
 force_unit
 
 #### Run parameters ####
+sizemults                   -28 28 -40 40 0 2
 #sizemults                   -49 49 -40 40 0 2
 #sizemults                   -40 40 -28 28 0 2
-sizemults                   -20 20 -24 24 0 2
-annealtemperature           0
+#sizemults                   -28 28 -49 49 0 2
+#sizemults                   -40 40 -49 49 0 2
+
+annealtemperature           50

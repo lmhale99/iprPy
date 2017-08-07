@@ -26,10 +26,12 @@ Curation System (MDCS). Records are stored in the MDCS instance as validated
 XML. With this method, a remote MDCS instance can be set up and accessed by 
 multiple computing resources.
 
-## Additional style requirements
+## Style requirements
 
-Using this style requires access to a working MDCS instance, and for the Python 
-MDCS-api-tools to be installed as the mdcs Python package. 
+- Access to a working MDCS instance.
+
+- The [Python MDCS-api-tools](https://github.com/lmhale99/MDCS-api-tools)
+  package needs to be installed. Note that this is still early development.
 
 ## Initialization arguments:
 
@@ -43,10 +45,9 @@ MDCS-api-tools to be installed as the mdcs Python package.
 - __cert__: the directory path to a web certification file, if required by the 
   MDCS instance.
 
-## Additional style notes:
+## Additional notes:
 
 - Adding records to an MDCS instance requires a valid XSD schema for each record 
   style, and that each corresponding XML record be consistent with that schema.
   
-- The current version does not support the delete_tar() method. This will be 
-  updated when the curator style is adapted for a newer stable MDCS version.
+- The current version does not support delete_tar() or update_tar().

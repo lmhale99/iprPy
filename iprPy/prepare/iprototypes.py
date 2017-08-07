@@ -1,36 +1,43 @@
+from __future__ import division, absolute_import, print_function
+
 from ..tools import aslist
 
 import pandas as pd
 
-def iprototypes(database, record_style='crystal-prototype', natypes=None, name=None, spacegroup=None, crystalfamily=None, pearson=None):
+def iprototypes(database, record_style='crystal_prototype', natypes=None,
+                name=None, spacegroup=None, crystalfamily=None, pearson=None):
     """
     Iterates over crystal prototype records in a database that match limiting 
     conditions.
     
-    Arguments:
-    database -- an iprPy.Database object for the database being accessed
-    
-    Keyword Arguments:
-    natypes -- int or list of ints for the number of atom types (i.e. sites) 
-               that the prototype must have. Default value is None (i.e. no 
-               selection by natypes)
-    name -- single string name or list of names for the prototypes to include.
-            Search uses potential's id, name, prototype, and Strukturbericht 
-            terms. Default value is None (i.e. no selection by name).
-    spacegroup -- single term or list of terms for limiting by crystal space 
-                   group, Search uses space group number, H-M and Schoenflies 
-                   names. Default value is None (i.e. no selection by space 
-                   group).
-    crystalfamily -- single string or list of strings for the crystal families
-                      to limit returned prototypes by. Default value is None 
-                      (i.e. no selection by crystal family).
-    pearson -- single string or list of strings for Pearson symbols to limit 
-               search by. Default value is None (i.e. no selection by Pearson 
-               symbol).
-    record_style -- string name for the record style (i.e. template) to use.
-                    Default value is 'crystal-prototype'.
-    
-    Yields iprPy.Record objects for the associated crystal prototypes.    
+    Parameters
+    ----------
+    database : iprPy.Database 
+        The database being accessed.
+    record_style : str, optional
+        The record style to access (Default is 'crystal_prototype').
+    name : str or list of str, optional
+        Single prototype name or list of prototype names to limit by.  Only 
+        prototypes with id, name, prototype, or Strukturbericht values matching
+        name will be included.  If not given, then no limiting by name.
+    spacegroup : str or list of str, optional
+        Single spacegroup or list of spacegroups to limit by.  Only 
+        prototypes with space-group number, Hermann-Maguin, or Schoenflies
+        values matching spacegroup will be included.  If not given, then no
+        limiting by spacegroup.
+    crystalfamily : str or list of str, optional
+        Single crystal family name or list of crystal family names to limit
+        by.  Only prototypes with the matching crystalfamily will be included.
+        If not given, then no limiting by crystalfamily.
+    pearson : str or list of str, optional
+        Single Pearson symbol or list of Pearson symbols to limit by.  Only 
+        prototypes with Pearson-symbol terms matching pearson will be 
+        included.  If not given, then no limiting by pearson.
+
+    Yields
+    ------
+    iprPy.Record 
+        Each record from the database matching the limiting conditions.
     """
     
     df = []

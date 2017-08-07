@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Other High-Throughput Tools &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Implementing New Calculations" href="../design/index.html" />
+    <link rel="prev" title="Runner" href="runner.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../design/index.html" title="Implementing New Calculations"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="runner.html" title="Runner"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >iprPy Tutorial</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">High-Throughput Calculations</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="other-high-throughput-tools">
+<h1>Other High-Throughput Tools<a class="headerlink" href="#other-high-throughput-tools" title="Permalink to this headline">¶</a></h1>
+<p>There are a few other tools that can be used for assisting in running
+calculations in high-throughput.  All except set and unset can be called using
+any of the following methods:</p>
+<ul class="simple">
+<li>Execute the Python script located in the iprPy/highthroughput directory.</li>
+<li>Use the iprPy inline command.</li>
+<li>In Python, call the function that is part of the iprPy.highthroughput
+module.</li>
+</ul>
+<div class="section" id="build">
+<h2>build<a class="headerlink" href="#build" title="Permalink to this headline">¶</a></h2>
+<p>The build tool copies all records from a reference library to a specified
+database. If the record already exists in the database, it will be skipped.</p>
+<p><strong>build.py input parameters</strong></p>
+<ul class="simple">
+<li>“database” and “database_*” – defines the access terms for a database.</li>
+<li>&#8220;lib_directory&#8221; – the path to the reference library to use.  If not given
+then the library/ directory of iprPy is used.</li>
+</ul>
+<p><strong>./iprPy build inline arguments</strong></p>
+<ul class="simple">
+<li>database – the name of a database that has been set using the iprPy set
+command.</li>
+</ul>
+<p><strong>iprPy.highthroughput.build function arguments</strong></p>
+<ul class="simple">
+<li>dbase (iprPy.Database) – a database</li>
+<li>lib_directory (str or None, optional) – the path to the reference library
+to use.  If None (default) then the library/ directory of iprPy is used.</li>
+</ul>
+</div>
+<div class="section" id="check">
+<h2>check<a class="headerlink" href="#check" title="Permalink to this headline">¶</a></h2>
+<p>The check tool checks on the number and status of all records of a given style
+in a database.</p>
+<p><strong>check.py input parameters</strong></p>
+<ul class="simple">
+<li>“database” and “database_*” – defines the access terms for a database.</li>
+<li>&#8220;record_style&#8221; - the record style to use.  If not given then a list of
+all loaded record styles will be printed and the user prompted to select
+one.</li>
+</ul>
+<p><strong>./iprPy check inline arguments</strong></p>
+<ul class="simple">
+<li>database – the name of a database that has been set using the iprPy set
+command.</li>
+<li>record_style - the record style to use.  If not given then a list of
+all loaded record styles will be printed and the user prompted to select
+one.</li>
+</ul>
+<p><strong>iprPy.highthroughput.check function arguments</strong></p>
+<ul class="simple">
+<li>dbase (iprPy.Database) – a database</li>
+<li>record_style (str or None, optional) – the record style to use.  If None
+(default) then a list of all loaded record styles will be printed and the
+user prompted to select one.</li>
+</ul>
+</div>
+<div class="section" id="check-modules">
+<h2>check_modules<a class="headerlink" href="#check-modules" title="Permalink to this headline">¶</a></h2>
+<p>The check_modules tool will print lists of all Record, Calculation, and
+Database styles that were successfully and unsuccessfully loaded by iprPy.  A
+style that failed to load indicates that an error was raised when trying to
+import it.  This means that there either is an issue with the underlying code
+or that all requirements for the style are not met.</p>
+<p>No arguments or parameters for this tool.</p>
+</div>
+<div class="section" id="clean">
+<h2>clean<a class="headerlink" href="#clean" title="Permalink to this headline">¶</a></h2>
+<p>The clean tool resets calculations that issued errors and cleans the prepared
+instances within a run_directory so that runners may operate over them again.
+In particular:</p>
+<ul class="simple">
+<li>Any calculation instances associated with a record style that issued errors
+are extracted from their database archives and returned to a run_directory.</li>
+<li>The &#8220;status&#8221; field in the associated records are changed from &#8220;error&#8221; to
+&#8220;not calculated&#8221;, and the &#8220;error&#8221; field is deleted.</li>
+<li>All results and bid files for calculation instances in the run_directory are
+deleted.</li>
+</ul>
+<p><strong>Note</strong>: To avoid potential runner collisions, don&#8217;t clean a run_directory
+that multiple runners are currently operating on.</p>
+<p><strong>clean.py input parameters</strong></p>
+<ul class="simple">
+<li>“database” and “database_*” – defines the access terms for a database.</li>
+<li>&#8220;run_directory&#8221; - the path to a run_directory.</li>
+<li>&#8220;record_style&#8221; - the record style to use.  If not given then a list of
+all loaded record styles will be printed and the user prompted to select
+one.</li>
+</ul>
+<p><strong>./iprPy clean inline arguments</strong></p>
+<ul class="simple">
+<li>database – the name of a database that has been set using the iprPy set
+command.</li>
+<li>&#8220;run_directory&#8221; - the name of a run_directory that has been set using the
+iprPy set command.</li>
+<li>record_style - the record style to use.  If not given then a list of
+all loaded record styles will be printed and the user prompted to select
+one.</li>
+</ul>
+<p><strong>iprPy.highthroughput.clean function arguments</strong></p>
+<ul class="simple">
+<li>dbase (iprPy.Database) – a database.</li>
+<li>run_directory (str) - the path to a run_directory.</li>
+<li>record_style (str or None, optional) – the record style to use.  If None
+(default) then a list of all loaded record styles will be printed and the
+user prompted to select one.</li>
+</ul>
+</div>
+<div class="section" id="copy">
+<h2>copy<a class="headerlink" href="#copy" title="Permalink to this headline">¶</a></h2>
+<p>The copy tool will copy all records of a given style from one database to
+another.</p>
+<p><strong>copyrecords.py input parameters</strong></p>
+<ul class="simple">
+<li>“database1” and “database1_*” – defines the access terms for a database to
+copy records from.</li>
+<li>“database2” and “database2_*” – defines the access terms for a database to
+copy records to.</li>
+<li>&#8220;record_style&#8221; - the record style to use.  If not given then a list of
+all loaded record styles will be printed and the user prompted to select
+one.</li>
+<li>&#8220;includetar&#8221; - indicates if the .tar.gz archives associated with the records
+are to be copied as well.  Default value is True.</li>
+</ul>
+<p><strong>./iprPy clean inline arguments</strong></p>
+<ul class="simple">
+<li>database1 – the name of a database that has been set using the iprPy set
+command to copy records from.</li>
+<li>database2 – the name of a database that has been set using the iprPy set
+command to copy records to.</li>
+<li>record_style - the record style to use.  If not given then a list of
+all loaded record styles will be printed and the user prompted to select
+one.</li>
+</ul>
+<p><strong>iprPy.highthroughput.clean function arguments</strong></p>
+<ul class="simple">
+<li>dbase1 (iprPy.Database) – a database to copy records from.</li>
+<li>dbase2 (iprPy.Database) – a database to copy records to.</li>
+<li>record_style (str or None, optional) – the record style to use.  If None
+(default) then a list of all loaded record styles will be printed and the
+user prompted to select one.</li>
+<li>includetar (bool) - indicates if the .tar.gz archives associated with the
+records are to be copied as well.  Default value is True.</li>
+</ul>
+</div>
+<div class="section" id="destroy">
+<h2>destroy<a class="headerlink" href="#destroy" title="Permalink to this headline">¶</a></h2>
+<p>Permanently deletes all records of a given style from a database.  A prompt
+will list the number of matching records, ask if you are sure, and require
+that you fully type &#8220;yes&#8221;.</p>
+<p><strong>destroy.py input parameters</strong></p>
+<ul class="simple">
+<li>“database” and “database_*” – defines the access terms for a database.</li>
+<li>&#8220;record_style&#8221; - the record style to use.  If not given then a list of
+all loaded record styles will be printed and the user prompted to select
+one.</li>
+</ul>
+<p><strong>./iprPy destroy inline arguments</strong></p>
+<ul class="simple">
+<li>database – the name of a database that has been set using the iprPy set
+command.</li>
+<li>record_style - the record style to use.  If not given then a list of
+all loaded record styles will be printed and the user prompted to select
+one.</li>
+</ul>
+<p><strong>iprPy.highthroughput.destroy function arguments</strong></p>
+<ul class="simple">
+<li>dbase (iprPy.Database) – a database.</li>
+<li>record_style (str or None, optional) – the record style to use.  If None
+(default) then a list of all loaded record styles will be printed and the
+user prompted to select one.</li>
+</ul>
+</div>
+<div class="section" id="set">
+<h2>set<a class="headerlink" href="#set" title="Permalink to this headline">¶</a></h2>
+<p>Allows for a database or run_directory to be defined for use with the inline
+commands for the other high-throughput tools.  If the name is already
+associated with a database or run_directory, a prompt will ask if you want to
+overwrite the existing values.  The command will prompt the user to enter the
+information specific to the object being defined.  This information is saved
+to a JSON-formatted file &#8221;.iprPy&#8221; in the root iprPy directory.</p>
+<p><strong>./iprPy set inline arguments</strong></p>
+<ul class="simple">
+<li>type – specify database or run_directory.</li>
+<li>name - the name to associate with the database or run_directory</li>
+</ul>
+</div>
+<div class="section" id="unset">
+<h2>unset<a class="headerlink" href="#unset" title="Permalink to this headline">¶</a></h2>
+<p>Deletes the information associated with a defined database or run_directory.
+A prompt will ask if you are sure, in which you must fully type &#8220;yes&#8221;.</p>
+<p><strong>./iprPy set inline arguments</strong></p>
+<ul class="simple">
+<li>type – specify database or run_directory.</li>
+<li>name - the name of the database or run_directory whose definition is to be
+deleted.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Other High-Throughput Tools</a><ul>
+<li><a class="reference internal" href="#build">build</a></li>
+<li><a class="reference internal" href="#check">check</a></li>
+<li><a class="reference internal" href="#check-modules">check_modules</a></li>
+<li><a class="reference internal" href="#clean">clean</a></li>
+<li><a class="reference internal" href="#copy">copy</a></li>
+<li><a class="reference internal" href="#destroy">destroy</a></li>
+<li><a class="reference internal" href="#set">set</a></li>
+<li><a class="reference internal" href="#unset">unset</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="runner.html"
+                        title="previous chapter">Runner</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../design/index.html"
+                        title="next chapter">Implementing New Calculations</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/tutorial/highthroughput/inline.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../design/index.html" title="Implementing New Calculations"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="runner.html" title="Runner"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >iprPy Tutorial</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >High-Throughput Calculations</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

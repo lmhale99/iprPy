@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Standard library imports
-from __future__ import print_function
+from __future__ import division, absolute_import, print_function
 import os
 import sys
 import glob
@@ -25,10 +25,10 @@ import iprPy
 
 # Define calc_style and record_style
 calc_style = 'E_vs_r_scan'
-record_style = 'calculation-cohesive-energy-relation'
+record_style = 'calculation_cohesive_energy_relation'
 
 def main(*args):
-    """main function called when script is executed directly"""
+    """Main function called when script is executed directly."""
     
     # Read input script
     with open(args[0]) as f:
@@ -44,33 +44,48 @@ def main(*args):
     prepare(dbase, run_directory, **input_dict)
 
 def prepare(dbase, run_directory, **kwargs):
-    """high-throughput prepare function for the calculation"""
+    """
+    High-throughput prepare function for the calculation.
+    
+    Parameters
+    ----------
+    dbase : iprPy.Database
+        The database to access and create new records for.
+    run_directory : str
+        The path to the local directory where the prepared calculation
+        instances will be placed.
+    **kwargs
+        Arbitrary keyword arguments.
+    """
     
     # Initialize Calculation instance
     calculation = iprPy.Calculation(calc_style)
     
     # Build record_df
-    record_df = build_record_df(dbase, record_style)
+    record_df = dbase.get_records_df(record_style, full=False, flat=True)
 
     # Loop over all potentials
     for pot_record in iprPy.prepare.ipotentials(dbase,
-                                                element =    kwargs.get('potential_element', None),
-                                                name =       kwargs.get('potential_name', None),
-                                                pair_style = kwargs.get('potential_pair_style', None),
-                                                currentIPR = iprPy.input.boolean(kwargs.get('potential_currentIPR', True))):
+                          element=kwargs.get('potential_element', None),
+                          name=kwargs.get('potential_name', None),
+                          pair_style=kwargs.get('potential_pair_style', None),
+                          currentIPR=iprPy.input.boolean(kwargs.get('potential_currentIPR', True))):
         potential = lmp.Potential(pot_record.content)
         pot_tar = dbase.get_tar(pot_record)
         
         # Loop over all prototypes
         for proto_record in iprPy.prepare.iprototypes(dbase,
-                                                      natypes =        kwargs.get('prototype_natypes', None), 
-                                                      name =           kwargs.get('prototype_name', None), 
-                                                      spacegroup =     kwargs.get('prototype_spacegroup', None), 
-                                                      crystalfamily =  kwargs.get('prototype_crystalfamily', None), 
-                                                      pearson =        kwargs.get('prototype_Pearsonsymbol', None)):
+                               natypes=kwargs.get('prototype_natypes', None),
+                               name=kwargs.get('prototype_name', None),
+                               spacegroup=kwargs.get('prototype_spacegroup',
+                                                     None),
+                               crystalfamily=kwargs.get('prototype_crystalfamily', None),
+                               pearson=kwargs.get('prototype_Pearsonsymbol',
+                                                  None)):
 
             # Iterate over all combinations of potentials, prototypes and symbols
-            for symbols in iprPy.prepare.isymbolscombos(proto_record, pot_record):
+            for symbols in iprPy.prepare.isymbolscombos(proto_record,
+                                                        pot_record):
                 
                 # Create calc_key
                 calc_key = str(uuid.uuid4())
@@ -78,15 +93,15 @@ def prepare(dbase, run_directory, **kwargs):
                 # Pass values to calculation 
                 calc_dict = {}
                 
-                calc_dict['potential_file'] =       pot_record.name + '.xml'
-                calc_dict['potential_dir'] =        pot_record.name
-                calc_dict['potential_content'] =    pot_record.content
+                calc_dict['potential_file'] = pot_record.name + '.xml'
+                calc_dict['potential_dir'] = pot_record.name
+                calc_dict['potential_content'] = pot_record.content
                 
-                calc_dict['load_file'] =            proto_record.name+'.xml'
-                calc_dict['load_style'] =           'system_model'
-                calc_dict['load_content'] =         proto_record.content
+                calc_dict['load_file'] = proto_record.name+'.xml'
+                calc_dict['load_style'] = 'system_model'
+                calc_dict['load_content'] = proto_record.content
 
-                calc_dict['symbols'] =              ' '.join(symbols)
+                calc_dict['symbols'] = ' '.join(symbols)
 
                 for key in singularkeys():
                     if key in kwargs:
@@ -95,8 +110,11 @@ def prepare(dbase, run_directory, **kwargs):
                 # Build incomplete record
                 input_dict = deepcopy(calc_dict)
                 calculation.process_input(input_dict, calc_key, build=False)
-                model = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict)
-                new_record = iprPy.Record(name=calc_key, content=model.xml(), style=record_style)
+                model = iprPy.buildmodel(record_style, 'calc_' + calc_style,
+                                         input_dict)
+                new_record = iprPy.Record(name=calc_key,
+                                          content=model.xml(),
+                                          style=record_style)
                 
                 # Check if record is new
                 if new_record.isnew(record_df=record_df):
@@ -132,26 +150,36 @@ def prepare(dbase, run_directory, **kwargs):
                     # Add prototype record file to calculation folder
                     with open(os.path.join(calc_directory, proto_record.name+'.xml'), 'w') as f:
                         f.write(proto_record.content)
-                    
-def build_record_df(dbase, record_style):
-    """Constructs a pandas.DataFrame for all records in a database of a given record_type"""
-    df = []
-    for record in dbase.iget_records(style=record_style):
-        df.append(record.todict(full=False, flat=True))
-    return pd.DataFrame(df)
 
 def unusedkeys():
-    """List the calc_*.in key terms that are ignored by the prepare function."""
-    return ['load_options',
+    """
+    The calculation input parameters that are not prepare input parameters.
+    
+    Returns
+    -------
+    list of str
+        The list of input parameter keys ignored by prepare.
+    """
+    return [
+            'load_options',
             'box_parameters',
             'x_axis',
             'y_axis',
             'z_axis',
-            'atomshift']
+            'atomshift',
+           ]
     
 def singularkeys():
-    """List the prepare_*.in key terms that are restricted to having only one value."""
-    return ['database', 
+    """
+    The prepare input parameters that can be assigned only one value.
+    
+    Returns
+    -------
+    list of str
+        The list of input parameter keys that are limited to singular values.
+    """
+    return [
+            'database', 
             'run_directory',
             'lammps_command',
             'mpi_command',
@@ -163,18 +191,28 @@ def singularkeys():
             'length_unit',
             'pressure_unit',
             'energy_unit',
-            'force_unit']
+            'force_unit',
+           ]
             
 def multikeys():
-    """List the prepare_*.in key terms that can have multiple values."""
-    return ['potential_element', 
+    """
+    The prepare input parameters that can be assigned multiple values.
+    
+    Returns
+    -------
+    list of str
+        The list of input parameter keys that can have multiple values.
+    """
+    return [
+            'potential_element', 
             'potential_name',
             'potential_pair_style',
             'prototype_natypes',
             'prototype_name',
             'prototype_spacegroup',
             'prototype_crystalfamily',
-            'prototype_Pearsonsymbol']
+            'prototype_Pearsonsymbol',
+           ]
             
 if __name__ == '__main__':
     main(*sys.argv[1:])

@@ -3,7 +3,7 @@
 # Python script created by Lucas Hale
 
 # Standard library imports
-from __future__ import print_function, division
+from __future__ import division, absolute_import, print_function
 import os
 import sys
 import uuid
@@ -27,60 +27,111 @@ import iprPy
 
 # Define calc_style and record_style
 calc_style = 'refine_structure'
-record_style = 'calculation-system-relax'
+record_style = 'calculation_system_relax'
 
 def main(*args):
-    """Main function for running calculation"""
+    """Main function called when script is executed directly."""
 
     # Read input file in as dictionary
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, allsingular=True)
     
-    # Interpret and process input parameters 
+    # Interpret and process input parameters
     process_input(input_dict, *args[1:])
     
     # Run quick_a_Cij to refine values
-    results_dict = quick_a_Cij(input_dict['lammps_command'], 
-                               input_dict['initialsystem'], 
+    results_dict = quick_a_Cij(input_dict['lammps_command'],
+                               input_dict['initialsystem'],
                                input_dict['potential'],
-                               input_dict['symbols'], 
+                               input_dict['symbols'],
                                mpi_command = input_dict['mpi_command'],
                                ucell = input_dict['ucell'],
-                               p_xx = input_dict['pressure_xx'], 
-                               p_yy = input_dict['pressure_yy'], 
+                               p_xx = input_dict['pressure_xx'],
+                               p_yy = input_dict['pressure_yy'],
                                p_zz = input_dict['pressure_zz'],
-                               delta = input_dict['strainrange'])
+                               strainrange = input_dict['strainrange'])
     
-    # Save data model of results 
-    results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict, results_dict)
+    # Save data model of results
+    results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict,
+                               results_dict)
 
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)
         
-def quick_a_Cij(lammps_command, system, potential, symbols, mpi_command=None, ucell=None,
-                p_xx=0.0, p_yy=0.0, p_zz=0.0, delta = 1e-5, tol=1e-10, diverge_scale=3.):
+def quick_a_Cij(lammps_command, system, potential, symbols,
+                mpi_command=None, ucell=None, strainrange=1e-6,
+                p_xx=0.0, p_yy=0.0, p_zz=0.0, tol=1e-10,
+                diverge_scale=3.):
     """
-    Quickly refines static orthorhombic system by evaluating the elastic constants and the virial pressure.
+    Quickly refines static orthorhombic system by evaluating the elastic
+    constants and the virial pressure.
     
-    Arguments:
-    lammps_command -- directory location for lammps executable
-    system -- atomman.System to statically deform and evaluate a,b,c and Cij at a given pressure
-    potential -- atomman.lammps.Potential representation of a LAMMPS implemented potential
-    symbols -- list of element-model symbols for the Potential that correspond to the System's atypes
+    Parameters
+    ----------
+    lammps_command :str
+        Command for running LAMMPS.
+    system : atomman.System
+        The system to perform the calculation on.
+    potential : atomman.lammps.Potential
+        The LAMMPS implemented potential to use.
+    symbols : list of str
+        The list of element-model symbols for the Potential that correspond to
+        system's atypes.
+    mpi_command : str, optional
+        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+        will run serially.
+    ucell : atomman.System, optional
+        The fundamental unit cell correspodning to system.  This is used to
+        convert system dimensions to cell dimensions. If not given, ucell will
+        be taken as system.
+    strainrange : float, optional
+        The small strain value to apply when calculating the elastic
+        constants (default is 1e-6).
+    p_xx : float, optional
+        The value to relax the x tensile pressure component to (default is
+        0.0).
+    p_yy : float, optional
+        The value to relax the y tensile pressure component to (default is
+        0.0).
+    p_zz : float, optional
+        The value to relax the z tensile pressure component to (default is
+        0.0).
+    tol : float, optional
+        The relative tolerance used to determine if the lattice constants have
+        converged (default is 1e-10).
+    diverge_scale : float, optional
+        Factor to identify if the system's dimensions have diverged.  Divergence
+        is identified if either any current box dimension is greater than the
+        original dimension multiplied by diverge_scale, or if any current box
+        dimension is less than the original dimension divided by diverge_scale.
+        (Default is 3.0).
     
-    Keyword Arguments:
-    mpi_command -- MPI command for running LAMMPS in parallel. Default value 
-                   is None (serial run).  
-    ucell -- an atomman.System representing a fundamental unit cell of the 
-             system. If not given, ucell will be taken as system.
-    p_xx, p_yy, p_zz -- tensile pressures to equilibriate to.  Default is 0.0 for all. 
-    delta -- the strain range to use in calculating the elastic constants. Default is 1e-5.    
-    tol -- the relative tolerance criterion for identifying box size convergence. Default is 1e-10.
-    diverge_scale -- identifies a divergent system if x / diverge_scale < x < x * diverge_scale is not True for x = a,b,c.
+    Returns
+    -------
+    dict
+        Dictionary of results consisting of keys:
+        
+        - **'a_lat'** (*float*) - The relaxed a lattice constant.
+        - **'b_lat'** (*float*) - The relaxed b lattice constant.
+        - **'c_lat'** (*float*) - The relaxed c lattice constant.
+        - **'alpha_lat'** (*float*) - The alpha lattice angle.
+        - **'beta_lat'** (*float*) - The beta lattice angle.
+        - **'gamma_lat'** (*float*) - The gamma lattice angle.
+        - **'E_coh'** (*float*) - The cohesive energy of the relaxed system.
+        - **'stress'** (*numpy.array*) - The measured stress state of the
+          relaxed system.
+        - **'C_elastic'** (*atomman.ElasticConstants*) - The relaxed system's
+          elastic constants.
+        - **'system_relaxed'** (*atomman.System*) - The relaxed system.
+    
+    Raises
+    ------
+    RuntimeError
+        If system diverges or no convergence reached after 100 cycles.
     """
     
-    # Initial parameter setup
-    converged = False                   # flag for if values have converged
+    # Flag for if values have converged
+    converged = False
     
     # Set ucell = system if ucell not given
     if ucell is None:
@@ -94,61 +145,72 @@ def quick_a_Cij(lammps_command, system, potential, symbols, mpi_command=None, uc
     beta =  system.box.beta
     gamma = system.box.gamma
     
-    # Define boxes for iterating
-    system_current = deepcopy(system)       # system with box parameters being evaluated
-    system_old = None                       # system with previous box parameters evaluated
+    # Define current and old systems
+    system_current = deepcopy(system)
+    system_old = None
     
     for cycle in xrange(100):
         
         # Run LAMMPS and evaluate results based on system_old
-        results = calc_cij(lammps_command, system_current, potential, symbols, 
-                           mpi_command=mpi_command, 
-                           p_xx=p_xx, p_yy=p_yy, p_zz=p_zz, 
-                           delta=delta, cycle=cycle)
+        results = calc_cij(lammps_command, system_current, potential, symbols,
+                           mpi_command=mpi_command,
+                           p_xx=p_xx, p_yy=p_yy, p_zz=p_zz,
+                           strainrange=strainrange, cycle=cycle)
         system_new = results['system_new']
         
-        # Test if box has converged to a single size
-        if np.allclose(system_new.box.vects, system_current.box.vects, rtol=tol, atol=0):
+        # Compare new and current to test for convergence
+        if np.allclose(system_new.box.vects,
+                       system_current.box.vects,
+                       rtol=tol, atol=0):
             converged = True
             break
         
-        # Test if box has converged to two sizes
-        elif system_old is not None and np.allclose(system_new.box.vects, system_old.box.vects, rtol=tol, atol=0):
-            # Update current box to average of old and new lattice constants
-            system_current.box_set(a = (system_new.box.a + system_old.box.a) / 2.,
-                                   b = (system_new.box.b + system_old.box.b) / 2.,
-                                   c = (system_new.box.c + system_old.box.c) / 2., 
+        # Compare old and new to test for double-value convergence
+        elif system_old is not None and np.allclose(system_new.box.vects,
+                                                    system_old.box.vects,
+                                                    rtol=tol, atol=0):
+            # Update current to average of old and new
+            system_current.box_set(a = (system_new.box.a+system_old.box.a) / 2.,
+                                   b = (system_new.box.b+system_old.box.b) / 2.,
+                                   c = (system_new.box.c+system_old.box.c) / 2.,
                                    scale=True)
-            results = calc_cij(lammps_command, system_current, potential, symbols, 
-                               mpi_command=mpi_command, 
+            # Calculate Cij for the averaged system
+            results = calc_cij(lammps_command, system_current, potential,
+                               symbols, mpi_command=mpi_command,
                                p_xx=p_xx, p_yy=p_yy, p_zz=p_zz, 
-                               delta=delta, cycle=cycle+1)                 
+                               strainrange=strainrange, cycle=cycle+1)
             converged = True
             break
         
-        # Test if values have diverged from initial guess
-        elif system_new.box.a < system.box.a / diverge_scale or system_new.box.a > system.box.a * diverge_scale:
+        # Test for divergence
+        elif system_new.box.a < system.box.a / diverge_scale:
             raise RuntimeError('Divergence of box dimensions')
-        elif system_new.box.b < system.box.b / diverge_scale or system_new.box.b > system.box.b * diverge_scale:
+        elif system_new.box.a > system.box.a * diverge_scale:
             raise RuntimeError('Divergence of box dimensions')
-        elif system_new.box.c < system.box.c / diverge_scale or system_new.box.c > system.box.c * diverge_scale:
-            raise RuntimeError('Divergence of box dimensions')  
+        elif system_new.box.b < system.box.b / diverge_scale:
+            raise RuntimeError('Divergence of box dimensions')
+        elif system_new.box.b > system.box.b * diverge_scale:
+            raise RuntimeError('Divergence of box dimensions')
+        elif system_new.box.c < system.box.c / diverge_scale:
+            raise RuntimeError('Divergence of box dimensions')
+        elif system_new.box.c > system.box.c * diverge_scale:
+            raise RuntimeError('Divergence of box dimensions')
         elif results['E_coh'] == 0.0:
             raise RuntimeError('Divergence: cohesive energy is 0')
                 
-        # If not converged or diverged, update system_old and system_current
+        # If not converged or diverged, current -> old and new -> current
         else:
             system_old, system_current = system_current, system_new
     
     # Return values when converged
-    if converged:  
+    if converged:
         # Extract final ucell parameters
         results['a_lat'] = system_new.box.a / lx_a
         results['b_lat'] = system_new.box.b / ly_b
         results['c_lat'] = system_new.box.c / lz_c
         results['alpha_lat'] = alpha
         results['beta_lat']  = beta
-        results['gamma_lat'] = gamma    
+        results['gamma_lat'] = gamma
         
         # Rename system_new to system_relaxed
         results['system_relaxed'] = results.pop('system_new')
@@ -156,20 +218,73 @@ def quick_a_Cij(lammps_command, system, potential, symbols, mpi_command=None, uc
     else:
         raise RuntimeError('Failed to converge after 100 cycles')
 
-def calc_cij(lammps_command, system, potential, symbols, 
-             mpi_command=None, p_xx=0.0, p_yy=0.0, p_zz=0.0, delta=1e-5, cycle=0):
-    """Runs cij_script and returns current Cij, stress, Ecoh, and new system guess."""
+def calc_cij(lammps_command, system, potential, symbols,
+             mpi_command=None, p_xx=0.0, p_yy=0.0, p_zz=0.0,
+             strainrange=1e-6, cycle=0):
+    """
+    Runs cij.in LAMMPS script to evaluate Cij, and E_coh of the current system,
+    and define a new system with updated box dimensions to test.
+    
+    Parameters
+    ----------
+    lammps_command :str
+        Command for running LAMMPS.
+    system : atomman.System
+        The system to perform the calculation on.
+    potential : atomman.lammps.Potential
+        The LAMMPS implemented potential to use.
+    symbols : list of str
+        The list of element-model symbols for the Potential that correspond to
+        system's atypes.
+    mpi_command : str, optional
+        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+        will run serially.
+    strainrange : float, optional
+        The small strain value to apply when calculating the elastic
+        constants (default is 1e-6).
+    p_xx : float, optional
+        The value to relax the x tensile pressure component to (default is
+        0.0).
+    p_yy : float, optional
+        The value to relax the y tensile pressure component to (default is
+        0.0).
+    p_zz : float, optional
+        The value to relax the z tensile pressure component to (default is
+        0.0).
+    cycle : int, optional
+        Indicates the iteration cycle of quick_a_Cij().  This is used to
+        uniquely save the LAMMPS input and output files.
+    
+    Returns
+    -------
+    dict
+        Dictionary of results consisting of keys:
+        
+        - **'E_coh'** (*float*) - The cohesive energy of the supplied system.
+        - **'stress'** (*numpy.array*) - The measured stress state of the
+          supplied system.
+        - **'C_elastic'** (*atomman.ElasticConstants*) - The supplied system's
+          elastic constants.
+        - **'system_new'** (*atomman.System*) - System with updated box
+          dimensions.
+    
+    Raises
+    ------
+    RuntimeError
+        If any of the new box dimensions are less than zero.
+    """
     
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
     
     # Define lammps variables
     lammps_variables = {}
-    lammps_variables['atomman_system_info'] = lmp.atom_data.dump(system, 'init'+str(cycle)+'.dat', 
-                                                                 units=potential.units, 
-                                                                 atom_style=potential.atom_style)
+    system_info = lmp.atom_data.dump(system, 'init'+str(cycle)+'.dat',
+                                     units=potential.units, 
+                                     atom_style=potential.atom_style)
+    lammps_variables['atomman_system_info'] = system_info
     lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
-    lammps_variables['delta'] = delta
+    lammps_variables['delta'] = strainrange
     lammps_variables['steps'] = 2
     
     # Write lammps input script
@@ -178,10 +293,12 @@ def calc_cij(lammps_command, system, potential, symbols,
     with open(template_file) as f:
         template = f.read()
     with open(lammps_script, 'w') as f:
-        f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
+        f.write(iprPy.tools.filltemplate(template, lammps_variables,
+                                         '<', '>'))
     
     # Run lammps 
-    output = lmp.run(lammps_command, lammps_script, mpi_command=mpi_command, return_style='model')
+    output = lmp.run(lammps_command, lammps_script, mpi_command=mpi_command,
+                     return_style='model')
     shutil.move('log.lammps', 'cij-'+str(cycle)+'-log.lammps')
     
     # Extract LAMMPS thermo data. Each term ranges i=0-12 where i=0 is undeformed
@@ -200,10 +317,8 @@ def calc_cij(lammps_command, system, potential, symbols,
     pxz = uc.set_in_units(np.array(output.finds('Pxz')), lammps_units['pressure'])
     pyz = uc.set_in_units(np.array(output.finds('Pyz')), lammps_units['pressure'])
     
-    #if output.lammps_date < datetime.date(2016, 8, 1):
-    pe = uc.set_in_units(np.array(output.finds('PotEng')), lammps_units['energy']) / system.natoms
-    #else:
-    #    pe = uc.set_in_units(np.array(output.finds('v_peatom')), lammps_units['energy'])
+    pe = uc.set_in_units(np.array(output.finds('PotEng')) / system.natoms,
+                         lammps_units['energy'])
     
     # Set the six non-zero strain values
     strains = np.array([ (lx[2] -  lx[1])  / lx[0],
@@ -252,15 +367,38 @@ def calc_cij(lammps_command, system, potential, symbols,
     system_new = deepcopy(system)
     system_new.box_set(a=new_a, b=new_b, c=new_c, scale=True)
     
-    return {'C_elastic':C, 'stress':stress, 'E_coh':pe[0], 'system_new':system_new}
+    results_dict = {}
+    results_dict['C_elastic'] = C
+    results_dict['stress'] = stress
+    results_dict['E_coh'] = pe[0]
+    results_dict['system_new'] = system_new
+    
+    return results_dict
 
 def process_input(input_dict, UUID=None, build=True):
-    """Reads the calc_*.in input commands for this calculation and sets default values if needed."""
+    """
+    Processes str input parameters, assigns default values if needed, and
+    generates new, more complex terms as used by the calculation.
+    
+    Parameters
+    ----------
+    input_dict :  dict
+        Dictionary containing the calculation input parameters with string
+        values.  The allowed keys depends on the calculation style.
+    UUID : str, optional
+        Unique identifier to use for the calculation instance.  If not 
+        given and a 'UUID' key is not in input_dict, then a random UUID4 
+        hash tag will be assigned.
+    build : bool, optional
+        Indicates if all complex terms are to be built.  A value of False
+        allows for default values to be assigned even if some inputs 
+        required by the calculation are incomplete.  (Default is True.)
+    """
     
     # Set calculation UUID
-    if UUID is not None: 
+    if UUID is not None:
         input_dict['calc_key'] = UUID
-    else: 
+    else:
         input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
     # Set default input/output units
@@ -280,15 +418,15 @@ def process_input(input_dict, UUID=None, build=True):
     input_dict['temperature'] = 0.0
     
     # These are calculation-specific default floats with units
-    input_dict['pressure_xx'] = iprPy.input.value(input_dict, 'pressure_xx', 
-                                    default_unit=input_dict['pressure_unit'], 
+    input_dict['pressure_xx'] = iprPy.input.value(input_dict, 'pressure_xx',
+                                    default_unit=input_dict['pressure_unit'],
                                     default_term='0.0 GPa')
-    input_dict['pressure_yy'] = iprPy.input.value(input_dict, 'pressure_yy', 
-                                    default_unit=input_dict['pressure_unit'], 
+    input_dict['pressure_yy'] = iprPy.input.value(input_dict, 'pressure_yy',
+                                    default_unit=input_dict['pressure_unit'],
                                     default_term='0.0 GPa')
-    input_dict['pressure_zz'] = iprPy.input.value(input_dict, 'pressure_zz', 
-                                    default_unit=input_dict['pressure_unit'], 
-                                    default_term='0.0 GPa')    
+    input_dict['pressure_zz'] = iprPy.input.value(input_dict, 'pressure_zz',
+                                    default_unit=input_dict['pressure_unit'],
+                                    default_term='0.0 GPa')
     
     # Check lammps_command and mpi_command
     iprPy.input.commands(input_dict)

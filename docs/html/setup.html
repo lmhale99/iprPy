@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Install iprPy &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="iprPy Tutorial" href="tutorial/index.html" />
+    <link rel="prev" title="Introduction to iprPy" href="intro.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tutorial/index.html" title="iprPy Tutorial"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction to iprPy"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="contents.html">iprPy 0.7.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="install-iprpy">
+<h1>Install iprPy<a class="headerlink" href="#install-iprpy" title="Permalink to this headline">¶</a></h1>
+<p>A key principle of iprPy is to minimize barriers for usage.  As such, the only
+requirements for running the framework are Python 2.7, and a few extra (mostly
+standard) Python packages.  All of the required packages should be compatible
+with any operating system that Python runs on.</p>
+<ol class="arabic">
+<li><p class="first">Install Python 2.7.  The <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a> distribution is preferred as it
+automatically installs the <a class="reference external" href="https://www.scipy.org/">scipy</a> family of packages that are required by
+iprPy.</p>
+</li>
+<li><p class="first">Add the Python package <a class="reference external" href="https://github.com/martinblech/xmltodict">xmltodict</a>, which can be done using pip</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">pip install xmltodict</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Add the Python package <a class="reference external" href="https://github.com/usnistgov/atomman/">atomman</a> using pip</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">pip install -U atomman</span>
+</pre></div>
+</div>
+<p>The atomman package should be updated with iprPy as the development of the
+two packages is closely aligned.</p>
+</li>
+<li><p class="first">Download or clone iprPy from GitHub.  The repository for the stable
+versions is available at <cite>https://github.com/usnistgov/iprPy</cite>.</p>
+</li>
+<li><p class="first">In a terminal, go into the iprPy root directory and add the iprPy package
+to Python with the command</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">python setup.py develop</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To test if the framework is working, in a terminal go into the iprPy/bin
+directory and enter the command</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">python iprPy check_modules</span>
+</pre></div>
+</div>
+<p>If you see a list of included calculation, record, and database styles,
+then it is working!</p>
+</li>
+<li><p class="first">The list printed in the last step indicates the iprPy modules that were
+successfully and unsuccessfully loaded.  If a module did not load, then
+either the module has additional requirements or has not yet been fully
+implemented into iprPy.</p>
+</li>
+</ol>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="intro.html"
+                        title="previous chapter">Introduction to iprPy</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tutorial/index.html"
+                        title="next chapter">iprPy Tutorial</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/setup.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tutorial/index.html" title="iprPy Tutorial"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction to iprPy"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="contents.html">iprPy 0.7.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

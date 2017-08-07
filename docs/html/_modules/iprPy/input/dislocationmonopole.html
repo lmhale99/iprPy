@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>iprPy.input.dislocationmonopole &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for iprPy.input.dislocationmonopole</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">DataModelDict</span> <span class="k">import</span> <span class="n">DataModelDict</span> <span class="k">as</span> <span class="n">DM</span>
+
+<div class="viewcode-block" id="dislocationmonopole"><a class="viewcode-back" href="../../../modules/iprPy.input.html#iprPy.input.dislocationmonopole">[docs]</a><span class="k">def</span> <span class="nf">dislocationmonopole</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interprets calculation parameters associated with a dislocation-monopole</span>
+<span class="sd">    record.</span>
+<span class="sd">    </span>
+<span class="sd">    The input_dict keys used by this function (which can be renamed using the</span>
+<span class="sd">    function&#39;s keyword arguments):</span>
+<span class="sd">    </span>
+<span class="sd">    - **&#39;dislocation_model&#39;** a dislocation-monopole record to load.</span>
+<span class="sd">    - **&#39;dislocation_content&#39;** alternate file or content to load instead of</span>
+<span class="sd">      specified dislocation_model.  This is used by prepare functions.</span>
+<span class="sd">    - **&#39;x_axis&#39;, &#39;y_axis&#39;, &#39;z_axis&#39;** the orientation axes.  This function</span>
+<span class="sd">      only reads in values from the dislocation_model.</span>
+<span class="sd">    - **&#39;atomshift&#39;** the atomic shift to apply to all atoms.  This function</span>
+<span class="sd">      only reads in values from the dislocation_model.</span>
+<span class="sd">    - **&#39;dislocation_burgersvector&#39;** the dislocation&#39;s Burgers vector as a</span>
+<span class="sd">      crystallographic.vector.</span>
+<span class="sd">    - **&#39;dislocation_boundaryshape&#39;** defines the shape of the boundary</span>
+<span class="sd">      region.</span>
+<span class="sd">    - **&#39;dislocation_boundarywidth&#39;** defines the minimum width of the</span>
+<span class="sd">      boundary region.  This term is in units of the unit cell&#39;s a lattice</span>
+<span class="sd">      parameter.</span>
+<span class="sd">    - **&#39;ucell&#39;** the unit cell system. Used here in scaling the model</span>
+<span class="sd">      parameters to the system being explored.</span>
+<span class="sd">    - **&#39;burgersvector&#39;** the dislocation&#39;s Burgers vector as a Cartesian</span>
+<span class="sd">      vector.</span>
+<span class="sd">    - **&#39;boundarywidth&#39;** defines the minimum width of the boundary region.</span>
+<span class="sd">      This term is in length units.</span>
+<span class="sd">       </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_dict : dict</span>
+<span class="sd">        Dictionary containing input parameter key-value pairs.</span>
+<span class="sd">    dislocation_model : str</span>
+<span class="sd">        Replacement parameter key name for &#39;dislocation_model&#39;.</span>
+<span class="sd">    dislocation_content : str</span>
+<span class="sd">        Replacement parameter key name for &#39;dislocation_content&#39;.</span>
+<span class="sd">    x_axis : str</span>
+<span class="sd">        Replacement parameter key name for &#39;x_axis&#39;.</span>
+<span class="sd">    y_axis : str</span>
+<span class="sd">        Replacement parameter key name for &#39;y_axis&#39;.</span>
+<span class="sd">    z_axis : str</span>
+<span class="sd">        Replacement parameter key name for &#39;z_axis&#39;.</span>
+<span class="sd">    atomshift : str</span>
+<span class="sd">        Replacement parameter key name for &#39;atomshift&#39;.</span>
+<span class="sd">    dislocation_burgersvector : str</span>
+<span class="sd">        Replacement parameter key name for &#39;dislocation_burgersvector&#39;.</span>
+<span class="sd">    dislocation_boundaryshape : str</span>
+<span class="sd">        Replacement parameter key name for &#39;dislocation_boundaryshape&#39;.</span>
+<span class="sd">    dislocation_boundarywidth : str</span>
+<span class="sd">        Replacement parameter key name for &#39;dislocation_boundarywidth&#39;.</span>
+<span class="sd">    ucell : str</span>
+<span class="sd">        Replacement parameter key name for &#39;ucell&#39;.</span>
+<span class="sd">    burgersvector : str</span>
+<span class="sd">        Replacement parameter key name for &#39;burgersvector&#39;.</span>
+<span class="sd">    boundarywidth : str</span>
+<span class="sd">        Replacement parameter key name for &#39;boundarywidth&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Set default keynames</span>
+    <span class="n">keynames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dislocation_model&#39;</span><span class="p">,</span> <span class="s1">&#39;dislocation_content&#39;</span><span class="p">,</span> <span class="s1">&#39;x_axis&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;y_axis&#39;</span><span class="p">,</span> <span class="s1">&#39;z_axis&#39;</span><span class="p">,</span> <span class="s1">&#39;atomshift&#39;</span><span class="p">,</span> <span class="s1">&#39;dislocation_burgersvector&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;dislocation_boundaryshape&#39;</span><span class="p">,</span> <span class="s1">&#39;dislocation_boundarywidth&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ucell&#39;</span><span class="p">,</span> <span class="s1">&#39;burgersvector&#39;</span><span class="p">,</span> <span class="s1">&#39;boundarywidth&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">keyname</span> <span class="ow">in</span> <span class="n">keynames</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="n">keyname</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keyname</span><span class="p">,</span> <span class="n">keyname</span><span class="p">)</span>
+    
+    <span class="c1"># Extract input values and assign default values</span>
+    <span class="n">dislocation_model</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dislocation_model&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">dislocation_content</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dislocation_content&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">dislocation_boundaryshape</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dislocation_boundaryshape&#39;</span><span class="p">],</span> <span class="s1">&#39;circle&#39;</span><span class="p">)</span>
+    <span class="n">dislocation_boundarywidth</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dislocation_boundarywidth&#39;</span><span class="p">],</span> <span class="mf">3.0</span><span class="p">))</span>
+    <span class="n">ucell</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ucell&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+    
+    <span class="c1"># Replace defect model with defect content if given</span>
+    <span class="k">if</span> <span class="n">dislocation_content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dislocation_model</span> <span class="o">=</span> <span class="n">dislocation_content</span>
+    
+    <span class="c1"># If defect model is given</span>
+    <span class="k">if</span> <span class="n">dislocation_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        
+        <span class="c1"># Verify competing parameters are not defined</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;atomshift&#39;</span><span class="p">,</span> <span class="s1">&#39;x_axis&#39;</span><span class="p">,</span> <span class="s1">&#39;y_axis&#39;</span><span class="p">,</span> <span class="s1">&#39;z_axis&#39;</span><span class="p">,</span> 
+                    <span class="s1">&#39;dislocation_burgersvector&#39;</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">input_dict</span><span class="p">,</span> <span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; and &#39;</span>
+                                                   <span class="o">+</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dislocation_model&#39;</span><span class="p">]</span>
+                                                   <span class="o">+</span> <span class="s1">&#39; cannot both be supplied&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># Load defect model</span>
+        <span class="n">dislocation_model</span> <span class="o">=</span> <span class="n">DM</span><span class="p">(</span><span class="n">dislocation_model</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;dislocation-monopole&#39;</span><span class="p">)</span>
+            
+        <span class="c1"># Extract parameter values from defect model</span>
+        <span class="n">input_dict</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;x_axis&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">dislocation_model</span><span class="p">[</span><span class="s1">&#39;calculation-parameter&#39;</span><span class="p">][</span><span class="s1">&#39;x_axis&#39;</span><span class="p">]</span>
+        <span class="n">input_dict</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;y_axis&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">dislocation_model</span><span class="p">[</span><span class="s1">&#39;calculation-parameter&#39;</span><span class="p">][</span><span class="s1">&#39;y_axis&#39;</span><span class="p">]</span>
+        <span class="n">input_dict</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;z_axis&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">dislocation_model</span><span class="p">[</span><span class="s1">&#39;calculation-parameter&#39;</span><span class="p">][</span><span class="s1">&#39;z_axis&#39;</span><span class="p">]</span>
+        <span class="n">input_dict</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;atomshift&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">dislocation_model</span><span class="p">[</span><span class="s1">&#39;calculation-parameter&#39;</span><span class="p">][</span><span class="s1">&#39;atomshift&#39;</span><span class="p">]</span>
+        <span class="n">input_dict</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dislocation_burgersvector&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">dislocation_model</span><span class="p">[</span><span class="s1">&#39;calculation-parameter&#39;</span><span class="p">][</span><span class="s1">&#39;burgersvector&#39;</span><span class="p">]</span>
+    
+    <span class="c1"># Set default parameter values if defect model not given</span>
+    <span class="c1">#else: </span>
+    
+    <span class="c1"># convert parameters if ucell exists</span>
+    <span class="k">if</span> <span class="n">ucell</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dislocation_burgersvector</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dislocation_burgersvector&#39;</span><span class="p">]]</span>
+        <span class="n">dislocation_burgersvector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dislocation_burgersvector</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span>
+                                             <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        
+        <span class="c1"># Convert crystallographic vectors to Cartesian vectors</span>
+        <span class="n">burgersvector</span> <span class="o">=</span> <span class="p">(</span><span class="n">dislocation_burgersvector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">ucell</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">avect</span> <span class="o">+</span>
+                         <span class="n">dislocation_burgersvector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">ucell</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">bvect</span> <span class="o">+</span>
+                         <span class="n">dislocation_burgersvector</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">ucell</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">cvect</span><span class="p">)</span>
+        
+        <span class="c1"># Scale boundary width by unit cell&#39;s a lattice constant</span>
+        <span class="n">boundarywidth</span> <span class="o">=</span> <span class="n">ucell</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">a</span> <span class="o">*</span> <span class="n">dislocation_boundarywidth</span>
+        
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">burgersvector</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">boundarywidth</span> <span class="o">=</span> <span class="kc">None</span>
+        
+    <span class="c1"># Save processed terms</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dislocation_model&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">dislocation_model</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dislocation_boundaryshape&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">dislocation_boundaryshape</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dislocation_boundarywidth&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">dislocation_boundarywidth</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;burgersvector&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">burgersvector</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;boundarywidth&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">boundarywidth</span></div>
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

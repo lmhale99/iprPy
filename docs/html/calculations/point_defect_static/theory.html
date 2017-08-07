@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Method and Theory &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="calc_point_defect_static.py" href="calc.html" />
+    <link rel="prev" title="Introduction" href="intro.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="calc.html" title="calc_point_defect_static.py"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">point_defect_static</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="method-and-theory">
+<span id="method-and-theory"></span><h1>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this headline">¶</a></h1>
+<p>An initial system is supplied, and a LAMMPS simulation performs an energy/force minimization on the system and estimates the cohesive energy, <span class="math">\(E_{coh}\)</span>. A corresponding defect system is constructed using the atomman.defect.point() function. After insertion, the system is relaxed using an energy/force minimization and the total potential energy of the defect system, <span class="math">\(E_{ptd}^{total}\)</span> is measured. The formation energy of the defect, <span class="math">\(E_{ptd}^f\)</span>, is obtained with</p>
+<p>$$E_{ptd}^f = E_{ptd}^{total} - E_{coh} * n_{ptd},$$</p>
+<p>where <span class="math">\(n_{ptd}\)</span> is the number of atoms in the defect system.</p>
+<p>The atomman.defect.point() method allows for the generation of four types of point defects:</p>
+<ul class="simple">
+<li><strong>vacancy</strong>, where an atom at a specified location is deleted.</li>
+<li><strong>interstitial</strong>, where an extra atom is inserted at a specified location (that does not correspond to an existing atom).</li>
+<li><strong>substitutional</strong>, where the atomic type of an atom at a specified location is changed.</li>
+<li><strong>dumbbell</strong> interstitial, where an atom at a specified location is replaced by a pair of atoms equidistant from the original atom&#8217;s position.</li>
+</ul>
+<p>Point defect complexes (clusters, balanced ionic defects, etc.) can also be constructed piecewise from these basic types.</p>
+<p>The final defect-containing system is analyzed using a few simple metrics to determine whether or not the point defect configuration has relaxed to a lower energy configuration:</p>
+<ul class="simple">
+<li><strong>centrosummation</strong> adds up the vector positions of atoms relative to the defect&#8217;s position for all atoms within a specified cutoff. In most simple crystals, the defect positions are associated with high symmetry lattice sites in which the centrosummation about that point in the defect-free system will be zero. If the defect only hydrostatically displaces neighbor atoms, then the centrosummation should also be zero for the defect system. This is computed for all defect types.</li>
+</ul>
+<p>$$centrosummation = \sum_i^N{\left(r_i - r_{ptd} \right)} $$</p>
+<ul class="simple">
+<li><strong>position_shift</strong> is the change in position of an interstitial or substitutional atom following relaxation of the system. A non-zero value indicates that the defect atom has moved from its initially ideal position.</li>
+</ul>
+<p>$$position_shift = r_{ptd} - r_{ptd}^0$$</p>
+<ul class="simple">
+<li><strong>db_vect_shift</strong> compares the unit vector associated with the pair of atoms in a dumbbell interstitial before and after relaxation. A non-zero value indicates that the dumbbell has rotated from its ideal configuration.</li>
+</ul>
+<p>$$db_vect_shift = \frac{r_{db1} - r_{db2}}{|r_{db1} - r_{db2}|} - \frac{r_{db1}^0 - r_{db2}^0}{|r_{db1}^0 - r_{db2}^0|}$$</p>
+<p>If any of the metrics have values not close to (0,0,0), then there was likely an atomic configuration relaxation.</p>
+<p>The final defect system and the associated perfect base system are retained in the calculation&#8217;s archive. The calculation&#8217;s record reports the base system&#8217;s cohesive energy, the point defect&#8217;s formation energy, and the values of any of the reconfiguration metrics used.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="intro.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="calc.html"
+                        title="next chapter">calc_point_defect_static.py</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/calculations/point_defect_static/theory.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="calc.html" title="calc_point_defect_static.py"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >point_defect_static</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

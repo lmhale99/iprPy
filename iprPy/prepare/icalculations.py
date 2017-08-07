@@ -1,28 +1,39 @@
+from __future__ import division, absolute_import, print_function
+
 from ..tools import aslist
 
 import pandas as pd
 import numpy as np
 
-def icalculations(database, record_style=None, symbol=None, family=None, potential=None):
+def icalculations(database, record_style=None, symbol=None, family=None,
+                  potential=None):
     """
-    Iterates over calculation records in a database that match limiting conditions.
+    Iterates over calculation records in a database that match limiting
+    conditions.
     
-    Arguments:
-    database -- an iprPy.Database object for the database being accessed
-    
-    Keyword Arguments:
-    record_style -- string name for the record style (i.e. template) to use.
-    symbol -- single string element tag or list of element symbols. Only 
-              potentials that contain models for at least one of the listed
-              symbols will be returned. Default value is None (i.e. no 
-              selection by element).
-    family -- single string name or list of names for the system families to 
-              include. Default value is None (i.e. no selection by family).
-    potential -- single string name or list of names for the prototypes to 
-                 include.
+    Parameters
+    ----------
+    database : iprPy.Database 
+        The database being accessed.
+    record_style : str
+        The record style to access.
+    symbol : str or list of str, optional
+        Single string element tag or list of element tags to limit by.  Only
+        calcualtions that use element models for at least one of the listed
+        symbols will be included.  If not given, then no limiting by symbol.
+    family : str or list of str, optional
+        Single family name or list of family names to limit by.  Only 
+        calculations associated with the given system families will be 
+        included.  If not given, then no limiting by family.
+    potential : str or list of str, optional
+        Single potential id or list of potential ids to limit by.  Only 
+        calculations associated with the given potential will be included.
+        If not given, then no limiting by potential.
 
-    
-    Yields iprPy.Record objects for the associated calculations.    
+    Yields
+    ------
+    iprPy.Record
+        Each record from the database matching the limiting conditions.
     """
     
     df = []

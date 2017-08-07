@@ -1,31 +1,48 @@
+from __future__ import division, absolute_import, print_function
+
 from .aslist import aslist
 
 def termtodict(term, keys):
     """
-    Takes a string term and parses it into a dictionary of key-value pairs 
-    based on the supplied key list
+    Takes a str term and parses it into a dictionary of key-value pairs
+    based on the supplied key list.
     
-    Arguments:
-    term -- string term to parse
-    keys -- list of keys to search for
+    Parameters
+    ----------
+    term : str, unicode
+        The str term to parse.
+    keys : list of str
+        The list of keys to parse by.
+    
+    Returns
+    -------
+    dict
+        Dictionary of parsed key-value terms.
+        
+    Raises
+    ------
+    ValueError
+        If any key appears mupltiple times or the first word in term does not
+        match a key.
     
     """
     
-    #Convert keys to list if needed
+    # Convert keys to list if needed
     keys = aslist(keys)
     
-    #initialize parameter dict
+    # Initialize parameter dict
     param_dict = {}
 
     words = term.split()
     
-    #loop through all words of term
+    # Loop through all words of term
     key = None
     for word in words:
         if word in keys:
             key = word
             if key in param_dict:
-                raise ValueError('Invalid terms: key '+key+' appears multiple times')
+                raise ValueError('Invalid terms: key ' + key
+                                 + ' appears multiple times')
         else:
             if key is None:
                 raise ValueError('Invalid terms: no keys match first term')
@@ -34,4 +51,4 @@ def termtodict(term, keys):
             else:
                 param_dict[key] = word
     
-    return param_dict            
+    return param_dict

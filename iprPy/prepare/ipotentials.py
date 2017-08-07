@@ -1,40 +1,53 @@
+from __future__ import division, absolute_import, print_function
+
 from ..tools import aslist
 
 import pandas as pd
 import numpy as np
 
-def ipotentials(database, record_style='potential-LAMMPS', 
+def ipotentials(database, record_style='potential_LAMMPS', 
                 element=None, name=None, pair_style=None, 
                 currentIPR=True):
     """
-    Iterates over potentials in a database that match limiting conditions.
+    Iterates over potential records in a database that match limiting 
+    conditions.
     
-    Arguments:
-    database -- an iprPy.Database object for the database being accessed
+    Parameters
+    ----------
+    database : iprPy.Database 
+        The database being accessed.
+    record_style : str, optional
+        The record style to access (Default is 'potential_LAMMPS').
+    element : str or list of str, optional
+        Single string element tag or list of element tags to limit by.  Only
+        potentials that have element models for at least one of the listed
+        elements will be included.  If not given, then no limiting by element.
+    name : str or list of str, optional
+        Single potential id or list of potential ids to limit by.  Only 
+        potentials with the given potential id will be included.  If not
+        given, then no limiting by name.
+    pair_style : str or list of str, optional
+        Single LAMMPS pair_style or list of LAMMPS pair_styles to limit by.
+        Only potentials with the given pair_style will be included.  If not
+        given, then no limiting by pair_style.
+    currentIPR : bool
+        If True, only the current IPR implementations of the potentials will
+        be included, i.e. the record names end with --IPR#, and # is the
+        highest for all records associated with the same potential id. If 
+        False, all matching implementations will be included. (Default is 
+        True.)
     
-    Keyword Arguments:
-    element -- single string element tag or list of element tags. Only 
-               potentials that contain models for at least one of the listed
-               elements will be returned. Default value is None (i.e. no 
-               selection by element).
-    name -- single string name or list of names for the potentials to include.
-            Default value is None (i.e. no selection by name).
-    pair_style -- single string LAMMPS pair_style type or list of pair_style 
-                  types that the potentials must be to be returned. Default
-                  value is None (i.e. no selection by pair_style).
-    record_style -- string name for the record type (i.e. template) to use.
-                   Default value is 'LAMMPS-potential'.
-    currentIPR -- boolean indicating if only the current IPR implementations of
-                  the potentials are to be considered. If True, only the IPR# 
-                  implementations with the highest # are included. If False, all
-                  matching implementations will be used. Default value is True.
-    
-    Yields iprPy.Record objects for the associated potentials.    
+    Yields
+    ------
+    iprPy.Record 
+        Each record from the database matching the limiting conditions.
     """
     
     df = []
+    records = {}
     for record in database.iget_records(style=record_style):
         df.append(record.todict())
+        records[record.name] = record
     df = pd.DataFrame(df)
     
     # Limit by potential name

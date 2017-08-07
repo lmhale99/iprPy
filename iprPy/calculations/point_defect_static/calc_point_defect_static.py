@@ -3,7 +3,7 @@
 # Python script created by Lucas Hale
 
 # Standard library imports
-from __future__ import print_function, division
+from __future__ import division, absolute_import, print_function
 import os
 import sys
 import uuid
@@ -28,74 +28,106 @@ import iprPy
 
 # Define calc_style and record_style
 calc_style = 'point_defect_static'
-record_style = 'calculation-point-defect-formation'
+record_style = 'calculation_point_defect_formation'
 
 def main(*args):
-    """Main function for running calculation"""
+    """Main function called when script is executed directly."""
 
     # Read input file in as dictionary
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, allsingular=True)
     
-    # Interpret and process input parameters 
+    # Interpret and process input parameters
     process_input(input_dict, *args[1:])
     
     # Run ptd_energy to refine values
-    results_dict = pointdefect(input_dict['lammps_command'], 
-                               input_dict['initialsystem'], 
-                               input_dict['potential'], 
+    results_dict = pointdefect(input_dict['lammps_command'],
+                               input_dict['initialsystem'],
+                               input_dict['potential'],
                                input_dict['symbols'],
                                input_dict['point_kwargs'],
                                mpi_command = input_dict['mpi_command'],
-                               etol =        input_dict['energytolerance'], 
-                               ftol =        input_dict['forcetolerance'], 
-                               maxiter =     input_dict['maxiterations'], 
-                               maxeval =     input_dict['maxevaluations'], 
-                               dmax =        input_dict['maxatommotion'])
+                               etol = input_dict['energytolerance'],
+                               ftol = input_dict['forcetolerance'],
+                               maxiter = input_dict['maxiterations'],
+                               maxeval = input_dict['maxevaluations'],
+                               dmax = input_dict['maxatommotion'])
     
     # Run check_ptd_config
     cutoff = 1.05*input_dict['ucell'].box.a
-    results_dict.update(check_ptd_config(results_dict['system_ptd'], 
-                                         input_dict['point_kwargs'], 
+    results_dict.update(check_ptd_config(results_dict['system_ptd'],
+                                         input_dict['point_kwargs'],
                                          cutoff))
     
-    # Save data model of results 
-    results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict, results_dict)
+    # Save data model of results
+    results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict,
+                               results_dict)
 
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)
 
-def pointdefect(lammps_command, system, potential, symbols, point_kwargs, mpi_command=None,
-               etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000, dmax=uc.set_in_units(0.01, 'angstrom')):
+def pointdefect(lammps_command, system, potential, symbols, point_kwargs,
+                mpi_command=None, etol=0.0, ftol=0.0, maxiter=10000,
+                maxeval=100000, dmax=uc.set_in_units(0.01, 'angstrom')):
     """
     Adds one or more point defects to a system and evaluates the defect 
     formation energy.
     
-    Arguments:
-    lammps_command -- command for running LAMMPS.
-    system -- atomman.System to add the point defect to.
-    potential -- atomman.lammps.Potential representation of a LAMMPS 
-                 implemented potential.
-    symbols -- list of element-model symbols for the Potential that correspond 
-               to system's atypes.
-    point_kwargs -- dictionary of keyword arguments used by atomman.defect.point
-                    for generating a point defect. Multiple defects can be added 
-                    simultaneously by providing a list where every entry is a 
-                    complete collection of keyword arguments.
+    Parameters
+    ----------
+    lammps_command :str
+        Command for running LAMMPS.
+    system : atomman.System
+        The system to perform the calculation on.
+    potential : atomman.lammps.Potential
+        The LAMMPS implemented potential to use.
+    symbols : list of str
+        The list of element-model symbols for the Potential that correspond to
+        system's atypes.
+    point_kwargs : dict or list of dict
+        One or more dictionaries containing the keyword arguments for
+        the atomman.defect.point() function to generate specific point
+        defect configuration(s).
+    mpi_command : str, optional
+        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+        will run serially.
+    sim_directory : str, optional
+        The path to the directory to perform the simuation in.  If not
+        given, will use the current working directory.
+    etol : float, optional
+        The energy tolerance for the structure minimization. This value is
+        unitless. (Default is 0.0).
+    ftol : float, optional
+        The force tolerance for the structure minimization. This value is in
+        units of force. (Default is 0.0).
+    maxiter : int, optional
+        The maximum number of minimization iterations to use (default is 
+        10000).
+    maxeval : int, optional
+        The maximum number of minimization evaluations to use (default is 
+        100000).
+    dmax : float, optional
+        The maximum distance in length units that any atom is allowed to relax
+        in any direction during a single minimization iteration (default is
+        0.01 Angstroms).
     
-    Keyword Arguments:
-    mpi_command -- MPI command for running LAMMPS in parallel. Default value is
-                   None (serial run).  
-    etol -- energy tolerance to use for the LAMMPS minimization. Default value 
-            is 0.0 (i.e. only uses ftol). 
-    ftol -- force tolerance to use for the LAMMPS minimization. Default value 
-            is 0.0.
-    maxiter -- the maximum number of iterations for the LAMMPS minimization. 
-               Default value is 10000.
-    maxeval -- the maximum number of evaluations for the LAMMPS minimization. 
-               Default value is 100000.    
-    dmax -- the maximum distance that an atom is allowed to relax during a 
-            minimization iteration. Default value is 0.01 Angstroms.
+    Returns
+    -------
+    dict
+        Dictionary of results consisting of keys:
+        
+        - **'E_coh'** (*float*) - The cohesive energy of the bulk system.
+        - **'E_ptd_f'** (*float*) - The point.defect formation energy.
+        - **'E_total_base'** (*float*) - The total potential energy of the
+          relaxed bulk system.
+        - **'E_total_ptd'** (*float*) - The total potential energy of the
+          relaxed defect system.
+        - **'system_base'** (*atomman.System*) - The relaxed bulk system.
+        - **'system_ptd'** (*atomman.System*) - The relaxed defect system.
+        - **'dumpfile_base'** (*str*) - The filename of the LAMMPS dump file
+          for the relaxed bulk system.
+        - **'dumpfile_ptd'** (*str*) - The filename of the LAMMPS dump file
+          for the relaxed defect system.
     """
     
     # Get lammps units
@@ -106,15 +138,16 @@ def pointdefect(lammps_command, system, potential, symbols, point_kwargs, mpi_co
     
     # Define lammps variables
     lammps_variables = {}
-    lammps_variables['atomman_system_info'] = lmp.atom_data.dump(system, 'perfect.dat', 
-                                                                 units=potential.units, 
-                                                                 atom_style=potential.atom_style)
-    lammps_variables['atomman_pair_info'] =   potential.pair_info(symbols)
-    lammps_variables['etol'] =                etol
-    lammps_variables['ftol'] =                uc.get_in_units(ftol, lammps_units['force'])
-    lammps_variables['maxiter'] =             maxiter
-    lammps_variables['maxeval'] =             maxeval
-    lammps_variables['dmax'] =                dmax
+    system_info = lmp.atom_data.dump(system, 'perfect.dat',
+                                     units=potential.units,
+                                     atom_style=potential.atom_style)
+    lammps_variables['atomman_system_info'] = system_info
+    lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
+    lammps_variables['etol'] = etol
+    lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])
+    lammps_variables['maxiter'] = maxiter
+    lammps_variables['maxeval'] = maxeval
+    lammps_variables['dmax'] = dmax
     
     # Set dump_modify format based on dump_modify_version
     if lammps_date < datetime.date(2016, 8, 3):
@@ -128,20 +161,23 @@ def pointdefect(lammps_command, system, potential, symbols, point_kwargs, mpi_co
     with open(template_file) as f:
         template = f.read()
     with open(lammps_script, 'w') as f:
-        f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
+        f.write(iprPy.tools.filltemplate(template, lammps_variables,
+                                         '<', '>'))
 
     # Run lammps to relax perfect.dat
     output = lmp.run(lammps_command, lammps_script, mpi_command)
     
     # Extract LAMMPS thermo data.
     thermo = output.simulations[0]['thermo']
-    E_total_base = uc.set_in_units(thermo.PotEng.values[-1], lammps_units['energy'])
+    E_total_base = uc.set_in_units(thermo.PotEng.values[-1],
+                                   lammps_units['energy'])
     E_coh = E_total_base / system.natoms
     
     # Rename log file
     shutil.move('log.lammps', 'min-perfect-log.lammps')
     
-    # Load relaxed system from dump file and copy old vects as dump files crop values
+    # Load relaxed system from dump file and copy old box vectors because 
+    # dump files crop the values.
     last_dump_file = 'atom.'+str(thermo.Step.values[-1])
     system_base = lmp.atom_dump.load(last_dump_file)
     system_base.box_set(vects=system.box.vects)
@@ -155,54 +191,91 @@ def pointdefect(lammps_command, system, potential, symbols, point_kwargs, mpi_co
         system_ptd = am.defect.point(system_ptd, **pkwargs)
     
     # Update lammps variables
-    lammps_variables['atomman_system_info'] = lmp.atom_data.dump(system_ptd, 'defect.dat',
-                                                                 units = potential.units, 
-                                                                 atom_style = potential.atom_style)
+    system_info = lmp.atom_data.dump(system_ptd, 'defect.dat',
+                                     units = potential.units, 
+                                     atom_style = potential.atom_style)
+    lammps_variables['atomman_system_info'] = system_info
     
     # Write lammps input script
     with open(lammps_script, 'w') as f:
-        f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
+        f.write(iprPy.tools.filltemplate(template, lammps_variables,
+                                         '<', '>'))
 
     # Run lammps
     output = lmp.run(lammps_command, lammps_script, mpi_command)
     
     # Extract lammps thermo data
     thermo = output.simulations[0]['thermo']
-    E_total_ptd = uc.set_in_units(thermo.PotEng.values[-1], lammps_units['energy'])
+    E_total_ptd = uc.set_in_units(thermo.PotEng.values[-1],
+                                  lammps_units['energy'])
     
     # Rename log file
-    shutil.move('log.lammps', 'min-defect-log.lammps')    
+    shutil.move('log.lammps', 'min-defect-log.lammps')
     
-    # Load relaxed system from dump file and copy old vects as dump files crop values
+    # Load relaxed system from dump file and copy old vects as 
+    # the dump files crop the values
     last_dump_file = 'atom.'+str(thermo.Step.values[-1])
     system_ptd = lmp.atom_dump.load(last_dump_file)
     system_ptd.box_set(vects=system.box.vects)
+    lmp.atom_dump.dump(system_ptd, 'defect.dump')
     
-    # Compute defect formation energy as difference between total potential energy of defect system
-    # and the cohesive energy of the perfect system times the number of atoms in the defect system
+    # Compute defect formation energy
     E_ptd_f = E_total_ptd - E_coh * system_ptd.natoms
     
-    # Clear atom.* files and save dump files of relaxed systems
-    for fname in glob.iglob(os.path.join(os.getcwd(), 'atom.*')):
+    # Cleanup files
+    for fname in glob.iglob('atom.*'):
         os.remove(fname)
+    for dumpjsonfile in glob.iglob('*.dump.json'):
+        os.remove(dumpjsonfile)
     
-    return {'E_coh':         E_coh,          'E_ptd_f':      E_ptd_f, 
-            'E_total_base':  E_total_base,   'E_total_ptd':  E_total_ptd,
-            'system_base':   system_base,    'system_ptd':   system_ptd,
-            'dumpfile_base': 'perfect.dump', 'dumpfile_ptd': 'defect.dump'}
+    # Return results
+    results_dict = {}
+    results_dict['E_coh'] = E_coh
+    results_dict['E_ptd_f'] = E_ptd_f
+    results_dict['E_total_base'] = E_total_base
+    results_dict['E_total_ptd'] = E_total_ptd
+    results_dict['system_base'] = system_base
+    results_dict['system_ptd'] = system_ptd
+    results_dict['dumpfile_base'] = 'perfect.dump'
+    results_dict['dumpfile_ptd'] = 'defect.dump'
+    
+    return results_dict
 
-def check_ptd_config(system, point_kwargs, cutoff, tol=uc.set_in_units(1e-5, 'angstrom')):
+def check_ptd_config(system, point_kwargs, cutoff,
+                     tol=uc.set_in_units(1e-5, 'angstrom')):
     """
-    Evaluates a relaxed system containing a point defect to determine if the defect 
-    structure has transformed to a different configuration.
+    Evaluates a relaxed system containing a point defect to determine if the
+    defect structure has transformed to a different configuration.
     
-    Arguments:
-    system -- atomman.System containing the point defect(s)
-    ptd_model -- DataModelDict representation of a point defect data model
-    cutoff -- cutoff to use for identifying atoms nearest to the defect's position
+    Parameters
+    ----------
+    system : atomman.System
+        The relaxed defect system.
+    point_kwargs : dict or list of dict
+        One or more dictionaries containing the keyword arguments for
+        the atomman.defect.point() function to generate specific point
+        defect configuration(s).
+    cutoff : float
+        Cutoff distance to use in identifying neighbor atoms.
+    tol : float, optional
+        Absolute tolerance to use for identifying if a defect has
+        reconfigured (default is 1e-5 Angstoms).
     
-    Keyword Argument:
-    tol -- tolerance to use for identifying if a defect has reconfigured. Default value is 1e-5.
+    Returns
+    -------
+    dict
+        Dictionary of results consisting of keys:
+        
+        - **'has_reconfigured'** (*bool*) - Flag indicating if the structure
+          has been identified as relaxing to a different defect configuration.
+        - **'centrosummation'** (*numpy.array of float*) - The centrosummation
+          parameter used for evaluating if the configuration has relaxed.
+        - **'position_shift'** (*numpy.array of float*) - The position_shift
+          parameter used for evaluating if the configuration has relaxed.
+          Only given for interstitial and substitutional-style defects.
+        - **'db_vect_shift'** (*numpy.array of float*) - The db_vect_shift
+          parameter used for evaluating if the configuration has relaxed.
+          Only given for dumbbell-style defects.
     """
     
     # Check if point_kwargs is a list
@@ -216,7 +289,8 @@ def check_ptd_config(system, point_kwargs, cutoff, tol=uc.set_in_units(1e-5, 'an
         
     # If it is a list of two (divacancy), use the first and average position
     elif len(point_kwargs) == 2:
-        pos = (np.array(point_kwargs[0]['pos']) + np.array(point_kwargs[1]['pos'])) / 2
+        pos = (np.array(point_kwargs[0]['pos'])
+               + np.array(point_kwargs[1]['pos'])) / 2
         point_kwargs = point_kwargs[0]
     
     # More than two not supported by this function
@@ -243,9 +317,9 @@ def check_ptd_config(system, point_kwargs, cutoff, tol=uc.set_in_units(1e-5, 'an
         if not np.allclose(position_shift, np.zeros(3), atol=tol):
             has_reconfigured = True
         
-        return {'has_reconfigured': has_reconfigured, 
-                'centrosummation':  centrosummation, 
-                'position_shift':   position_shift}
+        return {'has_reconfigured': has_reconfigured,
+                'centrosummation': centrosummation,
+                'position_shift': position_shift}
         
     # Investigate if dumbbell vector has shifted direction 
     elif point_kwargs['ptd_type'] == 'db':
@@ -257,21 +331,38 @@ def check_ptd_config(system, point_kwargs, cutoff, tol=uc.set_in_units(1e-5, 'an
         if not np.allclose(db_vect_shift, np.zeros(3), atol=tol):
             has_reconfigured = True
     
-        return {'has_reconfigured': has_reconfigured, 
-                'centrosummation':  centrosummation, 
-                'db_vect_shift':    db_vect_shift}   
+        return {'has_reconfigured': has_reconfigured,
+                'centrosummation': centrosummation,
+                'db_vect_shift': db_vect_shift}
     
     else:
-        return {'has_reconfigured': has_reconfigured, 
-                'centrosummation':  centrosummation}
+        return {'has_reconfigured': has_reconfigured,
+                'centrosummation': centrosummation}
 
 def process_input(input_dict, UUID=None, build=True):
-    """Reads the calc_*.in input commands for this calculation and sets default values if needed."""
+    """
+    Processes str input parameters, assigns default values if needed, and
+    generates new, more complex terms as used by the calculation.
+    
+    Parameters
+    ----------
+    input_dict :  dict
+        Dictionary containing the calculation input parameters with string
+        values.  The allowed keys depends on the calculation style.
+    UUID : str, optional
+        Unique identifier to use for the calculation instance.  If not 
+        given and a 'UUID' key is not in input_dict, then a random UUID4 
+        hash tag will be assigned.
+    build : bool, optional
+        Indicates if all complex terms are to be built.  A value of False
+        allows for default values to be assigned even if some inputs 
+        required by the calculation are incomplete.  (Default is True.)
+    """
     
     # Set calculation UUID
-    if UUID is not None: 
+    if UUID is not None:
         input_dict['calc_key'] = UUID
-    else: 
+    else:
         input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
     # Set default input/output units
@@ -279,27 +370,26 @@ def process_input(input_dict, UUID=None, build=True):
     
     # These are calculation-specific default strings
     input_dict['sizemults'] = input_dict.get('sizemults', '5 5 5')
-    
+    input_dict['forcetolerance'] = input_dict.get('forcetolerance',
+                                                  '1.0e-6 eV/angstrom')
+                                                  
     # These are calculation-specific default booleans
     # None for this calculation
     
     # These are calculation-specific default integers
-    input_dict['maxiterations'] =  int(input_dict.get('maxiterations',  100000))
-    input_dict['maxevaluations'] = int(input_dict.get('maxevaluations', 100000))
+    # None for this calculation
     
     # These are calculation-specific default unitless floats
-    input_dict['energytolerance'] = float(input_dict.get('energytolerance', 0.0))
+    # None for this calculation
     
     # These are calculation-specific default floats with units
-    input_dict['forcetolerance'] = iprPy.input.value(input_dict, 'forcetolerance',
-                                                     default_unit=input_dict['force_unit'],  
-                                                     default_term='1.0e-6 eV/angstrom')             
-    input_dict['maxatommotion'] = iprPy.input.value(input_dict, 'maxatommotion', 
-                                                    default_unit=input_dict['length_unit'], 
-                                                    default_term='0.01 angstrom')
+    # None for this calculation
     
     # Check lammps_command and mpi_command
     iprPy.input.commands(input_dict)
+    
+    # Set default system minimization parameters
+    iprPy.input.minimize(input_dict)
     
     # Load potential
     iprPy.input.potential(input_dict)
@@ -314,4 +404,4 @@ def process_input(input_dict, UUID=None, build=True):
     iprPy.input.systemmanipulate(input_dict, build=build)
                 
 if __name__ == '__main__':
-    main(*sys.argv[1:])    
+    main(*sys.argv[1:])

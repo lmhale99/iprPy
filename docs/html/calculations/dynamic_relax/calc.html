@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calc_dynamic_relax.py &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="point_defect_static" href="../point_defect_static/index.html" />
+    <link rel="prev" title="Method and Theory" href="theory.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../point_defect_static/index.html" title="point_defect_static"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="theory.html" title="Method and Theory"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">dynamic_relax</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="calc-dynamic-relax-py">
+<h1>calc_dynamic_relax.py<a class="headerlink" href="#calc-dynamic-relax-py" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-iprPy.calculations.dynamic_relax.calc_dynamic_relax">
+<span id="calculation-script-functions"></span><h2>Calculation script functions<a class="headerlink" href="#module-iprPy.calculations.dynamic_relax.calc_dynamic_relax" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="iprPy.calculations.dynamic_relax.calc_dynamic_relax.full_relax">
+<code class="descname">full_relax</code><span class="sig-paren">(</span><em>lammps_command</em>, <em>system</em>, <em>potential</em>, <em>symbols</em>, <em>mpi_command=None</em>, <em>ucell=None</em>, <em>p_xx=0.0</em>, <em>p_yy=0.0</em>, <em>p_zz=0.0</em>, <em>temperature=0.0</em>, <em>integrator=None</em>, <em>runsteps=220000</em>, <em>thermosteps=100</em>, <em>dumpsteps=None</em>, <em>equilsteps=20000</em>, <em>randomseed=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/iprPy/calculations/dynamic_relax/calc_dynamic_relax.html#full_relax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iprPy.calculations.dynamic_relax.calc_dynamic_relax.full_relax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a full dynamic relax on a given system at the given temperature
+to the specified pressure state.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lammps_command</strong> (<em>str</em>) &#8211; Command for running LAMMPS.</li>
+<li><strong>system</strong> (<em>atomman.System</em>) &#8211; The system to perform the calculation on.</li>
+<li><strong>potential</strong> (<em>atomman.lammps.Potential</em>) &#8211; The LAMMPS implemented potential to use.</li>
+<li><strong>symbols</strong> (<em>list of str</em>) &#8211; The list of element-model symbols for the Potential that correspond to
+system&#8217;s atypes.</li>
+<li><strong>mpi_command</strong> (<em>str</em><em>, </em><em>optional</em>) &#8211; The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+will run serially.</li>
+<li><strong>ucell</strong> (<em>atomman.System</em><em>, </em><em>optional</em>) &#8211; The fundamental unit cell correspodning to system.  This is used to
+convert system dimensions to cell dimensions. If not given, ucell will
+be taken as system.</li>
+<li><strong>p_xx</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; The value to relax the x tensile pressure component to (default is
+0.0).</li>
+<li><strong>p_yy</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; The value to relax the y tensile pressure component to (default is
+0.0).</li>
+<li><strong>p_zz</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; The value to relax the z tensile pressure component to (default is
+0.0).</li>
+<li><strong>temperature</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; The temperature to relax at (default is 0.0).</li>
+<li><strong>runsteps</strong> (<em>int</em><em>, </em><em>optional</em>) &#8211; The number of integration steps to perform (default is 220000).</li>
+<li><strong>integrator</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) &#8211; The integration method to use. Options are &#8216;npt&#8217;, &#8216;nvt&#8217;, &#8216;nph&#8217;,
+&#8216;nve&#8217;, &#8216;nve+l&#8217;, &#8216;nph+l&#8217;. The +l options use Langevin thermostat.
+(Default is None, which will use &#8216;nph+l&#8217; for temperature == 0, and
+&#8216;npt&#8217; otherwise.)</li>
+<li><strong>thermosteps</strong> (<em>int</em><em>, </em><em>optional</em>) &#8211; Thermo values will be reported every this many steps (default is
+100).</li>
+<li><strong>dumpsteps</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) &#8211; Dump files will be saved every this many steps (default is None,
+which sets dumpsteps equal to runsteps).</li>
+<li><strong>equilsteps</strong> (<em>int</em><em>, </em><em>optional</em>) &#8211; The number of timesteps at the beginning of the simulation to
+exclude when computing average values (default is 20000).</li>
+<li><strong>randomseed</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) &#8211; Random number seed used by LAMMPS in creating velocities and with
+the Langevin thermostat.  (Default is None which will select a
+random int between 1 and 900000000.)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>Dictionary of results consisting of keys:</p>
+<ul class="simple">
+<li><strong>&#8216;a_lat&#8217;</strong> (<em>float</em>) - The mean measured a lattice constant.</li>
+<li><strong>&#8216;b_lat&#8217;</strong> (<em>float</em>) - The mean measured b lattice constant.</li>
+<li><strong>&#8216;c_lat&#8217;</strong> (<em>float</em>) - The mean measured c lattice constant.</li>
+<li><strong>&#8216;alpha_lat&#8217;</strong> (<em>float</em>) - The alpha lattice angle.</li>
+<li><strong>&#8216;beta_lat&#8217;</strong> (<em>float</em>) - The beta lattice angle.</li>
+<li><strong>&#8216;gamma_lat&#8217;</strong> (<em>float</em>) - The gamma lattice angle.</li>
+<li><strong>&#8216;E_coh&#8217;</strong> (<em>float</em>) - The mean measured cohesive energy.</li>
+<li><strong>&#8216;stress&#8217;</strong> (<em>numpy.array</em>) - The mean measured stress state.</li>
+<li><strong>&#8216;temp&#8217;</strong> (<em>float</em>) - The mean measured temperature.</li>
+<li><strong>&#8216;a_lat_std&#8217;</strong> (<em>float</em>) - The standard deviation in the measured
+a lattice constant values.</li>
+<li><strong>&#8216;b_lat_std&#8217;</strong> (<em>float</em>) - The standard deviation in the measured
+b lattice constant values.</li>
+<li><strong>&#8216;c_lat_std&#8217;</strong> (<em>float</em>) - The standard deviation in the measured
+c lattice constant values.</li>
+<li><strong>&#8216;E_coh_std&#8217;</strong> (<em>float</em>) - The standard deviation in the measured
+cohesive energy values.</li>
+<li><strong>&#8216;stress_std&#8217;</strong> (<em>numpy.array</em>) - The standard deviation in the
+measured stress state values.</li>
+<li><strong>&#8216;temp_std&#8217;</strong> (<em>float</em>) - The standard deviation in the measured
+temperature values.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.calculations.dynamic_relax.calc_dynamic_relax.integrator_info">
+<code class="descname">integrator_info</code><span class="sig-paren">(</span><em>integrator=None</em>, <em>p_xx=0.0</em>, <em>p_yy=0.0</em>, <em>p_zz=0.0</em>, <em>temperature=0.0</em>, <em>randomseed=None</em>, <em>units='metal'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/iprPy/calculations/dynamic_relax/calc_dynamic_relax.html#integrator_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iprPy.calculations.dynamic_relax.calc_dynamic_relax.integrator_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates LAMMPS commands for velocity creation and fix integrators.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>integrator</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) &#8211; The integration method to use. Options are &#8216;npt&#8217;, &#8216;nvt&#8217;, &#8216;nph&#8217;,
+&#8216;nve&#8217;, &#8216;nve+l&#8217;, &#8216;nph+l&#8217;. The +l options use Langevin thermostat.
+(Default is None, which will use &#8216;nph+l&#8217; for temperature == 0, and
+&#8216;npt&#8217; otherwise.)</li>
+<li><strong>p_xx</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; The value to relax the x tensile pressure component to (default is
+0.0).</li>
+<li><strong>p_yy</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; The value to relax the y tensile pressure component to (default is
+0.0).</li>
+<li><strong>p_zz</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; The value to relax the z tensile pressure component to (default is
+0.0).</li>
+<li><strong>temperature</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; The temperature to relax at (default is 0.0).</li>
+<li><strong>randomseed</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) &#8211; Random number seed used by LAMMPS in creating velocities and with
+the Langevin thermostat.  (Default is None which will select a
+random int between 1 and 900000000.)</li>
+<li><strong>units</strong> (<em>str</em><em>, </em><em>optional</em>) &#8211; The LAMMPS units style to use (default is &#8216;metal&#8217;).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The generated LAMMPS input lines for velocity create and fix
+integration commands.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.calculations.dynamic_relax.calc_dynamic_relax.main">
+<code class="descname">main</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/iprPy/calculations/dynamic_relax/calc_dynamic_relax.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iprPy.calculations.dynamic_relax.calc_dynamic_relax.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main function called when script is executed directly.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.calculations.dynamic_relax.calc_dynamic_relax.process_input">
+<code class="descname">process_input</code><span class="sig-paren">(</span><em>input_dict</em>, <em>UUID=None</em>, <em>build=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/iprPy/calculations/dynamic_relax/calc_dynamic_relax.html#process_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iprPy.calculations.dynamic_relax.calc_dynamic_relax.process_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes str input parameters, assigns default values if needed, and
+generates new, more complex terms as used by the calculation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>input_dict</strong> (<em>dict</em>) &#8211; Dictionary containing the calculation input parameters with string
+values.  The allowed keys depends on the calculation style.</li>
+<li><strong>UUID</strong> (<em>str</em><em>, </em><em>optional</em>) &#8211; Unique identifier to use for the calculation instance.  If not
+given and a &#8216;UUID&#8217; key is not in input_dict, then a random UUID4
+hash tag will be assigned.</li>
+<li><strong>build</strong> (<em>bool</em><em>, </em><em>optional</em>) &#8211; Indicates if all complex terms are to be built.  A value of False
+allows for default values to be assigned even if some inputs
+required by the calculation are incomplete.  (Default is True.)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">calc_dynamic_relax.py</a><ul>
+<li><a class="reference internal" href="#module-iprPy.calculations.dynamic_relax.calc_dynamic_relax">Calculation script functions</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="theory.html"
+                        title="previous chapter">Method and Theory</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../point_defect_static/index.html"
+                        title="next chapter">point_defect_static</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/calculations/dynamic_relax/calc.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../point_defect_static/index.html" title="point_defect_static"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="theory.html" title="Method and Theory"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../contents.html">iprPy 0.7.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >dynamic_relax</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

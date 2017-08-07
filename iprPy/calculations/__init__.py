@@ -1,5 +1,20 @@
+"""
+Attributes
+----------
+
+failed_calculations : list of str
+    List of all of the calculation styles that failed to load.
+calculations_dict : dict
+    Dictionary of the calculation styles that successfully loaded. The
+    dictionary keys are the calculation style names, and the values are the
+    loaded modules.
+"""
+from __future__ import division, absolute_import, print_function
+
 import os
 import importlib
+
+__all__ = ['failed_calculations', 'calculations_dict']
 
 failed_calculations = []
 
