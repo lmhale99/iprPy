@@ -294,7 +294,6 @@ class Record(object):
         
         # Compare string and int terms
         for term in terms:
-
             # Compare total size multipliers (high-low)
             if   term == 'a_mult':
                 test_df = test_df[test_df['a_mult2']-test_df['a_mult1'] == record_dict['a_mult2']-record_dict['a_mult1']]

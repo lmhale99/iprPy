@@ -62,7 +62,7 @@ def prepare(dbase, run_directory, **kwargs):
     calculation = iprPy.Calculation(calc_style)
     
     # Build record_df
-    record_df = dbase.get_records_df(record_style, full=False, flat=True)
+    record_df = dbase.get_records_df(style=record_style, full=False, flat=True)
     
     # Build potential dictionaries (single dbase access)
     pot_record_dict = {}
