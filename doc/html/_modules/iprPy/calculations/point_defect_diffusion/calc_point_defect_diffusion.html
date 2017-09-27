@@ -1,0 +1,458 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>iprPy.calculations.point_defect_diffusion.calc_point_defect_diffusion &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/agogo.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../../../../index.html">iprPy 0.7.2 documentation</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for iprPy.calculations.point_defect_diffusion.calc_point_defect_diffusion</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="c1"># Python script created by Lucas Hale</span>
+
+<span class="c1"># Standard library imports</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="c1"># http://www.numpy.org/</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># https://github.com/usnistgov/DataModelDict</span>
+<span class="kn">from</span> <span class="nn">DataModelDict</span> <span class="k">import</span> <span class="n">DataModelDict</span> <span class="k">as</span> <span class="n">DM</span>
+
+<span class="c1"># https://github.com/usnistgov/atomman</span>
+<span class="kn">import</span> <span class="nn">atomman</span> <span class="k">as</span> <span class="nn">am</span>
+<span class="kn">import</span> <span class="nn">atomman.lammps</span> <span class="k">as</span> <span class="nn">lmp</span>
+<span class="kn">import</span> <span class="nn">atomman.unitconvert</span> <span class="k">as</span> <span class="nn">uc</span>
+
+<span class="c1"># https://github.com/usnistgov/iprPy</span>
+<span class="kn">import</span> <span class="nn">iprPy</span>
+
+<span class="c1"># Define calc_style and record_style</span>
+<span class="n">calc_style</span> <span class="o">=</span> <span class="s1">&#39;point_defect_diffusion&#39;</span>
+<span class="n">record_style</span> <span class="o">=</span> <span class="s1">&#39;calculation_point_defect_diffusion&#39;</span>
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../calculations/point_defect_diffusion/calc.html#iprPy.calculations.point_defect_diffusion.calc_point_defect_diffusion.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Main function called when script is executed directly.&quot;&quot;&quot;</span>
+    
+    <span class="c1"># Read in parameters from input file</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">input_dict</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">parseinput</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">allsingular</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    <span class="c1"># Interpret and process input parameters</span>
+    <span class="n">process_input</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    
+    <span class="c1">#Run pointdiffusion </span>
+    <span class="n">results_dict</span> <span class="o">=</span> <span class="n">pointdiffusion</span><span class="p">(</span><span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;lammps_command&#39;</span><span class="p">],</span>
+                                  <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;initialsystem&#39;</span><span class="p">],</span>
+                                  <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;potential&#39;</span><span class="p">],</span>
+                                  <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;symbols&#39;</span><span class="p">],</span>
+                                  <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;point_kwargs&#39;</span><span class="p">],</span>
+                                  <span class="n">mpi_command</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;mpi_command&#39;</span><span class="p">],</span>
+                                  <span class="n">temperature</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;temperature&#39;</span><span class="p">],</span>
+                                  <span class="n">runsteps</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;runsteps&#39;</span><span class="p">],</span>
+                                  <span class="n">thermosteps</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;thermosteps&#39;</span><span class="p">],</span>
+                                  <span class="n">dumpsteps</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;dumpsteps&#39;</span><span class="p">],</span>
+                                  <span class="n">equilsteps</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;equilsteps&#39;</span><span class="p">],</span>
+                                  <span class="n">randomseed</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;randomseed&#39;</span><span class="p">])</span>
+    
+    <span class="c1"># Save data model of results</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">buildmodel</span><span class="p">(</span><span class="n">record_style</span><span class="p">,</span> <span class="s1">&#39;calc_&#39;</span> <span class="o">+</span> <span class="n">calc_style</span><span class="p">,</span> <span class="n">input_dict</span><span class="p">,</span>
+                               <span class="n">results_dict</span><span class="p">)</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;results.json&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="n">fp</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="pointdiffusion"><a class="viewcode-back" href="../../../../calculations/point_defect_diffusion/calc.html#iprPy.calculations.point_defect_diffusion.calc_point_defect_diffusion.pointdiffusion">[docs]</a><span class="k">def</span> <span class="nf">pointdiffusion</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">point_kwargs</span><span class="p">,</span>
+                   <span class="n">mpi_command</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                   <span class="n">runsteps</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">thermosteps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dumpsteps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">equilsteps</span><span class="o">=</span><span class="mi">20000</span><span class="p">,</span> <span class="n">randomseed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                   
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Evaluates the diffusion rate of a point defect at a given temperature. This</span>
+<span class="sd">    method will run two simulations: an NVT run at the specified temperature to </span>
+<span class="sd">    equilibrate the system, then an NVE run to measure the defect&#39;s diffusion </span>
+<span class="sd">    rate. The diffusion rate is evaluated using the mean squared displacement of</span>
+<span class="sd">    all atoms in the system, and using the assumption that diffusion is only due</span>
+<span class="sd">    to the added defect(s).</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lammps_command :str</span>
+<span class="sd">        Command for running LAMMPS.</span>
+<span class="sd">    system : atomman.System</span>
+<span class="sd">        The system to perform the calculation on.</span>
+<span class="sd">    potential : atomman.lammps.Potential</span>
+<span class="sd">        The LAMMPS implemented potential to use.</span>
+<span class="sd">    symbols : list of str</span>
+<span class="sd">        The list of element-model symbols for the Potential that correspond to</span>
+<span class="sd">        system&#39;s atypes.</span>
+<span class="sd">    point_kwargs : dict or list of dict</span>
+<span class="sd">        One or more dictionaries containing the keyword arguments for</span>
+<span class="sd">        the atomman.defect.point() function to generate specific point</span>
+<span class="sd">        defect configuration(s).</span>
+<span class="sd">    mpi_command : str, optional</span>
+<span class="sd">        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS</span>
+<span class="sd">        will run serially.</span>
+<span class="sd">    temperature : float, optional</span>
+<span class="sd">        The temperature to run at (default is 300.0).</span>
+<span class="sd">    runsteps : int, optional</span>
+<span class="sd">        The number of integration steps to perform (default is 100000).</span>
+<span class="sd">    thermosteps : int, optional</span>
+<span class="sd">        Thermo values will be reported every this many steps (default is</span>
+<span class="sd">        100).</span>
+<span class="sd">    dumpsteps : int or None, optional</span>
+<span class="sd">        Dump files will be saved every this many steps (default is None,</span>
+<span class="sd">        which sets dumpsteps equal to runsteps).</span>
+<span class="sd">    equilsteps : int, optional</span>
+<span class="sd">        The number of timesteps at the beginning of the simulation to</span>
+<span class="sd">        exclude when computing average values (default is 20000).</span>
+<span class="sd">    randomseed : int or None, optional</span>
+<span class="sd">        Random number seed used by LAMMPS in creating velocities and with</span>
+<span class="sd">        the Langevin thermostat.  (Default is None which will select a</span>
+<span class="sd">        random int between 1 and 900000000.)</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Dictionary of results consisting of keys:</span>
+<span class="sd">        </span>
+<span class="sd">        - **&#39;natoms&#39;** (*int*) - The number of atoms in the system.</span>
+<span class="sd">        - **&#39;temp&#39;** (*float*) - The mean measured temperature.</span>
+<span class="sd">        - **&#39;pxx&#39;** (*float*) - The mean measured normal xx pressure.</span>
+<span class="sd">        - **&#39;pyy&#39;** (*float*) - The mean measured normal yy pressure.</span>
+<span class="sd">        - **&#39;pzz&#39;** (*float*) - The mean measured normal zz pressure.</span>
+<span class="sd">        - **&#39;Epot&#39;** (*numpy.array*) - The mean measured total potential </span>
+<span class="sd">          energy.</span>
+<span class="sd">        - **&#39;temp_std&#39;** (*float*) - The standard deviation in the measured</span>
+<span class="sd">          temperature values.</span>
+<span class="sd">        - **&#39;pxx_std&#39;** (*float*) - The standard deviation in the measured</span>
+<span class="sd">          normal xx pressure values.</span>
+<span class="sd">        - **&#39;pyy_std&#39;** (*float*) - The standard deviation in the measured</span>
+<span class="sd">          normal yy pressure values.</span>
+<span class="sd">        - **&#39;pzz_std&#39;** (*float*) - The standard deviation in the measured</span>
+<span class="sd">          normal zz pressure values.</span>
+<span class="sd">        - **&#39;Epot_std&#39;** (*float*) - The standard deviation in the measured</span>
+<span class="sd">          total potential energy values.</span>
+<span class="sd">        - **&#39;dx&#39;** (*float*) - The computed diffusion constant along the </span>
+<span class="sd">          x-direction.</span>
+<span class="sd">        - **&#39;dy&#39;** (*float*) - The computed diffusion constant along the </span>
+<span class="sd">          y-direction.</span>
+<span class="sd">        - **&#39;dz&#39;** (*float*) - The computed diffusion constant along the </span>
+<span class="sd">          y-direction.</span>
+<span class="sd">        - **&#39;d&#39;** (*float*) - The total computed diffusion constant.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Add defect(s) to the initially perfect system</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point_kwargs</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">point_kwargs</span> <span class="o">=</span> <span class="p">[</span><span class="n">point_kwargs</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">pkwargs</span> <span class="ow">in</span> <span class="n">point_kwargs</span><span class="p">:</span>
+        <span class="n">system</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">defect</span><span class="o">.</span><span class="n">point</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="o">**</span><span class="n">pkwargs</span><span class="p">)</span>
+    
+    <span class="c1"># Get lammps units</span>
+    <span class="n">lammps_units</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+    
+    <span class="c1"># Get lammps version date</span>
+    <span class="n">lammps_date</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">check_lammps_version</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">)[</span><span class="s1">&#39;lammps_date&#39;</span><span class="p">]</span>
+    
+    <span class="c1"># Check that temperature is greater than zero</span>
+    <span class="k">if</span> <span class="n">temperature</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Temperature must be greater than zero&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># Handle default values</span>
+    <span class="k">if</span> <span class="n">thermosteps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+        <span class="n">thermosteps</span> <span class="o">=</span> <span class="n">runsteps</span> <span class="o">//</span> <span class="mi">1000</span>
+        <span class="k">if</span> <span class="n">thermosteps</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">thermosteps</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">dumpsteps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dumpsteps</span> <span class="o">=</span> <span class="n">runsteps</span>
+    <span class="k">if</span> <span class="n">randomseed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">randomseed</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">900000000</span><span class="p">)</span>
+    
+    <span class="c1"># Define lammps variables</span>
+    <span class="n">lammps_variables</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">system_info</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">atom_data</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="s1">&#39;initial.dat&#39;</span><span class="p">,</span> 
+                                     <span class="n">units</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> 
+                                     <span class="n">atom_style</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">atom_style</span><span class="p">)</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_system_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_info</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_pair_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">potential</span><span class="o">.</span><span class="n">pair_info</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;temperature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">temperature</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;runsteps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">runsteps</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;equilsteps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">equilsteps</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;thermosteps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">thermosteps</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dumpsteps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dumpsteps</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;randomseed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">randomseed</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;timestep&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">timestep</span><span class="p">(</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+    
+    <span class="c1"># Set dump_info</span>
+    <span class="k">if</span> <span class="n">dumpsteps</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;# Define dump files&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dump dumpit all custom $</span><span class="si">{dumpsteps}</span><span class="s1"> *.dump id type x y z c_peatom&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dump_modify dumpit format &lt;dump_modify_format&gt;&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="p">])</span>
+        
+        <span class="c1"># Set dump_modify_format based on lammps_date</span>
+        <span class="k">if</span> <span class="n">lammps_date</span> <span class="o">&lt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&quot;</span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1">&quot;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;float </span><span class="si">%.13e</span><span class="s1">&#39;</span>
+
+    <span class="c1"># Write lammps input script</span>
+    <span class="n">template_file</span> <span class="o">=</span> <span class="s1">&#39;diffusion.template&#39;</span>
+    <span class="n">lammps_script</span> <span class="o">=</span> <span class="s1">&#39;diffusion.in&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">template_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lammps_script</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">filltemplate</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">lammps_variables</span><span class="p">,</span>
+                                         <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
+
+    <span class="c1"># Run lammps</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="s1">&#39;diffusion.in&#39;</span><span class="p">,</span> <span class="n">mpi_command</span><span class="p">)</span>
+    
+    <span class="c1"># Extract LAMMPS thermo data.</span>
+    <span class="n">thermo</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">simulations</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;thermo&#39;</span><span class="p">]</span>
+    <span class="n">temps</span> <span class="o">=</span> <span class="n">thermo</span><span class="o">.</span><span class="n">Temp</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">pxxs</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">Pxx</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">])</span>
+    <span class="n">pyys</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">Pyy</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">])</span>
+    <span class="n">pzzs</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">Pzz</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">])</span>
+    <span class="n">potengs</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">PotEng</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;energy&#39;</span><span class="p">])</span>
+    <span class="n">steps</span> <span class="o">=</span> <span class="n">thermo</span><span class="o">.</span><span class="n">Step</span><span class="o">.</span><span class="n">values</span>
+    
+    <span class="c1"># Read user-defined thermo data</span>
+    <span class="k">if</span> <span class="n">output</span><span class="o">.</span><span class="n">lammps_date</span> <span class="o">&lt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">msd_x</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="p">[</span><span class="s1">&#39;msd[1]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                                <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;^2&#39;</span><span class="p">)</span>
+        <span class="n">msd_y</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="p">[</span><span class="s1">&#39;msd[2]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                                <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;^2&#39;</span><span class="p">)</span>
+        <span class="n">msd_z</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="p">[</span><span class="s1">&#39;msd[3]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                                <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;^2&#39;</span><span class="p">)</span>
+        <span class="n">msd</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="p">[</span><span class="s1">&#39;msd[4]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                              <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;^2&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msd_x</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="p">[</span><span class="s1">&#39;c_msd[1]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                                <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;^2&#39;</span><span class="p">)</span>
+        <span class="n">msd_y</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="p">[</span><span class="s1">&#39;c_msd[2]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                                <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;^2&#39;</span><span class="p">)</span>
+        <span class="n">msd_z</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="p">[</span><span class="s1">&#39;c_msd[3]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                                <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;^2&#39;</span><span class="p">)</span>
+        <span class="n">msd</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="p">[</span><span class="s1">&#39;c_msd[4]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                              <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;^2&#39;</span><span class="p">)</span>
+        
+    <span class="c1"># Initialize results dict</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;natoms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">natoms</span>
+    
+    <span class="c1"># Get mean and std for temperature, pressure, and potential energy</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">temps</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;temp_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">temps</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;pxx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">pxxs</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;pxx_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">pxxs</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;pyy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">pyys</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;pyy_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">pyys</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;pzz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">pzzs</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;pzz_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">pzzs</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;Epot&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">potengs</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;Epot_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">potengs</span><span class="p">)</span>
+    
+    <span class="c1"># Convert steps to times</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">steps</span> <span class="o">*</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;timestep&#39;</span><span class="p">],</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
+    
+    <span class="c1"># Estimate diffusion rates</span>
+    <span class="c1"># MSD_ptd = natoms * MSD_atoms (if one defect in system)</span>
+    <span class="c1"># MSD = 2 * ndim * D * t  --&gt;  D = MSD/t / (2 * ndim)</span>
+    <span class="n">mx</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">natoms</span> <span class="o">*</span> <span class="n">msd_x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">my</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">natoms</span> <span class="o">*</span> <span class="n">msd_y</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">mz</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">natoms</span> <span class="o">*</span> <span class="n">msd_z</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">m</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">natoms</span> <span class="o">*</span> <span class="n">msd</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;dx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mx</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;dy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">my</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;dz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mz</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span> <span class="o">/</span> <span class="mi">6</span>
+    
+    <span class="k">return</span> <span class="n">results</span></div>
+
+<div class="viewcode-block" id="process_input"><a class="viewcode-back" href="../../../../calculations/point_defect_diffusion/calc.html#iprPy.calculations.point_defect_diffusion.calc_point_defect_diffusion.process_input">[docs]</a><span class="k">def</span> <span class="nf">process_input</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">UUID</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Processes str input parameters, assigns default values if needed, and</span>
+<span class="sd">    generates new, more complex terms as used by the calculation.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_dict :  dict</span>
+<span class="sd">        Dictionary containing the calculation input parameters with string</span>
+<span class="sd">        values.  The allowed keys depends on the calculation style.</span>
+<span class="sd">    UUID : str, optional</span>
+<span class="sd">        Unique identifier to use for the calculation instance.  If not </span>
+<span class="sd">        given and a &#39;UUID&#39; key is not in input_dict, then a random UUID4 </span>
+<span class="sd">        hash tag will be assigned.</span>
+<span class="sd">    build : bool, optional</span>
+<span class="sd">        Indicates if all complex terms are to be built.  A value of False</span>
+<span class="sd">        allows for default values to be assigned even if some inputs </span>
+<span class="sd">        required by the calculation are incomplete.  (Default is True.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Set calculation UUID</span>
+    <span class="k">if</span> <span class="n">UUID</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;calc_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UUID</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;calc_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;calc_key&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
+    
+    <span class="c1"># Set default input/output units</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">units</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+    
+    <span class="c1"># These are calculation-specific default strings</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;sizemults&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sizemults&#39;</span><span class="p">,</span> <span class="s1">&#39;5 5 5&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># These are calculation-specific default booleans</span>
+    <span class="c1"># None for this calculation</span>
+    
+    <span class="c1"># These are calculation-specific default integers</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;runsteps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;runsteps&#39;</span><span class="p">,</span> <span class="mi">100000</span><span class="p">))</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;thermosteps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;thermosteps&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;dumpsteps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dumpsteps&#39;</span><span class="p">,</span>
+                                                 <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;runsteps&#39;</span><span class="p">]))</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;equilsteps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;equilsteps&#39;</span><span class="p">,</span> <span class="mi">20000</span><span class="p">))</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;randomseed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;randomseed&#39;</span><span class="p">,</span>
+                                      <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">900000000</span><span class="p">)))</span>
+    
+    <span class="c1"># These are calculation-specific default unitless floats</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;temperature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;temperature&#39;</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">))</span>
+    
+    <span class="c1"># These are calculation-specific default floats with units</span>
+    <span class="c1"># None for this calculation</span>
+    
+    <span class="c1"># Check lammps_command and mpi_command</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">commands</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+    
+    <span class="c1"># Load potential</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">potential</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+    
+    <span class="c1"># Load ucell system</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">systemload</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">)</span>
+    
+    <span class="c1"># Load point defect parameters</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">pointdefect</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">)</span>
+    
+    <span class="c1"># Construct initialsystem by manipulating ucell system</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">systemmanipulate</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">input_dict</span></div>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">(</span><span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          <h3>Table Of Contents</h3>
+          <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro.html">Introduction to iprPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../setup.html">Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basics/index.html">iprPy Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../highthroughput/index.html">High-Throughput Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../extend/index.html">Adding Content to iprPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../calculation_styles.html">Calculation Styles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../record_styles.html">Record Styles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../database_styles.html">Database Styles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules/index.html">iprPy</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Search</h3>
+            <form class="search" action="../../../../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+            </form>
+          </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="../../../../py-modindex.html" title="Python Module Index"
+              >modules</a> |
+            <a href="../../../../genindex.html" title="General Index"
+              >index</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

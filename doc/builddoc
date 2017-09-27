@@ -1,0 +1,7 @@
+#!/bin/bash
+
+rm -r html
+rm -r rst
+python buildstyledocs.py
+sphinx-build -b html source html
+sphinx-build -b rst source rst
