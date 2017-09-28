@@ -31,14 +31,14 @@ record_style = 'calculation_dynamic_relax'
 
 def main(*args):
     """Main function called when script is executed directly."""
-
+    
     # Read input file in as dictionary
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, allsingular=True)
     
     # Interpret and process input parameters
     process_input(input_dict, *args[1:])
-
+    
     # Run full_Relax to refine values
     results_dict = full_relax(input_dict['lammps_command'],
                               input_dict['initialsystem'],
@@ -56,11 +56,11 @@ def main(*args):
                               dumpsteps = input_dict['dumpsteps'],
                               equilsteps = input_dict['equilsteps'],
                               randomseed = input_dict['randomseed'])
-
+    
     # Save data model of results
     results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict,
                                results_dict)
-
+    
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)
 

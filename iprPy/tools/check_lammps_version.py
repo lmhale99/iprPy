@@ -27,6 +27,8 @@ def check_lammps_version(lammps_command):
     # Define absolute path to emptyscript
     emptyscript = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                'empty.in')
+    logfile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               'empty.lammps')
     
     # Create emptyscript if it doesn't exist
     if not os.path.isfile(emptyscript):
@@ -35,10 +37,9 @@ def check_lammps_version(lammps_command):
     
     # Run lammps_command with emptyscript
     try:
-        log = lmp.run(lammps_command, emptyscript, logfile='empty.lammps')
+        log = lmp.run(lammps_command, emptyscript, logfile=logfile)
     except:
         raise ValueError('Failed to run simulation with lammps_command '+lammps_command)
-    os.remove('empty.lammps')
     
     # Extract lammps version and date info
     version_info = {}

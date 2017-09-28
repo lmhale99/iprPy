@@ -27,8 +27,8 @@ import atomman.unitconvert as uc
 import iprPy
 
 # Define calc_style and record_style
-calc_style = 'point_defect_static'
-record_style = 'calculation_point_defect_formation'
+calc_style = 'point_defect_diffusion'
+record_style = 'calculation_point_defect_diffusion'
 
 def main(*args):
     """Main function called when script is executed directly."""
@@ -63,7 +63,7 @@ def prepare(dbase, run_directory, **kwargs):
     
     # Initialize Calculation instance
     calculation = iprPy.Calculation(calc_style)
-    
+
     # Build record_df
     record_df = dbase.get_records_df(style=record_style, full=False, flat=True)
 
@@ -72,7 +72,7 @@ def prepare(dbase, run_directory, **kwargs):
     pot_tar_dict = {}
     for pot_record in dbase.iget_records(style='potential_LAMMPS'):
         pot_record_dict[pot_record.name] = pot_record
-        
+
     # Build defect model record dictionary and df (single dbase access)
     defect_record_dict = {}
     defect_record_df = []
@@ -80,27 +80,27 @@ def prepare(dbase, run_directory, **kwargs):
         defect_record_dict[defect_record.name] = defect_record
         defect_record_df.append(defect_record.todict())
     defect_record_df = pd.DataFrame(defect_record_df)
-    
+
     # Limit by defect name
     if 'pointdefect_name' in kwargs:
         defect_names = iprPy.tools.aslist(kwargs['pointdefect_name'])
         defect_selection = defect_record_df.id.isin(defect_names)
         defect_record_df = defect_record_df[defect_selection]
-    
+
     # Get parent records
     if 'parent_records' in kwargs:
         parent_records = kwargs['parent_records']
     else:
         parent_records = iprPy.prepare.icalculations(dbase,
-                            record_style = 'calculation_system_relax',
+                            record_style = 'calculation_dynamic_relax',
                             symbol = kwargs.get('symbol_name', None),
                             family = kwargs.get('family_name', None),
                             potential = kwargs.get('potential_name', None))
-    
+
     # Loop over parent records
     for parent_record in parent_records:
         parent_dict = parent_record.todict()
-    
+
         # Load potential
         pot_record = pot_record_dict[parent_dict['potential_LAMMPS_id']]
         potential = lmp.Potential(pot_record.content)
@@ -111,89 +111,91 @@ def prepare(dbase, run_directory, **kwargs):
         else:
             pot_tar = dbase.get_tar(pot_record)
             pot_tar_dict[parent_dict['potential_LAMMPS_id']] = pot_tar
-    
+        
+        # Get parent's phase state info
+        temperature = parent_dict['temperature']
+        if temperature == 0.0:
+            continue
+        
         # Loop over defect model records with family name matching parent record
         matches = defect_record_df['family'] == parent_dict['family']
         defect_keys = defect_record_df[matches].id.tolist()
         for defect_key in defect_keys:
             defect_record = defect_record_dict[defect_key]
             
-            # Loop over sizemults
-            for sizemults in iprPy.tools.aslist(kwargs.get('sizemults', '')):
+            # Create calc_key
+            calc_key = str(uuid.uuid4())
             
-                # Create calc_key
-                calc_key = str(uuid.uuid4())
-                
-                # Define values for calc_*.in file
-                calc_dict = {}
-                
-                calc_dict['potential_file'] = pot_record.name + '.xml'
-                calc_dict['potential_dir'] = pot_record.name
-                calc_dict['potential_content'] = pot_record.content
-                
-                calc_dict['load_file'] = parent_record.name+'.xml'
-                calc_dict['load_style'] = 'system_model'
-                calc_dict['load_content'] = parent_record.content
-                calc_dict['load_options'] = 'key relaxed-atomic-system'
+            # Define values for calc_*.in file
+            calc_dict = {}
+            
+            calc_dict['potential_file'] = pot_record.name + '.xml'
+            calc_dict['potential_dir'] = pot_record.name
+            calc_dict['potential_content'] = pot_record.content
+            
+            calc_dict['load_file'] = parent_record.name+'.xml'
+            calc_dict['load_style'] = 'system_model'
+            calc_dict['load_content'] = parent_record.content
+            calc_dict['load_options'] = 'key relaxed-atomic-system'
 
-                calc_dict['pointdefect_model'] = defect_record.name+'.xml'
-                calc_dict['pointdefect_content'] = defect_record.content
+            calc_dict['pointdefect_model'] = defect_record.name+'.xml'
+            calc_dict['pointdefect_content'] = defect_record.content
+            
+            calc_dict['temperature'] = temperature
+            
+            for key in singularkeys():
+                if key in kwargs:
+                    calc_dict[key] = kwargs[key]
+            
+            # Build incomplete record
+            input_dict = deepcopy(calc_dict)
+            calculation.process_input(input_dict, calc_key, build=False)
+            model = iprPy.buildmodel(record_style,
+                                     'calc_' + calc_style,
+                                     input_dict)
+            new_record = iprPy.Record(name=calc_key,
+                                      content=model.xml(),
+                                      style=record_style)
+            
+            # Check if record is new
+            if new_record.isnew(record_df=record_df):
                 
-                calc_dict['sizemults'] = sizemults
+                # Assign '' to any unassigned keys
+                for key in unusedkeys()+singularkeys()+multikeys():
+                    if key not in calc_dict:
+                        calc_dict[key] = ''
                 
-                for key in singularkeys():
-                    if key in kwargs:
-                        calc_dict[key] = kwargs[key]
+                # Add record to database
+                dbase.add_record(record=new_record)
                 
-                # Build incomplete record
-                input_dict = deepcopy(calc_dict)
-                calculation.process_input(input_dict, calc_key, build=False)
-                model = iprPy.buildmodel(record_style, 
-                                         'calc_' + calc_style,
-                                         input_dict)
-                new_record = iprPy.Record(name=calc_key,
-                                          content=model.xml(),
-                                          style=record_style)
+                # Generate calculation folder
+                calc_directory = os.path.join(run_directory, calc_key)
+                os.makedirs(calc_directory)
                 
-                # Check if record is new
-                if new_record.isnew(record_df=record_df):
-                
-                    # Assign '' to any unassigned keys
-                    for key in unusedkeys()+singularkeys()+multikeys():
-                        if key not in calc_dict:
-                            calc_dict[key] = ''
-                        
-                    # Add record to database
-                    dbase.add_record(record=new_record)
-                    
-                    # Generate calculation folder
-                    calc_directory = os.path.join(run_directory, calc_key)
-                    os.makedirs(calc_directory)
-                    
-                    # Save inputfile to calculation folder
-                    inputfile = iprPy.tools.filltemplate(calculation.template, calc_dict, '<', '>')
-                    with open(os.path.join(calc_directory, 'calc_' + calc_style + '.in'), 'w') as f:
-                        f.write(inputfile)
+                # Save inputfile to calculation folder
+                inputfile = iprPy.tools.filltemplate(calculation.template, calc_dict, '<', '>')
+                with open(os.path.join(calc_directory, 'calc_' + calc_style + '.in'), 'w') as f:
+                    f.write(inputfile)
 
-                    # Add calculation files to calculation folder
-                    for calc_file in calculation.files:
-                        shutil.copy(calc_file, calc_directory)
+                # Add calculation files to calculation folder
+                for calc_file in calculation.files:
+                    shutil.copy(calc_file, calc_directory)
+                
+                # Add potential record file to calculation folder
+                with open(os.path.join(calc_directory, pot_record.name+'.xml'), 'w') as f:
+                    f.write(pot_record.content)
                     
-                    # Add potential record file to calculation folder
-                    with open(os.path.join(calc_directory, pot_record.name+'.xml'), 'w') as f:
-                        f.write(pot_record.content)
-                        
-                    # Extract potential's tar files to calculation folder
-                    pot_tar.extractall(calc_directory)
+                # Extract potential's tar files to calculation folder
+                pot_tar.extractall(calc_directory)
+                
+                # Add parent record file to calculation folder
+                with open(os.path.join(calc_directory, parent_record.name+'.xml'), 'w') as f:
+                    f.write(parent_record.content)
                     
-                    # Add parent record file to calculation folder
-                    with open(os.path.join(calc_directory, parent_record.name+'.xml'), 'w') as f:
-                        f.write(parent_record.content)
-                        
-                    # Add defect record file to calculation folder
-                    with open(os.path.join(calc_directory, defect_record.name+'.xml'), 'w') as f:
-                        f.write(defect_record.content)
-    
+                # Add defect record file to calculation folder
+                with open(os.path.join(calc_directory, defect_record.name+'.xml'), 'w') as f:
+                    f.write(defect_record.content)
+
 def unusedkeys():
     """
     The calculation input parameters that are not prepare input parameters.
@@ -231,11 +233,12 @@ def singularkeys():
             'run_directory',
             'lammps_command',
             'mpi_command',
-            'energytolerance',
-            'forcetolerance',
-            'maxiterations',
-            'maxevaluations',
-            'maxatommotion',
+            'sizemults',
+            'thermosteps',
+            'dumpsteps',
+            'runsteps',
+            'equilsteps',
+            'randomseed',
             'length_unit',
             'pressure_unit',
             'energy_unit',
@@ -256,7 +259,6 @@ def multikeys():
             'symbol_name',
             'family_name',
             'pointdefect_name',
-            'sizemults',
            ]
             
 if __name__ == '__main__':

@@ -48,7 +48,7 @@ def systemmanipulate(input_dict, build=True, **kwargs):
     """
     
     #Set default keynames
-    keynames = ['ucell', 'x_axis', 'y_axis', 'z_axis', 'axes','atomshift',
+    keynames = ['ucell', 'x_axis', 'y_axis', 'z_axis', 'axes', 'atomshift',
                 'sizemults', 'initialsystem']
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)

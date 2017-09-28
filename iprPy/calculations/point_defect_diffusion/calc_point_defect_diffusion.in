@@ -1,0 +1,45 @@
+#Run script for calc_point_defect_diffusion.py
+
+#Command lines for LAMMPS (and MPI).
+#For lammps_command, exclude passing in a script, i.e. no "-in term"
+lammps_command              lmp_mpi
+mpi_command                 mpiexec -localonly 4
+
+#Paths to the potential data model file, and directory containing potential parameters
+potential_file              2012--Park-H--Mo.json
+potential_dir               2012--Park-H--Mo
+
+#Initial system configuration to load
+load                        system_model A2--W--bcc.json
+load_options                
+symbols                     Mo
+box_parameters              3.19495249919 3.19495249919 3.19495249919
+
+#System manipulations
+x_axis                      
+y_axis                      
+z_axis                      
+atomshift                   
+sizemults                   5 5 5
+
+#Defect parameters
+pointdefect_model           A2--W--bcc--vacancy.json
+pointdefect_type            
+pointdefect_atype           
+pointdefect_pos             
+pointdefect_dumbbell_vect   
+pointdefect_scale           
+
+#Units that input/output values are in
+length_unit                 
+pressure_unit               
+energy_unit                 
+force_unit                  
+
+#Run parameters
+temperature                   1500
+thermosteps                   1000
+dumpsteps                    10000
+runsteps                   1000000
+equilsteps                   20000
+randomseed                  
