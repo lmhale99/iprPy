@@ -28,7 +28,7 @@ bin/iprPy_runner.*
 */*/*/*/.ipynb_checkpoints/
 
 #Demonstration Notebook working directories
-docs/demonstrations/*/
+demonstrations/*/
 
 #Generated web content
 analysis/webcontent
