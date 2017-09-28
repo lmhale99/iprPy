@@ -1,6 +1,5 @@
-
 Method and Theory
-*****************
+-----------------
 
 First, an initial system is generated. This is accomplished by
 
@@ -20,16 +19,16 @@ First, an initial system is generated. This is accomplished by
 The Stroh method is used to compute the Eshelby solution for an
 anisotropic straight dislocation. This is done using the
 atomman.defect.Stroh class. The solution is computed for a dislocation
-parallel to the initial system's z-axis using the bulk elastic
-constants tensor for the system, C_{ij}, and the dislocation's Burgers
-vector, b_i.
+parallel to the initial system's z-axis using the bulk elastic constants
+tensor for the system, :math:`C_{ij}`, and the dislocation's Burgers
+vector, :math:`b_i`.
 
 A dislocation monopole system is constructed with dislocation line
-positioned along the z-axis, i.e. xy coordinates = (0,0). For every
-atom in the initial system, the Stroh displacement is computed based
-on their xy coordinates and the Stroh solution. The dislocation system
-is then created by shifting the atomic positions of the initial system
-by the Stroh displacements.
+positioned along the z-axis, i.e. xy coordinates = (0,0). For every atom
+in the initial system, the Stroh displacement is computed based on their
+xy coordinates and the Stroh solution. The dislocation system is then
+created by shifting the atomic positions of the initial system by the
+Stroh displacements.
 
 The boundary conditions of the dislocation monopole system are handled
 as such:
@@ -39,21 +38,20 @@ as such:
 
 2. The system is divided into active and fixed regions.
 
-1. The fixed region consists of atoms near the x and y boundaries and
-   should always be of a thickness such that atoms in the active
-   region do not interact with the free surfaces.
+a. The fixed region consists of atoms near the x and y boundaries and
+   should always be of a thickness such that atoms in the active region
+   do not interact with the free surfaces.
 
-2. The active region is centered around the dislocation line, and has
-   a cross-sectional area that is either circular or rectangular.
+b. The active region is centered around the dislocation line, and has a
+   cross-sectional area that is either circular or rectangular.
 
-1. Atoms in the fixed region are identified by altering their integer
+3. Atoms in the fixed region are identified by altering their integer
    atomic types.
 
-Finally, a LAMMPS simulation is performed using the dislocation
-monopole system. In the simulation, the atoms in the active region are
-allowed to relax either with nvt integration followed by an
-energy/force minimization, or with just an energy/force minimization.
-The atoms in the fixed region are not allowed to relax and remain
-fixed (at the elastic solution). Upon completion, the relaxed
-dislocation system and parameters from the Stroh solution are
-retained.
+Finally, a LAMMPS simulation is performed using the dislocation monopole
+system. In the simulation, the atoms in the active region are allowed to
+relax either with nvt integration followed by an energy/force
+minimization, or with just an energy/force minimization. The atoms in
+the fixed region are not allowed to relax and remain fixed (at the
+elastic solution). Upon completion, the relaxed dislocation system and
+parameters from the Stroh solution are retained.

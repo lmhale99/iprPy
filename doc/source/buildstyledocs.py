@@ -22,10 +22,10 @@ def buildcalculations():
     docpath = 'source/calculations'
     
     # Load template file(s)
-    with open(os.path.join('templates', 'calcindex.template')) as f:
+    with open(os.path.join('source', 'calcindex.template')) as f:
         indextemplate = f.read()
         
-    with open(os.path.join('templates', 'calcscript.template')) as f:
+    with open(os.path.join('source', 'calcscript.template')) as f:
         scripttemplate = f.read()
     
     # Remove existing doc source
@@ -77,7 +77,7 @@ def buildrecords():
     docpath = 'source/records'
     
     # Load template file(s)
-    with open(os.path.join('templates', 'recordindex.template')) as f:
+    with open(os.path.join('source', 'recordindex.template')) as f:
         indextemplate = f.read()
     
     # Remove existing doc source
@@ -117,7 +117,7 @@ def builddatabases():
     docpath = 'source/databases'
     
     # Load template file(s)
-    with open(os.path.join('templates', 'databaseindex.template')) as f:
+    with open(os.path.join('source', 'databaseindex.template')) as f:
         indextemplate = f.read()
     
     # Remove existing doc source

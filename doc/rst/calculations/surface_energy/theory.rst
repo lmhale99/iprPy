@@ -1,6 +1,5 @@
-
 Method and Theory
-*****************
+-----------------
 
 First, an initial system is generated. This is accomplished by
 
@@ -19,28 +18,27 @@ First, an initial system is generated. This is accomplished by
 
 Two LAMMPS simulations are then performed that apply an energy/force
 minimization on the system, and the total energy of the system after
-relaxing is measured, E^{total}. In the first simulation, all of the
-box's directions are kept periodic (ppp), while in the second
+relaxing is measured, :math:`E^{total}`. In the first simulation, all of
+the box's directions are kept periodic (ppp), while in the second
 simulation two are periodic and one is non-periodic (ppm). This
-effectively slices the system along the boundary plane creating two
-free surfaces, each with surface area
+effectively slices the system along the boundary plane creating two free
+surfaces, each with surface area
 
-   A_{surface} = \left| \vec{a_1} \times \vec{a_2} \right|
+.. math:: A_{surface} = \left| \vec{a_1} \times \vec{a_2} \right|
 
 ,
 
-where \vec{a_1} and \vec{a_2} are the two lattice vectors
-corresponding to the periodic directions.
+where :math:`\vec{a_1}` and :math:`\vec{a_2}` are the two lattice
+vectors corresponding to the periodic directions.
 
-The formation energy of the free surface, E_{surface}^f, is computed
-in units of energy over area as
+The formation energy of the free surface, :math:`E_{surface}^f`, is
+computed in units of energy over area as
 
-   E_{surface}^f = \frac{E_{ppm}^{total} - E_{ppp}^{total}} {2
-   A_{surface}}.
+.. math:: E_{surface}^f = \frac{E_{ppm}^{total} - E_{ppp}^{total}} {2 A_{surface}}.
 
 The calculation method allows for the specification of which of the
 three box dimensions the cut is made along. If not specified, the
-default behavior is to make the \vec{c} vector direction non-periodic.
-This choice allows for consistency with the stacking fault
-calculations, where a non-periodic \vec{c} is most convenient based on
-the box vector normalizations that LAMMPS uses.
+default behavior is to make the :math:`\vec{c}` vector direction
+non-periodic. This choice allows for consistency with the stacking fault
+calculations, where a non-periodic :math:`\vec{c}` is most convenient
+based on the box vector normalizations that LAMMPS uses.

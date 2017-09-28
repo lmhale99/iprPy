@@ -1,6 +1,5 @@
-
 Method and Theory
-*****************
+-----------------
 
 First, a defect system is constructed by adding a single point defect
 (or defect cluster) to an initially bulk system using the
@@ -17,26 +16,24 @@ simulation consists of two separate runs
    measured as a function of time.
 
 Between the two runs, the atomic velocities are rescaled such that the
-average temperature of the nve run is closer to the target
-temperature.
+average temperature of the nve run is closer to the target temperature.
 
-The mean square displacement of the defect, \left< \Delta r_{ptd}^2
-\right> is then estimated using the mean square displacement of the
-atoms \left< \Delta r_{i}^2 \right>. Under the assumption that all
-diffusion is associated with the single point defect, the defect's
-mean square displacement can be taken as the summed square
-displacement of the atoms
+The mean square displacement of the defect,
+:math:`\left< \Delta r_{ptd}^2 \right>` is then estimated using the mean
+square displacement of the atoms :math:`\left< \Delta r_{i}^2 \right>`.
+Under the assumption that all diffusion is associated with the single
+point defect, the defect's mean square displacement can be taken as the
+summed square displacement of the atoms
 
-   \left< \Delta r_{ptd}^2 \right> \approx \sum_i^N \Delta r_{i}^2 = N
-   \left< \Delta r_{i}^2 \right>
+.. math::  \left< \Delta r_{ptd}^2 \right> \approx \sum_i^N \Delta r_{i}^2 = N \left< \Delta r_{i}^2 \right> 
 
 ,
 
-where N is the number of atoms in the system. The diffusion constant
-is then estimated by linearly fitting the change in mean square
+where :math:`N` is the number of atoms in the system. The diffusion
+constant is then estimated by linearly fitting the change in mean square
 displacement with time
 
-   \left< \Delta r_{ptd}^2 \right> = 2 d D_{ptd} \Delta t
+.. math::  \left< \Delta r_{ptd}^2 \right> = 2 d D_{ptd} \Delta t 
 
 ,
 

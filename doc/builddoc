@@ -2,6 +2,7 @@
 
 rm -r html
 rm -r rst
-python buildstyledocs.py
+python source/buildstyledocs.py
 sphinx-build -b html source html
 sphinx-build -b rst source rst
+python source/copymath.py
