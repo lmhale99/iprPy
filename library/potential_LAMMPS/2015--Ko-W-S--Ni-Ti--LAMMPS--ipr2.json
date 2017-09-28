@@ -1,17 +1,21 @@
 {
     "potential-LAMMPS": {
-        "key": "83ca7343-12d3-4644-b85b-2b3a839f884e", 
-        "id": "2015--Pascuet-M-I--Al--LAMMPS--ipr1", 
+        "key": "8543ed40-90c3-4e0b-b941-2106e522d285", 
+        "id": "2015--Ko-W-S--Ni-Ti--LAMMPS--ipr2", 
         "potential": {
-            "key": "b5fb2f1f-a582-4f81-9445-f002ce31e66e", 
-            "id": "2015--Pascuet-M-I--Al"
+            "key": "904676a4-1559-4205-bc31-b64d5ac26d79", 
+            "id": "2015--Ko-W-S--Ni-Ti"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
         "atom": [
             {
-                "element": "Al", 
-                "mass": 26.9815
+                "element": "Ni", 
+                "mass": 58.69
+            }, 
+            {
+                "element": "Ti", 
+                "mass": 47.88
             }
         ], 
         "pair_style": {
@@ -20,13 +24,13 @@
         "pair_coeff": {
             "term": [
                 {
-                    "file": "library-Al.meam"
+                    "file": "library.meam"
                 }, 
                 {
-                    "option": "Al"
+                    "option": "Ni Ti"
                 }, 
                 {
-                    "file": "Al.meam"
+                    "file": "NiTi.meam"
                 }, 
                 {
                     "symbols": "True"

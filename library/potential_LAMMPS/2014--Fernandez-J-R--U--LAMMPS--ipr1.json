@@ -21,7 +21,7 @@
                     "file": "library-U.meam"
                 }, 
                 {
-                    "symbolsList": "True"
+                    "option": "U"
                 }, 
                 {
                     "file": "U.meam"

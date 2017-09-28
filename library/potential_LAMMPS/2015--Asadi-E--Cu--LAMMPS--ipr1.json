@@ -20,7 +20,7 @@
                     "file": "library.Cu.meam"
                 }, 
                 {
-                    "symbolsList": "True"
+                    "option": "Cu"
                 }, 
                 {
                     "file": "Cu.meam"

@@ -20,7 +20,7 @@
                     "file": "library.Fe.meam"
                 }, 
                 {
-                    "symbolsList": "True"
+                    "option": "Fe"
                 }, 
                 {
                     "file": "Fe.meam"

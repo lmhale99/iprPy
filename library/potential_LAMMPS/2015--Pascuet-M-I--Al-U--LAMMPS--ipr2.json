@@ -1,10 +1,10 @@
 {
     "potential-LAMMPS": {
-        "key": "83ca7343-12d3-4644-b85b-2b3a839f884e", 
-        "id": "2015--Pascuet-M-I--Al--LAMMPS--ipr1", 
+        "key": "94dc2354-d7d7-4561-aa6a-13f5652e0d14", 
+        "id": "2015--Pascuet-M-I--Al-U--LAMMPS--ipr2", 
         "potential": {
-            "key": "b5fb2f1f-a582-4f81-9445-f002ce31e66e", 
-            "id": "2015--Pascuet-M-I--Al"
+            "key": "6eac6c3e-c4f2-45d2-abbf-ba5a6e7a20b2", 
+            "id": "2015--Pascuet-M-I--Al-U"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
@@ -12,6 +12,10 @@
             {
                 "element": "Al", 
                 "mass": 26.9815
+            }, 
+            {
+                "element": "U", 
+                "mass": 238.04
             }
         ], 
         "pair_style": {
@@ -20,13 +24,13 @@
         "pair_coeff": {
             "term": [
                 {
-                    "file": "library-Al.meam"
+                    "file": "library.meam"
                 }, 
                 {
-                    "option": "Al"
+                    "option": "Al U"
                 }, 
                 {
-                    "file": "Al.meam"
+                    "file": "AlU.meam"
                 }, 
                 {
                     "symbols": "True"
