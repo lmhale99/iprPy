@@ -1,0 +1,53 @@
+<h2>Static Crystal Structure Predictions</h2>
+<p>
+    The properties listed here are obtained from static calculations for given 
+    crystal structures. The values were obtained using an algorithm that takes 
+    an initial estimate for the lattice constants and evaluates the cohesive 
+    energy and virial pressures for the structure. Elastic constants are calculated 
+    using the changes in the virial pressures due to the application of small strains 
+    (1e-5). The pressure values and elastic compliances are used to obtain a new lattice 
+    parameter guess by linearly extrapolating to zero pressure. This process is repeated 
+    until the lattice constants from one iteration to the next are within a relative 
+    tolerance of 1e-10. The elastic constants shown coincide with the final iteration.
+</p><p>
+    Initial estimates for the lattice constants correspond to all the energy minima 
+    identified in the cohesive energy vs interatomic spacing plots. This means that 
+    it is possible that some potentials have multiple refined results for the same 
+    crystal structure. Having multiple energy minimums for a structure does not 
+    necessarily make the potential 'bad' as unwanted configurations may be unstable or 
+    correspond to conditions that may not be relevant to the problem of interest 
+    (eg. very high strains).
+</p><p>
+    More information about the calculation used can be found on the 
+    <a href="http://www.ctcms.nist.gov/potentials/tools.html">Tools</a> page.
+</p><p>
+    <a href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST disclaimer</a>
+</p><p>
+    <b>Disclaimer:</b> These values are meant to be guidelines for comparing 
+    potentials, not the absolute values for any potential's properties. The 
+    presence of any structures in this list does not guarantee that those 
+    structures are stable as only the box dimensions are changed, not the 
+    relative positions of the atoms in the cell. Also, the lowest energy 
+    structure may not be included in this list. Variations in the values may 
+    occur for fully relaxed configurations, different small strain values, 
+    different simulation software and different implementations of the 
+    interatomic potential. The algorithm used works best when the interatomic 
+    potential's elastic constants vary smoothly with changes in volume.
+</p><p>
+    <b>Version Information:</b> As property calculation methods are developed and updated, there 
+    may be changes in the calculated values. Updates to the calculation methods 
+    that affect the values will be documented and archival versions of this page 
+    will be made available as a record. 
+    <ul><li>
+        2016-09-28. Values for simple compounds added. All identified energy minima 
+        for each structure are listed. The existing elemental data was regenerated. Most values are 
+        consistent with before, but some differences have been noted. Specifically, variations are 
+        seen with some values for potentials where the elastic constants don't vary smoothly near 
+        the equilibrium state. Additionally, the inclusion of some high-energy structures has 
+        changed based on new criteria for identifying when structures have relaxed to another structure.        
+    </li><li>
+        2016-04-07. Values for elemental crystal structures added. Only values for the 
+        global energy minimum of each unique structure given.
+    </li></ul>
+</p>
+<hr/>

@@ -29,3 +29,6 @@ bin/iprPy_runner.*
 
 #Demonstration Notebook working directories
 docs/demonstrations/*/
+
+#Generated web content
+analysis/webcontent
