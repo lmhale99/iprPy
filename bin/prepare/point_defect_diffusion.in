@@ -1,0 +1,36 @@
+#### Calculation Style ####
+calculation_style           point_defect_diffusion
+
+#### Commands (prepare on Windows) ####
+lammps_command               lmp_mpi
+mpi_command                  
+
+#### Commands (prepare on Linux) ####
+#lammps_command               /users/lmh1/LAMMPS/lammps-30Jul16/src/lmp_mpi
+#mpi_command                  
+
+#### Run condition limiters ####
+potential_name              2006--Chamati-H--Fe
+potential_name              2012--Proville-L--Fe
+potential_name              2012--Park-H--Mo
+symbol_name
+family_name                 
+pointdefect_name            A2--W--bcc--vacancy
+
+#### Unit specifications ####
+length_unit
+pressure_unit
+energy_unit
+force_unit
+
+#### Run parameters ####
+sizemults                   5 5 5
+#sizemults                   6 6 6
+#sizemults                   7 7 7
+#sizemults                   8 8 8
+#sizemults                   9 9 9
+#sizemults                   10 10 10
+thermosteps                 100
+runsteps                    1000000
+equilsteps                  20000
+dumpsteps                   0
