@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Method and Theory &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/agogo.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="calc_dislocation_monopole.py" href="calc.html" />
+    <link rel="prev" title="Introduction" href="intro.html" /> 
+  </head>
+  <body role="document">
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../../index.html">iprPy 0.7.2 documentation</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="intro.html" title="Introduction"
+             accesskey="P">previous</a> |
+          <a href="calc.html" title="calc_dislocation_monopole.py"
+             accesskey="N">next</a> |
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="method-and-theory">
+<h1>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this headline">¶</a></h1>
+<p>First, an initial system is generated. This is accomplished by</p>
+<ol class="arabic simple">
+<li>Starting with a unit cell system.</li>
+<li>Generating a transformed system by rotating the unit cell such that
+the new system&#8217;s box vectors correspond to crystallographic
+directions, and filled in with atoms to remain a perfect bulk cell
+when the three boundaries are periodic.</li>
+<li>All atoms are shifted by a fractional amount of the box vectors if
+needed.</li>
+<li>A supercell system is constructed by combining multiple replicas of
+the transformed system.</li>
+</ol>
+<p>The Stroh method is used to compute the Eshelby solution for an
+anisotropic straight dislocation. This is done using the
+atomman.defect.Stroh class. The solution is computed for a dislocation
+parallel to the initial system&#8217;s z-axis using the bulk elastic constants
+tensor for the system, <span class="math">\(C_{ij}\)</span>, and the dislocation&#8217;s Burgers
+vector, <span class="math">\(b_i\)</span>.</p>
+<p>A dislocation monopole system is constructed with dislocation line
+positioned along the z-axis, i.e. xy coordinates = (0,0). For every atom
+in the initial system, the Stroh displacement is computed based on their
+xy coordinates and the Stroh solution. The dislocation system is then
+created by shifting the atomic positions of the initial system by the
+Stroh displacements.</p>
+<p>The boundary conditions of the dislocation monopole system are handled
+as such:</p>
+<ol class="arabic simple">
+<li>The box dimension parallel to the z-axis is periodic, and the other
+two box directions are non-periodic.</li>
+<li>The system is divided into active and fixed regions.</li>
+</ol>
+<ol class="loweralpha simple">
+<li>The fixed region consists of atoms near the x and y boundaries and
+should always be of a thickness such that atoms in the active region
+do not interact with the free surfaces.</li>
+<li>The active region is centered around the dislocation line, and has a
+cross-sectional area that is either circular or rectangular.</li>
+</ol>
+<ol class="arabic simple" start="3">
+<li>Atoms in the fixed region are identified by altering their integer
+atomic types.</li>
+</ol>
+<p>Finally, a LAMMPS simulation is performed using the dislocation monopole
+system. In the simulation, the atoms in the active region are allowed to
+relax either with nvt integration followed by an energy/force
+minimization, or with just an energy/force minimization. The atoms in
+the fixed region are not allowed to relax and remain fixed (at the
+elastic solution). Upon completion, the relaxed dislocation system and
+parameters from the Stroh solution are retained.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          <h3>Table Of Contents</h3>
+          <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction to iprPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../basics/index.html">iprPy Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../highthroughput/index.html">High-Throughput Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../extend/index.html">Adding Content to iprPy</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../calculation_styles.html">Calculation Styles</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../E_vs_r_scan/index.html">E_vs_r_scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LAMMPS_ELASTIC/index.html">LAMMPS_ELASTIC</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">dislocation_monopole</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Method and Theory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="calc.html">calc_dislocation_monopole.py</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_relax/index.html">dynamic_relax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../point_defect_diffusion/index.html">point_defect_diffusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../point_defect_static/index.html">point_defect_static</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../refine_structure/index.html">refine_structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../stacking_fault/index.html">stacking_fault</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../stacking_fault_multi/index.html">stacking_fault_multi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../surface_energy/index.html">surface_energy</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../record_styles.html">Record Styles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../database_styles.html">Database Styles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/index.html">iprPy</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Search</h3>
+            <form class="search" action="../../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+            </form>
+          </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="intro.html" title="Introduction"
+              >previous</a> |
+            <a href="calc.html" title="calc_dislocation_monopole.py"
+              >next</a> |
+            <a href="../../py-modindex.html" title="Python Module Index"
+              >modules</a> |
+            <a href="../../genindex.html" title="General Index"
+              >index</a>
+          </div>
+          <div role="note" aria-label="source link">
+              <br/>
+              <a href="../../_sources/calculations/dislocation_monopole/theory.rst.txt"
+                rel="nofollow">Show Source</a>
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

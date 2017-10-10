@@ -1,0 +1,8 @@
+<scriptheader>
+
+Calculation script functions
+----------------------------
+.. automodule:: iprPy.calculations.<name>.calc_<name>
+    :members:
+    :undoc-members:
+    :show-inheritance:

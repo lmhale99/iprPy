@@ -10,10 +10,12 @@ mpi_command
 #mpi_command                  
 
 #### Potential limiters ####
-potential_name              2017--Purja-Pun-G-P--Au
-potential_element
-potential_pair_style
-potential_currentIPR        False
+potential_name              #2006--Chamati-H--Fe
+potential_name              #2012--Park-H--Mo
+potential_name              #2012--Proville-L--Fe
+potential_element           
+potential_pair_style        meam
+#potential_currentIPR        false
 
 #### Crystal prototype limiters ####
 prototype_name
@@ -21,7 +23,7 @@ prototype_spacegroup
 prototype_crystalfamily
 prototype_Pearsonsymbol
 prototype_natypes
-            
+
 #### Run parameters ####
 sizemults                   
 minimum_r                   

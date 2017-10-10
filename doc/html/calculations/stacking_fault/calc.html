@@ -1,0 +1,313 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calc_stacking_fault.py &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/agogo.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="stacking_fault_multi" href="../stacking_fault_multi/index.html" />
+    <link rel="prev" title="Method and Theory" href="theory.html" /> 
+  </head>
+  <body role="document">
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../../index.html">iprPy 0.7.2 documentation</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="theory.html" title="Method and Theory"
+             accesskey="P">previous</a> |
+          <a href="../stacking_fault_multi/index.html" title="stacking_fault_multi"
+             accesskey="N">next</a> |
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="calc-stacking-fault-py">
+<h1>calc_stacking_fault.py<a class="headerlink" href="#calc-stacking-fault-py" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-iprPy.calculations.stacking_fault.calc_stacking_fault">
+<span id="calculation-script-functions"></span><h2>Calculation script functions<a class="headerlink" href="#module-iprPy.calculations.stacking_fault.calc_stacking_fault" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="iprPy.calculations.stacking_fault.calc_stacking_fault.main">
+<code class="descname">main</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/iprPy/calculations/stacking_fault/calc_stacking_fault.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iprPy.calculations.stacking_fault.calc_stacking_fault.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main function called when script is executed directly.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.calculations.stacking_fault.calc_stacking_fault.process_input">
+<code class="descname">process_input</code><span class="sig-paren">(</span><em>input_dict</em>, <em>UUID=None</em>, <em>build=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/iprPy/calculations/stacking_fault/calc_stacking_fault.html#process_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iprPy.calculations.stacking_fault.calc_stacking_fault.process_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes str input parameters, assigns default values if needed, and
+generates new, more complex terms as used by the calculation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>input_dict</strong> (<em>dict</em>) &#8211; Dictionary containing the calculation input parameters with string
+values.  The allowed keys depends on the calculation style.</li>
+<li><strong>UUID</strong> (<em>str</em><em>, </em><em>optional</em>) &#8211; Unique identifier to use for the calculation instance.  If not
+given and a &#8216;UUID&#8217; key is not in input_dict, then a random UUID4
+hash tag will be assigned.</li>
+<li><strong>build</strong> (<em>bool</em><em>, </em><em>optional</em>) &#8211; Indicates if all complex terms are to be built.  A value of False
+allows for default values to be assigned even if some inputs
+required by the calculation are incomplete.  (Default is True.)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.calculations.stacking_fault.calc_stacking_fault.stackingfault">
+<code class="descname">stackingfault</code><span class="sig-paren">(</span><em>lammps_command, system, potential, symbols, mpi_command=None, cutboxvector=None, faultpos=0.5, faultshift=[0.0, 0.0, 0.0], etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000, dmax=0.01</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/iprPy/calculations/stacking_fault/calc_stacking_fault.html#stackingfault"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iprPy.calculations.stacking_fault.calc_stacking_fault.stackingfault" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the generalized stacking fault value for a single faultshift.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lammps_command</strong> (<em>str</em>) &#8211; Command for running LAMMPS.</li>
+<li><strong>system</strong> (<em>atomman.System</em>) &#8211; The system to perform the calculation on.</li>
+<li><strong>potential</strong> (<em>atomman.lammps.Potential</em>) &#8211; The LAMMPS implemented potential to use.</li>
+<li><strong>symbols</strong> (<em>list of str</em>) &#8211; The list of element-model symbols for the Potential that correspond to
+system&#8217;s atypes.</li>
+<li><strong>mpi_command</strong> (<em>str</em><em>, </em><em>optional</em>) &#8211; The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+will run serially.</li>
+<li><strong>etol</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; The energy tolerance for the structure minimization. This value is
+unitless. (Default is 0.0).</li>
+<li><strong>ftol</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; The force tolerance for the structure minimization. This value is in
+units of force. (Default is 0.0).</li>
+<li><strong>maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) &#8211; The maximum number of minimization iterations to use (default is
+10000).</li>
+<li><strong>maxeval</strong> (<em>int</em><em>, </em><em>optional</em>) &#8211; The maximum number of minimization evaluations to use (default is
+100000).</li>
+<li><strong>dmax</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; The maximum distance in length units that any atom is allowed to relax
+in any direction during a single minimization iteration (default is
+0.01 Angstroms).</li>
+<li><strong>cutboxvector</strong> (<em>str</em><em>, </em><em>optional</em>) &#8211; Indicates which of the three system box vectors, &#8216;a&#8217;, &#8216;b&#8217;, or &#8216;c&#8217;, to
+cut with a non-periodic boundary (default is &#8216;c&#8217;).</li>
+<li><strong>faultpos</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; The fractional position along the cutboxvector where the stacking
+fault plane will be placed (default is 0.5).</li>
+<li><strong>faultshift</strong> (<em>list of float</em><em>, </em><em>optional</em>) &#8211; The vector shift to apply to all atoms above the fault plane defined
+by faultpos (default is [0,0,0], i.e. no shift applied).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>Dictionary of results consisting of keys:</p>
+<ul class="simple">
+<li><strong>&#8216;E_gsf&#8217;</strong> (<em>float</em>) - The stacking fault formation energy.</li>
+<li><strong>&#8216;E_total_0&#8217;</strong> (<em>float</em>) - The total potential energy of the
+system before applying the faultshift.</li>
+<li><strong>&#8216;E_total_sf&#8217;</strong> (<em>float</em>) - The total potential energy of the
+system after applying the faultshift.</li>
+<li><strong>&#8216;delta_disp&#8217;</strong> (<em>float</em>) - The change in the center of mass
+difference between before and after applying the faultshift.</li>
+<li><strong>&#8216;disp_0&#8217;</strong> (<em>float</em>) - The center of mass difference between atoms
+above and below the fault plane in the cutboxvector direction for
+the system before applying the faultshift.</li>
+<li><strong>&#8216;disp_sf&#8217;</strong> (<em>float</em>) - The center of mass difference between
+atoms above and below the fault plane in the cutboxvector direction
+for the system after applying the faultshift.</li>
+<li><strong>&#8216;A_fault&#8217;</strong> (<em>float</em>) - The area of the fault surface.</li>
+<li><strong>&#8216;dumpfile_0&#8217;</strong> (<em>str</em>) - The name of the LAMMMPS dump file
+associated with the relaxed system before applying the faultshift.</li>
+<li><strong>&#8216;dumpfile_sf&#8217;</strong> (<em>str</em>) - The name of the LAMMMPS dump file
+associated with the relaxed system after applying the faultshift.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.calculations.stacking_fault.calc_stacking_fault.stackingfaultpoint">
+<code class="descname">stackingfaultpoint</code><span class="sig-paren">(</span><em>lammps_command, system, potential, symbols, mpi_command=None, sim_directory=None, cutboxvector='c', faultpos=0.5, faultshift=[0.0, 0.0, 0.0], etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000, dmax=0.01</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/iprPy/calculations/stacking_fault/calc_stacking_fault.html#stackingfaultpoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iprPy.calculations.stacking_fault.calc_stacking_fault.stackingfaultpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a stacking fault relaxation simulation for a single faultshift.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lammps_command</strong> (<em>str</em>) &#8211; Command for running LAMMPS.</li>
+<li><strong>system</strong> (<em>atomman.System</em>) &#8211; The system to perform the calculation on.</li>
+<li><strong>potential</strong> (<em>atomman.lammps.Potential</em>) &#8211; The LAMMPS implemented potential to use.</li>
+<li><strong>symbols</strong> (<em>list of str</em>) &#8211; The list of element-model symbols for the Potential that correspond to
+system&#8217;s atypes.</li>
+<li><strong>mpi_command</strong> (<em>str</em><em>, </em><em>optional</em>) &#8211; The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+will run serially.</li>
+<li><strong>sim_directory</strong> (<em>str</em><em>, </em><em>optional</em>) &#8211; The path to the directory to perform the simuation in.  If not
+given, will use the current working directory.</li>
+<li><strong>etol</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; The energy tolerance for the structure minimization. This value is
+unitless. (Default is 0.0).</li>
+<li><strong>ftol</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; The force tolerance for the structure minimization. This value is in
+units of force. (Default is 0.0).</li>
+<li><strong>maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) &#8211; The maximum number of minimization iterations to use (default is
+10000).</li>
+<li><strong>maxeval</strong> (<em>int</em><em>, </em><em>optional</em>) &#8211; The maximum number of minimization evaluations to use (default is
+100000).</li>
+<li><strong>dmax</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; The maximum distance in length units that any atom is allowed to relax
+in any direction during a single minimization iteration (default is
+0.01 Angstroms).</li>
+<li><strong>cutboxvector</strong> (<em>str</em><em>, </em><em>optional</em>) &#8211; Indicates which of the three system box vectors, &#8216;a&#8217;, &#8216;b&#8217;, or &#8216;c&#8217;, to
+cut with a non-periodic boundary (default is &#8216;c&#8217;).</li>
+<li><strong>faultpos</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; The fractional position along the cutboxvector where the stacking
+fault plane will be placed (default is 0.5).</li>
+<li><strong>faultshift</strong> (<em>list of float</em><em>, </em><em>optional</em>) &#8211; The vector shift to apply to all atoms above the fault plane defined
+by faultpos (default is [0,0,0], i.e. no shift applied).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>Dictionary of results consisting of keys:</p>
+<ul class="simple">
+<li><strong>&#8216;logfile&#8217;</strong> (<em>str</em>) - The filename of the LAMMPS log file.</li>
+<li><strong>&#8216;dumpfile&#8217;</strong> (<em>str</em>) - The filename of the LAMMPS dump file
+of the relaxed system.</li>
+<li><strong>&#8216;system&#8217;</strong> (<em>atomman.System</em>) - The relaxed system.</li>
+<li><strong>&#8216;A_fault&#8217;</strong> (<em>float</em>) - The area of the fault surface.</li>
+<li><strong>&#8216;E_total&#8217;</strong> (<em>float</em>) - The total potential energy of the relaxed
+system.</li>
+<li><strong>&#8216;disp&#8217;</strong> (<em>float</em>) - The center of mass difference between atoms
+above and below the fault plane in the cutboxvector direction.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">dict</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; For invalid cutboxvectors.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          <h3>Table Of Contents</h3>
+          <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction to iprPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../basics/index.html">iprPy Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../highthroughput/index.html">High-Throughput Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../extend/index.html">Adding Content to iprPy</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../calculation_styles.html">Calculation Styles</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../E_vs_r_scan/index.html">E_vs_r_scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LAMMPS_ELASTIC/index.html">LAMMPS_ELASTIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dislocation_monopole/index.html">dislocation_monopole</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_relax/index.html">dynamic_relax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../point_defect_diffusion/index.html">point_defect_diffusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../point_defect_static/index.html">point_defect_static</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../refine_structure/index.html">refine_structure</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">stacking_fault</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="theory.html">Method and Theory</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">calc_stacking_fault.py</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-iprPy.calculations.stacking_fault.calc_stacking_fault">Calculation script functions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../stacking_fault_multi/index.html">stacking_fault_multi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../surface_energy/index.html">surface_energy</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../record_styles.html">Record Styles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../database_styles.html">Database Styles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/index.html">iprPy</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Search</h3>
+            <form class="search" action="../../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+            </form>
+          </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="theory.html" title="Method and Theory"
+              >previous</a> |
+            <a href="../stacking_fault_multi/index.html" title="stacking_fault_multi"
+              >next</a> |
+            <a href="../../py-modindex.html" title="Python Module Index"
+              >modules</a> |
+            <a href="../../genindex.html" title="General Index"
+              >index</a>
+          </div>
+          <div role="note" aria-label="source link">
+              <br/>
+              <a href="../../_sources/calculations/stacking_fault/calc.rst.txt"
+                rel="nofollow">Show Source</a>
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

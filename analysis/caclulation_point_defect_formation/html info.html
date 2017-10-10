@@ -1,0 +1,22 @@
+<h2>Point Defect Formation Energy</h2>
+<p>
+    Computed point defect formation energies for the potential are tabulated below.  The values were computed using the iprPy point_defect_static calculation method.  A 10x10x10 supercell of the crystal's unit cell was constructed, and the bulk cohesive energy was calculated after an atomic energy minimization.  A single point defect was then introduced into the system and subjected to another minimization relaxation.  The defect formation energy was then calculated by finding the difference between the total energy of the defect system and the bulk cohesive energy times the number of atoms in the defect system.
+</p><p>
+    The defect system after relaxation is examined using simple metrics to determine if the defect has relaxed to a different atomic configuration.  These reconfiguration metrics are based on local symmetry, and therefore are likely valid for most defects corresponding to high-symmetry lattice positions.  For the 'reconfigured' column of the table, a value of false means that the metrics predict the final configuration to remain true to the defect type, while a value of true means that the system is identified as relaxing to a different defect configuration.
+</p><p>
+    <a href="https://github.com/usnistgov/iprPy/blob/master/doc/rst/calculations/point_defect_static/index.rst">Calculation documentation</a>
+</p><p>
+    <a href="https://github.com/usnistgov/iprPy/tree/master/iprPy/calculations/point_defect_static">Calculation code</a>
+</p><p>
+    <a href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST disclaimer</a>
+</p><p>
+    <b>Note</b>: Multiple reported energy values for the same point defect are possible if the Static Crystal Structure Predictions computed multiple lattice constants for the crystal structure.
+</p><p>
+    <b>Disclaimer</b>: These results are meant to be used as guidelines for comparing potentials, not as definitive measurements for the properties.  Because only a static relaxation is performed, the relaxed configuration obtained from a calculation might only be locally stable. Additionally, the true stable configuration may not correspond to any of the configurations explored.  No guarantees are given that the 
+</p><p>
+    <b>Version Information:</b> As property calculation methods are developed and updated, there may be changes in the calculated values. Updates to the calculation methods that affect the values will be documented and archival versions of this page will be made available as a record. 
+    <ul><li>
+        2017-09-28 Point defect formation energy values added.
+    </li></ul>
+</p>
+<hr/>

@@ -149,7 +149,7 @@ def pointdefect(lammps_command, system, potential, symbols, point_kwargs,
     lammps_variables['maxeval'] = maxeval
     lammps_variables['dmax'] = dmax
     
-    # Set dump_modify format based on dump_modify_version
+    # Set dump_modify_format based on lammps_date
     if lammps_date < datetime.date(2016, 8, 3):
         lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e"'
     else:

@@ -240,7 +240,7 @@ def disl_boundary_fix(system, symbols, bwidth, bshape='circle'):
 
     new_system = deepcopy(system)
     new_system.atoms_prop(key='atype', value=atypes)
-    symbols.extend(symbols)
+    symbols = symbols * 2
     
     return new_system, symbols
         

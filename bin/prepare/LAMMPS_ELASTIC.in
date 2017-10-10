@@ -10,9 +10,9 @@ mpi_command
 #mpi_command                  
             
 #### Run condition limiters ####
-potential_name          
+potential_name                  
 symbol_name
-family_name          
+family_name
 
 #### Run parameters ####
 sizemults 

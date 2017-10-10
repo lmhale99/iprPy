@@ -1,0 +1,601 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>iprPy.calculations.stacking_fault.calc_stacking_fault &#8212; iprPy 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/agogo.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../../../../index.html">iprPy 0.7.2 documentation</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for iprPy.calculations.stacking_fault.calc_stacking_fault</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="c1"># Python script created by Lucas Hale and Norman Luu.</span>
+
+<span class="c1"># Standard library imports</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+
+<span class="c1"># http://www.numpy.org/</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+
+<span class="c1"># https://github.com/usnistgov/DataModelDict </span>
+<span class="kn">from</span> <span class="nn">DataModelDict</span> <span class="k">import</span> <span class="n">DataModelDict</span> <span class="k">as</span> <span class="n">DM</span>
+
+<span class="c1"># https://github.com/usnistgov/atomman </span>
+<span class="kn">import</span> <span class="nn">atomman</span> <span class="k">as</span> <span class="nn">am</span>
+<span class="kn">import</span> <span class="nn">atomman.lammps</span> <span class="k">as</span> <span class="nn">lmp</span>
+<span class="kn">import</span> <span class="nn">atomman.unitconvert</span> <span class="k">as</span> <span class="nn">uc</span>
+
+<span class="c1"># https://github.com/usnistgov/iprPy</span>
+<span class="kn">import</span> <span class="nn">iprPy</span>
+
+<span class="c1"># Define calc_style and record_style</span>
+<span class="n">calc_style</span> <span class="o">=</span> <span class="s1">&#39;stacking_fault&#39;</span>
+<span class="n">record_style</span> <span class="o">=</span> <span class="s1">&#39;calculation_stacking_fault&#39;</span>
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../calculations/stacking_fault/calc.html#iprPy.calculations.stacking_fault.calc_stacking_fault.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Main function called when script is executed directly.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Read input file in as dictionary</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">input_dict</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">parseinput</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">allsingular</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    <span class="c1"># Interpret and process input parameters</span>
+    <span class="n">process_input</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    
+    <span class="n">results_dict</span> <span class="o">=</span> <span class="n">stackingfault</span><span class="p">(</span><span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;lammps_command&#39;</span><span class="p">],</span>
+                                 <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;initialsystem&#39;</span><span class="p">],</span>
+                                 <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;potential&#39;</span><span class="p">],</span>
+                                 <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;symbols&#39;</span><span class="p">],</span>
+                                 <span class="n">mpi_command</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;mpi_command&#39;</span><span class="p">],</span>
+                                 <span class="n">cutboxvector</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;stackingfault_cutboxvector&#39;</span><span class="p">],</span>
+                                 <span class="n">faultpos</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;faultpos&#39;</span><span class="p">],</span>
+                                 <span class="n">faultshift</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;faultshift&#39;</span><span class="p">],</span>
+                                 <span class="n">etol</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;energytolerance&#39;</span><span class="p">],</span>
+                                 <span class="n">ftol</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;forcetolerance&#39;</span><span class="p">],</span>
+                                 <span class="n">maxiter</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;maxiterations&#39;</span><span class="p">],</span>
+                                 <span class="n">maxeval</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;maxevaluations&#39;</span><span class="p">],</span>
+                                 <span class="n">dmax</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;maxatommotion&#39;</span><span class="p">])</span>
+    
+    <span class="c1"># Save data model of results</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">buildmodel</span><span class="p">(</span><span class="n">record_style</span><span class="p">,</span> <span class="s1">&#39;calc_&#39;</span> <span class="o">+</span> <span class="n">calc_style</span><span class="p">,</span> <span class="n">input_dict</span><span class="p">,</span>
+                               <span class="n">results_dict</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;results.json&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="n">fp</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="stackingfaultpoint"><a class="viewcode-back" href="../../../../calculations/stacking_fault/calc.html#iprPy.calculations.stacking_fault.calc_stacking_fault.stackingfaultpoint">[docs]</a><span class="k">def</span> <span class="nf">stackingfaultpoint</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span>
+                       <span class="n">mpi_command</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sim_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">cutboxvector</span><span class="o">=</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="n">faultpos</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                       <span class="n">faultshift</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="n">etol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                       <span class="n">maxiter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">maxeval</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
+                       <span class="n">dmax</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform a stacking fault relaxation simulation for a single faultshift.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lammps_command :str</span>
+<span class="sd">        Command for running LAMMPS.</span>
+<span class="sd">    system : atomman.System</span>
+<span class="sd">        The system to perform the calculation on.</span>
+<span class="sd">    potential : atomman.lammps.Potential</span>
+<span class="sd">        The LAMMPS implemented potential to use.</span>
+<span class="sd">    symbols : list of str</span>
+<span class="sd">        The list of element-model symbols for the Potential that correspond to</span>
+<span class="sd">        system&#39;s atypes.</span>
+<span class="sd">    mpi_command : str, optional</span>
+<span class="sd">        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS</span>
+<span class="sd">        will run serially.</span>
+<span class="sd">    sim_directory : str, optional</span>
+<span class="sd">        The path to the directory to perform the simuation in.  If not</span>
+<span class="sd">        given, will use the current working directory.</span>
+<span class="sd">    etol : float, optional</span>
+<span class="sd">        The energy tolerance for the structure minimization. This value is</span>
+<span class="sd">        unitless. (Default is 0.0).</span>
+<span class="sd">    ftol : float, optional</span>
+<span class="sd">        The force tolerance for the structure minimization. This value is in</span>
+<span class="sd">        units of force. (Default is 0.0).</span>
+<span class="sd">    maxiter : int, optional</span>
+<span class="sd">        The maximum number of minimization iterations to use (default is </span>
+<span class="sd">        10000).</span>
+<span class="sd">    maxeval : int, optional</span>
+<span class="sd">        The maximum number of minimization evaluations to use (default is </span>
+<span class="sd">        100000).</span>
+<span class="sd">    dmax : float, optional</span>
+<span class="sd">        The maximum distance in length units that any atom is allowed to relax</span>
+<span class="sd">        in any direction during a single minimization iteration (default is</span>
+<span class="sd">        0.01 Angstroms).</span>
+<span class="sd">    cutboxvector : str, optional</span>
+<span class="sd">        Indicates which of the three system box vectors, &#39;a&#39;, &#39;b&#39;, or &#39;c&#39;, to</span>
+<span class="sd">        cut with a non-periodic boundary (default is &#39;c&#39;).</span>
+<span class="sd">    faultpos : float, optional</span>
+<span class="sd">        The fractional position along the cutboxvector where the stacking</span>
+<span class="sd">        fault plane will be placed (default is 0.5).</span>
+<span class="sd">    faultshift : list of float, optional</span>
+<span class="sd">        The vector shift to apply to all atoms above the fault plane defined</span>
+<span class="sd">        by faultpos (default is [0,0,0], i.e. no shift applied).</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Dictionary of results consisting of keys:</span>
+<span class="sd">        </span>
+<span class="sd">        - **&#39;logfile&#39;** (*str*) - The filename of the LAMMPS log file.</span>
+<span class="sd">        - **&#39;dumpfile&#39;** (*str*) - The filename of the LAMMPS dump file</span>
+<span class="sd">          of the relaxed system.</span>
+<span class="sd">        - **&#39;system&#39;** (*atomman.System*) - The relaxed system.</span>
+<span class="sd">        - **&#39;A_fault&#39;** (*float*) - The area of the fault surface.</span>
+<span class="sd">        - **&#39;E_total&#39;** (*float*) - The total potential energy of the relaxed</span>
+<span class="sd">          system.</span>
+<span class="sd">        - **&#39;disp&#39;** (*float*) - The center of mass difference between atoms</span>
+<span class="sd">          above and below the fault plane in the cutboxvector direction.</span>
+<span class="sd">    </span>
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        For invalid cutboxvectors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Set options based on cutboxvector</span>
+    <span class="k">if</span> <span class="n">cutboxvector</span> <span class="o">==</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span>
+        <span class="c1"># Assert system is compatible with planeaxis value</span>
+        <span class="k">if</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">xy</span> <span class="o">!=</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">xz</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;box tilts xy and xz must be 0 for cutboxvector=&#39;a&#39;&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Specify cutindex</span>
+        <span class="n">cutindex</span> <span class="o">=</span> <span class="mi">0</span>
+        
+        <span class="c1"># Identify atoms above fault</span>
+        <span class="n">faultpos</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">xlo</span> <span class="o">+</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">lx</span> <span class="o">*</span> <span class="n">faultpos</span>
+        <span class="n">abovefault</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">view</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][:,</span> <span class="n">cutindex</span><span class="p">]</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">faultpos</span><span class="p">)</span>
+        
+        <span class="c1"># Compute fault area</span>
+        <span class="n">faultarea</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">bvect</span><span class="p">,</span>
+                                            <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">cvect</span><span class="p">))</span>
+        
+        <span class="c1"># Give correct LAMMPS fix setforce command</span>
+        <span class="n">fix_cut_setforce</span> <span class="o">=</span> <span class="s1">&#39;fix cut all setforce NULL 0 0&#39;</span>
+        
+    <span class="k">elif</span> <span class="n">cutboxvector</span> <span class="o">==</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span>
+        <span class="c1"># Assert system is compatible with planeaxis value</span>
+        <span class="k">if</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">yz</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;box tilt yz must be 0 for cutboxvector=&#39;b&#39;&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Specify cutindex</span>
+        <span class="n">cutindex</span> <span class="o">=</span> <span class="mi">1</span>
+        
+        <span class="c1"># Identify atoms above fault</span>
+        <span class="n">faultpos</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">ylo</span> <span class="o">+</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">ly</span> <span class="o">*</span> <span class="n">faultpos</span>
+        <span class="n">abovefault</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">view</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][:,</span> <span class="n">cutindex</span><span class="p">]</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">faultpos</span><span class="p">)</span>
+        
+        <span class="c1"># Compute fault area</span>
+        <span class="n">faultarea</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">avect</span><span class="p">,</span>
+                                            <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">cvect</span><span class="p">))</span>
+        
+        <span class="c1"># Give correct LAMMPS fix setforce command</span>
+        <span class="n">fix_cut_setforce</span> <span class="o">=</span> <span class="s1">&#39;fix cut all setforce 0 NULL 0&#39;</span>
+        
+    <span class="k">elif</span> <span class="n">cutboxvector</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>
+        <span class="c1"># Specify cutindex</span>
+        <span class="n">cutindex</span> <span class="o">=</span> <span class="mi">2</span>
+        
+        <span class="c1"># Identify atoms above fault</span>
+        <span class="n">faultpos</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">zlo</span> <span class="o">+</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">lz</span> <span class="o">*</span> <span class="n">faultpos</span>
+        <span class="n">abovefault</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">view</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][:,</span> <span class="n">cutindex</span><span class="p">]</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">faultpos</span><span class="p">)</span>
+        
+        <span class="c1"># Compute fault area</span>
+        <span class="n">faultarea</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">avect</span><span class="p">,</span>
+                                            <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">bvect</span><span class="p">))</span>
+        
+        <span class="c1"># Give correct LAMMPS fix setforce command</span>
+        <span class="n">fix_cut_setforce</span> <span class="o">=</span> <span class="s1">&#39;fix cut all setforce 0 0 NULL&#39;</span>
+        
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid cutboxvector&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># Assert faultshift is in cut plane</span>
+    <span class="k">if</span> <span class="n">faultshift</span><span class="p">[</span><span class="n">cutindex</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;faultshift must be in cut plane&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># Generate stacking fault system by shifting atoms above the fault</span>
+    <span class="n">sfsystem</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+    <span class="n">sfsystem</span><span class="o">.</span><span class="n">pbc</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]</span>
+    <span class="n">sfsystem</span><span class="o">.</span><span class="n">pbc</span><span class="p">[</span><span class="n">cutindex</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">sfsystem</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">view</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="n">abovefault</span><span class="p">]</span> <span class="o">+=</span> <span class="n">faultshift</span>
+    <span class="n">sfsystem</span><span class="o">.</span><span class="n">wrap</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="n">sim_directory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Create sim_directory if it doesn&#39;t exist</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">sim_directory</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">sim_directory</span><span class="p">)</span>
+            
+        <span class="c1"># Add &#39;/&#39; to end of sim_directory string if needed</span>
+        <span class="k">if</span> <span class="n">sim_directory</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span> 
+            <span class="n">sim_directory</span> <span class="o">=</span> <span class="n">sim_directory</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Set sim_directory if is None</span>
+        <span class="n">sim_directory</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    
+    <span class="c1"># Get lammps units</span>
+    <span class="n">lammps_units</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+       
+    <span class="c1">#Get lammps version date</span>
+    <span class="n">lammps_date</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">check_lammps_version</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">)[</span><span class="s1">&#39;lammps_date&#39;</span><span class="p">]</span>
+    
+    <span class="c1"># Define lammps variables</span>
+    <span class="n">lammps_variables</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">system_info</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">atom_data</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">sfsystem</span><span class="p">,</span>
+                                     <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sim_directory</span><span class="p">,</span>
+                                                  <span class="s1">&#39;system.dat&#39;</span><span class="p">),</span>
+                                     <span class="n">units</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">,</span>
+                                     <span class="n">atom_style</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">atom_style</span><span class="p">)</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_system_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_info</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_pair_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">potential</span><span class="o">.</span><span class="n">pair_info</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;fix_cut_setforce&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fix_cut_setforce</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;sim_directory&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sim_directory</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;etol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">etol</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;ftol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">ftol</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;force&#39;</span><span class="p">])</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxiter</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;maxeval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxeval</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dmax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">dmax</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">])</span>
+    
+    <span class="c1"># Set dump_modify format based on dump_modify_version</span>
+    <span class="k">if</span> <span class="n">lammps_date</span> <span class="o">&lt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+        <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&quot;</span><span class="si">%i</span><span class="s1"> </span><span class="si">%i</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1">&quot;&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;float </span><span class="si">%.13e</span><span class="s1">&#39;</span>
+        
+    <span class="c1"># Write lammps input script</span>
+    <span class="n">template_file</span> <span class="o">=</span> <span class="s1">&#39;sfmin.template&#39;</span>
+    <span class="n">lammps_script</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sim_directory</span><span class="p">,</span> <span class="s1">&#39;sfmin.in&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">template_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lammps_script</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">filltemplate</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">lammps_variables</span><span class="p">,</span>
+                                         <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
+    
+    <span class="c1"># Run LAMMPS</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">lammps_script</span><span class="p">,</span> <span class="n">mpi_command</span><span class="p">,</span>
+                     <span class="n">return_style</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                     <span class="n">logfile</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sim_directory</span><span class="p">,</span> <span class="s1">&#39;log.lammps&#39;</span><span class="p">))</span>
+    
+    <span class="c1"># Extract output values</span>
+    <span class="n">thermo</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">simulations</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;thermo&#39;</span><span class="p">]</span>
+    <span class="n">logfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sim_directory</span><span class="p">,</span> <span class="s1">&#39;log.lammps&#39;</span><span class="p">)</span>
+    <span class="n">dumpfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sim_directory</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%i</span><span class="s1">.dump&#39;</span> <span class="o">%</span> <span class="n">thermo</span><span class="o">.</span><span class="n">Step</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">E_total</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">PotEng</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                              <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;energy&#39;</span><span class="p">])</span>
+    
+    <span class="c1">#Load relaxed system</span>
+    <span class="n">sfsystem</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">atom_dump</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dumpfile</span><span class="p">)</span>
+              
+    <span class="c1"># Find center of mass difference in top/bottom planes</span>
+    <span class="n">disp</span> <span class="o">=</span> <span class="p">(</span><span class="n">sfsystem</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">view</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="n">abovefault</span><span class="p">,</span> <span class="n">cutindex</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+            <span class="o">-</span> <span class="n">sfsystem</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">view</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="o">~</span><span class="n">abovefault</span><span class="p">,</span> <span class="n">cutindex</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+    
+    <span class="c1"># Return results</span>
+    <span class="n">results_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;logfile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">logfile</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;dumpfile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dumpfile</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sfsystem</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;A_fault&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">faultarea</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_total&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_total</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;disp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">disp</span>
+    
+    <span class="k">return</span> <span class="n">results_dict</span></div>
+    
+<div class="viewcode-block" id="stackingfault"><a class="viewcode-back" href="../../../../calculations/stacking_fault/calc.html#iprPy.calculations.stacking_fault.calc_stacking_fault.stackingfault">[docs]</a><span class="k">def</span> <span class="nf">stackingfault</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span>
+                  <span class="n">mpi_command</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cutboxvector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">faultpos</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                  <span class="n">faultshift</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="n">etol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                  <span class="n">maxiter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">maxeval</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
+                  <span class="n">dmax</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the generalized stacking fault value for a single faultshift.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lammps_command :str</span>
+<span class="sd">        Command for running LAMMPS.</span>
+<span class="sd">    system : atomman.System</span>
+<span class="sd">        The system to perform the calculation on.</span>
+<span class="sd">    potential : atomman.lammps.Potential</span>
+<span class="sd">        The LAMMPS implemented potential to use.</span>
+<span class="sd">    symbols : list of str</span>
+<span class="sd">        The list of element-model symbols for the Potential that correspond to</span>
+<span class="sd">        system&#39;s atypes.</span>
+<span class="sd">    mpi_command : str, optional</span>
+<span class="sd">        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS</span>
+<span class="sd">        will run serially.</span>
+<span class="sd">    etol : float, optional</span>
+<span class="sd">        The energy tolerance for the structure minimization. This value is</span>
+<span class="sd">        unitless. (Default is 0.0).</span>
+<span class="sd">    ftol : float, optional</span>
+<span class="sd">        The force tolerance for the structure minimization. This value is in</span>
+<span class="sd">        units of force. (Default is 0.0).</span>
+<span class="sd">    maxiter : int, optional</span>
+<span class="sd">        The maximum number of minimization iterations to use (default is </span>
+<span class="sd">        10000).</span>
+<span class="sd">    maxeval : int, optional</span>
+<span class="sd">        The maximum number of minimization evaluations to use (default is </span>
+<span class="sd">        100000).</span>
+<span class="sd">    dmax : float, optional</span>
+<span class="sd">        The maximum distance in length units that any atom is allowed to relax</span>
+<span class="sd">        in any direction during a single minimization iteration (default is</span>
+<span class="sd">        0.01 Angstroms).</span>
+<span class="sd">    cutboxvector : str, optional</span>
+<span class="sd">        Indicates which of the three system box vectors, &#39;a&#39;, &#39;b&#39;, or &#39;c&#39;, to</span>
+<span class="sd">        cut with a non-periodic boundary (default is &#39;c&#39;).</span>
+<span class="sd">    faultpos : float, optional</span>
+<span class="sd">        The fractional position along the cutboxvector where the stacking</span>
+<span class="sd">        fault plane will be placed (default is 0.5).</span>
+<span class="sd">    faultshift : list of float, optional</span>
+<span class="sd">        The vector shift to apply to all atoms above the fault plane defined</span>
+<span class="sd">        by faultpos (default is [0,0,0], i.e. no shift applied).</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Dictionary of results consisting of keys:</span>
+<span class="sd">        </span>
+<span class="sd">        - **&#39;E_gsf&#39;** (*float*) - The stacking fault formation energy.</span>
+<span class="sd">        - **&#39;E_total_0&#39;** (*float*) - The total potential energy of the</span>
+<span class="sd">          system before applying the faultshift.</span>
+<span class="sd">        - **&#39;E_total_sf&#39;** (*float*) - The total potential energy of the</span>
+<span class="sd">          system after applying the faultshift.</span>
+<span class="sd">        - **&#39;delta_disp&#39;** (*float*) - The change in the center of mass</span>
+<span class="sd">          difference between before and after applying the faultshift.</span>
+<span class="sd">        - **&#39;disp_0&#39;** (*float*) - The center of mass difference between atoms</span>
+<span class="sd">          above and below the fault plane in the cutboxvector direction for</span>
+<span class="sd">          the system before applying the faultshift.</span>
+<span class="sd">        - **&#39;disp_sf&#39;** (*float*) - The center of mass difference between </span>
+<span class="sd">          atoms above and below the fault plane in the cutboxvector direction</span>
+<span class="sd">          for the system after applying the faultshift.</span>
+<span class="sd">        - **&#39;A_fault&#39;** (*float*) - The area of the fault surface.</span>
+<span class="sd">        - **&#39;dumpfile_0&#39;** (*str*) - The name of the LAMMMPS dump file</span>
+<span class="sd">          associated with the relaxed system before applying the faultshift.</span>
+<span class="sd">        - **&#39;dumpfile_sf&#39;** (*str*) - The name of the LAMMMPS dump file</span>
+<span class="sd">          associated with the relaxed system after applying the faultshift.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Evaluate the system without shifting along the fault plane</span>
+    <span class="n">zeroshift</span> <span class="o">=</span> <span class="n">stackingfaultpoint</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span>
+                                   <span class="n">mpi_command</span><span class="o">=</span><span class="n">mpi_command</span><span class="p">,</span>
+                                   <span class="n">cutboxvector</span><span class="o">=</span><span class="n">cutboxvector</span><span class="p">,</span>
+                                   <span class="n">faultpos</span><span class="o">=</span><span class="n">faultpos</span><span class="p">,</span>
+                                   <span class="n">etol</span><span class="o">=</span><span class="n">etol</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="n">ftol</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span>
+                                   <span class="n">maxeval</span><span class="o">=</span><span class="n">maxeval</span><span class="p">,</span> <span class="n">dmax</span><span class="o">=</span><span class="n">dmax</span><span class="p">,</span>
+                                   <span class="n">faultshift</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+    
+    <span class="c1"># Extract terms</span>
+    <span class="n">E_total_0</span> <span class="o">=</span> <span class="n">zeroshift</span><span class="p">[</span><span class="s1">&#39;E_total&#39;</span><span class="p">]</span>
+    <span class="n">disp_0</span> <span class="o">=</span>    <span class="n">zeroshift</span><span class="p">[</span><span class="s1">&#39;disp&#39;</span><span class="p">]</span>
+    <span class="n">A_fault</span> <span class="o">=</span>   <span class="n">zeroshift</span><span class="p">[</span><span class="s1">&#39;A_fault&#39;</span><span class="p">]</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="s1">&#39;log.lammps&#39;</span><span class="p">,</span> <span class="s1">&#39;zeroshift-log.lammps&#39;</span><span class="p">)</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">zeroshift</span><span class="p">[</span><span class="s1">&#39;dumpfile&#39;</span><span class="p">],</span> <span class="s1">&#39;zeroshift.dump&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># Evaluate the system after shifting along the fault plane</span>
+    <span class="n">shifted</span> <span class="o">=</span> <span class="n">stackingfaultpoint</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span>
+                                 <span class="n">mpi_command</span><span class="o">=</span><span class="n">mpi_command</span><span class="p">,</span>
+                                 <span class="n">cutboxvector</span><span class="o">=</span><span class="n">cutboxvector</span><span class="p">,</span>
+                                 <span class="n">faultpos</span><span class="o">=</span><span class="n">faultpos</span><span class="p">,</span> <span class="n">etol</span><span class="o">=</span><span class="n">etol</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="n">ftol</span><span class="p">,</span>
+                                 <span class="n">maxiter</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span> <span class="n">maxeval</span><span class="o">=</span><span class="n">maxeval</span><span class="p">,</span> <span class="n">dmax</span><span class="o">=</span><span class="n">dmax</span><span class="p">,</span>
+                                 <span class="n">faultshift</span><span class="o">=</span><span class="n">faultshift</span><span class="p">)</span>
+    
+    <span class="c1"># Extract terms</span>
+    <span class="n">E_total_sf</span> <span class="o">=</span> <span class="n">shifted</span><span class="p">[</span><span class="s1">&#39;E_total&#39;</span><span class="p">]</span>
+    <span class="n">disp_sf</span> <span class="o">=</span>    <span class="n">shifted</span><span class="p">[</span><span class="s1">&#39;disp&#39;</span><span class="p">]</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="s1">&#39;log.lammps&#39;</span><span class="p">,</span> <span class="s1">&#39;shifted-log.lammps&#39;</span><span class="p">)</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">shifted</span><span class="p">[</span><span class="s1">&#39;dumpfile&#39;</span><span class="p">],</span> <span class="s1">&#39;shifted.dump&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Compute the stacking fault energy</span>
+    <span class="n">E_gsf</span> <span class="o">=</span> <span class="p">(</span><span class="n">E_total_sf</span> <span class="o">-</span> <span class="n">E_total_0</span><span class="p">)</span> <span class="o">/</span> <span class="n">A_fault</span>
+    
+    <span class="c1"># Compute the change in displacement normal to fault plane</span>
+    <span class="n">delta_disp</span> <span class="o">=</span> <span class="n">disp_sf</span> <span class="o">-</span> <span class="n">disp_0</span>
+    
+    <span class="c1"># Return processed results</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;E_gsf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_gsf</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;E_total_0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_total_0</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;E_total_sf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_total_sf</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;delta_disp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">delta_disp</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;disp_0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">disp_0</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;disp_sf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">disp_sf</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;A_fault&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">A_fault</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;dumpfile_0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;zeroshift.dump&#39;</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;dumpfile_sf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;shifted.dump&#39;</span>
+    
+    <span class="k">return</span> <span class="n">results</span></div>
+
+<div class="viewcode-block" id="process_input"><a class="viewcode-back" href="../../../../calculations/stacking_fault/calc.html#iprPy.calculations.stacking_fault.calc_stacking_fault.process_input">[docs]</a><span class="k">def</span> <span class="nf">process_input</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">UUID</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Processes str input parameters, assigns default values if needed, and</span>
+<span class="sd">    generates new, more complex terms as used by the calculation.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_dict :  dict</span>
+<span class="sd">        Dictionary containing the calculation input parameters with string</span>
+<span class="sd">        values.  The allowed keys depends on the calculation style.</span>
+<span class="sd">    UUID : str, optional</span>
+<span class="sd">        Unique identifier to use for the calculation instance.  If not </span>
+<span class="sd">        given and a &#39;UUID&#39; key is not in input_dict, then a random UUID4 </span>
+<span class="sd">        hash tag will be assigned.</span>
+<span class="sd">    build : bool, optional</span>
+<span class="sd">        Indicates if all complex terms are to be built.  A value of False</span>
+<span class="sd">        allows for default values to be assigned even if some inputs </span>
+<span class="sd">        required by the calculation are incomplete.  (Default is True.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Set calculation UUID</span>
+    <span class="k">if</span> <span class="n">UUID</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;calc_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UUID</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;calc_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;calc_key&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
+    
+    <span class="c1"># Set default input/output units</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">units</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+    
+    <span class="c1"># These are calculation-specific default strings</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;sizemults&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sizemults&#39;</span><span class="p">,</span> <span class="s1">&#39;3 3 3&#39;</span><span class="p">)</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;forcetolerance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;forcetolerance&#39;</span><span class="p">,</span>
+                                                  <span class="s1">&#39;1.0e-6 eV/angstrom&#39;</span><span class="p">)</span>
+                                                  
+    <span class="c1"># These are calculation-specific default booleans</span>
+    <span class="c1"># None for this calculation</span>
+    
+    <span class="c1"># These are calculation-specific default integers</span>
+    <span class="c1"># None for this calculation</span>
+    
+    <span class="c1"># These are calculation-specific default unitless floats</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;stackingfault_shiftfraction1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;stackingfault_shiftfraction1&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;stackingfault_shiftfraction2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;stackingfault_shiftfraction2&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+    
+    <span class="c1"># These are calculation-specific default floats with units</span>
+    <span class="c1"># None for this calculation</span>
+    
+    <span class="c1"># Check lammps_command and mpi_command</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">commands</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+    
+    <span class="c1"># Set default system minimization parameters</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+    
+    <span class="c1"># Load potential</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">potential</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+    
+    <span class="c1"># Load ucell system</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">systemload</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">)</span>
+    
+    <span class="c1"># Load stackingfault parameters</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">stackingfault1</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+    
+    <span class="c1"># Load elastic constants</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">elasticconstants</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">)</span>
+    
+    <span class="c1"># Construct initialsystem by manipulating ucell system</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">systemmanipulate</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">)</span>
+    
+    <span class="c1"># Convert stackingfault parameters</span>
+    <span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">stackingfault2</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="n">build</span><span class="p">)</span>
+    
+    <span class="c1"># Calculate faultshift</span>
+    <span class="k">if</span> <span class="n">build</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">fraction1</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;stackingfault_shiftfraction1&#39;</span><span class="p">]</span>
+        <span class="n">fraction2</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;stackingfault_shiftfraction2&#39;</span><span class="p">]</span>
+        <span class="n">shiftvector1</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;shiftvector1&#39;</span><span class="p">]</span>
+        <span class="n">shiftvector2</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;shiftvector2&#39;</span><span class="p">]</span>
+        <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;faultshift&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fraction1</span><span class="o">*</span><span class="n">shiftvector1</span> <span class="o">+</span> <span class="n">fraction2</span><span class="o">*</span><span class="n">shiftvector2</span></div>
+    
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">(</span><span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          <h3>Table Of Contents</h3>
+          <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro.html">Introduction to iprPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../setup.html">Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basics/index.html">iprPy Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../highthroughput/index.html">High-Throughput Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../extend/index.html">Adding Content to iprPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../calculation_styles.html">Calculation Styles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../record_styles.html">Record Styles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../database_styles.html">Database Styles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules/index.html">iprPy</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Search</h3>
+            <form class="search" action="../../../../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+            </form>
+          </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="../../../../py-modindex.html" title="Python Module Index"
+              >modules</a> |
+            <a href="../../../../genindex.html" title="General Index"
+              >index</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Hale.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

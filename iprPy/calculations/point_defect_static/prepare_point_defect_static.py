@@ -177,13 +177,13 @@ def prepare(dbase, run_directory, **kwargs):
 
                     # Add calculation files to calculation folder
                     for calc_file in calculation.files:
-                        shutil.copy(calc_file, calc_directory)  
+                        shutil.copy(calc_file, calc_directory)
                     
                     # Add potential record file to calculation folder
                     with open(os.path.join(calc_directory, pot_record.name+'.xml'), 'w') as f:
                         f.write(pot_record.content)
                         
-                    # Extract potential's tar files to calculation folder    
+                    # Extract potential's tar files to calculation folder
                     pot_tar.extractall(calc_directory)
                     
                     # Add parent record file to calculation folder

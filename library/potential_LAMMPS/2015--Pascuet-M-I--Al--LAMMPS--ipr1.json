@@ -23,7 +23,7 @@
                     "file": "library-Al.meam"
                 }, 
                 {
-                    "symbolsList": "True"
+                    "option": "Al"
                 }, 
                 {
                     "file": "Al.meam"

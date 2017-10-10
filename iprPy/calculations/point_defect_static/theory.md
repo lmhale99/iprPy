@@ -1,10 +1,12 @@
 ## Method and Theory
 
-An initial system is supplied, and a LAMMPS simulation performs an energy/force minimization on the system and estimates the cohesive energy, $E_{coh}$. A corresponding defect system is constructed using the atomman.defect.point() function. After insertion, the system is relaxed using an energy/force minimization and the total potential energy of the defect system, $E_{ptd}^{total}$ is measured. The formation energy of the defect, $E_{ptd}^f$, is obtained with
+The method starts with a bulk initial system, and relaxes the atomic positions with a LAMMPS simulation that performs an energy/force minimization.  The cohesive energy, $E_{coh}$, is taken by dividing the system's total energy by the number of atoms in the system.
+
+A corresponding defect system is then constructed using the atomman.defect.point() function.  The defect system is relaxed using the same energy/force minimization as was done with the bulk system.  The formation energy of the defect, $E_{ptd}^f$, is obtained as
 
 $$E_{ptd}^f = E_{ptd}^{total} - E_{coh} * n_{ptd},$$
 
-where $n_{ptd}$ is the number of atoms in the defect system.  
+where $E_{ptd}^{total}$ is the total potential energy of the relaxed defect system, and $n_{ptd}$ is the number of atoms in the defect system.
 
 The atomman.defect.point() method allows for the generation of four types of point defects:
 
@@ -20,19 +22,17 @@ Point defect complexes (clusters, balanced ionic defects, etc.) can also be cons
 
 The final defect-containing system is analyzed using a few simple metrics to determine whether or not the point defect configuration has relaxed to a lower energy configuration:
 
-- __centrosummation__ adds up the vector positions of atoms relative to the defect's position for all atoms within a specified cutoff. In most simple crystals, the defect positions are associated with high symmetry lattice sites in which the centrosummation about that point in the defect-free system will be zero. If the defect only hydrostatically displaces neighbor atoms, then the centrosummation should also be zero for the defect system. This is computed for all defect types. 
+- __centrosummation__ adds up the vector positions of atoms relative to the defect's position for all atoms within a specified cutoff. In most simple crystals, the defect positions are associated with high symmetry lattice sites in which the centrosummation about that point in the defect-free system will be zero. If the defect only hydrostatically displaces neighbor atoms, then the centrosummation should also be zero for the defect system. This is computed for all defect types.
 
-$$centrosummation = \sum_i^N{\left(r_i - r_{ptd} \right)} $$
+$$ \vec{cs} = \sum_i^N{\left( \vec{r}_i - \vec{r}_{ptd} \right)} $$
 
 - __position_shift__ is the change in position of an interstitial or substitutional atom following relaxation of the system. A non-zero value indicates that the defect atom has moved from its initially ideal position. 
 
-$$position\_shift = r_{ptd} - r_{ptd}^0$$
+$$ \Delta \vec{r} = \vec{r}_{ptd} - \vec{r}_{ptd}^{0}$$
 
 - __db_vect_shift__ compares the unit vector associated with the pair of atoms in a dumbbell interstitial before and after relaxation. A non-zero value indicates that the dumbbell has rotated from its ideal configuration.
 
-
-
-$$db\_vect\_shift = \frac{r_{db1} - r_{db2}}{|r_{db1} - r_{db2}|} - \frac{r_{db1}^0 - r_{db2}^0}{|r_{db1}^0 - r_{db2}^0|}$$
+$$ \Delta \vec{db} = \frac{\vec{r}_{db1} - \vec{r}_{db2}}{|\vec{r}_{db1} - \vec{r}_{db2}|} - \frac{\vec{r}_{db1}^0 - \vec{r}_{db2}^0}{|\vec{r}_{db1}^0 - \vec{r}_{db2}^0|}$$
 
 If any of the metrics have values not close to (0,0,0), then there was likely an atomic configuration relaxation.
 

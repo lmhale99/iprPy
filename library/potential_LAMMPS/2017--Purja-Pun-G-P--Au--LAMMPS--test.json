@@ -18,7 +18,7 @@
         "pair_coeff": {
             "term": [
                 {
-                    "file": "Au_GLJ10_2.eam.alloy"
+                    "file": "Au_GLJ10_3.eam.alloy"
                 }, 
                 {
                     "symbols": "True"

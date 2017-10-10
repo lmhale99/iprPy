@@ -1,0 +1,95 @@
+
+Calculations
+************
+
+The iprPy framework is designed around calculations.  In design, all
+implemented calculations behave the same way:
+
+1. Every calculation is an independent and self-contained unit of
+   work.  In other words, it can run in isolation from all other
+   calculations.
+
+2. Each calculation exists as or is executed by calling a Python
+   script.
+
+3. The calculation reads in all variable inputs from an input
+   parameter file.
+
+4. Upon successful completion, the calculation generates an XML- or
+   JSON-formatted results record.
+
+
+Location of Calculations
+========================
+
+The calculations are located in the iprPy/calculations directory. This
+location lets the iprPy package identify the calculations and load
+them as a calculation style. Doing so makes it possible for objects of
+the `Calculation class <../highthroughput/classes.rst>`_ to access
+components and interact with the different calculation styles in a
+common way.
+
+Within the iprPy/calculations directory, each calculation is placed in
+a subdirectory matching the calculation's name.  Collecting all files
+for a given calculation together into a single folder allows for the
+calculations to be treated modularly.
+
+
+Run a Calculation
+=================
+
+A calculation can be performed in one of three ways
+
+1. Run the Jupyter Notebook
+
+2. Run the calculation script
+
+3. Prepare and run in high-throughput
+
+
+Run the Jupyter Notebook
+------------------------
+
+The demonstration directory has a Jupyter Notebook for every
+calculation. Each Notebook combines the calculation’s documentation
+and calculation script functions and methods into a single stand-alone
+file.  This is perhaps the most convenient way to learn about the
+methods, theory and parameters of a given calculation and to test it
+out yourself.
+
+
+Run the calculation script
+--------------------------
+
+Alternatively, you can run the calculation's script.  Text
+documentation for the calculation can be found in the ".md" files in
+the calculation folder. Equivalent HTML documentation is also provided
+in the `calculation_styles
+<../modules/iprPy.rst#iprPy.calculation_styles>`_.
+
+1. Copy the calculation folder to another location (this keeps the
+   original folder from becoming cluttered).
+
+2. Create an `Input Parameter File <inputfile.rst>`_.
+
+3. In a terminal, cd to the calculation folder you created, and enter:
+
+   ::
+      python calc_[calcname].py [inputfile]
+
+4. When the calculation finishes successfully, a "record.json" record
+   file will be created containing the processed results.
+
+
+Prepare and run in high-throughput
+----------------------------------
+
+Multiple instances of the same calculation can also be prepared and
+executed in a high-throughput manner using the `Prepare
+<../highthroughput/prepare.rst>`_ and `Runner
+<../highthroughput/runner.rst>`_ methods and scripts. Before doing so,
+it is suggested that you try running a single instance of the
+calculation using either the Jupyter Notebook or the calculation
+script as the calculation’s prepare uses most of the same input
+parameters as the calculation itself. When ready, check out the
+`High-Throughput Tools <../highthroughput/index.rst>`_ tutorial.

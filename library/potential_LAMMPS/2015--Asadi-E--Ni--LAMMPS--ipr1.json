@@ -20,7 +20,7 @@
                     "file": "library.Ni.meam"
                 }, 
                 {
-                    "symbolsList": "True"
+                    "option": "Ni"
                 }, 
                 {
                     "file": "Ni.meam"
