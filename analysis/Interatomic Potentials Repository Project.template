@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<!-- New demo for 2015-%2DPurja-Pun-G-P-%2DNi-Al-Co -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" id="Description" content="Interatomic Potentials Repository Project">
+    <meta name="dcterms.description" id="Description" content="Interatomic Potentials Repository Project">
+    <meta name="dcterms.creator" content="U.S. Department of Commerce, National Institute of Standards and Technology">
+    <title>Interatomic Potentials Repository Project</title>
+    <link rel="stylesheet" type="text/css" href="./Interatomic Potentials Repository Project_files/style.css">
+    <script src="./Interatomic Potentials Repository Project_files/ga.js.download" async="" type="text/javascript"></script>
+    <script language="javascript" type="text/javascript" src="./Interatomic Potentials Repository Project_files/jquery-3.1.1.min.js.download"></script>
+    <script language="javascript" type="text/javascript" src="./Interatomic Potentials Repository Project_files/jquery.leaveNotice.min.js.download"></script>
+    <link rel="stylesheet" type="text/css" href="./Interatomic Potentials Repository Project_files/jquery.leaveNotice.css">
+  <!-- Start new lines -->
+    <link rel="stylesheet" type="text/css" href="./Interatomic Potentials Repository Project_files/tablestyle.css">
+    <script language="javascript" type="text/javascript" src="./Interatomic Potentials Repository Project_files/showSelection.js"></script>
+  <!-- End new lines -->
+    <script type="text/javascript">
+$(function(){
+	$('a.external').leaveNotice({
+		siteName:"the NIST Interatomic Potentials Repository Project"
+	});
+});
+</script>
+  </head>
+  <body>
+    <div id="container">
+      <!-- Header -->
+      <div id="header-wrapper">
+        <div class="center-wrapper">
+          <div id="header">
+            <div id="help">
+              <div class="right"> <a href="https://www.nist.gov/"><img src="./Interatomic Potentials Repository Project_files/nist-logo-right.png" width="150"></a> </div>
+            </div>
+            <div id="logo">
+              <div class="left"> <a href="https://www.ctcms.nist.gov/potentials/"><img src="./Interatomic Potentials Repository Project_files/logo.png" width="75"></a> </div>
+              <h1 id="site-title">Interatomic Potentials Repository
+                Project</h1>
+              <h2 id="site-slogan">Part of the Materials Genome
+                Initiative</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="navigation-wrapper">
+        <div id="navigation-wrapper-2">
+          <div class="center-wrapper">
+            <div id="navigation">
+              <ul class="tabbed">
+                <li class=""><a href="https://www.ctcms.nist.gov/potentials/">Home</a></li>
+                <li class=""><a href="https://www.ctcms.nist.gov/potentials/tools.html">Tools</a></li>
+                <li class=""><a href="https://www.ctcms.nist.gov/potentials/refs.html">References</a></li>
+                <li class=""><a href="https://www.ctcms.nist.gov/potentials/faq.html">FAQ</a></li>
+                <li class=""><a href="https://www.ctcms.nist.gov/potentials/resources.html">Resources</a></li>
+                <li class=""><a href="https://www.ctcms.nist.gov/potentials/credits.html">People</a></li>
+                <li class=""><a href="mailto:potentials@nist.gov?Subject=NIST%20Potentials%20Repository" target="_top">Contact</a></li>
+              </ul>
+              <div class="clearer">&nbsp;</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="subnav-wrapper">
+        <div id="subnav-wrapper-2">
+          <div class="center-wrapper">
+            <div id="subnav">
+              <div class="clearer">&nbsp;</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- END Header -->
+      
+      
+      <!-- Content -->
+      <div id="content" class="colM">
+        <div id="content-wrapper">
+          <div class="center-wrapper">
+            <div class="content">
+              <div id="featured-wrapper">
+                <div id="featured">
+                  <div class="left">
+<br>Note that elemental potentials taken from alloy descriptions may not work well for the pure species.  This is particularly true if the elements were fit for compounds instead of being optimized separately.  As with all interatomic potentials, please check to make sure that the performance is adequate for your problem.<br><br>
+<br><a name="2015--Purja-Pun-G-P--Ni-Al-Co"></a><h1>Identifier: 2015--Purja-Pun-G-P--Ni-Al-Co</h1>
+<b>Purja Pun, G. P., Yamakov, V., and Mishin, Y. (2015). Interatomic potential for the ternary Ni-Al-Co system and application to atomistic modeling of the B2-L1 0 martensitic transformation . Modelling Simul. Mater. Sci. Eng., 23(6), 065006. DOI: <a href="http://dx.doi.org/10.1088/0965-0393/23/6/065006" class="external">10.1088/0965-0393/23/6/065006</a></b>
+<br><br><b>Notes:</b> This file was sent by Y. Mishin (George Mason Univ.) on 17 Sept. 2013 and was posted on 17 Jan. 2014. This version is compatible with LAMMPS. Validation and usage information can be found <a href="https://www.ctcms.nist.gov/potentials/Download/Ni-Al-Co-YM13/Mishin-Ni-Al-Co-2013_lammps.pdf">here</a>. The reference information was updated on 26 Aug. 2015.
+<br><br><b>Format:</b> EAM/alloy setfl
+<br><b>File(s):</b>  <a href="https://www.ctcms.nist.gov/potentials/Download/Ni-Al-Co-YM13/Mishin-Ni-Al-Co-2013.eam.alloy">Mishin-Ni-Al-Co-2013.eam.alloy</a>
+<br><br><b>Notes:</b> This file was sent by G Purja Pun (George Mason Univ.) on 12 Oct. 2015 and was posted on 15 Dec. 2015. This version corrects an issue with the cutoff distance for Co interactions that was discovered during calculations of pressure dependent elastic constants.
+<br><br><b>Format:</b> EAM/alloy setfl
+<br><b>File(s):</b>  <a href="https://www.ctcms.nist.gov/potentials/Download/Ni-Al-Co-YM13/Mishin_updated-Ni-Al-Co-2013.eam.alloy">Mishin_updated-Ni-Al-Co-2013.eam.alloy</a>
+<br><br><h3>Computed properties</h3>
+<b>Go To: </b><a href="https://www.ctcms.nist.gov/potentials/2015--Purja-Pun-G-P--Ni-Al-Co.html#1">Static Crystal Structure Predictions</a><br>
+<b>Go To: </b><a href="https://www.ctcms.nist.gov/potentials/2015--Purja-Pun-G-P--Ni-Al-Co.html#2">Cohesive Energy vs. Interatomic Spacing</a><br>
+<b>Go To: </b><a href="https://www.ctcms.nist.gov/potentials/2015--Purja-Pun-G-P--Ni-Al-Co.html#3">Point Defect Formation Energies</a><br>
+<b>Go To: </b><a href="https://www.ctcms.nist.gov/potentials/2015--Purja-Pun-G-P--Ni-Al-Co.html#4">Free Surface Formation Energies</a><br>
+<b>Go To: </b><a href="https://www.ctcms.nist.gov/potentials/2015--Purja-Pun-G-P--Ni-Al-Co.html#5">Generalized Planar Fault Energy</a><br>
+<br><br><hr>
+<a id="1"></a>
+<!--!Structure!-->
+<br><br><hr>
+<a id="2"></a>
+<!--!EvsR!-->
+<br><br><hr>
+<a id="3"></a>
+<!--!Point!-->
+<br><br><hr>
+<a id="4"></a>
+<!--!Surface!-->
+<br><br><hr>
+<a id="5"></a>
+<h2>Generalized Planar Fault Energy of pure Aluminum</h2>
+<img width="800" src="./Interatomic Potentials Repository Project_files/fig.1.png">
+<p>Illustration of a complete (1 1 1) fault energy surface with local minima, maxima, and saddle points labeled with their respective fault energy. </p>
+<hr>
+<h2>Generalized Planar Fault Energy of pure Nickel</h2>
+<img width="800" src="./Interatomic Potentials Repository Project_files/fig.2.png">
+<p>Illustration of a complete (1 1 1) fault energy surface with local minima, maxima, and saddle points labeled with their respective fault energy. </p>
+<br><br><hr>
+	          <p>Date created: October 5, 2010 | Last updated: August 23, 2017</p>
+                  </div>
+                  <div class="clearer">&nbsp;</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- END Content -->
+      <div id="footer-wrapper">
+        <div class="center-wrapper">
+          <div id="footer2">
+            <div class="left"> <a href="https://www.nist.gov/"><img src="./Interatomic Potentials Repository Project_files/nist-logo-left.png" width="300"></a> </div>
+            <div class="right"> </div>
+            <div class="clearer">&nbsp;</div>
+          </div>
+        </div>
+      </div>
+      <div id="bottom">
+        <div class="center-wrapper">
+          <div class="left"> <a href="https://www.nist.gov/privacy-policy">Privacy Policy</a>
+            <span class="text-separator">|</span> <a href="https://www.nist.gov/disclaimer">Disclaimer</a>
+          </div>
+          <div class="right"> </div>
+          <div class="clearer">&nbsp;</div>
+        </div>
+      </div>
+    </div>
+  
+
+</body></html>
