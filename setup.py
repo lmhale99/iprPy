@@ -41,7 +41,8 @@ setup(name = 'iprPy',
         'scipy',
         'pandas',
         'numericalunits',
-        'atomman'
+        'atomman',
+        'requests',
       ],
       package_data={'': ['*']},
       zip_safe = False)
