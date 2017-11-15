@@ -1,14 +1,14 @@
-#compiled python modules
+# Compiled python modules
 *.pyc
 
-#Python egg metadata for atomman
+# Python egg metadata
 *.egg-info/
 *.egg
 
-#Local iprPy settings
+# Local iprPy settings
 iprPy/.iprPy
 
-#test scripts
+# test scripts
 test/
 test.py
 */test.py
@@ -16,19 +16,22 @@ test.py
 */*/*/test.py
 */*/*/*/test.py
 
-#High-throughput log files
+# High-throughput log files
 runner-logs/
 bin/iprPy_runner.*
 
-#Jupyter Notebook checkpoints
+# Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 */.ipynb_checkpoints/
 */*/.ipynb_checkpoints/
 */*/*/.ipynb_checkpoints/
 */*/*/*/.ipynb_checkpoints/
 
-#Demonstration Notebook working directories
+# Demonstration Notebook working directories
 demonstrations/*/
 
-#Generated web content
+# Generated web content
 analysis/webcontent
+
+# empty.lammps as used by lammps version checking
+iprPy/tools/empty.lammps
