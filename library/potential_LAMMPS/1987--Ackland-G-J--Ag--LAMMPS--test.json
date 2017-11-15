@@ -1,16 +1,16 @@
 {
     "potential-LAMMPS": {
-        "key": "f20ef526-a67b-4bdb-9037-5a16c33d311e", 
-        "id": "2003--Han-S--V--LAMMPS--ipr1", 
+        "key": "024ec18c-c358-4eca-b6f9-442d70cfbf05", 
+        "id": "1987--Ackland-G-J--Ag--LAMMPS--test", 
         "potential": {
-            "key": "04ad93c0-31f0-413f-a6f0-a68f2e709b8f", 
-            "id": "2003--Han-S--V"
+            "key": "dc4149ce-3592-4131-8683-ecf654d5a519", 
+            "id": "1987--Ackland-G-J--Ag"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
         "atom": {
-            "element": "V", 
-            "mass": 50.9415
+            "element": "Ag", 
+            "mass": 107.8682
         }, 
         "pair_style": {
             "type": "eam/fs"
@@ -18,7 +18,7 @@
         "pair_coeff": {
             "term": [
                 {
-                    "file": "V.eam.fs"
+                    "file": "Ag_v2.eam.fs"
                 }, 
                 {
                     "symbols": "True"

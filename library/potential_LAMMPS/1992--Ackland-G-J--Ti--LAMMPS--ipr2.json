@@ -1,16 +1,16 @@
 {
     "potential-LAMMPS": {
-        "key": "71d1f717-285f-49d9-bbc4-95fcc8322ff1", 
-        "id": "2003--Han-S--Cs--LAMMPS--ipr1", 
+        "key": "8ba373d3-812d-435f-a44b-68c236cbf882", 
+        "id": "1992--Ackland-G-J--Ti--LAMMPS--ipr2", 
         "potential": {
-            "key": "ca73cf4e-aaae-40f6-9592-6f28abc18029", 
-            "id": "2003--Han-S--Cs"
+            "key": "8a634ace-23df-4e28-8041-007bd0e11cfb", 
+            "id": "1992--Ackland-G-J--Ti"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
         "atom": {
-            "element": "Cs", 
-            "mass": 132.9
+            "element": "Ti", 
+            "mass": 47.867
         }, 
         "pair_style": {
             "type": "eam/fs"
@@ -18,7 +18,7 @@
         "pair_coeff": {
             "term": [
                 {
-                    "file": "Cs.eam.fs"
+                    "file": "Ti_v2.eam.fs"
                 }, 
                 {
                     "symbols": "True"
