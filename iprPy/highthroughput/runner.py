@@ -27,21 +27,50 @@ def main(*args):
     
     runner(input_dict['dbase'], 
            input_dict['run_directory'],
-           orphan_directory = input_dict['orphan_directory'])
+           orphan_directory = input_dict['orphan_directory'],
+           hold_directory = input_dict['hold_directory'])
     
-def runner(dbase, run_directory, orphan_directory=None):
-    """High-throughput calculation runner"""
+def runner(dbase, run_directory, orphan_directory=None, hold_directory=None):
+    """
+    High-throughput calculation runner.
+    
+    Parameters
+    ----------
+    dbase : iprPy.Database
+        The database to interact with.
+    run_directory : str
+        The path to the directory where the calculation instances to run are
+        located.
+    orphan_directory : str, optional
+        The path for the orphan directory where incomplete calculations are
+        moved.  If None (default) then will use 'orphan' at the same level as
+        the run_directory.
+    hold_directory : str, optional
+        The path for the hold directory where tar archives that failed to be
+        uploaded are moved to.  If None (default) then will use 'hold' at the
+        same level as the run_directory.
+    """
     
     # Define runner log file
     d = datetime.datetime.now()
-    runner_log_dir = os.path.join(os.path.dirname(iprPy.rootdir), 'runner-logs')
+    pid = os.getpid()
+    runner_log_dir = os.path.join(os.path.dirname(iprPy.rootdir),
+                                  'runner-logs')
     if not os.path.isdir(runner_log_dir):
         os.makedirs(runner_log_dir)
-    log_file = os.path.join(runner_log_dir, '%04i-%02i-%02i-%02i-%02i-%06i.log' % (d.year, d.month, d.day, d.minute, d.second, d.microsecond))
+    log_file = os.path.join(runner_log_dir,
+                            '%04i-%02i-%02i-%02i-%02i-%06i-%i.log'
+                            % (d.year, d.month, d.day, d.minute, d.second,
+                               d.microsecond, pid))
     
     # Set default orphan_directory
     if orphan_directory is None:
-        orphan_directory = os.path.join(os.path.dirname(run_directory), 'orphan')
+        orphan_directory = os.path.join(os.path.dirname(run_directory),
+                                        'orphan')
+        
+    # Set default orphan_directory
+    if hold_directory is None:
+        hold_directory = os.path.join(os.path.dirname(run_directory), 'hold')
     
     # Start runner log file
     with open(log_file, 'a') as log:
@@ -51,6 +80,10 @@ def runner(dbase, run_directory, orphan_directory=None):
         
         # Initialize bidfailcount counter
         bidfailcount = 0
+        
+        # Announce the runner's pid
+        print('Runner started with pid', pid)
+        sys.stdout.flush()
         
         # flist is the running list of calculations
         flist = os.listdir(run_directory)
@@ -70,7 +103,8 @@ def runner(dbase, run_directory, orphan_directory=None):
                 os.chdir(sim)
                 log.write('%s\n' % sim)
                 
-                # Check that the calculation has calc_*.py, calc_*.in and record in the database
+                # Check that the calculation has calc_*.py, calc_*.in and
+                # record in the database
                 try:
                     record = dbase.get_record(name=sim)
                     calc_py = get_file('calc_*.py')
@@ -86,12 +120,15 @@ def runner(dbase, run_directory, orphan_directory=None):
                     os.chdir(run_directory)
                     if not os.path.isdir(orphan_directory):
                         os.makedirs(orphan_directory)
-                    shutil.make_archive(os.path.join(orphan_directory, sim), 'gztar', root_dir=run_directory, base_dir=sim)
+                    shutil.make_archive(os.path.join(orphan_directory, sim),
+                                        'gztar', root_dir=run_directory,
+                                        base_dir=sim)
                     removecalc(os.path.join(run_directory, sim))
                     flist = os.listdir(run_directory)
                     continue
                 
-                # Check if any files in the calculation folder are incomplete records 
+                # Check if any files in the calculation folder are incomplete
+                # records
                 error_flag = False
                 ready_flag = True
 
@@ -154,7 +191,8 @@ def runner(dbase, run_directory, orphan_directory=None):
                 # Run the calculation
                 try:   
                     assert not error_flag, error_message
-                    run = subprocess.Popen(['python', calc_py, calc_in, sim], stderr=subprocess.PIPE)
+                    run = subprocess.Popen(['python', calc_py, calc_in, sim],
+                                           stderr=subprocess.PIPE)
                     error_message = run.stderr.read()
                     
                     # Load results.json
@@ -165,7 +203,7 @@ def runner(dbase, run_directory, orphan_directory=None):
                     except:
                         error_flag = True
                     assert not error_flag, error_message
-                    log.write('sim calculated successfully\n\n')
+                    log.write('sim calculated successfully\n')
                 
                 # Catch any errors and build results.json
                 except:
@@ -175,19 +213,35 @@ def runner(dbase, run_directory, orphan_directory=None):
                     model[record_type]['error'] = str(sys.exc_info()[1])
                     with open('results.json', 'w') as f:
                         model.json(fp=f, indent=4)
-                    log.write('error: %s\n\n' % model[record_type]['error'])
+                    log.write('error: %s\n' % model[record_type]['error'])
 
-                # Update record in the database
+                # Read in results.json
                 with open('results.json') as f:
                     model = DM(f)
-                dbase.update_record(content=model.xml(), name=sim)
-                                
-                # Archive calculation and add to database
-                dbase.add_tar(root_dir=run_directory, name=sim)
                 
-                # Remove simulation directory
-                os.chdir(run_directory)
-                removecalc(os.path.join(run_directory, sim))
+                # Update record
+                tries = 0
+                while tries < 10:
+                    try:
+                        dbase.update_record(content=model.xml(), name=sim)
+                        break
+                    except:
+                        tries += 1
+                if tries == 10:
+                    os.chdir(run_directory)
+                    log.write('failed to update record\n')
+                else:
+                    # Archive calculation and add to database or hold_directory
+                    try:
+                        dbase.add_tar(root_dir=run_directory, name=sim)
+                    except:
+                        log.write('failed to upload archive\n')
+                        if not os.path.isdir(hold_directory):
+                            os.makedirs(hold_directory)
+                        shutil.move(sim+'.tar.gz', hold_directory)
+                    os.chdir(run_directory)
+                    removecalc(os.path.join(run_directory, sim))
+                log.write('\n')
             
             # Else if bid(sim) failed
             else:
@@ -251,7 +305,7 @@ def bid(sim):
 
 def get_file(path):
     """
-    Uniquely find a single file accoring to a wildcard string.
+    Uniquely find a single file according to a wildcard string.
     
     Parameters
     ----------
@@ -293,6 +347,7 @@ def process_input(input_dict):
     input_dict['dbase'] = iprPy.database_fromdict(input_dict)
     input_dict['run_directory'] = os.path.abspath(input_dict['run_directory'])
     input_dict['orphan_directory'] = input_dict.get('orphan_directory', None)
+    input_dict['hold_directory'] = input_dict.get('hold_directory', None)
     
 def removecalc(dir):
     """

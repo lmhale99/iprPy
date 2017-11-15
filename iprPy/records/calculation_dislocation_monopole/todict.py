@@ -94,7 +94,10 @@ def todict(record, full=True, flat=False):
                 for K in calc['Stroh-K-tensor']:
                     params['K'+str(K['ij'][0])+str(K['ij'][2])] = uc.value_unit(K['coefficient'])
             else:
-                params['C'] = am.ElasticConstants(model=model)
+                try:
+                    params['C'] = am.ElasticConstants(model=model)
+                except:
+                    params['C'] = 'Invalid'
                 params['K_tensor'] = np.empty((3,3))
                 for kterm in calc['Stroh-K-tensor']:
                     i = int(kterm['ij'][0]) - 1

@@ -111,6 +111,9 @@ def todict(record, full=True, flat=False):
                 for C in calc['elastic-constants'].aslist('C'):
                     params['C'+str(C['ij'][0])+str(C['ij'][2])] = uc.value_unit(C['stiffness'])
             else:
-                params['C'] = am.ElasticConstants(model=calc)
+                try:
+                    params['C'] = am.ElasticConstants(model=calc)
+                except:
+                    params['C'] = 'invalid'
         
     return params

@@ -1,7 +1,7 @@
-# compiled python modules
+# Compiled python modules
 *.pyc
 
-# Python egg metadata for atomman
+# Python egg metadata
 *.egg-info/
 *.egg
 
@@ -33,5 +33,5 @@ demonstrations/*/
 # Generated web content
 analysis/webcontent
 
-# empty.lammps
+# empty.lammps as used by lammps version checking
 iprPy/tools/empty.lammps

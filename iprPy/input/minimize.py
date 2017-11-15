@@ -66,8 +66,8 @@ def minimize(input_dict, **kwargs):
     etol = float(input_dict.get(kwargs['energytolerance'], 0.0))
     ftol = value(input_dict, kwargs['forcetolerance'],
                  default_unit=force_unit, default_term='0.0')
-    maxiter = int(input_dict.get(kwargs['maxiterations'], 10000))
-    maxeval = int(input_dict.get(kwargs['maxevaluations'], 100000))
+    maxiter = int(input_dict.get(kwargs['maxiterations'], 100000))
+    maxeval = int(input_dict.get(kwargs['maxevaluations'], 1000000))
     dmax = value(input_dict, kwargs['maxatommotion'],
                  default_unit=length_unit, default_term='0.01 angstrom')
     

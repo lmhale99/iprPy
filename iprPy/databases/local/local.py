@@ -123,7 +123,7 @@ def get_record(database_info, name=None, style=None):
     if len(record) == 1:
         return record[0]
     elif len(record) == 0:
-        raise ValueError('Cannot find matching record')
+        raise ValueError('Cannot find matching record '+ name + ' (' +style + ')')
     else:
         raise ValueError('Multiple matching records found')
     

@@ -335,18 +335,28 @@ def add_tar(database_info, record=None, name=None, style=None, root_dir=None):
     
     # Check if an archive already exists
     model = DM(record.content)
-    if len(model.finds('archive')) > 0:
-        raise ValueError('Record already has an archive')
+    #if len(model.finds('archive')) > 0:
+    #    raise ValueError('Record already has an archive')
     
     # Make archive
     shutil.make_archive(record.name, 'gztar', root_dir=root_dir,
                         base_dir=record.name)
     
     # Upload archive
+    tries = 0
+    while tries < 2:
+        try:
+            url = database_info.add_file(record.name + '.tar.gz')
+            break
+        except:
+            tries += 1
+    if tries == 2:
+        raise ValueError('Failed to upload archive 2 times')
+    
+    # Update corresponding record
     root_key = model.keys()[0]
     model[root_key]['archive'] = DM()
-    model[root_key]['archive']['url'] = database_info.add_file(record.name
-                                                               + '.tar.gz')
+    model[root_key]['archive']['url'] = url
     
     update_record(database_info, name=record.name, style=record.style,
                   content=model.xml())

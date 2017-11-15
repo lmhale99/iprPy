@@ -84,7 +84,10 @@ def clean(dbase=None, run_directory=None, record_style=None):
                 tar.close()
                 
                 # Delete database version of tar
-                dbase.delete_tar(name=record_name, style=record_style)
+                try:
+                    dbase.delete_tar(name=record_name, style=record_style)
+                except:
+                    pass
             
             # Remove error and status from stored record
             try:
