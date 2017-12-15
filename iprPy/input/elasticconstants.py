@@ -3,6 +3,8 @@ from __future__ import division, absolute_import, print_function
 from DataModelDict import DataModelDict as DM
 import atomman as am
 
+from .value import value
+
 def elasticconstants(input_dict, build=True, **kwargs):
     """
     Interprets calculation parameters associated with elastic constants.
@@ -73,8 +75,7 @@ def elasticconstants(input_dict, build=True, **kwargs):
         keyhead = key[:len(Ckey)]
         keytail = key[len(Ckey):]
         if keyhead == Ckey:
-            Cdict['C'+keytail] = iprPy.input.value(input_dict, key,
-                                                   default_unit=pressure_unit)
+            Cdict['C'+keytail] = value(input_dict, key, default_unit=pressure_unit)
     
     # If model is given
     if elasticconstants_model is not None:

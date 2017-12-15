@@ -18,9 +18,12 @@ from .pointdefect import pointdefect
 from .freesurface import freesurface
 from .dislocationmonopole import dislocationmonopole
 from .stackingfault import stackingfault1, stackingfault2
+from .gammasurface import gammasurface
+from .peierlsnabarro import peierlsnabarro
 
 __all__ = ['value', 'boolean', 'units', 'commands', 'minimize', 'potential',
            'systemload', 'systemmanipulate', 'elasticconstants',
            'pointdefect', 'freesurface', 'dislocationmonopole',
-           'stackingfault1', 'stackingfault2']
+           'stackingfault1', 'stackingfault2', 'gammasurface',
+           'peierlsnabarro']
 __all__.sort()

@@ -34,11 +34,11 @@ def __load_records():
                 names.append(name)
         
     for name in names:
-        if True:
-        #try:
+        #if True:
+        try:
             records_dict[name] = importlib.import_module('.'+name, 'iprPy.records')
-        else:
-        #except:
+        #else:
+        except:
             failed_records.append(name)
 
     return records_dict

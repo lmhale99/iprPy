@@ -1,0 +1,29 @@
+#### Calculation Style ####
+calculation_style           dislocation_Peierls_Nabarro_stress
+
+#### Run condition limiters ####
+potential_name
+symbol_name
+family_name                 A1--Cu--fcc
+#dislocation_name            A1--Cu--fcc--110-screw
+dislocation_name            A1--Cu--fcc--111-edge
+#dislocation_name            A2--W--bcc--110-edge
+#dislocation_name            A2--W--bcc--111-screw
+#dislocation_name            A2--W--bcc--112-edge
+
+
+#### Unit specifications ####
+length_unit
+pressure_unit
+energy_unit
+force_unit
+
+#### Run parameters ####
+delta_tau_xy                0.01 meV/Angstrom^3
+delta_tau_yy                
+delta_tau_yz                
+tausteps                    30
+fullstress                  
+cdiffstress                 
+minimize_style              Powell
+minimize_options            disp True xtol 1e-6 ftol 1e-6
