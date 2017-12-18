@@ -49,9 +49,9 @@ def buildmodel(script, input_dict, results_dict=None):
     run_params['halfwidth'] = uc.model(input_dict['halfwidth'], input_dict['length_unit'])
     
     x, idisreg = peierlsnabarro_disregistry(xmax=input_dict['xmax'], xnum=input_dict['xnum'], xstep=input_dict['xstep'])
-    run_params['xmax'] = uc.model(x.max(), input_dict['length_unit'])
+    run_params['xmax'] = x.max()
     run_params['xnum'] = len(x)
-    run_params['xstep'] = uc.model(x[1]-x[0], input_dict['length_unit'])
+    run_params['xstep'] = x[1]-x[0]
     
     # Save info on system file loaded
     calc['system-info'] = DM()

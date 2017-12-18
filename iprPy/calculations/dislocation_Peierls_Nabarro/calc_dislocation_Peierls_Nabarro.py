@@ -40,7 +40,8 @@ def main(*args):
     # Interpret and process input parameters
     process_input(input_dict, *args[1:])
     
-    results_dict = peierlsnabarro(input_dict['C'],
+    results_dict = peierlsnabarro(input_dict['ucell'].box.a,
+                                  input_dict['C'],
                                   input_dict['axes'],
                                   input_dict['burgersvector'],
                                   input_dict['gamma'],
@@ -67,7 +68,7 @@ def main(*args):
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)
 
-def peierlsnabarro(C, axes, burgers, gamma,
+def peierlsnabarro(alat, C, axes, burgers, gamma,
                    cutofflongrange=uc.set_in_units(1000, 'Angstrom'),
                    tau=np.zeros((3,3)), alpha=[0.0], beta=np.zeros((3,3)),
                    cdiffelastic=False, cdiffgradient=True, cdiffstress=False,
@@ -87,6 +88,12 @@ def peierlsnabarro(C, axes, burgers, gamma,
     # Transform burgers to axes
     T = am.tools.axes_check(axes)
     b = T.dot(burgers)
+    
+    # Scale xmax and xstep by alat
+    if xmax is not None:
+        xmax *= alat
+    if xstep is not None:
+        xstep *= alat
     
     # Generate initial disregistry guess
     x, idisreg = peierlsnabarro_disregistry(xmax=xmax, xstep=xstep, xnum=xnum,
@@ -159,7 +166,8 @@ def process_input(input_dict, UUID=None, build=True):
     input_dict['xnum'] = int(input_dict.get('xnum', 0))
     
     # These are calculation-specific default unitless floats
-    # None for this calculation
+    input_dict['xstep'] = float(input_dict.get('xstep', 0.0))
+    input_dict['xmax'] = float(input_dict.get('xmax', 0.0))
     
     # These are calculation-specific default floats with units
     input_dict['beta_xx'] = iprPy.input.value(input_dict, 'beta_xx',
@@ -189,12 +197,6 @@ def process_input(input_dict, UUID=None, build=True):
     input_dict['tau_yz'] = iprPy.input.value(input_dict, 'tau_yz',
                                     default_unit=input_dict['pressure_unit'],
                                     default_term='0.0 GPa')
-    input_dict['xstep'] = iprPy.input.value(input_dict, 'xstep',
-                                    default_unit=input_dict['length_unit'],
-                                    default_term='0.0 Angstrom')
-    input_dict['xmax'] = iprPy.input.value(input_dict, 'xmax',
-                                    default_unit=input_dict['length_unit'],
-                                    default_term='0.0 Angstrom')
     input_dict['halfwidth'] = iprPy.input.value(input_dict, 'halfwidth',
                                     default_unit=input_dict['length_unit'],
                                     default_term='1.0 Angstrom')

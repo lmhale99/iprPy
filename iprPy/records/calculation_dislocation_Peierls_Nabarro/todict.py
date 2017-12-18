@@ -45,9 +45,9 @@ def todict(record, full=True, flat=False):
     
     rp = calc['calculation']['run-parameter']
     params['halfwidth'] = uc.value_unit(rp['halfwidth'])
-    params['xmax'] = uc.value_unit(rp['xmax'])
+    params['xmax'] = rp['xmax']
     params['xnum'] = rp['xnum']
-    params['xstep'] = uc.value_unit(rp['xstep'])
+    params['xstep'] = rp['xstep']
     
     params['load_file'] = calc['system-info']['artifact']['file']
     params['load_style'] = calc['system-info']['artifact']['format']
