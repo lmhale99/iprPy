@@ -7,7 +7,6 @@ import atomman.unitconvert as uc
 import numpy as np
 
 from iprPy.tools import aslist
-from iprPy.input import boolean
 
 def todict(record, full=True, flat=True):
     """
@@ -90,7 +89,7 @@ def todict(record, full=True, flat=True):
             params['natoms'] = calc['number-of-atoms']
             
             r_c = calc['reconfiguration-check']
-            params['reconfigured'] = boolean(r_c['has_reconfigured'])
+            params['reconfigured'] =r_c['has_reconfigured']
             if flat is False:
                 params['centrosummation'] = r_c['centrosummation']
                 params['position_shift'] = r_c.get('position_shift', np.nan)

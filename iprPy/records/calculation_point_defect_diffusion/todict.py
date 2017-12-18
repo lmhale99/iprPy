@@ -7,7 +7,6 @@ import atomman.unitconvert as uc
 import numpy as np
 
 from iprPy.tools import aslist
-from iprPy.input import boolean
 
 def todict(record, full=True, flat=True):
     """
