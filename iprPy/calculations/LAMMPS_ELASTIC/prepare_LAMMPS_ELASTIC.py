@@ -68,7 +68,7 @@ def prepare(dbase, run_directory, **kwargs):
     pot_record_dict = {}
     pot_tar_dict = {}
     for pot_record in dbase.iget_records(style='potential_LAMMPS'):
-        pot_record_dict[pot_record.name] = pot_record
+        pot_record_dict[pot_record.todict()['key']] = pot_record
     
     # Get parent records
     if 'parent_records' in kwargs:
@@ -83,9 +83,12 @@ def prepare(dbase, run_directory, **kwargs):
     # Loop over parent records
     for parent_record in parent_records:
         parent_dict = parent_record.todict()
-    
+        
         # Load potential
-        pot_record = pot_record_dict[parent_dict['potential_LAMMPS_id']]
+        try:
+            pot_record = pot_record_dict[parent_dict['potential_LAMMPS_key']]
+        except:
+            continue
         potential = lmp.Potential(pot_record.content)
         
         # Get pot_tar from dbase only once per potential
@@ -96,11 +99,13 @@ def prepare(dbase, run_directory, **kwargs):
             pot_tar_dict[parent_dict['potential_LAMMPS_id']] = pot_tar
         
         # Loop over number_min_states
-        for i in xrange(parent_dict['number_min_states']):
-            if i == 0:
-                load_options = 'key minimum-atomic-system'
-            else:
-                load_options = 'key minimum-atomic-system index '+str(i)
+        load_options = kwargs.get('load_options', 'key minimum-atomic-system')
+        
+        number_min_states = parent_dict.get('number_min_states', 1)
+        
+        for i in xrange(number_min_states):
+            if i != 0:
+                load_options = load_options + ' index '+str(i)
             
             # Loop over strainrange values
             strainranges = kwargs.get('strainrange', '')
@@ -120,7 +125,7 @@ def prepare(dbase, run_directory, **kwargs):
                 calc_dict['load_style'] = 'system_model'
                 calc_dict['load_content'] = parent_record.content
                 calc_dict['load_options'] = load_options
-
+                
                 calc_dict['strainrange'] = strainrange
                 
                 for key in singularkeys():
@@ -215,6 +220,7 @@ def singularkeys():
             'pressure_unit',
             'energy_unit',
             'force_unit',
+            'load_options',
            ]
 
 def multikeys():
