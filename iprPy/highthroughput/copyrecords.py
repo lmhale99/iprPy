@@ -1,13 +1,17 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import glob
 import tempfile
 import shutil
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# https://github.com/usnistgov/iprPy
 import iprPy
 
 def main(*args):
@@ -19,7 +23,7 @@ def main(*args):
     
     # Interpret and process input parameters 
     process_input(input_dict)
-
+    
     # Copy all records of a given style from one database to another
     copy(input_dict['dbase1'], input_dict['dbase2'],
          record_style = input_dict['record_style'],
@@ -52,33 +56,33 @@ def copy(dbase1, dbase2, record_style=None, includetar=True):
         for i, style in enumerate(styles):
             print(i+1, style)
         choice = iprPy.tools.screen_input(':')
-        try:    
+        try:
             choice = int(choice)
-        except: 
+        except:
             record_style = choice
         else:
             record_style = styles[choice-1]
         print()
-        
-    if record_style is not None:
     
+    if record_style is not None:
+        
         # Retrieve records from dbase1
         records = dbase1.get_records(style=record_style)
         
         # Copy records
         for record in records:
-            try: 
+            try:
                 dbase2.add_record(record=record)
-            except: 
+            except:
                 pass
         
         # Copy archives
         if includetar:
             tempdir = tempfile.mkdtemp()
             for record in records:
-                try: 
+                try:
                     tar = dbase1.get_tar(record=record)
-                except: 
+                except:
                     pass
                 else:
                     tar.extractall(tempdir)
@@ -102,7 +106,8 @@ def process_input(input_dict):
     input_dict['dbase1'] = iprPy.database_fromdict(input_dict, 'database1')
     input_dict['dbase2'] = iprPy.database_fromdict(input_dict, 'database2')
     input_dict['record_style'] = input_dict.get('record_style', None)
-    input_dict['includetar'] = iprPy.input.boolean(input_dict.get('includetar', True))
-    
+    input_dict['includetar'] = iprPy.input.boolean(input_dict.get('includetar',
+                                                                  True))
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

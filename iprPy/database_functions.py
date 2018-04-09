@@ -1,8 +1,12 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
-from .databases import databases_dict
-
+# https://pandas.pydata.org/
 import pandas as pd
+
+# iprPy imports
+from .databases import databases_dict
 
 __all__ = ['database_styles', 'database_fromdict', 'Database']
 

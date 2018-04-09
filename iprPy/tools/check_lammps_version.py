@@ -1,6 +1,9 @@
-from __future__ import division, absolute_import, print_function
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
+
+# https://github.com/usnistgov/atomman
 import atomman.lammps as lmp
 
 def check_lammps_version(lammps_command):

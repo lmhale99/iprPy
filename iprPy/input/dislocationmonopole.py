@@ -1,7 +1,11 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# http://www.numpy.org/
 import numpy as np
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
 def dislocationmonopole(input_dict, **kwargs):
@@ -94,7 +98,7 @@ def dislocationmonopole(input_dict, **kwargs):
         
         # Load defect model
         dislocation_model = DM(dislocation_model).find('dislocation-monopole')
-            
+        
         # Extract parameter values from defect model
         input_dict[kwargs['x_axis']] = dislocation_model['calculation-parameter']['x_axis']
         input_dict[kwargs['y_axis']] = dislocation_model['calculation-parameter']['y_axis']
@@ -122,11 +126,10 @@ def dislocationmonopole(input_dict, **kwargs):
     else:
         burgersvector = None
         boundarywidth = None
-        
+    
     # Save processed terms
     input_dict[kwargs['dislocation_model']] = dislocation_model
     input_dict[kwargs['dislocation_boundaryshape']] = dislocation_boundaryshape
     input_dict[kwargs['dislocation_boundarywidth']] = dislocation_boundarywidth
     input_dict[kwargs['burgersvector']] = burgersvector
     input_dict[kwargs['boundarywidth']] = boundarywidth
-    

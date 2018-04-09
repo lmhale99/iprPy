@@ -1,8 +1,10 @@
-from __future__ import division, absolute_import, print_function
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import sys
 
-PY3 = sys.version_info[0] > 2
+# iprPy imports
+from ..compatibility import ispython2, ispython3
 
 def screen_input(prompt=''):
     """
@@ -25,7 +27,9 @@ def screen_input(prompt=''):
     sys.stdout.flush()
     
     # Call version dependent function
-    if PY3: 
+    if ispython3: 
         return input()
-    else: 
+    elif ispython2:
         return raw_input()
+    else:
+        raise ValueError('Unsupported Python version')

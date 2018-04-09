@@ -1,10 +1,17 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
-import atomman.unitconvert as uc
+# http://www.numpy.org/
 import numpy as np
 
+# https://github.com/usnistgov/atomman
+import atomman.unitconvert as uc
+
+# iprPy imports
 from iprPy.tools import aslist
 
 def todict(record, full=True, flat=False):
@@ -25,14 +32,14 @@ def todict(record, full=True, flat=False):
         values, which is useful for comparisons.  If False, the term
         values can be of any data type, which is convenient for analysis.
         (Default is False).
-        
+    
     Returns
     -------
     dict
         A dictionary representation of the record's content.
     """
     model = DM(record)
-
+    
     calc = model['calculation-surface-energy']
     params = {}
     params['calc_key'] = calc['key']
@@ -47,7 +54,7 @@ def todict(record, full=True, flat=False):
     params['maxatommotion'] = calc['calculation']['run-parameter']['maxatommotion']
     
     sizemults = calc['calculation']['run-parameter']['size-multipliers']
-
+    
     params['potential_LAMMPS_key'] = calc['potential-LAMMPS']['key']
     params['potential_LAMMPS_id'] = calc['potential-LAMMPS']['id']
     params['potential_key'] = calc['potential-LAMMPS']['potential']['key']
@@ -82,9 +89,9 @@ def todict(record, full=True, flat=False):
         
         elif params['status'] == 'not calculated':
             pass
-            
+        
         else:
             params['E_coh'] = uc.value_unit(calc['cohesive-energy'])
             params['gamma_fs'] = uc.value_unit(calc['free-surface-energy'])
-        
+    
     return params

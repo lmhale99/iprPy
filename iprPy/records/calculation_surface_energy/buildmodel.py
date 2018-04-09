@@ -1,11 +1,15 @@
-from __future__ import division, absolute_import, print_function
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 
-import atomman.unitconvert as uc
-
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# https://github.com/usnistgov/atomman
+import atomman.unitconvert as uc
+
+# iprPy imports
 import iprPy
 
 def buildmodel(script, input_dict, results_dict=None):
@@ -21,7 +25,7 @@ def buildmodel(script, input_dict, results_dict=None):
         Dictionary of all input parameter terms.
     results_dict : dict, optional
         Dictionary containing any results produced by the calculation.
-        
+    
     Returns
     -------
     DataModelDict
@@ -90,7 +94,7 @@ def buildmodel(script, input_dict, results_dict=None):
     cp['z_axis'] = input_dict['z_axis']
     cp['atomshift'] = input_dict['atomshift']
     cp['cutboxvector'] = input_dict['surface_cutboxvector']
-        
+    
     if results_dict is None:
         calc['status'] = 'not calculated'
     else:        
@@ -110,10 +114,10 @@ def buildmodel(script, input_dict, results_dict=None):
         calc['defect-system']['artifact']['format'] = 'atom_dump'
         calc['defect-system']['symbols'] = input_dict['symbols']
         calc['defect-system']['potential-energy'] = DM()
-        calc['defect-system']['potential-energy']['value'] = uc.get_in_units(results_dict['E_total_surf'], 
+        calc['defect-system']['potential-energy']['value'] = uc.get_in_units(results_dict['E_total_surf'],
                                                              input_dict['energy_unit'])
         calc['defect-system']['potential-energy']['unit'] =  input_dict['energy_unit']
-
+        
         # Save the cohesive energy
         calc['cohesive-energy'] = DM()
         calc['cohesive-energy']['value'] = uc.get_in_units(results_dict['E_coh'], 
@@ -125,6 +129,5 @@ def buildmodel(script, input_dict, results_dict=None):
         calc['free-surface-energy']['value'] = uc.get_in_units(results_dict['E_surf_f'], 
                                                input_dict['energy_unit']+'/'+input_dict['length_unit']+'^2')
         calc['free-surface-energy']['unit'] =  input_dict['energy_unit']+'/'+input_dict['length_unit']+'^2'
-
+    
     return output
-        

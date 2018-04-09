@@ -1,11 +1,11 @@
+# Standard Python libraries
 from __future__ import division, absolute_import, print_function
-
 import os
 import importlib
 
-##############################################################
+###############################################################
 # NOTE: file_names in files() are unique to each calculation! #
-##############################################################
+###############################################################
 
 __all__ = ['prepare', 'process_input', 'template', 'files']
 
@@ -24,7 +24,7 @@ prep = importlib.import_module('.'+prepare_name, __name__)
 prepare = prep.prepare
 prepare_keys = {'singular': prep.singularkeys(),
                 'multi': prep.multikeys()}
-    
+
 # Define template function
 def template():
     """
@@ -51,6 +51,6 @@ def files():
     file_names = [
                   calc_name+'.py',
                   ]
-                      
-    for i in xrange(len(file_names)):
-        yield os.path.join(calc_dir, file_names[i])
+    
+    for file_name in file_names:
+        yield os.path.join(calc_dir, file_name)

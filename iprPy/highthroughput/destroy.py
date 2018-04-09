@@ -1,7 +1,10 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import sys
 
+# https://github.com/usnistgov/iprPy
 import iprPy
 
 def main(*args):
@@ -13,8 +16,8 @@ def main(*args):
     
     # Interpret and process input parameters 
     process_input(input_dict)
-
-    destroy(dbase =        input_dict['dbase'],
+    
+    destroy(dbase = input_dict['dbase'],
             record_style = input_dict['record_style'])
 
 def destroy(dbase, record_style=None):
@@ -29,12 +32,11 @@ def destroy(dbase, record_style=None):
         The record style to delete.  If not given, then the available record
         styles will be listed and the user prompted to pick one.
     """
-    
     if record_style is None:
-        #Build list of calculation records
+        # Build list of calculation records
         styles = iprPy.record_styles()
         
-        #Ask for selection
+        # Ask for selection
         print('Select record_style to destroy')
         for i, style in enumerate(styles):
             print(i+1, style)
@@ -60,8 +62,7 @@ def destroy(dbase, record_style=None):
                 except:
                     pass
             print(count, 'records successfully deleted')
-            
-    
+
 def process_input(input_dict):
     """
     Processes the input parameter terms.
@@ -71,8 +72,7 @@ def process_input(input_dict):
     input_dict : dict
         Dictionary of input parameter terms.
     """
-    
     input_dict['dbase'] = iprPy.database_fromdict(input_dict)
-    
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

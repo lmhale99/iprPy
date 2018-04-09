@@ -30,8 +30,8 @@ calc_style = 'refine_structure'
 record_style = 'calculation_system_relax'
 
 def main(*args):
-    """Main function called when script is executed directly."""
-
+    """Main function  called when script is executed directly."""
+    
     # Read input file in as dictionary
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, allsingular=True)
@@ -54,10 +54,10 @@ def main(*args):
     # Save data model of results
     results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict,
                                results_dict)
-
+    
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)
-        
+
 def quick_a_Cij(lammps_command, system, potential, symbols,
                 mpi_command=None, ucell=None, strainrange=1e-6,
                 p_xx=0.0, p_yy=0.0, p_zz=0.0, tol=1e-10,
@@ -197,7 +197,7 @@ def quick_a_Cij(lammps_command, system, potential, symbols,
             raise RuntimeError('Divergence of box dimensions')
         elif results['E_coh'] == 0.0:
             raise RuntimeError('Divergence: cohesive energy is 0')
-                
+        
         # If not converged or diverged, current -> old and new -> current
         else:
             system_old, system_current = system_current, system_new
@@ -279,9 +279,9 @@ def calc_cij(lammps_command, system, potential, symbols,
     
     # Define lammps variables
     lammps_variables = {}
-    system_info = lmp.atom_data.dump(system, 'init'+str(cycle)+'.dat',
-                                     units=potential.units, 
-                                     atom_style=potential.atom_style)
+    system_info = system.dump('atom_data', 'init' + str(cycle) + '.dat',
+                              units=potential.units,
+                              atom_style=potential.atom_style)
     lammps_variables['atomman_system_info'] = system_info
     lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
     lammps_variables['delta'] = strainrange
@@ -327,7 +327,7 @@ def calc_cij(lammps_command, system, potential, symbols,
                          (yz[8] -  yz[7])  / lz[0],
                          (xz[10] - xz[9])  / lz[0],
                          (xy[12] - xy[11]) / ly[0] ])
-
+    
     # Calculate cij using stress changes associated with each non-zero strain
     cij = np.empty((6,6))
     for i in xrange(6):
@@ -337,13 +337,13 @@ def calc_cij(lammps_command, system, potential, symbols,
                                   pyz[2*i+1]-pyz[2*i+2],
                                   pxz[2*i+1]-pxz[2*i+2],
                                   pxy[2*i+1]-pxy[2*i+2] ])
-
-        cij[i] = delta_stress / strains[i] 
         
+        cij[i] = delta_stress / strains[i] 
+    
     for i in xrange(6):
         for j in xrange(i):
             cij[i,j] = cij[j,i] = (cij[i,j] + cij[j,i]) / 2
-
+    
     C = am.ElasticConstants(Cij=cij)
     
     S = C.Sij
@@ -439,6 +439,6 @@ def process_input(input_dict, UUID=None, build=True):
     
     # Construct initialsystem by manipulating ucell system
     iprPy.input.systemmanipulate(input_dict, build=build)
-    
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

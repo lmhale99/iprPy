@@ -1,4 +1,6 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
 def boolean(value):
     """
@@ -34,5 +36,5 @@ def boolean(value):
         return False
     
     # Issue error for invalid string
-    else: 
+    else:
         raise ValueError('Invalid Boolean string')

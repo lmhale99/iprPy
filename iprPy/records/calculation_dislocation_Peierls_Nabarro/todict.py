@@ -1,13 +1,22 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 from collections import OrderedDict
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
-import atomman as am
-import atomman.unitconvert as uc
+# http://www.numpy.org/
 import numpy as np
+
+# https://pandas.pydata.org/
 import pandas as pd
 
+# https://github.com/usnistgov/atomman
+import atomman as am
+import atomman.unitconvert as uc
+
+# iprPy imports
 from iprPy.tools import aslist
 
 def todict(record, full=True, flat=False):

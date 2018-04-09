@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
-# Standard library imports
-from __future__ import division, absolute_import, print_function
+# Python script created by Lucas Hale
+
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import glob
@@ -45,7 +48,7 @@ def main(*args):
     
     # Call prepare
     prepare(dbase, run_directory, **input_dict)
-    
+
 def prepare(dbase, run_directory, **kwargs):
     """
     High-throughput prepare function for the calculation.
@@ -157,7 +160,7 @@ def prepare(dbase, run_directory, **kwargs):
             
             # Check if record is new
             if new_record.isnew(record_df=record_df):
-            
+                
                 # Assign '' to any unassigned keys
                 for key in unusedkeys()+singularkeys()+multikeys():
                     if key not in calc_dict:
@@ -214,7 +217,7 @@ def unusedkeys():
             'gammasurface_model',
             'peierlsnabarro_model',
            ]
-    
+
 def singularkeys():
     """
     The prepare input parameters that can be assigned only one value.
@@ -256,6 +259,6 @@ def multikeys():
             'family_name',
             'dislocation_name',
            ]
-            
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

@@ -1,5 +1,8 @@
+# Standard Python libraries
 from __future__ import division, absolute_import, print_function
 
-from .stacking_fault import *
+# iprPy imports
+from .schema import schema
+from .todict import todict
 
-__all__ = stacking_fault.__all__
+__all__ = ['schema', 'todict']

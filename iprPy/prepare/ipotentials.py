@@ -1,9 +1,15 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
-from ..tools import aslist
-
-import pandas as pd
+# http://www.numpy.org/
 import numpy as np
+
+# https://pandas.pydata.org/
+import pandas as pd
+
+# iprPy imports
+from ..tools import aslist
 
 def ipotentials(database, record_style='potential_LAMMPS', 
                 element=None, name=None, pair_style=None, 
@@ -80,7 +86,7 @@ def ipotentials(database, record_style='potential_LAMMPS',
                 versionstyle.append(version)
             else:
                 versionstyle.append(version[:-1])
-
+        
         df['versionstyle'] = versionstyle
         df['versionnumber'] = versionnumber
         
@@ -97,6 +103,6 @@ def ipotentials(database, record_style='potential_LAMMPS',
         
         # Limit df by includeid potentials
         df = df[df['id'].isin(includeid)]
-                
+    
     for name in df['id'].values:
         yield database.get_record(name=name, style=record_style)

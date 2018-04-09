@@ -1,5 +1,5 @@
+# Standard Python libraries
 from __future__ import division, absolute_import, print_function
-
 import os
 import importlib
 
@@ -52,6 +52,6 @@ def files():
                   calc_name+'.py',
                   'run0.template',
                  ]
-                      
-    for i in xrange(len(file_names)):
-        yield os.path.join(calc_dir, file_names[i])
+    
+    for file_name in file_names:
+        yield os.path.join(calc_dir, file_name)

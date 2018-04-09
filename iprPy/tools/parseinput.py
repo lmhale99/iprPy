@@ -1,6 +1,10 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# iprPy imports
 from .aslist import aslist
+from ..compatibility import stringtype
 
 def parseinput(infile, singularkeys=[], allsingular=False):
     """
@@ -47,7 +51,7 @@ def parseinput(infile, singularkeys=[], allsingular=False):
         raise ValueError('allsingular and singularkeys options cannot both be given')
     
     # Split strings into lines
-    if isinstance(infile, (str, unicode)):
+    if isinstance(infile, stringtype):
         infile = infile.splitlines()
 
     params = {}

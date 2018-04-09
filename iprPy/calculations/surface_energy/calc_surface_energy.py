@@ -31,7 +31,7 @@ record_style = 'calculation_surface_energy'
 
 def main(*args):
     """Main function called when script is executed directly."""
-
+    
     # Read input file in as dictionary
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, allsingular=True)
@@ -55,10 +55,10 @@ def main(*args):
     # Save data model of results
     results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict,
                                results_dict)
-
+    
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)
-    
+
 def surface_energy(lammps_command, system, potential, symbols,
                    mpi_command=None, etol=0.0, ftol=0.0, maxiter=10000,
                    maxeval=100000, dmax=uc.set_in_units(0.01, 'angstrom'),
@@ -122,9 +122,9 @@ def surface_energy(lammps_command, system, potential, symbols,
     Raises
     ------
     ValueError
-        For invalid cutboxvectors.
+        For invalid cutboxvectors
     """
-
+    
     # Evaluate perfect system
     system.pbc = [True, True, True]
     perfect = relax_system(lammps_command, system, potential, symbols,
@@ -136,25 +136,25 @@ def surface_energy(lammps_command, system, potential, symbols,
     shutil.move(perfect['finaldumpfile'], dumpfile_base)
     shutil.move('log.lammps', 'perfect-log.lammps')
     E_total_base = perfect['potentialenergy']
-
+    
     # Set up defect system
     # A_surf is area of parallelogram defined by the two box vectors not along
     # the cutboxvector
     if   cutboxvector == 'a':
         system.pbc[0] = False
         A_surf = np.linalg.norm(np.cross(system.box.bvect, system.box.cvect))
-        
+    
     elif cutboxvector == 'b':
         system.pbc[1] = False
         A_surf = np.linalg.norm(np.cross(system.box.avect, system.box.cvect))
-        
+    
     elif cutboxvector == 'c':
         system.pbc[2] = False
         A_surf = np.linalg.norm(np.cross(system.box.avect, system.box.bvect))
-        
+    
     else:
         raise ValueError('Invalid cutboxvector')
-        
+    
     # Evaluate system with free surface
     surface = relax_system(lammps_command, system, potential, symbols,
                            mpi_command=mpi_command, etol=etol, ftol=ftol,
@@ -181,7 +181,7 @@ def surface_energy(lammps_command, system, potential, symbols,
     results_dict['E_surf_f'] = E_surf_f
     
     return results_dict
-    
+
 def relax_system(lammps_command, system, potential, symbols,
                  mpi_command=None, etol=0.0, ftol=0.0, maxiter=10000,
                  maxeval=100000, dmax=uc.set_in_units(0.01, 'angstrom')):
@@ -219,7 +219,7 @@ def relax_system(lammps_command, system, potential, symbols,
         The maximum distance in length units that any atom is allowed to relax
         in any direction during a single minimization iteration (default is
         0.01 Angstroms).
-        
+    
     Returns
     -------
     dict
@@ -249,9 +249,9 @@ def relax_system(lammps_command, system, potential, symbols,
     lammps_variables = {}
     
     # Generate system and pair info
-    system_info = lmp.atom_data.dump(system, 'system.dat',
-                                     units=potential.units,
-                                     atom_style=potential.atom_style)
+    system_info = system.dump('atom_data', 'system.dat',
+                              units=potential.units,
+                              atom_style=potential.atom_style)
     lammps_variables['atomman_system_info'] = system_info
     lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
     
@@ -284,10 +284,10 @@ def relax_system(lammps_command, system, potential, symbols,
     # Extract output values
     thermo = output.simulations[-1]['thermo']
     results = {}
-    results['logfile'] =         'log.lammps'
+    results['logfile'] = 'log.lammps'
     results['initialdatafile'] = 'system.dat'
     results['initialdumpfile'] = 'atom.0'
-    results['finaldumpfile'] =   'atom.%i' % thermo.Step.values[-1]
+    results['finaldumpfile'] = 'atom.%i' % thermo.Step.values[-1]
     results['potentialenergy'] = uc.set_in_units(thermo.PotEng.values[-1],
                                                  lammps_units['energy'])
     
@@ -326,7 +326,7 @@ def process_input(input_dict, UUID=None, build=True):
     input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
     input_dict['forcetolerance'] = input_dict.get('forcetolerance',
                                                   '1.0e-6 eV/angstrom')
-                                                  
+    
     # These are calculation-specific default booleans
     # None for this calculation
     
@@ -356,6 +356,6 @@ def process_input(input_dict, UUID=None, build=True):
     
     # Construct initialsystem by manipulating ucell system
     iprPy.input.systemmanipulate(input_dict, build=build)
-    
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

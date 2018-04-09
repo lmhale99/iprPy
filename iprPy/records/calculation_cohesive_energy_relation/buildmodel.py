@@ -1,11 +1,15 @@
-from __future__ import division, absolute_import, print_function
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 
-import atomman.unitconvert as uc
-
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# https://github.com/usnistgov/atomman
+import atomman.unitconvert as uc
+
+# iprPy imports
 import iprPy
 
 def buildmodel(script, input_dict, results_dict=None):
@@ -86,9 +90,9 @@ def buildmodel(script, input_dict, results_dict=None):
         calc['cohesive-energy-relation']['cohesive-energy'] = DM()
         calc['cohesive-energy-relation']['cohesive-energy']['value'] = list(uc.get_in_units(results_dict['Ecoh_values'], input_dict['energy_unit']))
         calc['cohesive-energy-relation']['cohesive-energy']['unit'] = input_dict['energy_unit']
-
+        
         if 'min_cell' in results_dict:
             for cell in results_dict['min_cell']:
                 calc.append('minimum-atomic-system', cell.model(symbols = input_dict['symbols'], box_unit = input_dict['length_unit'])['atomic-system'])
-
+    
     return output

@@ -1,7 +1,11 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# https://github.com/usnistgov/atomman
 import atomman as am
 
+# iprPy imports
 from .. import Record
 
 def peierlsnabarro(input_dict, build=True, **kwargs):
@@ -39,7 +43,7 @@ def peierlsnabarro(input_dict, build=True, **kwargs):
     
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
-        
+    
     # Extract input values and assign default values
     peierlsnabarro_model = input_dict.get(kwargs['peierlsnabarro_model'], None)
     peierlsnabarro_content = input_dict.get(kwargs['peierlsnabarro_content'], None)
@@ -51,9 +55,8 @@ def peierlsnabarro(input_dict, build=True, **kwargs):
     
     # Load Peierls-Nabarro solution
     if build is True:
-        peierlsnabarro = am.defect.SemiDiscretePeierlsNabarro(
-                                            model=peierlsnabarro_model,
-                                            gamma=gamma)
+        peierlsnabarro = am.defect.SDVPN(model=peierlsnabarro_model,
+                                         gamma=gamma)
     else:
         peierlsnabarro = None
     

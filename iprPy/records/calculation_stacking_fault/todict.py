@@ -1,12 +1,20 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
-import atomman.unitconvert as uc
+# http://www.numpy.org/
 import numpy as np
 
+# https://pandas.pydata.org/
 import pandas as pd
 
+# https://github.com/usnistgov/atomman
+import atomman.unitconvert as uc
+
+# iprPy imports
 from iprPy.tools import aslist
 
 def todict(record, full=True, flat=False):
@@ -27,14 +35,14 @@ def todict(record, full=True, flat=False):
         values, which is useful for comparisons.  If False, the term
         values can be of any data type, which is convenient for analysis.
         (Default is False).
-        
+    
     Returns
     -------
     dict
         A dictionary representation of the record's content.
     """
     model = DM(record)
-
+    
     calc = model['calculation-stacking-fault']
     params = {}
     params['calc_key'] = calc['key']
@@ -52,7 +60,7 @@ def todict(record, full=True, flat=False):
     params['shiftfraction2'] = calc['calculation']['run-parameter']['stackingfault_shiftfraction2']
     
     sizemults = calc['calculation']['run-parameter']['size-multipliers']
-
+    
     params['potential_LAMMPS_key'] = calc['potential-LAMMPS']['key']
     params['potential_LAMMPS_id'] = calc['potential-LAMMPS']['id']
     params['potential_key'] = calc['potential-LAMMPS']['potential']['key']
@@ -66,7 +74,7 @@ def todict(record, full=True, flat=False):
     
     params['stackingfault_key'] = calc['stacking-fault']['key']
     params['stackingfault_id'] = calc['stacking-fault']['id']
-
+    
     params['shiftvector1'] = calc['stacking-fault']['calculation-parameter']['shiftvector1']
     params['shiftvector2'] = calc['stacking-fault']['calculation-parameter']['shiftvector2']
     
@@ -87,13 +95,12 @@ def todict(record, full=True, flat=False):
     if full is True:
         if params['status'] == 'error':
             params['error'] = calc['error']
-                 
         
         elif params['status'] == 'not calculated':
             pass
-            
+        
         else:
             params['gamma_sf'] = uc.value_unit(calc['stacking-fault-energy'])
             params['delta_disp_sf'] = uc.value_unit(calc['plane-separation'])
-        
+    
     return params

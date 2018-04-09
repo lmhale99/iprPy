@@ -1,7 +1,11 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# http://www.numpy.org/
 import numpy as np
 
 def todict(record, full=True, flat=False):

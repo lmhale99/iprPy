@@ -1,4 +1,9 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
+
+# iprPy imports
+from ..compatibility import stringtype
 
 def iaslist(term):
     """
@@ -15,7 +20,7 @@ def iaslist(term):
     any
         Items in the list representation of term.
     """
-    if isinstance(term, (str, unicode)):
+    if isinstance(term, stringtype):
         yield term
     else:
         try:

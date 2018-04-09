@@ -1,11 +1,20 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
-import atomman.unitconvert as uc
+# http://www.numpy.org/
 import numpy as np
+
+# https://pandas.pydata.org/
 import pandas as pd
 
+# https://github.com/usnistgov/atomman
+import atomman.unitconvert as uc
+
+# iprPy imports
 from iprPy.tools import aslist
 
 def todict(record, full=True, flat=False):
@@ -26,14 +35,14 @@ def todict(record, full=True, flat=False):
         values, which is useful for comparisons.  If False, the term
         values can be of any data type, which is convenient for analysis.
         (Default is False).
-        
+    
     Returns
     -------
     dict
         A dictionary representation of the record's content.
     """
     model = DM(record)
-
+    
     calc = model['calculation-cohesive-energy-relation']
     params = {}
     params['calc_key'] = calc['key']
@@ -77,10 +86,10 @@ def todict(record, full=True, flat=False):
         if params['status'] == 'error':
             params['error'] = calc['error']
             params['number_min_states'] = 0
-            
+        
         elif params['status'] == 'not calculated':
             params['number_min_states'] = 1
-
+        
         else:
             params['number_min_states'] = len(calc.aslist('minimum-atomic-system'))
             if flat is False:
@@ -90,5 +99,5 @@ def todict(record, full=True, flat=False):
                 er_plot['a'] = uc.value_unit(plot['a'])
                 er_plot['E_coh'] = uc.value_unit(plot['cohesive-energy'])
                 params['e_vs_r_plot'] = pd.DataFrame(er_plot)
-            
+    
     return params

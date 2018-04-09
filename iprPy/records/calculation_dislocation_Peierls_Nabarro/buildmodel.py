@@ -1,15 +1,17 @@
-from __future__ import division, absolute_import, print_function
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 
-import numpy as np
-
-import atomman as am
-import atomman.unitconvert as uc
-from atomman.defect import peierlsnabarro_disregistry
-
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# https://github.com/usnistgov/atomman
+import atomman as am
+import atomman.unitconvert as uc
+from atomman.defect import pn_arctan_disregistry
+
+# iprPy imports
 import iprPy
 
 def buildmodel(script, input_dict, results_dict=None):
@@ -48,7 +50,7 @@ def buildmodel(script, input_dict, results_dict=None):
     calc['calculation']['run-parameter'] = run_params = DM()
     run_params['halfwidth'] = uc.model(input_dict['halfwidth'], input_dict['length_unit'])
     
-    x, idisreg = peierlsnabarro_disregistry(xmax=input_dict['xmax'], xnum=input_dict['xnum'], xstep=input_dict['xstep'])
+    x, idisreg = pn_arctan_disregistry(xmax=input_dict['xmax'], xnum=input_dict['xnum'], xstep=input_dict['xstep'])
     run_params['xmax'] = x.max()
     run_params['xnum'] = len(x)
     run_params['xstep'] = x[1]-x[0]
@@ -65,11 +67,11 @@ def buildmodel(script, input_dict, results_dict=None):
     #Save defect parameters
     calc['dislocation-monopole'] = disl = DM()
     if input_dict['dislocation_model'] is not None:
-        disl['key'] =            input_dict['dislocation_model']['key']
-        disl['id'] =             input_dict['dislocation_model']['id']
-        disl['character'] =      input_dict['dislocation_model']['character']
+        disl['key'] = input_dict['dislocation_model']['key']
+        disl['id'] = input_dict['dislocation_model']['id']
+        disl['character'] = input_dict['dislocation_model']['character']
         disl['Burgers-vector'] = input_dict['dislocation_model']['Burgers-vector']
-        disl['slip-plane'] =     input_dict['dislocation_model']['slip-plane']
+        disl['slip-plane'] = input_dict['dislocation_model']['slip-plane']
         disl['line-direction'] = input_dict['dislocation_model']['line-direction']
     
     disl['system-family'] = input_dict['system_family']

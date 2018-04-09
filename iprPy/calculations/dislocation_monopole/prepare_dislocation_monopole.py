@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
-# Standard library imports
-from __future__ import division, absolute_import, print_function
+# Python script created by Lucas Hale
+
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import glob
@@ -36,7 +39,7 @@ def main(*args):
     # Read input script
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, singularkeys=singularkeys())
-
+    
     # Open database
     dbase = iprPy.database_fromdict(input_dict)
     
@@ -45,7 +48,7 @@ def main(*args):
     
     # Call prepare
     prepare(dbase, run_directory, **input_dict)
-    
+
 def prepare(dbase, run_directory, **kwargs):
     """
     High-throughput prepare function for the calculation.
@@ -66,13 +69,13 @@ def prepare(dbase, run_directory, **kwargs):
     
     # Build record_df
     record_df = dbase.get_records_df(style=record_style, full=False, flat=True)
-
+    
     # Build potential dictionaries (single dbase access)
     pot_record_dict = {}
     pot_tar_dict = {}
     for pot_record in dbase.iget_records(style='potential_LAMMPS'):
         pot_record_dict[pot_record.name] = pot_record
-        
+    
     # Build defect model record dictionary and df (single dbase access)
     defect_record_dict = {}
     defect_record_df = []
@@ -100,7 +103,7 @@ def prepare(dbase, run_directory, **kwargs):
     # Loop over parent records
     for parent_record in parent_records:
         parent_dict = parent_record.todict()
-    
+        
         # Load potential
         pot_record = pot_record_dict[parent_dict['potential_LAMMPS_id']]
         potential = lmp.Potential(pot_record.content)
@@ -111,7 +114,7 @@ def prepare(dbase, run_directory, **kwargs):
         else:
             pot_tar = dbase.get_tar(pot_record)
             pot_tar_dict[parent_dict['potential_LAMMPS_id']] = pot_tar
-    
+        
         # Loop over defect model records with family name matching parent record
         matches = defect_record_df['family'] == parent_dict['family']
         defect_keys = defect_record_df[matches].id.tolist()
@@ -132,14 +135,14 @@ def prepare(dbase, run_directory, **kwargs):
             calc_dict['load_style'] = 'system_model'
             calc_dict['load_content'] = parent_record.content
             calc_dict['load_options'] = 'key relaxed-atomic-system'
-
+            
             calc_dict['dislocation_model'] = defect_record.name+'.xml'
             calc_dict['dislocation_content'] = defect_record.content
             
             for key in singularkeys():
                 if key in kwargs:
                     calc_dict[key] = kwargs[key]
-    
+            
             # Build incomplete record
             input_dict = deepcopy(calc_dict)
             calculation.process_input(input_dict, calc_key, build=False)
@@ -161,7 +164,7 @@ def prepare(dbase, run_directory, **kwargs):
                 # Add record to database
                 dbase.add_record(record=new_record)
                 
-                # Generate calculation folder    
+                # Generate calculation folder
                 calc_directory = os.path.join(run_directory, calc_key)
                 os.makedirs(calc_directory)
                 
@@ -169,16 +172,16 @@ def prepare(dbase, run_directory, **kwargs):
                 inputfile = iprPy.tools.filltemplate(calculation.template, calc_dict, '<', '>')
                 with open(os.path.join(calc_directory, 'calc_' + calc_style + '.in'), 'w') as f:
                     f.write(inputfile)
-
+                
                 # Add calculation files to calculation folder
                 for calc_file in calculation.files:
-                    shutil.copy(calc_file, calc_directory)  
+                    shutil.copy(calc_file, calc_directory)
                 
                 # Add potential record file to calculation folder
                 with open(os.path.join(calc_directory, pot_record.name+'.xml'), 'w') as f:
                     f.write(pot_record.content)
-                    
-                # Extract potential's tar files to calculation folder    
+                
+                # Extract potential's tar files to calculation folder
                 pot_tar.extractall(calc_directory)
                 
                 # Add parent record file to calculation folder
@@ -215,7 +218,7 @@ def unusedkeys():
                                                'C66',
             'randomseed',
            ]
-    
+
 def singularkeys():
     """
     The prepare input parameters that can be assigned only one value.
@@ -260,6 +263,6 @@ def multikeys():
             'family_name',
             'dislocation_name',
            ]
-            
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

@@ -1,15 +1,19 @@
-from __future__ import division, absolute_import, print_function
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 
-import numpy as np
-
-import atomman as am
-import atomman.unitconvert as uc
-from atomman.defect import peierlsnabarro_disregistry
-
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# http://www.numpy.org/
+import numpy as np
+
+# https://github.com/usnistgov/atomman
+import atomman as am
+import atomman.unitconvert as uc
+
+# iprPy imports
 import iprPy
 
 def buildmodel(script, input_dict, results_dict=None):
@@ -70,11 +74,11 @@ def buildmodel(script, input_dict, results_dict=None):
     #Save defect parameters
     calc['dislocation-monopole'] = disl = DM()
     if input_dict['dislocation_model'] is not None:
-        disl['key'] =            input_dict['dislocation_model']['key']
-        disl['id'] =             input_dict['dislocation_model']['id']
-        disl['character'] =      input_dict['dislocation_model']['character']
+        disl['key'] = input_dict['dislocation_model']['key']
+        disl['id'] = input_dict['dislocation_model']['id']
+        disl['character'] = input_dict['dislocation_model']['character']
         disl['Burgers-vector'] = input_dict['dislocation_model']['Burgers-vector']
-        disl['slip-plane'] =     input_dict['dislocation_model']['slip-plane']
+        disl['slip-plane'] = input_dict['dislocation_model']['slip-plane']
         disl['line-direction'] = input_dict['dislocation_model']['line-direction']
     
     disl['system-family'] = input_dict['system_family']

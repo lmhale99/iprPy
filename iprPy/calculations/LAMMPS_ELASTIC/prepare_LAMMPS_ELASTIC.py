@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
-# Standard library imports
-from __future__ import division, absolute_import, print_function
+# Python script created by Lucas Hale
+
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import glob
@@ -22,6 +25,7 @@ import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/iprPy
 import iprPy
+from iprPy.compatibility import range
 
 # Define calc_style and record_style
 calc_style = 'LAMMPS_ELASTIC'
@@ -33,7 +37,7 @@ def main(*args):
     # Read input script
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, singularkeys=singularkeys())
-
+    
     # Open database
     dbase = iprPy.database_fromdict(input_dict)
     
@@ -63,7 +67,7 @@ def prepare(dbase, run_directory, **kwargs):
     
     # Build record_df
     record_df = dbase.get_records_df(style=record_style, full=False, flat=True)
-
+    
     # Build potential dictionaries (single dbase access)
     pot_record_dict = {}
     pot_tar_dict = {}
@@ -103,7 +107,7 @@ def prepare(dbase, run_directory, **kwargs):
         
         number_min_states = parent_dict.get('number_min_states', 1)
         
-        for i in xrange(number_min_states):
+        for i in range(number_min_states):
             if i != 0:
                 load_options = load_options + ' index '+str(i)
             
@@ -144,15 +148,15 @@ def prepare(dbase, run_directory, **kwargs):
                 
                 #Check if record is new
                 if new_record.isnew(record_df=record_df):
-                
+                    
                     # Assign '' to any unassigned keys
                     for key in unusedkeys()+singularkeys()+multikeys():
                         if key not in calc_dict:
                             calc_dict[key] = ''
-                            
+                    
                     #Add record to database
                     dbase.add_record(record=new_record)
-                        
+                    
                     # Generate calculation folder
                     calc_directory = os.path.join(run_directory, calc_key)
                     os.makedirs(calc_directory)
@@ -161,7 +165,7 @@ def prepare(dbase, run_directory, **kwargs):
                     inputfile = iprPy.tools.filltemplate(calculation.template, calc_dict, '<', '>')
                     with open(os.path.join(calc_directory, 'calc_' + calc_style + '.in'), 'w') as f:
                         f.write(inputfile)
-
+                    
                     # Add calculation files to calculation folder
                     for calc_file in calculation.files:
                         shutil.copy(calc_file, calc_directory)
@@ -169,14 +173,14 @@ def prepare(dbase, run_directory, **kwargs):
                     # Add potential record file to calculation folder
                     with open(os.path.join(calc_directory, pot_record.name+'.xml'), 'w') as f:
                         f.write(pot_record.content)
-                        
+                    
                     # Extract potential's tar files to calculation folder
                     pot_tar.extractall(calc_directory)
                     
                     # Add parent record file to calculation folder
                     with open(os.path.join(calc_directory, parent_record.name+'.xml'), 'w') as f:
                         f.write(parent_record.content)
-    
+
 def unusedkeys():
     """
     The calculation input parameters that are not prepare input parameters.
@@ -194,7 +198,7 @@ def unusedkeys():
             'z_axis',
             'atomshift',
            ]
-    
+
 def singularkeys():
     """
     The prepare input parameters that can be assigned only one value.
@@ -238,6 +242,6 @@ def multikeys():
             'family_name',
             'strainrange',
            ]
-            
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

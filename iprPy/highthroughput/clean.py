@@ -1,14 +1,20 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import glob
 import os
 import shutil
 import tarfile 
 import sys
+
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# https://pandas.pydata.org/
 import pandas as pd
 
+# https://github.com/usnistgov/iprPy
 import iprPy
 
 def main(*args):
@@ -20,11 +26,11 @@ def main(*args):
     
     # Interpret and process input parameters
     process_input(input_dict)
-
+    
     clean(input_dict['dbase'],
           input_dict['record_style'],
           input_dict['run_directory'])
-            
+
 def clean(dbase=None, run_directory=None, record_style=None):
     """
     Resets all records of a given style that issued errors. Useful if the
@@ -41,7 +47,7 @@ def clean(dbase=None, run_directory=None, record_style=None):
         The record style to clean.  If not given, then the available record
         styles will be listed and the user prompted to pick one.
     """
-
+    
     if record_style is None:
         # Build list of calculation records
         styles = iprPy.record_styles()
@@ -52,14 +58,14 @@ def clean(dbase=None, run_directory=None, record_style=None):
         for i, style in enumerate(styles):
             print(i+1, style)
         choice = iprPy.tools.screen_input(':')
-        try:    
+        try:
             choice = int(choice)
-        except: 
+        except:
             record_style = choice
-        else:   
+        else:
             record_style = styles[choice-1]
         print()
-        
+    
     if dbase is not None and record_style is not None:
         # Find all records of record_style that issued errors
         records = dbase.get_records(style=record_style)
@@ -78,7 +84,7 @@ def clean(dbase=None, run_directory=None, record_style=None):
                 tar = dbase.get_tar(name=record_name, style=record_style)
             except:
                 pass
-            else:   
+            else:
                 # Copy tar back to run_directory
                 tar.extractall(run_directory)
                 tar.close()
@@ -98,20 +104,21 @@ def clean(dbase=None, run_directory=None, record_style=None):
                 model_root = model.keys()[0]
                 del(model[model_root]['error'])
                 model[model_root]['status'] = 'not calculated'
-                dbase.update_record(name=record_name, style=record_style, content=model.xml())
-            
+                dbase.update_record(name=record_name, style=record_style,
+                                    content=model.xml())
     
     if run_directory is not None:
         # Remove bid files
         for bidfile in glob.iglob(os.path.join(run_directory, '*', '*.bid')):
             os.remove(bidfile)
-            
+        
         # Remove results.json files
-        for bidfile in glob.iglob(os.path.join(run_directory, '*', 'results.json')):
+        for bidfile in glob.iglob(os.path.join(run_directory, '*',
+                                               'results.json')):
             os.remove(bidfile)
     else:
         raise ValueError('No run_directory supplied')
-    
+
 def process_input(input_dict):
     """
     Processes the input parameter terms.
@@ -121,11 +128,11 @@ def process_input(input_dict):
     input_dict : dict
         Dictionary of input parameter terms.
     """
-
+    
     if 'database' in input_dict:
         input_dict['dbase'] = iprPy.database_fromdict(input_dict)
     else: 
         input_dict['dbase'] = None
-    
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

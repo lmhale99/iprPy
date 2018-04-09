@@ -1,11 +1,15 @@
-from __future__ import division, absolute_import, print_function
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 
-import atomman.unitconvert as uc
-
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# https://github.com/usnistgov/atomman
+import atomman.unitconvert as uc
+
+# iprPy imports
 import iprPy
 
 def buildmodel(script, input_dict, results_dict=None):
@@ -21,7 +25,7 @@ def buildmodel(script, input_dict, results_dict=None):
         Dictionary of all input parameter terms.
     results_dict : dict, optional
         Dictionary containing any results produced by the calculation.
-        
+    
     Returns
     -------
     DataModelDict
@@ -105,7 +109,7 @@ def buildmodel(script, input_dict, results_dict=None):
         calc['defect-system']['artifact']['format'] = 'atom_dump'
         calc['defect-system']['symbols'] = input_dict['symbols']
         calc['defect-system']['potential-energy'] = DM()
-        calc['defect-system']['potential-energy']['value'] = uc.get_in_units(results_dict['E_total_ptd'], 
+        calc['defect-system']['potential-energy']['value'] = uc.get_in_units(results_dict['E_total_ptd'],
                                                              input_dict['energy_unit'])
         calc['defect-system']['potential-energy']['unit'] =  input_dict['energy_unit']
         
@@ -120,7 +124,7 @@ def buildmodel(script, input_dict, results_dict=None):
         
         # Save the defect formation energy
         calc['defect-formation-energy'] = DM()
-        calc['defect-formation-energy']['value'] = uc.get_in_units(results_dict['E_ptd_f'], 
+        calc['defect-formation-energy']['value'] = uc.get_in_units(results_dict['E_ptd_f'],
                                                    input_dict['energy_unit']) 
         calc['defect-formation-energy']['unit'] =  input_dict['energy_unit']
         
@@ -132,5 +136,5 @@ def buildmodel(script, input_dict, results_dict=None):
             r_c['position_shift'] = list(results_dict['position_shift'])
         elif 'db_vect_shift' in results_dict:
             r_c['db_vect_shift'] = list(results_dict['db_vect_shift'])
-
+    
     return output

@@ -1,7 +1,6 @@
-from __future__ import division, absolute_import, print_function
-
-__all__ = ['schema']
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 
 def schema():

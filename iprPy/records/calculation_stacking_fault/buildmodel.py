@@ -1,11 +1,15 @@
-from __future__ import division, absolute_import, print_function
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 
-import atomman.unitconvert as uc
-
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# https://github.com/usnistgov/atomman
+import atomman.unitconvert as uc
+
+# iprPy imports
 import iprPy
 
 def buildmodel(script, input_dict, results_dict=None):
@@ -21,7 +25,7 @@ def buildmodel(script, input_dict, results_dict=None):
         Dictionary of all input parameter terms.
     results_dict : dict, optional
         Dictionary containing any results produced by the calculation.
-        
+    
     Returns
     -------
     DataModelDict
@@ -48,9 +52,9 @@ def buildmodel(script, input_dict, results_dict=None):
     run_params['size-multipliers']['b'] = list(input_dict['sizemults'][1])
     run_params['size-multipliers']['c'] = list(input_dict['sizemults'][2])
     
-    run_params['energytolerance']          = input_dict['energytolerance']
+    run_params['energytolerance'] = input_dict['energytolerance']
     run_params['forcetolerance'] = DM()
-    run_params['forcetolerance']['value'] = uc.get_in_units(input_dict['forcetolerance'], 
+    run_params['forcetolerance']['value'] = uc.get_in_units(input_dict['forcetolerance'],
                                             input_dict['energy_unit']+'/'+input_dict['length_unit'])
     run_params['forcetolerance']['unit'] =  input_dict['energy_unit']+'/'+input_dict['length_unit']
     run_params['maxiterations']  = input_dict['maxiterations']
@@ -103,7 +107,7 @@ def buildmodel(script, input_dict, results_dict=None):
     
     if results_dict is None:
         calc['status'] = 'not calculated'
-    else:        
+    else:
         calc['defect-free-system'] = DM()
         calc['defect-free-system']['artifact'] = DM()
         calc['defect-free-system']['artifact']['file'] = results_dict['dumpfile_0']

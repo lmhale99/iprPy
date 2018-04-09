@@ -31,7 +31,7 @@ record_style = 'calculation_stacking_fault'
 
 def main(*args):
     """Main function called when script is executed directly."""
-
+    
     # Read input file in as dictionary
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, allsingular=True)
@@ -56,10 +56,10 @@ def main(*args):
     # Save data model of results
     results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict,
                                results_dict)
-
+    
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)
-    
+
 def stackingfaultpoint(lammps_command, system, potential, symbols,
                        mpi_command=None, sim_directory=None,
                        cutboxvector='c', faultpos=0.5,
@@ -144,7 +144,7 @@ def stackingfaultpoint(lammps_command, system, potential, symbols,
         
         # Identify atoms above fault
         faultpos = system.box.xlo + system.box.lx * faultpos
-        abovefault = system.atoms.view['pos'][:, cutindex] > (faultpos)
+        abovefault = system.atoms.pos[:, cutindex] > (faultpos)
         
         # Compute fault area
         faultarea = np.linalg.norm(np.cross(system.box.bvect,
@@ -152,7 +152,7 @@ def stackingfaultpoint(lammps_command, system, potential, symbols,
         
         # Give correct LAMMPS fix setforce command
         fix_cut_setforce = 'fix cut all setforce NULL 0 0'
-        
+    
     elif cutboxvector == 'b':
         # Assert system is compatible with planeaxis value
         if system.box.yz != 0.0:
@@ -163,7 +163,7 @@ def stackingfaultpoint(lammps_command, system, potential, symbols,
         
         # Identify atoms above fault
         faultpos = system.box.ylo + system.box.ly * faultpos
-        abovefault = system.atoms.view['pos'][:, cutindex] > (faultpos)
+        abovefault = system.atoms.pos[:, cutindex] > (faultpos)
         
         # Compute fault area
         faultarea = np.linalg.norm(np.cross(system.box.avect,
@@ -171,14 +171,14 @@ def stackingfaultpoint(lammps_command, system, potential, symbols,
         
         # Give correct LAMMPS fix setforce command
         fix_cut_setforce = 'fix cut all setforce 0 NULL 0'
-        
+    
     elif cutboxvector == 'c':
         # Specify cutindex
         cutindex = 2
         
         # Identify atoms above fault
         faultpos = system.box.zlo + system.box.lz * faultpos
-        abovefault = system.atoms.view['pos'][:, cutindex] > (faultpos)
+        abovefault = system.atoms.pos[:, cutindex] > (faultpos)
         
         # Compute fault area
         faultarea = np.linalg.norm(np.cross(system.box.avect,
@@ -198,14 +198,14 @@ def stackingfaultpoint(lammps_command, system, potential, symbols,
     sfsystem = deepcopy(system)
     sfsystem.pbc = [True, True, True]
     sfsystem.pbc[cutindex] = False
-    sfsystem.atoms.view['pos'][abovefault] += faultshift
+    sfsystem.atoms.pos[abovefault] += faultshift
     sfsystem.wrap()
     
     if sim_directory is not None:
         # Create sim_directory if it doesn't exist
         if not os.path.isdir(sim_directory):
             os.mkdir(sim_directory)
-            
+        
         # Add '/' to end of sim_directory string if needed
         if sim_directory[-1] != '/': 
             sim_directory = sim_directory + '/'
@@ -215,17 +215,16 @@ def stackingfaultpoint(lammps_command, system, potential, symbols,
     
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
-       
+    
     #Get lammps version date
     lammps_date = iprPy.tools.check_lammps_version(lammps_command)['lammps_date']
     
     # Define lammps variables
     lammps_variables = {}
-    system_info = lmp.atom_data.dump(sfsystem,
-                                     os.path.join(sim_directory,
-                                                  'system.dat'),
-                                     units=potential.units,
-                                     atom_style=potential.atom_style)
+    system_info = sfsystem.dump('atom_data',
+                                os.path.join(sim_directory, 'system.dat'),
+                                units=potential.units,
+                                atom_style=potential.atom_style)
     lammps_variables['atomman_system_info'] = system_info
     lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
     lammps_variables['fix_cut_setforce'] = fix_cut_setforce
@@ -241,7 +240,7 @@ def stackingfaultpoint(lammps_command, system, potential, symbols,
         lammps_variables['dump_modify_format'] = '"%i %i %.13e %.13e %.13e %.13e"'
     else:
         lammps_variables['dump_modify_format'] = 'float %.13e'
-        
+    
     # Write lammps input script
     template_file = 'sfmin.template'
     lammps_script = os.path.join(sim_directory, 'sfmin.in')
@@ -263,12 +262,12 @@ def stackingfaultpoint(lammps_command, system, potential, symbols,
     E_total = uc.set_in_units(thermo.PotEng.values[-1],
                               lammps_units['energy'])
     
-    #Load relaxed system
-    sfsystem = lmp.atom_dump.load(dumpfile)
-              
+    # Load relaxed system
+    sfsystem = am.load('atom_dump', dumpfile)
+    
     # Find center of mass difference in top/bottom planes
-    disp = (sfsystem.atoms.view['pos'][abovefault, cutindex].mean()
-            - sfsystem.atoms.view['pos'][~abovefault, cutindex].mean())
+    disp = (sfsystem.atoms.pos[abovefault, cutindex].mean()
+            - sfsystem.atoms.pos[~abovefault, cutindex].mean())
     
     # Return results
     results_dict = {}
@@ -280,7 +279,7 @@ def stackingfaultpoint(lammps_command, system, potential, symbols,
     results_dict['disp'] = disp
     
     return results_dict
-    
+
 def stackingfault(lammps_command, system, potential, symbols,
                   mpi_command=None, cutboxvector=None, faultpos=0.5,
                   faultshift=[0.0, 0.0, 0.0], etol=0.0, ftol=0.0,
@@ -365,8 +364,8 @@ def stackingfault(lammps_command, system, potential, symbols,
     
     # Extract terms
     E_total_0 = zeroshift['E_total']
-    disp_0 =    zeroshift['disp']
-    A_fault =   zeroshift['A_fault']
+    disp_0 = zeroshift['disp']
+    A_fault = zeroshift['A_fault']
     shutil.move('log.lammps', 'zeroshift-log.lammps')
     shutil.move(zeroshift['dumpfile'], 'zeroshift.dump')
     
@@ -380,7 +379,7 @@ def stackingfault(lammps_command, system, potential, symbols,
     
     # Extract terms
     E_total_sf = shifted['E_total']
-    disp_sf =    shifted['disp']
+    disp_sf = shifted['disp']
     shutil.move('log.lammps', 'shifted-log.lammps')
     shutil.move(shifted['dumpfile'], 'shifted.dump')
 
@@ -437,7 +436,7 @@ def process_input(input_dict, UUID=None, build=True):
     input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
     input_dict['forcetolerance'] = input_dict.get('forcetolerance',
                                                   '1.0e-6 eV/angstrom')
-                                                  
+    
     # These are calculation-specific default booleans
     # None for this calculation
     
@@ -481,7 +480,7 @@ def process_input(input_dict, UUID=None, build=True):
         fraction2 = input_dict['stackingfault_shiftfraction2']
         shiftvector1 = input_dict['shiftvector1']
         shiftvector2 = input_dict['shiftvector2']
-        input_dict['faultshift'] = fraction1*shiftvector1 + fraction2*shiftvector2
-    
+        input_dict['faultshift'] = fraction1 * shiftvector1 + fraction2 * shiftvector2
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

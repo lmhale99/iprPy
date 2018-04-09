@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
-# Standard library imports
-from __future__ import division, absolute_import, print_function
+# Python script created by Lucas Hale
+
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import glob
@@ -36,7 +39,7 @@ def main(*args):
     # Read input script
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, singularkeys=singularkeys())
-
+    
     # open database
     dbase = iprPy.database_fromdict(input_dict)
     
@@ -45,7 +48,7 @@ def main(*args):
     
     # Call prepare
     prepare(dbase, run_directory, **input_dict)
-    
+
 def prepare(dbase, run_directory, **kwargs):
     """
     High-throughput prepare function for the calculation.
@@ -72,7 +75,7 @@ def prepare(dbase, run_directory, **kwargs):
     pot_tar_dict = {}
     for pot_record in dbase.iget_records(style='potential_LAMMPS'):
         pot_record_dict[pot_record.name] = pot_record
-        
+    
     # Build defect model record dictionary and df (single dbase access)
     defect_record_dict = {}
     defect_record_df = []
@@ -134,7 +137,7 @@ def prepare(dbase, run_directory, **kwargs):
                 calc_dict['load_style'] = 'system_model'
                 calc_dict['load_content'] = parent_record.content
                 calc_dict['load_options'] = 'key relaxed-atomic-system'
-
+                
                 calc_dict['surface_model'] = defect_record.name+'.xml'
                 calc_dict['surface_content'] = defect_record.content
                 
@@ -143,7 +146,7 @@ def prepare(dbase, run_directory, **kwargs):
                 for key in singularkeys():
                     if key in kwargs:
                         calc_dict[key] = kwargs[key]
-
+                
                 # Build incomplete record
                 input_dict = deepcopy(calc_dict)
                 calculation.process_input(input_dict, calc_key, build=False)
@@ -156,12 +159,12 @@ def prepare(dbase, run_directory, **kwargs):
                 
                 # Check if record is new
                 if new_record.isnew(record_df=record_df):
-                
+                    
                     # Assign '' to any unassigned keys
                     for key in unusedkeys()+singularkeys()+multikeys():
                         if key not in calc_dict:
                             calc_dict[key] = ''
-                
+                    
                     # Add record to database
                     dbase.add_record(record=new_record)
                     
@@ -173,7 +176,7 @@ def prepare(dbase, run_directory, **kwargs):
                     inputfile = iprPy.tools.filltemplate(calculation.template, calc_dict, '<', '>')
                     with open(os.path.join(calc_directory, 'calc_' + calc_style + '.in'), 'w') as f:
                         f.write(inputfile)
-
+                    
                     # Add calculation files to calculation folder
                     for calc_file in calculation.files:
                         shutil.copy(calc_file, calc_directory)
@@ -181,18 +184,18 @@ def prepare(dbase, run_directory, **kwargs):
                     # Add potential record file to calculation folder
                     with open(os.path.join(calc_directory, pot_record.name+'.xml'), 'w') as f:
                         f.write(pot_record.content)
-                        
+                    
                     # Extract potential's tar files to calculation folder
                     pot_tar.extractall(calc_directory)
                     
                     # Add parent record file to calculation folder
                     with open(os.path.join(calc_directory, parent_record.name+'.xml'), 'w') as f:
                         f.write(parent_record.content)
-                        
+                    
                     # Add defect record file to calculation folder
                     with open(os.path.join(calc_directory, defect_record.name+'.xml'), 'w') as f:
                         f.write(defect_record.content)
-    
+
 def unusedkeys():
     """
     The calculation input parameters that are not prepare input parameters.
@@ -211,7 +214,7 @@ def unusedkeys():
             'atomshift',
             'surface_cutboxvector',
            ]
-            
+
 def singularkeys():
     """
     The prepare input parameters that can be assigned only one value.
@@ -253,6 +256,6 @@ def multikeys():
             'surface_name',
             'sizemults',
            ]
-            
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

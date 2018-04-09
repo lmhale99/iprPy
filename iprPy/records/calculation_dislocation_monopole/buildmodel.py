@@ -1,11 +1,15 @@
-from __future__ import division, absolute_import, print_function
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 
-import atomman.unitconvert as uc
-
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# https://github.com/usnistgov/atomman
+import atomman.unitconvert as uc
+
+# iprPy imports
 import iprPy
 
 def buildmodel(script, input_dict, results_dict=None):
@@ -21,7 +25,7 @@ def buildmodel(script, input_dict, results_dict=None):
         Dictionary of all input parameter terms.
     results_dict : dict, optional
         Dictionary containing any results produced by the calculation.
-        
+    
     Returns
     -------
     DataModelDict
@@ -85,11 +89,11 @@ def buildmodel(script, input_dict, results_dict=None):
     #Save defect parameters
     calc['dislocation-monopole'] = disl = DM()
     if input_dict['dislocation_model'] is not None:
-        disl['key'] =            input_dict['dislocation_model']['key']
-        disl['id'] =             input_dict['dislocation_model']['id']
-        disl['character'] =      input_dict['dislocation_model']['character']
+        disl['key'] = input_dict['dislocation_model']['key']
+        disl['id'] = input_dict['dislocation_model']['id']
+        disl['character'] = input_dict['dislocation_model']['character']
         disl['Burgers-vector'] = input_dict['dislocation_model']['Burgers-vector']
-        disl['slip-plane'] =     input_dict['dislocation_model']['slip-plane']
+        disl['slip-plane'] = input_dict['dislocation_model']['slip-plane']
         disl['line-direction'] = input_dict['dislocation_model']['line-direction']
     
     disl['system-family'] = input_dict['system_family']
@@ -104,7 +108,7 @@ def buildmodel(script, input_dict, results_dict=None):
         calc['status'] = 'not calculated'
     else:
         calc['elastic-constants'] = input_dict['C'].model(unit=input_dict['pressure_unit'])['elastic-constants']
-    
+        
         calc['base-system'] = DM()
         calc['base-system']['artifact'] = DM()
         calc['base-system']['artifact']['file'] = results_dict['dumpfile_base']
@@ -136,5 +140,5 @@ def buildmodel(script, input_dict, results_dict=None):
                 K['coefficient']['unit'] = input_dict['pressure_unit']
                 K['ij'] = '%i %i' % (i+1, j+1)
                 calc['Stroh-K-tensor'].append(K)
-
+    
     return output

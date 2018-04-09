@@ -3,7 +3,8 @@
 # Python script created by Lucas Hale
 
 # Standard library imports
-from __future__ import division, absolute_import, print_function
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import uuid
@@ -33,7 +34,7 @@ record_style = 'calculation_dislocation_monopole'
 
 def main(*args):
     """Main function called when script is executed directly."""
-
+    
     # Read input file in as dictionary
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, allsingular=True)
@@ -62,11 +63,11 @@ def main(*args):
     # Save data model of results
     results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict,
                                results_dict)
-
+    
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)
-    
-def dislocationmonopole(lammps_command, system, potential, symbols, burgers,
+
+def dislocationmonopole(lammps_command, system, potential, burgers,
                         C, mpi_command=None, axes=None, randomseed=None,
                         etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000,
                         dmax=uc.set_in_units(0.01, 'angstrom'),
@@ -83,9 +84,6 @@ def dislocationmonopole(lammps_command, system, potential, symbols, burgers,
         The bulk system to add the defect to.
     potential : atomman.lammps.Potential
         The LAMMPS implemented potential to use.
-    symbols : list of str
-        The list of element-model symbols for the Potential that correspond to
-        system's atypes.
     burgers : list or numpy.array of float
         The burgers vector for the dislocation being added.
     C : atomman.ElasticConstants
@@ -153,23 +151,23 @@ def dislocationmonopole(lammps_command, system, potential, symbols, burgers,
     results_dict = {}
     
     # Save initial perfect system
-    am.lammps.atom_dump.dump(system, 'base.dump')
+    system.dump('atom_dump', 'base.dump')
     results_dict['dumpfile_base'] = 'base.dump'
-    results_dict['symbols_base'] = symbols
-
+    results_dict['symbols_base'] = system.symbols
+    
     # Solve Stroh method for dislocation
     stroh = am.defect.Stroh(C, burgers, axes=axes)
     results_dict['Stroh_preln'] = stroh.preln
     results_dict['Stroh_K_tensor'] = stroh.K_tensor
     
     # Generate dislocation system by displacing atoms
-    disp = stroh.displacement(system.atoms.view['pos'])
+    disp = stroh.displacement(system.atoms.pos)
     system.atoms.view['pos'] += disp
-
+    
     system.wrap()
     
     # Apply fixed boundary conditions
-    system, symbols = disl_boundary_fix(system, symbols, bwidth, bshape)
+    system = disl_boundary_fix(system, bwidth, bshape)
     
     # Relax system
     relaxed = disl_relax(lammps_command, system, potential, symbols,
@@ -181,12 +179,12 @@ def dislocationmonopole(lammps_command, system, potential, symbols, burgers,
                          maxeval = maxeval)
     
     # Save relaxed dislocation system with original box vects
-    system_disl = am.load('atom_dump', relaxed['dumpfile'])[0]
-
+    system_disl = am.load('atom_dump', relaxed['dumpfile'])
+    
     system_disl.box_set(vects=system.box.vects, origin=system.box.origin)
-    lmp.atom_dump.dump(system_disl, 'disl.dump')
+    system_disl.dump('atom_dump', 'disl.dump')
     results_dict['dumpfile_disl'] = 'disl.dump'
-    results_dict['symbols_disl'] = symbols
+    results_dict['symbols_disl'] = system_disl.symbols
     
     results_dict['E_total_disl'] = relaxed['E_total']
     
@@ -198,7 +196,7 @@ def dislocationmonopole(lammps_command, system, potential, symbols, burgers,
     
     return results_dict
 
-def disl_boundary_fix(system, symbols, bwidth, bshape='circle'):
+def disl_boundary_fix(system, bwidth, bshape='circle'):
     """
     Creates a boundary region by changing atom types.
     
@@ -216,8 +214,8 @@ def disl_boundary_fix(system, symbols, bwidth, bshape='circle'):
         'rect' (default is 'circle').
     """
     natypes = system.natypes
-    atypes = system.atoms_prop(key='atype')
-    pos = system.atoms_prop(key='pos')
+    atype = system.atoms_prop(key='atype')
+    pos = system.atoms.pos
     
     if bshape == 'circle':
         # Find x or y bound closest to 0
@@ -225,25 +223,25 @@ def disl_boundary_fix(system, symbols, bwidth, bshape='circle'):
                            abs(system.box.ylo), abs(system.box.yhi)])
         
         radius = smallest_xy - bwidth
-        xy_mag = np.linalg.norm(system.atoms_prop(key='pos')[:,:2], axis=1)        
-        atypes[xy_mag > radius] += natypes
+        xy_mag = np.linalg.norm(pos[:,:2], axis=1)
+        atype[xy_mag > radius] += natypes
     
     elif bshape == 'rect':
         index = np.unique(np.hstack((np.where(pos[:,0] < system.box.xlo + bwidth),
                                      np.where(pos[:,0] > system.box.xhi - bwidth),
                                      np.where(pos[:,1] < system.box.ylo + bwidth),
                                      np.where(pos[:,1] > system.box.yhi - bwidth))))
-        atypes[index] += natypes
-           
+        atype[index] += natypes
+    
     else:
         raise ValueError("Unknown boundary shape type! Enter 'circle' or 'rect'")
-
-    new_system = deepcopy(system)
-    new_system.atoms_prop(key='atype', value=atypes)
-    symbols = symbols * 2
     
-    return new_system, symbols
-        
+    new_system = deepcopy(system)
+    new_system.atoms.atype = atype
+    new_system.symbols = list(system.symbols) * 2
+    
+    return new_system
+
 def disl_relax(lammps_command, system, potential, symbols, 
                mpi_command=None, annealtemp=0.0, randomseed=None,
                etol=0.0, ftol=1e-6, maxiter=10000, maxeval=100000,
@@ -310,13 +308,13 @@ def disl_relax(lammps_command, system, potential, symbols,
     
     # Define lammps variables
     lammps_variables = {}
-    system_info = lmp.atom_data.dump(system, 'system.dat',
-                                     units=potential.units,
-                                     atom_style=potential.atom_style)
+    system_info = system.dump('atom_data', 'system.dat',
+                              units=potential.units,
+                              atom_style=potential.atom_style)
     lammps_variables['atomman_system_info'] = system_info
     lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
-    ann_info = anneal_info(annealtemp, randomseed, potential.units)
-    lammps_variables['anneal_info'] = ann_info
+    lammps_variables['anneal_info'] = anneal_info(annealtemp, randomseed,
+                                                  potential.units)
     lammps_variables['etol'] = etol
     lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])
     lammps_variables['maxiter'] = maxiter
@@ -340,7 +338,7 @@ def disl_relax(lammps_command, system, potential, symbols,
     with open(lammps_script, 'w') as f:
         f.write(iprPy.tools.filltemplate(template, lammps_variables,
                                          '<', '>'))
-
+    
     # Run LAMMPS
     output = lmp.run(lammps_command, lammps_script, mpi_command,
                      return_style='object')
@@ -387,7 +385,7 @@ def anneal_info(temperature=0.0, randomseed=None, units='metal'):
     else:
         if randomseed is None:
             randomseed = random.randint(1, 900000000)
-            
+        
         start_temp = 2 * temperature
         tdamp = 100 * lmp.style.timestep(units)
         timestep = lmp.style.timestep(units)
@@ -399,9 +397,9 @@ def anneal_info(temperature=0.0, randomseed=None, units='metal'):
             'thermo 10000',
             'run 10000',
             ])
-
-    return info
     
+    return info
+
 def process_input(input_dict, UUID=None, build=True):
     """
     Processes str input parameters, assigns default values if needed, and

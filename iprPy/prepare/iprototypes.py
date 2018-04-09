@@ -1,8 +1,12 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
-from ..tools import aslist
-
+# https://pandas.pydata.org/
 import pandas as pd
+
+# iprPy imports
+from ..tools import aslist
 
 def iprototypes(database, record_style='crystal_prototype', natypes=None,
                 name=None, spacegroup=None, crystalfamily=None, pearson=None):
@@ -47,23 +51,23 @@ def iprototypes(database, record_style='crystal_prototype', natypes=None,
     
     if natypes is not None:
         df = df[df.natypes.isin(aslist(natypes))]
-        
+    
     if crystalfamily is not None:
         df = df[df.crystal_family.isin(aslist(crystalfamily))]
-        
+    
     if pearson is not None:
         df = df[df.Pearson_symbol.isin(aslist(pearson))]
-        
+    
     if name is not None:
         df = df[(df.id.isin(aslist(name))) |
                 (df.name.isin(aslist(name))) |
                 (df.prototype.isin(aslist(name))) |
                 (df.Strukturbericht.isin(aslist(name))) ]
-        
+    
     if spacegroup is not None:
         df = df[(df.sg_HG.isin(aslist(spacegroup))) |
                 (df.sg_Schoen.isin(aslist(spacegroup))) |
                 (df.sg_number.isin(aslist(spacegroup)))]
-        
+    
     for proto_id in df.id.tolist():
         yield database.get_record(name=proto_id, style=record_style)

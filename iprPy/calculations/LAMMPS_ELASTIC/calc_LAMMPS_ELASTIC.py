@@ -4,7 +4,8 @@
 # Built around LAMMPS script by Steve Plimpton
 
 # Standard library imports
-from __future__ import division, absolute_import, print_function
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import uuid
@@ -71,11 +72,11 @@ def main(*args):
                                       maxeval = input_dict['maxevaluations'],
                                       dmax = input_dict['maxatommotion'],
                                       pressure_unit = input_dict['pressure_unit'])
-                                  
+    
     # Save data model of results
     results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict,
                                results_dict)
-
+    
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)
 
@@ -190,17 +191,12 @@ def lammps_ELASTIC_refine(lammps_command, system, potential, symbols,
             shutil.move(atom_dump, 'elastic-'+str(cycle)+'-config.dump')
         
         # Test if box dimensions have converged
-        if (np.isclose(old_results['a_lat'],
-                       new_results['a_lat'],
-                       rtol=tol, atol=0)
-          and
-            np.isclose(old_results['b_lat'],
-                       new_results['b_lat'],
-                       rtol=tol, atol=0)
-          and
-            np.isclose(old_results['c_lat'],
-                       new_results['c_lat'],
-                       rtol=tol, atol=0)):
+        if (    np.isclose(old_results['a_lat'], new_results['a_lat'],
+                           rtol=tol, atol=0)
+            and np.isclose(old_results['b_lat'], new_results['b_lat'],
+                           rtol=tol, atol=0)
+            and np.isclose(old_results['c_lat'], new_results['c_lat'],
+                           rtol=tol, atol=0)):
             converged = True
             break
         else:
@@ -216,7 +212,7 @@ def lammps_ELASTIC_refine(lammps_command, system, potential, symbols,
         return new_results
     else:
         raise RuntimeError('Failed to converge after 100 cycles')
-        
+
 def lammps_ELASTIC(lammps_command, system, potential, symbols,
                    mpi_command=None, ucell=None,
                    strainrange=1e-6, etol=0.0, ftol=0.0, maxiter=10000,
@@ -301,9 +297,9 @@ def lammps_ELASTIC(lammps_command, system, potential, symbols,
 
     # Define lammps variables
     lammps_variables = {}
-    system_info = lmp.atom_data.dump(system, 'init.dat',
-                                     units=potential.units,
-                                     atom_style=potential.atom_style)
+    system_info = system.dump('atom_data', 'init.dat',
+                              units=potential.units,
+                              atom_style=potential.atom_style)
     lammps_variables['atomman_system_info'] = system_info
     lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
     lammps_variables['strainrange'] = strainrange
@@ -360,14 +356,14 @@ def lammps_ELASTIC(lammps_command, system, potential, symbols,
     
     # Load relaxed system from dump file
     last_dump_file = 'atom.'+str(thermo.Step.values[-1])
-    results['system_relaxed'] = lmp.atom_dump.load(last_dump_file)
+    results['system_relaxed'] = am.load('atom_dump', last_dump_file)
     
     with open('log.lammps') as log_file:
         log = log_file.read()
     
     start = log.find('print "Elastic Constant C11all = ${C11all} ${cunits}"')
     lines = log[start+54:].split('\n')
-
+    
     Cdict = {}
     for line in lines:
         terms = line.split()
@@ -378,7 +374,7 @@ def lammps_ELASTIC(lammps_command, system, potential, symbols,
             
             Cdict[c_term] = uc.set_in_units(c_value, c_unit)
     results['C_elastic'] = am.ElasticConstants(**Cdict)
-                
+    
     return results
 
 def process_input(input_dict, UUID=None, build=True):
@@ -445,6 +441,6 @@ def process_input(input_dict, UUID=None, build=True):
     
     # Construct initialsystem by manipulating ucell system
     iprPy.input.systemmanipulate(input_dict, build=build)
-    
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

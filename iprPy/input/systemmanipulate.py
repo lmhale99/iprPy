@@ -1,8 +1,12 @@
-from __future__ import division, absolute_import, print_function
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 from copy import deepcopy
 
+# http://www.numpy.org/
 import numpy as np
+
+# https://github.com/usnistgov/atomman
 import atomman as am
 
 def systemmanipulate(input_dict, build=True, **kwargs):
@@ -95,9 +99,9 @@ def systemmanipulate(input_dict, build=True, **kwargs):
                           [sizemults[2], sizemults[3]],
                           [sizemults[4], sizemults[5]]]
         
-        else: 
+        else:
             raise ValueError('Invalid sizemults command')
-            
+    
     # Properly divide up sizemults if 3 terms given
     elif len(sizemults) == 3:
         for i in xrange(3):
@@ -121,31 +125,24 @@ def systemmanipulate(input_dict, build=True, **kwargs):
         # Extract ucell
         ucell = input_dict[kwargs['ucell']]
         
-        # Copy ucell to initialsystem
-        initialsystem = deepcopy(ucell)
-
         # Rotate to specified axes
-        try:
-            initialsystem = am.rotate_cubic(initialsystem, axes)
-        except:
-            if not np.allclose(axes, np.array([[1,0,0], [0,1,0], [0,0,1]])):
-                raise ValueError('Rotation of non-cubic systems not supported yet')
-
+        initialsystem = ucell.rotate(axes)
+        
         # Shift atoms by atomshift
         shift = list(np.array(atomshift.strip().split(), dtype=float))
         shift = (shift[0] * initialsystem.box.avect +
                  shift[1] * initialsystem.box.bvect +
                  shift[2] * initialsystem.box.cvect)
-        pos = initialsystem.atoms_prop(key='pos')
-        initialsystem.atoms_prop(key='pos', value=pos+shift)
-
+        initialsystem.atoms.pos += shift
+        
         # Apply sizemults
-        initialsystem.supersize(tuple(sizemults[0]), tuple(sizemults[1]),
-                                tuple(sizemults[2]))
+        initialsystem = initialsystem.supersize(tuple(sizemults[0]),
+                                                tuple(sizemults[1]),
+                                                tuple(sizemults[2]))
     
     else:
         initialsystem = None
-     
+    
     # Save processed terms
     input_dict[kwargs['x_axis']] = x_axis
     input_dict[kwargs['y_axis']] = y_axis

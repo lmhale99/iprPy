@@ -3,7 +3,8 @@
 # Python script created by Lucas Hale
 
 # Standard Python libraries
-from __future__ import print_function, division
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 from collections import OrderedDict
 import os
 import sys
@@ -21,7 +22,7 @@ from scipy.optimize import minimize_scalar
 # https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.unitconvert as uc
-from atomman.defect import peierlsnabarro_disregistry, SemiDiscretePeierlsNabarro
+from atomman.defect import pn_arctan_disregistry, SDVPN
 
 # https://github.com/usnistgov/iprPy
 import iprPy
@@ -69,11 +70,11 @@ def main(*args):
         results.json(fp=f, indent=4)
 
 def peierlsnabarro(alat, C, axes, burgers, gamma,
-                   cutofflongrange=uc.set_in_units(1000, 'Angstrom'),
+                   cutofflongrange=uc.set_in_units(1000, 'angstrom'),
                    tau=np.zeros((3,3)), alpha=[0.0], beta=np.zeros((3,3)),
                    cdiffelastic=False, cdiffgradient=True, cdiffstress=False,
                    fullstress=True,
-                   halfwidth=uc.set_in_units(1, 'Angstrom'),
+                   halfwidth=uc.set_in_units(1, 'angstrom'),
                    normalizedisreg=True,
                    xnum=None, xmax=None, xstep=None,
                    min_method='Powell', min_options={}):
@@ -96,28 +97,28 @@ def peierlsnabarro(alat, C, axes, burgers, gamma,
         xstep *= alat
     
     # Generate initial disregistry guess
-    x, idisreg = peierlsnabarro_disregistry(xmax=xmax, xstep=xstep, xnum=xnum,
-                                            burgers=b, halfwidth=halfwidth,
-                                            normalize=normalizedisreg)
+    x, idisreg = pn_arctan_disregistry(xmax=xmax, xstep=xstep, xnum=xnum,
+                                       burgers=b, halfwidth=halfwidth,
+                                       normalize=normalizedisreg)
     
     # Minimize disregistry
-    pnsolution = SemiDiscretePeierlsNabarro(x, idisreg, gamma, axes, Kij,
-                                            tau=tau, alpha=alpha, beta=beta,
-                                            cutofflongrange=cutofflongrange,
-                                            burgers=b,
-                                            fullstress=fullstress,
-                                            cdiffelastic=cdiffelastic,
-                                            cdiffgradient=cdiffgradient,
-                                            cdiffstress=cdiffstress,
-                                            min_method=min_method,
-                                            min_options=min_options)
+    pnsolution = SDVPN(x, idisreg, gamma, axes, Kij,
+                       tau=tau, alpha=alpha, beta=beta,
+                       cutofflongrange=cutofflongrange,
+                       burgers=b,
+                       fullstress=fullstress,
+                       cdiffelastic=cdiffelastic,
+                       cdiffgradient=cdiffgradient,
+                       cdiffstress=cdiffstress,
+                       min_method=min_method,
+                       min_options=min_options)
     
     # Initialize results dict
     results_dict = {}
     results_dict['SDPN_solution'] = pnsolution
     
     return results_dict
-        
+
 def process_input(input_dict, UUID=None, build=True):
     """
     Processes str input parameters, assigns default values if needed, and
@@ -172,22 +173,22 @@ def process_input(input_dict, UUID=None, build=True):
     # These are calculation-specific default floats with units
     input_dict['beta_xx'] = iprPy.input.value(input_dict, 'beta_xx',
                                     default_unit=pl_unit,
-                                    default_term='0.0 GPa*Angstrom')
+                                    default_term='0.0 GPa*angstrom')
     input_dict['beta_xy'] = iprPy.input.value(input_dict, 'beta_xy',
                                     default_unit=pl_unit,
-                                    default_term='0.0 GPa*Angstrom')
+                                    default_term='0.0 GPa*angstrom')
     input_dict['beta_xz'] = iprPy.input.value(input_dict, 'beta_xz',
                                     default_unit=pl_unit,
-                                    default_term='0.0 GPa*Angstrom')
+                                    default_term='0.0 GPa*angstrom')
     input_dict['beta_yy'] = iprPy.input.value(input_dict, 'beta_yy',
                                     default_unit=pl_unit,
-                                    default_term='0.0 GPa*Angstrom')
+                                    default_term='0.0 GPa*angstrom')
     input_dict['beta_yz'] = iprPy.input.value(input_dict, 'beta_yz',
                                     default_unit=pl_unit,
-                                    default_term='0.0 GPa*Angstrom')
+                                    default_term='0.0 GPa*angstrom')
     input_dict['beta_zz'] = iprPy.input.value(input_dict, 'beta_zz',
                                     default_unit=pl_unit,
-                                    default_term='0.0 GPa*Angstrom')
+                                    default_term='0.0 GPa*angstrom')
     input_dict['tau_xy'] = iprPy.input.value(input_dict, 'tau_xy',
                                     default_unit=input_dict['pressure_unit'],
                                     default_term='0.0 GPa')
@@ -199,11 +200,11 @@ def process_input(input_dict, UUID=None, build=True):
                                     default_term='0.0 GPa')
     input_dict['halfwidth'] = iprPy.input.value(input_dict, 'halfwidth',
                                     default_unit=input_dict['length_unit'],
-                                    default_term='1.0 Angstrom')
+                                    default_term='1.0 angstrom')
     input_dict['cutofflongrange'] = iprPy.input.value(input_dict,
                                     'cutofflongrange',
                                     default_unit=input_dict['length_unit'],
-                                    default_term='1000 Angstrom')
+                                    default_term='1000 angstrom')
     
     # Process tau
     txy = input_dict['tau_xy']

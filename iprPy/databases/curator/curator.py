@@ -1,19 +1,24 @@
-from __future__ import division, absolute_import, print_function
-
-__all__ = ['initialize', 'iget_records', 'get_records', 'get_record',
-           'add_record', 'update_record', 'delete_record', 'add_tar',
-           'get_tar']
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import shutil
 import tarfile
 from io import BytesIO
 
-import mdcs 
+# ADD INFO
+import mdcs
+
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# iprPy imports
 from iprPy.tools import iaslist
 from iprPy import Record
+
+__all__ = ['initialize', 'iget_records', 'get_records', 'get_record',
+           'add_record', 'update_record', 'delete_record', 'add_tar',
+           'get_tar']
 
 def initialize(host, user=None, pswd=None, cert=None):
     """
@@ -319,7 +324,7 @@ def add_tar(database_info, record=None, name=None, style=None, root_dir=None):
         If style and/or name content given with record or the record already
         has an archive.
     """
-
+    
     # Create Record object if not given
     if record is None:
         record = get_record(database_info, name=name, style=style)
@@ -363,7 +368,6 @@ def add_tar(database_info, record=None, name=None, style=None, root_dir=None):
     
     # Remove local archive copy
     os.remove(record.name+'.tar.gz')
-    
 
 def get_tar(database_info, record=None, name=None, style=None, raw=False):
     """
@@ -419,4 +423,3 @@ def get_tar(database_info, record=None, name=None, style=None, raw=False):
         return tardata
     else:
         return tarfile.open(fileobj = BytesIO(tardata))
-    

@@ -3,7 +3,8 @@
 # Python script created by Lucas Hale
 
 # Standard library imports
-from __future__ import division, absolute_import, print_function
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import uuid
@@ -32,7 +33,7 @@ record_style = 'calculation_point_defect_formation'
 
 def main(*args):
     """Main function called when script is executed directly."""
-
+    
     # Read input file in as dictionary
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, allsingular=True)
@@ -54,7 +55,7 @@ def main(*args):
                                dmax = input_dict['maxatommotion'])
     
     # Run check_ptd_config
-    cutoff = 1.05*input_dict['ucell'].box.a
+    cutoff = 1.05 * input_dict['ucell'].box.a
     results_dict.update(check_ptd_config(results_dict['system_ptd'],
                                          input_dict['point_kwargs'],
                                          cutoff))
@@ -62,7 +63,7 @@ def main(*args):
     # Save data model of results
     results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict,
                                results_dict)
-
+    
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)
 
@@ -138,9 +139,9 @@ def pointdefect(lammps_command, system, potential, symbols, point_kwargs,
     
     # Define lammps variables
     lammps_variables = {}
-    system_info = lmp.atom_data.dump(system, 'perfect.dat',
-                                     units=potential.units,
-                                     atom_style=potential.atom_style)
+    system_info = system.dump('atom_data', 'perfect.dat',
+                              units=potential.units,
+                              atom_style=potential.atom_style)
     lammps_variables['atomman_system_info'] = system_info
     lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
     lammps_variables['etol'] = etol
@@ -178,10 +179,10 @@ def pointdefect(lammps_command, system, potential, symbols, point_kwargs,
     
     # Load relaxed system from dump file and copy old box vectors because 
     # dump files crop the values.
-    last_dump_file = 'atom.'+str(thermo.Step.values[-1])
-    system_base = lmp.atom_dump.load(last_dump_file)
+    last_dump_file = 'atom.' + str(thermo.Step.values[-1])
+    system_base = am.load('atom_dump', last_dump_file)
     system_base.box_set(vects=system.box.vects)
-    lmp.atom_dump.dump(system_base, 'perfect.dump')
+    system_base.dump('atom_dump', 'perfect.dump')
     
     # Add defect(s)
     system_ptd = deepcopy(system_base)
@@ -191,16 +192,16 @@ def pointdefect(lammps_command, system, potential, symbols, point_kwargs,
         system_ptd = am.defect.point(system_ptd, **pkwargs)
     
     # Update lammps variables
-    system_info = lmp.atom_data.dump(system_ptd, 'defect.dat',
-                                     units = potential.units, 
-                                     atom_style = potential.atom_style)
+    system_info = system_ptd.dump('atom_data', 'defect.dat',
+                                  units = potential.units, 
+                                  atom_style = potential.atom_style)
     lammps_variables['atomman_system_info'] = system_info
     
     # Write lammps input script
     with open(lammps_script, 'w') as f:
         f.write(iprPy.tools.filltemplate(template, lammps_variables,
                                          '<', '>'))
-
+    
     # Run lammps
     output = lmp.run(lammps_command, lammps_script, mpi_command)
     
@@ -215,9 +216,9 @@ def pointdefect(lammps_command, system, potential, symbols, point_kwargs,
     # Load relaxed system from dump file and copy old vects as 
     # the dump files crop the values
     last_dump_file = 'atom.'+str(thermo.Step.values[-1])
-    system_ptd = lmp.atom_dump.load(last_dump_file)
+    system_ptd = am.load('atom_dump', last_dump_file)
     system_ptd.box_set(vects=system.box.vects)
-    lmp.atom_dump.dump(system_ptd, 'defect.dump')
+    system_ptd.dump('atom_dump', 'defect.dump')
     
     # Compute defect formation energy
     E_ptd_f = E_total_ptd - E_coh * system_ptd.natoms
@@ -301,7 +302,7 @@ def check_ptd_config(system, point_kwargs, cutoff,
     has_reconfigured = False
     
     # Calculate distance of all atoms from defect position
-    pos_vects = system.dvect(system.atoms.view['pos'], pos) 
+    pos_vects = system.dvect(system.atoms.pos, pos) 
     pos_mags = np.linalg.norm(pos_vects, axis=1)
     
     # Calculate centrosummation by summing up the positions of the close atoms
@@ -330,7 +331,7 @@ def check_ptd_config(system, point_kwargs, cutoff,
         
         if not np.allclose(db_vect_shift, np.zeros(3), atol=tol):
             has_reconfigured = True
-    
+        
         return {'has_reconfigured': has_reconfigured,
                 'centrosummation': centrosummation,
                 'db_vect_shift': db_vect_shift}
@@ -372,7 +373,7 @@ def process_input(input_dict, UUID=None, build=True):
     input_dict['sizemults'] = input_dict.get('sizemults', '5 5 5')
     input_dict['forcetolerance'] = input_dict.get('forcetolerance',
                                                   '1.0e-6 eV/angstrom')
-                                                  
+    
     # These are calculation-specific default booleans
     # None for this calculation
     
@@ -402,6 +403,6 @@ def process_input(input_dict, UUID=None, build=True):
     
     # Construct initialsystem by manipulating ucell system
     iprPy.input.systemmanipulate(input_dict, build=build)
-                
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

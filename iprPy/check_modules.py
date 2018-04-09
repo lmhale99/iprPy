@@ -1,9 +1,11 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# iprPy imports
 from .calculations import failed_calculations
 from .records import failed_records
 from .databases import failed_databases
-
 from . import calculation_styles
 from . import record_styles
 from . import database_styles
@@ -13,7 +15,7 @@ __all__ = ['check_modules']
 def check_modules():
     """
     Prints lists of the calculation, record, and database styles that were
-    sucessfully and unsucessfully loaded when iprPy was initialized.
+    successfully and unsuccessfully loaded when iprPy was initialized.
     """
     
     print('calculations that passed import:')

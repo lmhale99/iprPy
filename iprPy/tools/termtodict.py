@@ -1,5 +1,8 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# iprPy imports
 from .aslist import aslist
 
 def termtodict(term, keys):

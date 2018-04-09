@@ -1,14 +1,19 @@
-from __future__ import division, absolute_import, print_function
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 
+# http://www.numpy.org/
 import numpy as np
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.unitconvert as uc
 
+# iprPy imports
 from ..tools import termtodict
 
 def systemload(input_dict, build=True, **kwargs):
@@ -88,7 +93,7 @@ def systemload(input_dict, build=True, **kwargs):
     # Build ucell
     if build is True:
         # Load ucell and symbols
-        ucell, symbols = am.load(load_style, load_file, **load_options_kwargs)
+        ucell = am.load(load_style, load_file, **load_options_kwargs)
         
         # Scale ucell by box_parameters
         if box_parameters is not None:
@@ -125,11 +130,10 @@ def systemload(input_dict, build=True, **kwargs):
     # Don't build ucell 
     else:
         ucell = None
-        symbols = [None]
-
+    
     # Replace symbols with symbolsgiven
-    if symbolsgiven is not None: 
-        symbols = symbolsgiven.split()
+    if symbolsgiven is not None:
+        ucell.symbols = symbolsgiven.split()
         
     # Extract system_family (and possibly symbols) from system_model
     if load_style == 'system_model':

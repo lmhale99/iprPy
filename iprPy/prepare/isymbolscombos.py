@@ -1,7 +1,15 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# http://www.numpy.org/
 import numpy as np
+
+# https://github.com/usnistgov/atomman
 import atomman.lammps as lmp
+
+# iprPy imports
+from ..compatibility import range
 
 def isymbolscombos(prototype, potential):
     """
@@ -31,7 +39,7 @@ def iterbox(a, b):
     """
     Yields lists of integers of length b where each term is in range 0-a.
     """
-    for i in xrange(a):
+    for i in range(a):
         if b > 1:
             for j in iterbox(a,b-1):
                 yield [i] + j

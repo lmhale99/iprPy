@@ -1,5 +1,8 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# https://github.com/usnistgov/atomman
 import atomman.unitconvert as uc
 
 def value(input_dict, key, default_unit=None, default_term=None):

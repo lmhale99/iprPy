@@ -3,7 +3,8 @@
 # Python script created by Lucas Hale
 
 # Standard Python libraries
-from __future__ import print_function, division
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 from collections import OrderedDict
 import os
 import sys
@@ -18,10 +19,11 @@ import pandas as pd
 # https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.unitconvert as uc
-from atomman.defect import SemiDiscretePeierlsNabarro
+from atomman.defect import SDVPN
 
 # https://github.com/usnistgov/iprPy
 import iprPy
+from iprPy.compatibility import range
 
 # Define calc_style and record_style
 calc_style = 'dislocation_Peierls_Nabarro_stress'

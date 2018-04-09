@@ -1,9 +1,14 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# http://www.numpy.org/
 import numpy as np
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# iprPy imports
 from .boolean import boolean
 
 def pointdefect(input_dict, build=True, **kwargs):
@@ -86,7 +91,7 @@ def pointdefect(input_dict, build=True, **kwargs):
         
         # Load defect model
         pointdefect_model = DM(pointdefect_model).find('point-defect')
-            
+        
         # Save raw parameters
         calculation_params = pointdefect_model['calculation-parameter']
     

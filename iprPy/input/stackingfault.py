@@ -1,9 +1,14 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# http://www.numpy.org/
 import numpy as np
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# https://github.com/usnistgov/atomman
 import atomman as am
 
 def stackingfault1(input_dict, **kwargs):
@@ -107,8 +112,7 @@ def stackingfault1(input_dict, **kwargs):
         
     # Save processed terms
     input_dict[kwargs['stackingfault_model']] = stackingfault_model
-    
-    
+
 def stackingfault2(input_dict, build=True, **kwargs):
     """
     Interprets calculation parameters associated with a stacking-fault record.
@@ -213,12 +217,12 @@ def stackingfault2(input_dict, build=True, **kwargs):
         # For even m, initial position of 0.0 goes to 0.5
         else:
             faultpos = (2 * stackingfault_faultpos + m) / (2 * m)
-
+    
     else:
         faultpos = None
         shiftvector1 = None
         shiftvector2 = None
-            
+    
     # Save processed terms
     input_dict[kwargs['faultpos']] = faultpos
     input_dict[kwargs['shiftvector1']] = shiftvector1

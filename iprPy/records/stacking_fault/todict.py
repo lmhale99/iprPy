@@ -1,9 +1,8 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
-__all__ = ['todict']
-
-import numpy as np
-
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
 def todict(record, full=True, flat=False):
@@ -24,7 +23,7 @@ def todict(record, full=True, flat=False):
         values, which is useful for comparisons.  If False, the term
         values can be of any data type, which is convenient for analysis.
         (Default is False).
-        
+    
     Returns
     -------
     dict
@@ -32,7 +31,7 @@ def todict(record, full=True, flat=False):
     """
     
     model = DM(record)
-
+    
     proto = model['stacking-fault']
     params = {}
     params['key'] = proto['key']

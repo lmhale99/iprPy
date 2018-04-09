@@ -5,15 +5,17 @@ iprPy.highthroughput.settings
 Collects functions that interact with the .iprPy settings file allowing
 database and run_directory information to be stored and easily accessed.
 """
-
-from __future__ import division, absolute_import, print_function
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
+
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
-from iprPy import Database, rootdir
-from iprPy.tools import screen_input
+from .. import Database, rootdir
+from ..tools import screen_input
 
 __all__ = ['get_database', 'set_database', 'unset_database',
            'get_run_directory', 'set_run_directory', 'unset_run_directory']
@@ -23,27 +25,27 @@ settingsfile = os.path.join(rootdir, '.iprPy')
 def load_settings():
     """Loads the .iprPy settings file."""
     
-    #Load settings file if it exists
-    try:
+    # Load settings file if it exists
+    if os.path.isfile(settingsfile):
         with open(settingsfile, 'r') as f:
             settings = DM(f)
     
-    #Create a new settings file if it doesn't exist
-    except:
+    # Create a new settings file if it doesn't exist
+    else:
         settings = DM()
         settings['iprPy-defined-parameters'] = DM()
         save_settings(settings)
-            
+    
     return settings
 
 def save_settings(settings):
     """Saves to the .iprPy settings file."""
     
-    #Verify settings is appropriate
+    # Verify settings is appropriate
     if not isinstance(settings, DM) or settings.keys()[0] != 'iprPy-defined-parameters':
         raise ValueError('Invalid settings')
     
-    #Save
+    # Save
     with open(settingsfile, 'w') as f:
         settings.json(fp=f, indent=4)
     
@@ -62,10 +64,10 @@ def get_database(name=None):
         The identified database.
     """
     
-    #Get information from settings file
+    # Get information from settings file
     settings = load_settings()
     
-    #Ask for name if not given
+    # Ask for name if not given
     if name is None:
         databases = settings['iprPy-defined-parameters'].aslist('database')
         if len(databases) > 0:
@@ -81,15 +83,15 @@ def get_database(name=None):
                 name = databases[choice-1]['name']
         else:
             print('No databases currently set')
-            sys.exit()
+            return
     
-    #Get the appropriate database
+    # Get the appropriate database
     try:
         database_settings = settings.find('database', yes={'name':name})
     except:
         raise ValueError('Database '+ name + ' not found')
     
-    #Extract parameters
+    # Extract parameters
     style = database_settings['style']
     host = database_settings['host']
     params = {}
@@ -97,9 +99,9 @@ def get_database(name=None):
         key = param.keys()[0]
         params[key] = param[key]
     
-    #Load database
+    # Load database
     return Database(style, host, **params)
-        
+
 def set_database(name=None, style=None, host=None):
     """
     Allows for database information to be defined in the settings file. Screen
@@ -119,28 +121,28 @@ def set_database(name=None, style=None, host=None):
         located. If not given, the user will be prompted to enter one.
     """
     
-    #Get information from the settings file
+    # Get information from the settings file
     settings = load_settings()
     
-    #Find existing database definitions
+    # Find existing database definitions
     databases = settings['iprPy-defined-parameters'].aslist('database')
     
-    #Ask for name if not given
+    # Ask for name if not given
     if name is None:
         name = screen_input('Enter a name for the database:')
-        
-    #Load database if it exists
-    try: 
+    
+    # Load database if it exists
+    try:
         database_settings = settings.find('database', yes={'name':name})
-
-    #Create new database entry if it doesn't exist
-    except: 
+    
+     #Create new database entry if it doesn't exist
+    except:
         database_settings = DM()
         settings['iprPy-defined-parameters'].append('database',
                                                     database_settings)
         database_settings['name'] = name
     
-    #Ask if existing database should be overwritten
+    # Ask if existing database should be overwritten
     else: 
         print('Database', name, 'already defined.')
         option = screen_input('Overwrite? (yes or no):')
@@ -150,8 +152,8 @@ def set_database(name=None, style=None, host=None):
             return None
         else: 
             raise ValueError('Invalid choice')
-            
-    #Ask for style if not given
+    
+    # Ask for style if not given
     if style is None: 
         style = screen_input("Enter the database's style:")
     database_settings['style'] = style
@@ -170,7 +172,7 @@ def set_database(name=None, style=None, host=None):
             break
         value = screen_input('value:')
         database_settings.append('params', DM([(key, value)]))
-        
+    
     save_settings(settings)
 
 def unset_database(name=None):
@@ -182,12 +184,12 @@ def unset_database(name=None):
     name : str
         The name assigned to a pre-defined database.
     """
-    #Get information from settings file
+    # Get information from settings file
     settings = load_settings()
     
     databases = settings['iprPy-defined-parameters'].aslist('database')
     
-    #Ask for name if not given
+    # Ask for name if not given
     if name is None:
         
         if len(databases) > 0:
@@ -205,7 +207,7 @@ def unset_database(name=None):
             print('No databases currently set')
             sys.exit()
     
-    #Verify listed name exists
+    # Verify listed name exists
     else:
         try:
             database_settings = settings.find('database', yes={'name':name})
@@ -226,7 +228,7 @@ def unset_database(name=None):
             
         save_settings(settings)
         print('Settings for database', name, 'successfully deleted')
-    
+
 def get_run_directory(name=None):
     """
     Loads a pre-defined run_directory from the settings file.
@@ -241,13 +243,12 @@ def get_run_directory(name=None):
     str
         The path to the identified run_directory.
     """
-    
-    #Get information from settings file
+    # Get information from settings file
     settings = load_settings()
     
     run_directories = settings['iprPy-defined-parameters'].aslist('run_directory')
     
-    #Ask for name if not given
+    # Ask for name if not given
     if name is None:
         if len(run_directories) > 0:
             print('Select a run_directory:')
@@ -269,9 +270,9 @@ def get_run_directory(name=None):
     except:
         raise ValueError('run_directory '+ name + ' not found')
     
-    #Extract parameters
+    # Extract parameters
     return run_directory_settings['path']
-        
+
 def set_run_directory(name=None, path=None):
     """
     Allows for run_directory information to be defined in the settings file.
@@ -286,39 +287,45 @@ def set_run_directory(name=None, path=None):
         be prompted to enter one.
     """
     
-    #Get information from the settings file
+    # Get information from the settings file
     settings = load_settings()
     
-    #Find existing run_directory definitions
+    # Find existing run_directory definitions
     run_directories = settings['iprPy-defined-parameters'].aslist('run_directory')
     
-    #Ask for name if not given
+    # Ask for name if not given
     if name is None:
         name = screen_input('Enter a name for the run_directory:')
         
-    #Load run_directory if it exists
-    try: run_directory_settings = settings.find('run_directory', yes={'name':name})
+    # Load run_directory if it exists
+    try: 
+        run_directory_settings = settings.find('run_directory',
+                                               yes={'name':name})
     
-    #Create new run_directory entry if it doesn't exist    
+    # Create new run_directory entry if it doesn't exist
     except: 
         run_directory_settings = DM()
         settings['iprPy-defined-parameters'].append('run_directory', run_directory_settings)
         run_directory_settings['name'] = name
     
-    #Ask if existing run_directory should be overwritten    
+    # Ask if existing run_directory should be overwritten    
     else: 
         print('run_directory', name, 'already defined.')
         option = screen_input('Overwrite? (yes or no):')
-        if option in ['yes', 'y']:  pass
-        elif option in ['no', 'n']: return None
-        else: raise ValueError('Invalid choice')
-            
-    #Ask for path if not given
-    if path is None: path = screen_input("Enter the run_directory's path:")
-    run_directory_settings['path'] = path
-        
-    save_settings(settings)
+        if option in ['yes', 'y']:
+            pass
+        elif option in ['no', 'n']:
+            return None
+        else:
+            raise ValueError('Invalid choice')
     
+    # Ask for path if not given
+    if path is None:
+        path = screen_input("Enter the run_directory's path:")
+    run_directory_settings['path'] = path
+    
+    save_settings(settings)
+
 def unset_run_directory(name=None):
     """
     Deletes the settings for a pre-defined run_directory from the settings
@@ -330,12 +337,11 @@ def unset_run_directory(name=None):
         The name assigned to a pre-defined run_directory.
     """
     
-    #Get information from settings file
+    # Get information from settings file
     settings = load_settings()
-    
     run_directories = settings['iprPy-defined-parameters'].aslist('run_directory')
     
-    #Ask for name if not given
+    # Ask for name if not given
     if name is None:
         if len(run_directories) > 0:
             print('Select a run_directory:')
@@ -352,10 +358,11 @@ def unset_run_directory(name=None):
             print('No run_directories currently set')
             sys.exit()
     
-    #Verify listed name exists
+    # Verify listed name exists
     else:
         try:
-            run_directory_settings = settings.find('run_directory', yes={'name':name})
+            run_directory_settings = settings.find('run_directory',
+                                                   yes={'name':name})
         except:
             raise ValueError('run_directory '+ name + ' not found')
     
@@ -370,6 +377,6 @@ def unset_run_directory(name=None):
                 if run_directory['name'] != name:
                     new.append('run_directory', run_directory)
             settings['iprPy-defined-parameters']['run_directory'] = new['run_directory']
-            
+        
         save_settings(settings)
         print('Settings for run_directory', name, 'successfully deleted')

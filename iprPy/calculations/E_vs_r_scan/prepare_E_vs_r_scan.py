@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
-# Standard library imports
-from __future__ import division, absolute_import, print_function
+# Python script created by Lucas Hale
+
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import glob
@@ -33,7 +36,7 @@ def main(*args):
     # Read input script
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, singularkeys=singularkeys())
-
+    
     # Open database
     dbase = iprPy.database_fromdict(input_dict)
     
@@ -63,7 +66,7 @@ def prepare(dbase, run_directory, **kwargs):
     
     # Build record_df
     record_df = dbase.get_records_df(style=record_style, full=False, flat=True)
-
+    
     # Loop over all potentials
     for pot_record in iprPy.prepare.ipotentials(dbase,
                           element=kwargs.get('potential_element', None),
@@ -82,7 +85,7 @@ def prepare(dbase, run_directory, **kwargs):
                                crystalfamily=kwargs.get('prototype_crystalfamily', None),
                                pearson=kwargs.get('prototype_Pearsonsymbol',
                                                   None)):
-
+            
             # Iterate over all combinations of potentials, prototypes and symbols
             for symbols in iprPy.prepare.isymbolscombos(proto_record,
                                                         pot_record):
@@ -100,9 +103,9 @@ def prepare(dbase, run_directory, **kwargs):
                 calc_dict['load_file'] = proto_record.name+'.xml'
                 calc_dict['load_style'] = 'system_model'
                 calc_dict['load_content'] = proto_record.content
-
+                
                 calc_dict['symbols'] = ' '.join(symbols)
-
+                
                 for key in singularkeys():
                     if key in kwargs:
                         calc_dict[key] = kwargs[key]
@@ -118,7 +121,7 @@ def prepare(dbase, run_directory, **kwargs):
                 
                 # Check if record is new
                 if new_record.isnew(record_df=record_df):
-                
+                    
                     # Assign '' to any unassigned keys
                     for key in unusedkeys()+singularkeys()+multikeys():
                         if key not in calc_dict:
@@ -135,15 +138,15 @@ def prepare(dbase, run_directory, **kwargs):
                     inputfile = iprPy.tools.filltemplate(calculation.template, calc_dict, '<', '>')
                     with open(os.path.join(calc_directory, 'calc_' + calc_style + '.in'), 'w') as f:
                         f.write(inputfile)
-
+                    
                     # Add calculation files to calculation folder
                     for calc_file in calculation.files:
-                        shutil.copy(calc_file, calc_directory)  
+                        shutil.copy(calc_file, calc_directory)
                     
                     # Add potential record file to calculation folder
                     with open(os.path.join(calc_directory, pot_record.name+'.xml'), 'w') as f:
                         f.write(pot_record.content)
-                        
+                    
                     # Extract potential's tar files to calculation folder
                     pot_tar.extractall(calc_directory)
                     
@@ -168,7 +171,7 @@ def unusedkeys():
             'z_axis',
             'atomshift',
            ]
-    
+
 def singularkeys():
     """
     The prepare input parameters that can be assigned only one value.
@@ -193,7 +196,7 @@ def singularkeys():
             'energy_unit',
             'force_unit',
            ]
-            
+
 def multikeys():
     """
     The prepare input parameters that can be assigned multiple values.
@@ -213,6 +216,6 @@ def multikeys():
             'prototype_crystalfamily',
             'prototype_Pearsonsymbol',
            ]
-            
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

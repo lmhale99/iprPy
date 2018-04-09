@@ -5,8 +5,8 @@ rootdir : str
     The absolute path to the iprPy package's root directory used to locate
     contained data files.
 """
+# Standard Python libraries
 from __future__ import division, absolute_import, print_function
-
 import os
 
 # Read version from VERSION file
@@ -18,28 +18,28 @@ __all__ = ['__version__', 'rootdir', 'tools', 'calculations', 'records',
 
 # Define root package directory
 rootdir = os.path.dirname(os.path.abspath(__file__))
-    
-# Basic submodule imports
+
+# iprPy imports
+from . import compatibility
 from . import tools
 
-# Modular submodule imports
 from . import calculations
-from . import calculation_functions
 from .calculation_functions import *
+from .calculation_functions import __all__ as calculation_functions_all
+__all__.extend(calculation_functions_all)
+
 from . import records
-from . import record_functions
 from .record_functions import *
+from .record_functions import __all__ as record_functions_all
+__all__.extend(record_functions_all)
+
 from . import databases
-from . import database_functions
 from .database_functions import *
+from .database_functions import __all__ as database_functions_all
+__all__.extend(database_functions_all)
 
 from .check_modules import check_modules
 from . import prepare
 from . import input
 from . import highthroughput
-
-__all__.extend(calculation_functions.__all__)
-__all__.extend(record_functions.__all__)
-__all__.extend(database_functions.__all__)
 __all__.sort()
-

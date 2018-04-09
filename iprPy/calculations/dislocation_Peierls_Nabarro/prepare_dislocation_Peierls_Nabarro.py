@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
-# Standard library imports
-from __future__ import division, absolute_import, print_function
+# Python script created by Lucas Hale
+
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import glob
@@ -213,7 +216,7 @@ def unusedkeys():
                                         'C55', 'C56',
                                                'C66',
            ]
-    
+
 def singularkeys():
     """
     The prepare input parameters that can be assigned only one value.
@@ -270,6 +273,6 @@ def multikeys():
             'dislocation_name',
             'stackingfault_name'
            ]
-            
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

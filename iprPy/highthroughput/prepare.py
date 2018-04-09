@@ -1,7 +1,10 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import sys
 
+# https://github.com/usnistgov/iprPy
 import iprPy
 
 def main(*args):
@@ -21,11 +24,12 @@ def main(*args):
     
     # Call prepare
     prepare(dbase, run_directory, calc_style=calc_style, input_dict=input_dict)
-    
-def prepare(dbase, run_directory, input_file=None, calc_style=None, input_dict=None):
+
+def prepare(dbase, run_directory, input_file=None, calc_style=None,
+            input_dict=None):
     """High-throughput calculation master prepare script"""
-        
-    # read input_file if needed
+    
+    # Read input_file if needed
     if input_dict is None and input_file is not None: 
         with open(input_file) as f:
             input_dict = iprPy.tools.parseinput(f)
@@ -35,7 +39,7 @@ def prepare(dbase, run_directory, input_file=None, calc_style=None, input_dict=N
         raise ValueError('Either input_file or input_dict must be given')
     elif input_dict is not None and input_file is not None: 
         raise ValueError('Cannot give both input_file and input_dict')
-            
+    
     # Extract calc_style from input_dict if needed
     if calc_style is None:
         calc_style = input_dict.pop('calculation_style')
@@ -47,7 +51,7 @@ def prepare(dbase, run_directory, input_file=None, calc_style=None, input_dict=N
             raise ValueError('Multiple terms found for singular key '+key)
     
     calc.prepare(dbase, run_directory, **input_dict)
-    
+
 def process_input(input_dict):
     """
     Processes the input parameter terms.
@@ -57,10 +61,8 @@ def process_input(input_dict):
     input_dict : dict
         Dictionary of input parameter terms.
     """
-    
     input_dict['dbase'] = iprPy.database_fromdict(input_dict)
     input_dict['run_directory'] = os.path.abspath(input_dict['run_directory'])
-        
-    
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

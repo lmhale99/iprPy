@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
-# Standard library imports
-from __future__ import division, absolute_import, print_function
+# Python script created by Lucas Hale
+
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import glob
@@ -22,6 +25,7 @@ import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/iprPy
 import iprPy
+from iprPy.compatibility import range
 
 # Define calc_style and record_style
 calc_style = 'refine_structure'
@@ -29,7 +33,7 @@ record_style = 'calculation_system_relax'
 
 def main(*args):
     """Main function called when script is executed directly."""
-
+    
     # Read input script
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, singularkeys=singularkeys())
@@ -42,7 +46,7 @@ def main(*args):
     
     # Call prepare
     prepare(dbase, run_directory, **input_dict)
-    
+
 def prepare(dbase, run_directory, **kwargs):
     """
     High-throughput prepare function for the calculation.
@@ -94,9 +98,9 @@ def prepare(dbase, run_directory, **kwargs):
         else:
             pot_tar = dbase.get_tar(pot_record)
             pot_tar_dict[parent_dict['potential_LAMMPS_id']] = pot_tar
-            
+        
         # Loop over number_min_states
-        for i in xrange(parent_dict['number_min_states']):
+        for i in range(parent_dict['number_min_states']):
             if i == 0:
                 load_options = 'key minimum-atomic-system'
             else:
@@ -120,13 +124,13 @@ def prepare(dbase, run_directory, **kwargs):
                 calc_dict['load_style'] = 'system_model'
                 calc_dict['load_content'] = parent_record.content
                 calc_dict['load_options'] = load_options
-
+                
                 calc_dict['strainrange'] = strainrange
                 
                 for key in singularkeys():
                     if key in kwargs:
                         calc_dict[key] = kwargs[key]
-                        
+                
                 # Build incomplete record
                 input_dict = deepcopy(calc_dict)
                 calculation.process_input(input_dict, calc_key, build=False)
@@ -139,7 +143,7 @@ def prepare(dbase, run_directory, **kwargs):
                 
                 # Check if record is new
                 if new_record.isnew(record_df=record_df):
-                
+                    
                     # Assign '' to any unassigned keys
                     for key in unusedkeys()+singularkeys()+multikeys():
                         if key not in calc_dict:
@@ -156,7 +160,7 @@ def prepare(dbase, run_directory, **kwargs):
                     inputfile = iprPy.tools.filltemplate(calculation.template, calc_dict, '<', '>')
                     with open(os.path.join(calc_directory, 'calc_' + calc_style + '.in'), 'w') as f:
                         f.write(inputfile)
-
+                    
                     # Add calculation files to calculation folder
                     for calc_file in calculation.files:
                         shutil.copy(calc_file, calc_directory)
@@ -164,14 +168,14 @@ def prepare(dbase, run_directory, **kwargs):
                     # Add potential record file to calculation folder
                     with open(os.path.join(calc_directory, pot_record.name+'.xml'), 'w') as f:
                         f.write(pot_record.content)
-                        
+                    
                     # Extract potential's tar files to calculation folder
                     pot_tar.extractall(calc_directory)
                     
                     # Add parent record file to calculation folder
                     with open(os.path.join(calc_directory, parent_record.name+'.xml'), 'w') as f:
                         f.write(parent_record.content)
- 
+
 def unusedkeys():
     """
     The calculation input parameters that are not prepare input parameters.
@@ -229,6 +233,6 @@ def multikeys():
             'family_name',
             'strainrange',
            ]
-            
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

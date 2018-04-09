@@ -2,8 +2,9 @@
 
 # Python script created by Lucas Hale
 
-# Standard library imports
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import uuid
@@ -24,6 +25,7 @@ import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/iprPy
 import iprPy
+from iprPy.compatibility import range
 
 # Define calc_style and record_style
 calc_style = 'E_vs_r_scan'
@@ -31,7 +33,7 @@ record_style = 'calculation_cohesive_energy_relation'
 
 def main(*args):
     """Main function called when script is executed directly."""
-
+    
     # Read input file in as dictionary
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, allsingular=True)
@@ -53,7 +55,7 @@ def main(*args):
     # Save data model of results
     results = iprPy.buildmodel(record_style, 'calc_' + calc_style, input_dict,
                                results_dict)
-
+    
     with open('results.json', 'w') as f:
         results.json(fp=f, indent=4)
 
@@ -126,7 +128,7 @@ def e_vs_r(lammps_command, system, potential, symbols,
     r_values = np.linspace(rmin, rmax, rsteps)
     a_values = r_values / r_a
     Ecoh_values = np.empty(rsteps)
- 
+    
     # Loop over values
     for i in xrange(rsteps):
         
@@ -142,9 +144,9 @@ def e_vs_r(lammps_command, system, potential, symbols,
         
         # Define lammps variables
         lammps_variables = {}
-        system_info = lmp.atom_data.dump(system, 'atom.dat',
-                                         units=potential.units,
-                                         atom_style=potential.atom_style)
+        system_info = system.dump('atom_data', 'atom.dat',
+                                  units=potential.units,
+                                  atom_style=potential.atom_style)
         lammps_variables['atomman_system_info'] = system_info
         lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
         
@@ -156,7 +158,7 @@ def e_vs_r(lammps_command, system, potential, symbols,
         with open(lammps_script, 'w') as f:
             f.write(iprPy.tools.filltemplate(template, lammps_variables,
                                              '<', '>'))
-
+        
         # Run lammps and extract data
         output = lmp.run(lammps_command, lammps_script, mpi_command)
         
@@ -211,13 +213,13 @@ def r_a_ratio(ucell):
         lattice parameter.
     """
     r_a = ucell.box.a
-    for i in xrange(ucell.natoms):
-        for j in xrange(i):
+    for i in range(ucell.natoms):
+        for j in range(i):
             dmag = np.linalg.norm(ucell.dvect(i,j))
             if dmag < r_a:
                 r_a = dmag
-    return r_a/ucell.box.a
-    
+    return r_a / ucell.box.a
+
 def process_input(input_dict, UUID=None, build=True):
     """
     Processes str input parameters, assigns default values if needed, and
@@ -279,6 +281,6 @@ def process_input(input_dict, UUID=None, build=True):
     
     # Construct initialsystem by manipulating ucell system
     iprPy.input.systemmanipulate(input_dict, build=build)
-    
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

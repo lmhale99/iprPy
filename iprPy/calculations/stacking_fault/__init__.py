@@ -1,5 +1,5 @@
+# Standard Python libraries
 from __future__ import division, absolute_import, print_function
-
 import os
 import importlib
 
@@ -24,7 +24,7 @@ prep = importlib.import_module('.'+prepare_name, __name__)
 prepare = prep.prepare
 prepare_keys = {'singular': prep.singularkeys(),
                 'multi': prep.multikeys()}
-    
+
 # Define template function
 def template():
     """
@@ -52,6 +52,6 @@ def files():
                   calc_name+'.py',
                   'sfmin.template',
                  ]
-                
-    for i in xrange(len(file_names)):
-        yield os.path.join(calc_dir, file_names[i])
+    
+    for file_name in file_names:
+        yield os.path.join(calc_dir, file_name)

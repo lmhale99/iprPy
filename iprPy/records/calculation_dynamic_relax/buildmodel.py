@@ -1,12 +1,16 @@
-from __future__ import division, absolute_import, print_function
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 from copy import deepcopy
 
-import atomman.unitconvert as uc
-
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# https://github.com/usnistgov/atomman
+import atomman.unitconvert as uc
+
+# iprPy imports
 import iprPy
 
 def buildmodel(script, input_dict, results_dict=None):
@@ -22,7 +26,7 @@ def buildmodel(script, input_dict, results_dict=None):
         Dictionary of all input parameter terms.
     results_dict : dict, optional
         Dictionary containing any results produced by the calculation.
-        
+    
     Returns
     -------
     DataModelDict
@@ -90,7 +94,7 @@ def buildmodel(script, input_dict, results_dict=None):
     calc['phase-state']['pressure-zz'] = DM()
     calc['phase-state']['pressure-zz']['value'] = uc.get_in_units(input_dict['pressure_zz'],
                                                                   input_dict['pressure_unit'])
-    calc['phase-state']['pressure-zz']['unit'] = input_dict['pressure_unit']                                                       
+    calc['phase-state']['pressure-zz']['unit'] = input_dict['pressure_unit']
     
     if results_dict is None:
         calc['status'] = 'not calculated'
@@ -133,7 +137,7 @@ def buildmodel(script, input_dict, results_dict=None):
         if 'stress_std' in results_dict:
             mps['pressure-yy']['error'] = -uc.get_in_units(results_dict['stress_std'][1,1], input_dict['pressure_unit'])
         mps['pressure-yy']['unit'] =  input_dict['pressure_unit']
-
+        
         mps['pressure-zz'] = DM()
         mps['pressure-zz']['value'] = -uc.get_in_units(results_dict['stress'][2,2], input_dict['pressure_unit'])
         if 'stress_std' in results_dict:
@@ -153,5 +157,5 @@ def buildmodel(script, input_dict, results_dict=None):
             c_model = results_dict['C_elastic'].model(unit = input_dict['pressure_unit'],
                                                       crystal_system = c_family)
             calc['elastic-constants'] = c_model['elastic-constants']
-
+    
     return output

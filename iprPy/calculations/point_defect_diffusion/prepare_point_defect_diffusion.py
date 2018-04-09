@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
-# Standard library imports
-from __future__ import division, absolute_import, print_function
+# Python script created by Lucas Hale
+
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import glob
@@ -36,7 +39,7 @@ def main(*args):
     # Read input script
     with open(args[0]) as f:
         input_dict = iprPy.tools.parseinput(f, singularkeys=singularkeys())
-
+    
     # Open database
     dbase = iprPy.database_fromdict(input_dict)
     
@@ -45,7 +48,7 @@ def main(*args):
     
     # Call prepare
     prepare(dbase, run_directory, **input_dict)
-    
+
 def prepare(dbase, run_directory, **kwargs):
     """
     High-throughput prepare function for the calculation.
@@ -63,16 +66,16 @@ def prepare(dbase, run_directory, **kwargs):
     
     # Initialize Calculation instance
     calculation = iprPy.Calculation(calc_style)
-
+    
     # Build record_df
     record_df = dbase.get_records_df(style=record_style, full=False, flat=True)
-
+    
     # Build potential dictionaries (single dbase access)
     pot_record_dict = {}
     pot_tar_dict = {}
     for pot_record in dbase.iget_records(style='potential_LAMMPS'):
         pot_record_dict[pot_record.name] = pot_record
-
+    
     # Build defect model record dictionary and df (single dbase access)
     defect_record_dict = {}
     defect_record_df = []
@@ -80,13 +83,13 @@ def prepare(dbase, run_directory, **kwargs):
         defect_record_dict[defect_record.name] = defect_record
         defect_record_df.append(defect_record.todict())
     defect_record_df = pd.DataFrame(defect_record_df)
-
+    
     # Limit by defect name
     if 'pointdefect_name' in kwargs:
         defect_names = iprPy.tools.aslist(kwargs['pointdefect_name'])
         defect_selection = defect_record_df.id.isin(defect_names)
         defect_record_df = defect_record_df[defect_selection]
-
+    
     # Get parent records
     if 'parent_records' in kwargs:
         parent_records = kwargs['parent_records']
@@ -96,7 +99,7 @@ def prepare(dbase, run_directory, **kwargs):
                             symbol = kwargs.get('symbol_name', None),
                             family = kwargs.get('family_name', None),
                             potential = kwargs.get('potential_name', None))
-
+    
     # Loop over parent records
     for parent_record in parent_records:
         parent_dict = parent_record.todict()
@@ -176,7 +179,7 @@ def prepare(dbase, run_directory, **kwargs):
                 inputfile = iprPy.tools.filltemplate(calculation.template, calc_dict, '<', '>')
                 with open(os.path.join(calc_directory, 'calc_' + calc_style + '.in'), 'w') as f:
                     f.write(inputfile)
-
+                
                 # Add calculation files to calculation folder
                 for calc_file in calculation.files:
                     shutil.copy(calc_file, calc_directory)
@@ -184,14 +187,14 @@ def prepare(dbase, run_directory, **kwargs):
                 # Add potential record file to calculation folder
                 with open(os.path.join(calc_directory, pot_record.name+'.xml'), 'w') as f:
                     f.write(pot_record.content)
-                    
+                
                 # Extract potential's tar files to calculation folder
                 pot_tar.extractall(calc_directory)
                 
                 # Add parent record file to calculation folder
                 with open(os.path.join(calc_directory, parent_record.name+'.xml'), 'w') as f:
                     f.write(parent_record.content)
-                    
+                
                 # Add defect record file to calculation folder
                 with open(os.path.join(calc_directory, defect_record.name+'.xml'), 'w') as f:
                     f.write(defect_record.content)
@@ -218,7 +221,7 @@ def unusedkeys():
             'pointdefect_dumbbell_vect',
             'pointdefect_scale',
            ]
-    
+
 def singularkeys():
     """
     The prepare input parameters that can be assigned only one value.
@@ -260,6 +263,6 @@ def multikeys():
             'family_name',
             'pointdefect_name',
            ]
-            
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

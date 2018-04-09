@@ -3,7 +3,8 @@
 # Python script created by Lucas Hale
 
 # Standard library imports
-from __future__ import division, absolute_import, print_function
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import uuid
@@ -167,9 +168,9 @@ def pointdiffusion(lammps_command, system, potential, symbols, point_kwargs,
     
     # Define lammps variables
     lammps_variables = {}
-    system_info = lmp.atom_data.dump(system, 'initial.dat', 
-                                     units=potential.units, 
-                                     atom_style=potential.atom_style)
+    system_info = system.dump('atom_data', 'initial.dat', 
+                              units=potential.units, 
+                              atom_style=potential.atom_style)
     lammps_variables['atomman_system_info'] = system_info
     lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
     lammps_variables['temperature'] = temperature
@@ -197,7 +198,7 @@ def pointdiffusion(lammps_command, system, potential, symbols, point_kwargs,
             lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e"'
         else:
             lammps_variables['dump_modify_format'] = 'float %.13e'
-
+    
     # Write lammps input script
     template_file = 'diffusion.template'
     lammps_script = 'diffusion.in'
@@ -265,7 +266,7 @@ def pointdiffusion(lammps_command, system, potential, symbols, point_kwargs,
     my, b = np.polyfit(times, system.natoms * msd_y, 1)
     mz, b = np.polyfit(times, system.natoms * msd_z, 1)
     m, b = np.polyfit(times, system.natoms * msd, 1)
-
+    
     results['dx'] = mx / 2
     results['dy'] = my / 2
     results['dz'] = mz / 2

@@ -1,13 +1,18 @@
-from __future__ import division, absolute_import, print_function
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 from io import BytesIO
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# http://www.numpy.org/
 import numpy as np
 
+# https://pandas.pydata.org/
 import pandas as pd
 
+# iprPy imports
 from .records import records_dict
 
 __all__ = ['record_styles', 'buildmodel', 'Record']

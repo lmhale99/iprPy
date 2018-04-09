@@ -1,11 +1,15 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import glob
 
+# https://pandas.pydata.org/
 import pandas as pd
 
+# https://github.com/usnistgov/iprPy
 import iprPy
 
 def main(*args):
@@ -17,7 +21,7 @@ def main(*args):
     
     # Interpret and process input parameters
     process_input(input_dict)
-
+    
     check(dbase = input_dict['dbase'],
           record_style = input_dict['record_style'])
 
@@ -76,8 +80,7 @@ def check(dbase, record_style=None):
             count = len(df[df.status == 'error'])
             print(' -', count, 'issued errors')
             sys.stdout.flush()
-            
-            
+
 def process_input(input_dict):
     """
     Processes the input parameter terms.
@@ -90,10 +93,10 @@ def process_input(input_dict):
     
     if 'database' in input_dict:
         input_dict['dbase'] = iprPy.database_fromdict(input_dict)
-    else: 
+    else:
         input_dict['dbase'] = None
-        
-    input_dict['record_style'] = input_dict.get('record_style', None)
     
+    input_dict['record_style'] = input_dict.get('record_style', None)
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

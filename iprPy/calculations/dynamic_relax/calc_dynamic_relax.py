@@ -3,7 +3,8 @@
 # Python script created by Lucas Hale and Karina Stetsyuk
 
 # Standard library imports
-from __future__ import division, absolute_import, print_function
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import uuid
@@ -175,9 +176,9 @@ def full_relax(lammps_command, system, potential, symbols,
     
     # Define lammps variables
     lammps_variables = {}
-    system_info = lmp.atom_data.dump(system, 'init.dat',
-                                     units=potential.units,
-                                     atom_style=potential.atom_style)
+    system_info = system.dump('atom_data', 'init.dat',
+                              units=potential.units,
+                              atom_style=potential.atom_style)
     lammps_variables['atomman_system_info'] = system_info
     lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
     integ_info = integrator_info(integrator=integrator,
@@ -214,7 +215,7 @@ def full_relax(lammps_command, system, potential, symbols,
     
     # Load relaxed system from dump file
     last_dump_file = str(thermo.Step.values[-1])+'.dump'
-    results['system_relaxed'] = lmp.atom_dump.load(last_dump_file)
+    results['system_relaxed'] = am.load('atom_dump', last_dump_file)
     
     # Only consider values where Step >= equilsteps
     thermo = thermo[thermo.Step >= equilsteps]
@@ -263,7 +264,7 @@ def full_relax(lammps_command, system, potential, symbols,
     results['stress_std'] = np.array([[pxx, pxy, pxz],
                                       [pxy, pyy, pyz],
                                       [pxz, pyz, pzz]])
-
+    
     # Get system temperature estimates
     results['temp'] = thermo.Temp.mean()
     results['temp_std'] = thermo.Temp.std()
@@ -326,7 +327,7 @@ def integrator_info(integrator=None, p_xx=0.0, p_yy=0.0, p_zz=0.0,
     # Set default randomseed
     if randomseed is None: randomseed = random.randint(1, 900000000)
     
-    if   integrator == 'npt':
+    if integrator == 'npt':
         start_temp = T*2.+1
         Tdamp = 100 * lmp.style.timestep(units)
         Pdamp = 1000 * lmp.style.timestep(units)
@@ -460,6 +461,6 @@ def process_input(input_dict, UUID=None, build=True):
     
     # Construct initialsystem by manipulating ucell system
     iprPy.input.systemmanipulate(input_dict, build=build)
-    
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

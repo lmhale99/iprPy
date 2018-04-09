@@ -1,11 +1,17 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
-import atomman as am
-import atomman.unitconvert as uc
+# http://www.numpy.org/
 import numpy as np
 
+# https://github.com/usnistgov/atomman
+import atomman.unitconvert as uc
+
+# iprPy imports
 from iprPy.tools import aslist
 
 def todict(record, full=True, flat=True):
@@ -26,7 +32,7 @@ def todict(record, full=True, flat=True):
         values, which is useful for comparisons.  If False, the term
         values can be of any data type, which is convenient for analysis.
         (Default is False).
-        
+    
     Returns
     -------
     dict

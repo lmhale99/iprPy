@@ -1,9 +1,15 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
-from ..tools import aslist
-
-import pandas as pd
+# http://www.numpy.org/
 import numpy as np
+
+# https://pandas.pydata.org/
+import pandas as pd
+
+# iprPy imports
+from ..tools import aslist
 
 def icalculations(database, record_style=None, symbol=None, family=None,
                   potential=None):
@@ -54,6 +60,6 @@ def icalculations(database, record_style=None, symbol=None, family=None,
         for i, e in enumerate(df.symbols):
             check[i] = np.any(np.in1d(e, aslist(symbol)))
         df = df[check]
-        
+    
     for calc_key in df.calc_key.tolist():
         yield records[calc_key]

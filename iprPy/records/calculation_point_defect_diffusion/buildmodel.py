@@ -1,11 +1,15 @@
-from __future__ import division, absolute_import, print_function
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 
-import atomman.unitconvert as uc
-
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# https://github.com/usnistgov/atomman
+import atomman.unitconvert as uc
+
+# iprPy imports
 import iprPy
 
 def buildmodel(script, input_dict, results_dict=None):
@@ -21,7 +25,7 @@ def buildmodel(script, input_dict, results_dict=None):
         Dictionary of all input parameter terms.
     results_dict : dict, optional
         Dictionary containing any results produced by the calculation.
-        
+    
     Returns
     -------
     DataModelDict
@@ -110,7 +114,7 @@ def buildmodel(script, input_dict, results_dict=None):
         mps['pressure-yy']['error'] = uc.get_in_units(results_dict['pyy_std'],
                                                   input_dict['pressure_unit'])
         mps['pressure-yy']['unit'] = input_dict['pressure_unit']
-
+        
         mps['pressure-zz'] = DM()
         mps['pressure-zz']['value'] = uc.get_in_units(results_dict['pzz'],
                                                   input_dict['pressure_unit'])
@@ -146,5 +150,5 @@ def buildmodel(script, input_dict, results_dict=None):
         dr['total'] = DM()
         dr['total']['value'] = uc.get_in_units(results_dict['d'], 'm^2/s')
         dr['total']['unit'] = 'm^2/s'
-
+    
     return output

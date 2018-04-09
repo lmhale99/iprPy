@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import sys
 import subprocess
@@ -11,8 +12,10 @@ import glob
 import datetime
 import requests
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# https://github.com/usnistgov/iprPy
 import iprPy
 
 def main(*args):
@@ -29,7 +32,7 @@ def main(*args):
            input_dict['run_directory'],
            orphan_directory = input_dict['orphan_directory'],
            hold_directory = input_dict['hold_directory'])
-    
+
 def runner(dbase, run_directory, orphan_directory=None, hold_directory=None):
     """
     High-throughput calculation runner.
@@ -131,7 +134,7 @@ def runner(dbase, run_directory, orphan_directory=None, hold_directory=None):
                 # records
                 error_flag = False
                 ready_flag = True
-
+                
                 for fname in glob.iglob('*'):
                     parent_sim, ext = os.path.splitext(os.path.basename(fname))
                     if ext in ('.json', '.xml'):
@@ -177,7 +180,7 @@ def runner(dbase, run_directory, orphan_directory=None, hold_directory=None):
                                 break
                         except:
                             continue
-
+                
                 # Handle calculations that have unfinished parents
                 if not ready_flag:
                     bid_files = glob.glob('*.bid')
@@ -214,7 +217,7 @@ def runner(dbase, run_directory, orphan_directory=None, hold_directory=None):
                     with open('results.json', 'w') as f:
                         model.json(fp=f, indent=4)
                     log.write('error: %s\n' % model[record_type]['error'])
-
+                
                 # Read in results.json
                 with open('results.json') as f:
                     model = DM(f)
@@ -258,7 +261,7 @@ def runner(dbase, run_directory, orphan_directory=None, hold_directory=None):
             flist = os.listdir(run_directory)
             log.flush()
             os.fsync(log.fileno())
-        
+
 def bid(sim):
     """
     Bids for the chance to run a calculation instance. Used to help avoid
@@ -282,7 +285,7 @@ def bid(sim):
         for fname in os.listdir(sim):
             if fname[-4:] == '.bid':
                 return False
-
+        
         # Place a bid
         pid = os.getpid()
         with open(os.path.join(sim, str(pid)+'.bid'), 'w') as f:
@@ -290,7 +293,7 @@ def bid(sim):
         
         # Wait to make sure all bids are in
         time.sleep(1)
-
+        
         # Check bids
         bids = []
         for fname in os.listdir(sim):
@@ -333,7 +336,7 @@ def get_file(path):
         raise ValueError('Cannot find file matching ' + path)
     else:
         raise ValueError('Multiple files found matching '+ path)
-    
+
 def process_input(input_dict):
     """
     Processes the input parameter terms.
@@ -385,6 +388,6 @@ def removecalc(dir):
     
     # Use rmtree on remaining content (hopefully only *.bid and the dir folder)
     shutil.rmtree(dir)
-    
+
 if __name__ == '__main__':
     main(*sys.argv[1:])

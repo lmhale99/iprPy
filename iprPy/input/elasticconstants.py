@@ -1,8 +1,14 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
+
+# https://github.com/usnistgov/atomman
 import atomman as am
 
+# iprPy imports
 from .value import value
 
 def elasticconstants(input_dict, build=True, **kwargs):
@@ -55,7 +61,7 @@ def elasticconstants(input_dict, build=True, **kwargs):
                 'pressure_unit', 'load_file', 'load_content']
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
-
+    
     # Extract input values and assign default values
     C = None
     Ckey = kwargs.get('Ckey', 'C')
@@ -82,10 +88,10 @@ def elasticconstants(input_dict, build=True, **kwargs):
         assert len(Cdict) == 0, (keyhead + 'ij values and '
                                  + kwargs['elasticconstants_model']
                                  + ' cannot both be specified.')
-                                 
+        
         if build is True:
             C = am.ElasticConstants(model=DM(elasticconstants_model))
-            
+    
     # Else if individual Cij terms are given
     elif len(Cdict) > 0:
         if build is True:
@@ -96,8 +102,8 @@ def elasticconstants(input_dict, build=True, **kwargs):
         if build is True:
             if load_content is not None:
                 load_file = load_content
-                
+            
             C = am.ElasticConstants(model=DM(load_file))
-                    
+    
     # Save processed terms
     input_dict[kwargs['C']] = C

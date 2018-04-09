@@ -1,5 +1,8 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
 def todict(record, full=True, flat=False):
@@ -55,4 +58,4 @@ def todict(record, full=True, flat=False):
         params['c'] = params['a']
     params['natypes'] = max(proto['atomic-system'].finds('component'))
     
-    return params 
+    return params

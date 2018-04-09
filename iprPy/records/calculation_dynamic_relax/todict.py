@@ -1,11 +1,17 @@
-from __future__ import division, absolute_import, print_function
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
-import atomman as am
-import atomman.unitconvert as uc
+# http://www.numpy.org/
 import numpy as np
 
+# https://github.com/usnistgov/atomman
+import atomman.unitconvert as uc
+
+# iprPy imports
 from iprPy.tools import aslist
 
 def todict(record, full=True, flat=False):
@@ -26,14 +32,14 @@ def todict(record, full=True, flat=False):
         values, which is useful for comparisons.  If False, the term
         values can be of any data type, which is convenient for analysis.
         (Default is False).
-        
+    
     Returns
     -------
     dict
         A dictionary representation of the record's content.
     """
     model = DM(record)
-
+    
     calc = model['calculation-dynamic-relax']
     params = {}
     params['calc_key'] = calc['key']
@@ -76,10 +82,10 @@ def todict(record, full=True, flat=False):
     if full is True:
         if params['status'] == 'error':
             params['error'] = calc['error']
-         
+        
         elif params['status'] == 'not calculated':
             pass
-            
+        
         else:
             init = calc['as-constructed-atomic-system']
             params['initial_a'] = uc.value_unit(init.find('a'))
@@ -91,7 +97,7 @@ def todict(record, full=True, flat=False):
                 params['initial_c'] = uc.value_unit(init.find('c'))
             except:
                 params['initial_c'] = params['initial_a']
-         
+            
             final = calc['relaxed-atomic-system']
             params['final_a'] = uc.value_unit(final.find('a'))
             params['final_a_std'] = uc.set_in_units(final.find('a')['error'],
@@ -114,5 +120,5 @@ def todict(record, full=True, flat=False):
             params['E_cohesive'] = uc.value_unit(calc['cohesive-energy'])
             params['E_cohesive_std'] = uc.set_in_units(calc['cohesive-energy']['error'],
                                                        calc['cohesive-energy']['unit'])
-            
+    
     return params

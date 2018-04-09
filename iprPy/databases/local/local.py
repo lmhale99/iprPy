@@ -1,16 +1,18 @@
-from __future__ import division, absolute_import, print_function
-
-__all__ = ['initialize', 'iget_records', 'get_records', 'get_record',
-           'add_record', 'update_record', 'delete_record', 'add_tar',
-           'get_tar', 'delete_tar', 'update_tar']
-
+# Standard Python libraries
+from __future__ import (absolute_import, print_function,
+                        division, unicode_literals)
 import os
 import glob
 import shutil
 import tarfile
 
+# iprPy imports
 from iprPy.tools import iaslist
 from iprPy import Record
+
+__all__ = ['initialize', 'iget_records', 'get_records', 'get_record',
+           'add_record', 'update_record', 'delete_record', 'add_tar',
+           'get_tar', 'delete_tar', 'update_tar']
 
 def initialize(host):
     """
@@ -56,8 +58,10 @@ def iget_records(database_info, name=None, style=None):
     """
     
     # Set default search parameters
-    if style is None: style = ['*']
-    if name is None: name = ['*']
+    if style is None:
+        style = ['*']
+    if name is None:
+        name = ['*']
     
     # Iterate through all files matching style, name, ext values
     for s in iaslist(style):
@@ -126,7 +130,7 @@ def get_record(database_info, name=None, style=None):
         raise ValueError('Cannot find matching record '+ name + ' (' +style + ')')
     else:
         raise ValueError('Multiple matching records found')
-    
+
 def add_record(database_info, record=None, style=None, name=None,
                content=None):
     """
@@ -182,9 +186,9 @@ def add_record(database_info, record=None, style=None, name=None,
     xml_file = os.path.join(database_info, record.style, record.name+'.xml')
     with open(xml_file, 'w') as f:
         f.write(record.content)
-        
+    
     return record
-       
+    
 def update_record(database_info, record=None, style=None, name=None,
                   content=None):
     """
@@ -206,7 +210,7 @@ def update_record(database_info, record=None, style=None, name=None,
     content : str, optional
         The new xml content to use for the record.  Required if record is
         not given.
-        
+    
     Returns
     ------
     iprPy.Record
@@ -249,7 +253,7 @@ def update_record(database_info, record=None, style=None, name=None,
     add_record(database_info, record=record)
     
     return record
-    
+
 def delete_record(database_info, record=None, name=None, style=None):
     """
     Permanently deletes a record from the database.  Will issue an error 
@@ -288,10 +292,10 @@ def delete_record(database_info, record=None, name=None, style=None):
     
     # Build path to record
     record_path = os.path.join(database_info, record.style, record.name)
-
+    
     # Delete record file
     os.remove(record_path+'.xml')
-        
+
 def add_tar(database_info, record=None, name=None, style=None, root_dir=None):
     """
     Archives and stores a folder associated with a record.  Issues an
@@ -322,7 +326,7 @@ def add_tar(database_info, record=None, name=None, style=None, root_dir=None):
         If style and/or name content given with record or the record already
         has an archive.
     """
-
+    
     # Create Record object if not given
     if record is None:
         record = get_record(database_info, name=name, style=style)
@@ -335,14 +339,14 @@ def add_tar(database_info, record=None, name=None, style=None, root_dir=None):
     else:
         record = get_record(database_info, name=record.name,
                             style=record.style)
-        
+    
     # Build path to record
     record_path = os.path.join(database_info, record.style, record.name)
-
+    
     # Check if an archive already exists
     if os.path.isfile(record_path+'.tar.gz'):
         raise ValueError('Record already has an archive')
-        
+    
     # Make archive
     shutil.make_archive(record_path, 'gztar', root_dir=root_dir,
                         base_dir=record.name)
@@ -366,19 +370,19 @@ def get_tar(database_info, record=None, name=None, style=None, raw=False):
     raw : bool, optional
         If True, return the archive as raw binary content. If 
         False, return as an open tarfile. (Default is False)
-        
+    
     Returns
     -------
     tarfile or str
         The tar archive as an open tarfile if raw=False, or as a binary str if
         raw=True.
-        
+    
     Raises
     ------
     ValueError
         If style and/or name content given with record.
     """
-
+    
     # Create Record object if not given
     if record is None:
         record = get_record(database_info, name=name, style=style)
@@ -401,7 +405,7 @@ def get_tar(database_info, record=None, name=None, style=None, raw=False):
             return f.read()
     else:
         return tarfile.open(record_path+'.tar.gz')
-    
+
 def delete_tar(database_info, record=None, name=None, style=None):
     """
     Deletes a tar file from the database.  Issues an error if exactly one
@@ -425,7 +429,7 @@ def delete_tar(database_info, record=None, name=None, style=None):
     ValueError
         If style and/or name content given with record.
     """
-
+    
     # Create Record object if not given
     if record is None:
         record = get_record(database_info, name=name, style=style)
@@ -444,7 +448,7 @@ def delete_tar(database_info, record=None, name=None, style=None):
     # Delete record if it exists
     if os.path.isfile(record_path+'.tar.gz'):
         os.remove(record_path+'.tar.gz')
-        
+
 def update_tar(database_info, record=None, name=None, style=None,
                root_dir=None):
     """
@@ -468,7 +472,7 @@ def update_tar(database_info, record=None, name=None, style=None,
         Specifies the root directory for finding the directory to archive.
         The directory to archive is at <root_dir>/<name>.
     """
-
+    
     # Delete the existing tar archive stored in the database
     delete_tar(database_info, record=record, name=name)
     
