@@ -13,8 +13,12 @@ import os
 with open(os.path.join(os.path.dirname(__file__), 'VERSION')) as version_file:
     __version__ = version_file.read().strip()
 
-__all__ = ['__version__', 'rootdir', 'tools', 'calculations', 'records',
-           'databases', 'prepare', 'input', 'highthroughput', 'check_modules']
+__all__ = ['__version__', 'rootdir', 'compatibility', 'tools', 'input',
+           'record', 'load_record', 'calculation', 'load_calculation',
+           'database', 'load_database', 'set_database', 'unset_database',
+           'load_run_directory', 'set_run_directory', 'unset_run_directory',
+           'check_modules']
+__all__.sort()
 
 # Define root package directory
 rootdir = os.path.dirname(os.path.abspath(__file__))
@@ -22,24 +26,17 @@ rootdir = os.path.dirname(os.path.abspath(__file__))
 # iprPy imports
 from . import compatibility
 from . import tools
+from . import input
 
-from . import calculations
-from .calculation_functions import *
-from .calculation_functions import __all__ as calculation_functions_all
-__all__.extend(calculation_functions_all)
+from . import record
+from .record import load_record
 
-from . import records
-from .record_functions import *
-from .record_functions import __all__ as record_functions_all
-__all__.extend(record_functions_all)
+from . import calculation
+from .calculation import load_calculation
 
-from . import databases
-from .database_functions import *
-from .database_functions import __all__ as database_functions_all
-__all__.extend(database_functions_all)
+from . import database
+from .database import (load_database, set_database, unset_database,
+                       load_run_directory, set_run_directory,
+                       unset_run_directory)
 
 from .check_modules import check_modules
-from . import prepare
-from . import input
-from . import highthroughput
-__all__.sort()

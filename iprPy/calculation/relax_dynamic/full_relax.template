@@ -1,0 +1,26 @@
+#LAMMPS input script that performs a simple dynamic integration
+
+box tilt large
+
+<atomman_system_info>
+
+change_box all triclinic
+
+<atomman_pair_info>
+
+compute pe all pe/atom
+compute ke all ke/atom
+compute stress all stress/atom <stressterm>
+
+thermo <thermosteps>
+thermo_style custom step temp pe ke etotal lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy
+thermo_modify format float %.13e
+timestep 0.001
+
+<integrator_info>
+
+dump dumpit all custom <dumpsteps> *.dump id type xu yu zu c_pe c_ke & 
+c_stress[1] c_stress[2] c_stress[3] c_stress[4] c_stress[5] c_stress[6]
+dump_modify dumpit format <dump_modify_format>
+
+run <runsteps> upto

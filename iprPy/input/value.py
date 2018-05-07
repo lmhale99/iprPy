@@ -5,6 +5,8 @@ from __future__ import (absolute_import, print_function,
 # https://github.com/usnistgov/atomman
 import atomman.unitconvert as uc
 
+__all__ = ['value']
+
 def value(input_dict, key, default_unit=None, default_term=None):
     """
     Interprets a calculation parameter by converting it from a string to a

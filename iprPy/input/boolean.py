@@ -2,6 +2,8 @@
 from __future__ import (absolute_import, print_function,
                         division, unicode_literals)
 
+__all__ = ['boolean']
+
 def boolean(value):
     """
     Allows conversion of strings to Booleans.

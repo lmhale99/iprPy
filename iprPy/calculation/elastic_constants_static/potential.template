@@ -1,0 +1,12 @@
+# NOTE: This script can be modified for different pair styles 
+# See in.elastic for more info.
+
+# Choose potential
+<atomman_pair_info>
+
+# Setup minimization style
+min_modify dmax ${dmax}
+
+# Setup output
+thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe
+thermo_modify format float %.13e

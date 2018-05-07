@@ -1,2 +1,0 @@
-## Method and Theory
-

@@ -1,0 +1,23 @@
+# LAMMPS input script that performs an energy minimization and box relaxation
+
+box tilt large
+
+<atomman_system_info>
+
+change_box all triclinic
+
+<atomman_pair_info>
+
+thermo_style custom step lx ly lz xy xz yz pxx pyy pzz pxy pxz pyz pe
+thermo_modify format float %.13e
+
+compute peatom all pe/atom
+
+dump dumpit all custom <maxeval> *.dump id type x y z c_peatom
+dump_modify dumpit format <dump_modify_format>
+
+fix boxrelax all box/relax x <p_xx> y <p_yy> z <p_zz> xy <p_xy> xz <p_xz> yz <p_yz>
+
+min_modify dmax <dmax>
+
+minimize <etol> <ftol> <maxiter> <maxeval>

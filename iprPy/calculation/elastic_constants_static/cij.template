@@ -1,0 +1,141 @@
+# Performs simulations to statically evaluate elastic constants using small strains
+# Based on the LAMMPS_ELASTIC script by Aidan Thompson (Sandia, athomps@sandia.gov)
+
+box tilt large
+
+<atomman_system_info>
+
+change_box all triclinic
+
+# Specify strain
+variable strain equal <strainrange>
+
+# Define minimization parameters
+variable etol equal <etol>
+variable ftol equal <ftol>
+variable maxiter equal <maxiter>
+variable maxeval equal <maxeval>
+variable dmax equal <dmax>
+
+# Specify variables of the initial configuration's dimensions
+variable lx0 equal $(lx)
+variable ly0 equal $(ly)
+variable lz0 equal $(lz)
+
+# Specify the thermo properties to calculate
+variable peatom equal pe/atoms
+
+# Read in potential and thermo information
+include potential.in
+
+# Relax initial configuration and save as restart
+minimize ${etol} ${ftol} ${maxiter} ${maxeval}
+write_restart initial.restart
+
+# Apply -xx strain
+clear
+read_restart initial.restart
+include potential.in
+
+variable delta equal -${strain}*${lx0}
+change_box all x delta 0 ${delta} remap units box
+minimize ${etol} ${ftol} ${maxiter} ${maxeval}
+
+# Apply +xx strain
+clear
+read_restart initial.restart
+include potential.in
+
+variable delta equal ${strain}*${lx0}
+change_box all x delta 0 ${delta} remap units box
+minimize ${etol} ${ftol} ${maxiter} ${maxeval}
+
+# Apply -yy strain
+clear
+read_restart initial.restart
+include potential.in
+
+variable delta equal -${strain}*${ly0}
+change_box all y delta 0 ${delta} remap units box
+minimize ${etol} ${ftol} ${maxiter} ${maxeval}
+
+# Apply +yy strain
+clear
+read_restart initial.restart
+include potential.in
+
+variable delta equal ${strain}*${ly0}
+change_box all y delta 0 ${delta} remap units box
+minimize ${etol} ${ftol} ${maxiter} ${maxeval}
+
+# Apply -zz strain
+clear
+read_restart initial.restart
+include potential.in
+
+variable delta equal -${strain}*${lz0}
+change_box all z delta 0 ${delta} remap units box
+minimize ${etol} ${ftol} ${maxiter} ${maxeval}
+
+# Apply +zz strain
+clear
+read_restart initial.restart
+include potential.in
+
+variable delta equal ${strain}*${lz0}
+change_box all z delta 0 ${delta} remap units box
+minimize ${etol} ${ftol} ${maxiter} ${maxeval}
+
+# Apply -yz strain
+clear
+read_restart initial.restart
+include potential.in
+
+variable delta equal -${strain}*${lz0}
+change_box all yz delta ${delta} remap units box
+minimize ${etol} ${ftol} ${maxiter} ${maxeval}
+
+# Apply +yz strain
+clear
+read_restart initial.restart
+include potential.in
+
+variable delta equal ${strain}*${lz0}
+change_box all yz delta ${delta} remap units box
+minimize ${etol} ${ftol} ${maxiter} ${maxeval}
+
+# Apply -xz strain
+clear
+read_restart initial.restart
+include potential.in
+
+variable delta equal -${strain}*${lz0}
+change_box all xz delta ${delta} remap units box
+minimize ${etol} ${ftol} ${maxiter} ${maxeval}
+
+# Apply +xz strain
+clear
+read_restart initial.restart
+include potential.in
+
+variable delta equal ${strain}*${lz0}
+change_box all xz delta ${delta} remap units box
+minimize ${etol} ${ftol} ${maxiter} ${maxeval}
+
+# Apply -xy strain
+clear
+read_restart initial.restart
+include potential.in
+
+variable delta equal -${strain}*${ly0}
+change_box all xy delta ${delta} remap units box
+minimize ${etol} ${ftol} ${maxiter} ${maxeval}
+
+# Apply +xy strain
+clear
+read_restart initial.restart
+include potential.in
+
+variable delta equal ${strain}*${ly0}
+change_box all xy delta ${delta} remap units box
+minimize ${etol} ${ftol} ${maxiter} ${maxeval}
