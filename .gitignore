@@ -10,11 +10,6 @@ iprPy/.iprPy
 
 # test scripts
 test/
-test.py
-*/test.py
-*/*/test.py
-*/*/*/test.py
-*/*/*/*/test.py
 
 # High-throughput log files
 runner-logs/
@@ -33,5 +28,5 @@ demonstrations/*/
 # Generated web content
 analysis/webcontent
 
-# empty.lammps as used by lammps version checking
-iprPy/tools/empty.lammps
+# Downloaded external reference structures
+library/ref/

@@ -1,0 +1,32 @@
+#LAMMPS input script for relaxing a dislocation monopole
+
+#Script and atom data file prepared by AtomMan package
+
+units metal
+atom_style atomic
+boundary p p p 
+read_data system.dat
+
+mass 1 26.982000
+mass 2 26.982000
+
+pair_style eam/alloy
+pair_coeff * * 2009--Purja-Pun-G-P--Ni-Al--LAMMPS--ipr1\Mishin-Ni-Al-2009.eam.alloy Al Al
+
+
+group move type 1
+group hold subtract all move
+
+compute peatom all pe/atom
+
+dump first all custom 100000 *.dump id type x y z c_peatom
+dump_modify first format float %.13e
+thermo_style custom step pe
+
+fix nomove hold setforce 0.0 0.0 0.0
+
+
+
+min_modify dmax 0.01
+
+minimize 0.0 1e-06 10000 100000

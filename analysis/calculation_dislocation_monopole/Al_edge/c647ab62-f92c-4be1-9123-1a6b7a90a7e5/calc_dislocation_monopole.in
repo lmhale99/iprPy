@@ -1,0 +1,69 @@
+#Run script for calc_dislocation_monopole.py
+
+#Command lines for LAMMPS (and MPI).
+#For lammps_command, exclude passing in a script, i.e. no "-in term"
+lammps_command              lmp_mpi
+mpi_command                 mpiexec -localonly 4
+
+#Paths to the potential data model file, and directory containing potential parameters
+potential_file              2009--Purja-Pun-G-P--Ni-Al--LAMMPS--ipr1.xml
+potential_dir               2009--Purja-Pun-G-P--Ni-Al--LAMMPS--ipr1
+
+#Initial system configuration to load
+load_file                   717f3455-9e56-4ea5-ae3a-fc043d7c5048.xml
+load_style                  system_model
+load_options                key relaxed-atomic-system
+symbols                     
+box_parameters              
+
+#System manipulations
+x_axis                      
+y_axis                      
+z_axis                      
+atomshift                   
+sizemults                   -49 49 -40 40 0 2
+
+#Defect parameters
+dislocation_model           A1--Cu--fcc--111-edge.xml
+dislocation_burgersvector   
+dislocation_boundarywidth   
+dislocation_boundaryshape   
+
+#Elastic constants parameters 
+elasticconstants_model      
+C11                         
+C12                         
+C13                         
+C14                         
+C15                         
+C16                         
+C22                         
+C23                         
+C24                         
+C25                         
+C26                         
+C33                         
+C34                         
+C35                         
+C36                         
+C44                         
+C45                         
+C46                         
+C55                         
+C56                         
+C66                         
+
+#Units that input/output values are in
+length_unit                 
+pressure_unit               
+energy_unit                 
+force_unit                  
+
+#Run parameters
+annealtemperature           0
+energytolerance             
+forcetolerance              
+maxiterations               
+maxevaluations              
+maxatommotion               
+randomseed                  

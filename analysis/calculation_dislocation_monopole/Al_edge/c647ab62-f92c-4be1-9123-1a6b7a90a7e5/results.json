@@ -1,0 +1,305 @@
+{
+    "calculation-dislocation-monopole": {
+        "key": "c647ab62-f92c-4be1-9123-1a6b7a90a7e5", 
+        "calculation": {
+            "iprPy-version": "0.7.2", 
+            "LAMMPS-version": "27 Aug 2016-ICMS", 
+            "script": "calc_dislocation_monopole", 
+            "run-parameter": {
+                "size-multipliers": {
+                    "a": [
+                        -49, 
+                        49
+                    ], 
+                    "b": [
+                        -40, 
+                        40
+                    ], 
+                    "c": [
+                        0, 
+                        2
+                    ]
+                }, 
+                "energytolerance": 0.0, 
+                "forcetolerance": {
+                    "value": 1e-06, 
+                    "unit": "eV/angstrom"
+                }, 
+                "maxiterations": 10000, 
+                "maxevaluations": 100000, 
+                "maxatommotion": {
+                    "value": 0.01, 
+                    "unit": "angstrom"
+                }, 
+                "dislocation_boundarywidth": 12.149999999999999, 
+                "dislocation_boundaryshape": "circle", 
+                "annealtemperature": 0.0
+            }
+        }, 
+        "potential-LAMMPS": {
+            "key": "702b81e2-b380-4659-ada4-368a6d0170d7", 
+            "id": "2009--Purja-Pun-G-P--Ni-Al--LAMMPS--ipr1", 
+            "potential": {
+                "key": "d71da5f1-db8a-46ad-a78d-c026768200af", 
+                "id": "2009--Purja-Pun-G-P--Ni-Al"
+            }
+        }, 
+        "system-info": {
+            "family": "A1--Cu--fcc", 
+            "artifact": {
+                "file": "717f3455-9e56-4ea5-ae3a-fc043d7c5048.xml", 
+                "format": "system_model", 
+                "load_options": "key relaxed-atomic-system"
+            }, 
+            "symbol": [
+                "Al"
+            ]
+        }, 
+        "dislocation-monopole": {
+            "key": "d59f2382-17e5-4fbd-b398-407c75e6009a", 
+            "id": "A1--Cu--fcc--111-edge", 
+            "character": "edge", 
+            "Burgers-vector": "a/2[ 1, 0,-1]", 
+            "slip-plane": [
+                1, 
+                1, 
+                1
+            ], 
+            "line-direction": [
+                1, 
+                -2, 
+                1
+            ], 
+            "system-family": "A1--Cu--fcc", 
+            "calculation-parameter": {
+                "x_axis": "1  0 -1", 
+                "y_axis": "1  1  1", 
+                "z_axis": "1 -2  1", 
+                "atomshift": "0.00 0.25 0.00", 
+                "burgersvector": "0.5  0.0 -0.5"
+            }
+        }, 
+        "elastic-constants": {
+            "C": [
+                {
+                    "stiffness": {
+                        "value": 113.78332152947634, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "1 1"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 61.53683213777547, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "1 2"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 61.53683213777547, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "1 3"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 0.0, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "1 4"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 0.0, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "1 5"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 0.0, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "1 6"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 113.78332152947634, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "2 2"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 61.53683213777547, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "2 3"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 0.0, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "2 4"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 0.0, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "2 5"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 0.0, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "2 6"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 113.78332152947634, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "3 3"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 0.0, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "3 4"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 0.0, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "3 5"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 0.0, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "3 6"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 31.598423706629607, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "4 4"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 0.0, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "4 5"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 0.0, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "4 6"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 31.598423706629607, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "5 5"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 0.0, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "5 6"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 31.598423706629607, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "6 6"
+                }
+            ]
+        }, 
+        "base-system": {
+            "artifact": {
+                "file": "base.dump", 
+                "format": "atom_dump"
+            }, 
+            "symbols": [
+                "Al"
+            ]
+        }, 
+        "defect-system": {
+            "artifact": {
+                "file": "disl.dump", 
+                "format": "atom_dump"
+            }, 
+            "symbols": [
+                "Al", 
+                "Al"
+            ], 
+            "potential-energy": {
+                "value": -1262591.0, 
+                "unit": "eV"
+            }
+        }, 
+        "Stroh-pre-ln-factor": {
+            "value": 0.1795122148044154, 
+            "unit": "eV/angstrom"
+        }, 
+        "Stroh-K-tensor": [
+            {
+                "coefficient": {
+                    "value": 44.06910124716565, 
+                    "unit": "GPa"
+                }, 
+                "ij": "1 1"
+            }, 
+            {
+                "coefficient": {
+                    "value": 0.0, 
+                    "unit": "GPa"
+                }, 
+                "ij": "1 2"
+            }, 
+            {
+                "coefficient": {
+                    "value": 0.0, 
+                    "unit": "GPa"
+                }, 
+                "ij": "1 3"
+            }, 
+            {
+                "coefficient": {
+                    "value": 44.38645009220309, 
+                    "unit": "GPa"
+                }, 
+                "ij": "2 2"
+            }, 
+            {
+                "coefficient": {
+                    "value": -0.8291655045490492, 
+                    "unit": "GPa"
+                }, 
+                "ij": "2 3"
+            }, 
+            {
+                "coefficient": {
+                    "value": 28.758216172773604, 
+                    "unit": "GPa"
+                }, 
+                "ij": "3 3"
+            }
+        ]
+    }
+}
