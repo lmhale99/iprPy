@@ -1,24 +1,24 @@
 {
     "potential-LAMMPS": {
-        "key": "8bfd0a48-8558-46f9-9d20-cd9e92cb83ae", 
-        "id": "2017--Purja-Pun-G-P--Au--LAMMPS--test", 
+        "key": "7108e5a9-2c06-41a2-9337-ff4889906288", 
+        "id": "2004--Zhou-X-W--Ni--LAMMPS--ipr2", 
         "potential": {
-            "key": "ef908258-25d1-439e-8223-3bf4df924ed0", 
-            "id": "2017--Purja-Pun-G-P--Au"
+            "key": "063c9331-69e4-40e4-bb6c-cee56d576b60", 
+            "id": "2004--Zhou-X-W--Ni"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
         "atom": {
-            "element": "Au", 
-            "mass": 196.96654
+            "element": "Ni", 
+            "mass": 58.693
         }, 
         "pair_style": {
-            "type": "eam/alloy"
+            "type": "eam/fs"
         }, 
         "pair_coeff": {
             "term": [
                 {
-                    "file": "Au_GLJ10_3.eam.alloy"
+                    "file": "Ni_Zhou04.eam.alloy"
                 }, 
                 {
                     "symbols": "True"

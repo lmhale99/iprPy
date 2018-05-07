@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "8439c072-b93c-4a6e-a7e6-aca990abd97d", 
+        "id": "2004--Zhou-X-W--Au--LAMMPS--ipr2", 
+        "potential": {
+            "key": "56c064d6-9bb4-42b6-b5e1-b54bb4dbae1d", 
+            "id": "2004--Zhou-X-W--Au"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Au", 
+            "mass": 196.97
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Au_Zhou04.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

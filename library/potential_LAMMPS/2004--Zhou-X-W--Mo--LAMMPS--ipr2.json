@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "a9477b21-0ed9-4cda-8672-e5cbe8612dc9", 
+        "id": "2004--Zhou-X-W--Mo--LAMMPS--ipr2", 
+        "potential": {
+            "key": "7447a36d-7f5c-4562-b569-825d3cf66cc1", 
+            "id": "2004--Zhou-X-W--Mo"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Mo", 
+            "mass": 95.94
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Mo_Zhou04.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}
