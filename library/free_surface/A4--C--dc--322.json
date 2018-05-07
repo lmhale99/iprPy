@@ -1,0 +1,14 @@
+{
+    "free-surface": {
+        "key": "4c23e447-7021-47d8-8ae0-d198a8e025ed", 
+        "id": "A4--C--dc--322", 
+        "system-family": "A4--C--dc", 
+        "calculation-parameter": {
+            "a_uvw": "-2  3  0", 
+            "b_uvw": "-2  0  3", 
+            "c_uvw": " 3  2  2", 
+            "cutboxvector": "c", 
+            "atomshift": "0.0 0.0 0.1"
+        }
+    }
+}

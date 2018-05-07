@@ -1,12 +1,12 @@
 {
     "free-surface": {
-        "key": "fa20df7e-57de-4440-a212-194b55dec905", 
-        "id": "A2--W--bcc--110",
+        "key": "8f7ebe9f-3592-49c4-8074-afc07ec0161d", 
+        "id": "A2--W--bcc--110", 
         "system-family": "A2--W--bcc", 
         "calculation-parameter": {
-            "x_axis": " 0  0  1", 
-            "y_axis": " 1 -1  0", 
-            "z_axis": " 1  1  0",
+            "a_uvw": "-1  1  0", 
+            "b_uvw": " 0  0  1", 
+            "c_uvw": " 1  1  0", 
             "cutboxvector": "c", 
             "atomshift": "0.0 0.0 0.1"
         }

@@ -1,8 +1,8 @@
 {
     "free-surface": {
-        "key": "52145b64-d02e-4705-9ca0-d0443629b888", 
-        "id": "A1--Cu--fcc--110", 
-        "system-family": "A1--Cu--fcc", 
+        "key": "a2c13b49-7305-40a4-abaa-205c97e2111f", 
+        "id": "A4--C--dc--110", 
+        "system-family": "A4--C--dc", 
         "calculation-parameter": {
             "a_uvw": "-1  1  0", 
             "b_uvw": " 0  0  1", 

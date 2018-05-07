@@ -1,12 +1,12 @@
 {
     "free-surface": {
-        "key": "52145b64-d02e-4705-9ca0-d0443629b888", 
-        "id": "A1--Cu--fcc--110", 
+        "key": "34d4602b-f13d-4b6d-ba3d-02a5a0db8631", 
+        "id": "A1--Cu--fcc--332", 
         "system-family": "A1--Cu--fcc", 
         "calculation-parameter": {
             "a_uvw": "-1  1  0", 
-            "b_uvw": " 0  0  1", 
-            "c_uvw": " 1  1  0", 
+            "b_uvw": "-2  0  3", 
+            "c_uvw": " 3  3  2", 
             "cutboxvector": "c", 
             "atomshift": "0.0 0.0 0.1"
         }
