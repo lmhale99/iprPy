@@ -22,9 +22,12 @@ and tools are designed towards molecular dynamics simulations.
 Documentation
 -------------
 
+**NOTE**: The current documentation is old and will be updated for version 0.8
+over the next few weeks.
+
 Demonstration versions of all implemented calculations can be found in 
 docs/demonstrations.
 
-New documentation can be found in the docs/html folder.  You will have to
+Documentation can be found in the docs/html folder.  You will have to
 download the repository to view them as GitHub shows the raw html.  Permanent
 URL for the code coming soon.
