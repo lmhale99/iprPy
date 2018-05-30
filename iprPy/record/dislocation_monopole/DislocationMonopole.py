@@ -6,6 +6,7 @@ import os
 # iprPy imports
 from .. import Record
 
+raise NotImplementedError('Needs updating')
 class DislocationMonopole(Record):
     
     @property

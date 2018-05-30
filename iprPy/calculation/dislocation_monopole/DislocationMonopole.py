@@ -5,6 +5,7 @@ import os
 
 from .. import Calculation
 
+raise NotImplementedError('Needs updating')
 class DislocationMonopole(Calculation):
     """
     Class for handling different calculation styles in the same fashion.  The

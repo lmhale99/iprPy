@@ -21,6 +21,7 @@ from ... import __version__ as iprPy_version
 from .. import Record
 from ...tools import aslist
 
+raise NotImplementedError('Needs updating')
 class CalculationStackingFaultStatic(Record):
     
     @property

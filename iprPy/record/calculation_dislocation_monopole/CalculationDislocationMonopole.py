@@ -21,6 +21,7 @@ from ... import __version__ as iprPy_version
 from .. import Record
 from ...tools import aslist
 
+raise NotImplementedError('Needs updating')
 class CalculationDislocationMonopole(Record):
     
     @property
@@ -68,6 +69,19 @@ class CalculationDislocationMonopole(Record):
         return [
                 'annealtemperature',
                ]
+    
+    def isvalid(self):
+        """
+        Looks at the values of elements in the record to determine if the
+        associated calculation would be a valid one to run.
+        
+        Returns
+        -------
+        bool
+            True if element combinations are valid, False if not.
+        """
+        calc = self.content[self.contentroot]
+        return calc['dislocation-monopole']['system-family'] == calc['system-info']['family']
     
     def buildcontent(self, script, input_dict, results_dict=None):
         """
@@ -155,11 +169,11 @@ class CalculationDislocationMonopole(Record):
             disl['slip-plane'] = input_dict['dislocation_model']['slip-plane']
             disl['line-direction'] = input_dict['dislocation_model']['line-direction']
         
-        disl['system-family'] = input_dict['family']
+        disl['system-family'] = input_dict.get('dislocation_family', input_dict['family'])
         disl['calculation-parameter'] = cp = DM() 
-        cp['x_axis'] = input_dict['x_axis']
-        cp['y_axis'] = input_dict['y_axis']
-        cp['z_axis'] = input_dict['z_axis']
+        cp['a_uvw'] = input_dict['a_uvw']
+        cp['b_uvw'] = input_dict['b_uvw']
+        cp['c_uvw'] = input_dict['c_uvw'] 
         cp['atomshift'] = input_dict['atomshift']
         cp['burgersvector'] = input_dict['dislocation_burgersvector']
         
