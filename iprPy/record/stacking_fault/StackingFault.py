@@ -51,9 +51,9 @@ class StackingFault(Record):
         params['family'] = fault['system-family']
         
         calcparam = fault['calculation-parameter']
-        params['x_axis'] = calcparam['x_axis']
-        params['y_axis'] = calcparam['y_axis']
-        params['z_axis'] = calcparam['z_axis']
+        params['a_uvw'] = calcparam['a_uvw']
+        params['b_uvw'] = calcparam['b_uvw']
+        params['c_uvw'] = calcparam['c_uvw']
         params['atomshift'] = calcparam['atomshift']
         params['cutboxvector'] = calcparam['cutboxvector']
         params['faultpos'] =  calcparam['faultpos']

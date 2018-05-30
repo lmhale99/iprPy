@@ -22,8 +22,9 @@ def dislocationmonopole(input_dict, **kwargs):
     - **'dislocation_content'** alternate file or content to load instead of
       specified dislocation_file.  This is used by prepare functions.
     - **'dislocation_model'** the open DataModelDict of file/content.
-    - **'x_axis', 'y_axis', 'z_axis'** the orientation axes.  This function
-      only reads in values from the dislocation_model.
+    - **'dislocation_family'** the crystal family the defect parameters are specified for.
+    - **'a_uvw, b_uvw, c_uvw'** the orientation [uvw] indices. This function only
+      reads in values from the surface_model.
     - **'atomshift'** the atomic shift to apply to all atoms.  This function
       only reads in values from the dislocation_model.
     - **'dislocation_burgersvector'** the dislocation's Burgers vector as a
@@ -50,12 +51,14 @@ def dislocationmonopole(input_dict, **kwargs):
         Replacement parameter key name for 'dislocation_content'.
     dislocation_model : str
         Replacement parameter key name for 'dislocation_model'.
-    x_axis : str
-        Replacement parameter key name for 'x_axis'.
-    y_axis : str
-        Replacement parameter key name for 'y_axis'.
-    z_axis : str
-        Replacement parameter key name for 'z_axis'.
+    dislocation_family : str
+        Replacement parameter key name for 'dislocation_family'.
+    a_uvw : str
+        Replacement parameter key name for 'a_uvw'.
+    b_uvw : str
+        Replacement parameter key name for 'b_uvw'.
+    c_uvw : str
+        Replacement parameter key name for 'c_uvw'.
     atomshift : str
         Replacement parameter key name for 'atomshift'.
     dislocation_burgersvector : str
@@ -74,7 +77,7 @@ def dislocationmonopole(input_dict, **kwargs):
     
     # Set default keynames
     keynames = ['dislocation_file', 'dislocation_model', 'dislocation_content',
-                'x_axis', 'y_axis', 'z_axis', 'atomshift', 
+                'dislocation_family', 'a_uvw', 'b_uvw', 'c_uvw', 'atomshift', 
                 'dislocation_burgersvector', 'dislocation_boundaryshape',
                 'dislocation_boundarywidth', 'ucell', 'burgersvector',
                 'boundarywidth']
@@ -96,7 +99,7 @@ def dislocationmonopole(input_dict, **kwargs):
     if dislocation_file is not None:
         
         # Verify competing parameters are not defined
-        for key in ('atomshift', 'x_axis', 'y_axis', 'z_axis', 
+        for key in ('atomshift', 'a_uvw', 'b_uvw', 'c_uvw',
                     'dislocation_burgersvector'):
             assert kwargs[key] not in input_dict, (kwargs[key] + ' and '
                                                    + kwargs['dislocation_file']
@@ -106,9 +109,10 @@ def dislocationmonopole(input_dict, **kwargs):
         dislocation_model = DM(dislocation_file).find('dislocation-monopole')
         
         # Extract parameter values from defect model
-        input_dict[kwargs['x_axis']] = dislocation_model['calculation-parameter']['x_axis']
-        input_dict[kwargs['y_axis']] = dislocation_model['calculation-parameter']['y_axis']
-        input_dict[kwargs['z_axis']] = dislocation_model['calculation-parameter']['z_axis']
+        input_dict[kwargs['dislocation_family']] = dislocation_model['system-family']
+        input_dict[kwargs['a_uvw']] = dislocation_model['calculation-parameter']['a_uvw']
+        input_dict[kwargs['b_uvw']] = dislocation_model['calculation-parameter']['b_uvw']
+        input_dict[kwargs['c_uvw']] = dislocation_model['calculation-parameter']['c_uvw']
         input_dict[kwargs['atomshift']] = dislocation_model['calculation-parameter']['atomshift']
         input_dict[kwargs['dislocation_burgersvector']] = dislocation_model['calculation-parameter']['burgersvector']
     

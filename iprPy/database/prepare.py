@@ -90,6 +90,11 @@ def prepare(database, run_directory, calculation, **kwargs):
     for key in calculation.singularkeys:
         calculation_dict[key] = kwargs[key]
     
+    #for key in kwargs:
+    #    print(key)
+    #    print(kwargs[key])
+    #    print()
+    
     # Iterate over multidict combinations
     for subdict in itermultidict(calculation.multikeys, **kwargs):
         calculation_dict.update(subdict)

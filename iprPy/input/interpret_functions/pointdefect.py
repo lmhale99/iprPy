@@ -23,7 +23,8 @@ def pointdefect(input_dict, build=True, **kwargs):
     - **'pointdefect_file'** a point-defect record to load.
     - **'pointdefect_content'** alternate file or content to load instead of
       specified pointdefect_file.  This is used by prepare functions.
-    - ** pointdefect_model'** The open DataModelDict of the file/content
+    - **'pointdefect_model'** The open DataModelDict of the file/content
+    - **'pointdefect_family'** the crystal family the defect parameters are specified for.
     - **'pointdefect_type'** defines the point defect type to add.
     - **'pointdefect_atype'** defines the atom type for the defect being
       added.
@@ -50,6 +51,8 @@ def pointdefect(input_dict, build=True, **kwargs):
         Replacement parameter key name for 'pointdefect_content'.
     pointdefect_model : str
         Replacement parameter key name for 'pointdefect_model'.
+    pointdefect_family : str
+        Replacement parameter key name for 'pointdefect_family'.
     pointdefect_type : str
         Replacement parameter key name for 'pointdefect_type'.
     pointdefect_atype : str
@@ -70,9 +73,10 @@ def pointdefect(input_dict, build=True, **kwargs):
     
     # Set default keynames
     keynames = ['pointdefect_file', 'pointdefect_content', 'pointdefect_model',
-                'pointdefect_type', 'pointdefect_atype', 'pointdefect_pos',
-                'pointdefect_dumbbell_vect', 'pointdefect_scale', 'ucell',
-                'calculation_params', 'point_kwargs']
+                'pointdefect_family', 'pointdefect_type', 'pointdefect_atype',
+                'pointdefect_pos', 'pointdefect_dumbbell_vect',
+                'pointdefect_scale', 'ucell', 'calculation_params',
+                'point_kwargs']
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
     
@@ -96,7 +100,7 @@ def pointdefect(input_dict, build=True, **kwargs):
         
         # Load defect model
         pointdefect_model = DM(pointdefect_file).find('point-defect')
-        
+        input_dict[kwargs['pointdefect_family']] = pointdefect_model['system-family']
         # Save raw parameters
         calculation_params = pointdefect_model['calculation-parameter']
     

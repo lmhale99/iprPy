@@ -19,8 +19,9 @@ def stackingfaultpart1(input_dict, **kwargs):
     - **'stackingfault_content'** alternate file or content to load instead of
       specified stackingfault_file.  This is used by prepare functions.
     - **'stackingfault_model'** the open DataModelDict of file/content.
-    - **'x_axis, y_axis, z_axis'** the orientation axes.  This function only
-      reads in values from the stackingfault_model.
+    - **'a_uvw, b_uvw, c_uvw'** the orientation [uvw] indices. This function only
+      reads in values from the surface_model.
+    - **'stackingfault_family'** the crystal family the defect parameters are specified for.
     - **'atomshift'** the atomic shift to apply to all atoms.  This function
       only reads in values from the stackingfault_model.
     - **'stackingfault_cutboxvector'** the cutboxvector parameter for the
@@ -43,12 +44,14 @@ def stackingfaultpart1(input_dict, **kwargs):
         Replacement parameter key name for 'stackingfault_content'.
     stackingfault_model : str
         Replacement parameter key name for 'stackingfault_model'.
-    x_axis : str
-        Replacement parameter key name for 'x_axis'.
-    y_axis : str
-        Replacement parameter key name for 'y_axis'.
-    z_axis : str
-        Replacement parameter key name for 'z_axis'.
+    stackingfault_family : str
+        Replacement parameter key name for 'stackingfault_family'.
+    a_uvw : str
+        Replacement parameter key name for 'a_uvw'.
+    b_uvw : str
+        Replacement parameter key name for 'b_uvw'.
+    c_uvw : str
+        Replacement parameter key name for 'c_uvw'.
     atomshift : str
         Replacement parameter key name for 'atomshift'.
     stackingfault_cutboxvector : str
@@ -63,8 +66,9 @@ def stackingfaultpart1(input_dict, **kwargs):
     
     # Set default keynames
     keynames = ['stackingfault_file', 'stackingfault_content',
-                'stackingfault_model', 'x_axis', 'y_axis', 'z_axis',
-                'atomshift', 'stackingfault_cutboxvector',
+                'stackingfault_model', 'stackingfault_family', 
+                'a_uvw', 'b_uvw', 'c_uvw', 'atomshift',
+                'stackingfault_cutboxvector',
                 'stackingfault_faultpos', 'stackingfault_shiftvector1',
                 'stackingfault_shiftvector2']
     for keyname in keynames:
@@ -83,7 +87,7 @@ def stackingfaultpart1(input_dict, **kwargs):
     if stackingfault_file is not None:
         
         # Verify competing parameters are not defined
-        for key in ('atomshift', 'x_axis', 'y_axis', 'z_axis',
+        for key in ('atomshift', 'a_uvw', 'b_uvw', 'c_uvw',
                     'stackingfault_cutboxvector', 'stackingfault_faultpos',
                     'stackingfault_shiftvector1',
                     'stackingfault_shiftvector2'):
@@ -95,9 +99,10 @@ def stackingfaultpart1(input_dict, **kwargs):
         stackingfault_model = DM(stackingfault_file).find('stacking-fault')
             
         # Extract parameter values from defect model
-        input_dict[kwargs['x_axis']] = stackingfault_model['calculation-parameter']['x_axis']
-        input_dict[kwargs['y_axis']] = stackingfault_model['calculation-parameter']['y_axis']
-        input_dict[kwargs['z_axis']] = stackingfault_model['calculation-parameter']['z_axis']
+        input_dict[kwargs['stackingfault_family']] = stackingfault_model['system-family']
+        input_dict[kwargs['a_uvw']] = stackingfault_model['calculation-parameter']['a_uvw']
+        input_dict[kwargs['b_uvw']] = stackingfault_model['calculation-parameter']['b_uvw']
+        input_dict[kwargs['c_uvw']] = stackingfault_model['calculation-parameter']['c_uvw']
         input_dict[kwargs['atomshift']] = stackingfault_model['calculation-parameter']['atomshift']
         input_dict[kwargs['stackingfault_cutboxvector']] = stackingfault_model['calculation-parameter']['cutboxvector']
         input_dict[kwargs['stackingfault_faultpos']] = float(stackingfault_model['calculation-parameter']['faultpos'])

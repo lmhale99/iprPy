@@ -40,9 +40,6 @@ class CrystalSpaceGroup(Calculation):
         """list: Calculation keys that can have multiple values during prepare."""
         return [
                    [
-                    'potential_file',
-                    'potential_content',
-                    'potential_dir',
                     'load_file',
                     'load_content',
                     'load_style',

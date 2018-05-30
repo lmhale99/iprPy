@@ -27,6 +27,8 @@ def atomman_systemmanipulate(input_dict, build=True, **kwargs):
     - **'atomshift'** scaled vector to shift all atoms by.
     - **'sizemults'** 3x2 array of ints indicating how to create a supercell.
     - **'uvws'** a 3x3 array containing all three uvw terms.
+    - **'transformationmatrix'** The Cartesian transformation matrix associated
+      with changing from ucell to initialsystem
     - **'initialsystem'** the resulting system after manipulation is saved
       here.
        
@@ -51,13 +53,15 @@ def atomman_systemmanipulate(input_dict, build=True, **kwargs):
         Replacement parameter key name for 'sizemults'.
     uvws : str
         Replacement parameter key name for 'uvws'.
+    transformationmatrix : str
+        Replacement parameter key name for 'transformationmatrix'.
     initialsystem : str
         Replacement parameter key name for 'initialsystem'.
     """
     
     #Set default keynames
     keynames = ['ucell', 'a_uvw', 'b_uvw', 'c_uvw', 'uvws', 'atomshift',
-                'sizemults', 'initialsystem']
+                'sizemults', 'transformationmatrix', 'initialsystem']
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
     
@@ -132,7 +136,7 @@ def atomman_systemmanipulate(input_dict, build=True, **kwargs):
         ucell = input_dict[kwargs['ucell']]
         
         # Rotate to specified uvws
-        initialsystem = ucell.rotate(uvws)
+        initialsystem, transform = ucell.rotate(uvws, return_transform=True)
         
         # Shift atoms by atomshift
         shift = list(np.array(atomshift.strip().split(), dtype=float))
@@ -148,6 +152,7 @@ def atomman_systemmanipulate(input_dict, build=True, **kwargs):
     
     else:
         initialsystem = None
+        transform = None
     
     # Save processed terms
     input_dict[kwargs['a_uvw']] = a_uvw
@@ -156,4 +161,5 @@ def atomman_systemmanipulate(input_dict, build=True, **kwargs):
     input_dict[kwargs['atomshift']] = atomshift
     input_dict[kwargs['sizemults']] = sizemults
     input_dict[kwargs['uvws']] = uvws
+    input_dict[kwargs['transformationmatrix']] = transform
     input_dict[kwargs['initialsystem']] = initialsystem

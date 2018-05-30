@@ -50,7 +50,7 @@ def defect(database, keys, record=None, query=None, **kwargs):
             if key == file_key:
                 inputs[key].append(defect.name + '.json')
             elif key == content_key:
-                inputs[key].append(defect.content)
+                inputs[key].append(defect.content.json(indent=4))
             elif key == family_key:
                 inputs[key].append(defect_series.family)
             else:

@@ -4,9 +4,9 @@
         "id": "A2--W--bcc--112sf",
         "system-family": "A2--W--bcc", 
         "calculation-parameter": {
-            "x_axis": " 1  1  1", 
-            "y_axis": " 1 -1  0", 
-            "z_axis": " 1  1 -2", 
+            "a_uvw": " 1  1  1", 
+            "b_uvw": " 1 -1  0", 
+            "c_uvw": " 1  1 -2", 
             "atomshift": " 0.01  0.01  0.01", 
             "cutboxvector": "c",
             "faultpos": 0.5, 

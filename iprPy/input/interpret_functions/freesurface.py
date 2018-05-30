@@ -18,6 +18,7 @@ def freesurface(input_dict, **kwargs):
     - **'surface_content'** alternate file or content to load instead of
       specified surface_model. This is used by prepare functions.
     - **'surface_model'** the open DataModelDict of file/content.
+    - **'surface_family'** the crystal family the defect parameters are specified for.
     - **'a_uvw, b_uvw, c_uvw'** the orientation [uvw] indices. This function only
       reads in values from the surface_model.
     - **'atomshift'** the atomic shift to apply to all atoms. This function
@@ -36,6 +37,8 @@ def freesurface(input_dict, **kwargs):
         Replacement parameter key name for 'surface_content'.
     surface_model : str
         Replacement parameter key name for 'surface_model'.
+    surface_family : str
+        Replacement parameter key name for 'surface_family'.
     a_uvw : str
         Replacement parameter key name for 'a_uvw'.
     b_uvw : str
@@ -49,7 +52,7 @@ def freesurface(input_dict, **kwargs):
     """
     
     # Set default keynames
-    keynames = ['surface_file', 'surface_content', 'surface_model', 
+    keynames = ['surface_file', 'surface_content', 'surface_model', 'surface_family',
                 'a_uvw', 'b_uvw', 'c_uvw', 'atomshift', 'surface_cutboxvector']
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
@@ -76,6 +79,7 @@ def freesurface(input_dict, **kwargs):
         surface_model = DM(surface_file).find('free-surface')
             
         # Extract parameter values from defect model
+        input_dict[kwargs['surface_family']] = surface_model['system-family']
         input_dict[kwargs['a_uvw']] = surface_model['calculation-parameter']['a_uvw']
         input_dict[kwargs['b_uvw']] = surface_model['calculation-parameter']['b_uvw']
         input_dict[kwargs['c_uvw']] = surface_model['calculation-parameter']['c_uvw']

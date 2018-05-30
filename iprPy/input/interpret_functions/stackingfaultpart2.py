@@ -26,14 +26,16 @@ def stackingfaultpart2(input_dict, build=True, **kwargs):
       as a crystallographic vector.
     - **'sizemults'** the system size multipliers. Only accessed here.
     - **'ucell'** the unit cell system. Only accessed here.
-    - **'axes'** the 3x3 matrix of axes. Only accessed here.
+    - **'uvws'** a 3x3 array containing all three uvw terms.
     - **'faultpos'** the absolute fault position relative to the initial
       system.
     - **'shiftvector1'** one of the two fault shifting vectors as a Cartesian
       vector.
     - **'shiftvector2'** one of the two fault shifting vectors as a Cartesian
       vector.
-       
+    - **'transformationmatrix'** The Cartesian transformation matrix associated
+      with changing from ucell to initialsystem
+    
     Parameters
     ----------
     input_dict : dict
@@ -48,21 +50,23 @@ def stackingfaultpart2(input_dict, build=True, **kwargs):
         Replacement parameter key name for 'sizemults'.
     ucell : str
         Replacement parameter key name for 'ucell'.
-    axes : str
-        Replacement parameter key name for 'axes'.
+    uvws : str
+        Replacement parameter key name for 'uvws'.
     faultpos : str
         Replacement parameter key name for 'faultpos'.
     shiftvector1 : str
         Replacement parameter key name for 'shiftvector1'.
     shiftvector2 : str
         Replacement parameter key name for 'shiftvector2'.
+    transformationmatrix : str
+        Replacement parameter key name for 'transformationmatrix'.
     """
     
     # Set default keynames
     keynames = ['stackingfault_faultpos', 'stackingfault_shiftvector1',
                 'stackingfault_shiftvector2', 'stackingfault_cutboxvector',
-                'sizemults', 'ucell', 'axes', 'faultpos', 'shiftvector1',
-                'shiftvector2']
+                'sizemults', 'ucell', 'uvws', 'faultpos', 'shiftvector1',
+                'shiftvector2', 'transformationmatrix']
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
     
@@ -75,7 +79,7 @@ def stackingfaultpart2(input_dict, build=True, **kwargs):
         stackingfault_cutboxvector = input_dict[kwargs['stackingfault_cutboxvector']]
         sizemults = input_dict[kwargs['sizemults']]
         ucell = input_dict[kwargs['ucell']]
-        axes = input_dict[kwargs['axes']]
+        transform = input_dict[kwargs['transformationmatrix']]
         
         # Convert string terms to arrays
         stackingfault_shiftvector1 = np.array(stackingfault_shiftvector1.strip().split(),
@@ -83,20 +87,16 @@ def stackingfaultpart2(input_dict, build=True, **kwargs):
         stackingfault_shiftvector2 = np.array(stackingfault_shiftvector2.strip().split(),
                                               dtype=float)
         
-        # Convert crystallographic vectors to Cartesian vectors
-        shiftvector1 = (stackingfault_shiftvector1[0] * ucell.box.avect +
-                        stackingfault_shiftvector1[1] * ucell.box.bvect +
-                        stackingfault_shiftvector1[2] * ucell.box.cvect)
+        # Convert shift vectors from crystallographic to Cartesian vectors
+        shiftvector1 = ucell.box.vects.T.dot(stackingfault_shiftvector1)
+        shiftvector2 = ucell.box.vects.T.dot(stackingfault_shiftvector2)
         
-        shiftvector2 = (stackingfault_shiftvector2[0] * ucell.box.avect +
-                        stackingfault_shiftvector2[1] * ucell.box.bvect +
-                        stackingfault_shiftvector2[2] * ucell.box.cvect)
+        # Transform shift vectors
+        shiftvector1 = transform.dot(shiftvector1)
+        shiftvector1[np.isclose(shiftvector1, 0.0, atol=1e-10, rtol=0.0)] = 0.0
+        shiftvector2 = transform.dot(shiftvector2)
+        shiftvector2[np.isclose(shiftvector2, 0.0, atol=1e-10, rtol=0.0)] = 0.0
         
-        # Transform using axes
-        T = am.tools.axes_check(axes)
-        shiftvector1 = T.dot(shiftvector1)
-        shiftvector2 = T.dot(shiftvector2)
-
         # Identify number of size multiples, m, along cutboxvector
         if   stackingfault_cutboxvector == 'a': 
             m = sizemults[0]

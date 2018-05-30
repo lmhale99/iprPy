@@ -64,6 +64,19 @@ class CalculationSurfaceEnergyStatic(Record):
         """
         return []
     
+    def isvalid(self):
+        """
+        Looks at the values of elements in the record to determine if the
+        associated calculation would be a valid one to run.
+        
+        Returns
+        -------
+        bool
+            True if element combinations are valid, False if not.
+        """
+        calc = self.content[self.contentroot]
+        return calc['free-surface']['system-family'] == calc['system-info']['family']
+    
     def buildcontent(self, script, input_dict, results_dict=None):
         """
         Builds a data model of the specified record style based on input (and
@@ -139,8 +152,7 @@ class CalculationSurfaceEnergyStatic(Record):
         if input_dict['surface_model'] is not None:
             surf['key'] = input_dict['surface_model']['key']
             surf['id'] = input_dict['surface_model']['id']
-        
-        surf['system-family'] = input_dict['family']
+        surf['system-family'] = input_dict.get('surface_family', input_dict['family'])
         surf['calculation-parameter'] = cp = DM()
         cp['a_uvw'] = input_dict['a_uvw']
         cp['b_uvw'] = input_dict['b_uvw']

@@ -62,8 +62,6 @@ class StackingFaultMap2D(Calculation):
                     'sizemults',
                    ],
                    [
-                    'stackingfault_numshifts1',
-                    'stackingfault_numshifts2',
                     'stackingfault_file',
                     'stackingfault_content',
                     'stackingfault_family',
@@ -71,6 +69,10 @@ class StackingFaultMap2D(Calculation):
                     'stackingfault_faultpos',
                     'stackingfault_shiftvector1',
                     'stackingfault_shiftvector2',
+                    ],
+                    [
+                    'stackingfault_numshifts1',
+                    'stackingfault_numshifts2',
                     ],
                     [
                     'energytolerance',

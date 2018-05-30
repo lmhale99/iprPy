@@ -64,6 +64,19 @@ class CalculationPointDefectStatic(Record):
         """
         return []
     
+    def isvalid(self):
+        """
+        Looks at the values of elements in the record to determine if the
+        associated calculation would be a valid one to run.
+        
+        Returns
+        -------
+        bool
+            True if element combinations are valid, False if not.
+        """
+        calc = self.content[self.contentroot]
+        return calc['point-defect']['system-family'] == calc['system-info']['family']
+    
     def buildcontent(self, script, input_dict, results_dict=None):
         """
         Builds a data model of the specified record style based on input (and
@@ -140,8 +153,7 @@ class CalculationPointDefectStatic(Record):
         if input_dict['pointdefect_model'] is not None:
             ptd['key'] = input_dict['pointdefect_model']['key']
             ptd['id'] =  input_dict['pointdefect_model']['id']
-        
-        ptd['system-family'] = input_dict['family']
+        ptd['system-family'] = input_dict.get('pointdefect_family', input_dict['family'])
         ptd['calculation-parameter'] = input_dict['calculation_params']
         
         if results_dict is None:

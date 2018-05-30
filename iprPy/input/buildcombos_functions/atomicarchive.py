@@ -14,54 +14,62 @@ __all__ = ['atomicarchive']
 def atomicarchive(database, keys, record=None, load_key='atomic-system',
                   query=None, **kwargs):
     
-    # Get potentials
-    if 'potential_file' in keys:
-        potential_kwargs = {}
-        for key in list(kwargs.keys()):
-            if key[:10] == 'potential_':
-                potential_kwargs[key[10:]] = kwargs.pop(key)
-        
-        pot_inputs = interatomicpotential(database, **potential_kwargs)
-        
-        potentials = {}
-        for i in range(len(pot_inputs['potential_dir'])):
-            potentials[pot_inputs['potential_dir'][i]] = pot_inputs['potential_content'][i]
-    
-    parents, parent_df = database.get_records(style=record, return_df=True,
-                                              query=query, **kwargs)
-    
+    # Setup
     inputs = {}
     for key in keys:
         inputs[key] = []
+    if 'potential_file' in keys:
+        include_potential = True
+    else:
+        include_potential = False
     
-    for i, parent_info in parent_df.iterrows():
-        parent = parents[i]
-        parent_model = DM(parent.content).finds(load_key)
+    # Loop over all matching records
+    parent_records = database.get_records(style=record, query=query, **kwargs)
+    for parent_record in parent_records:
+        parent = parent_record.content
         
-        for j in range(len(parent_model)):
-            for key in keys:
-                if key == 'potential_file':
-                    potential_name = parent_info.potential_LAMMPS_id
-                    inputs['potential_file'].append(potential_name + '.json')
-                elif key == 'potential_content':
-                    potential_name = parent_info.potential_LAMMPS_id
-                    potential_content = potentials[potential_name]
-                    inputs['potential_content'].append(potential_content)
-                elif key == 'potential_dir':
-                    potential_name = parent_info.potential_LAMMPS_id
-                    inputs['potential_dir'].append(potential_name)
-                elif key == 'load_file':
-                    load_file = parent.name + '/' + parent_model[j]['artifact']['file']
-                    inputs['load_file'].append(load_file)
-                elif key == 'load_content':
-                    inputs['load_content'].append('tar ' + parent.name + ' ' + parent_model[j]['artifact']['file'])
-                elif key == 'load_style':
-                    inputs['load_style'].append(parent_model[j]['artifact']['format'])
-                elif key == 'family':
-                    inputs['family'].append(parent_info.family)
-                elif key == 'symbols':
-                    inputs['symbols'].append(' '.join(parent_model[j].aslist('symbols')))
-                else:
-                    inputs[key].append('')
+        # Loop over load_keys
+        for load_info in parent.finds(load_key):
+            
+            name = parent_record.name
+            file = load_info['artifact']['file']
+            style = load_info['artifact']['format']
+            options = load_info['artifact'].get('load_options', '')
+            try:
+                family = load_info['family']
+            except:
+                family = parent.find('system-info')['family']
+            
+            # Extract load information
+            inputs['load_file'].append(name + '/' + file)
+            inputs['load_content'].append('tar ' + name + ' ' + file)
+            inputs['load_style'].append(style)
+            inputs['load_options'].append(options)
+            inputs['family'].append(family)
+            inputs['symbols'].append(' '.join(load_info.aslist('symbols')))
+            inputs['box_parameters'].append('')
+            
+            # Extract potential information
+            if include_potential is True:
+                try:
+                    # Get name of potential from parent
+                    potential_name = parent.find('potential-LAMMPS')['id']
+                except:
+                    # Search grandparents for name of potential
+                    potential_name = None
+                    for grandparent_record in database.get_parent_records(record=parent_record):
+                        grandparent = grandparent_record.content
+                        try:
+                            potential_name = grandparent.find('potential-LAMMPS')['id']
+                        except:
+                            pass
+                        else:
+                            break
+                    if potential_name is None:
+                        raise ValueError('potential info not found')
+                
+                inputs['potential_file'].append(potential_name + '.json')
+                inputs['potential_content'].append(database.get_record(name=potential_name).content.json(indent=4))
+                inputs['potential_dir'].append(potential_name)
     
     return inputs
