@@ -1,2 +1,0 @@
-#!/bin/bash
-python ../iprPy/highthroughput/runner.py "$1"
