@@ -1,0 +1,25 @@
+# Commands and executables
+lammps_command              lmp_mpi
+mpi_command                 
+
+# Build load information based on prototype records
+buildcombos                 crystalprototype load_file prototype
+prototype_potential_name    2004--Zhou-X-W--Al--LAMMPS--ipr2
+
+# System manipulations
+a_uvw                      
+b_uvw                      
+c_uvw                  
+atomshift                   
+sizemults                   3 3 3
+
+# Units that input/output values are in
+length_unit                 
+pressure_unit               
+energy_unit                 
+force_unit                  
+
+# Run parameters
+minimum_r                   2.0
+maximum_r                   6.0
+number_of_steps_r           200  

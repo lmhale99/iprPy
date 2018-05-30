@@ -9,9 +9,37 @@ from copy import deepcopy
 # iprPy imports
 from ..tools import aslist, filltemplate
 from .. import load_record
-from ..input import buildcombos
+from ..input import buildcombos, parse
 
-def prepare(database, run_directory, calculation, **kwargs):
+def prepare(database, run_directory, calculation, input_script=None, **kwargs):
+    """
+    Function for preparing any iprPy calculation for high-throughput execution.
+    Input parameters for preparing can either be given within an input script
+    or by passing in keyword parameters.
+    
+    Parameters
+    ----------
+    database : iprPy.database.Database
+        The database that will host the records for the prepared calculations
+    run_directory : str
+        The path to the local run_directory where the prepared calculations
+        are to be placed.
+    calculation : iprPy.calculation.Calculation
+        The calculation to prepare.
+    input_script : str or file-like object, optional
+        The file, path to file, or contents of an input script containing
+        parameters for preparing the calculation.  Cannot be given with kwargs.
+    **kwargs : str or list
+        Input parameters for preparing the calculation.  Values must be strings
+        or list of strings if allowed by the calculation.
+    """
+    
+    # Parse input_script to kwargs if given
+    if input_script is not None:
+        if len(kwargs) == 0:
+            kwargs = parse(input_script, singularkeys=calculation.singularkeys)
+        else:
+            raise ValueError('input_script cannot be given with other keyword parameters')
     
     # Build dataframe of all existing records for the calculation style
     record_df = database.get_records_df(style=calculation.record_style,
@@ -89,11 +117,6 @@ def prepare(database, run_directory, calculation, **kwargs):
     calculation_dict = {}
     for key in calculation.singularkeys:
         calculation_dict[key] = kwargs[key]
-    
-    #for key in kwargs:
-    #    print(key)
-    #    print(kwargs[key])
-    #    print()
     
     # Iterate over multidict combinations
     for subdict in itermultidict(calculation.multikeys, **kwargs):

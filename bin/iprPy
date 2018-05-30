@@ -2,155 +2,178 @@
 # Standard Python libraries
 from __future__ import (absolute_import, print_function,
                         division, unicode_literals)
-import os
-import sys
 import argparse
 
 # https://github.com/usnistgov/iprPy
 import iprPy
 
-parser = argparse.ArgumentParser(description='iprPy high-throughput commands')
-subparsers = parser.add_subparsers(title='actions', dest='action')
-
-# define subparser for build
-parser_build = subparsers.add_parser('build', 
-                    help='add library reference records to a database')
-parser_build.add_argument('database', nargs='?', default=None, 
-                    help='database name')
-
-# define subparser for check
-parser_check = subparsers.add_parser('check', 
-                    help='checks status of a run_directory or database')
-parser_check.add_argument('database', nargs='?', default=None,
-                    help='database name')
-parser_check.add_argument('record_style', nargs='?', default=None,
-                    help='optional record style to limit by')
-
-# define subparser for check_modules
-parser_check_modules = subparsers.add_parser('check_modules',
-                    help='prints load status of all modules in iprPy')
-
-# define subparser for clean
-parser_clean = subparsers.add_parser('clean',
-                    help='resets prepared calculations for running again')
-parser_clean.add_argument('database', nargs='?', default=None,
-                    help='database name')
-parser_clean.add_argument('run_directory', nargs='?', default=None,
-                    help='run_directory name')
-parser_clean.add_argument('record_style', nargs='?', default=None,
-                    help='optional record style')
-
-# define subparser for copy
-parser_copy = subparsers.add_parser('copy',
-                    help='copy records of a given style from one database to another')
-parser_copy.add_argument('database1', nargs='?', default=None,
-                    help='database name to copy from')
-parser_copy.add_argument('database2', nargs='?', default=None,
-                    help='database name to copy to')
-parser_copy.add_argument('record_style', nargs='?', default=None,
-                    help='optional record style')
-
-# define subparser for destroy
-parser_destroy = subparsers.add_parser('destroy',
-                    help='delete all records of a given style from a database')
-parser_destroy.add_argument('database', nargs='?', default=None,
-                    help='database name')
-parser_destroy.add_argument('record_style', nargs='?', default=None,
-                    help='record style')
-
-# define subparser for prepare
-parser_prepare = subparsers.add_parser('prepare',
-                    help='prepare calculations')
-parser_prepare.add_argument('database',
-                    help='database name')
-parser_prepare.add_argument('run_directory',
-                    help='run_directory name')
-parser_prepare.add_argument('input_file',
-                    help='prepare parameter file')
-
-# define subparser for runner
-parser_runner = subparsers.add_parser('runner',
-                    help='start runner working on prepared calculations')
-parser_runner.add_argument('database', nargs='?', default=None,
-                    help='database name')
-parser_runner.add_argument('run_directory', nargs='?', default=None,
-                    help='run_directory name')
-
-# define subparser for set
-parser_set = subparsers.add_parser('set',
-                    help='define a database or run_directory')
-parser_set.add_argument('type', choices=['database', 'run_directory'],
-                    help='select database or run_directory')
-parser_set.add_argument('name', nargs='?', default=None,
-                    help='name for the object')
-
-# define subparser for unset
-parser_set = subparsers.add_parser('unset',
-                    help='remove defined database or run_directory')
-parser_set.add_argument('type', choices=['database', 'run_directory'],
-                    help='select database or run_directory')
-parser_set.add_argument('name', nargs='?', default=None,
-                    help='name for the object')
-
-# Parse command line arguments
-args = parser.parse_args()
-
-# Actions for subcommand build
-if args.action == 'build':
-    dbase = iprPy.highthroughput.get_database(args.database)
-    iprPy.highthroughput.build(dbase)
-
-# Actions for subcommand check
-elif args.action == 'check':
-    dbase = iprPy.highthroughput.get_database(args.database)
-    iprPy.highthroughput.check(dbase=dbase, record_style=args.record_style)
-
-# Actions for subcommand check_modules
-elif args.action == 'check_modules':
-    iprPy.check_modules()
-
-# Actions for subcommand clean
-elif args.action == 'clean':
-    if args.database != 'None':
-        dbase = iprPy.highthroughput.get_database(args.database)
+def main(args):
+    """
+    Calls iprPy actions based on the parsed arguments
+    """
+    # Actions for subcommand build_refs
+    if args.action == 'build_refs':
+        database = iprPy.load_database(args.database)
+        database.build_refs()
+    
+    # Actions for subcommand check_records
+    elif args.action == 'check_records':
+        database = iprPy.load_database(args.database)
+        database.check_records(record_style=args.record_style)
+    
+    # Actions for subcommand check_modules
+    elif args.action == 'check_modules':
+        iprPy.check_modules()
+    
+    # Actions for subcommand clean_records
+    elif args.action == 'clean_records':
+        database = iprPy.load_database(args.database)
+        run_directory = iprPy.load_run_directory(args.run_directory)
+        database.clean_records(run_directory=run_directory, record_style=args.record_style)
+    
+    # Actions for subcommand copy_records
+    elif args.action == 'copy_records':
+        database1 = iprPy.load_database(args.database1)
+        database2 = iprPy.load_database(args.database2)
+        database1.copy_records(database2, record_style=args.record_style)
+    
+    # Actions for subcommand destroy_records
+    elif args.action == 'destroy_records':
+        database = iprPy.load_database(args.database)
+        database.destroy_records(args.record_style)
+    
+    # Actions for subcommand prepare
+    elif args.action == 'prepare':
+        database = iprPy.load_database(args.database)
+        run_directory = iprPy.load_run_directory(args.run_directory)
+        calculation = iprPy.load_calculation(args.calculation)
+        database.prepare(run_directory, calculation, input_script=args.input_script)
+    
+    # Actions for subcommand runner
+    elif args.action == 'runner':
+        database = iprPy.load_database(args.database)
+        run_directory = iprPy.load_run_directory(args.run_directory)
+        database.runner(run_directory)
+    
+    # Actions for subcommand set_database
+    elif args.action == 'set_database':
+        iprPy.set_database(args.name)
+    
+    # Actions for subcommand unset_database
+    elif args.action == 'unset_database':
+        iprPy.unset_database(args.name)
+    
+    # Actions for subcommand set_run_directory
+    elif args.action == 'set_run_directory':
+        iprPy.set_run_directory(args.name)
+    
+    # Actions for subcommand unset_run_directory
+    elif args.action == 'unset_run_directory':
+        iprPy.unset_run_directory(args.name)
+    
     else:
-        dbase = None
-    run_directory = iprPy.highthroughput.get_run_directory(args.run_directory)
-    iprPy.highthroughput.clean(dbase=dbase, run_directory=run_directory, record_style=args.record_style)
+        raise ValueError('Unknown action argument')
+    
+def iprPy_command_line_parser():
+    """
+    Defines the command line parsing logic for the iprPy command line executable.
+    """
+    parser = argparse.ArgumentParser(description='iprPy high-throughput commands')
+    subparsers = parser.add_subparsers(title='actions', dest='action')
+    
+    # Define subparser for build_refs
+    parser_build = subparsers.add_parser('build_refs', 
+                        help='add library reference records to a database')
+    parser_build.add_argument('database', nargs='?', default=None, 
+                        help='database name')
+    
+    # Define subparser for check_records
+    parser_check = subparsers.add_parser('check_records', 
+                        help='checks status of a run_directory or database')
+    parser_check.add_argument('database', nargs='?', default=None,
+                        help='database name')
+    parser_check.add_argument('record_style', nargs='?', default=None,
+                        help='optional record style to limit by')
+    
+    # Define subparser for check_modules
+    parser_check_modules = subparsers.add_parser('check_modules',
+                        help='prints load status of all modules in iprPy')
+    
+    # Define subparser for clean_records
+    parser_clean = subparsers.add_parser('clean_records',
+                        help='resets prepared calculations for running again')
+    parser_clean.add_argument('database', nargs='?', default=None,
+                        help='database name')
+    parser_clean.add_argument('run_directory', nargs='?', default=None,
+                        help='run_directory name')
+    parser_clean.add_argument('record_style', nargs='?', default=None,
+                        help='optional record style')
+    
+    # Define subparser for copy_records
+    parser_copy = subparsers.add_parser('copy_records',
+                        help='copy records of a given style from one database to another')
+    parser_copy.add_argument('database1', nargs='?', default=None,
+                        help='database name to copy from')
+    parser_copy.add_argument('database2', nargs='?', default=None,
+                        help='database name to copy to')
+    parser_copy.add_argument('record_style', nargs='?', default=None,
+                        help='optional record style')
+    
+    # Define subparser for destroy_records
+    parser_destroy = subparsers.add_parser('destroy_records',
+                        help='delete all records of a given style from a database')
+    parser_destroy.add_argument('database', nargs='?', default=None,
+                        help='database name')
+    parser_destroy.add_argument('record_style', nargs='?', default=None,
+                        help='record style')
+    
+    # Define subparser for prepare
+    parser_prepare = subparsers.add_parser('prepare',
+                        help='prepare calculations')
+    parser_prepare.add_argument('database',
+                        help='database name')
+    parser_prepare.add_argument('run_directory',
+                        help='run_directory name')
+    parser_prepare.add_argument('calculation',
+                        help='calculation name')
+    parser_prepare.add_argument('input_script',
+                        help='input parameter script')
+    
+    # Define subparser for runner
+    parser_runner = subparsers.add_parser('runner',
+                        help='start runner working on prepared calculations')
+    parser_runner.add_argument('database', nargs='?', default=None,
+                        help='database name')
+    parser_runner.add_argument('run_directory', nargs='?', default=None,
+                        help='run_directory name')
+    
+    # Define subparser for set_database
+    parser_set = subparsers.add_parser('set_database',
+                        help='define database access information')
+    parser_set.add_argument('name', nargs='?', default=None,
+                        help='name to assign to the database')
+    
+    # Define subparser for unset_database
+    parser_set = subparsers.add_parser('unset_database',
+                        help='forget settings for a defined database')
+    parser_set.add_argument('name', nargs='?', default=None,
+                        help='name assigned to the database')
+    
+    # Define subparser for set_run_directory
+    parser_set = subparsers.add_parser('set_run_directory',
+                        help='define run_directory path')
+    parser_set.add_argument('name', nargs='?', default=None,
+                        help='name to assign to the run_directory')
+    
+    # Define subparser for unset_run_directory
+    parser_set = subparsers.add_parser('unset_run_directory',
+                        help='forget settings for a defined run_directory')
+    parser_set.add_argument('name', nargs='?', default=None,
+                        help='name assigned to the run_directory')
+    
+    # Parse command line arguments
+    return parser.parse_args()
 
-# Actions for subcommand copy
-elif args.action == 'copy':
-    dbase1 = iprPy.highthroughput.get_database(args.database1)
-    dbase2 = iprPy.highthroughput.get_database(args.database2)
-    iprPy.highthroughput.copy(dbase1, dbase2, record_style=args.record_style)
-
-# Actions for subcommand destroy
-elif args.action == 'destroy':
-    dbase = iprPy.highthroughput.get_database(args.database)
-    iprPy.highthroughput.destroy(dbase, args.record_style)
-
-# Actions for subcommand prepare
-elif args.action == 'prepare':
-    dbase = iprPy.highthroughput.get_database(args.database)
-    run_directory = iprPy.highthroughput.get_run_directory(args.run_directory)
-    iprPy.highthroughput.prepare(dbase, run_directory, input_file=args.input_file)
-
-# Actions for subcommand runner
-elif args.action == 'runner':
-    dbase = iprPy.highthroughput.get_database(args.database)
-    run_directory = iprPy.highthroughput.get_run_directory(args.run_directory)
-    iprPy.highthroughput.runner(dbase, run_directory)
-
-# Actions for subcommand set
-elif args.action == 'set':
-    if args.type == 'database':
-        iprPy.highthroughput.set_database(args.name)
-    elif args.type == 'run_directory':
-        iprPy.highthroughput.set_run_directory(args.name)
-
-# Actions for subcommand unset
-elif args.action == 'unset':
-    if args.type == 'database':
-        iprPy.highthroughput.unset_database(args.name)
-    elif args.type == 'run_directory':
-        iprPy.highthroughput.unset_run_directory(args.name)
+if __name__ == '__main__':
+    args = iprPy_command_line_parser()
+    main(args)

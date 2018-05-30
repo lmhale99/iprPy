@@ -2,13 +2,15 @@
 from __future__ import (absolute_import, print_function,
                         division, unicode_literals)
 
+from atomman.tools import uber_open_rmode
+                       
 # iprPy imports
 from ..tools import aslist
 from ..compatibility import stringtype
 
 __all__ = ['parse']
 
-def parse(infile, singularkeys=[], allsingular=False):
+def parse(inscript, singularkeys=[], allsingular=False):
     """
     Parses an input file and returns a dictionary of parameter terms.
     
@@ -29,8 +31,8 @@ def parse(infile, singularkeys=[], allsingular=False):
     
     Parameters
     ----------
-    infile : string or file-like-object
-        The file or file contents to parse out parameter terms.
+    inscript : string or file-like-object
+        The file, path to file, or contents of the input script to parse.
     singularkeys : list of str, optional
         List of term keys that should not have multiple values.
     allsingular : bool, optional
@@ -44,7 +46,8 @@ def parse(infile, singularkeys=[], allsingular=False):
     Raises
     ------
     ValueError
-        If both singularkeys and allsingular are given, or if multiple values found for a singular key.
+        If both singularkeys and allsingular are given, or if multiple values
+        found for a singular key.
     """
     
     # Argument check
@@ -52,52 +55,55 @@ def parse(infile, singularkeys=[], allsingular=False):
     if allsingular and len(singularkeys) > 0:
         raise ValueError('allsingular and singularkeys options cannot both be given')
     
-    # Split strings into lines
-    if isinstance(infile, stringtype):
-        infile = infile.splitlines()
-
     params = {}
     
-    # Iterate over all lines in infile
-    for line in infile:
-        terms = line.split()
-
-        # Remove comments
-        i = 0
-        index = len(line)
-        while i < len(terms):
-            if len(terms[i]) > 0 and terms[i][0] == '#':
-                index = line.index(terms[i])
-                break
-            i += 1
-        terms = terms[:i]
-        line = line[:index]
-
-        # Skip empty, comment, and valueless lines
-        if len(terms) > 1:
-            
-            # Split into key and value
-            key = terms[0]
-            value = line.replace(key, '', 1).strip()
+    # Open inscript
+    with uber_open_rmode(inscript) as infile:
         
-            # First time key is called save as is
-            if key not in params:
-                params[key] = value
+        # Iterate over all lines in infile
+        for line in infile:
+            try:
+                line = line.decode('utf-8')
+            except:
+                pass
+            terms = line.split()
             
-            # Append value to key if not singular
-            elif not allsingular and key not in singularkeys:
+            # Remove comments
+            i = 0
+            index = len(line)
+            while i < len(terms):
+                if len(terms[i]) > 0 and terms[i][0] == '#':
+                    index = line.index(terms[i])
+                    break
+                i += 1
+            terms = terms[:i]
+            line = line[:index]
+
+            # Skip empty, comment, and valueless lines
+            if len(terms) > 1:
                 
-                # Append value if parameter is already a list
-                if isinstance(params[key], list):
-                    params[key].append(value)
+                # Split into key and value
+                key = terms[0]
+                value = line.replace(key, '', 1).strip()
+            
+                # First time key is called save as is
+                if key not in params:
+                    params[key] = value
                 
-                # Convert parameter to list if needed and then append value
+                # Append value to key if not singular
+                elif not allsingular and key not in singularkeys:
+                    
+                    # Append value if parameter is already a list
+                    if isinstance(params[key], list):
+                        params[key].append(value)
+                    
+                    # Convert parameter to list if needed and then append value
+                    else:
+                        params[key] = [params[key]]
+                        params[key].append(value)
+                
+                # Issue error for trying to append to a singular value
                 else:
-                    params[key] = [params[key]]
-                    params[key].append(value)
-            
-            # Issue error for trying to append to a singular value
-            else:
-                raise ValueError('multiple values found for singular input parameter ' + key)
-            
+                    raise ValueError('multiple values found for singular input parameter ' + key)
+    
     return params

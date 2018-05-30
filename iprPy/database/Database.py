@@ -448,7 +448,7 @@ class Database(object):
             error_df = error_df[error_df.status == 'error']
             
             # Loop over all error records
-            for record_name in error_df.calc_key.tolist():
+            for record_name in error_df.key.tolist():
                 # Check if record has saved tar
                 try:
                     tar = self.get_tar(name=record_name, style=record_style)
