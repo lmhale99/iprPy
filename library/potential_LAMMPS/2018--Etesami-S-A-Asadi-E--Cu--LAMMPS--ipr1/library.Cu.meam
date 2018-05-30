@@ -1,0 +1,8 @@
+# meam data for Cu
+# elt        lat     z       ielement     atwt 
+# alpha      b0      b1      b2           b3    alat    esub    asub 
+# t0         t1              t2           t3            rozero  ibar 
+'Cu' 'fcc' 12 29 63.546000 
+5.200000 4.250000 2.200000 6.000000 2.200000 3.620000 3.540000 0.960000 
+1.000000 2.720000 4.2460000 2.50000 1.000000 -5.000000 
+

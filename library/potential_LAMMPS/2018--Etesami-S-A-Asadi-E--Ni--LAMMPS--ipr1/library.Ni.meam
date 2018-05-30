@@ -1,0 +1,11 @@
+# meam data for Ni 
+# elt        lat     z       ielement     atwt 
+# alpha      b0      b1      b2           b3    alat    esub    asub 
+# t0         t1              t2           t3            rozero  ibar 
+'Ni' 'fcc' 12 28 58.693000 
+5.1000 3.650000 1.500000 6.000000 1.500000 3.520000 4.450000 1.05930000 
+1.000000 3.100000 4.3900000 3.00000 1.000000 -5.000000
+
+
+ 
+

@@ -1,0 +1,45 @@
+{
+    "potential-LAMMPS": {
+        "key": "3b1fa0b6-e1bc-45a5-a7a1-97db42e5dad8", 
+        "id": "2017--Maisel-S-B--V-Ni-Ti--LAMMPS--ipr1", 
+        "potential": {
+            "key": "a24dc04d-afe4-4d8b-a2e5-8202e1c073c4", 
+            "id": "2017--Maisel-S-B--V-Ni-Ti"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "V", 
+                "mass": 50.942
+            }, 
+            {
+                "element": "Ni", 
+                "mass": 58.69
+            }, 
+            {
+                "element": "Ti", 
+                "mass": 47.88
+            }
+        ], 
+        "pair_style": {
+            "type": "meam"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "library.meam"
+                }, 
+                {
+                    "option": "V Ni Ti"
+                }, 
+                {
+                    "file": "VNiTi.meam"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

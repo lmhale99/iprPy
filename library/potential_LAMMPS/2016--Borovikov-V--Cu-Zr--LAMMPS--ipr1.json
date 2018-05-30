@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "24ebf7a9-1cdb-498a-94a7-7cd6b96e7381", 
+        "id": "2016--Borovikov-V--Cu-Zr--LAMMPS--ipr1", 
+        "potential": {
+            "key": "4fc0f7d5-dff6-4de7-8567-d9e87746cb2c", 
+            "id": "2016--Borovikov-V--Cu-Zr"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Cu", 
+                "mass": 63.546
+            }, 
+            {
+                "element": "Zr", 
+                "mass": 91.224
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Cu-Zr_3.eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

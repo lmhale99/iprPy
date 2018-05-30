@@ -1,0 +1,39 @@
+{
+    "potential-LAMMPS": {
+        "key": "39d756f6-9bc2-4c62-bd0f-65d8e21c7d7e", 
+        "id": "2004--Zhou-X-W--Cu-Ag-Au--LAMMPS--ipr1", 
+        "potential": {
+            "key": "52da31b9-68f7-4c14-9e82-048f6fbdd145", 
+            "id": "2004--Zhou-X-W--Cu-Ag-Au"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Cu", 
+                "mass": 63.546
+            },
+            {
+                "element": "Ag", 
+                "mass": 107.87
+            },
+            {
+                "element": "Au", 
+                "mass": 196.97
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "CuAgAu.set"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "potential-LAMMPS": {
+        "key": "9c6b46e1-e953-4cb9-a469-07383eff613e", 
+        "id": "2018--Byggmastar-J--Be-O--LAMMPS--ipr1", 
+        "potential": {
+            "key": "46322ac0-7204-44ca-91c1-88c5b6bc657c", 
+            "id": "2018--Byggmastar-J--Be-O"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Be"
+            }, 
+            {
+                "element": "O"
+            }
+        ], 
+        "pair_style": {
+            "type": "tersoff/zbl"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Be-O.tersoff.zbl"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

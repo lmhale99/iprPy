@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "6aa8fa90-ebf0-48e9-a517-5b0c5e671302", 
+        "id": "2017--Bonny-G--W-Re--LAMMPS--ipr1", 
+        "potential": {
+            "key": "57fe7a02-b8ad-4362-b98f-6439c9ad14dd", 
+            "id": "2017--Bonny-G--W-Re"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "W", 
+                "mass": 183.84
+            }, 
+            {
+                "element": "Re", 
+                "mass": 186.207
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "WRe.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

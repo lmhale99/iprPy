@@ -1,10 +1,10 @@
 {
     "potential-LAMMPS": {
-        "key": "c6bbc01f-77ce-488e-8997-3a7b6e9c9f99", 
-        "id": "2017--Wang-P--Fe-Mn--LAMMPS--ipr1", 
+        "key": "0216ae4e-9b99-4b4b-9f45-426b0022e420", 
+        "id": "2013--Bonny-G--Fe-W--LAMMPS--ipr1", 
         "potential": {
-            "key": "4a8890c8-1ff4-4346-bdd7-72250e853a56", 
-            "id": "2017--Wang-P--Fe-Mn"
+            "key": "64d55ff4-a0d4-4eb6-897f-56c6d3c0154e", 
+            "id": "2013--Bonny-G--Fe-W"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
@@ -12,15 +12,19 @@
             {
                 "element": "Fe", 
                 "mass": 55.845
+            }, 
+            {
+                "element": "W", 
+                "mass": 183.85
             }
-        ], 
+        ],
         "pair_style": {
-            "type": "eam/fs"
+            "type": "eam/alloy"
         }, 
         "pair_coeff": {
             "term": [
                 {
-                    "file": "Fe.eam.fs"
+                    "file": "FeW.eam.alloy"
                 }, 
                 {
                     "symbols": "True"

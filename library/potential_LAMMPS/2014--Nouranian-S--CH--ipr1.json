@@ -1,0 +1,41 @@
+{
+    "potential-LAMMPS": {
+        "key": "2e6aa122-4e8c-4704-b0b9-bdff856d4df1", 
+        "id": "2014--Nouranian-S--CH--ipr1", 
+        "potential": {
+            "key": "91ffec63-8483-445c-b807-7a04d4ecf632", 
+            "id": "2014--Nouranian-S--CH"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "C", 
+                "mass": 12.0111
+            }, 
+            {
+                "element": "H", 
+                "mass": 1.0079
+            }
+        ],
+        "pair_style": {
+            "type": "meam"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Nouranian_CH_library.meam"
+                }, 
+                {
+                    "option": "C H"
+                }, 
+                {
+                    "file": "Nouranian_CH.meam"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

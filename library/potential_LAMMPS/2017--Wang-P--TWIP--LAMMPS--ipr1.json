@@ -1,24 +1,26 @@
 {
     "potential-LAMMPS": {
-        "key": "024ec18c-c358-4eca-b6f9-442d70cfbf05", 
-        "id": "1987--Ackland-G-J--Ag--LAMMPS--test", 
+        "key": "c6bbc01f-77ce-488e-8997-3a7b6e9c9f99", 
+        "id": "2017--Wang-P--TWIP--LAMMPS--ipr1", 
         "potential": {
-            "key": "dc4149ce-3592-4131-8683-ecf654d5a519", 
-            "id": "1987--Ackland-G-J--Ag"
+            "key": "4a8890c8-1ff4-4346-bdd7-72250e853a56", 
+            "id": "2017--Wang-P--TWIP"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
-        "atom": {
-            "element": "Ag", 
-            "mass": 107.8682
-        }, 
+        "atom": [
+            {
+                "element": "Fe", 
+                "mass": 55.845
+            }
+        ], 
         "pair_style": {
             "type": "eam/fs"
         }, 
         "pair_coeff": {
             "term": [
                 {
-                    "file": "Ag_v2.eam.fs"
+                    "file": "Fe.eam.fs"
                 }, 
                 {
                     "symbols": "True"

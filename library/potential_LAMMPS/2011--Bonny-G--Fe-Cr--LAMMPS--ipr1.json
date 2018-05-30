@@ -1,0 +1,55 @@
+{
+    "potential-LAMMPS": {
+        "key": "213ff649-f180-4e00-a7d0-14d9cbbc07f9", 
+        "id": "2011--Bonny-G--Fe-Cr--LAMMPS--ipr1", 
+        "potential": {
+            "key": "c42c513a-f843-41c4-ba4f-3f31316c6a7b", 
+            "id": "2011--Bonny-G--Fe-Cr"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Fe", 
+                "mass": 55.845
+            }, 
+            {
+                "element": "Cr", 
+                "mass": 51.9961
+            }
+        ], 
+        "pair_style": {
+            "type": "hybrid/overlay", 
+            "term": {
+                "option": "eam/alloy eam/fs"
+            }
+        }, 
+        "pair_coeff": [
+            {
+                "term": [
+                    {
+                        "option": "eam/alloy"
+                    }, 
+                    {
+                        "file": "FeCr_d.eam.alloy"
+                    }, 
+                    {
+                        "symbols": "True"
+                    }
+                ]
+            }, 
+            {
+                "term": [
+                    {
+                        "option": "eam/fs"
+                    }, 
+                    {
+                        "file": "FeCr_s.eam.fs"
+                    }, 
+                    {
+                        "symbols": "True"
+                    }
+                ]
+            }
+    }
+}

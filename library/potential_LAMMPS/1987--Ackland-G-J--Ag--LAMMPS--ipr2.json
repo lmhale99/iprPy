@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "024ec18c-c358-4eca-b6f9-442d70cfbf05", 
+        "id": "1987--Ackland-G-J--Ag--LAMMPS--ipr2", 
+        "potential": {
+            "key": "dc4149ce-3592-4131-8683-ecf654d5a519", 
+            "id": "1987--Ackland-G-J--Ag"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ag", 
+            "mass": 107.8682
+        }, 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Ag_v2.eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

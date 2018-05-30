@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "068259bd-61b9-4efb-8833-63756a294046", 
+        "id": "2018--Etesami-S-A-Asadi-E--Ni--LAMMPS--ipr1", 
+        "potential": {
+            "key": "f69c42dc-75b2-4a1b-abf0-bab1a0e9c778", 
+            "id": "2018--Etesami-S-A-Asadi-E--Ni"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ni", 
+            "mass": 58.693
+        }, 
+        "pair_style": {
+            "type": "meam"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "library.Ni.meam"
+                }, 
+                {
+                    "option": "Ni"
+                }, 
+                {
+                    "file": "Ni.meam"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}
