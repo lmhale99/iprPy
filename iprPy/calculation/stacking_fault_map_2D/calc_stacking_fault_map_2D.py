@@ -18,9 +18,6 @@ import numpy as np
 # https://pandas.pydata.org/
 import pandas as pd
 
-# https://github.com/usnistgov/DataModelDict 
-from DataModelDict import DataModelDict as DM
-
 # https://github.com/usnistgov/atomman 
 import atomman as am
 import atomman.lammps as lmp
@@ -57,6 +54,13 @@ def main(*args):
                                      maxiter = input_dict['maxiterations'],
                                      maxeval = input_dict['maxevaluations'],
                                      dmax = input_dict['maxatommotion'])
+    
+    results_dict['gamma'] = am.defect.GammaSurface(a1vect = input_dict['stackingfault_shiftvector1'],
+                                                   a2vect = input_dict['stackingfault_shiftvector2'],
+                                                   box = input_dict['ucell'].box,
+                                                   a1 = results_dict['shift1'],
+                                                   a2 = results_dict['shift2'],
+                                                   E_gsf = results_dict['E_gsf'])
     
     # Save data model of results
     script = os.path.splitext(os.path.basename(__file__))[0]
@@ -260,7 +264,6 @@ def stackingfaultpoint(lammps_command, system, potential,
     
     # Run LAMMPS
     output = lmp.run(lammps_command, lammps_script, mpi_command,
-                     return_style='object',
                      logfile=os.path.join(sim_directory, 'log.lammps'))
     
     # Extract output values
