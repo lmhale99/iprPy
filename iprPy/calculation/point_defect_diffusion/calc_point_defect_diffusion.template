@@ -1,43 +1,44 @@
-# Input script for calc_relax_dynamic.py
+#Run script for calc_point_defect_diffusion.py
 
-# Command lines for LAMMPS and MPI
+#Command lines for LAMMPS (and MPI).
+#For lammps_command, exclude passing in a script, i.e. no "-in term"
 lammps_command              <lammps_command>
 mpi_command                 <mpi_command>
 
-# Potential definition and directory containing associated filesparameters
+#Paths to the potential data model file, and directory containing potential parameters
 potential_file              <potential_file>
 potential_dir               <potential_dir>
 
-# Initial system configuration to load
+#Initial system configuration to load
 load_file                   <load_file>
 load_style                  <load_style>
 load_options                <load_options>
-family                      <family>
 symbols                     <symbols>
 box_parameters              <box_parameters>
 
-# System manipulations
-a_uvw                       <a_uvw>
-b_uvw                       <b_uvw>
-c_uvw                       <c_uvw>
+#System manipulations
+x_axis                      <x_axis>
+y_axis                      <y_axis>
+z_axis                      <z_axis>
 atomshift                   <atomshift>
 sizemults                   <sizemults>
 
-# Units for input/output values
+#Defect parameters
+pointdefect_model           <pointdefect_model>
+pointdefect_type            <pointdefect_type>
+pointdefect_atype           <pointdefect_atype>
+pointdefect_pos             <pointdefect_pos>
+pointdefect_dumbbell_vect   <pointdefect_dumbbell_vect>
+pointdefect_scale           <pointdefect_scale>
+
+#Units that input/output values are in
 length_unit                 <length_unit>
 pressure_unit               <pressure_unit>
 energy_unit                 <energy_unit>
 force_unit                  <force_unit>
 
-# Run parameters
+#Run parameters
 temperature                 <temperature>
-pressure_xx                 <pressure_xx>
-pressure_yy                 <pressure_yy>
-pressure_zz                 <pressure_zz>
-pressure_xy                 <pressure_xy>
-pressure_xz                 <pressure_xz>
-pressure_yz                 <pressure_yz>
-integrator                  <integrator>
 thermosteps                 <thermosteps>
 dumpsteps                   <dumpsteps>
 runsteps                    <runsteps>

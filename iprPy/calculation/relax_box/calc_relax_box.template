@@ -1,15 +1,14 @@
-# Run script for calc_relax_box.py
+# Input script for calc_relax_box.py
 
-# Command lines for LAMMPS (and MPI).
-# For lammps_command, exclude passing in a script, i.e. no "-in term"
+# Command lines for LAMMPS and MPI
 lammps_command              <lammps_command>
 mpi_command                 <mpi_command>
 
-# Paths to the potential data model file, and directory containing potential parameters
+# Potential definition and directory containing associated files
 potential_file              <potential_file>
 potential_dir               <potential_dir>
 
-#Initial system configuration to load
+# Initial system configuration to load
 load_file                   <load_file>
 load_style                  <load_style>
 load_options                <load_options>
@@ -17,14 +16,14 @@ family                      <family>
 symbols                     <symbols>
 box_parameters              <box_parameters>
 
-#System manipulations
+# System manipulations
 a_uvw                       <a_uvw>
 b_uvw                       <b_uvw>
 c_uvw                       <c_uvw>
 atomshift                   <atomshift>
 sizemults                   <sizemults>
 
-# Units that input/output values are in
+# Units for input/output values
 length_unit                 <length_unit>
 pressure_unit               <pressure_unit>
 energy_unit                 <energy_unit>

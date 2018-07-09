@@ -1,11 +1,10 @@
-# Run script for calc_relax_static.py
+# Input script for calc_relax_static.py
 
-# Command lines for LAMMPS (and MPI).
-# For lammps_command, exclude passing in a script, i.e. no "-in term"
+# Command lines for LAMMPS and MPI
 lammps_command              <lammps_command>
 mpi_command                 <mpi_command>
 
-# Paths to the potential data model file, and directory containing potential parameters
+# Potential definition and directory containing associated files
 potential_file              <potential_file>
 potential_dir               <potential_dir>
 
@@ -24,7 +23,7 @@ c_uvw                       <c_uvw>
 atomshift                   <atomshift>
 sizemults                   <sizemults>
 
-# Units that input/output values are in
+# Units for input/output values
 length_unit                 <length_unit>
 pressure_unit               <pressure_unit>
 energy_unit                 <energy_unit>
