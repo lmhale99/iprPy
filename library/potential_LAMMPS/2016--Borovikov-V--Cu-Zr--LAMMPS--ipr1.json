@@ -24,7 +24,7 @@
         "pair_coeff": {
             "term": [
                 {
-                    "file": "Cu-Zr_3.eam.fs"
+                    "file": "CuZr_3.eam.fs"
                 }, 
                 {
                     "symbols": "True"

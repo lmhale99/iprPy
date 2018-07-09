@@ -1,7 +1,7 @@
 ! EAM potential for Al from the original analytical potential in file Al-EAM-Zhak1 of 2 October 2007.
 ! Vasily V. Zhakhovsky: 6asi1z@gmail.com. The potential is fitted by stress-matching method upto compression V/V0=0.3
-! bulk modulus B=81.57 GPa at (P=0,T=0).  See details in Appl. Surf. Sci., vol.255, pp. 9592-9596 (2009)
-           1  Al  3.36069 ! cohesive energy [eV] to check
+! bulk modulus B=81.57 GPa at (P=0,T=0). cohesive energy=3.36069 eV to check See details in Appl. Surf. Sci., vol.255, pp. 9592-9596 (2009)
+           1  Al
   8193   6.7138671875E-04  8193   8.392333984375E-04   6.875
 13   26.9815384   4.032  fcc
  0.0000000000000000E+00 -6.3980610815881616E-03 -1.2780087746439362E-02 -1.9146131609598164E-02 -2.5496244064162111E-02

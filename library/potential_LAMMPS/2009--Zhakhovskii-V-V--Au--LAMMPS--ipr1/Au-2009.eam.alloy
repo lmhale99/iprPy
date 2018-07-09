@@ -1,7 +1,7 @@
 ! EAM potential for Au from the original analytical potential in file Au-EAM-Zhak1 of 28 August 2008.
 ! Vasily V. Zhakhovsky: 6asi1z@gmail.com. The potential is fitted by stress-matching method upto compression V/V0=0.3
-! bulk modulus B=179.4 GPa at (P=0,T=0).  See details in Appl. Surf. Sci., vol.255, pp. 9592-9596 (2009)
-           1  Au  3.81 ! cohesive energy [eV] to check
+! bulk modulus B=179.4 GPa at (P=0,T=0). cohesive energy=3.81 eV to check See details in Appl. Surf. Sci., vol.255, pp. 9592-9596 (2009)
+           1  Au
   8193   1.220703125E-03  8193   8.392333984375E-04   6.875
 79   196.966569   4.065  fcc
  0.0000000000000000E+00 -1.2296013734110494E-02 -2.4540159802653946E-02 -3.6732712873826574E-02 -4.8873945673364297E-02

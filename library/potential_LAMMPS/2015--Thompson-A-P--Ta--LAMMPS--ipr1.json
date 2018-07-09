@@ -42,7 +42,7 @@
                         "file": "Ta06A.snapcoeff"
                     }, 
                     {
-                        "symbolsList": "True"
+                        "option": "Ta"
                     }, 
                     {
                         "file": "Ta06A.snapparam"
