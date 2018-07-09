@@ -1,0 +1,250 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Input script parameters &#8212; iprPy 0.8.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="calc_relax_dynamic.py" href="calc.html" />
+    <link rel="prev" title="Method and Theory" href="theory.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="calc.html" title="calc_relax_dynamic.py"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="theory.html" title="Method and Theory"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">relax_dynamic</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="input-script-parameters">
+<h1>Input script parameters<a class="headerlink" href="#input-script-parameters" title="Permalink to this headline">¶</a></h1>
+<p>This is a list of the input parameter names recognized by the
+calculation script.</p>
+<div class="section" id="command-lines-for-lammps-and-mpi">
+<h2>Command lines for LAMMPS and MPI<a class="headerlink" href="#command-lines-for-lammps-and-mpi" title="Permalink to this headline">¶</a></h2>
+<p>Provides the external commands for running LAMMPS and MPI.</p>
+<ul class="simple">
+<li><strong>lammps_command</strong>: the path to the executable for running LAMMPS on
+your system. Don’t include command line options.</li>
+<li><strong>mpi_command</strong>: the path to the MPI executable and any command line
+options to use for calling LAMMPS to run in parallel on your system.
+Default value is None (run LAMMPS as a serial process).</li>
+</ul>
+</div>
+<div class="section" id="potential-definition-and-directory-containing-associated-files">
+<h2>Potential definition and directory containing associated files<a class="headerlink" href="#potential-definition-and-directory-containing-associated-files" title="Permalink to this headline">¶</a></h2>
+<p>Provides the information associated with an interatomic potential
+implemented for LAMMPS.</p>
+<ul class="simple">
+<li><strong>potential_file</strong>: the path to the potential_LAMMPS data model
+used by atomman to generate the proper LAMMPS commands for an
+interatomic potential.</li>
+<li><strong>potential_dir</strong>: the path to the directory containing any
+potential artifacts (eg. eam.alloy setfl files) that are used. If not
+given, then any required files are expected to be in the working
+directory where the calculation is executed.</li>
+</ul>
+</div>
+<div class="section" id="initial-system-configuration-to-load">
+<h2>Initial system configuration to load<a class="headerlink" href="#initial-system-configuration-to-load" title="Permalink to this headline">¶</a></h2>
+<p>Provides the information associated with loading an atomic
+configuration.</p>
+<ul class="simple">
+<li><strong>load_file</strong>: the path to the initial configuration file being read
+in.</li>
+<li><strong>load_style</strong>: the style/format for the load_file. The style can
+be any file type supported by atomman.load()</li>
+<li><strong>load_options</strong>: a list of key-value pairs for the optional
+style-dependent arguments used by atomman.load().</li>
+<li><strong>family</strong>: specifies the configuration family to associate with the
+loaded file. This is typically a crystal structure/prototype
+identifier that helps with linking calculations on the same material
+together. If not given and the load_style is system_model, then the
+family will be taken from the file if included. Otherwise, the family
+will be taken as load_file stripped of path and extension.</li>
+<li><strong>symbols</strong>: a space-delimited list of the potential’s atom-model
+symbols to associate with the loaded system’s atom types. Required if
+load_file does not contain this information.</li>
+<li><strong>box_parameters</strong>: allows for the specification of new box
+parameters to scale the loaded configuration by. This is useful for
+running calculations based on prototype configurations that do not
+contain material-specific dimensions. Can be given either as a list
+of three or six numbers, with an optional unit of length at the end.
+If the unit of length is not given, the specified length_unit
+(below) will be used.<ul>
+<li>a b c (unit): for orthogonal boxes.</li>
+<li>a b c alpha beta gamma (unit): for triclinic boxes. The angles are
+taken in degrees.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="system-manipulations">
+<h2>System manipulations<a class="headerlink" href="#system-manipulations" title="Permalink to this headline">¶</a></h2>
+<p>Performs simple manipulations on the loaded initial system.</p>
+<ul class="simple">
+<li><strong>a_uvw, b_uvw, c_uvw</strong>: are crystallographic Miller vectors to
+rotate the system by such that the rotated system’s a, b, c box
+vectors correspond to the specified Miller vectors of the loaded
+configuration. Using crystallographic vectors for rotating ensures
+that if the initial configuration is periodic in all three
+directions, the resulting rotated configuration can be as well with
+no boundary incompatibilities. Default values are ‘1 0 0’, ‘0 1 0’,
+and ‘0 0 1’, respectively (i.e. no rotation).</li>
+<li><strong>atomshift</strong>: a vector positional shift to apply to all atoms. The
+shift is relative to the size of the system after rotating, but
+before sizemults have been applied. This allows for the same relative
+shift regardless of box_parameters and sizemults. Default value is
+‘0.0 0.0 0.0’ (i.e. no shift).</li>
+<li><strong>sizemults</strong>: multiplication parameters for making a supercell of
+the loaded system. This may either be a list of three or six integer
+numbers. Default value is ‘3 3 3’.<ul>
+<li>ma mb mc: multipliers for each box axis. Values can be positive or
+negative indicating the direction relative to the original box’s
+origin for shifting/multiplying the system.</li>
+<li>na pa nb pb nc pc: negative, positive multiplier pairs for each
+box axis. The n terms must be less than or equal to zero, and the
+p terms greater than or equal to zero. This allows for expanding
+the system in both directions relative to the original box’s
+origin.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="units-for-input-output-values">
+<h2>Units for input/output values<a class="headerlink" href="#units-for-input-output-values" title="Permalink to this headline">¶</a></h2>
+<p>Specifies the units for various physical quantities to use when saving
+values to the results record file. Also used as the default units for
+parameters in this input parameter file.</p>
+<ul class="simple">
+<li><strong>length_unit</strong>: defines the unit of length for results, and input
+parameters if not directly specified. Default value is ‘angstrom’.</li>
+<li><strong>energy_unit</strong>: defines the unit of energy for results, and input
+parameters if not directly specified. Default value is ‘eV’.</li>
+<li><strong>pressure_unit</strong>: defines the unit of pressure for results, and
+input parameters if not directly specified. Default value is ‘GPa’.</li>
+<li><strong>force_unit</strong>: defines the unit of pressure for results, and input
+parameters if not directly specified. Default value is ‘eV/angstrom’.</li>
+</ul>
+</div>
+<div class="section" id="run-parameters">
+<h2>Run parameters<a class="headerlink" href="#run-parameters" title="Permalink to this headline">¶</a></h2>
+<p>Provides parameters specific to the calculation at hand.</p>
+<ul class="simple">
+<li><strong>temperature</strong>: temperature in Kelvin at which to run the MD
+integration scheme at. Default value is ‘0’.</li>
+<li><strong>pressure_xx, pressure_yy, pressure_zz, pressure_xy,
+pressure_xz, pressure_yz</strong>: specifies the pressures to relax the
+box to. Default values are ‘0 GPa’ for all.</li>
+<li><strong>integrator</strong>: specifies which MD integration scheme to use. Default
+value is ‘nph+l’ for temperature = 0, and ‘npt’ otherwise.</li>
+<li><strong>runsteps</strong>: specifies how many timesteps to integrate the system.
+Default value is 100000.</li>
+<li><strong>thermosteps</strong>: specifies how often LAMMPS prints the system-wide
+thermo data. Default value is runsteps/1000, or 1 if runsteps is less
+than 1000.</li>
+<li><strong>dumpsteps</strong>: specifies how often LAMMPS saves the atomic
+configuration to a LAMMPS dump file. Default value is runsteps,
+meaning only the first and last states are saved.</li>
+<li><strong>equilsteps</strong>: specifies how many timesteps are ignored as
+equilibration time when computing the mean box parameters. Default
+value is 10000.</li>
+<li><strong>randomseed</strong>: provides a random number seed to generating the
+initial atomic velocities. Default value gives a random number as the
+seed.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Input script parameters</a><ul>
+<li><a class="reference internal" href="#command-lines-for-lammps-and-mpi">Command lines for LAMMPS and MPI</a></li>
+<li><a class="reference internal" href="#potential-definition-and-directory-containing-associated-files">Potential definition and directory containing associated files</a></li>
+<li><a class="reference internal" href="#initial-system-configuration-to-load">Initial system configuration to load</a></li>
+<li><a class="reference internal" href="#system-manipulations">System manipulations</a></li>
+<li><a class="reference internal" href="#units-for-input-output-values">Units for input/output values</a></li>
+<li><a class="reference internal" href="#run-parameters">Run parameters</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="theory.html"
+                        title="previous chapter">Method and Theory</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="calc.html"
+                        title="next chapter">calc_relax_dynamic.py</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="calc.html" title="calc_relax_dynamic.py"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="theory.html" title="Method and Theory"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >relax_dynamic</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

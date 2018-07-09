@@ -1,35 +1,12 @@
 # local Database style
 
---------------------------------------------------------------------------------
-
-**Lucas M. Hale**, 
-[lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), 
-*Materials Science and Engineering Division, NIST*.
-
-**Chandler A. Becker**, 
-[chandler.becker@nist.gov](mailto:chandler.becker@nist.gov?Subject=ipr-demo), 
-*Office of Data and Informatics, NIST*.
-
-**Zachary T. Trautt**, 
-[zachary.trautt@nist.gov](mailto:zachary.trautt@nist.gov?Subject=ipr-demo), 
-*Materials Measurement Science Division, NIST*.
-
-Version: 2017-05-01
-
-[Disclaimers](http://www.nist.gov/public_affairs/disclaimer.cfm) 
-
---------------------------------------------------------------------------------
-
 ## Introduction
 
-The local Database style interacts with a database consisting of files and 
-folders of XML records located in a local directory. This offers a simple means 
-of creating a database for running high-throughput calculations, which can be 
-directly accessed and analyzed, and uploaded to another (remote) database later.
+The local Database style stores and accesses XML records from a local directory.
 
 ## Style requirements
 
-This style has no extra requirements
+This style has no extra requirements.
 
 ## Initialization arguments:
 
@@ -37,5 +14,8 @@ This style has no extra requirements
 
 ## Additional notes:
 
-- Using a local style is useful for testing new calculations as the files
-  can be directly modified and deleted.
+- With no active server requirements, these are trivial to set up and use but lack sophisticated, quick querying abilities.
+
+- Using a local Database is useful for testing purposes as the records can be accessed directly through the operating system's file explorers.
+
+- Multiple local Databases can be defined on one computer allowing for groups of calculations to be stored separately.  An example of when this is useful is to run parameter sensitivity tests without the test results being mixed in with the primary data.

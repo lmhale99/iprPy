@@ -6,4 +6,4 @@ Database Styles
     :maxdepth: 1
     :glob:
 
-    databases/*/index
+    database/*/index

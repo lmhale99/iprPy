@@ -6,4 +6,4 @@ Record Styles
     :maxdepth: 1
     :glob:
 
-    records/*/index
+    record/*/index

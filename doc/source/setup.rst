@@ -10,7 +10,7 @@ with any operating system that Python runs on.
 Installing iprPy
 ================
 
-#. Install Python 2.7 and the `scipy`_ family of Python packages.  If you
+#. Install Python 2.7/3.6 and the `scipy`_ family of Python packages.  If you
    don't already have Python, the easiest way to do this is to install
    `Anaconda`_.  The standard Anaconda distribution automatically adds the
    scipy packages.  For miniconda or a new environment of an existing anaconda
@@ -37,12 +37,12 @@ Installing iprPy
         
    If you see a list of included calculation, record, and database styles,
    then it is working!
-    
+
 #. The list printed in the last step indicates the iprPy modules that were
    successfully and unsuccessfully loaded.  If a module did not load, then
    either the module has additional package requirements or has not yet been
    fully implemented into iprPy.
-    
+
 Updating iprPy
 ==============
 

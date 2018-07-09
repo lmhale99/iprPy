@@ -1,0 +1,131 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>iprPy Package Overview &#8212; iprPy 0.8.0 documentation</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Reference Library" href="addreference.html" />
+    <link rel="prev" title="Extending iprPy" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="addreference.html" title="Reference Library"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Extending iprPy"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Extending iprPy</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="iprpy-package-overview">
+<h1>iprPy Package Overview<a class="headerlink" href="#iprpy-package-overview" title="Permalink to this headline">¶</a></h1>
+<p>It is helpful to understand what the different components of the iprPy package are before going into how to add to them.  This page provides a brief explanation of the conceptual and computational components of the framework.</p>
+<div class="section" id="conceptual-components-of-iprpy">
+<h2>Conceptual Components of iprPy<a class="headerlink" href="#conceptual-components-of-iprpy" title="Permalink to this headline">¶</a></h2>
+<p>The iprPy computational framework consists of four primary conceptual components: records, calculations, databases, and supporting code.</p>
+<ul class="simple">
+<li><strong>Records</strong> collect reference input information and calculation results as structured data.  The information exists in an XML/JSON equivalent form.</li>
+<li><strong>Calculations</strong> are the heart of the iprPy framework.  Each calculation is a Python script that performs an independent unit of work in isolation from any other calculation.  A calculation reads in all variable input parameters from a simple key-value format, and generates a results record upon successful completion.</li>
+<li><strong>Databases</strong> are where the input and calculation records are stored.  Interactions with a database allow for calculations to be prepared and executed in a high-throughput fashion, and for the produced records to be accessed, explored, and analyzed.</li>
+<li><strong>Supporting code</strong> provides tools for interacting with different records, calculations, and databases in a similar manner.  It also provides common functions for interpreting specific parameter inputs that can be shared across similar calculations.</li>
+</ul>
+</div>
+<div class="section" id="modular-components-of-the-iprpy-package">
+<h2>Modular Components of the iprPy Package<a class="headerlink" href="#modular-components-of-the-iprpy-package" title="Permalink to this headline">¶</a></h2>
+<p>The supporting code is provided by the iprPy Python package.  The components of the package are modular to provide generality of the method and allow for new content to be easily added.  In particular, there are three class types and two functions that are modular and allow for new “styles” to be implemented.  For the classes, each implementation style exists as a subclass of the parent class.  For the functions, each implementation style takes input parameters and performs actions in a common manner.  Additionally, the record entries themselves can be thought of as modular components that define parameter sets used by the various calculations.</p>
+<ul class="simple">
+<li><strong>Reference records</strong> can be found in the iprPy/library directory.  Each reference entry corresponds to a defined calculation style and defines a set of parameters that can be interpreted by one or more calculations.</li>
+<li>The <strong>Record class</strong> defines methods for generating, comparing, and interacting with records of different styles.  Each Record style corresponds to a unique schema, i.e. data and metadata fields.</li>
+<li>The <strong>Calculation class</strong> defines methods for accessing metadata associated with a calculation, such as the allowed input parameters and the Record style the results are saved as.  Each Calculation style corresponds to a different implemented calculation.</li>
+<li>The <strong>Database class</strong> defines methods for interacting with records stored in a database.  This includes simple interactions, such as adding and accessing records, as well as complex interactions, such as preparing and running calculations in a high-throughput manner.  Each Database style corresponds to a different type of database, such as a local directory, an MDCS database or a MongoDB database.</li>
+<li>The <strong>input.interpret functions</strong> interpret a collection of calculation input parameters in a specific manner that can be shared across multiple Calculation styles.  These help in the development of new Calculation styles and provide consistency in input parameters across calculations.  They also provide a means of interpreting information from records that can be used for calculation inputs.  Each input.interpret style is associated with interpreting a specific set of calculation input parameters.</li>
+<li>The <strong>input.buildcombos functions</strong> support preparing calculations for high-throughput runs by defining combinatorial logic specific to multiple calculation input parameters.  These make it easier to prepare new simulations based on available reference and calculation records.  Each input.buildcombos style generates lists of values for a set of calculation input parameters based on a Record style stored in the database.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">iprPy Package Overview</a><ul>
+<li><a class="reference internal" href="#conceptual-components-of-iprpy">Conceptual Components of iprPy</a></li>
+<li><a class="reference internal" href="#modular-components-of-the-iprpy-package">Modular Components of the iprPy Package</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Extending iprPy</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="addreference.html"
+                        title="next chapter">Reference Library</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="addreference.html" title="Reference Library"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Extending iprPy"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Extending iprPy</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

@@ -6,4 +6,4 @@ Calculation Styles
     :maxdepth: 1
     :glob:
 
-    calculations/*/index
+    calculation/*/index

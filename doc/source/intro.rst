@@ -64,7 +64,7 @@ It’s all in the design
 With iprPy, the idea is to avoid these complications beforehand through
 proper calculation design. 
 
-- Python :any:`calculation scripts <basics/calculation>` are used to collect
+- Python calculation scripts are used to collect
   specific calculation processes (steps 2-5 of the research workflow above)
   into independent, self-contained units of work. Each self-contained
   calculation allows for the entire calculation technique and knowledge behind
@@ -72,13 +72,13 @@ proper calculation design.
   be archived and/or shared.
   
 - All of a calculation script’s variable parameters are read in through a
-  simple :any:`input parameter <basics/inputfile>` file. This highlights the
+  simple input parameter file. This highlights the
   important parameters of the calculation allowing parameter sensitivity
   studies. The simple standard input also opens the calculations to being
   implemented into high-throughput workflow managers.
   
-- Upon successful completion, the calculation scripts produce :any:`XML- or
-  JSON-formatted results records <basics/recordformat>`. Records in these
+- Upon successful completion, the calculation scripts produce XML- or
+  JSON-formatted results records. Records in these
   formats can automatically be uploaded to databases for storing, processing,
   and sharing of the information. Additionally, with properly named and
   structured elements, the contents of a record should be able to be
@@ -98,18 +98,16 @@ barriers for usage.  We want that initial cost as low as possible to reap
 the rewards.
 
 - :any:`Setup <setup>` requirements are minimal. The basic framework only
-  requires Python 2.7 and a few system-independent packages.
+  requires Python 3.6 and a few extra packages.
   
 - All calculation scripts can be directly executed.
 
-- Demonstration `Jupyter Notebooks <../../demonstrations/README.md>`_ are
-  provided for each calculation.
+- Demonstration Jupyter Notebooks are provided for each calculation.
 
 - The high-throughput tools can be directly executed from stand-alone
-  scripts, called as Python functions, or accessed with :any:`inline console
-  commands <highthroughput/inline>`.
+  scripts, called as Python functions, or accessed with inline console
+  commands.
   
-- New :any:`calculation, record, and database styles 
-  <highthroughput/classes>` can be easily added in a modular fashion.
+- New calculation, record, and database styles can be easily added in a modular fashion.
   
 - Where possible, common codebase is developed for similar calculations.

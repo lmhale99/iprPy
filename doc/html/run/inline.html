@@ -1,0 +1,167 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Command Line Actions &#8212; iprPy 0.8.0 documentation</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Extending iprPy" href="../extend/index.html" />
+    <link rel="prev" title="High-Throughput Calculation Execution" href="htp.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../extend/index.html" title="Extending iprPy"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="htp.html" title="High-Throughput Calculation Execution"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Calculations</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="command-line-actions">
+<h1>Command Line Actions<a class="headerlink" href="#command-line-actions" title="Permalink to this headline">¶</a></h1>
+<p>Most of the high-throughput actions can alternatively be performed at the command line using the iprPy file located in the iprPy/bin directory.  The following examples show the command assuming that the working directory for your terminal is iprPy/bin.</p>
+<div class="section" id="define">
+<h2>Define<a class="headerlink" href="#define" title="Permalink to this headline">¶</a></h2>
+<p>Save database access information to a simple name</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>./iprPy set_database &lt;database name&gt;
+</pre></div>
+</div>
+<p>This will prompt for the database style, host and any other necessary access parameters.</p>
+<p>Save run_directory access information to a simple name</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>./iprPy set_run_directory &lt;run_directory name&gt;
+</pre></div>
+</div>
+<p>This will prompt for the run_directory path.</p>
+<p>There are also similar <a href="#id1"><span class="problematic" id="id2">unset_</span></a> options that will delete the stored access information.</p>
+</div>
+<div class="section" id="build">
+<h2>Build<a class="headerlink" href="#build" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>./iprPy build_refs &lt;database name&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="prepare">
+<h2>Prepare<a class="headerlink" href="#prepare" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>./iprPy prepare &lt;database name&gt; &lt;run_directory name&gt; &lt;calculation name&gt; &lt;input file&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="runner">
+<h2>Runner<a class="headerlink" href="#runner" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>./iprPy runner &lt;database name&gt; &lt;run_directory name&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="other">
+<h2>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h2>
+<p>check_modules will list all modular class and function styles that were successfully and unsuccessfully imported with iprPy.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>./iprPy check_modules
+</pre></div>
+</div>
+<p>check_records will show how many records of a given style are in the database, and how many of each are completed, still to run, and issued errors.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>./iprPy check_records &lt;database name&gt; &lt;record style&gt;
+</pre></div>
+</div>
+<p>copy_records will copy records of a given style from one database to another.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>./iprPy copy_records &lt;database name&gt; &lt;database name&gt; &lt;record style&gt;
+</pre></div>
+</div>
+<p>clean_records will reset calculations that issued errors by moving them back into the run_directory.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>./iprPy clean_records &lt;database name&gt; &lt;run_directory name&gt; &lt;record style&gt;
+</pre></div>
+</div>
+<p>destroy_records will permanently delete all records of a given style from the run_directory.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>./iprPy destroy_records &lt;database name&gt; &lt;record style&gt;
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Command Line Actions</a><ul>
+<li><a class="reference internal" href="#define">Define</a></li>
+<li><a class="reference internal" href="#build">Build</a></li>
+<li><a class="reference internal" href="#prepare">Prepare</a></li>
+<li><a class="reference internal" href="#runner">Runner</a></li>
+<li><a class="reference internal" href="#other">Other</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="htp.html"
+                        title="previous chapter">High-Throughput Calculation Execution</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../extend/index.html"
+                        title="next chapter">Extending iprPy</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../extend/index.html" title="Extending iprPy"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="htp.html" title="High-Throughput Calculation Execution"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Calculations</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

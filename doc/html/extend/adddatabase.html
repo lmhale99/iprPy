@@ -1,0 +1,129 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Databases &#8212; iprPy 0.8.0 documentation</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Calculation Styles" href="../calculation_styles.html" />
+    <link rel="prev" title="Modular functions" href="addfunctions.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../calculation_styles.html" title="Calculation Styles"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="addfunctions.html" title="Modular functions"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Extending iprPy</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="databases">
+<h1>Databases<a class="headerlink" href="#databases" title="Permalink to this headline">¶</a></h1>
+<p>This section describes the components of a Database style in more detail as well as tips for those wanting to add a new Database style to the framework.</p>
+<div class="section" id="database-directories">
+<h2>Database directories<a class="headerlink" href="#database-directories" title="Permalink to this headline">¶</a></h2>
+<p>All databases styles are stored in subdirectories of the iprPy/database directory, with directory named for the database type, i.e. [databasename].  Each directory contains:</p>
+<ul class="simple">
+<li><strong>[DatabaseName].py</strong>: Includes the definition of a Python class that is a subclass of iprPy.database.Database.  This defines how the iprPy codebase interacts with the database type.</li>
+<li><strong>README.md</strong>: Descriptions of what the database type is and how to define the access parameters.</li>
+<li><strong>__init__.py</strong>: The Python init file allowing Python to interpret the database directory as a submodule of the iprPy package.</li>
+<li>Any other supporting files.</li>
+</ul>
+<div class="section" id="database-classes">
+<h3>Database classes<a class="headerlink" href="#database-classes" title="Permalink to this headline">¶</a></h3>
+<p>The Database classes handle interactions with different types of databases in a common way.  The methods can be divided into two categories:</p>
+<ul class="simple">
+<li>Methods for adding and accessing content stored in the database.  The underlying code for these methods need to be defined for each Database style to properly interact with a type of database.</li>
+<li>Methods supporting high-throughput calculations.  These are defined by the parent Database class and do not need to be redefined.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Databases</a><ul>
+<li><a class="reference internal" href="#database-directories">Database directories</a><ul>
+<li><a class="reference internal" href="#database-classes">Database classes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="addfunctions.html"
+                        title="previous chapter">Modular functions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../calculation_styles.html"
+                        title="next chapter">Calculation Styles</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../calculation_styles.html" title="Calculation Styles"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="addfunctions.html" title="Modular functions"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Extending iprPy</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

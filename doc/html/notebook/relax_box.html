@@ -1,0 +1,1369 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>relax_box Calculation &#8212; iprPy 0.8.0 documentation</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="relax_dynamic Calculation" href="relax_dynamic.html" />
+    <link rel="prev" title="point_defect_static Calculation Demonstration" href="point_defect_static.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="relax_dynamic.html" title="relax_dynamic Calculation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="point_defect_static.html" title="point_defect_static Calculation Demonstration"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 9ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+</style>
+<div class="section" id="relax_box-Calculation">
+<h1>relax_box Calculation<a class="headerlink" href="#relax_box-Calculation" title="Permalink to this headline">¶</a></h1>
+<p><strong>Lucas M. Hale</strong>,
+<a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>,
+<em>Materials Science and Engineering Division, NIST</em>.</p>
+<p><strong>Chandler A. Becker</strong>,
+<a class="reference external" href="mailto:chandler&#46;becker&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">chandler<span>&#46;</span>becker<span>&#64;</span>nist<span>&#46;</span>gov</a>,
+<em>Office of Data and Informatics, NIST</em>.</p>
+<p><strong>Zachary T. Trautt</strong>,
+<a class="reference external" href="mailto:zachary&#46;trautt&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">zachary<span>&#46;</span>trautt<span>&#64;</span>nist<span>&#46;</span>gov</a>,
+<em>Materials Measurement Science Division, NIST</em>.</p>
+<p>Version: 2018-06-24</p>
+<p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">Disclaimers</a></p>
+<div class="section" id="Introduction">
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<p>The relax_box calculation refines the lattice parameters of an
+orthogonal system (crystal structure) by relaxing the box dimensions
+towards a given pressure. In refining the lattice parameter values, the
+box dimensions are allowed to relax, but the relative positions of the
+atoms within the box are held fixed.</p>
+<p>This calculations provides a quick tool for obtaining lattice parameters
+for ideal crystal structures.</p>
+<p><strong>Version notes</strong>: This was previously called the refine_structure
+calculation and was renamed for consistency with other calculations.
+Additionally, reporting of the elastic constants is removed as their
+values may be incorrect for some crystal structures.</p>
+<p><strong>Disclaimer #1</strong>: With this method there is no guarantee that the
+resulting parameters are for a stable structure. Allowing internal
+relaxations may result in different values for some structures.
+Additionally, some transformation paths may be restricted from occurring
+due to symmetry, i.e. initially cubic structures may remain cubic
+instead of relaxing to a non-cubic structure.</p>
+</div>
+<div class="section" id="Method-and-Theory">
+<h2>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this headline">¶</a></h2>
+<p>The math in this section uses Voigt notation, where indicies i,j
+correspond to 1=xx, 2=yy, 3=zz, 4=yz, 5=xz, and 6=xy, and x, y and z are
+orthogonal box vectors.</p>
+<p>An initial system (and corresponding unit cell system) is supplied with
+box dimensions, <span class="math">\(a_i^0\)</span>, close to the equilibrium values. A LAMMPS
+simulation is performed that evaluates the system’s pressures,
+<span class="math">\(P_{i}\)</span>, for the initial system as given, and subjected to twelve
+different strain states corresponding to one of <span class="math">\(\epsilon_{i}\)</span>
+being given a value of <span class="math">\(\frac{\Delta \epsilon}{2}\)</span>, where
+<span class="math">\(\Delta \epsilon\)</span> is the strain range parameter. Using the
+<span class="math">\(P_{i}\)</span> values obtained from the strained states, the
+<span class="math">\(C_{ij}\)</span> matrix for the system is estimated as</p>
+<div class="math">
+\[C_{ij} \approx - \frac{P_i(\epsilon_j=\frac{\Delta \epsilon}{2}) - P_i(\epsilon_j=-\frac{\Delta \epsilon}{2})}{\Delta \epsilon}.\]</div>
+<p>The negative out front comes from the fact that the system-wide stress
+state is <span class="math">\(\sigma_i = -P_i\)</span>. Using <span class="math">\(C_{ij}\)</span>, an attempt is
+made to compute the elastic compliance matrix as
+<span class="math">\(S_{ij} = C_{ij}^{-1}\)</span>. If successful, new box dimensions are
+estimated using <span class="math">\(S_{ij}\)</span>, <span class="math">\(a_i^0\)</span>, and <span class="math">\(P_i\)</span> for the
+unstrained system</p>
+<div class="math">
+\[a_i = \frac{a_i^0}{1 - (\sum_{j=1}^3{S_{ij} P_j})}.\]</div>
+<p>The system is updated using the new box dimensions. The process is
+repeated until either <span class="math">\(a_i\)</span> converge less than a specified
+tolerance, <span class="math">\(a_i\)</span> diverge from <span class="math">\(a_i^0\)</span> greater than some
+limit, or convergence is not reached after 100 iterations. If the
+calculation is successful, the final <span class="math">\(a_i\)</span> dimensions are
+reported.</p>
+</div>
+<div class="section" id="Demonstration">
+<h2>Demonstration<a class="headerlink" href="#Demonstration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="1.-Setup">
+<h3>1. Setup<a class="headerlink" href="#1.-Setup" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="1.1.-Library-imports">
+<h4>1.1. Library imports<a class="headerlink" href="#1.1.-Library-imports" title="Permalink to this headline">¶</a></h4>
+<p>Import libraries needed by the calculation. The external libraries used
+are:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.numpy.org/">numpy</a></li>
+<li><a class="reference external" href="https://github.com/usnistgov/DataModelDict">DataModelDict</a></li>
+<li><a class="reference external" href="https://github.com/usnistgov/atomman">atomman</a></li>
+<li><a class="reference external" href="https://github.com/usnistgov/iprPy">iprPy</a></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Standard library imports</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+
+<span class="c1"># http://www.numpy.org/</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># https://github.com/usnistgov/DataModelDict</span>
+<span class="kn">from</span> <span class="nn">DataModelDict</span> <span class="k">import</span> <span class="n">DataModelDict</span> <span class="k">as</span> <span class="n">DM</span>
+
+<span class="c1"># https://github.com/usnistgov/atomman</span>
+<span class="kn">import</span> <span class="nn">atomman</span> <span class="k">as</span> <span class="nn">am</span>
+<span class="kn">import</span> <span class="nn">atomman.lammps</span> <span class="k">as</span> <span class="nn">lmp</span>
+<span class="kn">import</span> <span class="nn">atomman.unitconvert</span> <span class="k">as</span> <span class="nn">uc</span>
+
+<span class="c1"># https://github.com/usnistgov/iprPy</span>
+<span class="kn">import</span> <span class="nn">iprPy</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;iprPy version&#39;</span><span class="p">,</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+iprPy version 0.8.0
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="1.2.-Default-calculation-setup">
+<h4>1.2. Default calculation setup<a class="headerlink" href="#1.2.-Default-calculation-setup" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Specify calculation style</span>
+<span class="n">calc_style</span> <span class="o">=</span> <span class="s1">&#39;relax_box&#39;</span>
+
+<span class="c1"># If workingdir is already set, then do nothing (already in correct folder)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">workingdir</span> <span class="o">=</span> <span class="n">workingdir</span>
+
+<span class="c1"># Change to workingdir if not already there</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">workingdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;calculationfiles&#39;</span><span class="p">,</span> <span class="n">calc_style</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">)</span>
+
+<span class="c1"># Default iprPy library directory</span>
+<span class="n">librarydir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">rootdir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;library&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="2.-Assign-values-for-the-calculation's-run-parameters">
+<h3>2. Assign values for the calculation’s run parameters<a class="headerlink" href="#2.-Assign-values-for-the-calculation's-run-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="2.1.-Specify-system-specific-paths">
+<h4>2.1. Specify system-specific paths<a class="headerlink" href="#2.1.-Specify-system-specific-paths" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>lammps_command</strong> is the LAMMPS command to use (required).</li>
+<li><strong>mpi_command</strong> MPI command for running LAMMPS in parallel. A value
+of None will run simulations serially.</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">lammps_command</span> <span class="o">=</span> <span class="s1">&#39;lmp_serial&#39;</span>
+<span class="n">mpi_command</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="2.2.-Load-interatomic-potential">
+<h4>2.2. Load interatomic potential<a class="headerlink" href="#2.2.-Load-interatomic-potential" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>potential_name</strong> gives the name of the potential_LAMMPS reference
+record in the iprPy library to use for the calculation.</li>
+<li><strong>potential_file</strong> gives the path to the potential_LAMMPS reference
+record to use. Here, this parameter is automatically generated using
+potential_name and librarydir.</li>
+<li><strong>potential_dir</strong> gives the path for the folder containing the
+artifacts associated with the potential (i.e. eam.alloy file). Here,
+this parameter is automatically generated using potential_name and
+librarydir.</li>
+<li><strong>potential</strong> is an atomman.lammps.Potential object (required). Here,
+this parameter is automatically generated from potential_file and
+potential_dir.</li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">potential_name</span> <span class="o">=</span> <span class="s1">&#39;1999--Mishin-Y--Ni--LAMMPS--ipr1&#39;</span>
+
+<span class="c1"># Define potential_file and potential_dir using librarydir and potential_name</span>
+<span class="n">potential_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">librarydir</span><span class="p">,</span> <span class="s1">&#39;potential_LAMMPS&#39;</span><span class="p">,</span> <span class="n">potential_name</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span>
+<span class="n">potential_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">librarydir</span><span class="p">,</span> <span class="s1">&#39;potential_LAMMPS&#39;</span><span class="p">,</span> <span class="n">potential_name</span><span class="p">)</span>
+
+<span class="c1"># Initialize Potential object using potential_file and potential_dir.</span>
+<span class="n">potential</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">Potential</span><span class="p">(</span><span class="n">potential_file</span><span class="p">,</span> <span class="n">potential_dir</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Successfully loaded potential&#39;</span><span class="p">,</span> <span class="n">potential</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Successfully loaded potential 1999--Mishin-Y--Ni--LAMMPS--ipr1
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="2.3.-Load-initial-unit-cell-system">
+<h4>2.3. Load initial unit cell system<a class="headerlink" href="#2.3.-Load-initial-unit-cell-system" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>prototype_name</strong> gives the name of the crystal_prototype
+reference record in the iprPy library to load.</li>
+<li><strong>symbols</strong> is a list of the potential’s elemental model symbols to
+associate with the unique atom types of the loaded system.</li>
+<li><strong>box_parameters</strong> is a list of the a, b, c lattice constants to
+assign to the loaded file.</li>
+<li><strong>load_file</strong> gives the path to the atomic configuration file to
+load for the ucell system. Here, this is generated automatically
+using prototype_name and librarydir.</li>
+<li><strong>load_style</strong> specifies the format of load_file. Here, this is
+automatically set for crystal_prototype records.</li>
+<li><strong>load_options</strong> specifies any other keyword options for properly
+loading the load_file. Here, this is automatically set for
+crystal_prototype records.</li>
+<li><strong>ucell</strong> is an atomman.System representing a fundamental unit cell
+of the system (required). Here, this is generated using the load_*
+parameters and symbols.</li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">prototype_name</span> <span class="o">=</span> <span class="s1">&#39;A1--Cu--fcc&#39;</span>
+<span class="n">symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ni&#39;</span><span class="p">]</span>
+<span class="n">box_parameters</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">([</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">],</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
+
+<span class="c1"># Define load_file using librarydir and prototype_name</span>
+<span class="n">load_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">librarydir</span><span class="p">,</span> <span class="s1">&#39;crystal_prototype&#39;</span><span class="p">,</span> <span class="n">prototype_name</span><span class="o">+</span><span class="s1">&#39;.json&#39;</span><span class="p">)</span>
+
+<span class="c1"># Define load_style and load_options for crystal_prototype records</span>
+<span class="n">load_style</span> <span class="o">=</span> <span class="s1">&#39;system_model&#39;</span>
+<span class="n">load_options</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># Create ucell by loading prototype record</span>
+<span class="n">ucell</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">load_style</span><span class="p">,</span> <span class="n">load_file</span><span class="p">,</span> <span class="n">symbols</span><span class="o">=</span><span class="n">symbols</span><span class="p">,</span> <span class="o">**</span><span class="n">load_options</span><span class="p">)</span>
+
+<span class="c1"># Rescale ucell using box_parameters</span>
+<span class="n">ucell</span><span class="o">.</span><span class="n">box_set</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">b</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">ucell</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+avect =  [ 3.500,  0.000,  0.000]
+bvect =  [ 0.000,  3.500,  0.000]
+cvect =  [ 0.000,  0.000,  3.500]
+origin = [ 0.000,  0.000,  0.000]
+natoms = 4
+natypes = 1
+symbols = (&#39;Ni&#39;,)
+pbc = [ True  True  True]
+     id |   atype |  pos[0] |  pos[1] |  pos[2]
+      0 |       1 |   0.000 |   0.000 |   0.000
+      1 |       1 |   0.000 |   1.750 |   1.750
+      2 |       1 |   1.750 |   0.000 |   1.750
+      3 |       1 |   1.750 |   1.750 |   0.000
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="2.4.-Modify-system">
+<h4>2.4. Modify system<a class="headerlink" href="#2.4.-Modify-system" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>sizemults</strong> list of three integers specifying how many times the
+ucell vectors of <span class="math">\(a\)</span>, <span class="math">\(b\)</span> and <span class="math">\(c\)</span> are replicated in
+creating system.</li>
+<li><strong>system</strong> is an atomman.System to perform the scan on (required).</li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">sizemults</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+<span class="c1"># Generate system by supersizing ucell</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ucell</span><span class="o">.</span><span class="n">supersize</span><span class="p">(</span><span class="o">*</span><span class="n">sizemults</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;# of atoms in system =&#39;</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">natoms</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+# of atoms in system = 108
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="2.5.-Specify-calculation-specific-run-parameters">
+<h4>2.5. Specify calculation-specific run parameters<a class="headerlink" href="#2.5.-Specify-calculation-specific-run-parameters" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>strainrange</strong> specifies the <span class="math">\(\Delta \epsilon\)</span> strain range to
+use in estimating <span class="math">\(C_{ij}\)</span>.</li>
+<li><strong>pressure_xx</strong> gives the xx component of the pressure to
+equilibriate the system to.</li>
+<li><strong>pressure_yy</strong> gives the yy component of the pressure to
+equilibriate the system to.</li>
+<li><strong>pressure_zz</strong> gives the zz component of the pressure to
+equilibriate the system to.</li>
+<li><strong>convergence_tol</strong> is the relative tolerance to use in identifying
+if the lattice constants have converged.</li>
+<li><strong>divergence_scale</strong> is a factor for identifying if the lattice
+constants have diverged from the original guess. Divergence is
+identified if <span class="math">\(a &gt; a^0 d\)</span> or <span class="math">\(a &lt; a^0 / d\)</span>, where d is
+divergence_scale.</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">strainrange</span> <span class="o">=</span> <span class="mf">1e-7</span>
+<span class="n">pressure_xx</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;GPa&#39;</span><span class="p">)</span>
+<span class="n">pressure_yy</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;GPa&#39;</span><span class="p">)</span>
+<span class="n">pressure_zz</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;GPa&#39;</span><span class="p">)</span>
+<span class="n">convergence_tol</span> <span class="o">=</span> <span class="mf">1e-11</span>
+<span class="n">divergence_scale</span> <span class="o">=</span> <span class="mf">3.</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="3.-Define-calculation-function(s)-and-generate-template-LAMMPS-script(s)">
+<h3>3. Define calculation function(s) and generate template LAMMPS script(s)<a class="headerlink" href="#3.-Define-calculation-function(s)-and-generate-template-LAMMPS-script(s)" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="3.1.-cij.template">
+<h4>3.1. cij.template<a class="headerlink" href="#3.1.-cij.template" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;cij.template&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;# LAMMPS input script that evaluates the Virial pressure of a system both as</span>
+<span class="s2"># it was given, and with small strains applied.</span>
+<span class="s2"># This can be used to estimate the 0 K elastic constants of the system.</span>
+
+<span class="s2">box tilt large</span>
+
+<span class="s2">&lt;atomman_system_info&gt;</span>
+
+<span class="s2">change_box all triclinic</span>
+
+<span class="s2">&lt;atomman_pair_info&gt;</span>
+
+<span class="s2"># Specify strain range and number of points to examine in the range</span>
+<span class="s2">variable delta equal &lt;delta&gt;</span>
+<span class="s2">variable steps equal &lt;steps&gt;</span>
+<span class="s2">variable deltax equal $</span><span class="si">{delta}</span><span class="s2">/($</span><span class="si">{steps}</span><span class="s2">-1)</span>
+
+<span class="s2"># Specify variables of the initial configuration&#39;s dimensions</span>
+<span class="s2">variable lx0 equal $(lx)</span>
+<span class="s2">variable ly0 equal $(ly)</span>
+<span class="s2">variable lz0 equal $(lz)</span>
+
+<span class="s2"># Specify the thermo properties to calculate</span>
+<span class="s2">variable peatom equal pe/atoms</span>
+<span class="s2">thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe</span>
+<span class="s2">thermo_modify format float </span><span class="si">%.13e</span><span class="s2"></span>
+
+<span class="s2"># Compute properties for the initial configuration</span>
+<span class="s2">run 0</span>
+
+<span class="s2"># Compute properties for normal x-direction strains</span>
+<span class="s2">variable aratio equal 1-$</span><span class="si">{delta}</span><span class="s2">/2.+(v_a-1)*$</span><span class="si">{deltax}</span><span class="s2"></span>
+<span class="s2">variable xmax equal v_aratio*$</span><span class="si">{lx0}</span><span class="s2"></span>
+<span class="s2">label loopa</span>
+<span class="s2">variable a loop $</span><span class="si">{steps}</span><span class="s2"></span>
+<span class="s2">change_box all x final 0 $</span><span class="si">{xmax}</span><span class="s2"> remap units box</span>
+<span class="s2">run 0</span>
+<span class="s2">next a</span>
+<span class="s2">jump cij.in loopa</span>
+<span class="s2">change_box all x final 0 $</span><span class="si">{lx0}</span><span class="s2"> remap units box</span>
+
+<span class="s2"># Compute properties for normal y-direction strains</span>
+<span class="s2">variable bratio equal 1-$</span><span class="si">{delta}</span><span class="s2">/2.+(v_b-1)*$</span><span class="si">{deltax}</span><span class="s2"></span>
+<span class="s2">variable ymax equal v_bratio*$</span><span class="si">{ly0}</span><span class="s2"></span>
+<span class="s2">label loopb</span>
+<span class="s2">variable b loop $</span><span class="si">{steps}</span><span class="s2"></span>
+<span class="s2">change_box all y final 0 $</span><span class="si">{ymax}</span><span class="s2"> remap units box</span>
+<span class="s2">run 0</span>
+<span class="s2">next b</span>
+<span class="s2">jump cij.in loopb</span>
+<span class="s2">change_box all y final 0 $</span><span class="si">{ly0}</span><span class="s2"> remap units box</span>
+
+<span class="s2"># Compute properties for normal z-direction strains</span>
+<span class="s2">variable cratio equal 1-$</span><span class="si">{delta}</span><span class="s2">/2.+(v_c-1)*$</span><span class="si">{deltax}</span><span class="s2"></span>
+<span class="s2">variable zmax equal v_cratio*$</span><span class="si">{lz0}</span><span class="s2"></span>
+<span class="s2">label loopc</span>
+<span class="s2">variable c loop $</span><span class="si">{steps}</span><span class="s2"></span>
+<span class="s2">change_box all z final 0 $</span><span class="si">{zmax}</span><span class="s2"> remap units box</span>
+<span class="s2">run 0</span>
+<span class="s2">next c</span>
+<span class="s2">jump cij.in loopc</span>
+<span class="s2">change_box all z final 0 $</span><span class="si">{lz0}</span><span class="s2"> remap units box</span>
+
+<span class="s2"># Compute properties for yz shear strains</span>
+<span class="s2">variable eyz equal (-$</span><span class="si">{delta}</span><span class="s2">/2.+(v_d-1)*$</span><span class="si">{deltax}</span><span class="s2">)*$</span><span class="si">{lz0}</span><span class="s2"></span>
+<span class="s2">label loopd</span>
+<span class="s2">variable d loop $</span><span class="si">{steps}</span><span class="s2"></span>
+<span class="s2">change_box all yz final $</span><span class="si">{eyz}</span><span class="s2"> remap units box</span>
+<span class="s2">run 0</span>
+<span class="s2">next d</span>
+<span class="s2">jump cij.in loopd</span>
+<span class="s2">change_box all yz final 0 remap units box</span>
+
+<span class="s2"># Compute properties for xz shear strains</span>
+<span class="s2">variable exz equal (-$</span><span class="si">{delta}</span><span class="s2">/2.+(v_e-1)*$</span><span class="si">{deltax}</span><span class="s2">)*$</span><span class="si">{lz0}</span><span class="s2"></span>
+<span class="s2">label loope</span>
+<span class="s2">variable e loop $</span><span class="si">{steps}</span><span class="s2"></span>
+<span class="s2">change_box all xz final $</span><span class="si">{exz}</span><span class="s2"> remap units box</span>
+<span class="s2">run 0</span>
+<span class="s2">next e</span>
+<span class="s2">jump cij.in loope</span>
+<span class="s2">change_box all xz final 0 remap units box</span>
+
+<span class="s2"># Compute properties for xy shear strains</span>
+<span class="s2">variable exy equal (-$</span><span class="si">{delta}</span><span class="s2">/2.+(v_f-1)*$</span><span class="si">{deltax}</span><span class="s2">)*$</span><span class="si">{ly0}</span><span class="s2"></span>
+<span class="s2">label loopf</span>
+<span class="s2">variable f loop $</span><span class="si">{steps}</span><span class="s2"></span>
+<span class="s2">change_box all xy final $</span><span class="si">{exy}</span><span class="s2"> remap units box</span>
+<span class="s2">run 0</span>
+<span class="s2">next f</span>
+<span class="s2">jump cij.in loopf</span>
+<span class="s2">change_box all xy final 0 remap units box&quot;&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="3.2.-relax_box()">
+<h4>3.2. relax_box()<a class="headerlink" href="#3.2.-relax_box()" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">relax_box</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span>
+              <span class="n">mpi_command</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strainrange</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+              <span class="n">p_xx</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">p_yy</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">p_zz</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">p_xy</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">p_xz</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">p_yz</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+              <span class="n">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">diverge_scale</span><span class="o">=</span><span class="mf">3.</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Quickly refines static orthorhombic system by evaluating the elastic</span>
+<span class="sd">    constants and the virial pressure.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lammps_command :str</span>
+<span class="sd">        Command for running LAMMPS.</span>
+<span class="sd">    system : atomman.System</span>
+<span class="sd">        The system to perform the calculation on.</span>
+<span class="sd">    potential : atomman.lammps.Potential</span>
+<span class="sd">        The LAMMPS implemented potential to use.</span>
+<span class="sd">    mpi_command : str, optional</span>
+<span class="sd">        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS</span>
+<span class="sd">        will run serially.</span>
+<span class="sd">    strainrange : float, optional</span>
+<span class="sd">        The small strain value to apply when calculating the elastic</span>
+<span class="sd">        constants (default is 1e-6).</span>
+<span class="sd">    p_xx : float, optional</span>
+<span class="sd">        The value to relax the x tensile pressure component to (default is</span>
+<span class="sd">        0.0).</span>
+<span class="sd">    p_yy : float, optional</span>
+<span class="sd">        The value to relax the y tensile pressure component to (default is</span>
+<span class="sd">        0.0).</span>
+<span class="sd">    p_zz : float, optional</span>
+<span class="sd">        The value to relax the z tensile pressure component to (default is</span>
+<span class="sd">        0.0).</span>
+<span class="sd">    tol : float, optional</span>
+<span class="sd">        The relative tolerance used to determine if the lattice constants have</span>
+<span class="sd">        converged (default is 1e-10).</span>
+<span class="sd">    diverge_scale : float, optional</span>
+<span class="sd">        Factor to identify if the system&#39;s dimensions have diverged.  Divergence</span>
+<span class="sd">        is identified if either any current box dimension is greater than the</span>
+<span class="sd">        original dimension multiplied by diverge_scale, or if any current box</span>
+<span class="sd">        dimension is less than the original dimension divided by diverge_scale.</span>
+<span class="sd">        (Default is 3.0).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Dictionary of results consisting of keys:</span>
+
+<span class="sd">        - **&#39;a_lat&#39;** (*float*) - The relaxed a lattice constant.</span>
+<span class="sd">        - **&#39;b_lat&#39;** (*float*) - The relaxed b lattice constant.</span>
+<span class="sd">        - **&#39;c_lat&#39;** (*float*) - The relaxed c lattice constant.</span>
+<span class="sd">        - **&#39;alpha_lat&#39;** (*float*) - The alpha lattice angle.</span>
+<span class="sd">        - **&#39;beta_lat&#39;** (*float*) - The beta lattice angle.</span>
+<span class="sd">        - **&#39;gamma_lat&#39;** (*float*) - The gamma lattice angle.</span>
+<span class="sd">        - **&#39;E_coh&#39;** (*float*) - The cohesive energy of the relaxed system.</span>
+<span class="sd">        - **&#39;stress&#39;** (*numpy.array*) - The measured stress state of the</span>
+<span class="sd">          relaxed system.</span>
+<span class="sd">        - **&#39;C_elastic&#39;** (*atomman.ElasticConstants*) - The relaxed system&#39;s</span>
+<span class="sd">          elastic constants.</span>
+<span class="sd">        - **&#39;system_relaxed&#39;** (*atomman.System*) - The relaxed system.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    RuntimeError</span>
+<span class="sd">        If system diverges or no convergence reached after 100 cycles.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Flag for if values have converged</span>
+    <span class="n">converged</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># Define current and old systems</span>
+    <span class="n">system_current</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+    <span class="n">system_old</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">system</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;atom_dump&#39;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="s1">&#39;initial.dump&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">cycle</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+
+        <span class="c1"># Run LAMMPS and evaluate results based on system_old</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">calc_cij</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system_current</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span>
+                           <span class="n">mpi_command</span><span class="o">=</span><span class="n">mpi_command</span><span class="p">,</span>
+                           <span class="n">p_xx</span><span class="o">=</span><span class="n">p_xx</span><span class="p">,</span> <span class="n">p_yy</span><span class="o">=</span><span class="n">p_yy</span><span class="p">,</span> <span class="n">p_zz</span><span class="o">=</span><span class="n">p_zz</span><span class="p">,</span>
+                           <span class="n">strainrange</span><span class="o">=</span><span class="n">strainrange</span><span class="p">,</span> <span class="n">cycle</span><span class="o">=</span><span class="n">cycle</span><span class="p">)</span>
+        <span class="n">system_new</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;system_new&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Compare new and current to test for convergence</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">vects</span><span class="p">,</span>
+                       <span class="n">system_current</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">vects</span><span class="p">,</span>
+                       <span class="n">rtol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+            <span class="n">converged</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">break</span>
+
+        <span class="c1"># Compare old and new to test for double-value convergence</span>
+        <span class="k">elif</span> <span class="n">system_old</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">vects</span><span class="p">,</span>
+                                                    <span class="n">system_old</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">vects</span><span class="p">,</span>
+                                                    <span class="n">rtol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+            <span class="c1"># Update current to average of old and new</span>
+            <span class="n">system_current</span><span class="o">.</span><span class="n">box_set</span><span class="p">(</span><span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">a</span><span class="o">+</span><span class="n">system_old</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span>
+                                   <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">b</span><span class="o">+</span><span class="n">system_old</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span>
+                                   <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">c</span><span class="o">+</span><span class="n">system_old</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">c</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span>
+                                   <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># Calculate Cij for the averaged system</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">calc_cij</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system_current</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span>
+                               <span class="n">mpi_command</span><span class="o">=</span><span class="n">mpi_command</span><span class="p">,</span>
+                               <span class="n">p_xx</span><span class="o">=</span><span class="n">p_xx</span><span class="p">,</span> <span class="n">p_yy</span><span class="o">=</span><span class="n">p_yy</span><span class="p">,</span> <span class="n">p_zz</span><span class="o">=</span><span class="n">p_zz</span><span class="p">,</span>
+                               <span class="n">strainrange</span><span class="o">=</span><span class="n">strainrange</span><span class="p">,</span> <span class="n">cycle</span><span class="o">=</span><span class="n">cycle</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">system_new</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;system_new&#39;</span><span class="p">]</span>
+            <span class="n">converged</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">break</span>
+
+        <span class="c1"># Test for divergence</span>
+        <span class="k">elif</span> <span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">a</span> <span class="o">&lt;</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">a</span> <span class="o">/</span> <span class="n">diverge_scale</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Divergence of box dimensions&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">a</span> <span class="o">&gt;</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">a</span> <span class="o">*</span> <span class="n">diverge_scale</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Divergence of box dimensions&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">b</span> <span class="o">&lt;</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">b</span> <span class="o">/</span> <span class="n">diverge_scale</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Divergence of box dimensions&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">b</span> <span class="o">&gt;</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">b</span> <span class="o">*</span> <span class="n">diverge_scale</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Divergence of box dimensions&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">c</span> <span class="o">&lt;</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">c</span> <span class="o">/</span> <span class="n">diverge_scale</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Divergence of box dimensions&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">c</span> <span class="o">&gt;</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">c</span> <span class="o">*</span> <span class="n">diverge_scale</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Divergence of box dimensions&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;E_coh&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Divergence: cohesive energy is 0&#39;</span><span class="p">)</span>
+
+        <span class="c1"># If not converged or diverged, current -&gt; old and new -&gt; current</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">system_old</span><span class="p">,</span> <span class="n">system_current</span> <span class="o">=</span> <span class="n">system_current</span><span class="p">,</span> <span class="n">system_new</span>
+
+    <span class="c1"># Return values when converged</span>
+    <span class="k">if</span> <span class="n">converged</span><span class="p">:</span>
+        <span class="n">system_new</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;atom_dump&#39;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="s1">&#39;final.dump&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Build results_dict</span>
+        <span class="n">results_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;dumpfile_initial&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;initial.dump&#39;</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;symbols_initial&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">symbols</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;dumpfile_final&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;final.dump&#39;</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;symbols_final&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">symbols</span>
+
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;lx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">lx</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;ly&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">ly</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;lz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">lz</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;xy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">xy</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;xz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">xz</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;yz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_new</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">yz</span>
+
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_coh&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;E_coh&#39;</span><span class="p">]</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pxx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;measured_pxx&#39;</span><span class="p">]</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pyy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;measured_pyy&#39;</span><span class="p">]</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pzz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;measured_pzz&#39;</span><span class="p">]</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pxy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;measured_pxy&#39;</span><span class="p">]</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pxz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;measured_pxz&#39;</span><span class="p">]</span>
+        <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pyz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;measured_pyz&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">results_dict</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Failed to converge after 100 cycles&#39;</span><span class="p">)</span>
+
+
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="3.3.-calc_cij()">
+<h4>3.3. calc_cij()<a class="headerlink" href="#3.3.-calc_cij()" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">calc_cij</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span>
+             <span class="n">mpi_command</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p_xx</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">p_yy</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">p_zz</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+             <span class="n">strainrange</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">cycle</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Runs cij.in LAMMPS script to evaluate Cij, and E_coh of the current system,</span>
+<span class="sd">    and define a new system with updated box dimensions to test.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lammps_command :str</span>
+<span class="sd">        Command for running LAMMPS.</span>
+<span class="sd">    system : atomman.System</span>
+<span class="sd">        The system to perform the calculation on.</span>
+<span class="sd">    potential : atomman.lammps.Potential</span>
+<span class="sd">        The LAMMPS implemented potential to use.</span>
+<span class="sd">    mpi_command : str, optional</span>
+<span class="sd">        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS</span>
+<span class="sd">        will run serially.</span>
+<span class="sd">    strainrange : float, optional</span>
+<span class="sd">        The small strain value to apply when calculating the elastic</span>
+<span class="sd">        constants (default is 1e-6).</span>
+<span class="sd">    p_xx : float, optional</span>
+<span class="sd">        The value to relax the x tensile pressure component to (default is</span>
+<span class="sd">        0.0).</span>
+<span class="sd">    p_yy : float, optional</span>
+<span class="sd">        The value to relax the y tensile pressure component to (default is</span>
+<span class="sd">        0.0).</span>
+<span class="sd">    p_zz : float, optional</span>
+<span class="sd">        The value to relax the z tensile pressure component to (default is</span>
+<span class="sd">        0.0).</span>
+<span class="sd">    cycle : int, optional</span>
+<span class="sd">        Indicates the iteration cycle of quick_a_Cij().  This is used to</span>
+<span class="sd">        uniquely save the LAMMPS input and output files.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Dictionary of results consisting of keys:</span>
+
+<span class="sd">        - **&#39;E_coh&#39;** (*float*) - The cohesive energy of the supplied system.</span>
+<span class="sd">        - **&#39;stress&#39;** (*numpy.array*) - The measured stress state of the</span>
+<span class="sd">          supplied system.</span>
+<span class="sd">        - **&#39;C_elastic&#39;** (*atomman.ElasticConstants*) - The supplied system&#39;s</span>
+<span class="sd">          elastic constants.</span>
+<span class="sd">        - **&#39;system_new&#39;** (*atomman.System*) - System with updated box</span>
+<span class="sd">          dimensions.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    RuntimeError</span>
+<span class="sd">        If any of the new box dimensions are less than zero.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Get lammps units</span>
+    <span class="n">lammps_units</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+
+    <span class="c1"># Define lammps variables</span>
+    <span class="n">lammps_variables</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">system_info</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;atom_data&#39;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="s1">&#39;init&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cycle</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.dat&#39;</span><span class="p">,</span>
+                              <span class="n">units</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">,</span>
+                              <span class="n">atom_style</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">atom_style</span><span class="p">)</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_system_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_info</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_pair_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">potential</span><span class="o">.</span><span class="n">pair_info</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">symbols</span><span class="p">)</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;delta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">strainrange</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;steps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="c1"># Write lammps input script</span>
+    <span class="n">template_file</span> <span class="o">=</span> <span class="s1">&#39;cij.template&#39;</span>
+    <span class="n">lammps_script</span> <span class="o">=</span> <span class="s1">&#39;cij.in&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">template_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lammps_script</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">filltemplate</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">lammps_variables</span><span class="p">,</span>
+                                         <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
+
+    <span class="c1"># Run lammps</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">lammps_script</span><span class="p">,</span> <span class="n">mpi_command</span><span class="o">=</span><span class="n">mpi_command</span><span class="p">,</span>
+                     <span class="n">return_style</span><span class="o">=</span><span class="s1">&#39;model&#39;</span><span class="p">)</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="s1">&#39;log.lammps&#39;</span><span class="p">,</span> <span class="s1">&#39;cij-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">cycle</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-log.lammps&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Extract LAMMPS thermo data. Each term ranges i=0-12 where i=0 is undeformed</span>
+    <span class="c1"># The remaining values are for -/+ strain pairs in the six unique directions</span>
+    <span class="n">lx</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">finds</span><span class="p">(</span><span class="s1">&#39;Lx&#39;</span><span class="p">)),</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">])</span>
+    <span class="n">ly</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">finds</span><span class="p">(</span><span class="s1">&#39;Ly&#39;</span><span class="p">)),</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">])</span>
+    <span class="n">lz</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">finds</span><span class="p">(</span><span class="s1">&#39;Lz&#39;</span><span class="p">)),</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">])</span>
+    <span class="n">xy</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">finds</span><span class="p">(</span><span class="s1">&#39;Xy&#39;</span><span class="p">)),</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">])</span>
+    <span class="n">xz</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">finds</span><span class="p">(</span><span class="s1">&#39;Xz&#39;</span><span class="p">)),</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">])</span>
+    <span class="n">yz</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">finds</span><span class="p">(</span><span class="s1">&#39;Yz&#39;</span><span class="p">)),</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">])</span>
+
+    <span class="n">pxx</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">finds</span><span class="p">(</span><span class="s1">&#39;Pxx&#39;</span><span class="p">)),</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">])</span>
+    <span class="n">pyy</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">finds</span><span class="p">(</span><span class="s1">&#39;Pyy&#39;</span><span class="p">)),</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">])</span>
+    <span class="n">pzz</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">finds</span><span class="p">(</span><span class="s1">&#39;Pzz&#39;</span><span class="p">)),</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">])</span>
+    <span class="n">pxy</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">finds</span><span class="p">(</span><span class="s1">&#39;Pxy&#39;</span><span class="p">)),</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">])</span>
+    <span class="n">pxz</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">finds</span><span class="p">(</span><span class="s1">&#39;Pxz&#39;</span><span class="p">)),</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">])</span>
+    <span class="n">pyz</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">finds</span><span class="p">(</span><span class="s1">&#39;Pyz&#39;</span><span class="p">)),</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">])</span>
+
+    <span class="n">pe</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">finds</span><span class="p">(</span><span class="s1">&#39;PotEng&#39;</span><span class="p">))</span> <span class="o">/</span> <span class="n">system</span><span class="o">.</span><span class="n">natoms</span><span class="p">,</span>
+                         <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;energy&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Set the six non-zero strain values</span>
+    <span class="n">strains</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="p">(</span><span class="n">lx</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span>  <span class="n">lx</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>  <span class="o">/</span> <span class="n">lx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                         <span class="p">(</span><span class="n">ly</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">-</span>  <span class="n">ly</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>  <span class="o">/</span> <span class="n">ly</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                         <span class="p">(</span><span class="n">lz</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">-</span>  <span class="n">lz</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>  <span class="o">/</span> <span class="n">lz</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                         <span class="p">(</span><span class="n">yz</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">-</span>  <span class="n">yz</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>  <span class="o">/</span> <span class="n">lz</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                         <span class="p">(</span><span class="n">xz</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">-</span> <span class="n">xz</span><span class="p">[</span><span class="mi">9</span><span class="p">])</span>  <span class="o">/</span> <span class="n">lz</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                         <span class="p">(</span><span class="n">xy</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span> <span class="o">-</span> <span class="n">xy</span><span class="p">[</span><span class="mi">11</span><span class="p">])</span> <span class="o">/</span> <span class="n">ly</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">])</span>
+
+    <span class="c1"># Calculate cij using stress changes associated with each non-zero strain</span>
+    <span class="n">cij</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+        <span class="n">delta_stress</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="n">pxx</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">pxx</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span>
+                                  <span class="n">pyy</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">pyy</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span>
+                                  <span class="n">pzz</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">pzz</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span>
+                                  <span class="n">pyz</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">pyz</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span>
+                                  <span class="n">pxz</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">pxz</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span>
+                                  <span class="n">pxy</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">pxy</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span> <span class="p">])</span>
+
+        <span class="n">cij</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">delta_stress</span> <span class="o">/</span> <span class="n">strains</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+            <span class="n">cij</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">cij</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">cij</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">cij</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+
+    <span class="n">C</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">ElasticConstants</span><span class="p">(</span><span class="n">Cij</span><span class="o">=</span><span class="n">cij</span><span class="p">)</span>
+
+    <span class="n">S</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">Sij</span>
+
+    <span class="c1"># Extract the current stress state</span>
+    <span class="n">stress</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">pxx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pxy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pxz</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                            <span class="p">[</span><span class="n">pxy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pyy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pyz</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                            <span class="p">[</span><span class="n">pxz</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pyz</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pzz</span><span class="p">[</span><span class="mi">0</span><span class="p">]]])</span>
+
+    <span class="n">s_xx</span> <span class="o">=</span> <span class="n">stress</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">p_xx</span>
+    <span class="n">s_yy</span> <span class="o">=</span> <span class="n">stress</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">p_yy</span>
+    <span class="n">s_zz</span> <span class="o">=</span> <span class="n">stress</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">p_zz</span>
+
+    <span class="n">new_a</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">a</span> <span class="o">/</span> <span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">s_xx</span> <span class="o">+</span> <span class="n">S</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">s_yy</span> <span class="o">+</span> <span class="n">S</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">s_zz</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">new_b</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">b</span> <span class="o">/</span> <span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">s_xx</span> <span class="o">+</span> <span class="n">S</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">s_yy</span> <span class="o">+</span> <span class="n">S</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">s_zz</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">new_c</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">c</span> <span class="o">/</span> <span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">s_xx</span> <span class="o">+</span> <span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">s_yy</span> <span class="o">+</span> <span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">s_zz</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">new_a</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">new_b</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">new_c</span> <span class="o">&lt;=</span><span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Divergence of box dimensions to &lt;= 0&#39;</span><span class="p">)</span>
+
+    <span class="n">system_new</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+    <span class="n">system_new</span><span class="o">.</span><span class="n">box_set</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">new_a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">new_b</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">new_c</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">results_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_coh&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pe</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;system_new&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_new</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pxx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pxx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pyy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pyy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pzz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pzz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pxy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pxy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pxz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pxz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pyz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pyz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">results_dict</span>
+
+
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="4.-Run-calculation-function(s)">
+<h3>4. Run calculation function(s)<a class="headerlink" href="#4.-Run-calculation-function(s)" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">results_dict</span> <span class="o">=</span> <span class="n">relax_box</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span>
+                           <span class="n">mpi_command</span> <span class="o">=</span> <span class="n">mpi_command</span><span class="p">,</span>
+                           <span class="n">p_xx</span> <span class="o">=</span> <span class="n">pressure_xx</span><span class="p">,</span>
+                           <span class="n">p_yy</span> <span class="o">=</span> <span class="n">pressure_yy</span><span class="p">,</span>
+                           <span class="n">p_zz</span> <span class="o">=</span> <span class="n">pressure_zz</span><span class="p">,</span>
+                           <span class="n">strainrange</span> <span class="o">=</span> <span class="n">strainrange</span><span class="p">,</span>
+                           <span class="n">tol</span><span class="o">=</span><span class="n">convergence_tol</span><span class="p">,</span>
+                           <span class="n">diverge_scale</span><span class="o">=</span><span class="n">divergence_scale</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">results_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[12]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>dict_keys([&#39;dumpfile_initial&#39;, &#39;symbols_initial&#39;, &#39;dumpfile_final&#39;, &#39;symbols_final&#39;, &#39;lx&#39;, &#39;ly&#39;, &#39;lz&#39;, &#39;xy&#39;, &#39;xz&#39;, &#39;yz&#39;, &#39;E_coh&#39;, &#39;measured_pxx&#39;, &#39;measured_pyy&#39;, &#39;measured_pzz&#39;, &#39;measured_pxy&#39;, &#39;measured_pxz&#39;, &#39;measured_pyz&#39;])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="5.-Report-results">
+<h3>5. Report results<a class="headerlink" href="#5.-Report-results" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="5.1.-Define-units-for-outputting-values">
+<h4>5.1. Define units for outputting values<a class="headerlink" href="#5.1.-Define-units-for-outputting-values" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>length_unit</strong> is the unit of length to display values in.</li>
+<li><strong>energy_unit</strong> is the unit of energy to display values in.</li>
+<li><strong>pressure_unit</strong> is the unit of pressure to display values in.</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">length_unit</span> <span class="o">=</span> <span class="s1">&#39;angstrom&#39;</span>
+<span class="n">energy_unit</span> <span class="o">=</span> <span class="s1">&#39;eV&#39;</span>
+<span class="n">pressure_unit</span> <span class="o">=</span> <span class="s1">&#39;GPa&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="5.2.-Print-Ecoh-and-lattice-constants-of-relaxed-ucell">
+<h4>5.2. Print Ecoh and lattice constants of relaxed ucell<a class="headerlink" href="#5.2.-Print-Ecoh-and-lattice-constants-of-relaxed-ucell" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Ecoh =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_coh&#39;</span><span class="p">],</span> <span class="n">energy_unit</span><span class="p">),</span> <span class="n">energy_unit</span><span class="p">)</span>
+
+<span class="n">box</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">Box</span><span class="p">(</span><span class="n">lx</span><span class="o">=</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;lx&#39;</span><span class="p">],</span> <span class="n">ly</span><span class="o">=</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;ly&#39;</span><span class="p">],</span> <span class="n">lz</span><span class="o">=</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;lz&#39;</span><span class="p">],</span>
+             <span class="n">xy</span><span class="o">=</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;xy&#39;</span><span class="p">],</span> <span class="n">xz</span><span class="o">=</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;xz&#39;</span><span class="p">],</span> <span class="n">yz</span><span class="o">=</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;yz&#39;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;a =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">box</span><span class="o">.</span><span class="n">a</span> <span class="o">/</span> <span class="n">sizemults</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">length_unit</span><span class="p">),</span> <span class="n">length_unit</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;b =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">box</span><span class="o">.</span><span class="n">b</span> <span class="o">/</span> <span class="n">sizemults</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">length_unit</span><span class="p">),</span> <span class="n">length_unit</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;c =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">box</span><span class="o">.</span><span class="n">c</span> <span class="o">/</span> <span class="n">sizemults</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">length_unit</span><span class="p">),</span> <span class="n">length_unit</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;alpha =&#39;</span><span class="p">,</span> <span class="n">box</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;beta = &#39;</span><span class="p">,</span> <span class="n">box</span><span class="o">.</span><span class="n">beta</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;gamma =&#39;</span><span class="p">,</span> <span class="n">box</span><span class="o">.</span><span class="n">gamma</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Ecoh = -4.44999999835 eV
+a = 3.51999943754 angstrom
+b = 3.51999943754 angstrom
+c = 3.51999943754 angstrom
+alpha = 90.0
+beta =  90.0
+gamma = 90.0
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="5.3.-Check-final-system-pressures">
+<h4>5.3. Check final system pressures<a class="headerlink" href="#5.3.-Check-final-system-pressures" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Pxx =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pxx&#39;</span><span class="p">],</span> <span class="n">pressure_unit</span><span class="p">),</span> <span class="n">pressure_unit</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Pyy =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pyy&#39;</span><span class="p">],</span> <span class="n">pressure_unit</span><span class="p">),</span> <span class="n">pressure_unit</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Pzz =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pzz&#39;</span><span class="p">],</span> <span class="n">pressure_unit</span><span class="p">),</span> <span class="n">pressure_unit</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Pyz =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pyz&#39;</span><span class="p">],</span> <span class="n">pressure_unit</span><span class="p">),</span> <span class="n">pressure_unit</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Pxz =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pxz&#39;</span><span class="p">],</span> <span class="n">pressure_unit</span><span class="p">),</span> <span class="n">pressure_unit</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Pxy =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;measured_pxy&#39;</span><span class="p">],</span> <span class="n">pressure_unit</span><span class="p">),</span> <span class="n">pressure_unit</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Pxx = 4.44627016048e-12 GPa
+Pyy = 4.44545069855e-12 GPa
+Pzz = 4.44584154791e-12 GPa
+Pyz = -4.15395449454e-16 GPa
+Pxz = -1.12156771353e-15 GPa
+Pxy = 1.02149517343e-15 GPa
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="5.4.-Show-relaxed-atomic-configuration">
+<h4>5.4. Show relaxed atomic configuration<a class="headerlink" href="#5.4.-Show-relaxed-atomic-configuration" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">finalsystem</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;atom_dump&#39;</span><span class="p">,</span> <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;dumpfile_final&#39;</span><span class="p">],</span>
+                      <span class="n">symbols</span><span class="o">=</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;symbols_final&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">finalsystem</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+avect =  [10.560,  0.000,  0.000]
+bvect =  [ 0.000, 10.560,  0.000]
+cvect =  [ 0.000,  0.000, 10.560]
+origin = [ 0.000,  0.000,  0.000]
+natoms = 108
+natypes = 1
+symbols = (&#39;Ni&#39;,)
+pbc = [ True  True  True]
+     id |   atype |  pos[0] |  pos[1] |  pos[2]
+      0 |       1 |   0.000 |   0.000 |   0.000
+      1 |       1 |   0.000 |   1.760 |   1.760
+      2 |       1 |   1.760 |   0.000 |   1.760
+      3 |       1 |   1.760 |   1.760 |   0.000
+      4 |       1 |   3.520 |   0.000 |   0.000
+      5 |       1 |   3.520 |   1.760 |   1.760
+      6 |       1 |   5.280 |   0.000 |   1.760
+      7 |       1 |   5.280 |   1.760 |   0.000
+      8 |       1 |   7.040 |   0.000 |   0.000
+      9 |       1 |   7.040 |   1.760 |   1.760
+     10 |       1 |   8.800 |   0.000 |   1.760
+     11 |       1 |   8.800 |   1.760 |   0.000
+     12 |       1 |   0.000 |   3.520 |   0.000
+     13 |       1 |   0.000 |   5.280 |   1.760
+     14 |       1 |   1.760 |   3.520 |   1.760
+     15 |       1 |   1.760 |   5.280 |   0.000
+     16 |       1 |   3.520 |   3.520 |   0.000
+     17 |       1 |   3.520 |   5.280 |   1.760
+     18 |       1 |   5.280 |   3.520 |   1.760
+     19 |       1 |   5.280 |   5.280 |   0.000
+     20 |       1 |   7.040 |   3.520 |   0.000
+     21 |       1 |   7.040 |   5.280 |   1.760
+     22 |       1 |   8.800 |   3.520 |   1.760
+     23 |       1 |   8.800 |   5.280 |   0.000
+     24 |       1 |   0.000 |   7.040 |   0.000
+     25 |       1 |   0.000 |   8.800 |   1.760
+     26 |       1 |   1.760 |   7.040 |   1.760
+     27 |       1 |   1.760 |   8.800 |   0.000
+     28 |       1 |   3.520 |   7.040 |   0.000
+     29 |       1 |   3.520 |   8.800 |   1.760
+     30 |       1 |   5.280 |   7.040 |   1.760
+     31 |       1 |   5.280 |   8.800 |   0.000
+     32 |       1 |   7.040 |   7.040 |   0.000
+     33 |       1 |   7.040 |   8.800 |   1.760
+     34 |       1 |   8.800 |   7.040 |   1.760
+     35 |       1 |   8.800 |   8.800 |   0.000
+     36 |       1 |   0.000 |   0.000 |   3.520
+     37 |       1 |   0.000 |   1.760 |   5.280
+     38 |       1 |   1.760 |   0.000 |   5.280
+     39 |       1 |   1.760 |   1.760 |   3.520
+     40 |       1 |   3.520 |   0.000 |   3.520
+     41 |       1 |   3.520 |   1.760 |   5.280
+     42 |       1 |   5.280 |   0.000 |   5.280
+     43 |       1 |   5.280 |   1.760 |   3.520
+     44 |       1 |   7.040 |   0.000 |   3.520
+     45 |       1 |   7.040 |   1.760 |   5.280
+     46 |       1 |   8.800 |   0.000 |   5.280
+     47 |       1 |   8.800 |   1.760 |   3.520
+     48 |       1 |   0.000 |   3.520 |   3.520
+     49 |       1 |   0.000 |   5.280 |   5.280
+     50 |       1 |   1.760 |   3.520 |   5.280
+     51 |       1 |   1.760 |   5.280 |   3.520
+     52 |       1 |   3.520 |   3.520 |   3.520
+     53 |       1 |   3.520 |   5.280 |   5.280
+     54 |       1 |   5.280 |   3.520 |   5.280
+     55 |       1 |   5.280 |   5.280 |   3.520
+     56 |       1 |   7.040 |   3.520 |   3.520
+     57 |       1 |   7.040 |   5.280 |   5.280
+     58 |       1 |   8.800 |   3.520 |   5.280
+     59 |       1 |   8.800 |   5.280 |   3.520
+     60 |       1 |   0.000 |   7.040 |   3.520
+     61 |       1 |   0.000 |   8.800 |   5.280
+     62 |       1 |   1.760 |   7.040 |   5.280
+     63 |       1 |   1.760 |   8.800 |   3.520
+     64 |       1 |   3.520 |   7.040 |   3.520
+     65 |       1 |   3.520 |   8.800 |   5.280
+     66 |       1 |   5.280 |   7.040 |   5.280
+     67 |       1 |   5.280 |   8.800 |   3.520
+     68 |       1 |   7.040 |   7.040 |   3.520
+     69 |       1 |   7.040 |   8.800 |   5.280
+     70 |       1 |   8.800 |   7.040 |   5.280
+     71 |       1 |   8.800 |   8.800 |   3.520
+     72 |       1 |   0.000 |   0.000 |   7.040
+     73 |       1 |   0.000 |   1.760 |   8.800
+     74 |       1 |   1.760 |   0.000 |   8.800
+     75 |       1 |   1.760 |   1.760 |   7.040
+     76 |       1 |   3.520 |   0.000 |   7.040
+     77 |       1 |   3.520 |   1.760 |   8.800
+     78 |       1 |   5.280 |   0.000 |   8.800
+     79 |       1 |   5.280 |   1.760 |   7.040
+     80 |       1 |   7.040 |   0.000 |   7.040
+     81 |       1 |   7.040 |   1.760 |   8.800
+     82 |       1 |   8.800 |   0.000 |   8.800
+     83 |       1 |   8.800 |   1.760 |   7.040
+     84 |       1 |   0.000 |   3.520 |   7.040
+     85 |       1 |   0.000 |   5.280 |   8.800
+     86 |       1 |   1.760 |   3.520 |   8.800
+     87 |       1 |   1.760 |   5.280 |   7.040
+     88 |       1 |   3.520 |   3.520 |   7.040
+     89 |       1 |   3.520 |   5.280 |   8.800
+     90 |       1 |   5.280 |   3.520 |   8.800
+     91 |       1 |   5.280 |   5.280 |   7.040
+     92 |       1 |   7.040 |   3.520 |   7.040
+     93 |       1 |   7.040 |   5.280 |   8.800
+     94 |       1 |   8.800 |   3.520 |   8.800
+     95 |       1 |   8.800 |   5.280 |   7.040
+     96 |       1 |   0.000 |   7.040 |   7.040
+     97 |       1 |   0.000 |   8.800 |   8.800
+     98 |       1 |   1.760 |   7.040 |   8.800
+     99 |       1 |   1.760 |   8.800 |   7.040
+    100 |       1 |   3.520 |   7.040 |   7.040
+    101 |       1 |   3.520 |   8.800 |   8.800
+    102 |       1 |   5.280 |   7.040 |   8.800
+    103 |       1 |   5.280 |   8.800 |   7.040
+    104 |       1 |   7.040 |   7.040 |   7.040
+    105 |       1 |   7.040 |   8.800 |   8.800
+    106 |       1 |   8.800 |   7.040 |   8.800
+    107 |       1 |   8.800 |   8.800 |   7.040
+</pre></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">relax_box Calculation</a><ul>
+<li><a class="reference internal" href="#Introduction">Introduction</a></li>
+<li><a class="reference internal" href="#Method-and-Theory">Method and Theory</a></li>
+<li><a class="reference internal" href="#Demonstration">Demonstration</a><ul>
+<li><a class="reference internal" href="#1.-Setup">1. Setup</a><ul>
+<li><a class="reference internal" href="#1.1.-Library-imports">1.1. Library imports</a></li>
+<li><a class="reference internal" href="#1.2.-Default-calculation-setup">1.2. Default calculation setup</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#2.-Assign-values-for-the-calculation's-run-parameters">2. Assign values for the calculation’s run parameters</a><ul>
+<li><a class="reference internal" href="#2.1.-Specify-system-specific-paths">2.1. Specify system-specific paths</a></li>
+<li><a class="reference internal" href="#2.2.-Load-interatomic-potential">2.2. Load interatomic potential</a></li>
+<li><a class="reference internal" href="#2.3.-Load-initial-unit-cell-system">2.3. Load initial unit cell system</a></li>
+<li><a class="reference internal" href="#2.4.-Modify-system">2.4. Modify system</a></li>
+<li><a class="reference internal" href="#2.5.-Specify-calculation-specific-run-parameters">2.5. Specify calculation-specific run parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#3.-Define-calculation-function(s)-and-generate-template-LAMMPS-script(s)">3. Define calculation function(s) and generate template LAMMPS script(s)</a><ul>
+<li><a class="reference internal" href="#3.1.-cij.template">3.1. cij.template</a></li>
+<li><a class="reference internal" href="#3.2.-relax_box()">3.2. relax_box()</a></li>
+<li><a class="reference internal" href="#3.3.-calc_cij()">3.3. calc_cij()</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#4.-Run-calculation-function(s)">4. Run calculation function(s)</a></li>
+<li><a class="reference internal" href="#5.-Report-results">5. Report results</a><ul>
+<li><a class="reference internal" href="#5.1.-Define-units-for-outputting-values">5.1. Define units for outputting values</a></li>
+<li><a class="reference internal" href="#5.2.-Print-Ecoh-and-lattice-constants-of-relaxed-ucell">5.2. Print Ecoh and lattice constants of relaxed ucell</a></li>
+<li><a class="reference internal" href="#5.3.-Check-final-system-pressures">5.3. Check final system pressures</a></li>
+<li><a class="reference internal" href="#5.4.-Show-relaxed-atomic-configuration">5.4. Show relaxed atomic configuration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="point_defect_static.html"
+                        title="previous chapter">point_defect_static Calculation Demonstration</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="relax_dynamic.html"
+                        title="next chapter">relax_dynamic Calculation</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="relax_dynamic.html" title="relax_dynamic Calculation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="point_defect_static.html" title="point_defect_static Calculation Demonstration"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

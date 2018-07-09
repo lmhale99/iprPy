@@ -1,0 +1,266 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>iprPy package &#8212; iprPy 0.8.0 documentation</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="iprPy.calculation package" href="calculation.html" />
+    <link rel="prev" title="Introduction" href="../database/local/intro.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="calculation.html" title="iprPy.calculation package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../database/local/intro.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="iprpy-package">
+<h1>iprPy package<a class="headerlink" href="#iprpy-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="calculation.html">iprPy.calculation package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compatibility.html">iprPy.compatibility package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">iprPy.database package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input.html">iprPy.input package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="record.html">iprPy.record package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">iprPy.tools package</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="module-iprPy">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-iprPy" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt id="iprPy.rootdir">
+<code class="descname">rootdir</code><a class="headerlink" href="#iprPy.rootdir" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – The absolute path to the iprPy package’s root directory used to locate
+contained data files.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.check_modules">
+<code class="descname">check_modules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.check_modules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints lists of the calculation, record, and database styles that were
+successfully and unsuccessfully loaded when iprPy was initialized.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.load_calculation">
+<code class="descname">load_calculation</code><span class="sig-paren">(</span><em>style</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.load_calculation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="iprPy.load_database">
+<code class="descname">load_database</code><span class="sig-paren">(</span><em>name=None</em>, <em>style=None</em>, <em>host=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.load_database" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a database object.  Can be either loaded from stored settings or
+by defining all needed access information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The name assigned to a pre-defined database.  If given, can be the only
+parameter.</li>
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The database style to use.</li>
+<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The URL/file path where the database is hosted.</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>optional</em>) – Any other keyword parameters defining necessary access information.
+Allowed keywords are database style-specific.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The database object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Subclass of iprPy.Database</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.load_record">
+<code class="descname">load_record</code><span class="sig-paren">(</span><em>style</em>, <em>name=None</em>, <em>content=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.load_record" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="iprPy.load_run_directory">
+<code class="descname">load_run_directory</code><span class="sig-paren">(</span><em>name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.load_run_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a pre-defined run_directory from the settings file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name assigned to a pre-defined run_directory.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The path to the identified run_directory.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.set_database">
+<code class="descname">set_database</code><span class="sig-paren">(</span><em>name=None</em>, <em>style=None</em>, <em>host=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.set_database" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows for database information to be defined in the settings file. Screen
+prompts will be given to allow any necessary database parameters to be
+entered.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the database. If not given, the user will be
+prompted to enter one.</li>
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The database style associated with the database. If not given, the
+user will be prompted to enter one.</li>
+<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The database host (directory path or url) where the database is
+located. If not given, the user will be prompted to enter one.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.set_run_directory">
+<code class="descname">set_run_directory</code><span class="sig-paren">(</span><em>name=None</em>, <em>path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.set_run_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows for run_directory information to be defined in the settings file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the run_directory.  If not given, the user will
+be prompted to enter one.</li>
+<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The directory path for the run_directory.  If not given, the user will
+be prompted to enter one.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.unset_database">
+<code class="descname">unset_database</code><span class="sig-paren">(</span><em>name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.unset_database" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes the settings for a pre-defined database from the settings file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name assigned to a pre-defined database.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.unset_run_directory">
+<code class="descname">unset_run_directory</code><span class="sig-paren">(</span><em>name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.unset_run_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes the settings for a pre-defined run_directory from the settings
+file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name assigned to a pre-defined run_directory.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">iprPy package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#module-iprPy">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../database/local/intro.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="calculation.html"
+                        title="next chapter">iprPy.calculation package</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="calculation.html" title="iprPy.calculation package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../database/local/intro.html" title="Introduction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>
