@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 # Python script created by Lucas Hale
-# Built around LAMMPS script by Steve Plimpton
 
 # Standard library imports
 from __future__ import (absolute_import, print_function,

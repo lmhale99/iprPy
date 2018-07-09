@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Python script created by Lucas Hale and Karina Stetsyuk
+# Python script created by Lucas Hale
 
 # Standard library imports
 from __future__ import (absolute_import, print_function,
