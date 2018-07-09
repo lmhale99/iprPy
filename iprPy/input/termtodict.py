@@ -27,7 +27,7 @@ def termtodict(term, keys):
     Raises
     ------
     ValueError
-        If any key appears mupltiple times or the first word in term does not
+        If any key appears multiple times or the first word in term does not
         match a key.
     
     """

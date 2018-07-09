@@ -142,6 +142,7 @@ class CalculationElasticConstantsStatic(Record):
             cij = DM()
             cij['Cij'] = uc.model(results_dict['raw_cij_negative'], 'GPa')
             calc.append('raw-elastic-constants', cij)
+            cij = DM()
             cij['Cij'] = uc.model(results_dict['raw_cij_positive'], 'GPa')
             calc.append('raw-elastic-constants', cij)
             
