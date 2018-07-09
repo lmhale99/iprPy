@@ -5,7 +5,6 @@ import os
 
 from .. import Calculation
 
-raise NotImplementedError('Needs updating')
 class StackingFaultStatic(Calculation):
     """
     Class for handling different calculation styles in the same fashion.  The

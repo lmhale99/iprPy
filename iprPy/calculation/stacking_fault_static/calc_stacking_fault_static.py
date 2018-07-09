@@ -66,7 +66,8 @@ def stackingfaultpoint(lammps_command, system, potential,
                        cutboxvector='c', faultpos=0.5,
                        faultshift=[0.0, 0.0, 0.0], etol=0.0, ftol=0.0,
                        maxiter=10000, maxeval=100000,
-                       dmax=uc.set_in_units(0.01, 'angstrom')):
+                       dmax=uc.set_in_units(0.01, 'angstrom'),
+                       lammps_date=None):
     """
     Perform a stacking fault relaxation simulation for a single faultshift.
     
@@ -109,6 +110,8 @@ def stackingfaultpoint(lammps_command, system, potential,
     faultshift : list of float, optional
         The vector shift to apply to all atoms above the fault plane defined
         by faultpos (default is [0,0,0], i.e. no shift applied).
+    lammps_date : datetime.date or None, optional
+        The date version of the LAMMPS executable.  If None, will be identified from the lammps_command (default is None).
     
     Returns
     -------
@@ -215,7 +218,8 @@ def stackingfaultpoint(lammps_command, system, potential,
     lammps_units = lmp.style.unit(potential.units)
     
     #Get lammps version date
-    lammps_date = lmp.checkversion(lammps_command)['date']
+    if lammps_date is None:
+        lammps_date = lmp.checkversion(lammps_command)['date']
     
     # Define lammps variables
     lammps_variables = {}
