@@ -17,7 +17,7 @@ __all__ = ['__version__', 'rootdir', 'compatibility', 'tools', 'input',
            'record', 'load_record', 'calculation', 'load_calculation',
            'database', 'load_database', 'set_database', 'unset_database',
            'load_run_directory', 'set_run_directory', 'unset_run_directory',
-           'check_modules']
+           'analysis', 'check_modules']
 __all__.sort()
 
 # Define root package directory
@@ -38,5 +38,7 @@ from . import database
 from .database import (load_database, set_database, unset_database,
                        load_run_directory, set_run_directory,
                        unset_run_directory)
+
+from . import analysis
 
 from .check_modules import check_modules
