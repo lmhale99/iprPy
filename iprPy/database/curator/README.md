@@ -1,7 +1,5 @@
 # curator Database style
 
-**NOTE** This style is not currently implemented as the underlying Python code has changed.
-
 ## Introduction
 
 The curator Database style interacts with an instance of the Materials Database Curation System (MDCS).  Records are stored in the MDCS instance as validated XML.
@@ -26,6 +24,6 @@ The curator Database style interacts with an instance of the Materials Database 
 
 - With this method, a remote MDCS instance can be accessed by multiple computing resources.
 
-- Adding records to an MDCS instance requires a valid XSD schema for each record   style, and that each corresponding XML record be consistent with that schema.
+- Adding records to an MDCS instance requires a valid XSD schema for each record style, and that each corresponding XML record be consistent with that schema.
   
 - There are no functions for update_tar and delete_tar as the current versions of MDCS do not allow the associated files to be deleted.

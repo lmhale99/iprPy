@@ -2,5 +2,5 @@
 from __future__ import division, absolute_import, print_function
 
 # iprPy imports
-from .curator import *
-__all__ = curator.__all__
+from .Curator import Curator
+__all__ = ['Curator']

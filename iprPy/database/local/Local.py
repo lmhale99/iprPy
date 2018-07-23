@@ -49,6 +49,9 @@ class Local(Database):
             The record name or id to limit the search by.
         style : str, optional
             The record style to limit the search by.
+        query : str, optional
+            A query str for identifying records.  Not supported by this style.
+        return_df : bool, optional
             
         Returns
         ------
@@ -157,7 +160,7 @@ class Local(Database):
         """
         
         # Get records
-        record = self.get_records(name=name, style=style)
+        record = self.get_records(name=name, style=style, query=None, **kwargs)
         
         # Verify that there is only one matching record
         if len(record) == 1:
@@ -208,7 +211,7 @@ class Local(Database):
             raise ValueError('kwargs style, name, and content cannot be given with kwarg record')
         
         # Verify that there isn't already a record with a matching name
-        if len(self.get_records(name=record.name)) > 0:
+        if len(self.get_records(name=record.name, style=record.style)) > 0:
             raise ValueError('Record ' + record.name + ' already exists')
         
         # Make record style directory if needed
