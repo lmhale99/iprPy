@@ -46,8 +46,10 @@ def main(*args):
                                        input_dict['potential'],
                                        input_dict['burgersvector'],
                                        input_dict['C'],
-                                       axes = input_dict['axes'],
                                        mpi_command = input_dict['mpi_command'],
+                                       axes = input_dict['transformationmatrix'],
+                                       m = input_dict['stroh_m'],
+                                       n = input_dict['stroh_n'],
                                        etol = input_dict['energytolerance'],
                                        ftol = input_dict['forcetolerance'],
                                        maxiter = input_dict['maxiterations'],
@@ -68,7 +70,8 @@ def main(*args):
         record.content.json(fp=f, indent=4)
 
 def dislocationmonopole(lammps_command, system, potential, burgers,
-                        C, mpi_command=None, axes=None, randomseed=None,
+                        C, mpi_command=None, axes=None, m=[1,0,0], n=[0,1,0],
+                        randomseed=None,
                         etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000,
                         dmax=uc.set_in_units(0.01, 'angstrom'),
                         annealtemp=0.0, bshape='circle',
@@ -156,7 +159,7 @@ def dislocationmonopole(lammps_command, system, potential, burgers,
     results_dict['symbols_base'] = system.symbols
     
     # Solve Stroh method for dislocation
-    stroh = am.defect.Stroh(C, burgers, axes=axes)
+    stroh = am.defect.Stroh(C, burgers, axes=axes, m=m, n=n)
     results_dict['Stroh_preln'] = stroh.preln
     results_dict['Stroh_K_tensor'] = stroh.K_tensor
     
@@ -166,7 +169,7 @@ def dislocationmonopole(lammps_command, system, potential, burgers,
     system.wrap()
     
     # Apply fixed boundary conditions
-    system = disl_boundary_fix(system, bwidth, bshape)
+    system = disl_boundary_fix(system, bwidth, bshape=bshape, m=m, n=n)
     
     # Relax system
     relaxed = disl_relax(lammps_command, system, potential,
@@ -195,7 +198,7 @@ def dislocationmonopole(lammps_command, system, potential, burgers,
     
     return results_dict
 
-def disl_boundary_fix(system, bwidth, bshape='circle'):
+def disl_boundary_fix(system, bwidth, bshape='circle', m=[1,0,0], n=[0,1,0]):
     """
     Creates a boundary region by changing atom types.
     
@@ -212,6 +215,8 @@ def disl_boundary_fix(system, bwidth, bshape='circle'):
     natypes = system.natypes
     atype = system.atoms_prop(key='atype')
     pos = system.atoms.pos
+    x = np.dot(pos, np.asaray(m, dtype='float64'))
+    y = np.dot(pos, np.asaray(n, dtype='float64'))
     
     if bshape == 'circle':
         # Find x or y bound closest to 0

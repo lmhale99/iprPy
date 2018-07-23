@@ -5,7 +5,6 @@ import os
 
 from .. import Calculation
 
-raise NotImplementedError('Needs updating')
 class DislocationMonopole(Calculation):
     """
     Class for handling different calculation styles in the same fashion.  The
@@ -88,6 +87,8 @@ class DislocationMonopole(Calculation):
                     'dislocation_burgersvector',
                     'dislocation_boundarywidth',
                     'dislocation_boundaryshape',
+                    'dislocation_stroh_m',
+                    'dislocation_stroh_n',
                     'a_uvw',
                     'b_uvw',
                     'c_uvw',

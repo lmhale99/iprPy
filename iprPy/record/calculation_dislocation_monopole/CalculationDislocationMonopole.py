@@ -21,7 +21,6 @@ from ... import __version__ as iprPy_version
 from .. import Record
 from ...tools import aslist
 
-raise NotImplementedError('Needs updating')
 class CalculationDislocationMonopole(Record):
     
     @property
@@ -171,6 +170,8 @@ class CalculationDislocationMonopole(Record):
         
         disl['system-family'] = input_dict.get('dislocation_family', input_dict['family'])
         disl['calculation-parameter'] = cp = DM() 
+        cp['stroh_m'] = input_dict['dislocation_stroh_m']
+        cp['stroh_n'] = input_dict['dislocation_stroh_n']
         cp['a_uvw'] = input_dict['a_uvw']
         cp['b_uvw'] = input_dict['b_uvw']
         cp['c_uvw'] = input_dict['c_uvw'] 

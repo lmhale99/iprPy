@@ -1,17 +1,19 @@
 {
     "dislocation-monopole": {    
         "key": "17d4954d-4832-4997-9a39-fa084c64c105", 
-        "id": "A2--W--bcc--111-screw",
+        "id": "A2--W--bcc--a-2-111--0-screw--{110}",
         "character": "screw",
         "Burgers-vector": "a/2[ 1, 1, 1]",
-        "slip-plane": [-1, 0, 1],
+        "slip-plane": [ 1,-1, 0],
         "line-direction": [ 1, 1, 1],
         "system-family": "A2--W--bcc",
         "calculation-parameter": {
-            "x_axis": "-1  2 -1",
-            "y_axis": "-1  0  1",
-            "z_axis": " 1  1  1",
-            "atomshift": " 0.0 0.66666666666667 0.0",
+            "stroh_m": "0 1 0",
+            "stroh_n": "0 0 1",
+            "a_uvw": " 1  1  1",
+            "b_uvw": "-1 -1  2",
+            "c_uvw": " 1 -1  0", 
+            "atomshift": " 0.0 0.0 0.66666666666667",
             "burgersvector": " 0.5  0.5  0.5"
         }
     }

@@ -26,6 +26,8 @@ sizemults                   <sizemults>
 
 #Defect parameters
 dislocation_file            <dislocation_file>
+dislocation_stroh_m         <dislocation_stroh_m>
+dislocation_stroh_n         <dislocation_stroh_n>
 dislocation_burgersvector   <dislocation_burgersvector>
 dislocation_boundarywidth   <dislocation_boundarywidth>
 dislocation_boundaryshape   <dislocation_boundaryshape>
