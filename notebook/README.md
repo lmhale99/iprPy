@@ -16,4 +16,6 @@
 
 ## [stacking_fault_map_2D](stacking_fault_map_2D.ipynb)
 
+## [stacking_fault_static](stacking_fault_static.ipynb)
+
 ## [surface_energy_static](surface_energy_static.ipynb)
