@@ -2,7 +2,7 @@
 from __future__ import (absolute_import, print_function,
                         division, unicode_literals)
 import os
-
+from .calc_dislocation_monopole import dislocationmonopole
 from .. import Calculation
 
 class DislocationMonopole(Calculation):
@@ -12,6 +12,12 @@ class DislocationMonopole(Calculation):
     implemented for each style.  The available styles are loaded from the
     iprPy.calculations submodule.
     """
+
+    def __init__(self):
+        self.calc = dislocationmonopole
+
+        Calculation.__init__(self)
+
     @property
     def files(self):
         """
@@ -89,6 +95,7 @@ class DislocationMonopole(Calculation):
                     'dislocation_boundaryshape',
                     'dislocation_stroh_m',
                     'dislocation_stroh_n',
+                    'dislocation_lineboxvector',
                     'a_uvw',
                     'b_uvw',
                     'c_uvw',

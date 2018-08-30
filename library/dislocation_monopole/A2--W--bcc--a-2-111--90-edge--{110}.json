@@ -10,6 +10,7 @@
         "calculation-parameter": {
             "stroh_m": "0 1 0",
             "stroh_n": "0 0 1",
+            "lineboxvector": "a",
             "a_uvw": " 1  1 -2", 
             "b_uvw": " 1  1  1", 
             "c_uvw": " 1 -1  0", 

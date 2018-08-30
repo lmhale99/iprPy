@@ -50,6 +50,7 @@ def main(*args):
                                        axes = input_dict['transformationmatrix'],
                                        m = input_dict['stroh_m'],
                                        n = input_dict['stroh_n'],
+                                       lineboxvector  = input_dict['dislocation_lineboxvector'],
                                        etol = input_dict['energytolerance'],
                                        ftol = input_dict['forcetolerance'],
                                        maxiter = input_dict['maxiterations'],
@@ -70,8 +71,8 @@ def main(*args):
         record.content.json(fp=f, indent=4)
 
 def dislocationmonopole(lammps_command, system, potential, burgers,
-                        C, mpi_command=None, axes=None, m=[1,0,0], n=[0,1,0],
-                        randomseed=None,
+                        C, mpi_command=None, axes=None, m=[0,1,0], n=[0,0,1],
+                        lineboxvector='a', randomseed=None,
                         etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000,
                         dmax=uc.set_in_units(0.01, 'angstrom'),
                         annealtemp=0.0, bshape='circle',
@@ -166,10 +167,9 @@ def dislocationmonopole(lammps_command, system, potential, burgers,
     # Generate dislocation system by displacing atoms
     disp = stroh.displacement(system.atoms.pos)
     system.atoms.pos += disp
-    system.wrap()
     
     # Apply fixed boundary conditions
-    system = disl_boundary_fix(system, bwidth, bshape=bshape, m=m, n=n)
+    system = disl_boundary_fix(system, bwidth, bshape=bshape, lineboxvector=lineboxvector, m=m, n=n)
     
     # Relax system
     relaxed = disl_relax(lammps_command, system, potential,
@@ -198,7 +198,7 @@ def dislocationmonopole(lammps_command, system, potential, burgers,
     
     return results_dict
 
-def disl_boundary_fix(system, bwidth, bshape='circle', m=[1,0,0], n=[0,1,0]):
+def disl_boundary_fix(system, bwidth, bshape='circle', lineboxvector='a', m=None, n=None):
     """
     Creates a boundary region by changing atom types.
     
@@ -210,38 +210,138 @@ def disl_boundary_fix(system, bwidth, bshape='circle', m=[1,0,0], n=[0,1,0]):
         The minimum thickness of the boundary region.
     bshape : str, optional
         The shape to make the boundary region.  Options are 'circle' and
-        'rect' (default is 'circle').
+        'box' (default is 'circle').
+    lineboxvector : str, optional
+        Specifies which of the three box vectors (a, b, or c) the dislocation line is to be
+        parallel to.  Default value is 'a'.
+    m : array-like object, optional
+        Cartesian vector used by the Stroh solution, which is perpendicular to both
+        lineboxvector and n.  Default value is [0, 1, 0], which assumes the default value
+        for the lineboxvector.
+    n : array-like object, optional
+        Cartesian vector used by the Stroh solution, which is perpendicular to both
+        lineboxvector and m.  Default value is [0, 0, 1], which assumes the default value
+        for the lineboxvector.
+        
     """
+    # Set default values
+    if m is None:
+        m = np.array([0, 1, 0])
+    m = np.asarray(m)
+    if n is None:
+        n = np.array([0, 0, 1])
+    n = np.asarray(n)
+    
+    # Extract values from system
     natypes = system.natypes
     atype = system.atoms_prop(key='atype')
     pos = system.atoms.pos
-    x = np.dot(pos, np.asaray(m, dtype='float64'))
-    y = np.dot(pos, np.asaray(n, dtype='float64'))
     
-    if bshape == 'circle':
-        # Find x or y bound closest to 0
-        smallest_xy = min([abs(system.box.xlo), abs(system.box.xhi),
-                           abs(system.box.ylo), abs(system.box.yhi)])
-        
-        radius = smallest_xy - bwidth
-        xy_mag = np.linalg.norm(pos[:,:2], axis=1)
-        atype[xy_mag > radius] += natypes
+    # Set line_box_velineboxvectorctor dependent values
+    if lineboxvector == 'a':
+        u = system.box.avect / system.box.a
+        boxvect1 = system.box.bvect
+        boxvect2 = system.box.cvect
+        pbc = (True, False, False)
+
+    elif lineboxvector == 'b':
+        u = system.box.bvect / system.box.b
+        boxvect1 = system.box.cvect
+        boxvect2 = system.box.avect
+        pbc = (False, True, False)
+
+    elif lineboxvector == 'c':
+        u = system.box.cvect / system.box.c
+        boxvect1 = system.box.avect
+        pbc = (False, False, True)
+
+    # Assert u, m, n are all orthogonal
+    assert np.isclose(np.dot(u, m), 0.0)
+    assert np.isclose(np.dot(u, n), 0.0)
+    assert np.isclose(np.dot(m, n), 0.0)
     
-    elif bshape == 'rect':
-        index = np.unique(np.hstack((np.where(pos[:,0] < system.box.xlo + bwidth),
-                                     np.where(pos[:,0] > system.box.xhi - bwidth),
-                                     np.where(pos[:,1] < system.box.ylo + bwidth),
-                                     np.where(pos[:,1] > system.box.yhi - bwidth))))
-        atype[index] += natypes
+    # Get components within mn plane
+    mn = np.array([m, n])
+    mnvect1 = mn.dot(boxvect1)
+    mnvect2 = mn.dot(boxvect2)
+    mnorigin = mn.dot(system.box.origin)
+    mnpos = mn.dot(pos.T).T
+    
+    # Compute normal vectors to box vectors
+    normal_mnvect1 = np.array([-mnvect1[1], mnvect1[0]])
+    normal_mnvect2 = np.array([mnvect2[1], -mnvect2[0]])
+    normal_mnvect1 = normal_mnvect1 / np.linalg.norm(normal_mnvect1)
+    normal_mnvect2 = normal_mnvect2 / np.linalg.norm(normal_mnvect2)
+    
+    # Find two opposite boundary corners 
+    botcorner = mnorigin
+    topcorner = mnorigin + mnvect1 + mnvect2
+    
+    if bshape == 'box':
+        # Project all positions normal to the two mnvectors
+        pos_normal_1 = np.dot(mnpos, normal_mnvect1)
+        pos_normal_2 = np.dot(mnpos, normal_mnvect2)
+
+        # Adjust atypes of boundary atoms
+        atype[(pos_normal_1 < np.dot(botcorner, normal_mnvect1) + bwidth)
+             |(pos_normal_2 < np.dot(botcorner, normal_mnvect2) + bwidth)
+             |(pos_normal_1 > np.dot(topcorner, normal_mnvect1) - bwidth)
+             |(pos_normal_2 > np.dot(topcorner, normal_mnvect2) - bwidth)] += natypes
+    
+    elif bshape == 'circle':
+        def line(p1, p2):
+            A = (p1[1] - p2[1])
+            B = (p2[0] - p1[0])
+            C = (p1[0]*p2[1] - p2[0]*p1[1])
+            return A, B, -C
+
+        def intersection(L1, L2):
+            D  = L1[0] * L2[1] - L1[1] * L2[0]
+            Dx = L1[2] * L2[1] - L1[1] * L2[2]
+            Dy = L1[0] * L2[2] - L1[2] * L2[0]
+            if D != 0:
+                x = Dx / D
+                y = Dy / D
+                return x,y
+            else:
+                return False
+
+        # Find two opposite boundary corners 
+        botcorner = mnorigin
+        topcorner = mnorigin + mnvect1 + mnvect2
+
+        # Define normal lines
+        normal_line_1 = line([0,0], normal_mnvect1)
+        normal_line_2 = line([0,0], normal_mnvect2)
+
+        # Define boundary lines
+        bound_bot1 = line(botcorner, botcorner+mnvect1)
+        bound_bot2 = line(botcorner, botcorner+mnvect2)
+        bound_top1 = line(topcorner, topcorner+mnvect1)
+        bound_top2 = line(topcorner, topcorner+mnvect2)
+
+        # Identify intersection points
+        intersections = np.array([intersection(normal_line_1, bound_bot1),
+                                  intersection(normal_line_2, bound_bot2),
+                                  intersection(normal_line_1, bound_top1),
+                                  intersection(normal_line_2, bound_top2)])
+
+        # Compute cylinder radius
+        radius = np.min(np.linalg.norm(intersections, axis=1)) - bwidth
+
+        # Adjust atypes of boundary atoms
+        atype[np.linalg.norm(mnpos, axis=1) > radius] += natypes
     
     else:
-        raise ValueError("Unknown boundary shape type! Enter 'circle' or 'rect'")
+        raise ValueError("Unknown boundary shape type! Enter 'circle' or 'box'")
     
-    new_system = deepcopy(system)
-    new_system.atoms.atype = atype
-    new_system.symbols = list(system.symbols) * 2
-    
-    return new_system
+    newsystem = deepcopy(system)
+    newsystem.atoms.atype = atype
+    newsystem.symbols = list(system.symbols) * 2
+    newsystem.pbc = pbc
+    newsystem.wrap()
+
+    return newsystem
 
 def disl_relax(lammps_command, system, potential,
                mpi_command=None, annealtemp=0.0, randomseed=None,
@@ -368,10 +468,7 @@ def anneal_info(temperature=0.0, randomseed=None, units='metal'):
     str
         The generated LAMMPS input lines for performing a dynamic relax.
         Will be '' if temperature==0.0.
-    """
-    # Get lammps units
-    lammps_units = lmp.style.unit(units)
-    
+    """    
     # Return nothing if temperature is 0.0 (don't do thermo anneal)
     if temperature == 0.0:
         return ''

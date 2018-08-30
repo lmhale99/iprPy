@@ -31,6 +31,8 @@ def dislocationmonopole(input_dict, **kwargs):
       two normal unit vectors used to orient the Stroh solution.
     - **'atomshift'** the atomic shift to apply to all atoms.  This function
       only reads in values from the dislocation_model.
+    - **'dislocation_lineboxvector'** the box vector for the system that
+      corresponds to the dislocation's line direction.
     - **'dislocation_burgersvector'** the dislocation's Burgers vector as a
       crystallographic.vector.
     - **'dislocation_boundaryshape'** defines the shape of the boundary
@@ -63,6 +65,8 @@ def dislocationmonopole(input_dict, **kwargs):
         Replacement parameter key name for 'b_uvw'.
     c_uvw : str
         Replacement parameter key name for 'c_uvw'.
+    dislocation_lineboxvector : str
+        Replacement parameter key name for 'dislocation_lineboxvector'.
     dislocation_stroh_m : str
         Replacement parameter key name for 'dislocation_stroh_m'.
     dislocation_stroh_n : str
@@ -90,7 +94,7 @@ def dislocationmonopole(input_dict, **kwargs):
     # Set default keynames
     keynames = ['dislocation_file', 'dislocation_model', 'dislocation_content',
                 'dislocation_family', 'dislocation_stroh_m', 'dislocation_stroh_n',
-                'a_uvw', 'b_uvw', 'c_uvw', 'stroh_m',
+                'a_uvw', 'b_uvw', 'c_uvw', 'stroh_m', 'dislocation_lineboxvector',
                 'stroh_n', 'atomshift', 'dislocation_burgersvector',
                 'dislocation_boundaryshape', 'dislocation_boundarywidth',
                 'ucell', 'burgersvector', 'boundarywidth']
@@ -112,8 +116,8 @@ def dislocationmonopole(input_dict, **kwargs):
     if dislocation_file is not None:
         
         # Verify competing parameters are not defined
-        for key in ('atomshift', 'a_uvw', 'b_uvw', 'c_uvw', 'dislocation_stroh_m',
-                    'dislocation_stroh_n', 'dislocation_burgersvector'):
+        for key in ('atomshift', 'a_uvw', 'b_uvw', 'c_uvw', 'dislocation_lineboxvector',
+                    'dislocation_stroh_m', 'dislocation_stroh_n', 'dislocation_burgersvector'):
             assert kwargs[key] not in input_dict, (kwargs[key] + ' and '
                                                    + kwargs['dislocation_file']
                                                    + ' cannot both be supplied')
@@ -125,6 +129,7 @@ def dislocationmonopole(input_dict, **kwargs):
         input_dict[kwargs['dislocation_family']] = dislocation_model['system-family']
         input_dict[kwargs['dislocation_stroh_m']] = dislocation_model['calculation-parameter']['stroh_m']
         input_dict[kwargs['dislocation_stroh_n']] = dislocation_model['calculation-parameter']['stroh_n']
+        input_dict[kwargs['dislocation_lineboxvector']] = dislocation_model['calculation-parameter']['lineboxvector']
         input_dict[kwargs['a_uvw']] = dislocation_model['calculation-parameter']['a_uvw']
         input_dict[kwargs['b_uvw']] = dislocation_model['calculation-parameter']['b_uvw']
         input_dict[kwargs['c_uvw']] = dislocation_model['calculation-parameter']['c_uvw']
@@ -133,8 +138,9 @@ def dislocationmonopole(input_dict, **kwargs):
     
     # Set default parameter values if defect model not given
     else: 
-        input_dict[kwargs['dislocation_stroh_m']] = input_dict.get([kwargs['dislocation_stroh_m']], '1 0 0')
-        input_dict[kwargs['dislocation_stroh_n']] = input_dict.get([kwargs['dislocation_stroh_n']], '0 1 0')
+        input_dict[kwargs['dislocation_lineboxvector']] = input_dict.get([kwargs['dislocation_lineboxvector']], 'a')
+        input_dict[kwargs['dislocation_stroh_m']] = input_dict.get([kwargs['dislocation_stroh_m']], '0 1 0')
+        input_dict[kwargs['dislocation_stroh_n']] = input_dict.get([kwargs['dislocation_stroh_n']], '0 0 1')
     
     # convert parameters if ucell exists
     if ucell is not None:

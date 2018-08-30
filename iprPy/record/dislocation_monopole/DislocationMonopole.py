@@ -6,7 +6,6 @@ import os
 # iprPy imports
 from .. import Record
 
-raise NotImplementedError('Needs updating')
 class DislocationMonopole(Record):
     
     @property
@@ -56,9 +55,12 @@ class DislocationMonopole(Record):
         params['family'] = disl['system-family']
         
         calcparam = disl['calculation-parameter']
-        params['x_axis'] = calcparam['x_axis']
-        params['y_axis'] = calcparam['y_axis']
-        params['z_axis'] = calcparam['z_axis']
+        params['stroh_m'] = calcparam['stroh_m']
+        params['stroh_n'] = calcparam['stroh_n']
+        params['lineboxvector'] = calcparam['lineboxvector']
+        params['a_uvw'] = calcparam['a_uvw']
+        params['b_uvw'] = calcparam['b_uvw']
+        params['c_uvw'] = calcparam['c_uvw']
         params['atomshift'] = calcparam['atomshift']
         params['burgersvector'] = calcparam['burgersvector']
         
