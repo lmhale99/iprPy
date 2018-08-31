@@ -522,7 +522,7 @@ def process_input(input_dict, UUID=None, build=True):
     iprPy.input.interpret('units', input_dict)
     
     # These are calculation-specific default strings
-    input_dict['sizemults'] = input_dict.get('sizemults', '-10 10 -10 10 0 3')
+    input_dict['sizemults'] = input_dict.get('sizemults', '0 3 -20 20 -20 20')
     input_dict['boundaryshape'] = input_dict.get('dislocation_boundaryshape',
                                                   'circle')
     input_dict['forcetolerance'] = input_dict.get('forcetolerance',
