@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "4d397ca1-8776-4e60-83c9-3b48fd5be762", 
+        "id": "EDIP_BOP_Bazant_Kaxiras_Si__MO_958932894036_001--LAMMPS", 
+        "potential": {
+            "key": "b9e9fc43-cf13-4447-b5a7-99524b9cca17", 
+            "id": "EDIP_BOP_Bazant_Kaxiras_Si__MO_958932894036_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Si"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EDIP_BOP_Bazant_Kaxiras_Si__MO_958932894036_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

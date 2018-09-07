@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "3e9191fa-4c63-4df6-aea0-d24bae631942", 
+        "id": "Three_Body_Stillinger_Weber_Balamane_Hauch_Brittle_Si__MO_381114941873_000--LAMMPS", 
+        "potential": {
+            "key": "a1bafa91-d1ea-4d44-b940-f1ba61d7f14b", 
+            "id": "Three_Body_Stillinger_Weber_Balamane_Hauch_Brittle_Si__MO_381114941873_000"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Si"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Three_Body_Stillinger_Weber_Balamane_Hauch_Brittle_Si__MO_381114941873_000"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

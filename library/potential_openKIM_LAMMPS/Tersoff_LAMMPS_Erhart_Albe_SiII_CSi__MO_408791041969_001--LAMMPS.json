@@ -1,0 +1,36 @@
+{
+    "potential-LAMMPS": {
+        "key": "33084c7b-0548-4bb5-a88a-4fe20b1cac75", 
+        "id": "Tersoff_LAMMPS_Erhart_Albe_SiII_CSi__MO_408791041969_001--LAMMPS", 
+        "potential": {
+            "key": "4842664c-7afb-4b22-b395-ab8a59443547", 
+            "id": "Tersoff_LAMMPS_Erhart_Albe_SiII_CSi__MO_408791041969_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Si"
+            }, 
+            {
+                "element": "C"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Tersoff_LAMMPS_Erhart_Albe_SiII_CSi__MO_408791041969_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

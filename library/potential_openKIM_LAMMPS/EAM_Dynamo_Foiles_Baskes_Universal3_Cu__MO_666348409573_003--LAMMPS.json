@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "642936c7-4d10-42a7-977c-d044307548b7", 
+        "id": "EAM_Dynamo_Foiles_Baskes_Universal3_Cu__MO_666348409573_003--LAMMPS", 
+        "potential": {
+            "key": "2d6ba8ca-0004-43c6-967f-3c4e0e5263fe", 
+            "id": "EAM_Dynamo_Foiles_Baskes_Universal3_Cu__MO_666348409573_003"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Cu"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EAM_Dynamo_Foiles_Baskes_Universal3_Cu__MO_666348409573_003"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

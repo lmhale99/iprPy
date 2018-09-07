@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "ae80f208-66ac-4be0-847b-8af292614583", 
+        "id": "Pair_Johnson_Fe__MO_857282754307_002--LAMMPS", 
+        "potential": {
+            "key": "ce0e1c37-c750-4717-8ff5-0d6ac5c2a0a5", 
+            "id": "Pair_Johnson_Fe__MO_857282754307_002"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Fe"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Pair_Johnson_Fe__MO_857282754307_002"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

@@ -1,0 +1,117 @@
+{
+    "potential-LAMMPS": {
+        "key": "4fdb41c2-a8fd-40de-87d4-ffb14b9f2117", 
+        "id": "MEAM_2NN_Fe_to_Ga__MO_145522277939_001--LAMMPS", 
+        "potential": {
+            "key": "f17a9f37-b4f5-4cf3-85db-89f370815c43", 
+            "id": "MEAM_2NN_Fe_to_Ga__MO_145522277939_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Fe"
+            }, 
+            {
+                "element": "Cr"
+            }, 
+            {
+                "element": "Mo"
+            }, 
+            {
+                "element": "W"
+            }, 
+            {
+                "element": "V"
+            }, 
+            {
+                "element": "Nb"
+            }, 
+            {
+                "element": "Ta"
+            }, 
+            {
+                "element": "Mn"
+            }, 
+            {
+                "element": "Li"
+            }, 
+            {
+                "element": "Ni"
+            }, 
+            {
+                "element": "Pd"
+            }, 
+            {
+                "element": "Pt"
+            }, 
+            {
+                "element": "Cu"
+            }, 
+            {
+                "element": "Ag"
+            }, 
+            {
+                "element": "Au"
+            }, 
+            {
+                "element": "Al"
+            }, 
+            {
+                "element": "Pb"
+            }, 
+            {
+                "element": "C"
+            }, 
+            {
+                "element": "Si"
+            }, 
+            {
+                "element": "Ge"
+            }, 
+            {
+                "element": "Ti"
+            }, 
+            {
+                "element": "Zr"
+            }, 
+            {
+                "element": "Co"
+            }, 
+            {
+                "element": "Mg"
+            }, 
+            {
+                "element": "O"
+            }, 
+            {
+                "element": "N"
+            }, 
+            {
+                "element": "H"
+            }, 
+            {
+                "element": "In"
+            }, 
+            {
+                "element": "Ga"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "MEAM_2NN_Fe_to_Ga__MO_145522277939_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "d0d63d44-8fcb-4543-8abb-655fb5d77463", 
+        "id": "model_Mo_PF_cubicsplines__MO_424746498193_001--LAMMPS", 
+        "potential": {
+            "key": "509a3a1c-727d-430c-b3cd-d27d58daa6c0", 
+            "id": "model_Mo_PF_cubicsplines__MO_424746498193_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Mo"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "model_Mo_PF_cubicsplines__MO_424746498193_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

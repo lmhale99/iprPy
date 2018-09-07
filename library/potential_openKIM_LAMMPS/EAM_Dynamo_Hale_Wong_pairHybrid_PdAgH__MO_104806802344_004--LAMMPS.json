@@ -1,0 +1,39 @@
+{
+    "potential-LAMMPS": {
+        "key": "2bc09596-cc10-4959-ba13-fc7d8b26578a", 
+        "id": "EAM_Dynamo_Hale_Wong_pairHybrid_PdAgH__MO_104806802344_004--LAMMPS", 
+        "potential": {
+            "key": "cc4b21c5-df05-4824-8685-1fcaf1316ce5", 
+            "id": "EAM_Dynamo_Hale_Wong_pairHybrid_PdAgH__MO_104806802344_004"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ag"
+            }, 
+            {
+                "element": "H"
+            }, 
+            {
+                "element": "Pd"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EAM_Dynamo_Hale_Wong_pairHybrid_PdAgH__MO_104806802344_004"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

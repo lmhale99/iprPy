@@ -1,0 +1,36 @@
+{
+    "potential-LAMMPS": {
+        "key": "7c1a85d2-2ad9-470d-a96f-c5ff073ff200", 
+        "id": "Pair_Exp6_Hogervorst_Mixing_Kong_Chakrabarty_ArNe__MO_946046425752_001--LAMMPS", 
+        "potential": {
+            "key": "c57c11af-e6d0-443f-8083-386f0bc5dd5c", 
+            "id": "Pair_Exp6_Hogervorst_Mixing_Kong_Chakrabarty_ArNe__MO_946046425752_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ar"
+            }, 
+            {
+                "element": "Ne"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Pair_Exp6_Hogervorst_Mixing_Kong_Chakrabarty_ArNe__MO_946046425752_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

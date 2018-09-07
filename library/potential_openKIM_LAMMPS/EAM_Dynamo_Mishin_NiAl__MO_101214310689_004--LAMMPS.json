@@ -1,0 +1,36 @@
+{
+    "potential-LAMMPS": {
+        "key": "1dffbdfb-42a4-4cb0-b962-e52655b4d1a1", 
+        "id": "EAM_Dynamo_Mishin_NiAl__MO_101214310689_004--LAMMPS", 
+        "potential": {
+            "key": "c064dad0-9c04-458d-8301-34d94951eef0", 
+            "id": "EAM_Dynamo_Mishin_NiAl__MO_101214310689_004"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ni"
+            }, 
+            {
+                "element": "Al"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EAM_Dynamo_Mishin_NiAl__MO_101214310689_004"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

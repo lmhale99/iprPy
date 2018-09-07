@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "09097459-09f6-47a2-bf37-c508911ea25f", 
+        "id": "Glue_Ercolessi_Adams_Al__MO_324507536345_001--LAMMPS", 
+        "potential": {
+            "key": "0cf4d6fc-f32c-4f64-bf7c-738123eb4000", 
+            "id": "Glue_Ercolessi_Adams_Al__MO_324507536345_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Al"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Glue_Ercolessi_Adams_Al__MO_324507536345_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

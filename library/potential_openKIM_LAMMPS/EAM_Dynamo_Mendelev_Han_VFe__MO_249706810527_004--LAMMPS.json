@@ -1,0 +1,36 @@
+{
+    "potential-LAMMPS": {
+        "key": "a6b41ab6-863c-48f2-97fc-6ec261cdda2c", 
+        "id": "EAM_Dynamo_Mendelev_Han_VFe__MO_249706810527_004--LAMMPS", 
+        "potential": {
+            "key": "721351fb-cd9c-467c-b138-2c2d9a318804", 
+            "id": "EAM_Dynamo_Mendelev_Han_VFe__MO_249706810527_004"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "V"
+            }, 
+            {
+                "element": "Fe"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EAM_Dynamo_Mendelev_Han_VFe__MO_249706810527_004"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "5fc98a1b-1743-4373-8a25-79051c26eed7", 
+        "id": "Pair_Morse_Shifted_GirifalcoWeizer_MedCutoff_Cr__MO_245813471114_001--LAMMPS", 
+        "potential": {
+            "key": "dcfc78c2-f773-4d72-8d2f-98287c469dd8", 
+            "id": "Pair_Morse_Shifted_GirifalcoWeizer_MedCutoff_Cr__MO_245813471114_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Cr"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Pair_Morse_Shifted_GirifalcoWeizer_MedCutoff_Cr__MO_245813471114_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "7778cfe1-36ab-48df-a65e-849666b197b1", 
+        "id": "Pair_Morse_Shifted_Glyde_Ne__MO_169434419764_001--LAMMPS", 
+        "potential": {
+            "key": "1197fb0b-4340-44f4-a822-de0c2b794a04", 
+            "id": "Pair_Morse_Shifted_Glyde_Ne__MO_169434419764_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ne"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Pair_Morse_Shifted_Glyde_Ne__MO_169434419764_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

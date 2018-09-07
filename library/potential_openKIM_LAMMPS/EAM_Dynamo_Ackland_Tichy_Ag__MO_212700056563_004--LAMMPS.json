@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "f71319da-554d-4873-a418-c9c6194cd08e", 
+        "id": "EAM_Dynamo_Ackland_Tichy_Ag__MO_212700056563_004--LAMMPS", 
+        "potential": {
+            "key": "33065433-6d25-43d0-8d74-536848fd58ef", 
+            "id": "EAM_Dynamo_Ackland_Tichy_Ag__MO_212700056563_004"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ag"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EAM_Dynamo_Ackland_Tichy_Ag__MO_212700056563_004"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "d6d7576a-c871-49ce-9640-6f1b828a5f35", 
+        "id": "Three_Body_Stillinger_Weber_Balamane_Si__MO_113686039439_002--LAMMPS", 
+        "potential": {
+            "key": "754a99ee-c858-4e4c-a03e-7b603c62525e", 
+            "id": "Three_Body_Stillinger_Weber_Balamane_Si__MO_113686039439_002"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Si"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Three_Body_Stillinger_Weber_Balamane_Si__MO_113686039439_002"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

@@ -1,0 +1,39 @@
+{
+    "potential-LAMMPS": {
+        "key": "41125f8f-d82f-4dfb-b806-bc9b0c2a02df", 
+        "id": "EAM_Dynamo_Bonny_Pasianot_FeCuNi__MO_469343973171_004--LAMMPS", 
+        "potential": {
+            "key": "73941934-6d97-4d77-b002-b3879856c332", 
+            "id": "EAM_Dynamo_Bonny_Pasianot_FeCuNi__MO_469343973171_004"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Fe"
+            }, 
+            {
+                "element": "Cu"
+            }, 
+            {
+                "element": "Ni"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EAM_Dynamo_Bonny_Pasianot_FeCuNi__MO_469343973171_004"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

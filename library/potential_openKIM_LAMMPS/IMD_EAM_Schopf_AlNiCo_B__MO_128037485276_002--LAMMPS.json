@@ -1,0 +1,39 @@
+{
+    "potential-LAMMPS": {
+        "key": "4b5c520b-873b-430f-848e-ea5cd8513ebe", 
+        "id": "IMD_EAM_Schopf_AlNiCo_B__MO_128037485276_002--LAMMPS", 
+        "potential": {
+            "key": "44b0c9ff-402e-4983-8f5a-51c739c2c392", 
+            "id": "IMD_EAM_Schopf_AlNiCo_B__MO_128037485276_002"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Al"
+            }, 
+            {
+                "element": "Ni"
+            }, 
+            {
+                "element": "Co"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "IMD_EAM_Schopf_AlNiCo_B__MO_128037485276_002"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

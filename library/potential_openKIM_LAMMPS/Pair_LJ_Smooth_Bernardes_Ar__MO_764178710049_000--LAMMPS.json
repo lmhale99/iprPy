@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "ef97c8d2-df04-4e5b-935d-999464a75777", 
+        "id": "Pair_LJ_Smooth_Bernardes_Ar__MO_764178710049_000--LAMMPS", 
+        "potential": {
+            "key": "aabf1763-f62d-41d5-868f-2960c691262f", 
+            "id": "Pair_LJ_Smooth_Bernardes_Ar__MO_764178710049_000"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ar"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Pair_LJ_Smooth_Bernardes_Ar__MO_764178710049_000"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

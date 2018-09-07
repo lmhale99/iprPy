@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "91863ddc-8883-4342-aa9f-48ba2914d586", 
+        "id": "Three_Body_Stillinger_Weber_Zhang_Silicene_Model2_Si__MO_475612090600_002--LAMMPS", 
+        "potential": {
+            "key": "32c1c875-1dfd-47dc-85c1-f017845ff755", 
+            "id": "Three_Body_Stillinger_Weber_Zhang_Silicene_Model2_Si__MO_475612090600_002"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Si"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Three_Body_Stillinger_Weber_Zhang_Silicene_Model2_Si__MO_475612090600_002"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

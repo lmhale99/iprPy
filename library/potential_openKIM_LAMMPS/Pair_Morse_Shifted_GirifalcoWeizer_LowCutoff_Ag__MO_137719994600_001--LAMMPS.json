@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "568e4dc4-c1c4-4d54-81ae-3ab562c3daf9", 
+        "id": "Pair_Morse_Shifted_GirifalcoWeizer_LowCutoff_Ag__MO_137719994600_001--LAMMPS", 
+        "potential": {
+            "key": "63028036-0302-4d7b-9821-9064091e6a64", 
+            "id": "Pair_Morse_Shifted_GirifalcoWeizer_LowCutoff_Ag__MO_137719994600_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ag"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Pair_Morse_Shifted_GirifalcoWeizer_LowCutoff_Ag__MO_137719994600_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

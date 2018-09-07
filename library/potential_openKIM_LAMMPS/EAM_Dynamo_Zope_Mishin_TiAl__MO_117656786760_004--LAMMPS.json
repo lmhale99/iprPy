@@ -1,0 +1,36 @@
+{
+    "potential-LAMMPS": {
+        "key": "ff2e3bf7-dd56-45be-ac35-931ceefafc79", 
+        "id": "EAM_Dynamo_Zope_Mishin_TiAl__MO_117656786760_004--LAMMPS", 
+        "potential": {
+            "key": "e7caca57-2fbd-4515-8cba-71ea56599357", 
+            "id": "EAM_Dynamo_Zope_Mishin_TiAl__MO_117656786760_004"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ti"
+            }, 
+            {
+                "element": "Al"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EAM_Dynamo_Zope_Mishin_TiAl__MO_117656786760_004"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "f99ccd2b-1dc7-40cd-a462-c72c9f6a7e16", 
+        "id": "EAM_Dynamo_Mishin_Mehl_Cu__MO_346334655118_004--LAMMPS", 
+        "potential": {
+            "key": "b473966b-512e-4aa5-ada1-f7482f85ab32", 
+            "id": "EAM_Dynamo_Mishin_Mehl_Cu__MO_346334655118_004"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Cu"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EAM_Dynamo_Mishin_Mehl_Cu__MO_346334655118_004"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

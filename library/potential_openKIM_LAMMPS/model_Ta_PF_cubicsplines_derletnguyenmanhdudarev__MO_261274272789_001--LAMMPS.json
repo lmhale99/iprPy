@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "6b4a69c1-0d65-400a-8c49-be8874b3b88b", 
+        "id": "model_Ta_PF_cubicsplines_derletnguyenmanhdudarev__MO_261274272789_001--LAMMPS", 
+        "potential": {
+            "key": "06c1972f-dc2d-4e6b-9bcf-faaac360d7b0", 
+            "id": "model_Ta_PF_cubicsplines_derletnguyenmanhdudarev__MO_261274272789_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ta"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "model_Ta_PF_cubicsplines_derletnguyenmanhdudarev__MO_261274272789_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

@@ -1,0 +1,36 @@
+{
+    "potential-LAMMPS": {
+        "key": "ed5483e2-9c6c-4860-b527-e2becb409b85", 
+        "id": "EAM_Dynamo_Wu_Trinkle_CuAg__MO_270337113239_004--LAMMPS", 
+        "potential": {
+            "key": "36cbd4d0-bc65-4dba-9454-f64d12f57db0", 
+            "id": "EAM_Dynamo_Wu_Trinkle_CuAg__MO_270337113239_004"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Cu"
+            }, 
+            {
+                "element": "Ag"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EAM_Dynamo_Wu_Trinkle_CuAg__MO_270337113239_004"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

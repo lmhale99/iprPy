@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "06118891-3cb4-424a-a9a7-334cdfa645a7", 
+        "id": "EAM_CubicNaturalSpline_Ercolessi_Adams_Al__MO_800509458712_001--LAMMPS", 
+        "potential": {
+            "key": "6ead1b57-ebdb-4871-93d3-e82e20c78455", 
+            "id": "EAM_CubicNaturalSpline_Ercolessi_Adams_Al__MO_800509458712_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Al"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EAM_CubicNaturalSpline_Ercolessi_Adams_Al__MO_800509458712_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

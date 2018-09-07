@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "3625475a-3109-45db-8011-50dc5cc44bd4", 
+        "id": "Pair_Morse_Shifted_GirifalcoWeizer_MedCutoff_Ca__MO_562200212426_001--LAMMPS", 
+        "potential": {
+            "key": "824d7736-6d04-4118-adf8-56941789a73f", 
+            "id": "Pair_Morse_Shifted_GirifalcoWeizer_MedCutoff_Ca__MO_562200212426_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ca"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Pair_Morse_Shifted_GirifalcoWeizer_MedCutoff_Ca__MO_562200212426_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

@@ -1,0 +1,39 @@
+{
+    "potential-LAMMPS": {
+        "key": "81bd037c-9b5a-4eac-a184-5ea8b7b3b5e0", 
+        "id": "MEAM_2NN_GaInN__MO_117938381510_001--LAMMPS", 
+        "potential": {
+            "key": "bc879d47-bc6f-4abc-aa1b-d030cbe1d27c", 
+            "id": "MEAM_2NN_GaInN__MO_117938381510_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ga"
+            }, 
+            {
+                "element": "In"
+            }, 
+            {
+                "element": "N"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "MEAM_2NN_GaInN__MO_117938381510_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

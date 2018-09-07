@@ -1,0 +1,39 @@
+{
+    "potential-LAMMPS": {
+        "key": "b10cf944-5356-4f34-9202-3f38625e0fa4", 
+        "id": "EAM_Dynamo_Angelo_Moody_NiAlH__MO_418978237058_004--LAMMPS", 
+        "potential": {
+            "key": "f59c1c9c-e506-4871-95a1-c66d7d0f046b", 
+            "id": "EAM_Dynamo_Angelo_Moody_NiAlH__MO_418978237058_004"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ni"
+            }, 
+            {
+                "element": "Al"
+            }, 
+            {
+                "element": "H"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EAM_Dynamo_Angelo_Moody_NiAlH__MO_418978237058_004"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

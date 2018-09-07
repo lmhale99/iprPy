@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "a77d323c-3735-4bf6-9319-261173b4ac31", 
+        "id": "EDIP_BOP_Belko_Gusakov_Dorozhkin_Ge__MO_129433059219_000--LAMMPS", 
+        "potential": {
+            "key": "45e68528-78d0-410f-a3f1-a1a9302af86f", 
+            "id": "EDIP_BOP_Belko_Gusakov_Dorozhkin_Ge__MO_129433059219_000"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ge"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EDIP_BOP_Belko_Gusakov_Dorozhkin_Ge__MO_129433059219_000"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

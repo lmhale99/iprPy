@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "9e8a7cac-753d-4c34-88d7-a2dd11bd2192", 
+        "id": "Tersoff_LAMMPS_Tersoff_PRB38_1988_Si__MO_186459956893_001--LAMMPS", 
+        "potential": {
+            "key": "d4e06cb4-f4fa-4291-93fe-57a015659f4d", 
+            "id": "Tersoff_LAMMPS_Tersoff_PRB38_1988_Si__MO_186459956893_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Si"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Tersoff_LAMMPS_Tersoff_PRB38_1988_Si__MO_186459956893_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

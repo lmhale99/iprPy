@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "ea0cd00e-896d-4627-a527-f990263cc3ed", 
+        "id": "Pair_Lennard_Jones_Shifted_Bernardes_MedCutoff_Kr__MO_984281096460_002--LAMMPS", 
+        "potential": {
+            "key": "92c6fc97-e5a8-4eef-bdf2-be71606c7bb3", 
+            "id": "Pair_Lennard_Jones_Shifted_Bernardes_MedCutoff_Kr__MO_984281096460_002"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Kr"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Pair_Lennard_Jones_Shifted_Bernardes_MedCutoff_Kr__MO_984281096460_002"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

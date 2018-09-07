@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "33a8a7ff-c15d-4124-8c14-fc53c11fb40f", 
+        "id": "EAM_Dynamo_Li_Siegel_Ta__MO_103054252769_004--LAMMPS", 
+        "potential": {
+            "key": "3d87a72a-8fb1-4ceb-80c7-385b934f78ef", 
+            "id": "EAM_Dynamo_Li_Siegel_Ta__MO_103054252769_004"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ta"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EAM_Dynamo_Li_Siegel_Ta__MO_103054252769_004"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

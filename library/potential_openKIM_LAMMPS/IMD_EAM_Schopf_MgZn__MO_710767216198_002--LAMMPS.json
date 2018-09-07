@@ -1,0 +1,36 @@
+{
+    "potential-LAMMPS": {
+        "key": "3b2dc821-84b9-4232-a764-91d566fa1763", 
+        "id": "IMD_EAM_Schopf_MgZn__MO_710767216198_002--LAMMPS", 
+        "potential": {
+            "key": "0d3337d0-d519-4af7-8352-b4be893cb708", 
+            "id": "IMD_EAM_Schopf_MgZn__MO_710767216198_002"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Mg"
+            }, 
+            {
+                "element": "Zn"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "IMD_EAM_Schopf_MgZn__MO_710767216198_002"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

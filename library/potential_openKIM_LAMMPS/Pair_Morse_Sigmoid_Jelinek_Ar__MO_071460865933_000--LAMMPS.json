@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "3e9a0b06-fb07-4d3c-902f-e60c536dd351", 
+        "id": "Pair_Morse_Sigmoid_Jelinek_Ar__MO_071460865933_000--LAMMPS", 
+        "potential": {
+            "key": "1be7b8fe-3668-4c26-9e2d-90b690a37098", 
+            "id": "Pair_Morse_Sigmoid_Jelinek_Ar__MO_071460865933_000"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ar"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Pair_Morse_Sigmoid_Jelinek_Ar__MO_071460865933_000"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

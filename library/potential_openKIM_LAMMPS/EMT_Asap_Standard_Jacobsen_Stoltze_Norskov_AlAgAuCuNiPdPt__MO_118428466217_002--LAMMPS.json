@@ -1,0 +1,51 @@
+{
+    "potential-LAMMPS": {
+        "key": "a2f4f825-e717-491e-b11c-8d2a1cfba6f2", 
+        "id": "EMT_Asap_Standard_Jacobsen_Stoltze_Norskov_AlAgAuCuNiPdPt__MO_118428466217_002--LAMMPS", 
+        "potential": {
+            "key": "007701d6-c7fd-40eb-a38f-fa4c5194fd11", 
+            "id": "EMT_Asap_Standard_Jacobsen_Stoltze_Norskov_AlAgAuCuNiPdPt__MO_118428466217_002"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Al"
+            }, 
+            {
+                "element": "Pb"
+            }, 
+            {
+                "element": "Au"
+            }, 
+            {
+                "element": "Pt"
+            }, 
+            {
+                "element": "Ag"
+            }, 
+            {
+                "element": "Ni"
+            }, 
+            {
+                "element": "Cu"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EMT_Asap_Standard_Jacobsen_Stoltze_Norskov_AlAgAuCuNiPdPt__MO_118428466217_002"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

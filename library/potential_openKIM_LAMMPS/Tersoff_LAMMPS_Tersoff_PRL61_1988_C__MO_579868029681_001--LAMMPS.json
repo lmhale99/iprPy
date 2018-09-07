@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "9fa4b14c-9a20-43c5-9949-1be1dc3740b3", 
+        "id": "Tersoff_LAMMPS_Tersoff_PRL61_1988_C__MO_579868029681_001--LAMMPS", 
+        "potential": {
+            "key": "929bc15e-0935-4260-8893-06a97242c9c7", 
+            "id": "Tersoff_LAMMPS_Tersoff_PRL61_1988_C__MO_579868029681_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "C"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Tersoff_LAMMPS_Tersoff_PRL61_1988_C__MO_579868029681_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

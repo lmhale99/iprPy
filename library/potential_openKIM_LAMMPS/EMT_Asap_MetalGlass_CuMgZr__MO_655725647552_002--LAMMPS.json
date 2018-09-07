@@ -1,0 +1,39 @@
+{
+    "potential-LAMMPS": {
+        "key": "3a125901-5cbd-4ed8-a6f4-0a50be9a7add", 
+        "id": "EMT_Asap_MetalGlass_CuMgZr__MO_655725647552_002--LAMMPS", 
+        "potential": {
+            "key": "484f7eaa-32c5-43e3-b370-5a5dd7ea9682", 
+            "id": "EMT_Asap_MetalGlass_CuMgZr__MO_655725647552_002"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Zr"
+            }, 
+            {
+                "element": "Mg"
+            }, 
+            {
+                "element": "Cu"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EMT_Asap_MetalGlass_CuMgZr__MO_655725647552_002"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

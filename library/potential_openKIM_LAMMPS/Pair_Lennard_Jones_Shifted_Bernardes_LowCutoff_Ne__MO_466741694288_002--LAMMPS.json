@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "d3fa376a-47e6-40dc-b35e-a381ad6f2632", 
+        "id": "Pair_Lennard_Jones_Shifted_Bernardes_LowCutoff_Ne__MO_466741694288_002--LAMMPS", 
+        "potential": {
+            "key": "ddd13f8c-14da-471c-bd6f-cee5e71db8fe", 
+            "id": "Pair_Lennard_Jones_Shifted_Bernardes_LowCutoff_Ne__MO_466741694288_002"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ne"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Pair_Lennard_Jones_Shifted_Bernardes_LowCutoff_Ne__MO_466741694288_002"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

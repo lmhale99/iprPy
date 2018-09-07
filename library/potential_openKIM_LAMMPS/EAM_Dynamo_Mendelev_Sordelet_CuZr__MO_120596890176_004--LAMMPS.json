@@ -1,0 +1,36 @@
+{
+    "potential-LAMMPS": {
+        "key": "f5676340-9174-44d3-9995-4f370d2db16b", 
+        "id": "EAM_Dynamo_Mendelev_Sordelet_CuZr__MO_120596890176_004--LAMMPS", 
+        "potential": {
+            "key": "e0a58015-56ef-4162-98a4-7f2de38c192c", 
+            "id": "EAM_Dynamo_Mendelev_Sordelet_CuZr__MO_120596890176_004"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Cu"
+            }, 
+            {
+                "element": "Zr"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EAM_Dynamo_Mendelev_Sordelet_CuZr__MO_120596890176_004"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "51358e93-52f6-4e8b-b474-e669bccdcc1a", 
+        "id": "EAM_Johnson_NearestNeighbor_Cu__MO_887933271505_001--LAMMPS", 
+        "potential": {
+            "key": "ef08c8de-d3f6-4bc5-ae1f-cbe34dffea80", 
+            "id": "EAM_Johnson_NearestNeighbor_Cu__MO_887933271505_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Cu"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EAM_Johnson_NearestNeighbor_Cu__MO_887933271505_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

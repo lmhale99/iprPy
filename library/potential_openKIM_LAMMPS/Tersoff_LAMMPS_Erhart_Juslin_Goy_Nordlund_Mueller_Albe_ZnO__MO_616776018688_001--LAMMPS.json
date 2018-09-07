@@ -1,0 +1,36 @@
+{
+    "potential-LAMMPS": {
+        "key": "54ef811e-926b-4132-a7ed-fc11661d28cd", 
+        "id": "Tersoff_LAMMPS_Erhart_Juslin_Goy_Nordlund_Mueller_Albe_ZnO__MO_616776018688_001--LAMMPS", 
+        "potential": {
+            "key": "f3bc1757-4e78-47da-96a9-ef9201c44eba", 
+            "id": "Tersoff_LAMMPS_Erhart_Juslin_Goy_Nordlund_Mueller_Albe_ZnO__MO_616776018688_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Zn"
+            }, 
+            {
+                "element": "O"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Tersoff_LAMMPS_Erhart_Juslin_Goy_Nordlund_Mueller_Albe_ZnO__MO_616776018688_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

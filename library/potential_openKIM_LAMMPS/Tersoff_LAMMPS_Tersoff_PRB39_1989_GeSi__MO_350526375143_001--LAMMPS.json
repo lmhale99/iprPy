@@ -1,0 +1,36 @@
+{
+    "potential-LAMMPS": {
+        "key": "e6aef758-41f5-4486-8c18-c3af930b1c0a", 
+        "id": "Tersoff_LAMMPS_Tersoff_PRB39_1989_GeSi__MO_350526375143_001--LAMMPS", 
+        "potential": {
+            "key": "a178d863-b268-445a-b3f4-ce096b72342e", 
+            "id": "Tersoff_LAMMPS_Tersoff_PRB39_1989_GeSi__MO_350526375143_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Si"
+            }, 
+            {
+                "element": "Ge"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Tersoff_LAMMPS_Tersoff_PRB39_1989_GeSi__MO_350526375143_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

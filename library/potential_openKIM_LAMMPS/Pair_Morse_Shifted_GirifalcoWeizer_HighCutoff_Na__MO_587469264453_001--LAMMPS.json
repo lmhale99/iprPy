@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "1e9d1a88-631f-4fae-a8e9-cddac056489b", 
+        "id": "Pair_Morse_Shifted_GirifalcoWeizer_HighCutoff_Na__MO_587469264453_001--LAMMPS", 
+        "potential": {
+            "key": "10524917-65d0-44d9-8022-48036eb9d546", 
+            "id": "Pair_Morse_Shifted_GirifalcoWeizer_HighCutoff_Na__MO_587469264453_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Na"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "Pair_Morse_Shifted_GirifalcoWeizer_HighCutoff_Na__MO_587469264453_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

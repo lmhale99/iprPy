@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "67efdd7a-cd5c-46c0-bbf6-3cef646f4d9e", 
+        "id": "model_Fe_PF_chiesa_quinticsplines__MO_140444321607_001--LAMMPS", 
+        "potential": {
+            "key": "efd27d98-efeb-43db-8904-c35e781a2b27", 
+            "id": "model_Fe_PF_chiesa_quinticsplines__MO_140444321607_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Fe"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "model_Fe_PF_chiesa_quinticsplines__MO_140444321607_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "5799b70f-1630-4180-ad30-5e4927c2de29", 
+        "id": "model_He_P_AbIn__MO_126942667206_001--LAMMPS", 
+        "potential": {
+            "key": "3b7ee9e8-a3d7-47f8-968a-6756e7a027c1", 
+            "id": "model_He_P_AbIn__MO_126942667206_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "He"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "model_He_P_AbIn__MO_126942667206_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

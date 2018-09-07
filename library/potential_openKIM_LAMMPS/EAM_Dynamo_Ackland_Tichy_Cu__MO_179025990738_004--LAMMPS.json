@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "6f084f8f-7509-494f-81ee-d8f8642d7a1b", 
+        "id": "EAM_Dynamo_Ackland_Tichy_Cu__MO_179025990738_004--LAMMPS", 
+        "potential": {
+            "key": "63245eae-1fb5-4b29-8851-c4b546100a7a", 
+            "id": "EAM_Dynamo_Ackland_Tichy_Cu__MO_179025990738_004"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Cu"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EAM_Dynamo_Ackland_Tichy_Cu__MO_179025990738_004"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

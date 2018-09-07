@@ -1,0 +1,36 @@
+{
+    "potential-LAMMPS": {
+        "key": "4525defc-a19d-4d85-aeee-6efb0d29f803", 
+        "id": "MorseEIP_GuthikondaElliott_2011_AuCd__MO_703849496106_001--LAMMPS", 
+        "potential": {
+            "key": "c5f76894-f353-4881-904c-c854ed13afc2", 
+            "id": "MorseEIP_GuthikondaElliott_2011_AuCd__MO_703849496106_001"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Au"
+            }, 
+            {
+                "element": "Cd"
+            }
+        ], 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "MorseEIP_GuthikondaElliott_2011_AuCd__MO_703849496106_001"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}

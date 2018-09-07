@@ -1,0 +1,31 @@
+{
+    "potential-LAMMPS": {
+        "key": "525bf0fa-f86d-42f5-bc18-e3f2f381e750", 
+        "id": "EAM_Dynamo_Zope_Mishin_Al__MO_664470114311_004--LAMMPS", 
+        "potential": {
+            "key": "ea007fd0-75a8-4ccc-bac2-b1d8a723fd56", 
+            "id": "EAM_Dynamo_Zope_Mishin_Al__MO_664470114311_004"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Al"
+        }, 
+        "pair_style": {
+            "type": "kim", 
+            "term": [
+                {
+                    "option": "LAMMPSvirial"
+                }, 
+                {
+                    "option": "EAM_Dynamo_Zope_Mishin_Al__MO_664470114311_004"
+                }
+            ]
+        }, 
+        "pair_coeff": {
+            "term": {
+                "symbols": "True"
+            }
+        }
+    }
+}
