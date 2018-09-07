@@ -4,7 +4,7 @@
 lammps_command              <lammps_command>
 mpi_command                 <mpi_command>
 
-# Potential definition and directory containing associated filesparameters
+# Potential definition and directory containing associated files
 potential_file              <potential_file>
 potential_dir               <potential_dir>
 

@@ -1,6 +1,6 @@
-## Method and Theory
+# Method and Theory
 
-An initial system (and corresponding unit cell system) is supplied with box dimensions, $a_i^0$, close to the equilibrium values. A LAMMPS simulation then integrates the atomic positions and velocities for a specified number of timesteps. 
+An initial system (and corresponding unit cell system) is supplied with box dimensions, $a_i^0$, close to the equilibrium values. A LAMMPS simulation then integrates the atomic positions and velocities for a specified number of timesteps.
 
 The calculation script allows for the use of different integration methods:
 
