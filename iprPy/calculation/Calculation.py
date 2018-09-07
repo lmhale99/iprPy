@@ -59,6 +59,13 @@ class Calculation(object):
         """
         self.__calc.main(*args)
     
+    def calc(self, *args, **kwargs):
+        """
+        Calls the primary calculation function(s).
+        This needs to be defined for each calculation
+        """
+        return None
+
     def process_input(self, input_dict, UUID=None, build=True):
         """
         Processes str input parameters, assigns default values if needed, and
