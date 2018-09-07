@@ -1,0 +1,43 @@
+# LAMMPS input script for dynamic msd computation
+
+box tilt large
+
+<atomman_system_info>
+
+<atomman_pair_info>
+
+# Assign simulation parameter values
+variable temperature equal <temperature>
+variable randomseed equal <randomseed>
+variable thermosteps equal <thermosteps>
+variable timestep equal <timestep>
+variable equilsteps equal <equilsteps>
+variable dumpsteps equal <dumpsteps>
+variable runsteps equal <runsteps>
+variable twotemp equal 2*${temperature}
+variable damptemp equal 100*${timestep}
+
+# Specify property computes
+compute peatom all pe/atom
+compute msd all msd com yes
+
+# Define thermo data
+thermo ${thermosteps}
+thermo_style custom step temp pe pxx pyy pzz c_msd[1] c_msd[2] c_msd[3] c_msd[4]
+thermo_modify format float %.13e
+
+# Specify timestep
+timestep ${timestep}
+
+# Create velocities and equilibrate system using nvt
+velocity all create ${twotemp} ${randomseed}
+fix 1 all nvt temp ${temperature} ${temperature} ${damptemp}
+run ${equilsteps}
+unfix 1
+<dump_info>
+
+# Scale velocities to wanted temperature and run nve
+velocity all scale ${temperature}
+reset_timestep 0
+fix 2 all nve
+run ${runsteps}

@@ -62,7 +62,7 @@ class Calculation(object):
     def calc(self, *args, **kwargs):
         """
         Calls the primary calculation function(s).
-        This needs to be defined for each calculation
+        This needs to be defined for each calculation.
         """
         return None
 
