@@ -18,7 +18,7 @@ Provides the information associated with an interatomic potential implemented fo
 
 - __potential_dir__: the path to the directory containing any potential artifacts (eg. eam.alloy setfl files) that are used. If not given, then any required files are expected to be in the working directory where the calculation is executed.
 
-### Initial system configuration to load
+## Initial system configuration to load
 
 Provides the information associated with loading an atomic configuration.
 

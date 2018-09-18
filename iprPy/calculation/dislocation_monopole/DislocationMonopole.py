@@ -2,6 +2,7 @@
 from __future__ import (absolute_import, print_function,
                         division, unicode_literals)
 import os
+
 from .calc_dislocation_monopole import dislocationmonopole
 from .. import Calculation
 
