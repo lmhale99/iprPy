@@ -3,9 +3,9 @@ from __future__ import (absolute_import, print_function,
                         division, unicode_literals)
 import os
 
+from .calc_dislocation_SDVPN import peierlsnabarro
 from .. import Calculation
 
-raise NotImplementedError('Needs updating')
 class DislocationSDVPN(Calculation):
     """
     Class for handling different calculation styles in the same fashion.  The
@@ -13,6 +13,12 @@ class DislocationSDVPN(Calculation):
     implemented for each style.  The available styles are loaded from the
     iprPy.calculations submodule.
     """
+
+    def __init__(self):
+        self.calc = peierlsnabarro
+
+        Calculation.__init__(self)
+
     @property
     def files(self):
         """
@@ -77,22 +83,18 @@ class DislocationSDVPN(Calculation):
                     'C66',
                    ],
                    [
-                    'a_uvw',
-                    'b_uvw',
-                    'c_uvw',
-                    'atomshift',
-                    'sizemults',
-                   ],
-                   [
                     'dislocation_file',
                     'dislocation_content',
                     'dislocation_family',
                     'dislocation_burgersvector',
                     'dislocation_boundarywidth',
                     'dislocation_boundaryshape',
-                    'x_axis',
-                    'y_axis',
-                    'z_axis',
+                    'dislocation_stroh_m',
+                    'dislocation_stroh_n',
+                    'dislocation_lineboxvector',
+                    'a_uvw',
+                    'b_uvw',
+                    'c_uvw',
                     ],
                     [
                     'xmax',
@@ -100,6 +102,7 @@ class DislocationSDVPN(Calculation):
                     'xnum',
                     'minimize_style',
                     'minimize_options',
+                    'minimize_cycles',
                     'cutofflongrange',
                     'tau_xy',
                     'tau_yy',
@@ -112,7 +115,7 @@ class DislocationSDVPN(Calculation):
                     'beta_xz',
                     'beta_yz',
                     'cdiffelastic',
-                    'cdiffgradient',
+                    'cdiffsurface',
                     'cdiffstress',
                     'halfwidth',
                     'normalizedisreg',

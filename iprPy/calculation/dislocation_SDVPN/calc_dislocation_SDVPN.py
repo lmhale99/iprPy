@@ -42,9 +42,11 @@ def main(*args):
     
     results_dict = peierlsnabarro(input_dict['ucell'].box.a,
                                   input_dict['C'],
-                                  input_dict['axes'],
+                                  input_dict['transformationmatrix'],
                                   input_dict['burgersvector'],
                                   input_dict['gamma'],
+                                  m = input_dict['stroh_m'],
+                                  n = input_dict['stroh_n'],
                                   cutofflongrange=input_dict['cutofflongrange'],
                                   tau=input_dict['tau'],
                                   alpha=input_dict['alpha'],
@@ -59,7 +61,8 @@ def main(*args):
                                   xstep=input_dict['xstep'],
                                   xmax=input_dict['xmax'],
                                   min_method=input_dict['minimize_style'],
-                                  min_options=input_dict['minimize_options'])
+                                  min_options=input_dict['minimize_options'],
+                                  min_cycles=input_dict['minimize_numcycles'])
     
     # Save data model of results
     script = os.path.splitext(os.path.basename(__file__))[0]
@@ -70,7 +73,7 @@ def main(*args):
     with open('results.json', 'w') as f:
         record.content.json(fp=f, indent=4)
 
-def peierlsnabarro(alat, C, axes, burgers, gamma,
+def peierlsnabarro(alat, C, axes, burgers, gamma, m=[0,1,0], n=[0,0,1],
                    cutofflongrange=uc.set_in_units(1000, 'angstrom'),
                    tau=np.zeros((3,3)), alpha=[0.0], beta=np.zeros((3,3)),
                    cdiffelastic=False, cdiffsurface=True, cdiffstress=False,
@@ -78,19 +81,25 @@ def peierlsnabarro(alat, C, axes, burgers, gamma,
                    halfwidth=uc.set_in_units(1, 'angstrom'),
                    normalizedisreg=True,
                    xnum=None, xmax=None, xstep=None,
-                   min_method='Powell', min_options={}):
+                   min_method='Powell', min_options={}, min_cycles=10):
     """
     Solves a Peierls-Nabarro dislocation model.
     """
-    
+
     # Solve Stroh method for dislocation
-    stroh = am.defect.Stroh(C, burgers, axes=axes)
+    stroh = am.defect.Stroh(C, burgers, axes=axes, m=m, n=n)
     Kij = stroh.K_tensor
-    
+
     # Transform burgers to axes
     T = am.tools.axes_check(axes)
     b = T.dot(burgers)
-    
+
+    # Transform b, axes and Kij to PN solution orientation
+    mnu = np.array([m, n, np.cross(m, n)])
+    axes = mnu.dot(axes)
+    Kij = mnu.dot(Kij).dot(mnu.T)    
+    b = mnu.dot(b)
+
     # Scale xmax and xstep by alat
     if xmax is not None:
         xmax *= alat
@@ -103,6 +112,7 @@ def peierlsnabarro(alat, C, axes, burgers, gamma,
                                        normalize=normalizedisreg)
     
     # Minimize disregistry
+    cycle = 1
     pnsolution = SDVPN(x, idisreg, gamma, axes, Kij,
                        tau=tau, alpha=alpha, beta=beta,
                        cutofflongrange=cutofflongrange,
@@ -113,10 +123,22 @@ def peierlsnabarro(alat, C, axes, burgers, gamma,
                        cdiffstress=cdiffstress,
                        min_method=min_method,
                        min_options=min_options)
-    
+
+    # Retrieve initial and first minimization solution energies
+    minimization_energies = []
+    minimization_energies.append(pnsolution.total_energy(x, idisreg))
+    minimization_energies.append(pnsolution.total_energy())
+
+    # Repeat minimize if min_cycles > 1
+    while cycle < min_cycles:
+        cycle += 1
+        pnsolution.solve()
+        minimization_energies.append(pnsolution.total_energy())
+
     # Initialize results dict
     results_dict = {}
     results_dict['SDVPN_solution'] = pnsolution
+    results_dict['minimization_energies'] = minimization_energies
     
     return results_dict
 
@@ -163,9 +185,10 @@ def process_input(input_dict, UUID=None, build=True):
     input_dict['fullstress'] = iprPy.input.boolean(input_dict.get('fullstress', True))
     input_dict['normalizedisreg'] = iprPy.input.boolean(input_dict.get('normalizedisreg',
                                                                        True))
-    
+
     # These are calculation-specific default integers
     input_dict['xnum'] = int(input_dict.get('xnum', 0))
+    input_dict['minimize_numcycles'] = int(input_dict.get('minimize_numcycles', 10))
     
     # These are calculation-specific default unitless floats
     input_dict['xstep'] = float(input_dict.get('xstep', 0.0))
@@ -231,7 +254,7 @@ def process_input(input_dict, UUID=None, build=True):
     unit = p_per_l_unit
     if len(alpha) > 1:
         try:
-            test = float(alpha[-1])
+            float(alpha[-1])
         except:
             unit = alpha.pop()
     for i in range(len(alpha)):

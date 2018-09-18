@@ -22,7 +22,6 @@ from ... import __version__ as iprPy_version
 from .. import Record
 from ...tools import aslist
 
-raise NotImplementedError('Needs updating')
 class CalculationDislocationSDVPN(Record):
     
     @property
@@ -55,8 +54,8 @@ class CalculationDislocationSDVPN(Record):
                 'dislocation_key',
                 'gammasurface_calc_key',
                 
-                'cdiffelastic'
-                'cdiffgradient'
+                'cdiffelastic',
+                'cdiffsurface',
                 'cdiffstress',
                 
                 'fullstress',
@@ -120,13 +119,15 @@ class CalculationDislocationSDVPN(Record):
         run_params['halfwidth'] = uc.model(input_dict['halfwidth'],
                                            input_dict['length_unit'])
         
-        x, idisreg = pn_arctan_disregistry(xmax=input_dict['xmax'],
-                                           xnum=input_dict['xnum'],
-                                           xstep=input_dict['xstep'])
+        x = pn_arctan_disregistry(xmax=input_dict['xmax'],
+                                  xnum=input_dict['xnum'],
+                                  xstep=input_dict['xstep'])[0]
+        
         run_params['xmax'] = x.max()
         run_params['xnum'] = len(x)
         run_params['xstep'] = x[1]-x[0]
-        
+        run_params['min_cycles'] = input_dict['minimize_numcycles']
+
         # Save info on system file loaded
         calc['system-info'] = DM()
         calc['system-info']['family'] = input_dict['family']
@@ -148,9 +149,9 @@ class CalculationDislocationSDVPN(Record):
         
         disl['system-family'] = input_dict['family']
         disl['calculation-parameter'] = cp = DM()
-        cp['x_axis'] = input_dict['x_axis']
-        cp['y_axis'] = input_dict['y_axis']
-        cp['z_axis'] = input_dict['z_axis']
+        cp['a_uvw'] = input_dict['a_uvw']
+        cp['b_uvw'] = input_dict['b_uvw']
+        cp['c_uvw'] = input_dict['c_uvw']
         cp['atomshift'] = input_dict['atomshift']
         cp['burgersvector'] = input_dict['dislocation_burgersvector']
         
@@ -183,6 +184,7 @@ class CalculationDislocationSDVPN(Record):
             params['fullstress'] = input_dict['fullstress']
             params['min_method'] = input_dict['minimize_style']
             params['min_options'] = input_dict['minimize_options']
+            
         else:
             c_model = input_dict['C'].model(unit=input_dict['pressure_unit'])
             calc['elastic-constants'] = c_model['elastic-constants']
@@ -202,6 +204,7 @@ class CalculationDislocationSDVPN(Record):
             calc['surface-energy'] = uc.model(pnsolution.surface_energy(), e_per_l_unit)
             calc['nonlocal-energy'] = uc.model(pnsolution.nonlocal_energy(), e_per_l_unit)
             calc['total-energy'] = uc.model(pnsolution.total_energy(), e_per_l_unit)
+            calc['total-energy-per-cycle'] = uc.model(results_dict['minimization_energies'], e_per_l_unit)
         
         self.content = output
     

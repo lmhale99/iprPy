@@ -16,6 +16,12 @@ c_uvw                       <c_uvw>
 
 # Defect parameters
 dislocation_file            <dislocation_file>
+dislocation_stroh_m         <dislocation_stroh_m>
+dislocation_stroh_n         <dislocation_stroh_n>
+dislocation_lineboxvector   <dislocation_lineboxvector>
+dislocation_burgersvector   <dislocation_burgersvector>
+dislocation_boundarywidth   <dislocation_boundarywidth>
+dislocation_boundaryshape   <dislocation_boundaryshape>
 gammasurface_file           <gammasurface_file>
 
 # Elastic constants parameters
@@ -54,6 +60,7 @@ xstep                       <xstep>
 xnum                        <xnum>
 minimize_style              <minimize_style>
 minimize_options            <minimize_options>
+minimize_cycles             <minimize_cycles>
 cutofflongrange             <cutofflongrange>
 tau_xy                      <tau_xy>
 tau_yy                      <tau_yy>
@@ -66,7 +73,7 @@ beta_xy                     <beta_xy>
 beta_xz                     <beta_xz>
 beta_yz                     <beta_yz>
 cdiffelastic                <cdiffelastic>
-cdiffgradient               <cdiffgradient>
+cdiffsurface                <cdiffsurface>
 cdiffstress                 <cdiffstress>
 halfwidth                   <halfwidth>
 normalizedisreg             <normalizedisreg>

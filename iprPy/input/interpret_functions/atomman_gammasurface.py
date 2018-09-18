@@ -30,14 +30,12 @@ def atomman_gammasurface(input_dict, build=True, **kwargs):
         Replacement parameter key name for 'gammasurface_file'.
     gammasurface_content : str
         Replacement parameter key name for 'gammasurface_content'.
-    ucell : str
-        Replacement parameter key name for 'ucell'.
     gamma : str
         Replacement parameter key name for 'gamma'.
     """
     
     # Set default keynames
-    keynames = ['gammasurface_file', 'gammasurface_content', 'ucell', 'gamma']
+    keynames = ['gammasurface_file', 'gammasurface_content', 'gamma']
     
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
@@ -45,7 +43,6 @@ def atomman_gammasurface(input_dict, build=True, **kwargs):
     # Extract input values and assign default values
     gammasurface_file = input_dict.get(kwargs['gammasurface_file'], None)
     gammasurface_content = input_dict.get(kwargs['gammasurface_content'], None)
-    ucell = input_dict.get(kwargs['ucell'], None)
     
     # Replace defect model with defect content if given
     if gammasurface_content is not None:
@@ -54,18 +51,11 @@ def atomman_gammasurface(input_dict, build=True, **kwargs):
     # If defect model is given
     if gammasurface_file is not None:
         pass
-    
     else:
         raise ValueError('gammasurface_file is required')
-    
-    # Get ucell's box
-    if ucell is not None:
-        box = ucell.box
-    else:
-        box = am.Box()
-    
+
     if build is True:
-        gamma = am.defect.GammaSurface(model=gammasurface_file, box=box)
+        gamma = am.defect.GammaSurface(model=gammasurface_file)
     else:
         gamma = None
     
