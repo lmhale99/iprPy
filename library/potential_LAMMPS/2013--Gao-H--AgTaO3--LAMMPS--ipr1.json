@@ -4,7 +4,7 @@
         "id": "2013--Gao-H--AgTaO3--LAMMPS--ipr1", 
         "potential": {
             "key": "fe333ad8-fd35-4b4d-9eb2-e293806c4d02", 
-            "id": "2013--Gao-H--AgTaO3"
+            "id": "2013--Gao-H-Otero-de-la-Roza-A-Aouadi-S-M-et-al--AgTaO3"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

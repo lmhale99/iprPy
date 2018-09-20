@@ -4,7 +4,7 @@
         "id": "2003--Zope-R-R--Ti-Al--LAMMPS--ipr1", 
         "potential": {
             "key": "274cbc15-b7c1-4701-a3e8-07b0b046ad7b", 
-            "id": "2003--Zope-R-R--Ti-Al"
+            "id": "2003--Zope-R-R-Mishin-Y--Ti-Al"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

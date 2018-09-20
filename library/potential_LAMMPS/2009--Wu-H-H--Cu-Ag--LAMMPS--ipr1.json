@@ -4,7 +4,7 @@
         "id": "2009--Wu-H-H--Cu-Ag--LAMMPS--ipr1", 
         "potential": {
             "key": "4001be29-5c6f-4fe9-bae3-71371cb247b6", 
-            "id": "2009--Wu-H-H--Cu-Ag"
+            "id": "2009--Wu-H-H-Trinkle-D-R--Cu-Ag"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

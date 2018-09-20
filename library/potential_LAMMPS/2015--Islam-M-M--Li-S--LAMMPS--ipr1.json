@@ -4,18 +4,18 @@
         "id": "2015--Islam-M-M--Li-S--LAMMPS--ipr1", 
         "potential": {
             "key": "e452f7d1-1cce-4811-8604-d29ea8194c90", 
-            "id": "2015--Islam-M-M--Li-S"
+            "id": "2015--Islam-M-M-Ostadhossein-A-Borodin-O-et-al--Li-S"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
         "atom": [
             {
                 "element": "Li", 
-                "mass": 6.9410
+                "mass": 6.941
             }, 
             {
                 "element": "S", 
-                "mass": 32.0600
+                "mass": 32.06
             }
         ], 
         "pair_style": {

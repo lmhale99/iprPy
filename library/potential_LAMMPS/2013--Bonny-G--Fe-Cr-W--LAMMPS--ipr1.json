@@ -4,7 +4,7 @@
         "id": "2013--Bonny-G--Fe-Cr-W-LAMMPS--ipr1", 
         "potential": {
             "key": "d0b8ed5d-d5bf-4e22-acfb-ccf84a87690b", 
-            "id": "2013--Bonny-G--Fe-Cr-W"
+            "id": "2013--Bonny-G-Castin-N-Bullens-J-et-al--Fe-Cr-W"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
@@ -55,5 +55,6 @@
                     }
                 ]
             }
+        ]
     }
 }

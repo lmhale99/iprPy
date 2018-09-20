@@ -4,7 +4,7 @@
         "id": "2006--Sun-D-Y--Mg--LAMMPS--ipr1", 
         "potential": {
             "key": "d07092e4-8c38-4cf5-bd05-bf18f8b80776", 
-            "id": "2006--Sun-D-Y--Mg"
+            "id": "2006--Sun-D-Y-Mendelev-M-I-Becker-C-A-et-al--Mg"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

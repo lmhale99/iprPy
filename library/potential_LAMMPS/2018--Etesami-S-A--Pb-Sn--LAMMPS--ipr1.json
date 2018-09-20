@@ -1,0 +1,41 @@
+{
+    "potential-LAMMPS": {
+        "key": "912cd0e2-8060-4859-a1fd-be62f67d7a80", 
+        "id": "2018--Etesami-S-A--Pb-Sn--LAMMPS--ipr1", 
+        "potential": {
+            "key": "7fda11d2-b6e8-4ffa-9083-fdb702cc5fab", 
+            "id": "2018--Etesami-S-A-Baskes-M-I-Laradji-M-Asadi-E--Pb-Sn"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Pb", 
+                "mass": 207.2
+            }, 
+            {
+                "element": "Sn", 
+                "mass": 118.71
+            }
+        ], 
+        "pair_style": {
+            "type": "meam"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "library.PbSn.meam"
+                }, 
+                {
+                    "option": "Pb Sn"
+                }, 
+                {
+                    "file": "PbSn.meam"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

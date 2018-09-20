@@ -4,7 +4,7 @@
         "id": "2000--Landa-A--Al-Pb--LAMMPS--ipr1", 
         "potential": {
             "key": "df6401e2-2541-484c-bf5d-1b0ff4b1ac39", 
-            "id": "2000--Landa-A--Al-Pb"
+            "id": "2000--Landa-A-Wynblatt-P-Siegel-D-J-et-al--Al-Pb"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

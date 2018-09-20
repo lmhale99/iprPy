@@ -1,0 +1,45 @@
+{
+    "potential-LAMMPS": {
+        "key": "62a85d17-508a-406f-aedb-710902e55dd4", 
+        "id": "2018--Dickel-D-E--Mg-Al-Zn--LAMMPS--ipr1", 
+        "potential": {
+            "key": "826e0c49-18e9-4e72-a526-aae0ff30d20d", 
+            "id": "2018--Dickel-D-E-Baskes-M-I-Aslam-I-Barrett-C-D--Mg-Al-Zn"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Mg", 
+                "mass": 24.305
+            }, 
+            {
+                "element": "Al", 
+                "mass": 26.9815
+            }, 
+            {
+                "element": "Zn", 
+                "mass": 65.38
+            }
+        ], 
+        "pair_style": {
+            "type": "meam"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "MgAlZn.library.meam"
+                }, 
+                {
+                    "option": "Mg Al Zn"
+                }, 
+                {
+                    "file": "MgAlZn.parameter.meam"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

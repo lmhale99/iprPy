@@ -4,7 +4,7 @@
         "id": "2012--Jelinek-B--Al-Si-Mg-Cu-Fe--LAMMPS--ipr1", 
         "potential": {
             "key": "1515dd80-1984-49de-bc92-d5724059ff56", 
-            "id": "2012--Jelinek-B--Al-Si-Mg-Cu-Fe"
+            "id": "2012--Jelinek-B-Groh-S-Horstemeyer-M-F-et-al--Al-Si-Mg-Cu-Fe"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

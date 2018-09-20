@@ -1,0 +1,11 @@
+# meam data for Pb and Sn  
+# elt        lat     z       ielement     atwt 
+# alpha      b0      b1      b2         b3    alat  esub    asub 
+# t0         t1              t2           t3            rozero  ibar 
+'Pb' 'fcc' 12 82 207.2
+6.3826 5.42 2.2 6.0 2.2 4.94975 2.04 1.01
+1.00 1.70 3.4 1.1 1.0 -5.0 
+'Sn' 'fcc' 12 50 118.710
+6.20        6.20    6.00    6.00         6.00  4.860   3.08    1.00
+1.0         12.5           8.0         -0.383         1.0      3.0
+

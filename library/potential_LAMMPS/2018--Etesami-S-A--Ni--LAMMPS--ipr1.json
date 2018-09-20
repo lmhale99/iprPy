@@ -1,16 +1,16 @@
 {
     "potential-LAMMPS": {
-        "key": "5796a72b-bcf4-4dd4-a0f3-ee5f462b7f7c", 
-        "id": "2018--Etesami-S-A-Asadi-E--Fe--LAMMPS--ipr1", 
+        "key": "068259bd-61b9-4efb-8833-63756a294046", 
+        "id": "2018--Etesami-S-A--Ni--LAMMPS--ipr1", 
         "potential": {
-            "key": "6c0f6df2-88e4-451b-833e-b9a0d3ccdc34", 
-            "id": "2018--Etesami-S-A-Asadi-E--Fe"
+            "key": "f69c42dc-75b2-4a1b-abf0-bab1a0e9c778", 
+            "id": "2018--Etesami-S-A-Asadi-E--Ni"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
         "atom": {
-            "element": "Fe", 
-            "mass": 55.845
+            "element": "Ni", 
+            "mass": 58.693
         }, 
         "pair_style": {
             "type": "meam"
@@ -18,13 +18,13 @@
         "pair_coeff": {
             "term": [
                 {
-                    "file": "library.Fe.meam"
+                    "file": "library.Ni.meam"
                 }, 
                 {
-                    "option": "Fe"
+                    "option": "Ni"
                 }, 
                 {
-                    "file": "Fe.meam"
+                    "file": "Ni.meam"
                 }, 
                 {
                     "symbols": "True"

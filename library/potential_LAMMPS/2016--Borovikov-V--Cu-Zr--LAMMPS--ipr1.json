@@ -4,7 +4,7 @@
         "id": "2016--Borovikov-V--Cu-Zr--LAMMPS--ipr1", 
         "potential": {
             "key": "4fc0f7d5-dff6-4de7-8567-d9e87746cb2c", 
-            "id": "2016--Borovikov-V--Cu-Zr"
+            "id": "2016--Borovikov-V-Mendelev-M-I-King-A-H--Cu-Zr"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

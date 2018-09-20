@@ -4,7 +4,7 @@
         "id": "2011--Bonny-G--Fe-Ni-Cr--LAMMPS--ipr1", 
         "potential": {
             "key": "17676f3f-5287-4bb9-892a-0bfe9b1fb160", 
-            "id": "2011--Bonny-G--Fe-Ni-Cr"
+            "id": "2011--Bonny-G-Terentyev-D-Pasianot-R-C-et-al--Fe-Ni-Cr"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

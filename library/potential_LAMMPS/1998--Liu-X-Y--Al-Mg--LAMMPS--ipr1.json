@@ -4,7 +4,7 @@
         "id": "1998--Liu-X-Y--Al-Mg--LAMMPS--ipr1", 
         "potential": {
             "key": "471c5c9d-fe61-4bbb-a088-a88be016d78d", 
-            "id": "1998--Liu-X-Y--Al-Mg"
+            "id": "1998--Liu-X-Y-Adams-J-B--Al-Mg"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

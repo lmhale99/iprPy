@@ -4,7 +4,7 @@
         "id": "2008--Hepburn-D-J--Fe-C--LAMMPS--ipr1", 
         "potential": {
             "key": "88820775-7b63-43bb-8c1c-026a5264b351", 
-            "id": "2008--Hepburn-D-J--Fe-C"
+            "id": "2008--Hepburn-D-J-Ackland-G-J--Fe-C"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

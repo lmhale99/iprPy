@@ -4,7 +4,7 @@
         "id": "2013--Bonny-G--Fe-W--LAMMPS--ipr1", 
         "potential": {
             "key": "64d55ff4-a0d4-4eb6-897f-56c6d3c0154e", 
-            "id": "2013--Bonny-G--Fe-W"
+            "id": "2013--Bonny-G-Castin-N-Bullens-J-et-al--Fe-W"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
@@ -17,7 +17,7 @@
                 "element": "W", 
                 "mass": 183.85
             }
-        ],
+        ], 
         "pair_style": {
             "type": "eam/alloy"
         }, 

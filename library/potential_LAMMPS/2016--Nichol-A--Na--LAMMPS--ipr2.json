@@ -4,7 +4,7 @@
         "id": "2016--Nichol-A--Na--LAMMPS--ipr2", 
         "potential": {
             "key": "d3ec6aef-1fc5-4151-a290-6e61acd25a77", 
-            "id": "2016--Nichol-A--Na"
+            "id": "2016--Nichol-A-Ackland-G-J--Na"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

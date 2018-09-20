@@ -4,7 +4,7 @@
         "id": "2015--Broqvist-P--Ce-O--LAMMPS--ipr1", 
         "potential": {
             "key": "898da38c-c94b-4254-b480-35f3b1ab22ac", 
-            "id": "2015--Broqvist-P--Ce-O"
+            "id": "2015--Broqvist-P-Kullgren-J-Wolf-M-J-et-al--Ce-O"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
@@ -12,7 +12,7 @@
             {
                 "element": "Ce", 
                 "mass": 140.1
-            },
+            }, 
             {
                 "element": "O", 
                 "mass": 15.999

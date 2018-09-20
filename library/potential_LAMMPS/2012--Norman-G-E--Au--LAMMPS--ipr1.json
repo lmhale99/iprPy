@@ -1,24 +1,24 @@
 {
     "potential-LAMMPS": {
-        "key": "3ea1fab8-f7a8-4eaf-898c-29805c9df566", 
-        "id": "2015--Mendelev-M-I--Mg--LAMMPS--ipr1", 
+        "key": "706c076a-97e5-40bf-9c90-8dbb32b64abc", 
+        "id": "2012--Norman-G-E--Au--LAMMPS--ipr1", 
         "potential": {
-            "key": "2a6e9260-0a82-4041-852b-88e69bfbd79d", 
-            "id": "2015--Mendelev-M-I--Mg"
+            "key": "d559106d-4277-4119-a8e7-9ecf845af3e5", 
+            "id": "2012--Norman-G-E-Starikov-S-V-Stegailov-V-V--Au"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
         "atom": {
-            "element": "Mg", 
-            "mass": 24.305
+            "element": "Au", 
+            "mass": 196.97
         }, 
         "pair_style": {
-            "type": "eam/fs"
+            "type": "eam/alloy"
         }, 
         "pair_coeff": {
             "term": [
                 {
-                    "file": "Mg1.eam.fs"
+                    "file": "Au_5T.eam.alloy"
                 }, 
                 {
                     "symbols": "True"

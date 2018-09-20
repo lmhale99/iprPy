@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "e302c10f-298b-4618-9444-007b0fb6eb72", 
+        "id": "2018--Starikov-S-V--U-Mo--LAMMPS--ipr2", 
+        "potential": {
+            "key": "0363c268-9d42-4d82-9cc7-5a610c707c6c", 
+            "id": "2018--Starikov-S-V-Kolotova-L-N-Kuksin-A-Y-et-al--U-Mo"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "U", 
+                "mass": 238.03
+            }, 
+            {
+                "element": "Mo", 
+                "mass": 95.96
+            }
+        ], 
+        "pair_style": {
+            "type": "adp"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "U_Mo.alloy.adp_cor.txt"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

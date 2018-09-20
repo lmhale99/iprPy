@@ -1,0 +1,33 @@
+{
+    "potential-LAMMPS": {
+        "key": "fb6201ce-3130-44d9-ae2c-06ecfe49a43b", 
+        "id": "2016--Zhang-P--Ti-O--LAMMPS--ipr2", 
+        "potential": {
+            "key": "df7bbc58-7b3e-4946-9be1-b155f5c1cab9", 
+            "id": "2016--Zhang-P-Trinkle-D-R--Ti-O"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ti"
+            }, 
+            {
+                "element": "O"
+            }
+        ], 
+        "pair_style": {
+            "type": "meam/spline"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "TiO.meam.spline"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

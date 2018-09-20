@@ -4,7 +4,7 @@
         "id": "2007--Mendelev-M-I--Cu-Zr--LAMMPS--ipr1", 
         "potential": {
             "key": "fbb1e782-509e-4103-a735-db0050ad7477", 
-            "id": "2007--Mendelev-M-I--Cu-Zr"
+            "id": "2007--Mendelev-M-I-Sordelet-D-J-Kramer-M-J--Cu-Zr"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

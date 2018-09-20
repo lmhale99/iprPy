@@ -4,7 +4,7 @@
         "id": "2012--Mendelev-M-I--Cu--LAMMPS--ipr1", 
         "potential": {
             "key": "6e89fdb2-4d7f-4032-a14d-53f7d1c8f2eb", 
-            "id": "2012--Mendelev-M-I--Cu"
+            "id": "2013--Mendelev-M-I-King-A-H--Cu"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

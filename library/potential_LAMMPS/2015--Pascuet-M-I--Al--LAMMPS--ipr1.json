@@ -4,7 +4,7 @@
         "id": "2015--Pascuet-M-I--Al--LAMMPS--ipr1", 
         "potential": {
             "key": "b5fb2f1f-a582-4f81-9445-f002ce31e66e", 
-            "id": "2015--Pascuet-M-I--Al"
+            "id": "2015--Pascuet-M-I-Fernandez-J-R--Al"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

@@ -4,7 +4,7 @@
         "id": "1987--Ackland-G-J--Mo--LAMMPS--ipr1", 
         "potential": {
             "key": "ff748ef8-f019-42b2-bdda-b5b5cadd6264", 
-            "id": "1987--Ackland-G-J--Mo"
+            "id": "1987--Ackland-G-J-Thetford-R--Mo"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

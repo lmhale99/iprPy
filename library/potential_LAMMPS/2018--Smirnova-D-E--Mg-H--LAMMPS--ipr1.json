@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "1c89550d-d2e0-4777-bd13-98cd3cb3c620", 
+        "id": "2018--Smirnova-D-E--Mg-H--LAMMPS--ipr1", 
+        "potential": {
+            "key": "9b94d565-98d8-4a45-ba5b-f45944960751", 
+            "id": "2018--Smirnova-D-E-Starikov-S-V-Vlasova-A-M--Mg-H"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Mg", 
+                "mass": 24.305
+            }, 
+            {
+                "element": "H", 
+                "mass": 1.008
+            }
+        ], 
+        "pair_style": {
+            "type": "adp"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Mg_H.adp.alloy.txt"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

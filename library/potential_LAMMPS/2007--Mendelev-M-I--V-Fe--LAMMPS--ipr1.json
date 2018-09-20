@@ -4,7 +4,7 @@
         "id": "2007--Mendelev-M-I--V-Fe--LAMMPS--ipr1", 
         "potential": {
             "key": "6b558c94-3b96-4bc1-840f-48521e8770b6", 
-            "id": "2007--Mendelev-M-I--V-Fe"
+            "id": "2007--Mendelev-M-I-Han-S-Son-W-et-al--V-Fe"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

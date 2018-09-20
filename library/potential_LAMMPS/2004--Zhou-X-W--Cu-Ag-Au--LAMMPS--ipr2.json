@@ -4,7 +4,7 @@
         "id": "2004--Zhou-X-W--Cu-Ag-Au--LAMMPS--ipr2", 
         "potential": {
             "key": "52da31b9-68f7-4c14-9e82-048f6fbdd145", 
-            "id": "2004--Zhou-X-W--Cu-Ag-Au"
+            "id": "2004--Zhou-X-W-Johnson-R-A-Wadley-H-N-G--Cu-Ag-Au"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
@@ -12,11 +12,11 @@
             {
                 "element": "Cu", 
                 "mass": 63.546
-            },
+            }, 
             {
                 "element": "Ag", 
                 "mass": 107.87
-            },
+            }, 
             {
                 "element": "Au", 
                 "mass": 196.97

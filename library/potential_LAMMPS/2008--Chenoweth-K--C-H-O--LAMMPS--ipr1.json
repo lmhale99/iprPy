@@ -4,7 +4,7 @@
         "id": "2008--Chenoweth-K--C-H-O--LAMMPS--ipr1", 
         "potential": {
             "key": "78d3b4a7-7778-4b5c-8fd7-eb164a7a82b5", 
-            "id": "2008--Chenoweth-K--C-H-O"
+            "id": "2008--Chenoweth-K-van-Duin-A-C-T-Goddard-W-A--C-H-O"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

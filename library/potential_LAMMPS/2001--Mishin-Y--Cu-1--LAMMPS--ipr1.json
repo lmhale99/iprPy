@@ -3,8 +3,8 @@
         "key": "996ee8d7-a0a4-48c1-b689-81e4e0825dfa", 
         "id": "2001--Mishin-Y--Cu-1--LAMMPS--ipr1", 
         "potential": {
-            "key": "5a94a06a-22c7-41e0-8593-ee42d4728018", 
-            "id": "2001--Mishin-Y--Cu-1"
+            "key": "a7910725-e80c-4a53-83e8-adfb5724dc9f", 
+            "id": "2001--Mishin-Y-Mehl-M-J-Papaconstantopoulos-D-A-et-al--Cu-1"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

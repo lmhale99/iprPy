@@ -4,7 +4,7 @@
         "id": "2015--Wilson-S-R--Ni-Zr--LAMMPS--ipr1", 
         "potential": {
             "key": "ee7b64fc-4e6e-4b43-8de1-082b8f85bd91", 
-            "id": "2015--Wilson-S-R--Ni-Zr"
+            "id": "2015--Wilson-S-R-Mendelev-M-I--Ni-Zr"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

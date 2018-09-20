@@ -4,7 +4,7 @@
         "id": "2012--Mendelev-M-I--Ni-Zr--LAMMPS--ipr1", 
         "potential": {
             "key": "2d5b5a05-a57f-4986-95ea-c5940c51d4d7", 
-            "id": "2012--Mendelev-M-I--Ni-Zr"
+            "id": "2012--Mendelev-M-I-Kramer-M-J-Hao-S-G-et-al--Ni-Zr"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 

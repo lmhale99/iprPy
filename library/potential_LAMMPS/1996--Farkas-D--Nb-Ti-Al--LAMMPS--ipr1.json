@@ -4,7 +4,7 @@
         "id": "1996--Farkas-D--Nb-Ti-Al--LAMMPS--ipr1", 
         "potential": {
             "key": "0856888b-57ec-4005-828d-d1b0c331f120", 
-            "id": "1996--Farkas-D--Nb-Ti-Al"
+            "id": "1996--Farkas-D-Jones-C--Nb-Ti-Al"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
