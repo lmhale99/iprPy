@@ -1,0 +1,968 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>dislocation_SDVPN Calculation &#8212; iprPy 0.8.2 documentation</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.8.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="dislocation_monopole Calculation" href="dislocation_monopole.html" />
+    <link rel="prev" title="crystal_space_group Calculation" href="crystal_space_group.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dislocation_monopole.html" title="dislocation_monopole Calculation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="crystal_space_group.html" title="crystal_space_group Calculation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 9ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+</style>
+<div class="section" id="dislocation_SDVPN-Calculation">
+<h1>dislocation_SDVPN Calculation<a class="headerlink" href="#dislocation_SDVPN-Calculation" title="Permalink to this headline">¶</a></h1>
+<p><strong>Lucas M. Hale</strong>,
+<a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>,
+<em>Materials Science and Engineering Division, NIST</em>.</p>
+<p><strong>Chandler A. Becker</strong>,
+<a class="reference external" href="mailto:chandler&#46;becker&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">chandler<span>&#46;</span>becker<span>&#64;</span>nist<span>&#46;</span>gov</a>,
+<em>Office of Data and Informatics, NIST</em>.</p>
+<p><strong>Zachary T. Trautt</strong>,
+<a class="reference external" href="mailto:zachary&#46;trautt&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">zachary<span>&#46;</span>trautt<span>&#64;</span>nist<span>&#46;</span>gov</a>,
+<em>Materials Measurement Science Division, NIST</em>.</p>
+<p>Version: 2018-09-24</p>
+<p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">Disclaimers</a></p>
+<div class="section" id="Introduction">
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<p>The <strong>dislocation_SDVPN</strong> calculation predicts a dislocation’s planar
+spreading using the semidiscrete variational Peierls-Nabarro method. The
+solution finds the disregistry (difference in displacement above and
+below the slip plane) that minimizes the dislocation’s energy. The
+energy term consists of two primary components: an elastic component due
+to the dislocation interacting with itself, and a misfit component
+arising from the formation of a generalized stacking fault along the
+dislocation’s spreading.</p>
+<p><strong>Disclaimer #1</strong>: The calculation method solves the problem using a 2D
+generalized stacking fault energy map. Better results may be possible by
+measuring a full 3D map, but that would require adding a new calculation
+for the 3D variation.</p>
+<p><strong>Disclaimer #2</strong>: The implemented method is suited for dislocations
+with planar spreading. It is not suited for dislocations that spread on
+multiple atomic planes, like the a/2&lt;111&gt; bcc screw dislocation.</p>
+<p><strong>Disclaimer #3</strong>: While the solution is taken at discrete points that
+(typically) correspond to atomic sites, the underlying method is still a
+continuum solution that does not fully account for the atomic nature of
+the dislocation.</p>
+</div>
+<div class="section" id="Method-and-Theory">
+<h2>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this headline">¶</a></h2>
+<p>This calculation method is a wrapper around the atomman.defect.SDVPN
+class. More details on the method and theory can be found in the
+<a class="reference external" href="https://www.ctcms.nist.gov/potentials/atomman/tutorial/04.4._Semidiscrete_Variational_Peierls-Nabarro.html">associated tutorial within the atomman
+documentation</a>.</p>
+</div>
+<div class="section" id="Demonstration">
+<h2>Demonstration<a class="headerlink" href="#Demonstration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="1.-Setup">
+<h3>1. Setup<a class="headerlink" href="#1.-Setup" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="1.1-Library-imports">
+<h4>1.1 Library imports<a class="headerlink" href="#1.1-Library-imports" title="Permalink to this headline">¶</a></h4>
+<p>Import libraries needed by the calculation. The external libraries used
+are:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.numpy.org/">numpy</a></li>
+<li><a class="reference external" href="https://scipy.org/scipylib/">scipy</a></li>
+<li><a class="reference external" href="https://matplotlib.org/">matplotlib</a></li>
+<li><a class="reference external" href="https://github.com/usnistgov/DataModelDict">DataModelDict</a></li>
+<li><a class="reference external" href="https://github.com/usnistgov/atomman">atomman</a></li>
+<li><a class="reference external" href="https://github.com/usnistgov/iprPy">iprPy</a></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Standard library imports</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+
+<span class="c1"># http://www.numpy.org/</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># https://matplotlib.org/</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="c1"># https://github.com/usnistgov/DataModelDict</span>
+<span class="kn">from</span> <span class="nn">DataModelDict</span> <span class="k">import</span> <span class="n">DataModelDict</span> <span class="k">as</span> <span class="n">DM</span>
+
+<span class="c1"># https://github.com/usnistgov/atomman</span>
+<span class="kn">import</span> <span class="nn">atomman</span> <span class="k">as</span> <span class="nn">am</span>
+<span class="kn">import</span> <span class="nn">atomman.lammps</span> <span class="k">as</span> <span class="nn">lmp</span>
+<span class="kn">import</span> <span class="nn">atomman.unitconvert</span> <span class="k">as</span> <span class="nn">uc</span>
+
+<span class="c1"># https://github.com/usnistgov/iprPy</span>
+<span class="kn">import</span> <span class="nn">iprPy</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Notebook last executed on&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">(),</span> <span class="s1">&#39;using iprPy version&#39;</span><span class="p">,</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Notebook last executed on 2018-09-24 using iprPy version 0.8.2
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="1.2.-Default-calculation-setup">
+<h4>1.2. Default calculation setup<a class="headerlink" href="#1.2.-Default-calculation-setup" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Specify calculation style</span>
+<span class="n">calc_style</span> <span class="o">=</span> <span class="s1">&#39;dislocation_SDVPN&#39;</span>
+
+<span class="c1"># If workingdir is already set, then do nothing (already in correct folder)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">workingdir</span> <span class="o">=</span> <span class="n">workingdir</span>
+
+<span class="c1"># Change to workingdir if not already there</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">workingdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;calculationfiles&#39;</span><span class="p">,</span> <span class="n">calc_style</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">)</span>
+
+<span class="c1"># Default iprPy library directory</span>
+<span class="n">librarydir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">rootdir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;library&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="2.-Assign-values-for-the-calculation's-run-parameters">
+<h3>2. Assign values for the calculation’s run parameters<a class="headerlink" href="#2.-Assign-values-for-the-calculation's-run-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="2.1-Specify-the-prototype-unit-cell-system">
+<h4>2.1 Specify the prototype unit cell system<a class="headerlink" href="#2.1-Specify-the-prototype-unit-cell-system" title="Permalink to this headline">¶</a></h4>
+<p>Simple input parameters:</p>
+<ul class="simple">
+<li><strong>prototype_name</strong> gives the name of the crystal_prototype
+reference record in the iprPy library to use for ucell.</li>
+<li><strong>box_parameters</strong> defines the box parameters to scale ucell to.
+This is a list of either three or six floats<ul>
+<li><strong>[a, b, c]</strong> are the orthogonal lattice parameters in length
+units.</li>
+<li><strong>[a, b, c, alpha, beta, gamma]</strong> are the triclinic lattice
+parameters in length units and angles in degrees.</li>
+</ul>
+</li>
+</ul>
+<p>Derived parameters:</p>
+<ul class="simple">
+<li><strong>prototype_path</strong> gives the path to the crystal_prototype
+reference record to use. (Here, it is derived from lib_directory and
+prototype_name).</li>
+<li><strong>ucell</strong> is an atomman.System representing a fundamental unit cell
+of the system. (Here, it is loaded from prototype_path file, then
+scaled using box_parameters).</li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">prototype_name</span> <span class="o">=</span> <span class="s1">&#39;A1--Cu--fcc&#39;</span>
+<span class="n">symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ni&#39;</span><span class="p">]</span>
+<span class="n">box_parameters</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">([</span><span class="mf">3.52</span><span class="p">,</span> <span class="mf">3.52</span><span class="p">,</span> <span class="mf">3.52</span><span class="p">],</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
+
+<span class="c1"># Define load_file using librarydir and prototype_name</span>
+<span class="n">load_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">librarydir</span><span class="p">,</span> <span class="s1">&#39;crystal_prototype&#39;</span><span class="p">,</span> <span class="n">prototype_name</span><span class="o">+</span><span class="s1">&#39;.json&#39;</span><span class="p">)</span>
+
+<span class="c1"># Define load_style and load_options for crystal_prototype records</span>
+<span class="n">load_style</span> <span class="o">=</span> <span class="s1">&#39;system_model&#39;</span>
+<span class="n">load_options</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># Create ucell by loading prototype record</span>
+<span class="n">ucell</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">load_style</span><span class="p">,</span> <span class="n">load_file</span><span class="p">,</span> <span class="n">symbols</span><span class="o">=</span><span class="n">symbols</span><span class="p">,</span> <span class="o">**</span><span class="n">load_options</span><span class="p">)</span>
+
+<span class="c1"># Rescale ucell using box_parameters</span>
+<span class="n">ucell</span><span class="o">.</span><span class="n">box_set</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">b</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">ucell</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+avect =  [ 3.520,  0.000,  0.000]
+bvect =  [ 0.000,  3.520,  0.000]
+cvect =  [ 0.000,  0.000,  3.520]
+origin = [ 0.000,  0.000,  0.000]
+natoms = 4
+natypes = 1
+symbols = (&#39;Ni&#39;,)
+pbc = [ True  True  True]
+     id |   atype |  pos[0] |  pos[1] |  pos[2]
+      0 |       1 |   0.000 |   0.000 |   0.000
+      1 |       1 |   0.000 |   1.760 |   1.760
+      2 |       1 |   1.760 |   0.000 |   1.760
+      3 |       1 |   1.760 |   1.760 |   0.000
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="2.2-Specify-material-elastic-constants">
+<h4>2.2 Specify material elastic constants<a class="headerlink" href="#2.2-Specify-material-elastic-constants" title="Permalink to this headline">¶</a></h4>
+<p>Simple input parameters:</p>
+<ul class="simple">
+<li><strong>C_dict</strong> is a dictionary containing the unique elastic constants
+for the potential and crystal structure defined above.</li>
+</ul>
+<p>Derived parameters</p>
+<ul class="simple">
+<li><strong>C</strong> is an atomman.ElasticConstants object built from C_dict.</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">C_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">C_dict</span><span class="p">[</span><span class="s1">&#39;C11&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">247.86</span><span class="p">,</span> <span class="s1">&#39;GPa&#39;</span><span class="p">)</span>
+<span class="n">C_dict</span><span class="p">[</span><span class="s1">&#39;C12&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">147.83</span><span class="p">,</span> <span class="s1">&#39;GPa&#39;</span><span class="p">)</span>
+<span class="n">C_dict</span><span class="p">[</span><span class="s1">&#39;C44&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">124.84</span><span class="p">,</span> <span class="s1">&#39;GPa&#39;</span><span class="p">)</span>
+
+<span class="c1"># -------------- Derived parameters -------------- #</span>
+<span class="c1"># Build ElasticConstants object from C_dict terms</span>
+<span class="n">C</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">ElasticConstants</span><span class="p">(</span><span class="o">**</span><span class="n">C_dict</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="2.3-Specify-the-defect-parameters">
+<h4>2.3 Specify the defect parameters<a class="headerlink" href="#2.3-Specify-the-defect-parameters" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>gammasurface_file</strong> gives the path to a data model file containing
+2D gamma surface results. This can be a
+calc_stacking_fault_map_2D record.</li>
+<li><strong>dislocation_name</strong> gives the name of the dislocation_monopole
+reference record in the iprPy library to use for potential.</li>
+<li><strong>dislocation_file</strong> gives the path to a dislocation_monopole
+reference containing defect input parameters. Here, this is built
+automatically using dislocation_name and librarydir.</li>
+<li><strong>dislocation_kwargs</strong> is a dictionary containing parameters for
+generating the defect. Values are extracted from the
+dislocation_model record and uniquely define a type of stacking
+fault. Included keywords are:<ul>
+<li><strong>burgers</strong> is the crystallographic Burgers vector for the
+dislocation</li>
+<li><strong>a_uvw, b_uvw, c_uvw</strong> specifies how to orient the system by
+defining the crystal vectors of ucell to place along the three
+system box vectors.</li>
+<li><strong>atomshift</strong> is a 3D vector rigid-body shift to apply to atoms in
+the system. The atomshift vector is relative to the rotated unit
+cell’s box vectors.</li>
+<li><strong>stroh_m</strong> a Cartesian unit vector used by the Stroh method to
+define the created dislocation’s orientation and type. This vector
+is in the dislocation’s slip plane and perpendicular to the
+dislocation’s line direction. Default value is [0, 1, 0], i.e.
+along the y-axis.</li>
+<li><strong>stroh_n</strong> a Cartesian unit vector used by the Stroh method to
+define the created dislocation’s orientation and type. This vector
+is normal to the dislocation’s slip plane. Default value is [0, 0,
+1], i.e. along the z-axis.</li>
+<li><strong>lineboxvector</strong> the system box vector, ‘a’, ‘b’, or ‘c’, along
+which the dislocation line is placed parallel to. Default value is
+‘a’.</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">gammasurface_file</span> <span class="o">=</span> <span class="s1">&#39;../stacking_fault_map_2D/gamma.json&#39;</span>
+
+<span class="c1">#dislocation_name = &#39;A1--Cu--fcc--a-2-110--0-screw--{111}&#39;</span>
+<span class="n">dislocation_name</span> <span class="o">=</span> <span class="s1">&#39;A1--Cu--fcc--a-2-110--90-edge--</span><span class="si">{111}</span><span class="s1">&#39;</span>
+
+<span class="c1"># Define dislocation_fi;e using librarydir and dislocation_name</span>
+<span class="n">dislocation_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">librarydir</span><span class="p">,</span> <span class="s1">&#39;dislocation_monopole&#39;</span><span class="p">,</span> <span class="n">dislocation_name</span><span class="o">+</span><span class="s1">&#39;.json&#39;</span><span class="p">)</span>
+
+<span class="c1"># Create dictionary of input parameters related to the defect</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ucell&#39;</span><span class="p">:</span><span class="n">ucell</span><span class="p">,</span> <span class="s1">&#39;dislocation_file&#39;</span><span class="p">:</span><span class="n">dislocation_file</span><span class="p">,</span> <span class="s1">&#39;gammasurface_file&#39;</span><span class="p">:</span> <span class="n">gammasurface_file</span><span class="p">}</span>
+
+<span class="c1"># Call input interpret functions</span>
+<span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">interpret</span><span class="p">(</span><span class="s1">&#39;dislocationmonopole&#39;</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+<span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">interpret</span><span class="p">(</span><span class="s1">&#39;atomman_systemmanipulate&#39;</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+<span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">interpret</span><span class="p">(</span><span class="s1">&#39;atomman_gammasurface&#39;</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+
+<span class="c1"># Show inputs</span>
+<span class="n">inputs</span>
+
+<span class="n">axes</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;transformationmatrix&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+c:\users\lmh1\documents\python-packages\atomman\atomman\lammps\normalize.py:60: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
+To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
+  transformation = np.linalg.lstsq(vects, system.box.vects)[0].T
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="2.4-Specify-calculation-specific-run-parameters">
+<h4>2.4 Specify calculation-specific run parameters<a class="headerlink" href="#2.4-Specify-calculation-specific-run-parameters" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>xmax</strong>: The maximum value of the x-coordinates to use for the
+points where the disregistry is evaluated. The solution is centered
+around x=0, therefore this also corresponds to the minimum value of x
+used. The set of x-coordinates used is fully defined by giving at
+least two of xmax, xstep and xnum.</li>
+<li><strong>xstep</strong>: The step size (delta x) value between the x-coordinates
+used to evaluate the disregistry. The set of x-coordinates used is
+fully defined by giving at least two of xmax, xstep and xnum.</li>
+<li><strong>xnum</strong>: The total number of x-coordinates at which to evaluate the
+disregistry. The set of x-coordinates used is fully defined by giving
+at least two of xmax, xstep and xnum.</li>
+<li><strong>minimize_style</strong>: The scipy.optimize.minimize method style to use
+when solving for the disregistry. Default value is ‘Powell’, which
+seems to do decently well for this problem.</li>
+<li><strong>minimize_options</strong>: Allows for the specification of the options
+dictionary used by scipy.optimize.minimize. This is given as “key
+value key value…”.</li>
+<li><strong>minimize_cycles</strong>: Specifies the number of times to run the
+minimization in succession. The minimization algorithms used by the
+underlying scipy code often benefit from restarting and rerunning the
+minimized configuration to achive a better fit. Default value is 10.</li>
+<li><strong>cutofflongrange</strong>: The radial cutoff (in distance units) to use for
+the long-range elastic energy. The long-range elastic energy is
+configuration-independent, so this value changes the dislocation’s
+energy but not the computed disregistry profile. Default value is
+1000 Angstroms.</li>
+<li><strong>tau_xy</strong>: Shear stress (in units of pressure) to apply to the
+system. Default value is 0 GPa.</li>
+<li><strong>tau_yy</strong>: Normal stress (in units of pressure) to apply to the
+system. Default value is 0 GPa.</li>
+<li><strong>tau_yz</strong>: Shear stress (in units of pressure) to apply to the
+system. Default value is 0 GPa.</li>
+<li><strong>alpha</strong>: Coefficient(s) (in pressure/length units) of the non-local
+energy correction term to use. Default value is 0.0, meaning this
+correction is not applied.</li>
+<li><strong>beta_xx, beta_yy, beta_zz, beta_xy, beta_xz, beta_yz</strong>:
+Components of the surface energy coefficient tensor (in units
+pressure-length) to use. Default value is 0.0 GPa-Angstrom for all,
+meaning this correction is not applied.</li>
+<li><strong>cdiffelastic, cdiffsurface, cdiffstress</strong>: Booleans indicating how
+the dislocation density (derivative of disregistry) is computed
+within the elastic, surface and stress terms, respectively. If True,
+central difference is used, otherwise only the change between the
+current and previous points is used. Default values are True for
+cdiffsurface, and False for the other two.</li>
+<li><strong>halfwidth</strong>: The arctan disregistry halfwidth (in length units) to
+use for creating the initial disregistry guess.</li>
+<li><strong>normalizedisreg</strong>: Boolean indicating how the disregistry profile
+is handled. If True (default), the disregistry is scaled such that
+the minimum x value has a disregistry of 0 and the maximum x value
+has a disregistry equal to the dislocation’s Burgers vector. Note
+that the disregistry for these endpoints is fixed, so if you use
+False the initial disregistry should be close to the final solution.</li>
+<li><strong>fullstress</strong>: Boolean indicating which of two stress formulas to
+use. True uses the original full formulation, while False uses a
+newer, simpler representation. Default value is True.</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">xmax</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">xstep</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">5</span>
+<span class="n">xnum</span> <span class="o">=</span> <span class="mi">200</span>
+
+<span class="n">minimize_style</span> <span class="o">=</span> <span class="s1">&#39;Powell&#39;</span>
+<span class="n">minimize_options</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">minimize_options</span><span class="p">[</span><span class="s1">&#39;disp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># will display convergence info</span>
+<span class="n">minimize_options</span><span class="p">[</span><span class="s1">&#39;xtol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-6</span> <span class="c1"># smaller convergence tolerance than default</span>
+<span class="n">minimize_options</span><span class="p">[</span><span class="s1">&#39;ftol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-6</span> <span class="c1"># smaller convergence tolerance than default</span>
+<span class="c1">#minimize_options[&#39;maxiter&#39;] = 2 # for testing purposes</span>
+<span class="n">minimize_numcycles</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="n">cutofflongrange</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
+<span class="n">halfwidth</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="3.-Define-calculation-function(s)">
+<h3>3. Define calculation function(s)<a class="headerlink" href="#3.-Define-calculation-function(s)" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="3.1-peierlsnabarro()">
+<h4>3.1 peierlsnabarro()<a class="headerlink" href="#3.1-peierlsnabarro()" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">peierlsnabarro</span><span class="p">(</span><span class="n">alat</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">burgers</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+                   <span class="n">cutofflongrange</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">),</span>
+                   <span class="n">tau</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)),</span> <span class="n">alpha</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">],</span> <span class="n">beta</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)),</span>
+                   <span class="n">cdiffelastic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cdiffsurface</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cdiffstress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                   <span class="n">fullstress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                   <span class="n">halfwidth</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">),</span>
+                   <span class="n">normalizedisreg</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                   <span class="n">xnum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xstep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">min_method</span><span class="o">=</span><span class="s1">&#39;Powell&#39;</span><span class="p">,</span> <span class="n">min_options</span><span class="o">=</span><span class="p">{},</span> <span class="n">min_cycles</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solves a Peierls-Nabarro dislocation model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Solve Stroh method for dislocation</span>
+    <span class="n">stroh</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">defect</span><span class="o">.</span><span class="n">Stroh</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">burgers</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">Kij</span> <span class="o">=</span> <span class="n">stroh</span><span class="o">.</span><span class="n">K_tensor</span>
+
+    <span class="c1"># Transform burgers to axes</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">axes_check</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">burgers</span><span class="p">)</span>
+
+    <span class="c1"># Transform b, axes and Kij to PN solution orientation</span>
+    <span class="n">mnu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">)])</span>
+    <span class="n">axes</span> <span class="o">=</span> <span class="n">mnu</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span>
+    <span class="n">Kij</span> <span class="o">=</span> <span class="n">mnu</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Kij</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">mnu</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">mnu</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+    <span class="c1"># Scale xmax and xstep by alat</span>
+    <span class="k">if</span> <span class="n">xmax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">xmax</span> <span class="o">*=</span> <span class="n">alat</span>
+    <span class="k">if</span> <span class="n">xstep</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">xstep</span> <span class="o">*=</span> <span class="n">alat</span>
+
+    <span class="c1"># Generate initial disregistry guess</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">idisreg</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">defect</span><span class="o">.</span><span class="n">pn_arctan_disregistry</span><span class="p">(</span><span class="n">xmax</span><span class="o">=</span><span class="n">xmax</span><span class="p">,</span> <span class="n">xstep</span><span class="o">=</span><span class="n">xstep</span><span class="p">,</span> <span class="n">xnum</span><span class="o">=</span><span class="n">xnum</span><span class="p">,</span>
+                                                 <span class="n">burgers</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">halfwidth</span><span class="o">=</span><span class="n">halfwidth</span><span class="p">,</span>
+                                                 <span class="n">normalize</span><span class="o">=</span><span class="n">normalizedisreg</span><span class="p">)</span>
+
+    <span class="c1"># Minimize disregistry</span>
+    <span class="n">cycle</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">pnsolution</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">defect</span><span class="o">.</span><span class="n">SDVPN</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">idisreg</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">Kij</span><span class="p">,</span>
+                                <span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span>
+                                <span class="n">cutofflongrange</span><span class="o">=</span><span class="n">cutofflongrange</span><span class="p">,</span>
+                                <span class="n">burgers</span><span class="o">=</span><span class="n">b</span><span class="p">,</span>
+                                <span class="n">fullstress</span><span class="o">=</span><span class="n">fullstress</span><span class="p">,</span>
+                                <span class="n">cdiffelastic</span><span class="o">=</span><span class="n">cdiffelastic</span><span class="p">,</span>
+                                <span class="n">cdiffsurface</span><span class="o">=</span><span class="n">cdiffsurface</span><span class="p">,</span>
+                                <span class="n">cdiffstress</span><span class="o">=</span><span class="n">cdiffstress</span><span class="p">,</span>
+                                <span class="n">min_method</span><span class="o">=</span><span class="n">min_method</span><span class="p">,</span>
+                                <span class="n">min_options</span><span class="o">=</span><span class="n">min_options</span><span class="p">)</span>
+
+    <span class="c1"># Retrieve initial and first minimization solution energies</span>
+    <span class="n">minimization_energies</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">minimization_energies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pnsolution</span><span class="o">.</span><span class="n">total_energy</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">idisreg</span><span class="p">))</span>
+    <span class="n">minimization_energies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pnsolution</span><span class="o">.</span><span class="n">total_energy</span><span class="p">())</span>
+
+    <span class="c1"># Repeat minimize if min_cycles &gt; 1</span>
+    <span class="k">while</span> <span class="n">cycle</span> <span class="o">&lt;</span> <span class="n">min_cycles</span><span class="p">:</span>
+        <span class="n">cycle</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">pnsolution</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+        <span class="n">minimization_energies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pnsolution</span><span class="o">.</span><span class="n">total_energy</span><span class="p">())</span>
+
+    <span class="c1"># Initialize results dict</span>
+    <span class="n">results_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;SDVPN_solution&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pnsolution</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;minimization_energies&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">minimization_energies</span>
+
+    <span class="k">return</span> <span class="n">results_dict</span>
+
+
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="4.-Run-calculation-function(s)">
+<h3>4. Run calculation function(s)<a class="headerlink" href="#4.-Run-calculation-function(s)" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">results_dict</span> <span class="o">=</span> <span class="n">peierlsnabarro</span><span class="p">(</span><span class="n">ucell</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;burgersvector&#39;</span><span class="p">],</span> <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">],</span>
+                              <span class="n">m</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;stroh_m&#39;</span><span class="p">],</span>
+                              <span class="n">n</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;stroh_n&#39;</span><span class="p">],</span>
+                              <span class="n">cutofflongrange</span> <span class="o">=</span> <span class="n">cutofflongrange</span><span class="p">,</span>
+                              <span class="c1">#tau = tau,</span>
+                              <span class="c1">#alpha = alpha,</span>
+                              <span class="c1">#beta = beta,</span>
+                              <span class="c1">#cdiffelastic = cdiffelastic,</span>
+                              <span class="c1">#cdiffsurface = cdiffsurface,</span>
+                              <span class="c1">#cdiffstress = cdiffstress,</span>
+                              <span class="c1">#fullstress = fullstress,</span>
+                              <span class="n">halfwidth</span> <span class="o">=</span> <span class="n">halfwidth</span><span class="p">,</span>
+                              <span class="c1">#normalizedisreg = normalizedisreg,</span>
+                              <span class="n">xnum</span> <span class="o">=</span> <span class="n">xnum</span><span class="p">,</span>
+                              <span class="n">xstep</span> <span class="o">=</span> <span class="n">xstep</span><span class="p">,</span>
+                              <span class="n">xmax</span> <span class="o">=</span> <span class="n">xmax</span><span class="p">,</span>
+                              <span class="n">min_method</span> <span class="o">=</span> <span class="n">minimize_style</span><span class="p">,</span>
+                              <span class="n">min_options</span> <span class="o">=</span> <span class="n">minimize_options</span><span class="p">,</span>
+                              <span class="n">min_cycles</span> <span class="o">=</span> <span class="n">minimize_numcycles</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Optimization terminated successfully.
+         Current function value: 4.934821
+         Iterations: 21
+         Function evaluations: 248485
+Optimization terminated successfully.
+         Current function value: 4.934816
+         Iterations: 1
+         Function evaluations: 12432
+Optimization terminated successfully.
+         Current function value: 4.934815
+         Iterations: 1
+         Function evaluations: 12782
+Optimization terminated successfully.
+         Current function value: 4.934815
+         Iterations: 1
+         Function evaluations: 12737
+Optimization terminated successfully.
+         Current function value: 4.934815
+         Iterations: 1
+         Function evaluations: 12722
+Optimization terminated successfully.
+         Current function value: 4.934815
+         Iterations: 1
+         Function evaluations: 12673
+Optimization terminated successfully.
+         Current function value: 4.934814
+         Iterations: 1
+         Function evaluations: 12824
+Optimization terminated successfully.
+         Current function value: 4.934814
+         Iterations: 1
+         Function evaluations: 12782
+Optimization terminated successfully.
+         Current function value: 4.934814
+         Iterations: 1
+         Function evaluations: 12922
+Optimization terminated successfully.
+         Current function value: 4.934814
+         Iterations: 1
+         Function evaluations: 12794
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">results_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[9]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>dict_keys([&#39;SDVPN_solution&#39;, &#39;minimization_energies&#39;])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="5.-Report-results">
+<h3>5. Report results<a class="headerlink" href="#5.-Report-results" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="5.1-Define-units-for-outputting-values">
+<h4>5.1 Define units for outputting values<a class="headerlink" href="#5.1-Define-units-for-outputting-values" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>length_unit</strong> is the unit of length to display results in.</li>
+<li><strong>energy_per_length_unit</strong> is the unit of energy per length to
+display dislocation energies in.</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">length_unit</span> <span class="o">=</span> <span class="s1">&#39;angstrom&#39;</span>
+<span class="n">energy_per_length_unit</span> <span class="o">=</span> <span class="s1">&#39;eV/angstrom&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="5.2-Solution">
+<h4>5.2 Solution<a class="headerlink" href="#5.2-Solution" title="Permalink to this headline">¶</a></h4>
+<p>SDVPN_solution in the results dictionary is an am.Defect.SDVPN object
+which contains the final disregistry information.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">x</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;SDVPN_solution&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">length_unit</span><span class="p">)</span>
+<span class="n">disreg</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;SDVPN_solution&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">disregistry</span><span class="p">,</span> <span class="n">length_unit</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">disreg</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebook_dislocation_SDVPN_28_0.png" src="../_images/notebook_dislocation_SDVPN_28_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="5.3-Minimum-energy-per-cycle">
+<h4>5.3 Minimum energy per cycle<a class="headerlink" href="#5.3-Minimum-energy-per-cycle" title="Permalink to this headline">¶</a></h4>
+<p>minimization_energies in the results dict lists the total computed
+dislocation energy for the initial disregistry and after each
+minimization run.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Total dislocation energy per minimization run (in </span><span class="si">%s</span><span class="s1">):&#39;</span> <span class="o">%</span> <span class="n">energy_per_length_unit</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">E_total</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;minimization_energies&#39;</span><span class="p">]):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">E_total</span><span class="p">,</span> <span class="n">energy_per_length_unit</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Total dislocation energy per minimization run (in eV/angstrom):
+0 5.34312789781401
+1 4.9348205067953845
+2 4.934816041927582
+3 4.934815359974682
+4 4.934815037305844
+5 4.934814788171262
+6 4.934814558636293
+7 4.934814337173051
+8 4.934814121496241
+9 4.93481391125507
+10 4.934813706448307
+</pre></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">dislocation_SDVPN Calculation</a><ul>
+<li><a class="reference internal" href="#Introduction">Introduction</a></li>
+<li><a class="reference internal" href="#Method-and-Theory">Method and Theory</a></li>
+<li><a class="reference internal" href="#Demonstration">Demonstration</a><ul>
+<li><a class="reference internal" href="#1.-Setup">1. Setup</a><ul>
+<li><a class="reference internal" href="#1.1-Library-imports">1.1 Library imports</a></li>
+<li><a class="reference internal" href="#1.2.-Default-calculation-setup">1.2. Default calculation setup</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#2.-Assign-values-for-the-calculation's-run-parameters">2. Assign values for the calculation’s run parameters</a><ul>
+<li><a class="reference internal" href="#2.1-Specify-the-prototype-unit-cell-system">2.1 Specify the prototype unit cell system</a></li>
+<li><a class="reference internal" href="#2.2-Specify-material-elastic-constants">2.2 Specify material elastic constants</a></li>
+<li><a class="reference internal" href="#2.3-Specify-the-defect-parameters">2.3 Specify the defect parameters</a></li>
+<li><a class="reference internal" href="#2.4-Specify-calculation-specific-run-parameters">2.4 Specify calculation-specific run parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#3.-Define-calculation-function(s)">3. Define calculation function(s)</a><ul>
+<li><a class="reference internal" href="#3.1-peierlsnabarro()">3.1 peierlsnabarro()</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#4.-Run-calculation-function(s)">4. Run calculation function(s)</a></li>
+<li><a class="reference internal" href="#5.-Report-results">5. Report results</a><ul>
+<li><a class="reference internal" href="#5.1-Define-units-for-outputting-values">5.1 Define units for outputting values</a></li>
+<li><a class="reference internal" href="#5.2-Solution">5.2 Solution</a></li>
+<li><a class="reference internal" href="#5.3-Minimum-energy-per-cycle">5.3 Minimum energy per cycle</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="crystal_space_group.html"
+                        title="previous chapter">crystal_space_group Calculation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="dislocation_monopole.html"
+                        title="next chapter">dislocation_monopole Calculation</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dislocation_monopole.html" title="dislocation_monopole Calculation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="crystal_space_group.html" title="crystal_space_group Calculation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

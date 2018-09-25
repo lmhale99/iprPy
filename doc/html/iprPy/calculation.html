@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>iprPy.calculation package &#8212; iprPy 0.8.0 documentation</title>
+    <title>iprPy.calculation package &#8212; iprPy 0.8.2 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.8.0',
+        VERSION:     '0.8.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  false,
@@ -23,7 +23,9 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="iprPy.compatibility package" href="compatibility.html" />
+    <link rel="prev" title="iprPy package" href="index.html" /> 
   </head>
   <body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -35,7 +37,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="compatibility.html" title="iprPy.compatibility package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="iprPy package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">iprPy package</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -65,7 +74,7 @@ loaded modules.</p>
 <dl class="class">
 <dt id="iprPy.calculation.Calculation">
 <em class="property">class </em><code class="descname">Calculation</code><a class="headerlink" href="#iprPy.calculation.Calculation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Class for handling different calculation styles in the same fashion.  The
 class defines the common methods and attributes, which are then uniquely
 implemented for each style.  The available styles are loaded from the
@@ -74,6 +83,13 @@ iprPy.calculations submodule.</p>
 <dt id="iprPy.calculation.Calculation.allkeys">
 <code class="descname">allkeys</code><a class="headerlink" href="#iprPy.calculation.Calculation.allkeys" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>list</em> – All keys used by the calculation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="iprPy.calculation.Calculation.calc">
+<code class="descname">calc</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.calc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls the primary calculation function(s).
+This needs to be defined for each calculation.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -110,12 +126,12 @@ generates new, more complex terms as used by the calculation.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing the calculation input parameters with string
+<li><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary containing the calculation input parameters with string
 values.  The allowed keys depends on the calculation style.</li>
-<li><strong>UUID</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Unique identifier to use for the calculation instance.  If not
+<li><strong>UUID</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Unique identifier to use for the calculation instance.  If not
 given and a ‘UUID’ key is not in input_dict, then a random UUID4
 hash tag will be assigned.</li>
-<li><strong>build</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if all complex terms are to be built.  A value of False
+<li><strong>build</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if all complex terms are to be built.  A value of False
 allows for default values to be assigned even if some inputs
 required by the calculation are incomplete. (Default is True.)</li>
 </ul>
@@ -173,6 +189,12 @@ required by the calculation are incomplete. (Default is True.)</li>
 </li>
 </ul>
 
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">iprPy package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="compatibility.html"
+                        title="next chapter">iprPy.compatibility package</a></p>
         </div>
       </div>
       <div class="clearer"></div>
@@ -186,7 +208,14 @@ required by the calculation are incomplete. (Default is True.)</li>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="compatibility.html" title="iprPy.compatibility package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="iprPy package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >iprPy package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

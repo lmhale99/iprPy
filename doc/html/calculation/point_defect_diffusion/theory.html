@@ -1,0 +1,129 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Method and Theory &#8212; iprPy 0.8.2 documentation</title>
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.8.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Input script parameters" href="parameters.html" />
+    <link rel="prev" title="Introduction" href="intro.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parameters.html" title="Input script parameters"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">point_defect_diffusion</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="method-and-theory">
+<h1>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this headline">¶</a></h1>
+<p>First, a defect system is constructed by adding a single point defect
+(or defect cluster) to an initially bulk system using the
+atomman.defect.point() function.</p>
+<p>A LAMMPS simulation is then performed on the defect system. The
+simulation consists of two separate runs</p>
+<ol class="arabic simple">
+<li>NVT equilibrium run: The system is allowed to equilibrate at the
+given temperature using nvt integration.</li>
+<li>NVE measurement run: The system is then evolved using nve
+integration, and the total mean square displacement of all atoms is
+measured as a function of time.</li>
+</ol>
+<p>Between the two runs, the atomic velocities are scaled such that the
+average temperature of the nve run is closer to the target temperature.</p>
+<p>The mean square displacement of the defect,
+<span class="math">\(\left&lt; \Delta r_{ptd}^2 \right&gt;\)</span> is then estimated using the mean
+square displacement of the atoms <span class="math">\(\left&lt; \Delta r_{i}^2 \right&gt;\)</span>.
+Under the assumption that all diffusion is associated with the single
+point defect, the defect’s mean square displacement can be taken as the
+summed square displacement of the atoms</p>
+<div class="math">
+\[\left&lt; \Delta r_{ptd}^2 \right&gt; \approx \sum_i^N \Delta r_{i}^2 = N \left&lt; \Delta r_{i}^2 \right&gt;,\]</div>
+<p>where <span class="math">\(N\)</span> is the number of atoms in the system. The diffusion
+constant is then estimated by linearly fitting the change in mean square
+displacement with time</p>
+<div class="math">
+\[\left&lt; \Delta r_{ptd}^2 \right&gt; = 2 d D_{ptd} \Delta t,\]</div>
+<p>where d is the number of dimensions included.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="intro.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="parameters.html"
+                        title="next chapter">Input script parameters</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parameters.html" title="Input script parameters"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >point_defect_diffusion</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

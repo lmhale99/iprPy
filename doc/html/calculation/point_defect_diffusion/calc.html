@@ -1,0 +1,216 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>calc_point_defect_diffusion.py &#8212; iprPy 0.8.2 documentation</title>
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.8.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="point_defect_static" href="../point_defect_static/index.html" />
+    <link rel="prev" title="Input script parameters" href="parameters.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../point_defect_static/index.html" title="point_defect_static"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="parameters.html" title="Input script parameters"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">point_defect_diffusion</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="calc-point-defect-diffusion-py">
+<h1>calc_point_defect_diffusion.py<a class="headerlink" href="#calc-point-defect-diffusion-py" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-iprPy.calculation.point_defect_diffusion.calc_point_defect_diffusion">
+<span id="calculation-script-functions"></span><h2>Calculation script functions<a class="headerlink" href="#module-iprPy.calculation.point_defect_diffusion.calc_point_defect_diffusion" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="iprPy.calculation.point_defect_diffusion.calc_point_defect_diffusion.main">
+<code class="descname">main</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.point_defect_diffusion.calc_point_defect_diffusion.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main function called when script is executed directly.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.calculation.point_defect_diffusion.calc_point_defect_diffusion.pointdiffusion">
+<code class="descname">pointdiffusion</code><span class="sig-paren">(</span><em>lammps_command</em>, <em>system</em>, <em>potential</em>, <em>point_kwargs</em>, <em>mpi_command=None</em>, <em>temperature=300</em>, <em>runsteps=200000</em>, <em>thermosteps=None</em>, <em>dumpsteps=0</em>, <em>equilsteps=20000</em>, <em>randomseed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.point_defect_diffusion.calc_point_defect_diffusion.pointdiffusion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the diffusion rate of a point defect at a given temperature. This
+method will run two simulations: an NVT run at the specified temperature to
+equilibrate the system, then an NVE run to measure the defect’s diffusion
+rate. The diffusion rate is evaluated using the mean squared displacement of
+all atoms in the system, and using the assumption that diffusion is only due
+to the added defect(s).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lammps_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Command for running LAMMPS.</li>
+<li><strong>system</strong> (<em>atomman.System</em>) – The system to perform the calculation on.</li>
+<li><strong>potential</strong> (<em>atomman.lammps.Potential</em>) – The LAMMPS implemented potential to use.</li>
+<li><strong>point_kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em> or </em><em>list of dict</em>) – One or more dictionaries containing the keyword arguments for
+the atomman.defect.point() function to generate specific point
+defect configuration(s).</li>
+<li><strong>mpi_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+will run serially.</li>
+<li><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The temperature to run at (default is 300.0).</li>
+<li><strong>runsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – The number of integration steps to perform (default is 200000).</li>
+<li><strong>thermosteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Thermo values will be reported every this many steps (default is
+100).</li>
+<li><strong>dumpsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em>, </em><em>optional</em>) – Dump files will be saved every this many steps (default is 0,
+which does not output dump files).</li>
+<li><strong>equilsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – The number of timesteps at the beginning of the simulation to
+exclude when computing average values (default is 20000).</li>
+<li><strong>randomseed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em>, </em><em>optional</em>) – Random number seed used by LAMMPS in creating velocities and with
+the Langevin thermostat.  (Default is None which will select a
+random int between 1 and 900000000.)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>Dictionary of results consisting of keys:</p>
+<ul class="simple">
+<li><strong>’natoms’</strong> (<em>int</em>) - The number of atoms in the system.</li>
+<li><strong>’temp’</strong> (<em>float</em>) - The mean measured temperature.</li>
+<li><strong>’pxx’</strong> (<em>float</em>) - The mean measured normal xx pressure.</li>
+<li><strong>’pyy’</strong> (<em>float</em>) - The mean measured normal yy pressure.</li>
+<li><strong>’pzz’</strong> (<em>float</em>) - The mean measured normal zz pressure.</li>
+<li><strong>’Epot’</strong> (<em>numpy.array</em>) - The mean measured total potential
+energy.</li>
+<li><strong>’temp_std’</strong> (<em>float</em>) - The standard deviation in the measured
+temperature values.</li>
+<li><strong>’pxx_std’</strong> (<em>float</em>) - The standard deviation in the measured
+normal xx pressure values.</li>
+<li><strong>’pyy_std’</strong> (<em>float</em>) - The standard deviation in the measured
+normal yy pressure values.</li>
+<li><strong>’pzz_std’</strong> (<em>float</em>) - The standard deviation in the measured
+normal zz pressure values.</li>
+<li><strong>’Epot_std’</strong> (<em>float</em>) - The standard deviation in the measured
+total potential energy values.</li>
+<li><strong>’dx’</strong> (<em>float</em>) - The computed diffusion constant along the
+x-direction.</li>
+<li><strong>’dy’</strong> (<em>float</em>) - The computed diffusion constant along the
+y-direction.</li>
+<li><strong>’dz’</strong> (<em>float</em>) - The computed diffusion constant along the
+y-direction.</li>
+<li><strong>’d’</strong> (<em>float</em>) - The total computed diffusion constant.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.calculation.point_defect_diffusion.calc_point_defect_diffusion.process_input">
+<code class="descname">process_input</code><span class="sig-paren">(</span><em>input_dict</em>, <em>UUID=None</em>, <em>build=True</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.point_defect_diffusion.calc_point_defect_diffusion.process_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes str input parameters, assigns default values if needed, and
+generates new, more complex terms as used by the calculation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary containing the calculation input parameters with string
+values.  The allowed keys depends on the calculation style.</li>
+<li><strong>UUID</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Unique identifier to use for the calculation instance.  If not
+given and a ‘UUID’ key is not in input_dict, then a random UUID4
+hash tag will be assigned.</li>
+<li><strong>build</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if all complex terms are to be built.  A value of False
+allows for default values to be assigned even if some inputs
+required by the calculation are incomplete.  (Default is True.)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">calc_point_defect_diffusion.py</a><ul>
+<li><a class="reference internal" href="#module-iprPy.calculation.point_defect_diffusion.calc_point_defect_diffusion">Calculation script functions</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="parameters.html"
+                        title="previous chapter">Input script parameters</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../point_defect_static/index.html"
+                        title="next chapter">point_defect_static</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../point_defect_static/index.html" title="point_defect_static"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="parameters.html" title="Input script parameters"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >point_defect_diffusion</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

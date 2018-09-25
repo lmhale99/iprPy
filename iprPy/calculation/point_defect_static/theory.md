@@ -16,7 +16,7 @@ The atomman.defect.point() method allows for the generation of four types of poi
 
 - __substitutional__, where the atomic type of an atom at a specified location is changed.
 
-- __dumbbell__ interstitial, where an atom at a specified location is replaced by a pair of atoms equidistant from the original atom's position. 
+- __dumbbell__ interstitial, where an atom at a specified location is replaced by a pair of atoms equidistant from the original atom's position.
 
 Point defect complexes (clusters, balanced ionic defects, etc.) can also be constructed piecewise from these basic types.
 
@@ -26,7 +26,7 @@ The final defect-containing system is analyzed using a few simple metrics to det
 
 $$ \vec{cs} = \sum_i^N{\left( \vec{r}_i - \vec{r}_{ptd} \right)} $$
 
-- __position_shift__ is the change in position of an interstitial or substitutional atom following relaxation of the system. A non-zero value indicates that the defect atom has moved from its initially ideal position. 
+- __position_shift__ is the change in position of an interstitial or substitutional atom following relaxation of the system. A non-zero value indicates that the defect atom has moved from its initially ideal position.
 
 $$ \Delta \vec{r} = \vec{r}_{ptd} - \vec{r}_{ptd}^{0}$$
 

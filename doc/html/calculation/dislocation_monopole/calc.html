@@ -1,0 +1,322 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>calc_dislocation_monopole.py &#8212; iprPy 0.8.2 documentation</title>
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.8.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="elastic_constants_static" href="../elastic_constants_static/index.html" />
+    <link rel="prev" title="Input script parameters" href="parameters.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../elastic_constants_static/index.html" title="elastic_constants_static"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="parameters.html" title="Input script parameters"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">dislocation_monopole</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="calc-dislocation-monopole-py">
+<h1>calc_dislocation_monopole.py<a class="headerlink" href="#calc-dislocation-monopole-py" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-iprPy.calculation.dislocation_monopole.calc_dislocation_monopole">
+<span id="calculation-script-functions"></span><h2>Calculation script functions<a class="headerlink" href="#module-iprPy.calculation.dislocation_monopole.calc_dislocation_monopole" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="iprPy.calculation.dislocation_monopole.calc_dislocation_monopole.anneal_info">
+<code class="descname">anneal_info</code><span class="sig-paren">(</span><em>temperature=0.0</em>, <em>randomseed=None</em>, <em>units='metal'</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_monopole.calc_dislocation_monopole.anneal_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates LAMMPS commands for thermo anneal.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The temperature to relax at (default is 0.0).</li>
+<li><strong>randomseed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em>, </em><em>optional</em>) – Random number seed used by LAMMPS in creating velocities and with
+the Langevin thermostat.  (Default is None which will select a
+random int between 1 and 900000000.)</li>
+<li><strong>units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The LAMMPS units style to use (default is ‘metal’).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The generated LAMMPS input lines for performing a dynamic relax.
+Will be ‘’ if temperature==0.0.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.calculation.dislocation_monopole.calc_dislocation_monopole.disl_boundary_fix">
+<code class="descname">disl_boundary_fix</code><span class="sig-paren">(</span><em>system</em>, <em>bwidth</em>, <em>bshape='circle'</em>, <em>lineboxvector='a'</em>, <em>m=None</em>, <em>n=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_monopole.calc_dislocation_monopole.disl_boundary_fix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a boundary region by changing atom types.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>system</strong> (<em>atomman.System</em>) – The system to add the boundary region to.</li>
+<li><strong>bwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The minimum thickness of the boundary region.</li>
+<li><strong>bshape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The shape to make the boundary region.  Options are ‘circle’ and
+‘box’ (default is ‘circle’).</li>
+<li><strong>lineboxvector</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Specifies which of the three box vectors (a, b, or c) the dislocation line is to be
+parallel to.  Default value is ‘a’.</li>
+<li><strong>m</strong> (<em>array-like object</em><em>, </em><em>optional</em>) – Cartesian vector used by the Stroh solution, which is perpendicular to both
+lineboxvector and n.  Default value is [0, 1, 0], which assumes the default value
+for the lineboxvector.</li>
+<li><strong>n</strong> (<em>array-like object</em><em>, </em><em>optional</em>) – Cartesian vector used by the Stroh solution, which is perpendicular to both
+lineboxvector and m.  Default value is [0, 0, 1], which assumes the default value
+for the lineboxvector.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.calculation.dislocation_monopole.calc_dislocation_monopole.disl_relax">
+<code class="descname">disl_relax</code><span class="sig-paren">(</span><em>lammps_command</em>, <em>system</em>, <em>potential</em>, <em>mpi_command=None</em>, <em>annealtemp=0.0</em>, <em>randomseed=None</em>, <em>etol=0.0</em>, <em>ftol=1e-06</em>, <em>maxiter=10000</em>, <em>maxeval=100000</em>, <em>dmax=0.01</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_monopole.calc_dislocation_monopole.disl_relax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets up and runs the disl_relax.in LAMMPS script for relaxing a
+dislocation monopole system.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lammps_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Command for running LAMMPS.</li>
+<li><strong>system</strong> (<em>atomman.System</em>) – The system to perform the calculation on.</li>
+<li><strong>potential</strong> (<em>atomman.lammps.Potential</em>) – The LAMMPS implemented potential to use.</li>
+<li><strong>mpi_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+will run serially.</li>
+<li><strong>annealtemp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The temperature to perform a dynamic relaxation at. (Default is 0.0,
+which will skip the dynamic relaxation.)</li>
+<li><strong>randomseed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em>, </em><em>optional</em>) – Random number seed used by LAMMPS in creating velocities and with
+the Langevin thermostat.  (Default is None which will select a
+random int between 1 and 900000000.)</li>
+<li><strong>etol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The energy tolerance for the structure minimization. This value is
+unitless. (Default is 0.0).</li>
+<li><strong>ftol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The force tolerance for the structure minimization. This value is in
+units of force. (Default is 0.0).</li>
+<li><strong>maxiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – The maximum number of minimization iterations to use (default is
+10000).</li>
+<li><strong>maxeval</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – The maximum number of minimization evaluations to use (default is
+100000).</li>
+<li><strong>dmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The maximum distance in length units that any atom is allowed to relax
+in any direction during a single minimization iteration (default is
+0.01 Angstroms).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>Dictionary of results consisting of keys:</p>
+<ul class="simple">
+<li><strong>’logfile’</strong> (<em>str</em>) - The name of the LAMMPS log file.</li>
+<li><strong>’dumpfile’</strong> (<em>str</em>) - The name of the LAMMPS dump file
+for the relaxed system.</li>
+<li><strong>’E_total’</strong> (<em>float</em>) - The total potential energy for the
+relaxed system.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.calculation.dislocation_monopole.calc_dislocation_monopole.dislocationmonopole">
+<code class="descname">dislocationmonopole</code><span class="sig-paren">(</span><em>lammps_command, system, potential, burgers, C, mpi_command=None, axes=None, m=[0, 1, 0], n=[0, 0, 1], lineboxvector='a', randomseed=None, etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000, dmax=0.01, annealtemp=0.0, bshape='circle', bwidth=10.0</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_monopole.calc_dislocation_monopole.dislocationmonopole" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates and relaxes a dislocation monopole system.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lammps_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Command for running LAMMPS.</li>
+<li><strong>system</strong> (<em>atomman.System</em>) – The bulk system to add the defect to.</li>
+<li><strong>potential</strong> (<em>atomman.lammps.Potential</em>) – The LAMMPS implemented potential to use.</li>
+<li><strong>burgers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em> or </em><em>numpy.array of float</em>) – The burgers vector for the dislocation being added.</li>
+<li><strong>C</strong> (<em>atomman.ElasticConstants</em>) – The system’s elastic constants.</li>
+<li><strong>mpi_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em>, </em><em>optional</em>) – The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+will run serially.</li>
+<li><strong>axes</strong> (<em>numpy.array of float</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em>, </em><em>optional</em>) – The 3x3 axes used to rotate the system by during creation.  If given,
+will be used to transform burgers and C from the standard
+crystallographic orientations to the system’s Cartesian units.</li>
+<li><strong>randomseed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em>, </em><em>optional</em>) – Random number seed used by LAMMPS in creating velocities and with
+the Langevin thermostat.  (Default is None which will select a
+random int between 1 and 900000000.)</li>
+<li><strong>etol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The energy tolerance for the structure minimization. This value is
+unitless. (Default is 0.0).</li>
+<li><strong>ftol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The force tolerance for the structure minimization. This value is in
+units of force. (Default is 0.0).</li>
+<li><strong>maxiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – The maximum number of minimization iterations to use (default is
+10000).</li>
+<li><strong>maxeval</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – The maximum number of minimization evaluations to use (default is
+100000).</li>
+<li><strong>dmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The maximum distance in length units that any atom is allowed to relax
+in any direction during a single minimization iteration (default is
+0.01 Angstroms).</li>
+<li><strong>annealtemp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The temperature to perform a dynamic relaxation at. (Default is 0.0,
+which will skip the dynamic relaxation.)</li>
+<li><strong>bshape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The shape to make the boundary region.  Options are ‘circle’ and
+‘rect’ (default is ‘circle’).</li>
+<li><strong>bwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The minimum thickness of the boundary region (default is 10
+Angstroms).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>Dictionary of results consisting of keys:</p>
+<ul class="simple">
+<li><strong>’dumpfile_base’</strong> (<em>str</em>) - The filename of the LAMMPS dump file
+for the relaxed base system.</li>
+<li><strong>’symbols_base’</strong> (<em>list of str</em>) - The list of element-model
+symbols for the Potential that correspond to the base system’s
+atypes.</li>
+<li><strong>’Stroh_preln’</strong> (<em>float</em>) - The pre-logarithmic factor in the
+dislocation’s self-energy expression.</li>
+<li><strong>’Stroh_K_tensor’</strong> (<em>numpy.array of float</em>) - The energy
+coefficient tensor based on the dislocation’s Stroh solution.</li>
+<li><strong>’dumpfile_disl’</strong> (<em>str</em>) - The filename of the LAMMPS dump file
+for the relaxed dislocation monopole system.</li>
+<li><strong>’symbols_disl’</strong> (<em>list of str</em>) - The list of element-model
+symbols for the Potential that correspond to the dislocation
+monopole system’s atypes.</li>
+<li><strong>’E_total_disl’</strong> (<em>float</em>) - The total potential energy of the
+dislocation monopole system.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.calculation.dislocation_monopole.calc_dislocation_monopole.main">
+<code class="descname">main</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_monopole.calc_dislocation_monopole.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main function called when script is executed directly.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.calculation.dislocation_monopole.calc_dislocation_monopole.process_input">
+<code class="descname">process_input</code><span class="sig-paren">(</span><em>input_dict</em>, <em>UUID=None</em>, <em>build=True</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_monopole.calc_dislocation_monopole.process_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes str input parameters, assigns default values if needed, and
+generates new, more complex terms as used by the calculation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary containing the calculation input parameters with string
+values.  The allowed keys depends on the calculation style.</li>
+<li><strong>UUID</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Unique identifier to use for the calculation instance.  If not
+given and a ‘UUID’ key is not in input_dict, then a random UUID4
+hash tag will be assigned.</li>
+<li><strong>build</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if all complex terms are to be built.  A value of False
+allows for default values to be assigned even if some inputs
+required by the calculation are incomplete.  (Default is True.)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">calc_dislocation_monopole.py</a><ul>
+<li><a class="reference internal" href="#module-iprPy.calculation.dislocation_monopole.calc_dislocation_monopole">Calculation script functions</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="parameters.html"
+                        title="previous chapter">Input script parameters</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../elastic_constants_static/index.html"
+                        title="next chapter">elastic_constants_static</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../elastic_constants_static/index.html" title="elastic_constants_static"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="parameters.html" title="Input script parameters"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >dislocation_monopole</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

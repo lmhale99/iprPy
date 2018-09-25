@@ -6,7 +6,7 @@ An initial system (and corresponding unit cell system) is supplied with box dime
 
 $$ C_{ij} \approx - \frac{P_i(\epsilon_j=\frac{\Delta \epsilon}{2}) - P_i(\epsilon_j=-\frac{\Delta \epsilon}{2})}{\Delta \epsilon}.$$
 
-The negative out front comes from the fact that the system-wide stress state is $\sigma_i = -P_i$. Using $C_{ij}$, an attempt is made to compute the elastic compliance matrix as $S_{ij} = C_{ij}^{-1}$. If successful, new box dimensions are estimated using $S_{ij}$, $a_i^0$, and $P_i$ for the unstrained system 
+The negative out front comes from the fact that the system-wide stress state is $\sigma_i = -P_i$. Using $C_{ij}$, an attempt is made to compute the elastic compliance matrix as $S_{ij} = C_{ij}^{-1}$. If successful, new box dimensions are estimated using $S_{ij}$, $a_i^0$, and $P_i$ for the unstrained system
 
 $$ a_i = \frac{a_i^0}{1 - (\sum_{j=1}^3{S_{ij} P_j})}.$$
 

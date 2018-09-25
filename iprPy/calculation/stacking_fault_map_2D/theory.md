@@ -18,7 +18,7 @@ The system is then cut by making one of the box boundaries non-periodic.  A limi
 
 - cutboxvector = 'a': the system's xy and xz tilts must be zero.
 
-A LAMMPS simulation performs an energy/force minimization on the system where the atoms are confined to only relax along the Cartesian direction normal to the cut plane. 
+A LAMMPS simulation performs an energy/force minimization on the system where the atoms are confined to only relax along the Cartesian direction normal to the cut plane.
 
 A mathematical fault plane parallel to the cut plane is defined in the middle of the system.  A generalized stacking fault system can then be created by shifting all atoms on one side of the fault plane by a vector, $\vec{s}$.  The shifted system is then relaxed using the same confined energy/force minimization used on the non-shifted system.  The generalized stacking fault energy, $\gamma_{gsf}$, can then be computed by comparing the total energy of the system, $E^{total}$, before and after $\vec{s}$ is applied
 

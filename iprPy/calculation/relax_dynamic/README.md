@@ -8,7 +8,7 @@
 
 Version: 2018-06-24
 
-[Disclaimers](http://www.nist.gov/public_affairs/disclaimer.cfm) 
+[Disclaimers](http://www.nist.gov/public_affairs/disclaimer.cfm)
 
 ## Introduction
 
@@ -20,13 +20,13 @@ __Disclaimer #1__: The calculation reports the standard deviation, $\sigma_X$ of
 
 $$ \sigma_{<X>} = \sigma_X \sqrt{\frac{C}{N}} $$,
 
-where $N$ is the number of samples taken of $X$, and $C$ is a statistical inefficiency due to the autocorrelation of the measurements with time.  Obtaining a proper estimate of $\sigma_{<X>}$ requires either estimating $C$ from the raw thermo data (not done here), or only taking measurements sporadically to ensure the samples are independent. 
+where $N$ is the number of samples taken of $X$, and $C$ is a statistical inefficiency due to the autocorrelation of the measurements with time.  Obtaining a proper estimate of $\sigma_{<X>}$ requires either estimating $C$ from the raw thermo data (not done here), or only taking measurements sporadically to ensure the samples are independent.
 
 __Disclaimer #2__: Good (low error) results requires running large simulations for a long time.  The reasons for this are:
 
 - Systems have to be large enough to avoid issues with fluctuations across the periodic boundaries.
 
-- Runs must first let the systems equilibriate before meaningful measurements can be taken. 
+- Runs must first let the systems equilibrate before meaningful measurements can be taken.
 
 - The standard deviation, $\sigma$, of thermo properties is proportional to the number of atoms, $N_a$ as $\sigma \propto \frac{1}{\sqrt{N_a}}$.
 

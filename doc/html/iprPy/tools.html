@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>iprPy.tools package &#8212; iprPy 0.8.0 documentation</title>
+    <title>iprPy.tools package &#8212; iprPy 0.8.2 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.8.0',
+        VERSION:     '0.8.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  false,
@@ -23,7 +23,8 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="iprPy.record package" href="record.html" /> 
   </head>
   <body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -35,7 +36,11 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="record.html" title="iprPy.record package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">iprPy package</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -57,7 +62,7 @@ item.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>term</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#any" title="(in Python v3.6)"><em>any</em></a>) – Term to convert into a list, if needed.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>term</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#any" title="(in Python v3.7)"><em>any</em></a>) – Term to convert into a list, if needed.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">All items in term as a list</td>
 </tr>
@@ -96,11 +101,11 @@ accessible by style name (root submodule).</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>template</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.6)"><em>string</em></a><em> or </em><em>file-like object</em>) – The template file or file content to fill in.</li>
-<li><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary with keys defining the delimited template variable terms,
+<li><strong>template</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.7)"><em>string</em></a><em> or </em><em>file-like object</em>) – The template file or file content to fill in.</li>
+<li><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary with keys defining the delimited template variable terms,
 and values the values to replace the variable terms with.</li>
-<li><strong>s_delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The leading delimiter for identifying the template variable terms.</li>
-<li><strong>e_delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The trailing delimiter for identifying the template variable terms.</li>
+<li><strong>s_delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The leading delimiter for identifying the template variable terms.</li>
+<li><strong>e_delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The trailing delimiter for identifying the template variable terms.</li>
 </ul>
 </td>
 </tr>
@@ -108,12 +113,12 @@ and values the values to replace the variable terms with.</li>
 corresponding defined values from variable.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code></a> – If delimited term found in template that has no value in variable.</li>
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> – If parsing of s_delimiter, e_delimiter pairs fails.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code></a> – If delimited term found in template that has no value in variable.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> – If parsing of s_delimiter, e_delimiter pairs fails.</li>
 </ul>
 </td>
 </tr>
@@ -130,7 +135,7 @@ term as a single item.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>term</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#any" title="(in Python v3.6)"><em>any</em></a>) – Term to iterate over.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>term</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#any" title="(in Python v3.7)"><em>any</em></a>) – Term to iterate over.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><em>any</em> – Items in the list representation of term.</td>
 </tr>
@@ -147,11 +152,11 @@ term as a single item.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>prompt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The screen prompt to use for asking for the input.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>prompt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The screen prompt to use for asking for the input.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The user input.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
 </tr>
 </tbody>
 </table>
@@ -174,6 +179,9 @@ term as a single item.</p>
 </li>
 </ul>
 
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="record.html"
+                        title="previous chapter">iprPy.record package</a></p>
         </div>
       </div>
       <div class="clearer"></div>
@@ -187,7 +195,11 @@ term as a single item.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="record.html" title="iprPy.record package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >iprPy package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

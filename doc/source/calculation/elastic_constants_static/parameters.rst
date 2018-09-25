@@ -65,10 +65,10 @@ configuration.
    If the unit of length is not given, the specified length\_unit
    (below) will be used.
 
-   -  a b c (unit): for orthogonal boxes.
+-  a b c (unit): for orthogonal boxes.
 
-   -  a b c alpha beta gamma (unit): for triclinic boxes. The angles are
-      taken in degrees.
+-  a b c alpha beta gamma (unit): for triclinic boxes. The angles are
+   taken in degrees.
 
 System manipulations
 ~~~~~~~~~~~~~~~~~~~~
@@ -94,9 +94,9 @@ Performs simple manipulations on the loaded initial system.
    the loaded system. This may either be a list of three or six integer
    numbers. Default value is '3 3 3'.
 
-   -  ma mb mc: multipliers for each box axis. Values can be positive or
-      negative indicating the direction relative to the original box's
-      origin for shifting/multiplying the system.
+-  ma mb mc: multipliers for each box axis. Values can be positive or
+   negative indicating the direction relative to the original box's
+   origin for shifting/multiplying the system.
 
    -  na pa nb pb nc pc: negative, positive multiplier pairs for each
       box axis. The n terms must be less than or equal to zero, and the

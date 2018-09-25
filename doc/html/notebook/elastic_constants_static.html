@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>elastic_constants_static Calculation &#8212; iprPy 0.8.0 documentation</title>
+    <title>elastic_constants_static Calculation &#8212; iprPy 0.8.2 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.8.0',
+        VERSION:     '0.8.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  false,
@@ -24,8 +24,8 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="point_defect_static Calculation Demonstration" href="point_defect_static.html" />
-    <link rel="prev" title="crystal_space_group Calculation" href="crystal_space_group.html" /> 
+    <link rel="next" title="point_defect_diffusion Calculation" href="point_defect_diffusion.html" />
+    <link rel="prev" title="dislocation_monopole Calculation" href="dislocation_monopole.html" /> 
   </head>
   <body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -38,12 +38,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="point_defect_static.html" title="point_defect_static Calculation Demonstration"
+          <a href="point_defect_diffusion.html" title="point_defect_diffusion Calculation"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="crystal_space_group.html" title="crystal_space_group Calculation"
+          <a href="dislocation_monopole.html" title="dislocation_monopole Calculation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>  
@@ -302,7 +302,7 @@ are:</p>
 <li><a class="reference external" href="https://github.com/usnistgov/atomman">atomman</a></li>
 <li><a class="reference external" href="https://github.com/usnistgov/iprPy">iprPy</a></li>
 </ul>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
 <span></span>In [1]:
 </pre></div>
@@ -331,8 +331,18 @@ are:</p>
 
 <span class="c1"># https://github.com/usnistgov/iprPy</span>
 <span class="kn">import</span> <span class="nn">iprPy</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Notebook last executed on&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">(),</span> <span class="s1">&#39;using iprPy version&#39;</span><span class="p">,</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Notebook last executed on 2018-09-24 using iprPy version 0.8.2
+</pre></div></div>
 </div>
 </div>
 <div class="section" id="1.2.-Default-calculation-setup">
@@ -1090,11 +1100,11 @@ Cij (GPa) =
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="crystal_space_group.html"
-                        title="previous chapter">crystal_space_group Calculation</a></p>
+  <p class="topless"><a href="dislocation_monopole.html"
+                        title="previous chapter">dislocation_monopole Calculation</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="point_defect_static.html"
-                        title="next chapter">point_defect_static Calculation Demonstration</a></p>
+  <p class="topless"><a href="point_defect_diffusion.html"
+                        title="next chapter">point_defect_diffusion Calculation</a></p>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1109,12 +1119,12 @@ Cij (GPa) =
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="point_defect_static.html" title="point_defect_static Calculation Demonstration"
+          <a href="point_defect_diffusion.html" title="point_defect_diffusion Calculation"
              >next</a> |</li>
         <li class="right" >
-          <a href="crystal_space_group.html" title="crystal_space_group Calculation"
+          <a href="dislocation_monopole.html" title="dislocation_monopole Calculation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>

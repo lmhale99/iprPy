@@ -65,10 +65,10 @@ configuration.
    If the unit of length is not given, the specified length\_unit
    (below) will be used.
 
-   -  a b c (unit): for orthogonal boxes.
+-  a b c (unit): for orthogonal boxes.
 
-   -  a b c alpha beta gamma (unit): for triclinic boxes. The angles are
-      taken in degrees.
+-  a b c alpha beta gamma (unit): for triclinic boxes. The angles are
+   taken in degrees.
 
 System manipulations
 ~~~~~~~~~~~~~~~~~~~~
@@ -94,24 +94,23 @@ Performs simple manipulations on the loaded initial system.
    the loaded system. This may either be a list of three or six integer
    numbers. Default value is '3 3 3'.
 
-   -  ma mb mc: multipliers for each box axis. Values can be positive or
-      negative indicating the direction relative to the original box's
-      origin for shifting/multiplying the system.
+-  ma mb mc: multipliers for each box axis. Values can be positive or
+   negative indicating the direction relative to the original box's
+   origin for shifting/multiplying the system.
 
-   -  na pa nb pb nc pc: negative, positive multiplier pairs for each
-      box axis. The n terms must be less than or equal to zero, and the
-      p terms greater than or equal to zero. This allows for expanding
-      the system in both directions relative to the original box's
-      origin.
+-  na pa nb pb nc pc: negative, positive multiplier pairs for each box
+   axis. The n terms must be less than or equal to zero, and the p terms
+   greater than or equal to zero. This allows for expanding the system
+   in both directions relative to the original box's origin.
 
 Defect Parameters
 ~~~~~~~~~~~~~~~~~
 
 Defines the defect system to construct and analyze.
 
--  **pointdefect\_file**: the path to a point-defect record file that
+-  **pointdefect\_file**: the path to a point\_defect record file that
    contains a set of input parameters associated with a specific point
-   defect or set of point defects. In particular, the point-defect
+   defect or set of point defects. In particular, the point\_defect
    record contains values for the pointdefect\_type, pointdefect\_atype,
    pointdefect\_pos, pointdefect\_dumbbell\_vect, and pointdefect\_scale
    parameters. As such, those parameters cannot be specified separately
@@ -120,13 +119,13 @@ Defines the defect system to construct and analyze.
 -  **pointdefect\_type**: indicates which type of point defect to
    generate.
 
-   -  'v' or 'vacancy': generate a vacancy.
+-  'v' or 'vacancy': generate a vacancy.
 
-   -  'i' or 'interstitial': generate a position-based interstitial.
+-  'i' or 'interstitial': generate a position-based interstitial.
 
-   -  's' or 'substitutional': generate a substitutional.
+-  's' or 'substitutional': generate a substitutional.
 
-   -  'd', 'db' or 'dumbbell': generate a dumbbell interstitial.
+-  'd', 'db' or 'dumbbell': generate a dumbbell interstitial.
 
 -  **pointdefect\_atype**: indicates the integer atom type to assign to
    an interstitial, substitutional, or dumbbell interstitial atom.

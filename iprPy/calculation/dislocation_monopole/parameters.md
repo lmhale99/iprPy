@@ -1,8 +1,8 @@
-# Input script parameters
+## Input script parameters
 
 This is a list of the input parameter names recognized by the calculation script.
 
-## Command lines for LAMMPS and MPI
+### Command lines for LAMMPS and MPI
 
 Provides the external commands for running LAMMPS and MPI.
 
@@ -10,7 +10,7 @@ Provides the external commands for running LAMMPS and MPI.
 
 - __mpi_command__: the path to the MPI executable and any command line options to use for calling LAMMPS to run in parallel on your system. Default value is None (run LAMMPS as a serial process).
 
-## Potential definition and directory containing associated files
+### Potential definition and directory containing associated files
 
 Provides the information associated with an interatomic potential implemented for LAMMPS.
 
@@ -18,7 +18,7 @@ Provides the information associated with an interatomic potential implemented fo
 
 - __potential_dir__: the path to the directory containing any potential artifacts (eg. eam.alloy setfl files) that are used. If not given, then any required files are expected to be in the working directory where the calculation is executed.
 
-## Initial system configuration to load
+### Initial system configuration to load
 
 Provides the information associated with loading an atomic configuration.
 
@@ -38,7 +38,7 @@ Provides the information associated with loading an atomic configuration.
 
   - a b c alpha beta gamma (unit): for triclinic boxes.  The angles are taken in degrees.
 
-## System manipulations
+### System manipulations
 
 Performs simple manipulations on the loaded initial system.
 
@@ -52,7 +52,7 @@ Performs simple manipulations on the loaded initial system.
   
   - na pa nb pb nc pc: negative, positive multiplier pairs for each box axis.  The n terms must be less than or equal to zero, and the p terms greater than or equal to zero.  This allows for expanding the system in both directions relative to the original box's origin.
 
-## Defect parameters
+### Defect parameters
 
 Defines the defect system to construct and analyze.
 
@@ -70,7 +70,7 @@ Defines the defect system to construct and analyze.
 
 - __dislocation_boundaryshape__: 'box' or 'circle' specifying the resulting shape of the active region after defining the boundary atoms.  For 'box', the boundary width is constant at the two non-periodic box edges.  For 'circle', the active region is a cylinder centered around the dislocation line.  Default value is 'circle'.
 
-## Elastic constants parameters
+### Elastic constants parameters
 
 Specifies the computed elastic constants for the interatomic potential and crystal structure, relative to the loaded system's orientation.
 
@@ -78,7 +78,7 @@ Specifies the computed elastic constants for the interatomic potential and cryst
 
 - __C11, C12, C13, C14, C15, C16, C22, C23, C24, C25, C26, C33, C34, C35, C36, C44, C45, C46, C55, C56, C66__: the individual elastic constants components in units of pressure.  If the loaded system's orientation is the standard setting for the crystal type, then missing values will automatically be filled in. Example: if the loaded system is a cubic prototype, then only *C11, C12* and *C44* need be specified.
 
-## Units for input/output values
+### Units for input/output values
 
 Specifies the units for various physical quantities to use when saving values to the results record file. Also used as the default units for parameters in this input parameter file.
 
@@ -90,7 +90,7 @@ Specifies the units for various physical quantities to use when saving values to
 
 - __force_unit__: defines the unit of pressure for results, and input parameters if not directly specified.  Default value is 'eV/angstrom'.
 
-## Run Parameters
+### Run Parameters
 
 Provides parameters specific to the calculation at hand.
 

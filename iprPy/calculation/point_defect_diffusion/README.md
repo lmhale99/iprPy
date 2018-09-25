@@ -1,4 +1,4 @@
-# point_defect_diffusion Calculation Demonstration
+# point_defect_diffusion Calculation
 
 **Lucas M. Hale**, [lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), *Materials Science and Engineering Division, NIST*.
 

@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>iprPy.database package &#8212; iprPy 0.8.0 documentation</title>
+    <title>iprPy.database package &#8212; iprPy 0.8.2 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.8.0',
+        VERSION:     '0.8.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  false,
@@ -23,7 +23,9 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="iprPy.input package" href="input.html" />
+    <link rel="prev" title="iprPy.compatibility package" href="compatibility.html" /> 
   </head>
   <body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -35,7 +37,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="input.html" title="iprPy.input package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="compatibility.html" title="iprPy.compatibility package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">iprPy package</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -65,7 +74,7 @@ loaded modules.</p>
 <dl class="class">
 <dt id="iprPy.database.Database">
 <em class="property">class </em><code class="descname">Database</code><span class="sig-paren">(</span><em>host</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Class for handling different database styles in the same fashion.  The
 class defines the common methods and attributes, which are then uniquely
 implemented for each style.  The available styles are loaded from the
@@ -82,11 +91,11 @@ matching record already exists in the database.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>record</strong> (<em>iprPy.Record</em><em>, </em><em>optional</em>) – The new record to add to the database.  If not given, then name,
 style and content are required.</li>
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the new record.  Required if record is not
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the new record.  Required if record is not
 given.</li>
-<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The record style for the new record.  Required if record is not
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The record style for the new record.  Required if record is not
 given.</li>
-<li><strong>content</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The xml content of the new record.  Required if record is not
+<li><strong>content</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The xml content of the new record.  Required if record is not
 given.</li>
 </ul>
 </td>
@@ -98,7 +107,7 @@ and content.</p>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">iprPy.Record</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If add_record is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If add_record is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -120,15 +129,15 @@ must match the name of the directory being archived.</p>
 <li><strong>record</strong> (<em>iprPy.Record</em><em>, </em><em>optional</em>) – The record to associate the tar archive with.  If not given, then
 name and/or style necessary to uniquely identify the record are
 needed.</li>
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – .The name to use in uniquely identifying the record.</li>
-<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – .The style to use in uniquely identifying the record.</li>
-<li><strong>root_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Specifies the root directory for finding the directory to archive.
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – .The name to use in uniquely identifying the record.</li>
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – .The style to use in uniquely identifying the record.</li>
+<li><strong>root_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Specifies the root directory for finding the directory to archive.
 The directory to archive is at &lt;root_dir&gt;/&lt;name&gt;.  (Default is to
 set root_dir to the current working directory.)</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If add_tar is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If add_tar is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -143,7 +152,7 @@ set root_dir to the current working directory.)</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>lib_directory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The directory path for the library.  If not given, then it will use
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>lib_directory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The directory path for the library.  If not given, then it will use
 the iprPy/library directory.</td>
 </tr>
 </tbody>
@@ -158,7 +167,7 @@ the iprPy/library directory.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>record_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to check on.  If not given, then the available record
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>record_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to check on.  If not given, then the available record
 styles will be listed and the user prompted to pick one.</td>
 </tr>
 </tbody>
@@ -175,9 +184,9 @@ errors are due to external conditions.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>run_directory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The directory where the cleaned calculation instances are to be
+<li><strong>run_directory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The directory where the cleaned calculation instances are to be
 returned.</li>
-<li><strong>record_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to clean.  If not given, then the available record
+<li><strong>record_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to clean.  If not given, then the available record
 styles will be listed and the user prompted to pick one.</li>
 </ul>
 </td>
@@ -196,9 +205,9 @@ styles will be listed and the user prompted to pick one.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>dbase2</strong> (<em>iprPy.Database</em>) – The database to copy to.</li>
-<li><strong>record_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to copy.  If not given, then the available record
+<li><strong>record_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to copy.  If not given, then the available record
 styles will be listed and the user prompted to pick one.</li>
-<li><strong>includetar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the tar archives will be copied along with the records.
+<li><strong>includetar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the tar archives will be copied along with the records.
 If False, only the records will be copied. (Default is True).</li>
 </ul>
 </td>
@@ -219,12 +228,12 @@ if exactly one matching record is not found in the database.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>record</strong> (<em>iprPy.Record</em><em>, </em><em>optional</em>) – The record to delete from the database.  If not given, name and/or
 style are needed to uniquely define the record to delete.</li>
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the record to delete.</li>
-<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The style of the record to delete.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the record to delete.</li>
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The style of the record to delete.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If delete_record is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If delete_record is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -244,12 +253,12 @@ matching record is not found in the database.</p>
 <li><strong>record</strong> (<em>iprPy.Record</em><em>, </em><em>optional</em>) – The record associated with the tar archive to delete.  If not
 given, then name and/or style necessary to uniquely identify
 the record are needed.</li>
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – .The name to use in uniquely identifying the record.</li>
-<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – .The style to use in uniquely identifying the record.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – .The name to use in uniquely identifying the record.</li>
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – .The style to use in uniquely identifying the record.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If delete_tar is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If delete_tar is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -264,7 +273,7 @@ the record are needed.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>record_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to delete.  If not given, then the available record
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>record_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to delete.  If not given, then the available record
 styles will be listed and the user prompted to pick one.</td>
 </tr>
 </tbody>
@@ -287,8 +296,8 @@ if multiple or no matching records are found.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The record name or id to limit the search by.</li>
-<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to limit the search by.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The record name or id to limit the search by.</li>
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to limit the search by.</li>
 </ul>
 </td>
 </tr>
@@ -298,7 +307,7 @@ if multiple or no matching records are found.</p>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">iprPy.Record</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If get_record is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If get_record is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -314,8 +323,8 @@ if multiple or no matching records are found.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The record name or id to limit the search by.</li>
-<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to limit the search by.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The record name or id to limit the search by.</li>
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to limit the search by.</li>
 </ul>
 </td>
 </tr>
@@ -325,7 +334,7 @@ if multiple or no matching records are found.</p>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">list of iprPy.Records</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If get_records is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If get_records is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -341,11 +350,11 @@ if multiple or no matching records are found.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The record style to collect records of.</li>
-<li><strong>full</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag used by the calculation records.  A True value will include
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The record style to collect records of.</li>
+<li><strong>full</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag used by the calculation records.  A True value will include
 terms for both the calculation’s input and results, while a value
 of False will only include input terms (Default is True).</li>
-<li><strong>flat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag affecting the format of the dictionary terms.  If True, the
+<li><strong>flat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag affecting the format of the dictionary terms.  If True, the
 dictionary terms are limited to having only str, int, and float
 values, which is useful for comparisons.  If False, the term
 values can be of any data type, which is convenient for analysis.
@@ -359,7 +368,7 @@ values can be of any data type, which is convenient for analysis.
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">pandas.DataFrame</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If get_record is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If get_record is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -378,9 +387,9 @@ database.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>record</strong> (<em>iprPy.Record</em><em>, </em><em>optional</em>) – The record to retrive the associated tar archive for.</li>
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – .The name to use in uniquely identifying the record.</li>
-<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – .The style to use in uniquely identifying the record.</li>
-<li><strong>raw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, return the archive as raw binary content. If
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – .The name to use in uniquely identifying the record.</li>
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – .The style to use in uniquely identifying the record.</li>
+<li><strong>raw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, return the archive as raw binary content. If
 False, return as an open tarfile. (Default is False)</li>
 </ul>
 </td>
@@ -389,10 +398,10 @@ False, return as an open tarfile. (Default is False)</li>
 str if raw=True.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/tarfile.html#module-tarfile" title="(in Python v3.6)">tarfile</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/tarfile.html#module-tarfile" title="(in Python v3.7)">tarfile</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If get_tar is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If get_tar is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -441,9 +450,9 @@ matching record is not found in the databse.</p>
 <li><strong>record</strong> (<em>iprPy.Record</em><em>, </em><em>optional</em>) – The record with new content to update in the database.  If not
 given, content is required along with name and/or style to
 uniquely define a record to update.</li>
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The name to uniquely identify the record to update.</li>
-<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The style of the record to update.</li>
-<li><strong>content</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The new xml content to use for the record.  Required if record is
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The name to uniquely identify the record to update.</li>
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The style of the record to update.</li>
+<li><strong>content</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The new xml content to use for the record.  Required if record is
 not given.</li>
 </ul>
 </td>
@@ -455,7 +464,7 @@ and content.</p>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">iprPy.Record</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If update_record is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If update_record is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -476,14 +485,14 @@ The record’s name must match the name of the directory being archived.</p>
 <li><strong>record</strong> (<em>iprPy.Record</em><em>, </em><em>optional</em>) – The record to associate the tar archive with.  If not given, then
 name and/or style necessary to uniquely identify the record are
 needed.</li>
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – .The name to use in uniquely identifying the record.</li>
-<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – .The style to use in uniquely identifying the record.</li>
-<li><strong>root_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Specifies the root directory for finding the directory to archive.
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – .The name to use in uniquely identifying the record.</li>
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – .The style to use in uniquely identifying the record.</li>
+<li><strong>root_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Specifies the root directory for finding the directory to archive.
 The directory to archive is at &lt;root_dir&gt;/&lt;name&gt;.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If update_tar is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If update_tar is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -502,11 +511,11 @@ by defining all needed access information.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The name assigned to a pre-defined database.  If given, can be the only
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The name assigned to a pre-defined database.  If given, can be the only
 parameter.</li>
-<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The database style to use.</li>
-<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The URL/file path where the database is hosted.</li>
-<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>optional</em>) – Any other keyword parameters defining necessary access information.
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The database style to use.</li>
+<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The URL/file path where the database is hosted.</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) – Any other keyword parameters defining necessary access information.
 Allowed keywords are database style-specific.</li>
 </ul>
 </td>
@@ -529,11 +538,11 @@ Allowed keywords are database style-specific.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name assigned to a pre-defined run_directory.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name assigned to a pre-defined run_directory.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The path to the identified run_directory.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
 </tr>
 </tbody>
 </table>
@@ -550,11 +559,11 @@ entered.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the database. If not given, the user will be
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the database. If not given, the user will be
 prompted to enter one.</li>
-<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The database style associated with the database. If not given, the
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The database style associated with the database. If not given, the
 user will be prompted to enter one.</li>
-<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The database host (directory path or url) where the database is
+<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The database host (directory path or url) where the database is
 located. If not given, the user will be prompted to enter one.</li>
 </ul>
 </td>
@@ -572,9 +581,9 @@ located. If not given, the user will be prompted to enter one.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the run_directory.  If not given, the user will
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the run_directory.  If not given, the user will
 be prompted to enter one.</li>
-<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The directory path for the run_directory.  If not given, the user will
+<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The directory path for the run_directory.  If not given, the user will
 be prompted to enter one.</li>
 </ul>
 </td>
@@ -591,7 +600,7 @@ be prompted to enter one.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name assigned to a pre-defined database.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name assigned to a pre-defined database.</td>
 </tr>
 </tbody>
 </table>
@@ -606,7 +615,7 @@ file.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name assigned to a pre-defined run_directory.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name assigned to a pre-defined run_directory.</td>
 </tr>
 </tbody>
 </table>
@@ -629,6 +638,12 @@ file.</p>
 </li>
 </ul>
 
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="compatibility.html"
+                        title="previous chapter">iprPy.compatibility package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="input.html"
+                        title="next chapter">iprPy.input package</a></p>
         </div>
       </div>
       <div class="clearer"></div>
@@ -642,7 +657,14 @@ file.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="input.html" title="iprPy.input package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="compatibility.html" title="iprPy.compatibility package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >iprPy package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

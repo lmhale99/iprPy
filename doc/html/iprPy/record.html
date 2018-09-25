@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>iprPy.record package &#8212; iprPy 0.8.0 documentation</title>
+    <title>iprPy.record package &#8212; iprPy 0.8.2 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.8.0',
+        VERSION:     '0.8.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  false,
@@ -23,7 +23,9 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="iprPy.tools package" href="tools.html" />
+    <link rel="prev" title="iprPy.input package" href="input.html" /> 
   </head>
   <body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -35,7 +37,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="tools.html" title="iprPy.tools package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="input.html" title="iprPy.input package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">iprPy package</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -65,7 +74,7 @@ loaded modules.</p>
 <dl class="class">
 <dt id="iprPy.record.Record">
 <em class="property">class </em><code class="descname">Record</code><span class="sig-paren">(</span><em>name=None</em>, <em>content=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.record.Record" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Class for handling different record styles in the same fashion.  The
 class defines the common methods and attributes, which are then uniquely
 implemented for each style.  The available styles are loaded from the
@@ -80,9 +89,9 @@ results) parameters.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>script</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the calculation script used.</li>
-<li><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary of all input parameter terms.</li>
-<li><strong>results_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>optional</em>) – Dictionary containing any results produced by the calculation.</li>
+<li><strong>script</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the calculation script used.</li>
+<li><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary of all input parameter terms.</li>
+<li><strong>results_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) – Dictionary containing any results produced by the calculation.</li>
 </ul>
 </td>
 </tr>
@@ -92,7 +101,7 @@ results) parameters.</p>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">DataModelDict</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If buildcontent is not defined for record style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If buildcontent is not defined for record style.</p>
 </td>
 </tr>
 </tbody>
@@ -156,9 +165,9 @@ style’s compare_terms.</li>
 flat=True) to check for approximately equal values, i.e. use
 numpy.isclose() for terms with float values. If not given, will
 use the record style’s compare_fterms.</li>
-<li><strong>atol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The absolute tolerance to use in numpy.isclose() for comparing
+<li><strong>atol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The absolute tolerance to use in numpy.isclose() for comparing
 fterms (Default value is 0.0).</li>
-<li><strong>rtol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The relative tolerance to use in numpy.isclose() for comparing
+<li><strong>rtol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The relative tolerance to use in numpy.isclose() for comparing
 fterms (Default value is 1e-8).</li>
 </ul>
 </td>
@@ -166,10 +175,10 @@ fterms (Default value is 1e-8).</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> – If more than one of record_df, record_list, and database are
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> – If more than one of record_df, record_list, and database are
 given.</p>
 </td>
 </tr>
@@ -188,7 +197,7 @@ associated calculation would be a valid one to run.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if element combinations are valid, False if not.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -221,9 +230,9 @@ style’s compare_terms.</li>
 flat=True) to check for approximately equal values, i.e. use
 numpy.isclose() for terms with float values. If not given, will
 use the record style’s compare_fterms.</li>
-<li><strong>atol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The absolute tolerance to use in numpy.isclose() for comparing
+<li><strong>atol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The absolute tolerance to use in numpy.isclose() for comparing
 fterms (Default value is 0.0).</li>
-<li><strong>rtol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The relative tolerance to use in numpy.isclose() for comparing
+<li><strong>rtol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The relative tolerance to use in numpy.isclose() for comparing
 fterms (Default value is 1e-8).</li>
 </ul>
 </td>
@@ -231,10 +240,10 @@ fterms (Default value is 1e-8).</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> – If more than one of record_df, record_list, and database are
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> – If more than one of record_df, record_list, and database are
 given.</p>
 </td>
 </tr>
@@ -270,10 +279,10 @@ record style.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>full</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag used by the calculation records.  A True value will include
+<li><strong>full</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag used by the calculation records.  A True value will include
 terms for both the calculation’s input and results, while a value
 of False will only include input terms (Default is True).</li>
-<li><strong>flat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag affecting the format of the dictionary terms.  If True, the
+<li><strong>flat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag affecting the format of the dictionary terms.  If True, the
 dictionary terms are limited to having only str, int, and float
 values, which is useful for comparisons.  If False, the term
 values can be of any data type, which is convenient for analysis.
@@ -284,10 +293,10 @@ values can be of any data type, which is convenient for analysis.
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A dictionary representation of the record’s content.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If todict is not defined for record style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If todict is not defined for record style.</p>
 </td>
 </tr>
 </tbody>
@@ -318,6 +327,12 @@ values can be of any data type, which is convenient for analysis.
 </li>
 </ul>
 
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="input.html"
+                        title="previous chapter">iprPy.input package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tools.html"
+                        title="next chapter">iprPy.tools package</a></p>
         </div>
       </div>
       <div class="clearer"></div>
@@ -331,7 +346,14 @@ values can be of any data type, which is convenient for analysis.
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="tools.html" title="iprPy.tools package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="input.html" title="iprPy.input package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >iprPy package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Input script parameters &#8212; iprPy 0.8.0 documentation</title>
+    <title>Input script parameters &#8212; iprPy 0.8.2 documentation</title>
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.8.0',
+        VERSION:     '0.8.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  false,
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="theory.html" title="Method and Theory"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">elastic_constants_static</a> &#187;</li> 
       </ul>
@@ -109,12 +109,10 @@ running calculations based on prototype configurations that do not
 contain material-specific dimensions. Can be given either as a list
 of three or six numbers, with an optional unit of length at the end.
 If the unit of length is not given, the specified length_unit
-(below) will be used.<ul>
+(below) will be used.</li>
 <li>a b c (unit): for orthogonal boxes.</li>
 <li>a b c alpha beta gamma (unit): for triclinic boxes. The angles are
 taken in degrees.</li>
-</ul>
-</li>
 </ul>
 </div>
 <div class="section" id="system-manipulations">
@@ -136,10 +134,10 @@ shift regardless of box_parameters and sizemults. Default value is
 ‘0.0 0.0 0.0’ (i.e. no shift).</li>
 <li><strong>sizemults</strong>: multiplication parameters for making a supercell of
 the loaded system. This may either be a list of three or six integer
-numbers. Default value is ‘3 3 3’.<ul>
+numbers. Default value is ‘3 3 3’.</li>
 <li>ma mb mc: multipliers for each box axis. Values can be positive or
 negative indicating the direction relative to the original box’s
-origin for shifting/multiplying the system.</li>
+origin for shifting/multiplying the system.<ul>
 <li>na pa nb pb nc pc: negative, positive multiplier pairs for each
 box axis. The n terms must be less than or equal to zero, and the
 p terms greater than or equal to zero. This allows for expanding
@@ -244,7 +242,7 @@ value is ‘0.01 angstrom’.</li>
         <li class="right" >
           <a href="theory.html" title="Method and Theory"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >elastic_constants_static</a> &#187;</li> 
       </ul>

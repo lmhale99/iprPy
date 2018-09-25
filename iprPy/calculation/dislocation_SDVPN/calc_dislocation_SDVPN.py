@@ -22,7 +22,6 @@ from scipy.optimize import minimize_scalar
 # https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.unitconvert as uc
-from atomman.defect import pn_arctan_disregistry, SDVPN
 
 # https://github.com/usnistgov/iprPy
 import iprPy
@@ -107,22 +106,22 @@ def peierlsnabarro(alat, C, axes, burgers, gamma, m=[0,1,0], n=[0,0,1],
         xstep *= alat
     
     # Generate initial disregistry guess
-    x, idisreg = pn_arctan_disregistry(xmax=xmax, xstep=xstep, xnum=xnum,
-                                       burgers=b, halfwidth=halfwidth,
-                                       normalize=normalizedisreg)
+    x, idisreg = am.defect.pn_arctan_disregistry(xmax=xmax, xstep=xstep, xnum=xnum,
+                                                 burgers=b, halfwidth=halfwidth,
+                                                 normalize=normalizedisreg)
     
     # Minimize disregistry
     cycle = 1
-    pnsolution = SDVPN(x, idisreg, gamma, axes, Kij,
-                       tau=tau, alpha=alpha, beta=beta,
-                       cutofflongrange=cutofflongrange,
-                       burgers=b,
-                       fullstress=fullstress,
-                       cdiffelastic=cdiffelastic,
-                       cdiffsurface=cdiffsurface,
-                       cdiffstress=cdiffstress,
-                       min_method=min_method,
-                       min_options=min_options)
+    pnsolution = am.defect.SDVPN(x, idisreg, gamma, axes, Kij,
+                                tau=tau, alpha=alpha, beta=beta,
+                                cutofflongrange=cutofflongrange,
+                                burgers=b,
+                                fullstress=fullstress,
+                                cdiffelastic=cdiffelastic,
+                                cdiffsurface=cdiffsurface,
+                                cdiffstress=cdiffstress,
+                                min_method=min_method,
+                                min_options=min_options)
 
     # Retrieve initial and first minimization solution energies
     minimization_energies = []

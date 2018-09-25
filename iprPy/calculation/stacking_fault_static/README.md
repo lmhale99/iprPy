@@ -1,7 +1,5 @@
 # stacking_fault_static Calculation
 
-- - -
-
 **Lucas M. Hale**, [lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), *Materials Science and Engineering Division, NIST*.
 
 **Chandler A. Becker**, [chandler.becker@nist.gov](mailto:chandler.becker@nist.gov?Subject=ipr-demo), *Office of Data and Informatics, NIST*.
@@ -10,9 +8,7 @@
 
 Version: 2018-07-09
 
-[Disclaimers](http://www.nist.gov/public_affairs/disclaimer.cfm) 
- 
-- - -
+[Disclaimers](http://www.nist.gov/public_affairs/disclaimer.cfm)
 
 ## Introduction
 

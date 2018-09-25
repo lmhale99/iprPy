@@ -1,0 +1,145 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Introduction &#8212; iprPy 0.8.2 documentation</title>
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.8.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="local" href="../local/index.html" />
+    <link rel="prev" title="curator" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../local/index.html" title="local"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="curator"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../database_styles.html" >Database Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">curator</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>The curator Database style interacts with an instance of the Materials
+Database Curation System (MDCS). Records are stored in the MDCS instance
+as validated XML.</p>
+<div class="section" id="style-requirements">
+<h2>Style requirements<a class="headerlink" href="#style-requirements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Access to a working 1.X MDCS instance.</li>
+<li>The included mdcs.py file, which uses Python to define REST
+interactions with a database.</li>
+</ul>
+</div>
+<div class="section" id="initialization-arguments">
+<h2>Initialization arguments:<a class="headerlink" href="#initialization-arguments" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>host</strong>: the URL for accessing the MDCS instance.</li>
+<li><strong>user</strong>: the username to use to access the MDCS instance.</li>
+<li><strong>pswd</strong>: the corresponding password for user, or path to a file
+containing the password.</li>
+<li><strong>cert</strong>: the directory path to a web certification file, if required
+by the MDCS instance.</li>
+</ul>
+</div>
+<div class="section" id="additional-notes">
+<h2>Additional notes:<a class="headerlink" href="#additional-notes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>With this method, a remote MDCS instance can be accessed by multiple
+computing resources.</li>
+<li>Adding records to an MDCS instance requires a valid XSD schema for
+each record style, and that each corresponding XML record be
+consistent with that schema.</li>
+<li>There are no functions for update_tar and delete_tar as the current
+versions of MDCS do not allow the associated files to be deleted.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#style-requirements">Style requirements</a></li>
+<li><a class="reference internal" href="#initialization-arguments">Initialization arguments:</a></li>
+<li><a class="reference internal" href="#additional-notes">Additional notes:</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">curator</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../local/index.html"
+                        title="next chapter">local</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../local/index.html" title="local"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="curator"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../database_styles.html" >Database Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >curator</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

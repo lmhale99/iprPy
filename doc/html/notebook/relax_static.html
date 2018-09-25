@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>relax_static Calculation &#8212; iprPy 0.8.0 documentation</title>
+    <title>relax_static Calculation &#8212; iprPy 0.8.2 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.8.0',
+        VERSION:     '0.8.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  false,
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="relax_dynamic.html" title="relax_dynamic Calculation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>  
@@ -298,7 +298,8 @@ are:</p>
 
 <span class="c1"># https://github.com/usnistgov/iprPy</span>
 <span class="kn">import</span> <span class="nn">iprPy</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;iprPy version&#39;</span><span class="p">,</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Notebook last executed on&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">(),</span> <span class="s1">&#39;using iprPy version&#39;</span><span class="p">,</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -307,7 +308,7 @@ are:</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-iprPy version 0.8.0
+Notebook last executed on 2018-09-24 using iprPy version 0.8.2
 </pre></div></div>
 </div>
 </div>
@@ -923,10 +924,10 @@ the lattice constants have converged from one cycle to the next.</li>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Ecoh = -4.44999999833 eV
-a = 3.5199994882 angstrom
-b = 3.51999946113 angstrom
-c = 3.51999951464 angstrom
+Ecoh = -4.449999998322499 eV
+a = 3.5199994969473423 angstrom
+b = 3.519999475023409 angstrom
+c = 3.5199994960334053 angstrom
 alpha = 90.0
 beta =  90.0
 gamma = 90.0
@@ -955,12 +956,12 @@ gamma = 90.0
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Pxx = -7.79220173544e-06 GPa
-Pyy = -7.02300624868e-06 GPa
-Pzz = -8.54342878877e-06 GPa
-Pyz = 1.12534169256e-10 GPa
-Pxz = -8.20376499663e-11 GPa
-Pxy = 3.83598776863e-11 GPa
+Pxx = -8.2096788654989e-06 GPa
+Pyy = -7.5869225062977e-06 GPa
+Pzz = -8.1837651767449e-06 GPa
+Pyz = -3.3106950576886e-10 GPa
+Pxz = -2.1283078685988998e-10 GPa
+Pxy = 2.1401860325888e-10 GPa
 </pre></div></div>
 </div>
 </div>
@@ -992,15 +993,15 @@ natypes = 1
 symbols = (&#39;Ni&#39;,)
 pbc = [ True  True  True]
      id |   atype |  pos[0] |  pos[1] |  pos[2]
-      0 |       1 |  -0.030 |  10.530 |  10.530
-      1 |       1 |  10.530 |   1.730 |   1.730
+      0 |       1 |  10.530 |  -0.030 |  10.530
+      1 |       1 |  -0.030 |   1.730 |   1.730
       2 |       1 |   1.730 |  10.530 |   1.730
-      3 |       1 |   1.730 |   1.730 |  -0.030
-      4 |       1 |   3.490 |  10.530 |  -0.030
+      3 |       1 |   1.730 |   1.730 |  10.530
+      4 |       1 |   3.490 |  10.530 |  10.530
       5 |       1 |   3.490 |   1.730 |   1.730
       6 |       1 |   5.250 |  -0.030 |   1.730
-      7 |       1 |   5.250 |   1.730 |  -0.030
-      8 |       1 |   7.010 |  10.530 |  10.530
+      7 |       1 |   5.250 |   1.730 |  10.530
+      8 |       1 |   7.010 |  -0.030 |  -0.030
       9 |       1 |   7.010 |   1.730 |   1.730
      10 |       1 |   8.770 |  -0.030 |   1.730
      11 |       1 |   8.770 |   1.730 |  10.530
@@ -1015,20 +1016,20 @@ pbc = [ True  True  True]
      20 |       1 |   7.010 |   3.490 |  10.530
      21 |       1 |   7.010 |   5.250 |   1.730
      22 |       1 |   8.770 |   3.490 |   1.730
-     23 |       1 |   8.770 |   5.250 |  -0.030
-     24 |       1 |  -0.030 |   7.010 |  10.530
-     25 |       1 |  -0.030 |   8.770 |   1.730
+     23 |       1 |   8.770 |   5.250 |  10.530
+     24 |       1 |  10.530 |   7.010 |  10.530
+     25 |       1 |  10.530 |   8.770 |   1.730
      26 |       1 |   1.730 |   7.010 |   1.730
-     27 |       1 |   1.730 |   8.770 |  10.530
+     27 |       1 |   1.730 |   8.770 |  -0.030
      28 |       1 |   3.490 |   7.010 |  -0.030
      29 |       1 |   3.490 |   8.770 |   1.730
      30 |       1 |   5.250 |   7.010 |   1.730
-     31 |       1 |   5.250 |   8.770 |  -0.030
-     32 |       1 |   7.010 |   7.010 |  10.530
+     31 |       1 |   5.250 |   8.770 |  10.530
+     32 |       1 |   7.010 |   7.010 |  -0.030
      33 |       1 |   7.010 |   8.770 |   1.730
      34 |       1 |   8.770 |   7.010 |   1.730
      35 |       1 |   8.770 |   8.770 |  10.530
-     36 |       1 |  10.530 |  10.530 |   3.490
+     36 |       1 |  -0.030 |  10.530 |   3.490
      37 |       1 |  -0.030 |   1.730 |   5.250
      38 |       1 |   1.730 |  10.530 |   5.250
      39 |       1 |   1.730 |   1.730 |   3.490
@@ -1036,11 +1037,11 @@ pbc = [ True  True  True]
      41 |       1 |   3.490 |   1.730 |   5.250
      42 |       1 |   5.250 |  -0.030 |   5.250
      43 |       1 |   5.250 |   1.730 |   3.490
-     44 |       1 |   7.010 |  10.530 |   3.490
+     44 |       1 |   7.010 |  -0.030 |   3.490
      45 |       1 |   7.010 |   1.730 |   5.250
      46 |       1 |   8.770 |  10.530 |   5.250
      47 |       1 |   8.770 |   1.730 |   3.490
-     48 |       1 |  10.530 |   3.490 |   3.490
+     48 |       1 |  -0.030 |   3.490 |   3.490
      49 |       1 |  -0.030 |   5.250 |   5.250
      50 |       1 |   1.730 |   3.490 |   5.250
      51 |       1 |   1.730 |   5.250 |   3.490
@@ -1064,17 +1065,17 @@ pbc = [ True  True  True]
      69 |       1 |   7.010 |   8.770 |   5.250
      70 |       1 |   8.770 |   7.010 |   5.250
      71 |       1 |   8.770 |   8.770 |   3.490
-     72 |       1 |  -0.030 |  -0.030 |   7.010
-     73 |       1 |  10.530 |   1.730 |   8.770
-     74 |       1 |   1.730 |  -0.030 |   8.770
+     72 |       1 |  10.530 |  10.530 |   7.010
+     73 |       1 |  -0.030 |   1.730 |   8.770
+     74 |       1 |   1.730 |  10.530 |   8.770
      75 |       1 |   1.730 |   1.730 |   7.010
      76 |       1 |   3.490 |  10.530 |   7.010
      77 |       1 |   3.490 |   1.730 |   8.770
-     78 |       1 |   5.250 |  10.530 |   8.770
+     78 |       1 |   5.250 |  -0.030 |   8.770
      79 |       1 |   5.250 |   1.730 |   7.010
-     80 |       1 |   7.010 |  -0.030 |   7.010
+     80 |       1 |   7.010 |  10.530 |   7.010
      81 |       1 |   7.010 |   1.730 |   8.770
-     82 |       1 |   8.770 |  -0.030 |   8.770
+     82 |       1 |   8.770 |  10.530 |   8.770
      83 |       1 |   8.770 |   1.730 |   7.010
      84 |       1 |  10.530 |   3.490 |   7.010
      85 |       1 |  -0.030 |   5.250 |   8.770
@@ -1089,7 +1090,7 @@ pbc = [ True  True  True]
      94 |       1 |   8.770 |   3.490 |   8.770
      95 |       1 |   8.770 |   5.250 |   7.010
      96 |       1 |  -0.030 |   7.010 |   7.010
-     97 |       1 |  10.530 |   8.770 |   8.770
+     97 |       1 |  -0.030 |   8.770 |   8.770
      98 |       1 |   1.730 |   7.010 |   8.770
      99 |       1 |   1.730 |   8.770 |   7.010
     100 |       1 |   3.490 |   7.010 |   7.010
@@ -1176,7 +1177,7 @@ pbc = [ True  True  True]
         <li class="right" >
           <a href="relax_dynamic.html" title="relax_dynamic Calculation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>

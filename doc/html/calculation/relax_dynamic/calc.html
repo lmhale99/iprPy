@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>calc_relax_dynamic.py &#8212; iprPy 0.8.0 documentation</title>
+    <title>calc_relax_dynamic.py &#8212; iprPy 0.8.2 documentation</title>
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.8.0',
+        VERSION:     '0.8.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  false,
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="parameters.html" title="Input script parameters"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">relax_dynamic</a> &#187;</li> 
       </ul>
@@ -67,27 +67,27 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>integrator</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em>, </em><em>optional</em>) – The integration method to use. Options are ‘npt’, ‘nvt’, ‘nph’,
+<li><strong>integrator</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em>, </em><em>optional</em>) – The integration method to use. Options are ‘npt’, ‘nvt’, ‘nph’,
 ‘nve’, ‘nve+l’, ‘nph+l’. The +l options use Langevin thermostat.
 (Default is None, which will use ‘nph+l’ for temperature == 0, and
 ‘npt’ otherwise.)</li>
-<li><strong>p_xx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the x tensile pressure component to (default is
+<li><strong>p_xx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the x tensile pressure component to (default is
 0.0).</li>
-<li><strong>p_yy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the y tensile pressure component to (default is
+<li><strong>p_yy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the y tensile pressure component to (default is
 0.0).</li>
-<li><strong>p_zz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the z tensile pressure component to (default is
+<li><strong>p_zz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the z tensile pressure component to (default is
 0.0).</li>
-<li><strong>p_xy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the xy shear pressure component to (default is
+<li><strong>p_xy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the xy shear pressure component to (default is
 0.0).</li>
-<li><strong>p_xz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the xz shear pressure component to (default is
+<li><strong>p_xz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the xz shear pressure component to (default is
 0.0).</li>
-<li><strong>p_yz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the yz shear pressure component to (default is
+<li><strong>p_yz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the yz shear pressure component to (default is
 0.0).</li>
-<li><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The temperature to relax at (default is 0.0).</li>
-<li><strong>randomseed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em>, </em><em>optional</em>) – Random number seed used by LAMMPS in creating velocities and with
+<li><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The temperature to relax at (default is 0.0).</li>
+<li><strong>randomseed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em>, </em><em>optional</em>) – Random number seed used by LAMMPS in creating velocities and with
 the Langevin thermostat.  (Default is None which will select a
 random int between 1 and 900000000.)</li>
-<li><strong>units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The LAMMPS units style to use (default is ‘metal’).</li>
+<li><strong>units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The LAMMPS units style to use (default is ‘metal’).</li>
 </ul>
 </td>
 </tr>
@@ -95,7 +95,7 @@ random int between 1 and 900000000.)</li>
 integration commands.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
 </td>
 </tr>
 </tbody>
@@ -118,12 +118,12 @@ generates new, more complex terms as used by the calculation.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing the calculation input parameters with string
+<li><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary containing the calculation input parameters with string
 values.  The allowed keys depends on the calculation style.</li>
-<li><strong>UUID</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Unique identifier to use for the calculation instance.  If not
+<li><strong>UUID</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Unique identifier to use for the calculation instance.  If not
 given and a ‘UUID’ key is not in input_dict, then a random UUID4
 hash tag will be assigned.</li>
-<li><strong>build</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if all complex terms are to be built.  A value of False
+<li><strong>build</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if all complex terms are to be built.  A value of False
 allows for default values to be assigned even if some inputs
 required by the calculation are incomplete.  (Default is True.)</li>
 </ul>
@@ -143,32 +143,32 @@ to the specified pressure state.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lammps_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Command for running LAMMPS.</li>
+<li><strong>lammps_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Command for running LAMMPS.</li>
 <li><strong>system</strong> (<em>atomman.System</em>) – The system to perform the calculation on.</li>
 <li><strong>potential</strong> (<em>atomman.lammps.Potential</em>) – The LAMMPS implemented potential to use.</li>
 <li><strong>symbols</strong> (<em>list of str</em>) – The list of element-model symbols for the Potential that correspond to
 system’s atypes.</li>
-<li><strong>mpi_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+<li><strong>mpi_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
 will run serially.</li>
-<li><strong>p_xx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the x tensile pressure component to (default is
+<li><strong>p_xx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the x tensile pressure component to (default is
 0.0).</li>
-<li><strong>p_yy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the y tensile pressure component to (default is
+<li><strong>p_yy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the y tensile pressure component to (default is
 0.0).</li>
-<li><strong>p_zz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the z tensile pressure component to (default is
+<li><strong>p_zz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the z tensile pressure component to (default is
 0.0).</li>
-<li><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – The temperature to relax at (default is 0.0).</li>
-<li><strong>runsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – The number of integration steps to perform (default is 220000).</li>
-<li><strong>integrator</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em>, </em><em>optional</em>) – The integration method to use. Options are ‘npt’, ‘nvt’, ‘nph’,
+<li><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The temperature to relax at (default is 0.0).</li>
+<li><strong>runsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – The number of integration steps to perform (default is 220000).</li>
+<li><strong>integrator</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em>, </em><em>optional</em>) – The integration method to use. Options are ‘npt’, ‘nvt’, ‘nph’,
 ‘nve’, ‘nve+l’, ‘nph+l’. The +l options use Langevin thermostat.
 (Default is None, which will use ‘nph+l’ for temperature == 0, and
 ‘npt’ otherwise.)</li>
-<li><strong>thermosteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – Thermo values will be reported every this many steps (default is
+<li><strong>thermosteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Thermo values will be reported every this many steps (default is
 100).</li>
-<li><strong>dumpsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em>, </em><em>optional</em>) – Dump files will be saved every this many steps (default is None,
+<li><strong>dumpsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em>, </em><em>optional</em>) – Dump files will be saved every this many steps (default is None,
 which sets dumpsteps equal to runsteps).</li>
-<li><strong>equilsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – The number of timesteps at the beginning of the simulation to
+<li><strong>equilsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – The number of timesteps at the beginning of the simulation to
 exclude when computing average values (default is 20000).</li>
-<li><strong>randomseed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em>, </em><em>optional</em>) – Random number seed used by LAMMPS in creating velocities and with
+<li><strong>randomseed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em>, </em><em>optional</em>) – Random number seed used by LAMMPS in creating velocities and with
 the Langevin thermostat.  (Default is None which will select a
 random int between 1 and 900000000.)</li>
 </ul>
@@ -211,7 +211,7 @@ temperature values.</li>
 </p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
 </td>
 </tr>
 </tbody>
@@ -260,7 +260,7 @@ temperature values.</li>
         <li class="right" >
           <a href="parameters.html" title="Input script parameters"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >relax_dynamic</a> &#187;</li> 
       </ul>

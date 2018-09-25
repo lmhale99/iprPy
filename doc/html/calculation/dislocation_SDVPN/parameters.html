@@ -1,0 +1,301 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Input script parameters &#8212; iprPy 0.8.2 documentation</title>
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.8.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="calc_dislocation_SDVPN.py" href="calc.html" />
+    <link rel="prev" title="Method and Theory" href="theory.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="calc.html" title="calc_dislocation_SDVPN.py"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="theory.html" title="Method and Theory"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">dislocation_SDVPN</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="input-script-parameters">
+<h1>Input script parameters<a class="headerlink" href="#input-script-parameters" title="Permalink to this headline">¶</a></h1>
+<p>This is a list of the input parameter names recognized by the
+calculation script.</p>
+<div class="section" id="initial-system-configuration-to-load">
+<h2>Initial system configuration to load<a class="headerlink" href="#initial-system-configuration-to-load" title="Permalink to this headline">¶</a></h2>
+<p>Provides the information associated with loading an atomic
+configuration.</p>
+<ul class="simple">
+<li><strong>load_file</strong>: the path to the initial configuration file being read
+in.</li>
+<li><strong>load_style</strong>: the style/format for the load_file. The style can
+be any file type supported by atomman.load()</li>
+<li><strong>load_options</strong>: a list of key-value pairs for the optional
+style-dependent arguments used by atomman.load().</li>
+<li><strong>family</strong>: specifies the configuration family to associate with the
+loaded file. This is typically a crystal structure/prototype
+identifier that helps with linking calculations on the same material
+together. If not given and the load_style is system_model, then the
+family will be taken from the file if included. Otherwise, the family
+will be taken as load_file stripped of path and extension.</li>
+<li><strong>symbols</strong>: a space-delimited list of the potential’s atom-model
+symbols to associate with the loaded system’s atom types. Required if
+load_file does not contain this information.</li>
+<li><strong>box_parameters</strong>: allows for the specification of new box
+parameters to scale the loaded configuration by. This is useful for
+running calculations based on prototype configurations that do not
+contain material-specific dimensions. Can be given either as a list
+of three or six numbers, with an optional unit of length at the end.
+If the unit of length is not given, the specified length_unit
+(below) will be used.</li>
+<li>a b c (unit): for orthogonal boxes.</li>
+<li>a b c alpha beta gamma (unit): for triclinic boxes. The angles are
+taken in degrees.</li>
+</ul>
+</div>
+<div class="section" id="system-manipulations">
+<h2>System manipulations<a class="headerlink" href="#system-manipulations" title="Permalink to this headline">¶</a></h2>
+<p>Performs simple manipulations on the loaded initial system.</p>
+<ul class="simple">
+<li><strong>a_uvw, b_uvw, c_uvw</strong>: are crystallographic Miller vectors to
+rotate the system by such that the rotated system’s a, b, c box
+vectors correspond to the specified Miller vectors of the loaded
+configuration. Using crystallographic vectors for rotating ensures
+that if the initial configuration is periodic in all three
+directions, the resulting rotated configuration can be as well with
+no boundary incompatibilities. Default values are ‘1 0 0’, ‘0 1 0’,
+and ‘0 0 1’, respectively (i.e. no rotation).</li>
+</ul>
+</div>
+<div class="section" id="defect-parameters">
+<h2>Defect Parameters<a class="headerlink" href="#defect-parameters" title="Permalink to this headline">¶</a></h2>
+<p>Defines the defect system to construct and analyze.</p>
+<ul class="simple">
+<li><strong>dislocation_file</strong>: the path to a dislocation_monopole record
+file that contains a set of input parameters associated with a
+specific dislocation. In particular, the dislocation_monopole record
+contains values for the <em>a_uvw, b_uvw, c_uvw, atomshift,
+dislocation_stroh_m, dislocation_stroh_n,
+dislocation_lineboxvector,</em> and <em>dislocation_burgersvector</em>
+parameters. As such, those parameters cannot be specified separately
+if <em>pointdefect_model</em> is given.</li>
+<li><strong>dislocation_stroh_m</strong>: three floating point numbers corresponding
+to the <span class="math">\(m\)</span> unit vector defining one of the two axes used by the
+Stroh method. <span class="math">\(m\)</span> must be perpendicular to the
+<em>dislocation_lineboxvector</em> and within the slip plane. Default value
+is ‘0 1 0’.</li>
+<li><strong>dislocation_stroh_n</strong>: three floating point numbers corresponding
+to the <span class="math">\(m\)</span> unit vector defining one of the two axes used by the
+Stroh method. <span class="math">\(n\)</span> must be perpendicular to the
+<em>dislocation_lineboxvector</em> and normal to the slip plane. Default
+value is ‘0 0 1’.</li>
+<li><strong>dislocation_lineboxvector</strong>: ‘a’, ‘b’, or ‘c’ specifying which of
+the three box vectors the dislocation line is made parallel to.
+Default value is ‘a’.</li>
+<li><strong>dislocation_burgersvector</strong>: three floating point numbers
+specifying the dislocation’s Burgers vector in Crystallographic uvw
+units relative to the loaded system’s box vectors.</li>
+<li><strong>dislocation_boundarywidth</strong>: floating point number specifying the
+minimum thickness of the boundary region. This number is taken
+relative to the loaded system’s <span class="math">\(a\)</span> box vector magnitude.</li>
+<li><strong>dislocation_boundaryshape</strong>: ‘box’ or ‘circle’ specifying the
+resulting shape of the active region after defining the boundary
+atoms. For ‘box’, the boundary width is constant at the two
+non-periodic box edges. For ‘circle’, the active region is a cylinder
+centered around the dislocation line. Default value is ‘circle’.</li>
+<li><strong>gammasurface_file</strong>: the path to a file that contains a data model
+associated with an atomman.defect.GammaSurface object. Within the
+iprPy framework, this can be a calculation_stacking_fault_map_2D
+record.</li>
+</ul>
+</div>
+<div class="section" id="elastic-constants-parameters">
+<h2>Elastic constants parameters<a class="headerlink" href="#elastic-constants-parameters" title="Permalink to this headline">¶</a></h2>
+<p>Specifies the computed elastic constants for the interatomic potential
+and crystal structure, relative to the loaded system’s orientation.</p>
+<ul class="simple">
+<li><strong>elasticconstants_file</strong>: the path to a record containing the
+elastic constants to use. If neither this or the individual Cij
+components (below) are given and <em>load_style</em> is ‘system_model’,
+this will be set to <em>load_file</em>.</li>
+<li><strong>C11, C12, C13, C14, C15, C16, C22, C23, C24, C25, C26, C33, C34,
+C35, C36, C44, C45, C46, C55, C56, C66</strong>: the individual elastic
+constants components in units of pressure. If the loaded system’s
+orientation is the standard setting for the crystal type, then
+missing values will automatically be filled in. Example: if the
+loaded system is a cubic prototype, then only <em>C11, C12</em> and <em>C44</em>
+need be specified.</li>
+</ul>
+</div>
+<div class="section" id="units-for-input-output-values">
+<h2>Units for input/output values<a class="headerlink" href="#units-for-input-output-values" title="Permalink to this headline">¶</a></h2>
+<p>Specifies the units for various physical quantities to use when saving
+values to the results record file. Also used as the default units for
+parameters in this input parameter file.</p>
+<ul class="simple">
+<li><strong>length_unit</strong>: defines the unit of length for results, and input
+parameters if not directly specified. Default value is ‘angstrom’.</li>
+<li><strong>energy_unit</strong>: defines the unit of energy for results, and input
+parameters if not directly specified. Default value is ‘eV’.</li>
+<li><strong>pressure_unit</strong>: defines the unit of pressure for results, and
+input parameters if not directly specified. Default value is ‘GPa’.</li>
+<li><strong>force_unit</strong>: defines the unit of pressure for results, and input
+parameters if not directly specified. Default value is ‘eV/angstrom’.</li>
+</ul>
+</div>
+<div class="section" id="run-parameters">
+<h2>Run parameters<a class="headerlink" href="#run-parameters" title="Permalink to this headline">¶</a></h2>
+<p>Provides parameters specific to the calculation at hand. See
+atomman.defect.SDVPN documentation for more details on these parameters.</p>
+<ul class="simple">
+<li><strong>xmax</strong>: The maximum value of the x-coordinates to use for the
+points where the disregistry is evaluated. The solution is centered
+around x=0, therefore this also corresponds to the minimum value of x
+used. The set of x-coordinates used is fully defined by giving at
+least two of xmax, xstep and xnum.</li>
+<li><strong>xstep</strong>: The step size (delta x) value between the x-coordinates
+used to evaluate the disregistry. The set of x-coordinates used is
+fully defined by giving at least two of xmax, xstep and xnum.</li>
+<li><strong>xnum</strong>: The total number of x-coordinates at which to evaluate the
+disregistry. The set of x-coordinates used is fully defined by giving
+at least two of xmax, xstep and xnum.</li>
+<li><strong>minimize_style</strong>: The scipy.optimize.minimize method style to use
+when solving for the disregistry. Default value is ‘Powell’, which
+seems to do decently well for this problem.</li>
+<li><strong>minimize_options</strong>: Allows for the specification of the options
+dictionary used by scipy.optimize.minimize. This is given as “key
+value key value…”.</li>
+<li><strong>minimize_cycles</strong>: Specifies the number of times to run the
+minimization in succession. The minimization algorithms used by the
+underlying scipy code often benefit from restarting and rerunning the
+minimized configuration to achive a better fit. Default value is 10.</li>
+<li><strong>cutofflongrange</strong>: The radial cutoff (in distance units) to use for
+the long-range elastic energy. The long-range elastic energy is
+configuration-independent, so this value changes the dislocation’s
+energy but not the computed disregistry profile. Default value is
+1000 Angstroms.</li>
+<li><strong>tau_xy</strong>: Shear stress (in units of pressure) to apply to the
+system. Default value is 0 GPa.</li>
+<li><strong>tau_yy</strong>: Normal stress (in units of pressure) to apply to the
+system. Default value is 0 GPa.</li>
+<li><strong>tau_yz</strong>: Shear stress (in units of pressure) to apply to the
+system. Default value is 0 GPa.</li>
+<li><strong>alpha</strong>: Coefficient(s) (in pressure/length units) of the non-local
+energy correction term to use. Default value is 0.0, meaning this
+correction is not applied.</li>
+<li><strong>beta_xx, beta_yy, beta_zz, beta_xy, beta_xz, beta_yz</strong>:
+Components of the surface energy coefficient tensor (in units
+pressure-length) to use. Default value is 0.0 GPa-Angstrom for all,
+meaning this correction is not applied.</li>
+<li><strong>cdiffelastic, cdiffsurface, cdiffstress</strong>: Booleans indicating how
+the dislocation density (derivative of disregistry) is computed
+within the elastic, surface and stress terms, respectively. If True,
+central difference is used, otherwise only the change between the
+current and previous points is used. Default values are True for
+cdiffsurface, and False for the other two.</li>
+<li><strong>halfwidth</strong>: The arctan disregistry halfwidth (in length units) to
+use for creating the initial disregistry guess.</li>
+<li><strong>normalizedisreg</strong>: Boolean indicating how the disregistry profile
+is handled. If True (default), the disregistry is scaled such that
+the minimum x value has a disregistry of 0 and the maximum x value
+has a disregistry equal to the dislocation’s Burgers vector. Note
+that the disregistry for these endpoints is fixed, so if you use
+False the initial disregistry should be close to the final solution.</li>
+<li><strong>fullstress</strong>: Boolean indicating which of two stress formulas to
+use. True uses the original full formulation, while False uses a
+newer, simpler representation. Default value is True.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Input script parameters</a><ul>
+<li><a class="reference internal" href="#initial-system-configuration-to-load">Initial system configuration to load</a></li>
+<li><a class="reference internal" href="#system-manipulations">System manipulations</a></li>
+<li><a class="reference internal" href="#defect-parameters">Defect Parameters</a></li>
+<li><a class="reference internal" href="#elastic-constants-parameters">Elastic constants parameters</a></li>
+<li><a class="reference internal" href="#units-for-input-output-values">Units for input/output values</a></li>
+<li><a class="reference internal" href="#run-parameters">Run parameters</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="theory.html"
+                        title="previous chapter">Method and Theory</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="calc.html"
+                        title="next chapter">calc_dislocation_SDVPN.py</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="calc.html" title="calc_dislocation_SDVPN.py"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="theory.html" title="Method and Theory"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >dislocation_SDVPN</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

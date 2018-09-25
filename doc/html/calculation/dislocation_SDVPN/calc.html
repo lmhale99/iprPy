@@ -1,0 +1,149 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>calc_dislocation_SDVPN.py &#8212; iprPy 0.8.2 documentation</title>
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.8.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="dislocation_monopole" href="../dislocation_monopole/index.html" />
+    <link rel="prev" title="Input script parameters" href="parameters.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../dislocation_monopole/index.html" title="dislocation_monopole"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="parameters.html" title="Input script parameters"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">dislocation_SDVPN</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="calc-dislocation-sdvpn-py">
+<h1>calc_dislocation_SDVPN.py<a class="headerlink" href="#calc-dislocation-sdvpn-py" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-iprPy.calculation.dislocation_SDVPN.calc_dislocation_SDVPN">
+<span id="calculation-script-functions"></span><h2>Calculation script functions<a class="headerlink" href="#module-iprPy.calculation.dislocation_SDVPN.calc_dislocation_SDVPN" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="iprPy.calculation.dislocation_SDVPN.calc_dislocation_SDVPN.main">
+<code class="descname">main</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.calc_dislocation_SDVPN.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main function called when script is executed directly.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.calculation.dislocation_SDVPN.calc_dislocation_SDVPN.peierlsnabarro">
+<code class="descname">peierlsnabarro</code><span class="sig-paren">(</span><em>alat, C, axes, burgers, gamma, m=[0, 1, 0], n=[0, 0, 1], cutofflongrange=1000.0, tau=array([[0., 0., 0.],        [0., 0., 0.],        [0., 0., 0.]]), alpha=[0.0], beta=array([[0., 0., 0.],        [0., 0., 0.],        [0., 0., 0.]]), cdiffelastic=False, cdiffsurface=True, cdiffstress=False, fullstress=True, halfwidth=1.0, normalizedisreg=True, xnum=None, xmax=None, xstep=None, min_method='Powell', min_options={}, min_cycles=10</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.calc_dislocation_SDVPN.peierlsnabarro" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solves a Peierls-Nabarro dislocation model.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.calculation.dislocation_SDVPN.calc_dislocation_SDVPN.process_input">
+<code class="descname">process_input</code><span class="sig-paren">(</span><em>input_dict</em>, <em>UUID=None</em>, <em>build=True</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.calc_dislocation_SDVPN.process_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes str input parameters, assigns default values if needed, and
+generates new, more complex terms as used by the calculation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary containing the calculation input parameters with string
+values.  The allowed keys depends on the calculation style.</li>
+<li><strong>UUID</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Unique identifier to use for the calculation instance.  If not
+given and a ‘UUID’ key is not in input_dict, then a random UUID4
+hash tag will be assigned.</li>
+<li><strong>build</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if all complex terms are to be built.  A value of False
+allows for default values to be assigned even if some inputs
+required by the calculation are incomplete.  (Default is True.)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">calc_dislocation_SDVPN.py</a><ul>
+<li><a class="reference internal" href="#module-iprPy.calculation.dislocation_SDVPN.calc_dislocation_SDVPN">Calculation script functions</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="parameters.html"
+                        title="previous chapter">Input script parameters</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../dislocation_monopole/index.html"
+                        title="next chapter">dislocation_monopole</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../dislocation_monopole/index.html" title="dislocation_monopole"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="parameters.html" title="Input script parameters"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >dislocation_SDVPN</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

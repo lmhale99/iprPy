@@ -1,4 +1,4 @@
-# Method and Theory
+## Method and Theory
 
 First, a defect system is constructed by adding a single point defect (or defect cluster) to an initially bulk system using the atomman.defect.point() function.
 
@@ -12,10 +12,10 @@ Between the two runs, the atomic velocities are scaled such that the average tem
 
 The mean square displacement of the defect, $\left< \Delta r_{ptd}^2 \right>$ is then estimated using the mean square displacement of the atoms $\left< \Delta r_{i}^2 \right>$.  Under the assumption that all diffusion is associated with the single point defect, the defect's mean square displacement can be taken as the summed square displacement of the atoms
 
-$$ \left< \Delta r_{ptd}^2 \right> \approx \sum_i^N \Delta r_{i}^2 = N \left< \Delta r_{i}^2 \right> $$,
+$$ \left< \Delta r_{ptd}^2 \right> \approx \sum_i^N \Delta r_{i}^2 = N \left< \Delta r_{i}^2 \right>, $$
 
 where $N$ is the number of atoms in the system.  The diffusion constant is then estimated by linearly fitting the change in mean square displacement with time
 
-$$ \left< \Delta r_{ptd}^2 \right> = 2 d D_{ptd} \Delta t $$,
+$$ \left< \Delta r_{ptd}^2 \right> = 2 d D_{ptd} \Delta t, $$
 
 where d is the number of dimensions included.

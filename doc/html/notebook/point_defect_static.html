@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>point_defect_static Calculation Demonstration &#8212; iprPy 0.8.0 documentation</title>
+    <title>point_defect_static Calculation &#8212; iprPy 0.8.2 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.8.0',
+        VERSION:     '0.8.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  false,
@@ -25,7 +25,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="relax_box Calculation" href="relax_box.html" />
-    <link rel="prev" title="elastic_constants_static Calculation" href="elastic_constants_static.html" /> 
+    <link rel="prev" title="point_defect_diffusion Calculation" href="point_defect_diffusion.html" /> 
   </head>
   <body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -41,9 +41,9 @@
           <a href="relax_box.html" title="relax_box Calculation"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="elastic_constants_static.html" title="elastic_constants_static Calculation"
+          <a href="point_defect_diffusion.html" title="point_defect_diffusion Calculation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>  
@@ -219,8 +219,8 @@ div.nboutput div.output_area.stderr {
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
 </style>
-<div class="section" id="point_defect_static-Calculation-Demonstration">
-<h1>point_defect_static Calculation Demonstration<a class="headerlink" href="#point_defect_static-Calculation-Demonstration" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="point_defect_static-Calculation">
+<h1>point_defect_static Calculation<a class="headerlink" href="#point_defect_static-Calculation" title="Permalink to this headline">¶</a></h1>
 <p><strong>Lucas M. Hale</strong>,
 <a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>,
 <em>Materials Science and Engineering Division, NIST</em>.</p>
@@ -343,7 +343,7 @@ are:</p>
 <li><a class="reference external" href="https://github.com/usnistgov/atomman">atomman</a></li>
 <li><a class="reference external" href="https://github.com/usnistgov/iprPy">iprPy</a></li>
 </ul>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
 <span></span>In [1]:
 </pre></div>
@@ -372,8 +372,18 @@ are:</p>
 
 <span class="c1"># https://github.com/usnistgov/iprPy</span>
 <span class="kn">import</span> <span class="nn">iprPy</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Notebook last executed on&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">(),</span> <span class="s1">&#39;using iprPy version&#39;</span><span class="p">,</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Notebook last executed on 2018-09-24 using iprPy version 0.8.2
+</pre></div></div>
 </div>
 </div>
 <div class="section" id="1.2.-Default-calculation-setup">
@@ -543,7 +553,7 @@ pbc = [ True  True  True]
 <ul class="simple">
 <li><strong>pointdefect_name</strong> gives the name of a point-defect reference
 record in the iprPy library containing point defect input parameters.</li>
-<li><strong>pointdefect_file</strong> gives the path to a point-defect reference
+<li><strong>pointdefect_file</strong> gives the path to a point_defect reference
 containing point defect input parameters. Here, this is built
 automatically using pointdefect_name and librarydir.</li>
 <li><strong>point_kwargs</strong> (required) is a dictionary or list of dictonaries
@@ -612,7 +622,7 @@ point_kwargs =
 </pre></div>
 </div>
 <div class="output_area highlight-none"><div class="highlight"><pre>
-<span></span>[{&#39;ptd_type&#39;: &#39;v&#39;, &#39;pos&#39;: array([ 0.,  0.,  0.]), &#39;scale&#39;: False}]
+<span></span>[{&#39;ptd_type&#39;: &#39;v&#39;, &#39;pos&#39;: array([0., 0., 0.]), &#39;scale&#39;: False}]
 </pre></div>
 </div>
 </div>
@@ -689,7 +699,7 @@ move during a minimization iteration. This is in length units.</li>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
 <span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;min.template&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;#LAMMPS input script that performs a simple energy minimization</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;# LAMMPS input script that performs a simple energy minimization</span>
 
 <span class="s2">box tilt large</span>
 
@@ -1126,8 +1136,8 @@ in.</li>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Ecoh =   -4.44999999835 eV
-Eptd_f = 1.59992126365 eV
+Ecoh =   -4.449999998346 eV
+Eptd_f = 1.5999212636525044 eV
 </pre></div></div>
 </div>
 </div>
@@ -1155,7 +1165,7 @@ Eptd_f = 1.59992126365 eV
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Has the system (likely) reconfigured? False
-centrosummation = [ -1.89596248e-12  -1.88649096e-12  -1.89537275e-12] angstrom
+centrosummation = [-1.89596248e-12 -1.88649096e-12 -1.89537275e-12] angstrom
 </pre></div></div>
 </div>
 </div>
@@ -1171,7 +1181,7 @@ centrosummation = [ -1.89596248e-12  -1.88649096e-12  -1.89537275e-12] angstrom
         <div class="sphinxsidebarwrapper">
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">point_defect_static Calculation Demonstration</a><ul>
+<li><a class="reference internal" href="#">point_defect_static Calculation</a><ul>
 <li><a class="reference internal" href="#Introduction">Introduction</a></li>
 <li><a class="reference internal" href="#Method-and-Theory">Method and Theory</a></li>
 <li><a class="reference internal" href="#Demonstration">Demonstration</a><ul>
@@ -1213,8 +1223,8 @@ centrosummation = [ -1.89596248e-12  -1.88649096e-12  -1.89537275e-12] angstrom
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="elastic_constants_static.html"
-                        title="previous chapter">elastic_constants_static Calculation</a></p>
+  <p class="topless"><a href="point_defect_diffusion.html"
+                        title="previous chapter">point_defect_diffusion Calculation</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="relax_box.html"
                         title="next chapter">relax_box Calculation</a></p>
@@ -1235,9 +1245,9 @@ centrosummation = [ -1.89596248e-12  -1.88649096e-12  -1.89537275e-12] angstrom
           <a href="relax_box.html" title="relax_box Calculation"
              >next</a> |</li>
         <li class="right" >
-          <a href="elastic_constants_static.html" title="elastic_constants_static Calculation"
+          <a href="point_defect_diffusion.html" title="point_defect_diffusion Calculation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>

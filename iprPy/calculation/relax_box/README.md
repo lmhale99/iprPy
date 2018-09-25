@@ -8,8 +8,8 @@
 
 Version: 2018-06-24
 
-[Disclaimers](http://www.nist.gov/public_affairs/disclaimer.cfm) 
- 
+[Disclaimers](http://www.nist.gov/public_affairs/disclaimer.cfm)
+
 ## Introduction
 
 The relax_box calculation refines the lattice parameters of an orthogonal system (crystal structure) by relaxing the box dimensions towards a given pressure.  In refining the lattice parameter values, the box dimensions are allowed to relax, but the relative positions of the atoms within the box are held fixed.

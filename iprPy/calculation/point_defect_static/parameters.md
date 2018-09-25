@@ -1,8 +1,8 @@
-# Input script parameters
+## Input script parameters
 
 This is a list of the input parameter names recognized by the calculation script.
 
-## Command lines for LAMMPS and MPI
+### Command lines for LAMMPS and MPI
 
 Provides the external commands for running LAMMPS and MPI.
 
@@ -10,7 +10,7 @@ Provides the external commands for running LAMMPS and MPI.
 
 - __mpi_command__: the path to the MPI executable and any command line options to use for calling LAMMPS to run in parallel on your system. Default value is None (run LAMMPS as a serial process).
 
-## Potential definition and directory containing associated files
+### Potential definition and directory containing associated files
 
 Provides the information associated with an interatomic potential implemented for LAMMPS.
 
@@ -38,7 +38,7 @@ Provides the information associated with loading an atomic configuration.
 
   - a b c alpha beta gamma (unit): for triclinic boxes.  The angles are taken in degrees.
 
-## System manipulations
+### System manipulations
 
 Performs simple manipulations on the loaded initial system.
 
@@ -52,7 +52,7 @@ Performs simple manipulations on the loaded initial system.
 
   - na pa nb pb nc pc: negative, positive multiplier pairs for each box axis.  The n terms must be less than or equal to zero, and the p terms greater than or equal to zero.  This allows for expanding the system in both directions relative to the original box's origin.
 
-## Defect Parameters
+### Defect Parameters
 
 Defines the defect system to construct and analyze.
 
@@ -76,7 +76,7 @@ Defines the defect system to construct and analyze.
 
 - __pointdefect_scale__: Boolean indicating if pointdefect_pos and pointdefect_dumbbell_vect are taken as absolute Cartesian vectors, or taken as scaled values relative to the loaded system. Default value is False.
 
-## Units for input/output values
+### Units for input/output values
 
 Specifies the units for various physical quantities to use when saving values to the results record file. Also used as the default units for parameters in this input parameter file.
 
@@ -88,7 +88,7 @@ Specifies the units for various physical quantities to use when saving values to
 
 - __force_unit__: defines the unit of pressure for results, and input parameters if not directly specified.  Default value is 'eV/angstrom'.
 
-## Run parameters
+### Run parameters
 
 Provides parameters specific to the calculation at hand.
 

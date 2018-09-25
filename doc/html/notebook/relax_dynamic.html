@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>relax_dynamic Calculation &#8212; iprPy 0.8.0 documentation</title>
+    <title>relax_dynamic Calculation &#8212; iprPy 0.8.2 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.8.0',
+        VERSION:     '0.8.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  false,
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="relax_box.html" title="relax_box Calculation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>  
@@ -326,7 +326,7 @@ are:</p>
 <li><a class="reference external" href="https://github.com/usnistgov/atomman">atomman</a></li>
 <li><a class="reference external" href="https://github.com/usnistgov/iprPy">iprPy</a></li>
 </ul>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
 <span></span>In [1]:
 </pre></div>
@@ -354,8 +354,18 @@ are:</p>
 
 <span class="c1"># https://github.com/usnistgov/iprPy</span>
 <span class="kn">import</span> <span class="nn">iprPy</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Notebook last executed on&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">(),</span> <span class="s1">&#39;using iprPy version&#39;</span><span class="p">,</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Notebook last executed on 2018-09-24 using iprPy version 0.8.2
+</pre></div></div>
 </div>
 </div>
 <div class="section" id="1.2.-Default-calculation-setup">
@@ -403,7 +413,7 @@ of None will run simulations serially.</li>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
 <span></span><span class="n">lammps_command</span> <span class="o">=</span> <span class="s1">&#39;lmp_mpi&#39;</span>
-<span class="n">mpi_command</span> <span class="o">=</span> <span class="s1">&#39;mpiexec -localonly 4&#39;</span>
+<span class="n">mpi_command</span> <span class="o">=</span> <span class="s1">&#39;C:/Program Files/MPICH2/bin/mpiexec -localonly 4&#39;</span>
 </pre></div>
 </div>
 </div>
@@ -1155,20 +1165,20 @@ Default value generates a new random integer every time.</li>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Measured thermo data with standard deviation:
-Ecoh = -4.413054 +-  0.000484 eV
-lx   = 35.329773 +-  0.012293 angstrom
-ly   = 35.330027 +-  0.011861 angstrom
-lz   = 35.330508 +-  0.013683 angstrom
-xy   = -0.000103 +-  0.015894 angstrom
-xz   = -0.000495 +-  0.017366 angstrom
-yz   =  0.000473 +-  0.015869 angstrom
-T    = 299.802863 +-  3.827775 K
-Pxx  =  0.000979 +-  0.060931 GPa
-Pyy  =  0.001553 +-  0.059885 GPa
-Pzz  = -0.000670 +-  0.065008 GPa
-Pxy  =  0.000680 +-  0.066357 GPa
-Pxz  = -0.000142 +-  0.073847 GPa
-Pyz  =  0.000533 +-  0.066376 GPa
+Ecoh = -4.413052 +-  0.000493 eV
+lx   = 35.330021 +-  0.012522 angstrom
+ly   = 35.329698 +-  0.013002 angstrom
+lz   = 35.330793 +-  0.013588 angstrom
+xy   = -0.000483 +-  0.016204 angstrom
+xz   =  0.000125 +-  0.017168 angstrom
+yz   =  0.000823 +-  0.015564 angstrom
+T    = 300.099177 +-  3.922062 K
+Pxx  = -0.001719 +-  0.060278 GPa
+Pyy  = -0.001165 +-  0.060891 GPa
+Pzz  = -0.000529 +-  0.063582 GPa
+Pxy  = -0.000347 +-  0.068136 GPa
+Pxz  =  0.000035 +-  0.072428 GPa
+Pyz  =  0.000474 +-  0.065403 GPa
 </pre></div></div>
 </div>
 </div>
@@ -1214,7 +1224,7 @@ assumption.</li>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Cubic lattice constant with standard error:
-a =  3.533010 +-  0.000016 angstrom
+a =  3.533017 +-  0.000017 angstrom
 </pre></div></div>
 </div>
 </div>
@@ -1237,10 +1247,10 @@ a =  3.533010 +-  0.000016 angstrom
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-avect =  [35.328,  0.000,  0.000]
-bvect =  [-0.002, 35.323,  0.000]
-cvect =  [-0.019, -0.030, 35.329]
-origin = [-0.164, -0.161, -0.165]
+avect =  [35.343,  0.000,  0.000]
+bvect =  [-0.005, 35.342,  0.000]
+cvect =  [-0.030, -0.027, 35.314]
+origin = [-0.172, -0.171, -0.157]
 </pre></div></div>
 </div>
 </div>
@@ -1319,7 +1329,7 @@ origin = [-0.164, -0.161, -0.165]
         <li class="right" >
           <a href="relax_box.html" title="relax_box Calculation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>

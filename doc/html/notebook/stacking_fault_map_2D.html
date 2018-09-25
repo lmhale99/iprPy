@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>stacking_fault_map_2D Calculation &#8212; iprPy 0.8.0 documentation</title>
+    <title>stacking_fault_map_2D Calculation &#8212; iprPy 0.8.2 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.8.0',
+        VERSION:     '0.8.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  false,
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="surface_energy Calculation" href="surface_energy_static.html" />
+    <link rel="next" title="stacking_fault_static Calculation" href="stacking_fault_static.html" />
     <link rel="prev" title="relax_static Calculation" href="relax_static.html" /> 
   </head>
   <body>
@@ -38,12 +38,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="surface_energy_static.html" title="surface_energy Calculation"
+          <a href="stacking_fault_static.html" title="stacking_fault_static Calculation"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="relax_static.html" title="relax_static Calculation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>  
@@ -319,7 +319,7 @@ are:</p>
 <li><a class="reference external" href="https://github.com/usnistgov/atomman">atomman</a></li>
 <li><a class="reference external" href="https://github.com/usnistgov/iprPy">iprPy</a></li>
 </ul>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
 <span></span>In [1]:
 </pre></div>
@@ -350,8 +350,18 @@ are:</p>
 
 <span class="c1"># https://github.com/usnistgov/iprPy</span>
 <span class="kn">import</span> <span class="nn">iprPy</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Notebook last executed on&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">(),</span> <span class="s1">&#39;using iprPy version&#39;</span><span class="p">,</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Notebook last executed on 2018-09-24 using iprPy version 0.8.2
+</pre></div></div>
 </div>
 <p>Import plotting library for the Notebook</p>
 <ul class="simple">
@@ -402,7 +412,6 @@ are:</p>
 <h3>2. Assign values for the calculation’s run parameters<a class="headerlink" href="#2.-Assign-values-for-the-calculation's-run-parameters" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="2.1-Specify-system-specific-paths">
 <h4>2.1 Specify system-specific paths<a class="headerlink" href="#2.1-Specify-system-specific-paths" title="Permalink to this headline">¶</a></h4>
-<p>Simple input parameters:</p>
 <ul class="simple">
 <li><strong>lammps_command</strong> is the LAMMPS command to use.</li>
 <li><strong>mpi_command</strong> MPI command for running LAMMPS in parallel. A value
@@ -563,8 +572,8 @@ are extracted from the defect model.</li>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
 <span></span><span class="n">stackingfault_name</span> <span class="o">=</span> <span class="s1">&#39;A1--Cu--fcc--111sf&#39;</span>
 
-<span class="n">numshifts1</span> <span class="o">=</span> <span class="mi">11</span>
-<span class="n">numshifts2</span> <span class="o">=</span> <span class="mi">11</span>
+<span class="n">numshifts1</span> <span class="o">=</span> <span class="mi">21</span>
+<span class="n">numshifts2</span> <span class="o">=</span> <span class="mi">21</span>
 
 <span class="c1"># Define surface_file using librarydir and surface_name</span>
 <span class="n">stackingfault_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">librarydir</span><span class="p">,</span> <span class="s1">&#39;stacking_fault&#39;</span><span class="p">,</span> <span class="n">stackingfault_name</span><span class="o">+</span><span class="s1">&#39;.json&#39;</span><span class="p">)</span>
@@ -653,16 +662,26 @@ calculation (required).</li>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 a_uvw = [ 1. -1.  0.]
 b_uvw = [ 1.  1. -2.]
-c_uvw = [ 1.  1.  1.]
-atomshift = [ 0.01  0.01  0.01]
+c_uvw = [1. 1. 1.]
+atomshift = [0.01 0.01 0.01]
 # of atoms in system = 6000
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+c:\users\lmh1\documents\python-packages\atomman\atomman\lammps\normalize.py:60: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
+To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
+  transformation = np.linalg.lstsq(vects, system.box.vects)[0].T
 </pre></div></div>
 </div>
 </div>
@@ -719,8 +738,8 @@ placing the cut inside a/the center cell replica.</li>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 faultpos = 0.55
-cartshiftvector1 = [ 2.48901587  0.          0.        ]
-cartshiftvector2 = [ 0.          4.31110195  0.        ]
+cartshiftvector1 = [2.48901587 0.         0.        ]
+cartshiftvector2 = [0.         4.31110195 0.        ]
 </pre></div></div>
 </div>
 </div>
@@ -990,7 +1009,6 @@ move during a minimization iteration. This is in length units.</li>
 
     <span class="c1"># Run LAMMPS</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">lammps_script</span><span class="p">,</span> <span class="n">mpi_command</span><span class="p">,</span>
-                     <span class="n">return_style</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">,</span>
                      <span class="n">logfile</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sim_directory</span><span class="p">,</span> <span class="s1">&#39;log.lammps&#39;</span><span class="p">))</span>
 
     <span class="c1"># Extract output values</span>
@@ -1301,7 +1319,7 @@ energy in.</li>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-A_fault = 10.7304011631 nm^2
+A_fault = 10.730401163050708 nm^2
 </pre></div></div>
 </div>
 </div>
@@ -1360,24 +1378,6 @@ A_fault = 10.7304011631 nm^2
 <img alt="../_images/notebook_stacking_fault_map_2D_45_0.png" src="../_images/notebook_stacking_fault_map_2D_45_0.png" />
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [22]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span><span class="n">gamma</span><span class="o">.</span><span class="n">delta_line_plot</span><span class="p">(</span><span class="n">vect</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">length_unit</span><span class="o">=</span><span class="n">length_unit</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/notebook_stacking_fault_map_2D_46_0.png" src="../_images/notebook_stacking_fault_map_2D_46_0.png" />
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -1433,8 +1433,8 @@ A_fault = 10.7304011631 nm^2
   <p class="topless"><a href="relax_static.html"
                         title="previous chapter">relax_static Calculation</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="surface_energy_static.html"
-                        title="next chapter">surface_energy Calculation</a></p>
+  <p class="topless"><a href="stacking_fault_static.html"
+                        title="next chapter">stacking_fault_static Calculation</a></p>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1449,12 +1449,12 @@ A_fault = 10.7304011631 nm^2
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="surface_energy_static.html" title="surface_energy Calculation"
+          <a href="stacking_fault_static.html" title="stacking_fault_static Calculation"
              >next</a> |</li>
         <li class="right" >
           <a href="relax_static.html" title="relax_static Calculation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>

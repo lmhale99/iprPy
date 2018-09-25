@@ -8,7 +8,7 @@
 
 Version: 2018-06-24
 
-[Disclaimers](http://www.nist.gov/public_affairs/disclaimer.cfm) 
+[Disclaimers](http://www.nist.gov/public_affairs/disclaimer.cfm)
 
 ## Introduction
 

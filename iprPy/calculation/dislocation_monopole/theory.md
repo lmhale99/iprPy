@@ -1,10 +1,10 @@
-# Method and Theory
+## Method and Theory
 
-## Stroh theory
+### Stroh theory
 
 A detailed description of the Stroh method to solve the Eshelby solution for an anisotropic straight dislocation can be found in the atomman documentation.
 
-## Orientation
+### Orientation
 
 One of the most important considerations in defining an atomistic system containing a dislocation monopole system is the system's orientation.  In particular, care is needed to properly align the system's Cartesian axes, $x, y, z$, the system's box vectors, $a, b, c$, and the Stroh solution's axes, $u, m, n$.
 
@@ -20,7 +20,7 @@ One of the most important considerations in defining an atomistic system contain
   
   - Given that neither $a$ nor $b$ have $z$ components, the normal to the slip plane will be perpendicular to $z$.  From this, it naturally follows that $m$ can be taken as parallel to the $y$-axis, and $n$ parallel to the $z$-axis.
 
-## Calculation methodology
+### Calculation methodology
 
 1. An initial system is generated based on the loaded system and *uvw*, *atomshift*, and *sizemults* input parameters.  This initial system is saved as base.dump.
 

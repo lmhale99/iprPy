@@ -16,6 +16,8 @@ def copymath():
         print(source)
         sys.stdout.flush()
         rst = source.replace('source', 'rst', 1)
+        if not os.path.isdir(os.path.dirname(rst)):
+            os.makedirs(os.path.dirname(rst))
         shutil.copy(source, rst)
         
     # Copy over all theory.rst files
@@ -23,6 +25,8 @@ def copymath():
         print(source)
         sys.stdout.flush()
         rst = source.replace('source', 'rst', 1)
+        if not os.path.isdir(os.path.dirname(rst)):
+            os.makedirs(os.path.dirname(rst))
         shutil.copy(source, rst)
 
 if __name__ == '__main__':

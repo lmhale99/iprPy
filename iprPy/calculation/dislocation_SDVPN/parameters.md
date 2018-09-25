@@ -1,8 +1,8 @@
-# Input script parameters
+## Input script parameters
 
 This is a list of the input parameter names recognized by the calculation script.
 
-## Initial system configuration to load
+### Initial system configuration to load
 
 Provides the information associated with loading an atomic configuration.
 
@@ -22,13 +22,13 @@ Provides the information associated with loading an atomic configuration.
 
   - a b c alpha beta gamma (unit): for triclinic boxes.  The angles are taken in degrees.
 
-## System manipulations
+### System manipulations
 
 Performs simple manipulations on the loaded initial system.
 
 - __a_uvw, b_uvw, c_uvw__: are crystallographic Miller vectors to rotate the system by such that the rotated system's a, b, c box vectors correspond to the specified Miller vectors of the loaded configuration.  Using crystallographic vectors for rotating ensures that if the initial configuration is periodic in all three directions, the resulting rotated configuration can be as well with no boundary incompatibilities.  Default values are '1 0 0', '0 1 0', and '0 0 1', respectively (i.e. no rotation).
 
-## Defect Parameters
+### Defect Parameters
 
 Defines the defect system to construct and analyze.
 
@@ -48,7 +48,7 @@ Defines the defect system to construct and analyze.
 
 - __gammasurface_file__: the path to a file that contains a data model associated with an atomman.defect.GammaSurface object. Within the iprPy framework, this can be a calculation_stacking_fault_map_2D record.
 
-## Elastic constants parameters
+### Elastic constants parameters
 
 Specifies the computed elastic constants for the interatomic potential and crystal structure, relative to the loaded system's orientation.
 
@@ -56,7 +56,7 @@ Specifies the computed elastic constants for the interatomic potential and cryst
 
 - __C11, C12, C13, C14, C15, C16, C22, C23, C24, C25, C26, C33, C34, C35, C36, C44, C45, C46, C55, C56, C66__: the individual elastic constants components in units of pressure.  If the loaded system's orientation is the standard setting for the crystal type, then missing values will automatically be filled in. Example: if the loaded system is a cubic prototype, then only *C11, C12* and *C44* need be specified.
 
-## Units for input/output values
+### Units for input/output values
 
 Specifies the units for various physical quantities to use when saving values to the results record file. Also used as the default units for parameters in this input parameter file.
 
@@ -68,7 +68,7 @@ Specifies the units for various physical quantities to use when saving values to
 
 - __force_unit__: defines the unit of pressure for results, and input parameters if not directly specified.  Default value is 'eV/angstrom'.
 
-## Run parameters
+### Run parameters
 
 Provides parameters specific to the calculation at hand.  See atomman.defect.SDVPN documentation for more details on these parameters.
 
