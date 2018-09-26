@@ -448,6 +448,9 @@ def process_input(input_dict, UUID=None, build=True):
     # Load ucell system
     iprPy.input.interpret('atomman_systemload', input_dict, build=build)
     
+    # Add atomic charges
+    iprPy.input.interpret('lammps_atomcharges', input_dict, build=build)
+    
     # Construct initialsystem by manipulating ucell system
     iprPy.input.interpret('atomman_systemmanipulate', input_dict, build=build)
 

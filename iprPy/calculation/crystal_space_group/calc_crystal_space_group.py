@@ -84,6 +84,7 @@ def crystal_space_group(system, symprec=1e-5, to_primitive=False,
         unit cell system.
     """
     # Identify the standardized unit cell representation
+    sym_data = spglib.get_symmetry_dataset(system.dump('spglib_cell'), symprec=symprec)
     ucell = spglib.standardize_cell(system.dump('spglib_cell'),
                                     to_primitive=to_primitive,
                                     no_idealize=no_idealize, symprec=symprec)
@@ -93,8 +94,18 @@ def crystal_space_group(system, symprec=1e-5, to_primitive=False,
     ucell.atoms.pos -= ucell.atoms.pos[0]
     ucell = ucell.normalize()
     
+    # Average extra per-atom properties by mappings to primitive
+    for index in np.unique(sym_data['mapping_to_primitive']):
+        for key in system.atoms.prop():
+            if key in ['atype', 'pos']:
+                continue
+            value = system.atoms.view[key][sym_data['mapping_to_primitive'] == index].mean()
+            if key not in ucell.atoms.prop():
+                ucell.atoms.view[key] = np.zeros_like(value)
+            ucell.atoms.view[key][sym_data['std_mapping_to_primitive'] == index] = value
+    
     # Get space group metadata
-    sym_data = spglib.get_symmetry_dataset(ucell.dump('spglib_cell'))
+    sym_data = spglib.get_symmetry_dataset(system.dump('spglib_cell'))
     spg_type = spglib.get_spacegroup_type(sym_data['hall_number'])
     
     # Generate Pearson symbol
