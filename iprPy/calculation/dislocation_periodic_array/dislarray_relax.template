@@ -1,0 +1,32 @@
+#LAMMPS input script for relaxing a periodic array of dislocations system
+
+<atomman_system_info>
+
+<atomman_pair_info>
+
+# Simulation input parameters
+variable bwidth equal <bwidth>
+
+# Derived variables
+variable topcut equal zhi-${bwidth}
+variable botcut equal zlo+${bwidth}
+
+# Define boundary groups
+region rtop block INF INF INF INF ${topcut} INF
+region rbot block INF INF INF INF INF ${botcut}
+group top region rtop
+group bot region rbot
+group mid subtract all top bot
+group bounds union top bot
+
+compute peatom all pe/atom
+
+dump first all custom <maxeval> *.dump id type x y z c_peatom
+dump_modify first format <dump_modify_format>
+thermo_style custom step pe
+
+fix boundary bounds setforce 0.0 0.0 0.0
+
+min_modify dmax <dmax>
+
+minimize <etol> <ftol> <maxiter> <maxeval>

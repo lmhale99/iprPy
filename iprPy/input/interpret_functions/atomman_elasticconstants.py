@@ -26,6 +26,8 @@ def atomman_elasticconstants(input_dict, build=True, **kwargs):
       of specified elasticconstants_model.  This is used by prepare functions.
     - **'C11', 'C12', ..., 'C66'** individually specified elastic constant
       terms.
+    - **'C_M', 'C_lambda', 'C_mu', 'C_E', 'C_nu', 'C_K'** individually
+      specified isotropic elastic constant terms.
     - **'C'** atomman.ElasticConstants object.
     - **'load_file'** the system load file, which is searched for elastic
       constants if neither elasticconstants_model nor Cij terms are specified.
@@ -47,7 +49,7 @@ def atomman_elasticconstants(input_dict, build=True, **kwargs):
         Replacement parameter key name for 'elasticconstants_content'.
     Ckey : str
         Replacement parameter key name for for identifying the C11, C12, etc.
-        terms.
+        terms and/or the C_iso terms
     load_file : str
         Replacement parameter key name for 'load_file'.
     load_content : str
@@ -83,7 +85,10 @@ def atomman_elasticconstants(input_dict, build=True, **kwargs):
         keyhead = key[:len(Ckey)]
         keytail = key[len(Ckey):]
         if keyhead == Ckey:
-            Cdict['C'+keytail] = value(input_dict, key, default_unit=pressure_unit)
+            if keytail[0] == '_':
+                Cdict[keytail[1:]] = value(input_dict, key, default_unit=pressure_unit)
+            else:
+                Cdict['C'+keytail] = value(input_dict, key, default_unit=pressure_unit)
     
     # If model is given
     if elasticconstants_model is not None:

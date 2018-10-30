@@ -21,12 +21,12 @@ from ... import __version__ as iprPy_version
 from .. import Record
 from ...tools import aslist
 
-class CalculationDislocationMonopole(Record):
+class CalculationDislocationPeriodicArray(Record):
     
     @property
     def contentroot(self):
         """str: The root element of the content"""
-        return 'calculation-dislocation-monopole'
+        return 'calculation-dislocation-periodic-array'
     
     @property
     def schema(self):
@@ -34,7 +34,7 @@ class CalculationDislocationMonopole(Record):
         str: The absolute directory path to the .xsd file associated with the
              record style.
         """
-        return os.path.join(self.directory, 'record-calculation-dislocation-monopole.xsd')
+        return os.path.join(self.directory, 'record-calculation-dislocation-periodic-array.xsd')
     
     @property
     def compare_terms(self):
@@ -66,7 +66,6 @@ class CalculationDislocationMonopole(Record):
         list of str: The default fterms used by isnew() for comparisons.
         """
         return [
-                'annealtemperature',
                ]
     
     def isvalid(self):
@@ -80,7 +79,7 @@ class CalculationDislocationMonopole(Record):
             True if element combinations are valid, False if not.
         """
         calc = self.content[self.contentroot]
-        return calc['dislocation-monopole']['system-family'] == calc['system-info']['family']
+        return calc['dislocation']['system-family'] == calc['system-info']['family']
     
     def buildcontent(self, script, input_dict, results_dict=None):
         """
@@ -137,9 +136,6 @@ class CalculationDislocationMonopole(Record):
                                                 input_dict['length_unit'])
         
         run_params['dislocation_boundarywidth'] = input_dict['boundarywidth']
-        run_params['dislocation_boundaryshape'] = input_dict['dislocation_boundaryshape']
-        
-        run_params['annealtemperature'] = input_dict['annealtemperature']
         
         # Copy over potential data model info
         calc['potential-LAMMPS'] = DM()
@@ -159,7 +155,7 @@ class CalculationDislocationMonopole(Record):
         calc['system-info']['symbol'] = input_dict['symbols']
         
         #Save defect parameters
-        calc['dislocation-monopole'] = disl = DM()
+        calc['dislocation'] = disl = DM()
         if input_dict['dislocation_model'] is not None:
             disl['key'] = input_dict['dislocation_model']['key']
             disl['id'] = input_dict['dislocation_model']['id']
@@ -182,8 +178,8 @@ class CalculationDislocationMonopole(Record):
         if results_dict is None:
             calc['status'] = 'not calculated'
         else:
-            c_model = input_dict['C'].model(unit=input_dict['pressure_unit'])
-            calc['elastic-constants'] = c_model['elastic-constants']
+            #c_model = input_dict['C'].model(unit=input_dict['pressure_unit'])
+            #calc['elastic-constants'] = c_model['elastic-constants']
             
             calc['base-system'] = DM()
             calc['base-system']['artifact'] = DM()
@@ -196,15 +192,6 @@ class CalculationDislocationMonopole(Record):
             calc['defect-system']['artifact']['file'] = results_dict['dumpfile_disl']
             calc['defect-system']['artifact']['format'] = 'atom_dump'
             calc['defect-system']['symbols'] = results_dict['symbols_disl']
-            calc['defect-system']['potential-energy'] = uc.model(results_dict['E_total_disl'], 
-                                                                 input_dict['energy_unit'])
-            
-            calc['Stroh-pre-ln-factor'] = uc.model(results_dict['Stroh_preln'],
-                                                   input_dict['energy_unit'] + '/'
-                                                   + input_dict['length_unit'])
-            
-            calc['Stroh-K-tensor'] = uc.model(results_dict['Stroh_K_tensor'],
-                                              input_dict['pressure_unit'])
             
             self.content = output
     
@@ -243,8 +230,6 @@ class CalculationDislocationMonopole(Record):
         params['maxiterations'] = calc['calculation']['run-parameter']['maxiterations']
         params['maxevaluations'] = calc['calculation']['run-parameter']['maxevaluations']
         params['maxatommotion'] = calc['calculation']['run-parameter']['maxatommotion']
-        
-        params['annealtemperature'] = calc['calculation']['run-parameter']['annealtemperature']
 
         sizemults = calc['calculation']['run-parameter']['size-multipliers']
         
@@ -259,8 +244,8 @@ class CalculationDislocationMonopole(Record):
         params['family'] = calc['system-info']['family']
         symbols = aslist(calc['system-info']['symbol'])
         
-        params['dislocation_key'] = calc['dislocation-monopole']['key']
-        params['dislocation_id'] = calc['dislocation-monopole']['id']
+        params['dislocation_key'] = calc['dislocation']['key']
+        params['dislocation_id'] = calc['dislocation']['id']
         
         if flat is True:
             params['a_mult1'] = sizemults['a'][0]
@@ -276,24 +261,11 @@ class CalculationDislocationMonopole(Record):
         
         params['status'] = calc.get('status', 'finished')
         params['error'] = calc.get('error', np.nan)
-        K_tensor = uc.value_unit(calc['Stroh-K-tensor'])
         if full is True and params['status'] == 'finished':
-            params['preln'] = uc.value_unit(calc['Stroh-pre-ln-factor'])
             
             if flat is True:
-                for C in calc['elastic-constants'].aslist('C'):
-                    params['C'+str(C['ij'][0])+str(C['ij'][2])] = uc.value_unit(C['stiffness'])
-                params['K11'] = K_tensor[0,0]
-                params['K12'] = K_tensor[0,1]
-                params['K13'] = K_tensor[0,2]
-                params['K22'] = K_tensor[1,1]
-                params['K23'] = K_tensor[1,2]
-                params['K33'] = K_tensor[2,2]
+                pass
             else:
-                try:
-                    params['C'] = am.ElasticConstants(model=calc)
-                except:
-                    params['C'] = 'Invalid'
-                params['K_tensor'] = K_tensor
+                pass
         
         return params

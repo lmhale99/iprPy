@@ -96,7 +96,7 @@ def dislocationmonopole(input_dict, **kwargs):
                 'dislocation_family', 'dislocation_stroh_m', 'dislocation_stroh_n',
                 'a_uvw', 'b_uvw', 'c_uvw', 'stroh_m', 'dislocation_lineboxvector',
                 'stroh_n', 'atomshift', 'dislocation_burgersvector',
-                'dislocation_boundaryshape', 'dislocation_boundarywidth',
+                #'dislocation_boundaryshape', 'dislocation_boundarywidth',
                 'ucell', 'burgersvector', 'boundarywidth']
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
@@ -104,8 +104,8 @@ def dislocationmonopole(input_dict, **kwargs):
     # Extract input values and assign default values
     dislocation_file = input_dict.get(kwargs['dislocation_file'], None)
     dislocation_content = input_dict.get(kwargs['dislocation_content'], None)
-    dislocation_boundaryshape = input_dict.get(kwargs['dislocation_boundaryshape'], 'circle')
-    dislocation_boundarywidth = float(input_dict.get(kwargs['dislocation_boundarywidth'], 3.0))
+    #dislocation_boundaryshape = input_dict.get(kwargs['dislocation_boundaryshape'], 'circle')
+    #dislocation_boundarywidth = float(input_dict.get(kwargs['dislocation_boundarywidth'], 3.0))
     ucell = input_dict.get(kwargs['ucell'], None)
     
     # Replace defect model with defect content if given
@@ -154,7 +154,7 @@ def dislocationmonopole(input_dict, **kwargs):
                          dislocation_burgersvector[2] * ucell.box.cvect)
         
         # Scale boundary width by unit cell's a lattice constant
-        boundarywidth = ucell.box.a * dislocation_boundarywidth
+        #boundarywidth = ucell.box.a * dislocation_boundarywidth
         
         # Interpret and check Stroh orientation vectors
         stroh_m = np.array(input_dict[kwargs['dislocation_stroh_m']].split(), dtype=float)
@@ -169,15 +169,15 @@ def dislocationmonopole(input_dict, **kwargs):
     
     else:
         burgersvector = None
-        boundarywidth = None
+        #boundarywidth = None
         stroh_m = None
         stroh_n = None
     
     # Save processed terms
     input_dict[kwargs['dislocation_model']] = dislocation_model
-    input_dict[kwargs['dislocation_boundaryshape']] = dislocation_boundaryshape
-    input_dict[kwargs['dislocation_boundarywidth']] = dislocation_boundarywidth
+    #input_dict[kwargs['dislocation_boundaryshape']] = dislocation_boundaryshape
+    #input_dict[kwargs['dislocation_boundarywidth']] = dislocation_boundarywidth
     input_dict[kwargs['burgersvector']] = burgersvector
-    input_dict[kwargs['boundarywidth']] = boundarywidth
+    #input_dict[kwargs['boundarywidth']] = boundarywidth
     input_dict[kwargs['stroh_m']] = stroh_m
     input_dict[kwargs['stroh_n']] = stroh_n

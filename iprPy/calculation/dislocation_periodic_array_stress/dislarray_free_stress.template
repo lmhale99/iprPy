@@ -1,0 +1,63 @@
+<atomman_system_info>
+
+<atomman_pair_info>
+
+# Calculation input parameters 
+# (stresses in force / length^2 units NOT pressure units!)
+variable sigma_xz equal <sigma_xz>
+variable sigma_yz equal <sigma_yz>
+variable bwidth equal <bwidth>
+
+# Run input parameters
+variable temperature equal <temperature>
+variable randomseed equal <randomseed>
+variable dumpsteps equal <dumpsteps>
+variable runsteps equal <runsteps>
+variable thermosteps equal <thermosteps>
+
+# Units-based parameters
+variable tdamp equal <tdamp>
+variable timestep equal <timestep>
+
+# Derived variables
+variable twotemp equal 2*${temperature}
+variable area equal lx*ly
+variable lz equal lz
+variable topcut equal zhi-${bwidth}
+variable botcut equal zlo+${bwidth}
+
+# Define boundary groups
+region rtop block INF INF INF INF ${topcut} INF
+region rbot block INF INF INF INF INF ${botcut}
+group top region rtop
+group bot region rbot
+variable ntop equal count(top)
+variable nbot equal count(bot)
+
+# Compute force to add
+variable fx equal ${sigma_xz}*${area}/(${ntop}+${nbot})
+variable fy equal ${sigma_yz}*${area}/(${ntop}+${nbot})
+fix ftop top addforce ${fx} ${fy} 0.0
+fix fbot bot addforce -${fx} -${fy} 0.0
+
+# Calculate strain
+compute displacement all displace/atom
+compute disptopx top reduce ave c_displacement[1]
+compute disptopy top reduce ave c_displacement[2]
+compute dispbotx bot reduce ave c_displacement[1]
+compute dispboty bot reduce ave c_displacement[2]
+variable strain_xz equal (c_disptopx-c_dispbotx)/${lz}
+variable strain_yz equal (c_disptopy-c_dispboty)/${lz}
+
+thermo ${thermosteps}
+thermo_style custom step temp etotal v_strain_xz v_strain_yz
+thermo_modify format float %.13f
+
+velocity all create ${twotemp} ${randomseed} mom yes rot yes dist gaussian
+fix nvt all nvt temp ${temperature} ${temperature} ${tdamp}
+
+dump dumpy all custom ${dumpsteps} *.dump id type x y z
+
+timestep ${timestep}
+
+run ${runsteps}

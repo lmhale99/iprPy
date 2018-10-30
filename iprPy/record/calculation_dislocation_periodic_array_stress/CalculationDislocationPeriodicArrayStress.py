@@ -21,12 +21,12 @@ from ... import __version__ as iprPy_version
 from .. import Record
 from ...tools import aslist
 
-class CalculationDislocationMonopole(Record):
+class CalculationDislocationPeriodicArrayStress(Record):
     
     @property
     def contentroot(self):
         """str: The root element of the content"""
-        return 'calculation-dislocation-monopole'
+        return 'calculation-dislocation-periodic-array-stress'
     
     @property
     def schema(self):
@@ -34,7 +34,7 @@ class CalculationDislocationMonopole(Record):
         str: The absolute directory path to the .xsd file associated with the
              record style.
         """
-        return os.path.join(self.directory, 'record-calculation-dislocation-monopole.xsd')
+        return os.path.join(self.directory, 'record-calculation-dislocation-periodic-array-stress.xsd')
     
     @property
     def compare_terms(self):
@@ -49,15 +49,8 @@ class CalculationDislocationMonopole(Record):
                 'symbols',
                 
                 'potential_LAMMPS_key',
-                
-                'a_mult1',
-                'a_mult2',
-                'b_mult1',
-                'b_mult2',
-                'c_mult1',
-                'c_mult2',
-                
-                'dislocation_key',
+
+                'rigidboundaries',
                ]
     
     @property
@@ -66,7 +59,9 @@ class CalculationDislocationMonopole(Record):
         list of str: The default fterms used by isnew() for comparisons.
         """
         return [
-                'annealtemperature',
+                'stress_xz',
+                'stress_yz',
+                'temperature',
                ]
     
     def isvalid(self):
@@ -79,8 +74,7 @@ class CalculationDislocationMonopole(Record):
         bool
             True if element combinations are valid, False if not.
         """
-        calc = self.content[self.contentroot]
-        return calc['dislocation-monopole']['system-family'] == calc['system-info']['family']
+        return True
     
     def buildcontent(self, script, input_dict, results_dict=None):
         """
@@ -122,24 +116,15 @@ class CalculationDislocationMonopole(Record):
         calc['calculation']['script'] = script
         calc['calculation']['run-parameter'] = run_params = DM()
         
-        run_params['size-multipliers'] = DM()
-        run_params['size-multipliers']['a'] = list(input_dict['sizemults'][0])
-        run_params['size-multipliers']['b'] = list(input_dict['sizemults'][1])
-        run_params['size-multipliers']['c'] = list(input_dict['sizemults'][2])
+        run_params['thermosteps'] = input_dict['thermosteps']
+        run_params['dumpsteps'] = input_dict['dumpsteps']
+        run_params['runsteps'] = input_dict['runsteps']
+        run_params['randomseed'] = input_dict['randomseed']
         
-        run_params['energytolerance'] = input_dict['energytolerance']
-        run_params['forcetolerance'] = uc.model(input_dict['forcetolerance'], 
-                                                input_dict['energy_unit'] + '/' 
-                                                + input_dict['length_unit'])
-        run_params['maxiterations']  = input_dict['maxiterations']
-        run_params['maxevaluations'] = input_dict['maxevaluations']
-        run_params['maxatommotion']  = uc.model(input_dict['maxatommotion'],
-                                                input_dict['length_unit'])
-        
-        run_params['dislocation_boundarywidth'] = input_dict['boundarywidth']
-        run_params['dislocation_boundaryshape'] = input_dict['dislocation_boundaryshape']
-        
-        run_params['annealtemperature'] = input_dict['annealtemperature']
+        run_params['boundarywidth'] = uc.model(input_dict['boundarywidth'], input_dict['length_unit'])
+        run_params['rigidboundaries'] = input_dict['rigidboundaries']
+        run_params['stress-xz'] = uc.model(input_dict['sigma_xz'], input_dict['pressure_unit'])
+        run_params['stress-yz'] = uc.model(input_dict['sigma_yz'], input_dict['pressure_unit'])
         
         # Copy over potential data model info
         calc['potential-LAMMPS'] = DM()
@@ -158,53 +143,20 @@ class CalculationDislocationMonopole(Record):
         calc['system-info']['artifact']['load_options'] = input_dict['load_options']
         calc['system-info']['symbol'] = input_dict['symbols']
         
-        #Save defect parameters
-        calc['dislocation-monopole'] = disl = DM()
-        if input_dict['dislocation_model'] is not None:
-            disl['key'] = input_dict['dislocation_model']['key']
-            disl['id'] = input_dict['dislocation_model']['id']
-            disl['character'] = input_dict['dislocation_model']['character']
-            disl['Burgers-vector'] = input_dict['dislocation_model']['Burgers-vector']
-            disl['slip-plane'] = input_dict['dislocation_model']['slip-plane']
-            disl['line-direction'] = input_dict['dislocation_model']['line-direction']
-        
-        disl['system-family'] = input_dict.get('dislocation_family', input_dict['family'])
-        disl['calculation-parameter'] = cp = DM() 
-        cp['stroh_m'] = input_dict['dislocation_stroh_m']
-        cp['stroh_n'] = input_dict['dislocation_stroh_n']
-        cp['lineboxvector'] = input_dict['dislocation_lineboxvector']
-        cp['a_uvw'] = input_dict['a_uvw']
-        cp['b_uvw'] = input_dict['b_uvw']
-        cp['c_uvw'] = input_dict['c_uvw'] 
-        cp['atomshift'] = input_dict['atomshift']
-        cp['burgersvector'] = input_dict['dislocation_burgersvector']
+        calc['phase-state'] = DM()
+        calc['phase-state']['temperature'] = uc.model(input_dict['temperature'], 'K')
         
         if results_dict is None:
             calc['status'] = 'not calculated'
         else:
-            c_model = input_dict['C'].model(unit=input_dict['pressure_unit'])
-            calc['elastic-constants'] = c_model['elastic-constants']
             
-            calc['base-system'] = DM()
-            calc['base-system']['artifact'] = DM()
-            calc['base-system']['artifact']['file'] = results_dict['dumpfile_base']
-            calc['base-system']['artifact']['format'] = 'atom_dump'
-            calc['base-system']['symbols'] = results_dict['symbols_base']
+            calc['strain-rate-relation'] = srr = DM()
+            srr['time'] = uc.model(results_dict['times'], 'ns')
+            srr['strain-xz'] = uc.model(results_dict['strains_xz'], None)
+            srr['strain-yz'] = uc.model(results_dict['strains_yz'], None)
             
-            calc['defect-system'] = DM()
-            calc['defect-system']['artifact'] = DM()
-            calc['defect-system']['artifact']['file'] = results_dict['dumpfile_disl']
-            calc['defect-system']['artifact']['format'] = 'atom_dump'
-            calc['defect-system']['symbols'] = results_dict['symbols_disl']
-            calc['defect-system']['potential-energy'] = uc.model(results_dict['E_total_disl'], 
-                                                                 input_dict['energy_unit'])
-            
-            calc['Stroh-pre-ln-factor'] = uc.model(results_dict['Stroh_preln'],
-                                                   input_dict['energy_unit'] + '/'
-                                                   + input_dict['length_unit'])
-            
-            calc['Stroh-K-tensor'] = uc.model(results_dict['Stroh_K_tensor'],
-                                              input_dict['pressure_unit'])
+            calc['strain-rate-xz'] = uc.model(results_dict['strainrate_xz'], 's^-1')
+            calc['strain-rate-yz'] = uc.model(results_dict['strainrate_yz'], 's^-1')
             
             self.content = output
     
@@ -237,16 +189,15 @@ class CalculationDislocationMonopole(Record):
         params['script'] = calc['calculation']['script']
         params['iprPy_version'] = calc['calculation']['iprPy-version']
         params['LAMMPS_version'] = calc['calculation']['LAMMPS-version']
-    
-        params['energytolerance']= calc['calculation']['run-parameter']['energytolerance']
-        params['forcetolerance'] = calc['calculation']['run-parameter']['forcetolerance']
-        params['maxiterations'] = calc['calculation']['run-parameter']['maxiterations']
-        params['maxevaluations'] = calc['calculation']['run-parameter']['maxevaluations']
-        params['maxatommotion'] = calc['calculation']['run-parameter']['maxatommotion']
-        
-        params['annealtemperature'] = calc['calculation']['run-parameter']['annealtemperature']
 
-        sizemults = calc['calculation']['run-parameter']['size-multipliers']
+        params['thermosteps']= calc['calculation']['run-parameter']['thermosteps']
+        params['dumpsteps'] = calc['calculation']['run-parameter']['dumpsteps']
+        params['runsteps'] = calc['calculation']['run-parameter']['runsteps']
+        params['randomseed'] = calc['calculation']['run-parameter']['randomseed']
+        params['boundarywidth'] = uc.value_unit(calc['calculation']['run-parameter']['boundarywidth'])
+        params['rigidboundaries'] = calc['calculation']['run-parameter']['rigidboundaries']
+        params['stress_xz'] = uc.value_unit(calc['calculation']['run-parameter']['stress-xz'])
+        params['stress_yz'] = uc.value_unit(calc['calculation']['run-parameter']['stress-yz'])
         
         params['potential_LAMMPS_key'] = calc['potential-LAMMPS']['key']
         params['potential_LAMMPS_id'] = calc['potential-LAMMPS']['id']
@@ -259,41 +210,28 @@ class CalculationDislocationMonopole(Record):
         params['family'] = calc['system-info']['family']
         symbols = aslist(calc['system-info']['symbol'])
         
-        params['dislocation_key'] = calc['dislocation-monopole']['key']
-        params['dislocation_id'] = calc['dislocation-monopole']['id']
+        params['temperature'] = uc.value_unit(calc['phase-state']['temperature'])
         
         if flat is True:
-            params['a_mult1'] = sizemults['a'][0]
-            params['a_mult2'] = sizemults['a'][1]
-            params['b_mult1'] = sizemults['b'][0]
-            params['b_mult2'] = sizemults['b'][1]
-            params['c_mult1'] = sizemults['c'][0]
-            params['c_mult2'] = sizemults['c'][1]
             params['symbols'] = ' '.join(symbols)
         else:
-            params['sizemults'] = np.array([sizemults['a'], sizemults['b'], sizemults['c']])
             params['symbols'] = symbols
         
         params['status'] = calc.get('status', 'finished')
         params['error'] = calc.get('error', np.nan)
-        K_tensor = uc.value_unit(calc['Stroh-K-tensor'])
         if full is True and params['status'] == 'finished':
-            params['preln'] = uc.value_unit(calc['Stroh-pre-ln-factor'])
             
+            params['strainrate_xz'] = uc.value_unit(calc['strain-rate-xz'])
+            params['strainrate_yz'] = uc.value_unit(calc['strain-rate-yz'])
+
             if flat is True:
-                for C in calc['elastic-constants'].aslist('C'):
-                    params['C'+str(C['ij'][0])+str(C['ij'][2])] = uc.value_unit(C['stiffness'])
-                params['K11'] = K_tensor[0,0]
-                params['K12'] = K_tensor[0,1]
-                params['K13'] = K_tensor[0,2]
-                params['K22'] = K_tensor[1,1]
-                params['K23'] = K_tensor[1,2]
-                params['K33'] = K_tensor[2,2]
+                pass
             else:
-                try:
-                    params['C'] = am.ElasticConstants(model=calc)
-                except:
-                    params['C'] = 'Invalid'
-                params['K_tensor'] = K_tensor
+                plot = calc['strain-rate-relation']
+                sr_plot = {}
+                sr_plot['t'] = uc.value_unit(plot['time'])
+                sr_plot['strain_xz'] = uc.value_unit(plot['strain-xz'])
+                sr_plot['strain_yz'] = uc.value_unit(plot['strain-yz'])
+                params['strain_vs_time_plot'] = pd.DataFrame(sr_plot)
         
         return params

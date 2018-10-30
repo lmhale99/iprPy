@@ -523,8 +523,8 @@ def process_input(input_dict, UUID=None, build=True):
     
     # These are calculation-specific default strings
     input_dict['sizemults'] = input_dict.get('sizemults', '0 3 -20 20 -20 20')
-    input_dict['boundaryshape'] = input_dict.get('dislocation_boundaryshape',
-                                                  'circle')
+    input_dict['dislocation_boundaryshape'] = input_dict.get('dislocation_boundaryshape',
+                                                             'circle')
     input_dict['forcetolerance'] = input_dict.get('forcetolerance',
                                                   '1.0e-6 eV/angstrom')
     
@@ -538,7 +538,7 @@ def process_input(input_dict, UUID=None, build=True):
     # These are calculation-specific default unitless floats
     input_dict['annealtemperature'] = float(input_dict.get('annealtemperature',
                                                            0.0))
-    input_dict['boundarywidth'] = float(input_dict.get('dislocation_boundarywidth', 3.0))
+    input_dict['dislocation_boundarywidth'] = float(input_dict.get('dislocation_boundarywidth', 3.0))
     
     # These are calculation-specific default floats with units
     # None for this calculation
@@ -558,6 +558,10 @@ def process_input(input_dict, UUID=None, build=True):
     # Load dislocation parameters
     iprPy.input.interpret('dislocationmonopole', input_dict)
     
+    # Multiply boundarywidth by alat
+    if input_dict['ucell'] is not None:
+        input_dict['boundarywidth'] = input_dict['ucell'].box.a * input_dict['dislocation_boundarywidth']
+
     # Load elastic constants
     iprPy.input.interpret('atomman_elasticconstants', input_dict, build=build)
     
