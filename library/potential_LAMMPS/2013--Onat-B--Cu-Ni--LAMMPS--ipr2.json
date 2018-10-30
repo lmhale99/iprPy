@@ -1,0 +1,33 @@
+{
+    "potential-LAMMPS": {
+        "key": "ef3c968c-5e47-45bb-836c-8d8703d44edb", 
+        "id": "2013--Onat-B--Cu-Ni--LAMMPS--ipr2", 
+        "potential": {
+            "key": "31a90189-5dd6-43bc-ba69-78c94fca1bd1", 
+            "id": "2013--Onat-B-Durukanoglu-S--Cu-Ni"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Cu"
+            }, 
+            {
+                "element": "Ni"
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "CuNi_v2.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

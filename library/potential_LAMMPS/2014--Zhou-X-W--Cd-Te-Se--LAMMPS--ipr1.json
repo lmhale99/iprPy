@@ -1,0 +1,39 @@
+{
+    "potential-LAMMPS": {
+        "key": "9f4a24af-9e1e-4272-8bbe-df62f01a8a09", 
+        "id": "2014--Zhou-X-W--Cd-Te-Se--LAMMPS--ipr1", 
+        "potential": {
+            "key": "48b64765-29eb-426e-b8ca-5f359640f5f6", 
+            "id": "2014--Zhou-X-W-Foster-M-E-van-Swol-F-B-et-al--Cd-Te-Se"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Cd", 
+                "mass": 112.41
+            }, 
+            {
+                "element": "Te", 
+                "mass": 127.6
+            }, 
+            {
+                "element": "Se", 
+                "mass": 78.96
+            }
+        ], 
+        "pair_style": {
+            "type": "bop"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "CdTeSe.bop.table"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

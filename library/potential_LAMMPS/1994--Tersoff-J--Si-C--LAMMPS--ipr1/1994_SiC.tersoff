@@ -1,0 +1,19 @@
+# Parameters for Si-C interactions from CITATION: J. Tersoff, Phys Rev B, 49, 16349 (1994)
+# Combines 1990's fitting parameters (slightly different B_C_Si) with 1989's cutoff parameters.
+
+# Parameter values verified by Lucas Hale.
+# The values in SiC_1994.tersoff files of August 22, 2018 LAMMPS distribution are comparable, with higher precisions used here for the derived mixing parameters.
+# Note that the value of n has no effect when B=0.
+
+
+# Values are in LAMMPS "metal" units.
+
+# e1 e2 e3 m   gamma lambda3  c      d       costheta0 n       beta      lambda2 B                  R                  D                   lambda1 A
+  C  C  C  3.0 1.0   0.0      19981  7.034  -0.33953   0.99054 4.1612e-6 2.3064  389.63             1.95               0.15                3.4653  1544.8
+  Si Si Si 3.0 1.0   0.0      100390 16.217 -0.59825   0.78734 1.1e-6    1.7322  471.18             2.85               0.15                2.4799  1830.8
+  C  Si Si 3.0 1.0   0.0      19981  7.034  -0.33953   0.99054 4.1612e-6 2.0193  432.1540445962956  2.3572604240535435 0.15271965554868316 2.9726  1681.731203254551
+  C  C  Si 3.0 1.0   0.0      19981  7.034  -0.33953   0.0     0.0       0.0     0.0                2.3572604240535435 0.15271965554868316 0.0     0.0
+  C  Si C  3.0 1.0   0.0      19981  7.034  -0.33953   0.0     0.0       0.0     0.0                1.95               0.15                0.0     0.0
+  Si C  C  3.0 1.0   0.0      100390 16.217 -0.59825   0.78734 1.1e-6    2.0193  432.1540445962956  2.3572604240535435 0.15271965554868316 2.9726  1681.731203254551
+  Si C  Si 3.0 1.0   0.0      100390 16.217 -0.59825   0.0     0.0       0.0     0.0                2.85               0.15                0.0     0.0
+  Si Si C  3.0 1.0   0.0      100390 16.217 -0.59825   0.0     0.0       0.0     0.0                2.3572604240535435 0.15271965554868316 0.0     0.0

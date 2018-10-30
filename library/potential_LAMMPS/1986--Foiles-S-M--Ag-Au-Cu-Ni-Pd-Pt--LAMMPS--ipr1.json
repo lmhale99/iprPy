@@ -1,0 +1,109 @@
+{
+    "potential-LAMMPS": {
+        "key": "c5afa7e8-6b3b-49cd-ad1c-ae3e4329363a", 
+        "id": "1986--Foiles-S-M--Ag-Au-Cu-Ni-Pd-Pt--LAMMPS--ipr1", 
+        "potential": {
+            "key": "7a1302de-59cf-4efb-900e-cad845b68ee5", 
+            "id": "1986--Foiles-S-M-Baskes-M-I-Daw-M-S--Ag-Au-Cu-Ni-Pd-Pt"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ag", 
+                "mass": 107.87
+            }, 
+            {
+                "element": "Au", 
+                "mass": 196.97
+            }, 
+            {
+                "element": "Cu", 
+                "mass": 63.55
+            }, 
+            {
+                "element": "Ni", 
+                "mass": 58.71
+            }, 
+            {
+                "element": "Pd", 
+                "mass": 106.4
+            }, 
+            {
+                "element": "Pt", 
+                "mass": 195.09
+            }
+        ], 
+        "pair_style": {
+            "type": "eam"
+        }, 
+        "pair_coeff": [
+            {
+                "interaction": {
+                    "symbol": [
+                        "Ag", 
+                        "Ag"
+                    ]
+                }, 
+                "term": {
+                    "file": "Ag_u3.eam"
+                }
+            }, 
+            {
+                "interaction": {
+                    "symbol": [
+                        "Au", 
+                        "Au"
+                    ]
+                }, 
+                "term": {
+                    "file": "Au_u3.eam"
+                }
+            }, 
+            {
+                "interaction": {
+                    "symbol": [
+                        "Cu", 
+                        "Cu"
+                    ]
+                }, 
+                "term": {
+                    "file": "Cu_u3.eam"
+                }
+            }, 
+            {
+                "interaction": {
+                    "symbol": [
+                        "Ni", 
+                        "Ni"
+                    ]
+                }, 
+                "term": {
+                    "file": "Ni_u3.eam"
+                }
+            }, 
+            {
+                "interaction": {
+                    "symbol": [
+                        "Pd", 
+                        "Pd"
+                    ]
+                }, 
+                "term": {
+                    "file": "Pd_u3.eam"
+                }
+            }, 
+            {
+                "interaction": {
+                    "symbol": [
+                        "Pt", 
+                        "Pt"
+                    ]
+                }, 
+                "term": {
+                    "file": "Pt_u3.eam"
+                }
+            }
+        ]
+    }
+}

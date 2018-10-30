@@ -1,0 +1,39 @@
+{
+    "potential-LAMMPS": {
+        "key": "bff3bd6f-654a-43e7-8614-aba46cff68df", 
+        "id": "2012--Ward-D-K--Cd-Te-Zn--LAMMPS--ipr1", 
+        "potential": {
+            "key": "c76b416e-986e-462d-946d-375a5e3fa509", 
+            "id": "2012--Ward-D-K-Zhou-X-W-Wong-B-M-et-al--Cd-Te-Zn"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Cd", 
+                "mass": 112.4118
+            }, 
+            {
+                "element": "Te", 
+                "mass": 127.603
+            }, 
+            {
+                "element": "Zn", 
+                "mass": 65.4094
+            }
+        ], 
+        "pair_style": {
+            "type": "bop"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "CdZnTe_v1.bop.table"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

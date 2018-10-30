@@ -1,0 +1,19 @@
+# Parameters for Si-Ge interactions from CITATION: J. Tersoff, Phys. Rev. B 39, 5566 (1989)
+# This is the first multi-element Tersoff model
+
+# Parameter values verified by Lucas Hale.
+# The values in SiCGe.tersoff file of August 22, 2018 LAMMPS distribution are comparable, with higher precisions used here for the derived mixing parameters.
+# Note that the value of n has no effect when B=0.
+# Identical values in openKIM model MO_350526375143_001 parameter file.
+
+# Values are in LAMMPS "metal" units.
+
+# e1 e2 e3 m   gamma lambda3  c      d       costheta0 n       beta      lambda2 B                  R                  D                   lambda1 A
+  Si Si Si 3.0 1.0   0.0      100390 16.217 -0.59825   0.78734 1.1e-6    1.7322  471.18             2.85               0.15                2.4799  1830.8
+  Ge Ge Ge 3.0 1.0   0.0      106430 15.652 -0.43884   0.75627 9.0166e-7 1.7047  419.23             2.95               0.15                2.4451  1769.0
+  Si Ge Ge 3.0 1.0   0.0      100390 16.217 -0.59825   0.78734 1.1e-6    1.71845 444.7177249755846  2.8995677766844428 0.1500223597109387  2.4625  1799.634740718238
+  Si Si Ge 3.0 1.0   0.0      100390 16.217 -0.59825   0.0     0.0       0.0     0.0                2.8995677766844428 0.1500223597109387  0.0     0.0
+  Si Ge Si 3.0 1.0   0.0      100390 16.217 -0.59825   0.0     0.0       0.0     0.0                2.85               0.15                0.0     0.0
+  Ge Si Si 3.0 1.0   0.0      106430 15.652 -0.43884   0.75627 9.0166e-7 1.71845 444.7177249755846  2.8995677766844428 0.1500223597109387  2.4625  1799.634740718238
+  Ge Si Ge 3.0 1.0   0.0      106430 15.652 -0.43884   0.0     0.0       0.0     0.0                2.95               0.15                0.0     0.0
+  Ge Ge Si 3.0 1.0   0.0      106430 15.652 -0.43884   0.0     0.0       0.0     0.0                2.8995677766844428 0.1500223597109387  0.0     0.0

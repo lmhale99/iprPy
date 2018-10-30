@@ -1,0 +1,33 @@
+{
+    "potential-LAMMPS": {
+        "key": "dcce3dbc-df92-480b-8256-8299cb58f833", 
+        "id": "1990--Tersoff-J--Si-C--LAMMPS--ipr1", 
+        "potential": {
+            "key": "b3b05ea5-7852-4b6f-95b4-f04414a2d9b6", 
+            "id": "1990--Tersoff-J--Si-C"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Si"
+            }, 
+            {
+                "element": "C"
+            }
+        ], 
+        "pair_style": {
+            "type": "tersoff"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "1990_SiC.tersoff"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

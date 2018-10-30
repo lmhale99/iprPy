@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "cca0d548-03ac-463a-ac7d-3150f67f3910", 
+        "id": "2006--Murdick-D-A--Ga-As--LAMMPS--ipr1", 
+        "potential": {
+            "key": "b661f788-d285-4fdb-b0c2-0f82a99cb8a1", 
+            "id": "2006--Murdick-D-A-Zhou-X-W-Wadley-H-N-G-et-al--Ga-As"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ga", 
+                "mass": 69.723
+            }, 
+            {
+                "element": "As", 
+                "mass": 74.921593
+            }
+        ], 
+        "pair_style": {
+            "type": "bop"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "GaAs.bop.table"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

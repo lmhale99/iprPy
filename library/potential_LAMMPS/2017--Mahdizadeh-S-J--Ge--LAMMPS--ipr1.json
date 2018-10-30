@@ -1,0 +1,28 @@
+{
+    "potential-LAMMPS": {
+        "key": "e0ee48bf-642c-49fb-a0ef-ea8283d1d5e2", 
+        "id": "2017--Mahdizadeh-S-J--Ge--LAMMPS--ipr1", 
+        "potential": {
+            "key": "c37d42e0-1455-4e73-a862-6547a82d99a4", 
+            "id": "2017--Mahdizadeh-S-J-Akhlamadi-G--Ge"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ge"
+        }, 
+        "pair_style": {
+            "type": "tersoff"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Ge.tersoff"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

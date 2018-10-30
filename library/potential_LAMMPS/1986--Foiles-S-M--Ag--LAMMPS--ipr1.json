@@ -1,0 +1,32 @@
+{
+    "potential-LAMMPS": {
+        "key": "76a265fc-45ff-49d7-8c64-2044f12402f2", 
+        "id": "1986--Foiles-S-M--Ag--LAMMPS--ipr1", 
+        "potential": {
+            "key": "672d54f8-9f48-4200-af56-8a7378ebbc4a", 
+            "id": "1986--Foiles-S-M-Baskes-M-I-Daw-M-S--Ag"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ag", 
+            "mass": 107.87
+        }, 
+        "pair_style": {
+            "type": "eam"
+        }, 
+        "pair_coeff": [
+            {
+                "interaction": {
+                    "symbol": [
+                        "Ag", 
+                        "Ag"
+                    ]
+                }, 
+                "term": {
+                    "file": "Ag_u3.eam"
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "5c669afa-2e70-4fbd-a1dd-074273c07653", 
+        "id": "2016--Zhou-X-W--Al-Cu--LAMMPS--ipr1", 
+        "potential": {
+            "key": "f1c13bf7-7839-466a-8463-50456aea68dc", 
+            "id": "2016--Zhou-X-W-Ward-D-K-Foster-M-E--Al-Cu"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Al", 
+                "mass": 26.98
+            }, 
+            {
+                "element": "Cu", 
+                "mass": 63.55
+            }
+        ], 
+        "pair_style": {
+            "type": "bop"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "AlCu.bop.table"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}
