@@ -137,7 +137,7 @@ class CalculationDislocationMonopole(Record):
                                                 input_dict['length_unit'])
         
         run_params['dislocation_boundarywidth'] = input_dict['boundarywidth']
-        run_params['dislocation_boundaryshape'] = input_dict['boundaryshape']
+        run_params['dislocation_boundaryshape'] = input_dict['dislocation_boundaryshape']
         
         run_params['annealtemperature'] = input_dict['annealtemperature']
         

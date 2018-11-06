@@ -1,0 +1,33 @@
+{
+    "potential-LAMMPS": {
+        "key": "da3a62f4-c17b-4119-a65f-deb47c842f69", 
+        "id": "2007--Vashishta-P--Si-C--LAMMPS--ipr1", 
+        "potential": {
+            "key": "d9495b9a-ff7a-4c4f-bb25-de2062e794d9", 
+            "id": "2007--Vashishta-P-Kalia-R-K-Nakano-A-Rino-J-P--Si-C"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Si"
+            }, 
+            {
+                "element": "C"
+            }
+        ], 
+        "pair_style": {
+            "type": "vashishta"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "SiC.vashishta"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

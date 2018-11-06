@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "46586f9c-95ec-4ce2-81d5-91416a009d60", 
+        "id": "2015--Purja-Pun-G-P--Cu-Ta--LAMMPS--ipr2", 
+        "potential": {
+            "key": "b2cdadf2-6f7a-4cfc-919b-b78904969e6b", 
+            "id": "2015--Purja-Pun-G-P-Darling-K-A-Kecskes-L-J-Mishin-Y--Cu-Ta"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Cu", 
+                "mass": 63.546
+            }, 
+            {
+                "element": "Ta", 
+                "mass": 180.9479
+            }
+        ], 
+        "pair_style": {
+            "type": "adp"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "CuTa_LJ15_2014.adp.txt"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,109 @@
+{
+    "potential-LAMMPS": {
+        "key": "8a99e4c9-7a90-4c0e-96f5-57048066940f", 
+        "id": "1989--Adams-J-B--Ag-Au-Cu-Ni-Pd-Pt--LAMMPS--ipr1", 
+        "potential": {
+            "key": "9ddb10de-d3f8-43fe-9dfc-472d704537e1", 
+            "id": "1989--Adams-J-B-Foiles-S-M-Wolfer-W-G--Ag-Au-Cu-Ni-Pd-Pt"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ag", 
+                "mass": 107.87
+            }, 
+            {
+                "element": "Au", 
+                "mass": 196.97
+            }, 
+            {
+                "element": "Cu", 
+                "mass": 63.55
+            }, 
+            {
+                "element": "Ni", 
+                "mass": 58.71
+            }, 
+            {
+                "element": "Pd", 
+                "mass": 106.4
+            }, 
+            {
+                "element": "Pt", 
+                "mass": 195.09
+            }
+        ], 
+        "pair_style": {
+            "type": "eam"
+        }, 
+        "pair_coeff": [
+            {
+                "interaction": {
+                    "symbol": [
+                        "Ag", 
+                        "Ag"
+                    ]
+                }, 
+                "term": {
+                    "file": "agu6.txt"
+                }
+            }, 
+            {
+                "interaction": {
+                    "symbol": [
+                        "Au", 
+                        "Au"
+                    ]
+                }, 
+                "term": {
+                    "file": "auu6.txt"
+                }
+            }, 
+            {
+                "interaction": {
+                    "symbol": [
+                        "Cu", 
+                        "Cu"
+                    ]
+                }, 
+                "term": {
+                    "file": "cuu6.txt"
+                }
+            }, 
+            {
+                "interaction": {
+                    "symbol": [
+                        "Ni", 
+                        "Ni"
+                    ]
+                }, 
+                "term": {
+                    "file": "niu6.txt"
+                }
+            }, 
+            {
+                "interaction": {
+                    "symbol": [
+                        "Pd", 
+                        "Pd"
+                    ]
+                }, 
+                "term": {
+                    "file": "pdu6.txt"
+                }
+            }, 
+            {
+                "interaction": {
+                    "symbol": [
+                        "Pt", 
+                        "Pt"
+                    ]
+                }, 
+                "term": {
+                    "file": "ptu6.txt"
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,22 @@
+# Parameters for Ga-N interactions from CITATION: J. Nord, K. Albe, P. Erhart, K. Nordlund, J Phys Condens Matter, 15, 5649 (2003)
+
+# Parameter values verified by Lucas Hale.
+# The values in GaN.tersoff files of August 22, 2018 LAMMPS distribution are comparable, with higher precisions used here for the derived mixing parameters.
+# Note that the value of n has no effect when B=0.
+# Identical values in openKIM model MO_612061685362_001 parameter file.
+
+# Values are in LAMMPS "metal" units.
+
+# e1 e2 e3 m   gamma    lambda3 c        d       costheta0 n   beta lambda2            B                  R    D    lambda1            A
+  Ga Ga Ga 1.0 0.007874 1.846   1.918    0.75    -0.3013   1.0 1.0  1.4496970792622927 410.13170048006185 2.87 0.15 1.6091637579811449 535.1992682033992
+  N  N  N  1.0 0.76612  0.0     0.178493 0.20172 -0.045238 1.0 1.0  2.3842551670030017 423.7693264497686  2.2  0.2  3.557785560201879  1044.7746144569705
+  Ga Ga N  1.0 0.001632 0.0     65.207   2.821   -0.518    0.0 0.0  0.0                0.0                2.9  0.2  0.0                0.0
+  Ga N  N  1.0 0.001632 0.0     65.207   2.821   -0.518    1.0 1.0  2.6390562469343104 3864.2674028818305 2.9  0.2  2.93515835784034   6136.436731930555
+  N  Ga Ga 1.0 0.001632 0.0     65.207   2.821   -0.518    1.0 1.0  2.6390562469343104 3864.2674028818305 2.9  0.2  2.93515835784034   6136.436731930555
+  N  Ga N  1.0 0.76612  0.0     0.178493 0.20172 -0.045238 0.0 0.0  0.0                0.0                2.2  0.2  0.0                0.0
+  N  N  Ga 1.0 0.001632 0.0     65.207   2.821   -0.518    0.0 0.0  0.0                0.0                2.9  0.2  0.0                0.0
+  Ga N  Ga 1.0 0.007874 1.846   1.918    0.75    -0.3013   0.0 0.0  0.0                0.0                2.87 0.15 0.0                0.0
+
+
+
+

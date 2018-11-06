@@ -1,0 +1,33 @@
+{
+    "potential-LAMMPS": {
+        "key": "19c66fc5-858c-4027-bb3c-feae215bf618", 
+        "id": "2017--Los-J-H--B-N--LAMMPS--ipr1", 
+        "potential": {
+            "key": "f416dd7d-6d20-4cbd-9ef9-25d6ac27fa9a", 
+            "id": "2017--Los-J-H-Kroes-J-M-H-Albe-K-et-al--B-N"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "B"
+            }, 
+            {
+                "element": "N"
+            }
+        ], 
+        "pair_style": {
+            "type": "extep"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "BN.extep"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

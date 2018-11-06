@@ -1,0 +1,32 @@
+{
+    "potential-LAMMPS": {
+        "key": "8e9ae12d-5034-418a-a168-fb5499ecffcd", 
+        "id": "1986--Foiles-S-M--Ni--LAMMPS--ipr1", 
+        "potential": {
+            "key": "15a085b9-d9d6-404f-9c2f-3ed40e8ff7a4", 
+            "id": "1986--Foiles-S-M-Baskes-M-I-Daw-M-S--Ni"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Ni", 
+            "mass": 58.710
+        }, 
+        "pair_style": {
+            "type": "eam"
+        }, 
+        "pair_coeff": [
+            {
+                "interaction": {
+                    "symbol": [
+                        "Ni", 
+                        "Ni"
+                    ]
+                }, 
+                "term": {
+                    "file": "Ni_u3.eam"
+                }
+            }
+        ]
+    }
+}

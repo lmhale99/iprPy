@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "3a5de314-63a6-4abe-bfb2-4fc9c3dab62c", 
+        "id": "2009--Stukowski-A--Fe-Cr--LAMMPS--ipr1", 
+        "potential": {
+            "key": "6b4ff48c-de09-4146-90e9-f34c892a66f6", 
+            "id": "2009--Stukowski-A-Sadigh-B-Erhart-P-Caro-A--Fe-Cr"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Fe", 
+                "mass": 55.845
+            }, 
+            {
+                "element": "Cr", 
+                "mass": 51.996
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/cd"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "FeCr.cdeam"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

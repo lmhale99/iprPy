@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "5770e76d-b0dc-462e-bf40-66acc61df7ea", 
+        "id": "2015--Zhou-X-W--C-Cu--LAMMPS--ipr1", 
+        "potential": {
+            "key": "09f60acf-a5ce-42ff-8981-42f8622a03d6", 
+            "id": "2015--Zhou-X-W-Ward-D-K-Foster-M-E--C-Cu"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "C", 
+                "mass": 12.01
+            }, 
+            {
+                "element": "Cu", 
+                "mass": 63.55
+            }
+        ], 
+        "pair_style": {
+            "type": "bop"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "CCu_v2.bop.table"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

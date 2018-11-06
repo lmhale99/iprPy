@@ -1,0 +1,28 @@
+{
+    "potential-LAMMPS": {
+        "key": "14ea91be-a501-4e1e-ac31-83849075aa47", 
+        "id": "2017--Purja-Pun-G-P--Si--LAMMPS--ipr1", 
+        "potential": {
+            "key": "698e838d-de9d-4912-bc4f-d78e8e0c66b5", 
+            "id": "2017--Purja-Pun-G-P-Mishin-Y--Si"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Si"
+        }, 
+        "pair_style": {
+            "type": "tersoff/mod/c"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Si.tersoff.modc"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

@@ -149,6 +149,7 @@ def atomman_systemmanipulate(input_dict, build=True, **kwargs):
         initialsystem = initialsystem.supersize(tuple(sizemults[0]),
                                                 tuple(sizemults[1]),
                                                 tuple(sizemults[2]))
+        initialsystem.wrap()
     
     else:
         initialsystem = None
