@@ -130,8 +130,14 @@ class CalculationCrystalSpaceGroup(Record):
                 wykoff['multiplicity'] = int(mult)
                 calc['space-group'].append('Wykoff', wykoff)
             
+            if 'charge' in results_dict['ucell'].atoms_prop():
+                prop_units = {'charge': 'e'}
+            else:
+                prop_units = {}
+            
             system_model = results_dict['ucell'].dump('system_model',
-                                                       box_unit=input_dict['length_unit'])
+                                                       box_unit=input_dict['length_unit'],
+                                                       prop_units=prop_units)
             calc['unit-cell-atomic-system'] = system_model['atomic-system']
         
         self.content = output

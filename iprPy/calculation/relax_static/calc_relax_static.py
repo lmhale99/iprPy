@@ -196,9 +196,18 @@ def relax_static(lammps_command, system, potential, mpi_command=None,
         lammps_variables['maxeval'] = maxeval
         lammps_variables['dmax'] = uc.get_in_units(dmax, lammps_units['length'])
         
+        # Set dump_keys based on atom_style
+        if potential.atom_style in ['charge']:
+            lammps_variables['dump_keys'] = 'id type q x y z c_peatom'
+        else:
+            lammps_variables['dump_keys'] = 'id type x y z c_peatom'
+        
         # Set dump_modify_format based on lammps_date
         if lammps_date < datetime.date(2016, 8, 3):
-            lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e"'
+            if potential.atom_style in ['charge']:
+                lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e %.13e"'
+            else:
+                lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e"'
         else:
             lammps_variables['dump_modify_format'] = 'float %.13e'
         
@@ -360,6 +369,9 @@ def process_input(input_dict, UUID=None, build=True):
     
     # Load ucell system
     iprPy.input.interpret('atomman_systemload', input_dict, build=build)
+    
+    # Add atomic charges
+    iprPy.input.interpret('lammps_atomcharges', input_dict, build=build)
     
     # Construct initialsystem by manipulating ucell system
     iprPy.input.interpret('atomman_systemmanipulate', input_dict, build=build)

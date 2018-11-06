@@ -193,9 +193,21 @@ def relax_dynamic(lammps_command, system, potential, mpi_command=None,
     else:
         lammps_variables['stressterm'] = 'NULL'
     
+    # Set dump_keys based on atom_style
+    if potential.atom_style in ['charge']:
+        lammps_variables['dump_keys'] = 'id type q xu yu zu c_pe c_ke &\n'
+        lammps_variables['dump_keys'] += 'c_stress[1] c_stress[2] c_stress[3] c_stress[4] c_stress[5] c_stress[6]'
+    else:
+        lammps_variables['dump_keys'] = 'id type xu yu zu c_pe c_ke &\n'
+        lammps_variables['dump_keys'] += 'c_stress[1] c_stress[2] c_stress[3] c_stress[4] c_stress[5] c_stress[6]'
+
+    
     # Set dump_modify_format based on lammps_date
     if lammps_date < datetime.date(2016, 8, 3):
-        lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e"'
+        if potential.atom_style in ['charge']:
+            lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e %.13e %.13e %.13e %.13e %.13e %.13e %.13e %.13e"'
+        else:
+            lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e %.13e %.13e %.13e %.13e %.13e %.13e %.13e"'
     else:
         lammps_variables['dump_modify_format'] = 'float %.13e'
     
@@ -482,6 +494,9 @@ def process_input(input_dict, UUID=None, build=True):
     
     # Load ucell system
     iprPy.input.interpret('atomman_systemload', input_dict, build=build)
+    
+    # Add atomic charges
+    iprPy.input.interpret('lammps_atomcharges', input_dict, build=build)
     
     # Construct initialsystem by manipulating ucell system
     iprPy.input.interpret('atomman_systemmanipulate', input_dict, build=build)
