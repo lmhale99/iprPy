@@ -1,0 +1,28 @@
+{
+    "potential-LAMMPS": {
+        "key": "09272147-ff2e-44aa-b0c6-cba8e2c5e6ca", 
+        "id": "2000--Lenosky-T-J--Si--LAMMPS--ipr1", 
+        "potential": {
+            "key": "eeb07b3b-d243-4825-803c-991feaa01cdd", 
+            "id": "2000--Lenosky-T-J-Sadigh-B-Alonso-E-et-al--Si"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Si"
+        }, 
+        "pair_style": {
+            "type": "meam/spline"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Si_1.meam.spline"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

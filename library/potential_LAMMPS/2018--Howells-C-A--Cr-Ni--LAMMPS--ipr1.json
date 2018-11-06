@@ -1,28 +1,30 @@
 {
     "potential-LAMMPS": {
-        "key": "51e7dfd7-66df-4d93-be8c-209ffc278d4e", 
-        "id": "2016--Zhang-P--Ti-O--LAMMPS--ipr1", 
+        "key": "0da50c21-0b24-4ed0-be9b-eb9f508217b1", 
+        "id": "2018--Howells-C-A--Cr-Ni--LAMMPS--ipr1", 
         "potential": {
-            "key": "df7bbc58-7b3e-4946-9be1-b155f5c1cab9", 
-            "id": "2016--Zhang-P-Trinkle-D-R--Ti-O"
+            "key": "ee6e7c54-fd7d-4459-96ca-5898e93053c6", 
+            "id": "2018--Howells-C-A-Mishin-Y--Cr-Ni"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
         "atom": [
             {
-                "element": "Ti"
+                "element": "Cr", 
+                "mass": 51.9961
             }, 
             {
-                "element": "O"
+                "element": "Ni", 
+                "mass": 58.6934
             }
         ], 
         "pair_style": {
-            "type": "meam/spline"
+            "type": "adp"
         }, 
         "pair_coeff": {
             "term": [
                 {
-                    "file": "TiO.meam.spline"
+                    "file": "CrNi.adp.txt"
                 }, 
                 {
                     "symbols": "True"

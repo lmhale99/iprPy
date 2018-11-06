@@ -1,5 +1,5 @@
 # Ti-O cubic spline potential where O is in the dilute limit. DATE: 2016-06-05 CONTRIBUTOR: Pinchao Zhang, Dallas R. Trinkle
-meam/spline
+meam/spline 2 Ti O
 spline3eq
 13
 -20 0

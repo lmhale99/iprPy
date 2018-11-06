@@ -1,28 +1,28 @@
 {
     "potential-LAMMPS": {
-        "key": "51e7dfd7-66df-4d93-be8c-209ffc278d4e", 
-        "id": "2016--Zhang-P--Ti-O--LAMMPS--ipr1", 
+        "key": "da3a62f4-c17b-4119-a65f-deb47c842f69", 
+        "id": "2007--Vashishta-P--Si-C--LAMMPS--ipr1", 
         "potential": {
-            "key": "df7bbc58-7b3e-4946-9be1-b155f5c1cab9", 
-            "id": "2016--Zhang-P-Trinkle-D-R--Ti-O"
+            "key": "d9495b9a-ff7a-4c4f-bb25-de2062e794d9", 
+            "id": "2007--Vashishta-P-Kalia-R-K-Nakano-A-Rino-J-P--Si-C"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
         "atom": [
             {
-                "element": "Ti"
+                "element": "Si"
             }, 
             {
-                "element": "O"
+                "element": "C"
             }
         ], 
         "pair_style": {
-            "type": "meam/spline"
+            "type": "vashishta"
         }, 
         "pair_coeff": {
             "term": [
                 {
-                    "file": "TiO.meam.spline"
+                    "file": "SiC.vashishta"
                 }, 
                 {
                     "symbols": "True"

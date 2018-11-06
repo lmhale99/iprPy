@@ -1,28 +1,28 @@
 {
     "potential-LAMMPS": {
-        "key": "fb6201ce-3130-44d9-ae2c-06ecfe49a43b", 
-        "id": "2016--Zhang-P--Ti-O--LAMMPS--ipr2", 
+        "key": "c4c1c55f-d95f-4858-a15b-f33854107cd0", 
+        "id": "2006--Bere-A--Ga-N--LAMMPS--ipr1", 
         "potential": {
-            "key": "df7bbc58-7b3e-4946-9be1-b155f5c1cab9", 
-            "id": "2016--Zhang-P-Trinkle-D-R--Ti-O"
+            "key": "a08eb46e-3856-4329-9dce-41af22f9acc1", 
+            "id": "2006--Bere-A-Serra-A--Ga-N"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
         "atom": [
             {
-                "element": "Ti"
+                "element": "Ga"
             }, 
             {
-                "element": "O"
+                "element": "N"
             }
         ], 
         "pair_style": {
-            "type": "meam/spline"
+            "type": "sw"
         }, 
         "pair_coeff": {
             "term": [
                 {
-                    "file": "TiO.meam.spline"
+                    "file": "GaN.sw"
                 }, 
                 {
                     "symbols": "True"

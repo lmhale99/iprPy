@@ -1,0 +1,28 @@
+{
+    "potential-LAMMPS": {
+        "key": "ee87565b-c8a9-4cc8-9f99-1e405f56d165", 
+        "id": "2007--Kumagai-T--Si--LAMMPS--ipr1", 
+        "potential": {
+            "key": "390be585-f40c-4e4c-ba6a-7aa0577dadee", 
+            "id": "2007--Kumagai-T-Izumi-S-Hara-S-Sakai-S--Si"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Si"
+        }, 
+        "pair_style": {
+            "type": "tersoff/mod"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Si.tersoff.mod"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}
