@@ -157,19 +157,28 @@ def e_vs_r(lammps_command, system, potential,
                                              '<', '>'))
         
         # Run lammps and extract data
-        output = lmp.run(lammps_command, lammps_script, mpi_command)
-        
-        thermo = output.simulations[0]['thermo']
-        
-        if output.lammps_date < datetime.date(2016, 8, 1):
-            Ecoh_values[i] = uc.set_in_units(thermo.peatom.values[-1],
-                                             lammps_units['energy'])
+        try:
+            output = lmp.run(lammps_command, lammps_script, mpi_command)
+        except:
+            Ecoh_values[i] = np.nan
         else:
-            Ecoh_values[i] = uc.set_in_units(thermo.v_peatom.values[-1],
-                                             lammps_units['energy'])
+            thermo = output.simulations[0]['thermo']
+            
+            if output.lammps_date < datetime.date(2016, 8, 1):
+                Ecoh_values[i] = uc.set_in_units(thermo.peatom.values[-1],
+                                                lammps_units['energy'])
+            else:
+                Ecoh_values[i] = uc.set_in_units(thermo.v_peatom.values[-1],
+                                                lammps_units['energy'])
         
         # Rename log.lammps
-        shutil.move('log.lammps', 'run0-'+str(i)+'-log.lammps')
+        try:
+            shutil.move('log.lammps', 'run0-'+str(i)+'-log.lammps')
+        except:
+            pass
+
+    if len(Ecoh_values[np.isfinite(Ecoh_values)]) == 0:
+        raise ValueError('All LAMMPS runs failed. Potential likely invalid or incompatible.')  
     
     # Find unit cell systems at the energy minimums
     min_cells = []

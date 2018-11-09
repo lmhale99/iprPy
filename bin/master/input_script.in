@@ -1,0 +1,21 @@
+
+
+# Build load information based on prototype records
+buildcombos                 crystalprototype load_file proto
+
+# Build load information based on reference structures
+buildcombos                 atomicreference load_file ref
+
+# Specify reference buildcombos limiters (only build for element sets listed)
+#ref_elements                Ag
+
+# Units that input/output values are in
+length_unit                 
+pressure_unit               
+energy_unit                 
+force_unit                  
+
+# Run parameters
+symmetryprecision           
+primitivecell               
+idealcell                   

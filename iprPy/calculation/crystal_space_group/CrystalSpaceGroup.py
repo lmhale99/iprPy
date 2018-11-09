@@ -3,6 +3,7 @@ from __future__ import (absolute_import, print_function,
                         division, unicode_literals)
 import os
 
+from .calc_crystal_space_group import crystal_space_group
 from .. import Calculation
 
 class CrystalSpaceGroup(Calculation):
@@ -12,6 +13,13 @@ class CrystalSpaceGroup(Calculation):
     implemented for each style.  The available styles are loaded from the
     iprPy.calculations submodule.
     """
+
+    def __init__(self):
+        self.calc = crystal_space_group
+
+        Calculation.__init__(self)
+
+
     @property
     def files(self):
         """

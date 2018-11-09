@@ -129,7 +129,8 @@ class CalculationCrystalSpaceGroup(Record):
                 wykoff['letter'] = letter
                 wykoff['multiplicity'] = int(mult)
                 calc['space-group'].append('Wykoff', wykoff)
-            
+            calc['space-group']['Wyckoff-fingerprint'] = results_dict['wyckoff_fingerprint']
+
             if 'charge' in results_dict['ucell'].atoms_prop():
                 prop_units = {'charge': 'e'}
             else:
@@ -198,7 +199,7 @@ class CalculationCrystalSpaceGroup(Record):
             params['spacegroup_number'] = calc['space-group']['number']
             params['spacegroup_international'] = calc['space-group']['Hermann-Maguin']
             params['spacegroup_Schoenflies'] = calc['space-group']['Schoenflies']
-            params['wykoff_letters'] = ' '.join(calc['space-group'].finds('letter'))
+            params['wykoff_fingerprint'] = calc['space-group']['Wyckoff-fingerprint']
             
             if flat is True:
                 params['a'] = ucell.box.a

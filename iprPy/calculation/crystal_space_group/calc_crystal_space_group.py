@@ -105,7 +105,7 @@ def crystal_space_group(system, symprec=1e-5, to_primitive=False,
             ucell.atoms.view[key][sym_data['std_mapping_to_primitive'] == index] = value
     
     # Get space group metadata
-    sym_data = spglib.get_symmetry_dataset(system.dump('spglib_cell'))
+    sym_data = spglib.get_symmetry_dataset(ucell.dump('spglib_cell'))
     spg_type = spglib.get_spacegroup_type(sym_data['hall_number'])
     
     # Generate Pearson symbol
@@ -129,12 +129,29 @@ def crystal_space_group(system, symprec=1e-5, to_primitive=False,
     natoms = str(ucell.natoms)
     pearson = crystalclass + latticetype + natoms
     
+    # Generate Wyckoff fingerprint
+    fingerprint_dict = {} 
+    usites, uindices = np.unique(sym_data['equivalent_atoms'], return_index=True)
+    for usite, uindex in zip(usites, uindices):
+        atype = ucell.atoms.atype[uindex]
+        wykoff = sym_data['wyckoffs'][uindex]
+        if atype not in fingerprint_dict:
+            fingerprint_dict[atype] = [wykoff]
+        else:
+            fingerprint_dict[atype].append(wykoff)
+    fingerprint = []
+    for atype in sorted(fingerprint_dict.keys()):
+        fingerprint.append(''.join(sorted(fingerprint_dict[atype])))
+    fingerprint = ' '.join(fingerprint)
+
     # Return results
     results_dict = spg_type
     results_dict['ucell'] = ucell
     results_dict['hall_number'] = sym_data['hall_number']
     results_dict['wyckoffs'] = sym_data['wyckoffs']
+    results_dict['equivalent_atoms'] = sym_data['equivalent_atoms']
     results_dict['pearson'] = pearson
+    results_dict['wyckoff_fingerprint'] = fingerprint
     
     return results_dict
     
