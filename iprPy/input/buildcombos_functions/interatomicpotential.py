@@ -15,44 +15,44 @@ def interatomicpotential(database, keys=['potential_file', 'potential_content', 
     potentials, potential_df = database.get_records(style=record, return_df=True,
                                                     query=query, **kwargs)
     
-    
-    potential_content = []
-    for potential in potentials:
-        potential_content.append(potential.content)
-    potential_df['content'] = potential_content
-    
-    # Limit to only current IPR implementations
-    if currentIPR is True:
+    if len(potential_df) > 0:
+        potential_content = []
+        for potential in potentials:
+            potential_content.append(potential.content)
+        potential_df['content'] = potential_content
         
-        # Extract versionstyle and versionnumber
-        versionstyle = []
-        versionnumber = []
-        for name in potential_df['id'].values:
-            version = name.split('--')[-1]
-            try:
-                versionnumber.append(int(version[-1]))
-            except:
-                versionnumber.append(np.nan)
-                versionstyle.append(version)
-            else:
-                versionstyle.append(version[:-1])
-        
-        potential_df['versionstyle'] = versionstyle
-        potential_df['versionnumber'] = versionnumber
-        
-        # Loop through unique potential id's
-        includeid = []
-        for pot_id in np.unique(potential_df.pot_id.values):
-            check_df = potential_df[potential_df.pot_id == pot_id]
-            check_df = check_df[check_df.versionstyle == 'ipr']
-            check_df = check_df[check_df.versionnumber == check_df.versionnumber.max()]
-            if len(check_df) == 1:
-                includeid.append(check_df['id'].values[0])
-            elif len(check_df) > 1:
-                raise ValueError('Bad currentIPR check for '+pot_id)
-        
-        # Limit df by includeid potentials
-        potential_df = potential_df[potential_df['id'].isin(includeid)]
+        # Limit to only current IPR implementations
+        if currentIPR is True:
+            
+            # Extract versionstyle and versionnumber
+            versionstyle = []
+            versionnumber = []
+            for name in potential_df['id'].values:
+                version = name.split('--')[-1]
+                try:
+                    versionnumber.append(int(version[-1]))
+                except:
+                    versionnumber.append(np.nan)
+                    versionstyle.append(version)
+                else:
+                    versionstyle.append(version[:-1])
+            
+            potential_df['versionstyle'] = versionstyle
+            potential_df['versionnumber'] = versionnumber
+            
+            # Loop through unique potential id's
+            includeid = []
+            for pot_id in np.unique(potential_df.pot_id.values):
+                check_df = potential_df[potential_df.pot_id == pot_id]
+                check_df = check_df[check_df.versionstyle == 'ipr']
+                check_df = check_df[check_df.versionnumber == check_df.versionnumber.max()]
+                if len(check_df) == 1:
+                    includeid.append(check_df['id'].values[0])
+                elif len(check_df) > 1:
+                    raise ValueError('Bad currentIPR check for '+pot_id)
+            
+            # Limit df by includeid potentials
+            potential_df = potential_df[potential_df['id'].isin(includeid)]
     
     inputs = {}
     for key in keys:
