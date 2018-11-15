@@ -1,0 +1,49 @@
+{
+    "potential-LAMMPS": {
+        "key": "79c8eb85-0f47-422b-b552-0fa7f405ffc8", 
+        "id": "2015--Kumar-A--Al-Ni--LAMMPS--ipr1", 
+        "potential": {
+            "key": "fb000490-6707-4628-b512-2a9ac4f50d78", 
+            "id": "2015--Kumar-A-Chernatynskiy-A-Liang-T-et-al--Al-Ni"
+        }, 
+        "units": "metal", 
+        "atom_style": "charge", 
+        "atom": [
+            {
+                "element": "Al"
+            }, 
+            {
+                "element": "Ni"
+            }
+        ], 
+        "pair_style": {
+            "type": "comb3",
+            "term": {
+                "option": "polar_off"
+            }
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "ffield.comb3.NiAlO"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        },
+        "command": {
+            "term": [
+                {
+                    "option": "fix qeq all qeq/comb"
+                },
+                {
+                    "parameter": 10
+                },
+                {
+                    "parameter": 0.0001
+                }
+            ]
+        }
+    }
+}
