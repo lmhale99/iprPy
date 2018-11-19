@@ -1,24 +1,40 @@
+# Standard Python libraries
+from __future__ import (print_function, division, absolute_import,
+                        unicode_literals)
+
 from DataModelDict import DataModelDict as DM
 import numpy as np
 
-def assign_composition(calc_df, database):
+def assign_composition(df, database):
     """
-    Identifies crystal prototype compositions.
+    Assigns compositions to calculations.
     """
+    # Build counts for available prototypes
     prototypes = database.get_records(style='crystal_prototype')
-    # Build counts for each prototype
     counts = {}
     for prototype in prototypes:
         counts[prototype.name] = np.unique(prototype.content.finds('component'), return_counts=True)[1]
     
     # Identify compositions
     compositions = []
-    for calc in calc_df.itertuples():
-        compositions.append(composition(calc.symbols, counts[calc.family]))
-    calc_df['composition'] = compositions
-    #calc_df = calc_df.assign(composition=compositions)
+    for i, series in df.iterrows():
+        
+        # Use ucell system if available (crystal_space_group)
+        if 'ucell' in series:
+            if series.ucell.symbols[0] is not None:
+                counts = np.unique(series.ucell.atoms.atype, return_counts=True)[1]
+                compositions.append(composition_str(series.ucell.symbols, counts))
+            else:
+                compositions.append(np.nan)
+        
+        # Use symbols and family info if available (E_vs_r_scan, relax_*)  
+        elif 'symbols' in series and series.family in counts:
+            compositions.append(composition_str(series.symbols, counts[series.family]))
+        else:
+            compositions.append(np.nan)
+    df['composition'] = compositions
 
-def composition(symbols, counts):
+def composition_str(symbols, counts):
     """
     Generates a composition string for a unit cell.
     
@@ -55,11 +71,11 @@ def composition(symbols, counts):
             for key in sym_dict:
                 sym_dict[key] /= prime
     
-    composition_str =''
+    composition =''
     for key in sorted(sym_dict):
         if sym_dict[key] > 0:
-            composition_str += key
+            composition += key
             if sym_dict[key] != 1:
-                composition_str += str(int(sym_dict[key]))
+                composition += str(int(sym_dict[key]))
     
-    return composition_str
+    return composition

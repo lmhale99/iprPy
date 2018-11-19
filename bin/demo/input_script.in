@@ -1,0 +1,35 @@
+
+
+# Build load information based on prototype records
+buildcombos                 crystalprototype load_file
+
+# Build load information based on reference structures
+buildcombos                 atomicreference load_file ref
+
+# Specify reference buildcombos limiters (only build for element sets listed)
+ref_elements                Ag
+
+# Build load information from relax_static results
+buildcombos                 atomicarchive load_file relax_static
+
+# Specify archive parent buildcombos terms (parent record's style and the load_key to access)
+relax_static_record         calculation_relax_static
+relax_static_load_key       final-system
+
+# Build load information from relax_box results
+buildcombos                 atomicarchive load_file relax_box
+
+# Specify archive parent buildcombos terms (parent record's style and the load_key to access)
+relax_box_record            calculation_relax_box
+relax_box_load_key          final-system
+
+# Units that input/output values are in
+length_unit                 
+pressure_unit               
+energy_unit                 
+force_unit                  
+
+# Run parameters
+symmetryprecision           
+primitivecell               
+idealcell                   
