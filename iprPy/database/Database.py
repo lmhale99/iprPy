@@ -456,14 +456,18 @@ class Database(object):
                     pass
                 else:
                     # Copy tar back to run_directory
-                    tar.extractall(run_directory)
-                    tar.close()
-                    
-                    # Delete database version of tar
                     try:
-                        self.delete_tar(name=record_name, style=record_style)
+                        tar.extractall(run_directory)
                     except:
-                        pass
+                        print('failed to extract', record_name, 'tar')
+                        tar.close()
+                    else:
+                        # Delete database version of tar
+                        tar.close()
+                        try:
+                            self.delete_tar(name=record_name, style=record_style)
+                        except:
+                            pass
                 
                 # Remove error and status from stored record
                 try:
