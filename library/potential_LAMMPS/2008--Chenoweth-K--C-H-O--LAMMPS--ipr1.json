@@ -7,7 +7,7 @@
             "id": "2008--Chenoweth-K-van-Duin-A-C-T-Goddard-W-A--C-H-O"
         }, 
         "units": "metal", 
-        "atom_style": "atomic", 
+        "atom_style": "charge", 
         "atom": [
             {
                 "element": "C", 
@@ -34,7 +34,7 @@
                     "file": "ffield.reax.CHO_2008"
                 }, 
                 {
-                    "symbols": "True"
+                    "symbols": true
                 }
             ]
         }, 
@@ -53,16 +53,16 @@
                     "option": "qeq/reax"
                 }, 
                 {
-                    "parameter": "1"
+                    "parameter": 1
                 }, 
                 {
-                    "parameter": "0.0"
+                    "parameter": 0.0
                 }, 
                 {
-                    "parameter": "10.0"
+                    "parameter": 10.0
                 }, 
                 {
-                    "parameter": "1.0e-6"
+                    "parameter": 1e-06
                 }, 
                 {
                     "option": "reax/c"

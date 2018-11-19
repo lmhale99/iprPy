@@ -43,16 +43,13 @@
         "pair_coeff": {
             "term": [
                 {
+                    "symbolsList": true
+                }, 
+                {
                     "file": "ffield.eim"
                 }, 
                 {
-                    "option": "Li Na K Rb Cs F Cl Br I"
-                }, 
-                {
-                    "file": "NULL"
-                }, 
-                {
-                    "symbols": "True"
+                    "symbols": true
                 }
             ]
         }

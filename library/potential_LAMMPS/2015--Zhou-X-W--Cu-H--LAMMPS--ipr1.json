@@ -30,6 +30,19 @@
                     "symbols": "True"
                 }
             ]
+        },
+        "command": {
+            "term": [
+                {
+                    "option": "comm_modify"
+                },
+                {
+                    "option": "cutoff"
+                },
+                {
+                    "parameter": 14.70
+                }
+            ]
         }
     }
 }

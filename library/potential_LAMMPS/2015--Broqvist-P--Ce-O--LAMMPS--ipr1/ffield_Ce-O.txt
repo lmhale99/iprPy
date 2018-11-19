@@ -1,18 +1,4 @@
 Reactive force field: 2016-02-09 Ce/O. 
-# Reference: Broqvist et al. J. Phys. Chem. C 119(24), 13598-13609 (2015).   
-# DOI: 10.1021/acs.jpcc.5b01597
-# Usage:
-# The parameters have been tested for static calculations of CeO2 and partially 
-# reduced CeO(2-x) using the LAMMPS code with the fortran implementation of reaxFF. 
-# For energy comparisons, use the in-cell approach (see the paper) when calculating 
-# reaction energies.
-#
-# Known deficiencies:
-# After publication, we have found additional false local minima. In particular one 
-# involving a short Ce-O bond (approx. 1.89 Å) occuring in partially reduced ceria systems. 
-# This  is problematic as it gives the wrong dynamic behavior. Attempts to heal this deficiency  
-# so far destroys the good performance regarding the ordering of the surface vacancy energies 
-# on the (111) surface. Therefore, keep track of the bond distances when analysing your results!  
  39       ! Number of general parameters                                        
    50.0000 !Overcoordination parameter                                          
     9.5469 !Overcoordination parameter                                          

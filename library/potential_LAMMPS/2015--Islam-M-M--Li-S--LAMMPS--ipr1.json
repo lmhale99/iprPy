@@ -7,7 +7,7 @@
             "id": "2015--Islam-M-M-Ostadhossein-A-Borodin-O-et-al--Li-S"
         }, 
         "units": "metal", 
-        "atom_style": "atomic", 
+        "atom_style": "charge", 
         "atom": [
             {
                 "element": "Li", 
@@ -49,16 +49,16 @@
                     "option": "qeq/reax"
                 }, 
                 {
-                    "parameter": "1"
+                    "parameter": 1
                 }, 
                 {
-                    "parameter": "0.0"
+                    "parameter": 0.0
                 }, 
                 {
-                    "parameter": "10.0"
+                    "parameter": 10.0
                 }, 
                 {
-                    "parameter": "1.0e-6"
+                    "parameter": 1.0e-6
                 }, 
                 {
                     "option": "reax/c"
