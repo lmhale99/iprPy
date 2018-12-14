@@ -1,27 +1,19 @@
 
+# Commands and executables
+lammps_command              lmp_mpi
+mpi_command                 
 
-# Build load information based on prototype records
-buildcombos                 crystalprototype load_file
+# Build load information from relax_dynamic results
+buildcombos                 atomicparent load_file parent
+parent_record               calculation_crystal_space_group
+parent_load_key             unit-cell-atomic-system
 
-# Build load information based on reference structures
-buildcombos                 atomicreference load_file ref
-
-# Specify reference buildcombos limiters (only build for element sets listed)
-ref_elements                Ag
-
-# Build load information from relax_static results
-buildcombos                 atomicarchive load_file relax_static
-
-# Specify archive parent buildcombos terms (parent record's style and the load_key to access)
-relax_static_record         calculation_relax_static
-relax_static_load_key       final-system
-
-# Build load information from relax_box results
-buildcombos                 atomicarchive load_file relax_box
-
-# Specify archive parent buildcombos terms (parent record's style and the load_key to access)
-relax_box_record            calculation_relax_box
-relax_box_load_key          final-system
+# System manipulations
+a_uvw                      
+b_uvw                      
+c_uvw                 
+atomshift                   
+sizemults                   5 5 5
 
 # Units that input/output values are in
 length_unit                 
@@ -30,6 +22,12 @@ energy_unit
 force_unit                  
 
 # Run parameters
-symmetryprecision           
-primitivecell               
-idealcell                   
+energytolerance             
+forcetolerance              
+maxiterations               
+maxevaluations              
+maxatommotion               
+strainrange                  1e-5
+strainrange                  1e-6
+strainrange                  1e-7
+strainrange                  1e-8
