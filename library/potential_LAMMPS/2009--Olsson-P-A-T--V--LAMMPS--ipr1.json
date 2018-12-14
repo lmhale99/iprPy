@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "35819717-5690-4c08-b0a3-2a4b0f7e203f", 
+        "id": "2009--Olsson-P-A-T--V--LAMMPS--ipr1", 
+        "potential": {
+            "key": "5e72b6b6-d839-4a13-8c6b-980f6f85a523", 
+            "id": "2009--Olsson-P-A-T--V"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "V", 
+            "mass": 50.9414
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "V_Olsson_CMS2009.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}
