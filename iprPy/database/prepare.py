@@ -188,11 +188,15 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
                         with open(os.path.join(calc_directory, input_dict[key_file]), 'wb') as f:
                             f.write(input_dict[key_content])
             
-            # Copy potential artifacts
+            # Copy potential artifacts if needed and exist
             if 'potential_dir' in input_dict:
-                tar = database.get_tar(name=input_dict['potential_dir'])
-                tar.extractall(calc_directory)
-                tar.close()
+                try:               
+                    tar = database.get_tar(name=input_dict['potential_dir'])
+                except:
+                    pass
+                else:
+                    tar.extractall(calc_directory)
+                    tar.close()
 
 def itermultidict(multikeys, **kwargs):
     
