@@ -30,3 +30,6 @@ analysis/webcontent
 
 # Downloaded external reference structures
 library/ref/
+
+# Virtual Studio Code metadata
+.vscode/
