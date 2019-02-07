@@ -54,7 +54,7 @@ class CalculationEvsRScan(Record):
                 'b_mult',
                 'c_mult',
                 
-                'number_of_steps_r',
+                #'number_of_steps_r',
                ]
     
     @property
@@ -63,8 +63,8 @@ class CalculationEvsRScan(Record):
         list of str: The default fterms used by isnew() for comparisons.
         """
         return [
-                'maximum_r',
-                'minimum_r',
+                #'maximum_r',
+                #'minimum_r',
                ]
     
     def buildcontent(self, script, input_dict, results_dict=None):
