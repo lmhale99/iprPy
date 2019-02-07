@@ -1,0 +1,39 @@
+{
+    "potential-LAMMPS": {
+        "key": "3ce61fa3-46f5-4fe7-9d0b-d50812ea814e", 
+        "id": "2018--Zhou-X-W--Fe-Ni-Cr--LAMMPS--ipr2", 
+        "potential": {
+            "key": "7d63cde1-4ef1-499b-84bf-cfbd63a8acec", 
+            "id": "2018--Zhou-X-W-Foster-M-E-Sills-R-B--Fe-Ni-Cr"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Fe", 
+                "mass": 55.85
+            }, 
+            {
+                "element": "Ni", 
+                "mass": 58.69
+            }, 
+            {
+                "element": "Cr", 
+                "mass": 52.0
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "FeNiCr_fs.t"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}
