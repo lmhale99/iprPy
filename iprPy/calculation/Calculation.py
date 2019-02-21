@@ -19,14 +19,18 @@ class Calculation(object):
         """
         # Get module information for current class
         self_module = sys.modules[self.__module__]
-        self.__mod_file = self_module.__file__
-        self.__mod_name = self_module.__name__
-        if self.__mod_name == 'iprPy.calculation.Calculation':
+        self.__module_file = self_module.__file__
+        self.__module_name = self_module.__name__
+        if self.module_name == 'iprPy.calculation.Calculation':
             raise TypeError("Don't use Calculation itself, only use derived classes")
         
         # Import calculation script
-        module_name = '.'.join(self.__mod_name.split('.')[:-1])
-        self.__calc = import_module('.calc_' + self.style, module_name)
+        package_name = '.'.join(self.module_name.split('.')[:-1])
+        self.__script = import_module('.calc_' + self.style, package_name)
+        
+        # Make shortcuts to calculation's functions
+        self.main = self.script.main
+        self.process_input = self.script.process_input
     
     def __str__(self):
         """
@@ -38,54 +42,33 @@ class Calculation(object):
         return 'calculation style ' + self.style
     
     @property
+    def script(self):
+        return self.__script
+
+    @property
+    def module_file(self):
+        return self.__module_file
+
+    @property
+    def module_name(self):
+        """str: The calculation style"""
+        return self.__module_name
+
+    @property
     def style(self):
         """str: The calculation style"""
-        pkgname = self.__mod_name.split('.')
+        pkgname = self.module_name.split('.')
         return pkgname[2]
     
     @property
     def directory(self):
         """str: The path to the calculation's directory"""
-        return os.path.dirname(os.path.abspath(self.__mod_file))
+        return os.path.dirname(os.path.abspath(self.module_file))
     
     @property
     def record_style(self):
         """str: The record style associated with the calculation."""
-        return self.__calc.record_style
-    
-    def main(self, *args):
-        """
-        Calls the calculation's main function.
-        """
-        self.__calc.main(*args)
-    
-    def calc(self, *args, **kwargs):
-        """
-        Calls the primary calculation function(s).
-        This needs to be defined for each calculation.
-        """
-        return None
-
-    def process_input(self, input_dict, UUID=None, build=True):
-        """
-        Processes str input parameters, assigns default values if needed, and
-        generates new, more complex terms as used by the calculation.
-        
-        Parameters
-        ----------
-        input_dict :  dict
-            Dictionary containing the calculation input parameters with string
-            values.  The allowed keys depends on the calculation style.
-        UUID : str, optional
-            Unique identifier to use for the calculation instance.  If not 
-            given and a 'UUID' key is not in input_dict, then a random UUID4 
-            hash tag will be assigned.
-        build : bool, optional
-            Indicates if all complex terms are to be built.  A value of False
-            allows for default values to be assigned even if some inputs 
-            required by the calculation are incomplete. (Default is True.)
-        """
-        self.__calc.process_input(input_dict, UUID=UUID, build=build)
+        return self.script.record_style
     
     @property
     def template(self):
@@ -96,6 +79,12 @@ class Calculation(object):
         
         return template
     
+    def calc(self, *args, **kwargs):
+        """
+        Calls the calculation's primary function(s)
+        """
+        raise AttributeError('calc not defined for Calculation style')
+
     @property
     def files(self):
         """

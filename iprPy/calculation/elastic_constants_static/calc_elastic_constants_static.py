@@ -184,7 +184,7 @@ def elastic_constants_static(lammps_command, system, potential, mpi_command=None
         
         # Calculate cij_n using stress changes
         cij_n[i] = np.array([pxx - pxx0, pyy - pyy0, pzz - pzz0,
-                             pyz - pyz0, pxz - pxz0, pxy - pxy0])/ strainrange
+                             pyz - pyz0, pxz - pxz0, pxy - pxy0]) / strainrange
     
     # Positive strains
     cij_p = np.empty((6,6))
@@ -200,8 +200,8 @@ def elastic_constants_static(lammps_command, system, potential, mpi_command=None
         pxy = uc.set_in_units(thermo.Pxy.values[-1], lammps_units['pressure'])
         
         # Calculate cij_p using stress changes
-        cij_p[i] = -np.array([pxx - pxx0, pyy - pyy0, pzz - pzz0,
-                              pyz - pyz0, pxz - pxz0, pxy - pxy0])/ strainrange
+        cij_p[i] = np.array([pxx - pxx0, pyy - pyy0, pzz - pzz0,
+                              pyz - pyz0, pxz - pxz0, pxy - pxy0]) / -strainrange
     
     # Average symmetric values
     cij = (cij_n + cij_p) / 2

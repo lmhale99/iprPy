@@ -3,6 +3,7 @@ from __future__ import (absolute_import, print_function,
                         division, unicode_literals)
 import os
 
+# iprPy imports
 from .. import Calculation
 
 class ElasticConstantsStatic(Calculation):
@@ -12,6 +13,15 @@ class ElasticConstantsStatic(Calculation):
     implemented for each style.  The available styles are loaded from the
     iprPy.calculations submodule.
     """
+
+    def __init__(self):
+        
+        # Call parent constructor
+        Calculation.__init__(self)
+
+        # Define calc shortcut
+        self.calc = self.script.elastic_constants_static
+
     @property
     def files(self):
         """

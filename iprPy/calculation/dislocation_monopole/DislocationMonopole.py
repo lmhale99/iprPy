@@ -3,7 +3,7 @@ from __future__ import (absolute_import, print_function,
                         division, unicode_literals)
 import os
 
-from .calc_dislocation_monopole import dislocationmonopole
+# iprPy imports
 from .. import Calculation
 
 class DislocationMonopole(Calculation):
@@ -15,9 +15,12 @@ class DislocationMonopole(Calculation):
     """
 
     def __init__(self):
-        self.calc = dislocationmonopole
-
+        
+        # Call parent constructor
         Calculation.__init__(self)
+
+        # Define calc shortcut
+        self.calc = self.script.dislocationmonopole
 
     @property
     def files(self):
@@ -43,6 +46,8 @@ class DislocationMonopole(Calculation):
                 'pressure_unit',
                 'energy_unit',
                 'force_unit',
+                'dislocation_boundarywidth',
+                'dislocation_boundaryshape',
                ]
     
     @property
@@ -92,8 +97,6 @@ class DislocationMonopole(Calculation):
                     'dislocation_content',
                     'dislocation_family',
                     'dislocation_burgersvector',
-                    'dislocation_boundarywidth',
-                    'dislocation_boundaryshape',
                     'dislocation_stroh_m',
                     'dislocation_stroh_n',
                     'dislocation_lineboxvector',

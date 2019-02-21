@@ -136,7 +136,7 @@ class CalculationDislocationMonopole(Record):
         run_params['maxatommotion']  = uc.model(input_dict['maxatommotion'],
                                                 input_dict['length_unit'])
         
-        run_params['dislocation_boundarywidth'] = input_dict['boundarywidth']
+        run_params['dislocation_boundarywidth'] = input_dict['dislocation_boundarywidth']
         run_params['dislocation_boundaryshape'] = input_dict['dislocation_boundaryshape']
         
         run_params['annealtemperature'] = input_dict['annealtemperature']
@@ -206,7 +206,7 @@ class CalculationDislocationMonopole(Record):
             calc['Stroh-K-tensor'] = uc.model(results_dict['Stroh_K_tensor'],
                                               input_dict['pressure_unit'])
             
-            self.content = output
+        self.content = output
     
     def todict(self, full=True, flat=False):
         """

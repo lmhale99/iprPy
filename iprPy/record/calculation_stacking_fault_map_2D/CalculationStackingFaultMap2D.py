@@ -267,22 +267,11 @@ class CalculationStackingFaultMap2D(Record):
             params['symbols'] = symbols
         
         params['status'] = calc.get('status', 'finished')
+        params['error'] = calc.get('error', np.nan)
         
-        if full is True:
-            if params['status'] == 'error':
-                params['error'] = calc['error']
-            
-            elif params['status'] == 'not calculated':
-                pass
-                
-            else:
-                if flat is False:
-                    plot = calc['stacking-fault-relation']
-                    gsf_plot = {}
-                    gsf_plot['shift1'] = plot['shift-vector-1-fraction']
-                    gsf_plot['shift2'] = plot['shift-vector-2-fraction']
-                    gsf_plot['energy'] = uc.value_unit(plot['energy'])
-                    gsf_plot['separation'] = uc.value_unit(plot['plane-separation'])
-                    params['gsf_plot'] = pd.DataFrame(gsf_plot)
+        if full is True and params['status'] == 'finished':
+        
+            if flat is False:
+                params['gammasurface'] = am.defect.GammaSurface(model=calc)
         
         return params

@@ -3,7 +3,7 @@ from __future__ import (absolute_import, print_function,
                         division, unicode_literals)
 import os
 
-from .calc_crystal_space_group import crystal_space_group
+# iprPy imports
 from .. import Calculation
 
 class CrystalSpaceGroup(Calculation):
@@ -15,9 +15,12 @@ class CrystalSpaceGroup(Calculation):
     """
 
     def __init__(self):
-        self.calc = crystal_space_group
-
+        
+        # Call parent constructor
         Calculation.__init__(self)
+
+        # Define calc shortcut
+        self.calc = self.script.crystal_space_group
 
 
     @property

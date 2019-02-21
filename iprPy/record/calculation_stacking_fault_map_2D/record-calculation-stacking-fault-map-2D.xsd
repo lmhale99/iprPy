@@ -2,5 +2,5 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified"
     elementFormDefault="unqualified">
 
-    <xsd:element name="calculation-calculation-stacking-fault-map-2D" type="xsd:anyType"/>
+    <xsd:element name="calculation-stacking-fault-map-2D" type="xsd:anyType"/>
 </xsd:schema>

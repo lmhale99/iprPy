@@ -175,7 +175,6 @@ def relax_static(lammps_command, system, potential, mpi_command=None,
     
     # Run minimizations up to maxcycles times
     for cycle in range(maxcycles):
-        old_system = deepcopy(system)
         
         # Define lammps variables
         lammps_variables = {}
