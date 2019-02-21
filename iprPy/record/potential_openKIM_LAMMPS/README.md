@@ -12,7 +12,7 @@ Version: 2019-02-08
 
 ## Introduction
 
-The potential_LAMMPS Record style is for collecting the parameters associated with a LAMMPS implemented interatomic potential.  It can be read in and interpreted using the atomman.lammps.Potential class.
+The potential_openKIM_LAMMPS Record style is for collecting the parameters associated with a LAMMPS implemented interatomic potential.  It can be read in and interpreted using the atomman.lammps.Potential class.
 
 The potential_*LAMMPS record styles are all identical and are only separated based on the content source:
 

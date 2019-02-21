@@ -5,7 +5,7 @@ import os
 import sys
 from importlib import import_module
 
-def dynamic_import(module_file, module_name, ignorelist=[]):
+def dynamic_import(module_file, module_name, ignorelist=None):
     """
     Dynamically imports classes stored in submodules and makes them directly
     accessible by style name within the returned loaded dictionary.
@@ -21,6 +21,8 @@ def dynamic_import(module_file, module_name, ignorelist=[]):
     failed : dict
         
     """
+    if ignorelist is None:
+        ignorelist = []
     names = []
     dir = os.path.dirname(module_file)
     ignorelist = ['__init__', '__pycache__'] + ignorelist

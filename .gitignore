@@ -28,6 +28,9 @@ notebook/*/
 # Generated web content
 analysis/webcontent
 
+# User-defined potentials
+library/potential_users_LAMMPS/
+
 # Downloaded external reference structures
 library/ref/
 
