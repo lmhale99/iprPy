@@ -73,7 +73,6 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
     
     # Handle prepare build special functions
     if 'buildcombos' in kwargs:
-        build_commands = {}
         for build_command in aslist(kwargs['buildcombos']):
             terms = build_command.split()
             

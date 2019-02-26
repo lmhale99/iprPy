@@ -13,17 +13,20 @@
             "mass": 55.85
         }, 
         "pair_style": {
-            "type": "eam/fs"
+            "type": "eam"
         }, 
-        "pair_coeff": {
-            "term": [
-                {
-                    "file": "Fe_2.eam"
+        "pair_coeff": [
+            {
+                "interaction": {
+                    "symbol": [
+                        "Fe", 
+                        "Fe"
+                    ]
                 }, 
-                {
-                    "symbols": "True"
+                "term": {
+                    "file": "Fe_2.eam"
                 }
-            ]
-        }
+            }
+        ]
     }
 }
