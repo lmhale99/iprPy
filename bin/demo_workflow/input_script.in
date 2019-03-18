@@ -1,23 +1,25 @@
 
 # Commands and executables
 lammps_command              lmp_mpi
-mpi_command                 
+#mpi_command                 c:\Program Files\MPICH2\bin\mpiexec -localonly 4
 
 # Build load information from crystal_space_group results
-buildcombos                 atomicparent load_file parent
-parent_record               calculation_crystal_space_group
-parent_load_key             unit-cell-atomic-system
+buildcombos                 elasticparent load_file parent
+parent_record               calculation_elastic_constants_static
+parent_load_key             system-info
+parent_strainrange          1e-7
 
 # Build defect records
-buildcombos                 defect pointdefect_file
-defect_record               point_defect
+buildcombos                 defect dislocation_file
+defect_record               dislocation_monopole
+defect_id                   A2--W--bcc--a-2-111--90-edge--{112}
 
 # System manipulations
 a_uvw                      
 b_uvw                      
 c_uvw                 
 atomshift                   
-sizemults                   10 10 10
+sizemults                   0 1 -57 57 -15 15
 
 # Units that input/output values are in
 length_unit                 
@@ -26,8 +28,14 @@ energy_unit
 force_unit                  
 
 # Run parameters
+annealtemperature           10
+annealsteps                 100
+randomseed
 energytolerance             
 forcetolerance              
 maxiterations               
 maxevaluations              
 maxatommotion               
+duplicatecutoff             
+boundarywidth               
+onlyuselinear               
