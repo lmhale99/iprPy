@@ -57,6 +57,7 @@ def main(*args):
                                        maxeval = input_dict['maxevaluations'],
                                        dmax = input_dict['maxatommotion'],
                                        annealtemp =  input_dict['annealtemperature'],
+                                       annealsteps =  input_dict['annealsteps'],
                                        randomseed = input_dict['randomseed'],
                                        bshape = input_dict['dislocation_boundaryshape'],
                                        bwidth = input_dict['boundarywidth'])
@@ -75,7 +76,7 @@ def dislocationmonopole(lammps_command, system, potential, burgers,
                         lineboxvector='a', randomseed=None,
                         etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000,
                         dmax=uc.set_in_units(0.01, 'angstrom'),
-                        annealtemp=0.0, bshape='circle',
+                        annealtemp=0.0, annealsteps=None, bshape='circle',
                         bwidth=uc.set_in_units(10, 'angstrom')):
     """
     Creates and relaxes a dislocation monopole system.
@@ -101,33 +102,36 @@ def dislocationmonopole(lammps_command, system, potential, burgers,
         crystallographic orientations to the system's Cartesian units.
     randomseed : int or None, optional
         Random number seed used by LAMMPS in creating velocities and with
-        the Langevin thermostat.  (Default is None which will select a
-        random int between 1 and 900000000.)
+        the Langevin thermostat.  Default is None which will select a
+        random int between 1 and 900000000.
     etol : float, optional
         The energy tolerance for the structure minimization. This value is
-        unitless. (Default is 0.0).
+        unitless. Default is 0.0.
     ftol : float, optional
         The force tolerance for the structure minimization. This value is in
-        units of force. (Default is 0.0).
+        units of force. Default is 0.0.
     maxiter : int, optional
-        The maximum number of minimization iterations to use (default is 
-        10000).
+        The maximum number of minimization iterations to use. Default is 
+        10000.
     maxeval : int, optional
-        The maximum number of minimization evaluations to use (default is 
-        100000).
+        The maximum number of minimization evaluations to use. Default is 
+        100000.
     dmax : float, optional
         The maximum distance in length units that any atom is allowed to relax
-        in any direction during a single minimization iteration (default is
-        0.01 Angstroms).
+        in any direction during a single minimization iteration. Default is
+        0.01 Angstroms.
     annealtemp : float, optional
-        The temperature to perform a dynamic relaxation at. (Default is 0.0,
-        which will skip the dynamic relaxation.)
+        The temperature to perform a dynamic relaxation at. Default is 0.0,
+        which will skip the dynamic relaxation.
+    annealsteps : int, optional
+        The number of time steps to run the dynamic relaxation for.  Default
+        is None, which will run for 10000 steps if annealtemp is not 0.0.  
     bshape : str, optional
         The shape to make the boundary region.  Options are 'circle' and
-        'rect' (default is 'circle').
+        'rect'. Default is 'circle'.
     bwidth : float, optional
-        The minimum thickness of the boundary region (default is 10
-        Angstroms).
+        The minimum thickness of the boundary region. Default is 10
+        Angstroms.
     
     Returns
     -------
@@ -175,6 +179,7 @@ def dislocationmonopole(lammps_command, system, potential, burgers,
     relaxed = disl_relax(lammps_command, system, potential,
                          mpi_command = mpi_command, 
                          annealtemp = annealtemp,
+                         annealsteps = annealsteps,
                          etol = etol, 
                          ftol = ftol, 
                          maxiter = maxiter, 
@@ -344,7 +349,8 @@ def disl_boundary_fix(system, bwidth, bshape='circle', lineboxvector='a', m=None
     return newsystem
 
 def disl_relax(lammps_command, system, potential,
-               mpi_command=None, annealtemp=0.0, randomseed=None,
+               mpi_command=None, 
+               annealtemp=0.0, annealsteps=None, randomseed=None,
                etol=0.0, ftol=1e-6, maxiter=10000, maxeval=100000,
                dmax=uc.set_in_units(0.01, 'angstrom')):
     """
@@ -363,28 +369,31 @@ def disl_relax(lammps_command, system, potential,
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
         will run serially.
     annealtemp : float, optional
-        The temperature to perform a dynamic relaxation at. (Default is 0.0,
-        which will skip the dynamic relaxation.)
+        The temperature to perform a dynamic relaxation at. Default is 0.0,
+        which will skip the dynamic relaxation.
+    annealsteps : int, optional
+        The number of time steps to run the dynamic relaxation for.  Default
+        is None, which will run for 10000 steps if annealtemp is not 0.0.        
     randomseed : int or None, optional
         Random number seed used by LAMMPS in creating velocities and with
-        the Langevin thermostat.  (Default is None which will select a
-        random int between 1 and 900000000.)
+        the Langevin thermostat.  Default is None which will select a
+        random int between 1 and 900000000.
     etol : float, optional
         The energy tolerance for the structure minimization. This value is
-        unitless. (Default is 0.0).
+        unitless. Default is 0.0.
     ftol : float, optional
         The force tolerance for the structure minimization. This value is in
-        units of force. (Default is 0.0).
+        units of force. Default is 0.0.
     maxiter : int, optional
-        The maximum number of minimization iterations to use (default is 
-        10000).
+        The maximum number of minimization iterations to use default is 
+        10000.
     maxeval : int, optional
-        The maximum number of minimization evaluations to use (default is 
-        100000).
+        The maximum number of minimization evaluations to use default is 
+        100000.
     dmax : float, optional
         The maximum distance in length units that any atom is allowed to relax
-        in any direction during a single minimization iteration (default is
-        0.01 Angstroms).
+        in any direction during a single minimization iteration default is
+        0.01 Angstroms.
         
     Returns
     -------
@@ -411,8 +420,8 @@ def disl_relax(lammps_command, system, potential,
                               atom_style=potential.atom_style)
     lammps_variables['atomman_system_info'] = system_info
     lammps_variables['atomman_pair_info'] = potential.pair_info(system.symbols)
-    lammps_variables['anneal_info'] = anneal_info(annealtemp, randomseed,
-                                                  potential.units)
+    lammps_variables['anneal_info'] = anneal_info(annealtemp, annealsteps, 
+                                                  randomseed, potential.units)
     lammps_variables['etol'] = etol
     lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])
     lammps_variables['maxiter'] = maxiter
@@ -448,7 +457,7 @@ def disl_relax(lammps_command, system, potential,
     
     return results
 
-def anneal_info(temperature=0.0, randomseed=None, units='metal'):
+def anneal_info(temperature=0.0, runsteps=None, randomseed=None, units='metal'):
     """
     Generates LAMMPS commands for thermo anneal.
     
@@ -477,6 +486,8 @@ def anneal_info(temperature=0.0, randomseed=None, units='metal'):
     else:
         if randomseed is None:
             randomseed = random.randint(1, 900000000)
+        if runsteps is None:
+            runsteps = 10000
         
         start_temp = 2 * temperature
         tdamp = 100 * lmp.style.timestep(units)
@@ -486,8 +497,8 @@ def anneal_info(temperature=0.0, randomseed=None, units='metal'):
             'fix nvt all nvt temp %f %f %f' % (temperature, temperature,
                                                tdamp),
             'timestep %f' % (timestep),
-            'thermo 10000',
-            'run 10000',
+            'thermo %i' % (runsteps),
+            'run %i' % (runsteps),
             ])
     
     return info
@@ -532,8 +543,8 @@ def process_input(input_dict, UUID=None, build=True):
     # None for this calculation
     
     # These are calculation-specific default integers
-    input_dict['randomseed'] =     int(input_dict.get('randomseed',
-                                       random.randint(1, 900000000)))
+    input_dict['randomseed'] = int(input_dict.get('randomseed',
+                                   random.randint(1, 900000000)))
     
     # These are calculation-specific default unitless floats
     input_dict['annealtemperature'] = float(input_dict.get('annealtemperature',
@@ -543,6 +554,12 @@ def process_input(input_dict, UUID=None, build=True):
     # These are calculation-specific default floats with units
     # None for this calculation
     
+        # These are calculation-specific dependent parameters
+    if input_dict['annealtemperature'] == 0.0:
+        input_dict['annealsteps'] = int(input_dict.get('annealsteps', 0))
+    else:
+        input_dict['annealsteps'] = int(input_dict.get('annealsteps', 10000))
+
     # Check lammps_command and mpi_command
     iprPy.input.interpret('lammps_commands', input_dict)
     

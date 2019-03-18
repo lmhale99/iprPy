@@ -27,6 +27,8 @@ thermo_style custom step pe
 
 fix boundary bounds setforce 0.0 0.0 0.0
 
+<anneal_info>
+
 min_modify dmax <dmax>
 
 minimize <etol> <ftol> <maxiter> <maxeval>

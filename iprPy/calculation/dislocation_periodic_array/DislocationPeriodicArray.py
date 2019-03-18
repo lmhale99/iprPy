@@ -3,7 +3,7 @@ from __future__ import (absolute_import, print_function,
                         division, unicode_literals)
 import os
 
-from .calc_dislocation_periodic_array import dislocationarray
+# iprPy imports
 from .. import Calculation
 
 class DislocationPeriodicArray(Calculation):
@@ -15,9 +15,12 @@ class DislocationPeriodicArray(Calculation):
     """
 
     def __init__(self):
-        self.calc = dislocationarray
-
+        
+        # Call parent constructor
         Calculation.__init__(self)
+
+        # Define calc shortcut
+        self.calc = self.script.dislocationarray
 
     @property
     def files(self):
@@ -101,15 +104,18 @@ class DislocationPeriodicArray(Calculation):
                     'dislocation_content',
                     'dislocation_family',
                     'dislocation_burgersvector',
-                    'dislocation_lineboxvector',
                     'dislocation_stroh_m',
                     'dislocation_stroh_n',
+                    'dislocation_lineboxvector',
                     'a_uvw',
                     'b_uvw',
                     'c_uvw',
                     'atomshift',
                     ],
                     [
+                    'randomseed',
+                    'annealtemperature',
+                    'annealsteps',                        
                     'energytolerance',
                     'forcetolerance',
                     'maxiterations',

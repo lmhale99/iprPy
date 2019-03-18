@@ -15,7 +15,8 @@ with open(os.path.join(os.path.dirname(__file__), 'VERSION')) as version_file:
 
 __all__ = ['__version__', 'rootdir', 'compatibility', 'tools', 'input',
            'record', 'load_record', 'calculation', 'load_calculation',
-           'database', 'load_database', 'set_database', 'unset_database',
+           'database', 'list_databases', 'load_database', 'set_database',
+           'unset_database', 'list_run_directories',
            'load_run_directory', 'set_run_directory', 'unset_run_directory',
            'analysis', 'check_modules']
 __all__.sort()
@@ -35,8 +36,8 @@ from . import calculation
 from .calculation import load_calculation
 
 from . import database
-from .database import (load_database, set_database, unset_database,
-                       load_run_directory, set_run_directory,
+from .database import (list_databases, load_database, set_database, unset_database,
+                       list_run_directories, load_run_directory, set_run_directory,
                        unset_run_directory)
 
 from . import analysis

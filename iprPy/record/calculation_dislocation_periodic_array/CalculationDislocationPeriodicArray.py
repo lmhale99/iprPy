@@ -58,6 +58,8 @@ class CalculationDislocationPeriodicArray(Record):
                 'c_mult2',
                 
                 'dislocation_key',
+
+                'annealsteps',
                ]
     
     @property
@@ -66,6 +68,7 @@ class CalculationDislocationPeriodicArray(Record):
         list of str: The default fterms used by isnew() for comparisons.
         """
         return [
+                'annealtemperature',
                ]
     
     def isvalid(self):
@@ -137,6 +140,9 @@ class CalculationDislocationPeriodicArray(Record):
         
         run_params['dislocation_boundarywidth'] = input_dict['boundarywidth']
         
+        run_params['annealtemperature'] = input_dict['annealtemperature']
+        run_params['annealsteps'] = input_dict['annealsteps']
+
         # Copy over potential data model info
         calc['potential-LAMMPS'] = DM()
         calc['potential-LAMMPS']['key'] = input_dict['potential'].key
@@ -178,8 +184,12 @@ class CalculationDislocationPeriodicArray(Record):
         if results_dict is None:
             calc['status'] = 'not calculated'
         else:
-            #c_model = input_dict['C'].model(unit=input_dict['pressure_unit'])
-            #calc['elastic-constants'] = c_model['elastic-constants']
+            try:
+                c_model = input_dict['C'].model(unit=input_dict['pressure_unit'])
+            except:
+                calc['elastic-constants'] = None
+            else:
+                calc['elastic-constants'] = c_model['elastic-constants']
             
             calc['base-system'] = DM()
             calc['base-system']['artifact'] = DM()
@@ -193,7 +203,7 @@ class CalculationDislocationPeriodicArray(Record):
             calc['defect-system']['artifact']['format'] = 'atom_dump'
             calc['defect-system']['symbols'] = results_dict['symbols_disl']
             
-            self.content = output
+        self.content = output
     
     def todict(self, full=True, flat=False):
         """
@@ -231,6 +241,9 @@ class CalculationDislocationPeriodicArray(Record):
         params['maxevaluations'] = calc['calculation']['run-parameter']['maxevaluations']
         params['maxatommotion'] = calc['calculation']['run-parameter']['maxatommotion']
 
+        params['annealtemperature'] = calc['calculation']['run-parameter']['annealtemperature']
+        params['annealsteps'] = calc['calculation']['run-parameter']['annealsteps']
+        
         sizemults = calc['calculation']['run-parameter']['size-multipliers']
         
         params['potential_LAMMPS_key'] = calc['potential-LAMMPS']['key']

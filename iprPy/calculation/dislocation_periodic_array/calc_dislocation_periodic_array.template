@@ -68,6 +68,8 @@ energy_unit                 <energy_unit>
 force_unit                  <force_unit>
 
 # Run parameters
+annealtemperature           <annealtemperature>
+annealsteps                 <annealsteps>
 energytolerance             <energytolerance>
 forcetolerance              <forcetolerance>
 maxiterations               <maxiterations>
@@ -76,3 +78,4 @@ maxatommotion               <maxatommotion>
 duplicatecutoff             <duplicatecutoff>
 boundarywidth               <boundarywidth>
 onlyuselinear               <onlyuselinear>
+randomseed                  <randomseed>

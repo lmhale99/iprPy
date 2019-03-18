@@ -18,11 +18,15 @@ def atomicarchive(database, keys, record=None, load_key='atomic-system',
     inputs = {}
     for key in keys:
         inputs[key] = []
+    
     if 'potential_file' in keys:
         include_potential = True
     else:
         include_potential = False
     
+    if 'elasticconstants_file' in keys:
+        raise ValueError('Use buildcombos elasticparent instead')
+        
     # Loop over all matching records
     parent_records = database.get_records(style=record, query=query, **kwargs)
     for parent_record in parent_records:

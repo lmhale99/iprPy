@@ -58,6 +58,8 @@ class CalculationDislocationMonopole(Record):
                 'c_mult2',
                 
                 'dislocation_key',
+
+                'annealsteps',
                ]
     
     @property
@@ -140,6 +142,7 @@ class CalculationDislocationMonopole(Record):
         run_params['dislocation_boundaryshape'] = input_dict['dislocation_boundaryshape']
         
         run_params['annealtemperature'] = input_dict['annealtemperature']
+        run_params['annealsteps'] = input_dict['annealsteps']
         
         # Copy over potential data model info
         calc['potential-LAMMPS'] = DM()
@@ -245,6 +248,7 @@ class CalculationDislocationMonopole(Record):
         params['maxatommotion'] = calc['calculation']['run-parameter']['maxatommotion']
         
         params['annealtemperature'] = calc['calculation']['run-parameter']['annealtemperature']
+        params['annealsteps'] = calc['calculation']['run-parameter']['annealsteps']
 
         sizemults = calc['calculation']['run-parameter']['size-multipliers']
         
@@ -276,10 +280,11 @@ class CalculationDislocationMonopole(Record):
         
         params['status'] = calc.get('status', 'finished')
         params['error'] = calc.get('error', np.nan)
-        K_tensor = uc.value_unit(calc['Stroh-K-tensor'])
+        
         if full is True and params['status'] == 'finished':
             params['preln'] = uc.value_unit(calc['Stroh-pre-ln-factor'])
-            
+            K_tensor = uc.value_unit(calc['Stroh-K-tensor'])
+
             if flat is True:
                 for C in calc['elastic-constants'].aslist('C'):
                     params['C'+str(C['ij'][0])+str(C['ij'][2])] = uc.value_unit(C['stiffness'])

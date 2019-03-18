@@ -1,15 +1,15 @@
-#Run script for calc_dislocation_monopole.py
+# Run script for calc_dislocation_monopole.py
 
-#Command lines for LAMMPS (and MPI).
-#For lammps_command, exclude passing in a script, i.e. no "-in term"
+# Command lines for LAMMPS (and MPI).
+# For lammps_command, exclude passing in a script, i.e. no "-in term"
 lammps_command              <lammps_command>
 mpi_command                 <mpi_command>
 
-#Paths to the potential data model file, and directory containing potential parameters
+# Paths to the potential data model file, and directory containing potential parameters
 potential_file              <potential_file>
 potential_dir               <potential_dir>
 
-#Initial system configuration to load
+# Initial system configuration to load
 load_file                   <load_file>
 load_style                  <load_style>
 load_options                <load_options>
@@ -17,14 +17,14 @@ family                      <family>
 symbols                     <symbols>
 box_parameters              <box_parameters>
 
-#System manipulations
+# System manipulations
 a_uvw                       <a_uvw>
 b_uvw                       <b_uvw>
 c_uvw                       <c_uvw>
 atomshift                   <atomshift>
 sizemults                   <sizemults>
 
-#Defect parameters
+# Defect parameters
 dislocation_file            <dislocation_file>
 dislocation_stroh_m         <dislocation_stroh_m>
 dislocation_stroh_n         <dislocation_stroh_n>
@@ -33,7 +33,7 @@ dislocation_burgersvector   <dislocation_burgersvector>
 dislocation_boundarywidth   <dislocation_boundarywidth>
 dislocation_boundaryshape   <dislocation_boundaryshape>
 
-#Elastic constants parameters 
+# Elastic constants parameters 
 elasticconstants_file       <elasticconstants_file>
 C11                         <C11>
 C12                         <C12>
@@ -56,15 +56,22 @@ C46                         <C46>
 C55                         <C55>
 C56                         <C56>
 C66                         <C66>
+C_M                         <C_M>
+C_lambda                    <C_lambda>
+C_mu                        <C_mu>
+C_E                         <C_E>
+C_nu                        <C_nu>
+C_K                         <C_K>
 
-#Units that input/output values are in
+# Units that input/output values are in
 length_unit                 <length_unit>
 pressure_unit               <pressure_unit>
 energy_unit                 <energy_unit>
 force_unit                  <force_unit>
 
-#Run parameters
+# Run parameters
 annealtemperature           <annealtemperature>
+annealsteps                 <annealsteps>
 energytolerance             <energytolerance>
 forcetolerance              <forcetolerance>
 maxiterations               <maxiterations>

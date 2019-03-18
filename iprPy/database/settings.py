@@ -18,8 +18,9 @@ from .. import rootdir
 from ..tools import screen_input
 from . import loaded
 
-__all__ = ['load_database', 'set_database', 'unset_database',
-           'load_run_directory', 'set_run_directory', 'unset_run_directory']
+__all__ = ['list_databases', 'load_database', 'set_database', 'unset_database',
+           'list_run_directories', 'load_run_directory', 'set_run_directory', 
+           'unset_run_directory']
 
 settingsfile = os.path.join(rootdir, '.iprPy')
 
@@ -53,6 +54,21 @@ def save_settings(settings):
     # Save
     with open(settingsfile, 'w') as f:
         settings.json(fp=f, indent=4)
+    
+def list_databases():
+    """
+    Gives a list of the pre-defined database names
+    
+    Returns
+    -------
+    list : The names associated with the pre-defined databases.
+    """
+    # Get information from settings file
+    settings = load_settings()
+    
+    # Extract and return the database names
+    databases = settings['iprPy-defined-parameters'].aslist('database')
+    return [database['name'] for database in databases]
     
 def load_database(name=None, style=None, host=None, **kwargs):
     """
@@ -254,6 +270,21 @@ def unset_database(name=None):
             
         save_settings(settings)
         print('Settings for database', name, 'successfully deleted')
+
+def list_run_directories():
+    """
+    Gives a list of the pre-defined run_directory names
+    
+    Returns
+    -------
+    list : The names associated with the pre-defined run_directories.
+    """
+    # Get information from settings file
+    settings = load_settings()
+    
+    # Extract and return the run_directory names
+    run_directories = settings['iprPy-defined-parameters'].aslist('run_directory')
+    return [run_directory['name'] for run_directory in run_directories]
 
 def load_run_directory(name=None):
     """

@@ -55,6 +55,9 @@ def main(*args):
                                     maxiter = input_dict['maxiterations'],
                                     maxeval = input_dict['maxevaluations'],
                                     dmax = input_dict['maxatommotion'],
+                                    annealtemp =  input_dict['annealtemperature'],
+                                    annealsteps =  input_dict['annealsteps'],
+                                    randomseed = input_dict['randomseed'],
                                     bwidth = input_dict['boundarywidth'],
                                     cutoff = input_dict['duplicatecutoff'],
                                     onlyuselinear = input_dict['onlyuselinear'])
@@ -71,6 +74,7 @@ def main(*args):
 def dislocationarray(lammps_command, system, potential, burgers,
                      C, mpi_command=None, axes=None, m=[0,1,0], n=[0,0,1],
                      etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000, dmax=None,
+                     annealtemp=0.0, annealsteps=None, randomseed=None,
                      bwidth=None, cutoff=None, onlyuselinear=False):
     """
     Creates and relaxes a dislocation monopole system.
@@ -96,8 +100,8 @@ def dislocationarray(lammps_command, system, potential, burgers,
         crystallographic orientations to the system's Cartesian units.
     randomseed : int or None, optional
         Random number seed used by LAMMPS in creating velocities and with
-        the Langevin thermostat.  (Default is None which will select a
-        random int between 1 and 900000000.)
+        the Langevin thermostat.  Default is None which will select a
+        random int between 1 and 900000000.
     etol : float, optional
         The energy tolerance for the structure minimization. This value is
         unitless. (Default is 0.0).
@@ -115,14 +119,25 @@ def dislocationarray(lammps_command, system, potential, burgers,
         in any direction during a single minimization iteration (default is
         0.01 Angstroms).
     annealtemp : float, optional
-        The temperature to perform a dynamic relaxation at. (Default is 0.0,
-        which will skip the dynamic relaxation.)
+        The temperature to perform a dynamic relaxation at. Default is 0.0,
+        which will skip the dynamic relaxation.
+    annealsteps : int, optional
+        The number of time steps to run the dynamic relaxation for.  Default
+        is None, which will run for 10000 steps if annealtemp is not 0.0. 
     bshape : str, optional
         The shape to make the boundary region.  Options are 'circle' and
         'rect' (default is 'circle').
-    bwidth : float, optional
-        The minimum thickness of the boundary region (default is 10
-        Angstroms).
+    cutoff : float, optional
+        Cutoff distance to use for identifying duplicate atoms to remove.
+        For dislocations with an edge component, applying the displacements
+        creates an extra half-plane of atoms that will have (nearly) identical
+        positions with other atoms after altering the boundary conditions.
+        Default cutoff value is 0.5 Angstrom.
+    useonlylinear : bool, optional
+        If False (default) the atoms in the middle of the system will be
+        displaced according to an elasticity solution for a dislocation core
+        and boundary atoms displaced by a linear gradient.  If True, all 
+        atoms are displaced by the linear gradient.
     
     Returns
     -------
@@ -156,7 +171,8 @@ def dislocationarray(lammps_command, system, potential, burgers,
     # Generate periodic array of dislocations
     if onlyuselinear is False:
         dislsol = am.defect.solve_volterra_dislocation(C, burgers, axes=axes, m=m, n=n)
-        dislsystem = am.defect.dislocation_array(system, dislsol=dislsol, bwidth=bwidth, cutoff=cutoff)
+        dislsystem = am.defect.dislocation_array(system, dislsol=dislsol, bwidth=bwidth,
+                                                 cutoff=cutoff)
     else:
         if axes is not None:
             T = am.tools.axes_check(axes)
@@ -176,6 +192,8 @@ def dislocationarray(lammps_command, system, potential, burgers,
                                   atom_style=potential.atom_style)
     lammps_variables['atomman_system_info'] = system_info
     lammps_variables['atomman_pair_info'] = potential.pair_info(dislsystem.symbols)
+    lammps_variables['anneal_info'] = anneal_info(annealtemp, annealsteps, 
+                                                  randomseed, potential.units)
     lammps_variables['etol'] = etol
     lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])
     lammps_variables['maxiter'] = maxiter
@@ -211,6 +229,52 @@ def dislocationarray(lammps_command, system, potential, burgers,
     results_dict['symbols_disl'] = dislsystem.symbols
 
     return results_dict
+
+def anneal_info(temperature=0.0, runsteps=None, randomseed=None, units='metal'):
+    """
+    Generates LAMMPS commands for thermo anneal.
+    
+    Parameters
+    ----------
+    temperature : float, optional
+        The temperature to relax at (default is 0.0).
+    randomseed : int or None, optional
+        Random number seed used by LAMMPS in creating velocities and with
+        the Langevin thermostat.  (Default is None which will select a
+        random int between 1 and 900000000.)
+    units : str, optional
+        The LAMMPS units style to use (default is 'metal').
+    
+    Returns
+    -------
+    str
+        The generated LAMMPS input lines for performing a dynamic relax.
+        Will be '' if temperature==0.0.
+    """    
+    # Return nothing if temperature is 0.0 (don't do thermo anneal)
+    if temperature == 0.0:
+        return ''
+    
+    # Generate velocity, fix nvt, and run LAMMPS command lines
+    else:
+        if randomseed is None:
+            randomseed = random.randint(1, 900000000)
+        if runsteps is None:
+            runsteps = 10000
+        
+        start_temp = 2 * temperature
+        tdamp = 100 * lmp.style.timestep(units)
+        timestep = lmp.style.timestep(units)
+        info = '\n'.join([
+            'velocity mid create %f %i mom yes rot yes dist gaussian' % (start_temp, randomseed),
+            'fix nvt all nvt temp %f %f %f' % (temperature, temperature,
+                                               tdamp),
+            'timestep %f' % (timestep),
+            'thermo %i' % (runsteps),
+            'run %i' % (runsteps),
+            ])
+    
+    return info
 
 def process_input(input_dict, UUID=None, build=True):
     """
@@ -252,10 +316,12 @@ def process_input(input_dict, UUID=None, build=True):
     input_dict['onlyuselinear'] = iprPy.input.boolean(input_dict.get('onlyuselinear', False))
     
     # These are calculation-specific default integers
-    # None for this calculation
+    input_dict['randomseed'] = int(input_dict.get('randomseed',
+                                   random.randint(1, 900000000)))
     
     # These are calculation-specific default unitless floats
-    # None for this calculation
+    input_dict['annealtemperature'] = float(input_dict.get('annealtemperature',
+                                                           0.0))
     
     # These are calculation-specific default floats with units
     input_dict['duplicatecutoff'] = iprPy.input.value(input_dict, 'duplicatecutoff',
@@ -265,6 +331,12 @@ def process_input(input_dict, UUID=None, build=True):
                                             default_unit=input_dict['length_unit'],
                                             default_term='10 angstrom')
     
+    # These are calculation-specific dependent parameters
+    if input_dict['annealtemperature'] == 0.0:
+        input_dict['annealsteps'] = int(input_dict.get('annealsteps', 0))
+    else:
+        input_dict['annealsteps'] = int(input_dict.get('annealsteps', 10000))
+
     # Check lammps_command and mpi_command
     iprPy.input.interpret('lammps_commands', input_dict)
     

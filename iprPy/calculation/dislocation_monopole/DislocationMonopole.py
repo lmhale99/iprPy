@@ -88,6 +88,12 @@ class DislocationMonopole(Calculation):
                     'C55',
                     'C56',
                     'C66',
+                    'C_M',
+                    'C_lambda',
+                    'C_mu',
+                    'C_E',
+                    'C_nu',
+                    'C_K',
                    ],
                    [
                     'sizemults',
@@ -108,6 +114,7 @@ class DislocationMonopole(Calculation):
                     [
                     'randomseed',
                     'annealtemperature',
+                    'annealsteps',
                     'energytolerance',
                     'forcetolerance',
                     'maxiterations',

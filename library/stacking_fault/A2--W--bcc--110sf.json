@@ -10,8 +10,8 @@
             "atomshift": " 0.01  0.01  0.01", 
             "cutboxvector": "c",
             "faultpos": 0.5, 
-            "shiftvector1": " 1.0  1.0 -2.0", 
-            "shiftvector2": " 0.5  0.5  0.5"
+            "shiftvector1": " 0.5  0.5  0.5", 
+            "shiftvector2": " 0.5  0.5 -0.5"
         }
     }
 }
