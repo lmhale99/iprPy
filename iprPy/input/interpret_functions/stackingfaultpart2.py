@@ -93,9 +93,9 @@ def stackingfaultpart2(input_dict, build=True, **kwargs):
         
         # Transform shift vectors
         shiftvector1 = transform.dot(shiftvector1)
-        shiftvector1[np.isclose(shiftvector1, 0.0, atol=1e-10, rtol=0.0)] = 0.0
+        shiftvector1[np.isclose(shiftvector1, 0.0, atol=1e-8, rtol=0.0)] = 0.0
         shiftvector2 = transform.dot(shiftvector2)
-        shiftvector2[np.isclose(shiftvector2, 0.0, atol=1e-10, rtol=0.0)] = 0.0
+        shiftvector2[np.isclose(shiftvector2, 0.0, atol=1e-8, rtol=0.0)] = 0.0
         
         # Identify number of size multiples, m, along cutboxvector
         if   stackingfault_cutboxvector == 'a': 

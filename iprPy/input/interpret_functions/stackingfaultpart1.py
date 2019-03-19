@@ -97,7 +97,8 @@ def stackingfaultpart1(input_dict, **kwargs):
         
         # Load defect model
         stackingfault_model = DM(stackingfault_file).find('stacking-fault')
-            
+        input_dict[kwargs['stackingfault_model']] = stackingfault_model
+        
         # Extract parameter values from defect model
         input_dict[kwargs['stackingfault_family']] = stackingfault_model['system-family']
         input_dict[kwargs['a_uvw']] = stackingfault_model['calculation-parameter']['a_uvw']
@@ -115,5 +116,4 @@ def stackingfaultpart1(input_dict, **kwargs):
         input_dict[kwargs['stackingfault_faultpos']] = float(input_dict.get(kwargs['stackingfault_faultpos'], 0.5))
         assert input_dict[kwargs['stackingfault_cutboxvector']] in ['a', 'b', 'c'], 'invalid stackingfault_cutboxvector'
         
-    # Save processed terms
-    input_dict[kwargs['stackingfault_model']] = stackingfault_model
+    
