@@ -1,14 +1,14 @@
-# curator Database style
+# mcds Database style
 
 ## Introduction
 
-The curator Database style interacts with an instance of the Materials Database Curation System (MDCS).  Records are stored in the MDCS instance as validated XML.
+The mdcs Database style interacts with an instance of the Materials Database Curation System (MDCS).  Records are stored in the MDCS instance as validated XML.
 
 ## Style requirements
 
 - Access to a working 1.X MDCS instance.
 
-- The included mdcs.py file, which uses Python to define REST interactions with a database.
+- Install pymdcs from: https://github.com/lmhale99/pymdcs
 
 ## Initialization arguments:
 

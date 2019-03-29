@@ -6,7 +6,7 @@ import shutil
 import tarfile
 from io import BytesIO
 
-from .mdcs import MDCS
+from mdcs import MDCS
 
 # http://www.numpy.org/
 import numpy as np
@@ -18,15 +18,11 @@ import pandas as pd
 from DataModelDict import DataModelDict as DM
 
 # iprPy imports
-from ...tools import iaslist
+from ...tools import aslist, iaslist
 from .. import Database
 from ... import load_record
 
-__all__ = ['initialize', 'iget_records', 'get_records', 'get_record',
-           'add_record', 'update_record', 'delete_record', 'add_tar',
-           'get_tar']
-
-class Curator(Database):
+class MDCSDatabase(Database):
     
     def __init__(self, host, user=None, pswd=None, cert=None):
         """
