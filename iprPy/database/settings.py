@@ -17,6 +17,7 @@ from DataModelDict import DataModelDict as DM
 from .. import rootdir
 from ..tools import screen_input
 from . import loaded
+from ..compatibility import iteritems
 
 __all__ = ['list_databases', 'load_database', 'set_database', 'unset_database',
            'list_run_directories', 'load_run_directory', 'set_run_directory', 
@@ -133,7 +134,7 @@ def load_database(name=None, style=None, host=None, **kwargs):
             host = database_settings['host']
             kwargs = {}
             for param in database_settings.aslist('params'):
-                key = param.keys()[0]
+                key = list(param.keys())[0]
                 kwargs[key] = param[key]
         else:
             raise ValueError('name cannot be given with any other parameters')
@@ -144,7 +145,7 @@ def load_database(name=None, style=None, host=None, **kwargs):
     else:
         raise KeyError('Unknown database style ' + style)
 
-def set_database(name=None, style=None, host=None):
+def set_database(name=None, style=None, host=None, **kwargs):
     """
     Allows for database information to be defined in the settings file. Screen
     prompts will be given to allow any necessary database parameters to be
@@ -205,14 +206,16 @@ def set_database(name=None, style=None, host=None):
         host = screen_input("Enter the database's host:")
     database_settings['host'] = host
     
-    print('Enter any other database parameters as key, value')
-    print('Exit by leaving key blank')
-    
-    while True:
-        key = screen_input('key:')
-        if key == '': 
-            break
-        value = screen_input('value:')
+    # Ask for additional kwargs if not given
+    if len(kwargs) == 0:
+        print('Enter any other database parameters as key, value')
+        print('Exit by leaving key blank')
+        while True:
+            key = screen_input('key:')
+            if key == '': 
+                break
+            kwargs[key] = screen_input('value:')
+    for key, value in iteritems(kwargs):
         database_settings.append('params', DM([(key, value)]))
     
     save_settings(settings)

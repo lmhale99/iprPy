@@ -16,7 +16,6 @@ import pandas as pd
 # https://api.mongodb.com/python/current/
 from pymongo import MongoClient
 from gridfs import GridFS
-from bson.codec_options import CodecOptions
 
 from DataModelDict import DataModelDict as DM
 
@@ -28,30 +27,24 @@ from ...record import loaded as record_styles
 
 class Mongo(Database):
     
-    def __init__(self, host, user=None, pswd=None):
+    def __init__(self, host='localhost', port=27017, database='iprPy', **kwargs):
         """
         Initializes a connection to a Mongo database.
         
         Parameters
         ----------
-        host : str, tuple
-            The mongo database name or tuple of (client, database).  If client is
-            not given, will use default localhost.
-        user : str or tuple of two str
-            The username to use for accessing the database.  Alternatively, a
-            tuple of (user, pswd).
-        pswd : str, optional
-            The password associated with user to use for accessing the database.
-            This can either be the password as a str, or a str path to a file
-            containing only the password. If not given, a prompt will ask for the
-            password.
+        host : dict
+            
+        **kwargs : dict, optional
+            Any keyword arguments allowed in initializing a pymongo.MongoClient
+            object.
         """
-        # Connect
-        if isinstance(host, str):
-            self.__mongodb = MongoClient()[host]
-        elif len(host) == 2:
-            self.__mongodb = MongoClient(host[0])[host[1]]
         
+        
+        # Connect to underlying class
+        self.__mongodb = MongoClient(host=host, port=port, document_class=DM, **kwargs)[database]
+        
+        # Define class host using client's host, port and database name
         host = str(self.mongodb.client.address[0]) + ':' + str(self.mongodb.client.address[1]) + '.' + self.mongodb.name
         
         # Pass host to Database initializer
@@ -82,8 +75,7 @@ class Mongo(Database):
         list of iprPy.Records
             All records from the database matching the given parameters.
         """
-        codec_options = CodecOptions(document_class=DM)
-
+        
         if style is None:
             style = list(record_styles.keys())
         else:
@@ -101,7 +93,7 @@ class Mongo(Database):
         df = []
         records = []
         for s in style:
-            collection = self.mongodb.get_collection(s, codec_options=codec_options)
+            collection = self.mongodb[s]
             for entry in collection.find(query):
                 
                 # Load as Record object
@@ -138,7 +130,6 @@ class Mongo(Database):
         list of iprPy.Records
             All records from the database matching the given parameters.
         """
-        codec_options = CodecOptions(document_class=DM)
         
         if style is None:
             style = list(record_styles.keys())
@@ -156,7 +147,7 @@ class Mongo(Database):
         
         df = []
         for s in style:
-            collection = self.mongodb.get_collection(s, codec_options=codec_options)
+            collection = self.mongodb[s]
             for entry in collection.find(query):
                     
                 # Load as Record object
@@ -170,7 +161,7 @@ class Mongo(Database):
                 df = df[df[key].isin(aslist(kwargs[key]))]
         
         return df
-
+    
     def get_record(self, name=None, style=None, query=None, **kwargs):
         """
         Returns a single matching record from the database.
@@ -202,7 +193,7 @@ class Mongo(Database):
         elif len(record) == 0:
             raise ValueError('Cannot find matching record '+ name + ' (' +style + ')')
         else:
-            raise ValueError('Multiple matching records found')    
+            raise ValueError('Multiple matching records found')
 
     def add_record(self, record=None, style=None, name=None, content=None):
         """
@@ -401,6 +392,10 @@ class Mongo(Database):
         
         # Define mongofs
         mongofs = GridFS(self.mongodb, collection=record.style)
+        
+        # Check if an archive already exists
+        if mongofs.exists({"recordname": record.name}):
+            raise ValueError('Record already has an archive')
         
         # Make archive
         shutil.make_archive(record.name, 'gztar', root_dir=root_dir,
