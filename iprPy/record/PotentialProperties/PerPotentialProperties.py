@@ -51,7 +51,7 @@ class PerPotentialProperties(Record):
         params['potential_LAMMPS_key'] = props['implementation']['key']
         params['potential_LAMMPS_id'] = props['implementation']['id']
         
-        params['cohesive-energy-scans'] = 'cohesive-energy-scans' in props
+        params['cohesive-energy-scan'] = 'cohesive-energy-scan' in props
         params['crystal-structure'] = 'crystal-structure' in props
 
         return params
