@@ -1,0 +1,33 @@
+{
+    "potential-LAMMPS": {
+        "key": "957b3de5-bc9d-413f-a117-4a5f929431e8", 
+        "id": "2019--Byggmastar-J--Fe-O--LAMMPS--ipr1", 
+        "potential": {
+            "key": "521acab0-00b4-4534-884b-218db3cb92ff", 
+            "id": "2019--Byggmastar-J-Nagel-M-Albe-K-et-al--Fe-O"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Fe"
+            }, 
+            {
+                "element": "O"
+            }
+        ], 
+        "pair_style": {
+            "type": "tersoff/zbl"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Fe-O.tersoff.zbl"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

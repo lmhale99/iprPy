@@ -1,0 +1,24 @@
+# DATE: 2018-05-16 16:00:25 CITATION: J. Byggmastar et al. JPCM 31 215401 (2019) https://doi.org/10.1088/1361-648X/ab0931
+# Fe-O part developed by J. Byggmastar in 2016
+# Fe-Fe part from: M. Muller et al. JPCM (2007) https://doi.org/10.1088/0953-8984/19/32/326220
+# O-O part from: P. Erhart et al. JPCM (2006) https://doi.org/10.1088/0953-8984/18/29/003
+
+# LAMMPS-compatible potential file http://lammps.sandia.gov/
+# tersoff/zbl pair_style
+# http://lammps.sandia.gov/doc/pair_tersoff_zbl.html
+
+# Parameters in LAMMPS metal units:
+#   A, B = eV; lambda1, lambda2, lambda3 = 1/Angstroms; R, D = Angstroms
+#   Z_i, Z_j = electron charge units
+#   other parameters are unitless
+
+# s1  s2  s3   m          gamma        lambda3              c              d      costheta0   n beta        lambda2              B      R      D        lambda1              A Z_i Z_j ZBLcut ZBLexpscale
+
+Fe   Fe  Fe  1.0      0.0115751            0.0      1.2898716      0.3413219           0.26 1.0  1.0  1.37635403631  67.8647722799   3.15    0.2   2.8481044096  953.948592555  26  26   0.95    2.9
+Fe   Fe  O   1.0  1.08052554111   1.0854004606  19.8656293772   4.5750149838  -0.0904310711   0    0              0              0   3.15   0.15              0              0  99  99      0      0
+Fe   O   Fe  1.0 0.00791968694578   0.3316469057      1.2898716      0.3413219           0.26   0    0              0              0   3.15    0.2              0              0  99  99      0      0
+Fe   O   O   1.0  1.29037190861    3.480349174  19.8656293772   4.5750149838  -0.0904310711 1.0  1.0  1.01239214376  59.1540987763   3.15   0.15   2.9091315936  393.513775364  26   8    1.0   10.0
+O    Fe  Fe  1.0  1.15356364687   1.0361635661  19.8656293772   4.5750149838  -0.0904310711 1.0  1.0  1.01239214376  59.1540987763   3.15   0.15   2.9091315936  393.513775364   8  26    1.0   10.0
+O    Fe  O   1.0        0.82595   0.7546312148       0.035608       0.046496       -0.45056   0    0              0              0    2.1    0.2              0              0  99  99      0      0
+O    O   Fe  1.0   1.1742630926          0.001  19.8656293772   4.5750149838  -0.0904310711   0    0              0              0   3.15   0.15              0              0  99  99      0      0
+O    O   O   1.0        0.82595            0.0       0.035608       0.046496       -0.45056 1.0  1.0  2.77328597845  527.650508973    2.1    0.2  3.84488368053  1388.08158139   8   8    0.5   12.0
