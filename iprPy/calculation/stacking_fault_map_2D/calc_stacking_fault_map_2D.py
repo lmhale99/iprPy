@@ -60,7 +60,8 @@ def main(*args):
                                                    box = input_dict['ucell'].box,
                                                    a1 = results_dict['shift1'],
                                                    a2 = results_dict['shift2'],
-                                                   E_gsf = results_dict['E_gsf'])
+                                                   E_gsf = results_dict['E_gsf'],
+                                                   delta = results_dict['delta_disp'])
     
     # Save data model of results
     script = os.path.splitext(os.path.basename(__file__))[0]
@@ -333,7 +334,7 @@ def stackingfaultworker(lammps_command, system, potential,
 
 def stackingfaultmap(lammps_command, system, potential,
                      shiftvector1, shiftvector2, mpi_command=None,
-                     numshifts1=11, numshifts2=11,
+                     numshifts1=10, numshifts2=10,
                      cutboxvector=None, faultpos=0.5,
                      etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000,
                      dmax=uc.set_in_units(0.01, 'angstrom')):
@@ -403,8 +404,8 @@ def stackingfaultmap(lammps_command, system, potential,
     sf_df = []
 
     # Construct mesh of regular points
-    shifts1, shifts2 = np.meshgrid(np.linspace(0, 1, numshifts1),
-                                   np.linspace(0, 1, numshifts2))
+    shifts1, shifts2 = np.meshgrid(np.linspace(0, 1, numshifts1, endpoint=False),
+                                   np.linspace(0, 1, numshifts2, endpoint=False))
     
     # Identify lammps_date version
     lammps_date = lmp.checkversion(lammps_command)['date']
@@ -492,8 +493,8 @@ def process_input(input_dict, UUID=None, build=True):
     # None for this calculation
     
     # These are calculation-specific default integers
-    input_dict['stackingfault_numshifts1'] = int(input_dict.get('stackingfault_numshifts1', 11))
-    input_dict['stackingfault_numshifts2'] = int(input_dict.get('stackingfault_numshifts2', 11))
+    input_dict['stackingfault_numshifts1'] = int(input_dict.get('stackingfault_numshifts1', 10))
+    input_dict['stackingfault_numshifts2'] = int(input_dict.get('stackingfault_numshifts2', 10))
     
     # These are calculation-specific default unitless floats
     # None for this calculation
