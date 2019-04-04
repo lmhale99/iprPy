@@ -48,14 +48,19 @@ class Mongo(Database):
         """
         # Connect
         if isinstance(host, str):
-            self.mongodb = MongoClient()[host]
+            self.__mongodb = MongoClient()[host]
         elif len(host) == 2:
-            self.mongodb = MongoClient(host[0])[host[1]]
-        self.mongofs = GridFS(self.mongodb)
+            self.__mongodb = MongoClient(host[0])[host[1]]
+        
         host = str(self.mongodb.client.address[0]) + ':' + str(self.mongodb.client.address[1]) + '.' + self.mongodb.name
         
         # Pass host to Database initializer
         Database.__init__(self, host)
+    
+    @property
+    def mongodb(self):
+        """pymongo.Database : The underlying database API object."""
+        return self.__mongodb
     
     def get_records(self, name=None, style=None, query=None, return_df=False,
                     **kwargs):
@@ -355,7 +360,33 @@ class Mongo(Database):
         self.mongodb[record.style].delete_one(query)
 
     def add_tar(self, record=None, name=None, style=None, root_dir=None):
-    
+        """
+        Archives and stores a folder associated with a record.  Issues an
+        error if exactly one matching record is not found in the database, or
+        the associated record already has a tar archive. The record's name
+        must match the name of the directory being archived.
+        
+        Parameters
+        ----------
+        record : iprPy.Record, optional
+            The record to associate the tar archive with.  If not given, then
+            name and/or style necessary to uniquely identify the record are
+            needed.
+        name : str, optional
+            .The name to use in uniquely identifying the record.
+        style : str, optional
+            .The style to use in uniquely identifying the record.
+        root_dir : str, optional
+            Specifies the root directory for finding the directory to archive.
+            The directory to archive is at <root_dir>/<name>.  (Default is to
+            set root_dir to the current working directory.)
+        
+        Raises
+        ------
+        ValueError
+            If style and/or name content given with record or the record already
+            has an archive.
+        """
         # Create Record object if not given
         if record is None:
             record = self.get_record(name=name, style=style)
@@ -367,49 +398,81 @@ class Mongo(Database):
         # Verify that record exists
         else:
             record = self.get_record(name=record.name, style=record.style)
-
+        
+        # Define mongofs
+        mongofs = GridFS(self.mongodb, collection=record.style)
+        
         # Make archive
         shutil.make_archive(record.name, 'gztar', root_dir=root_dir,
                             base_dir=record.name)
-
+        
+        # Upload archive
         filename = record.name + '.tar.gz'
         with open(filename, 'rb') as f:
-        
-            # Upload archive
             tries = 0
             while tries < 2:
                 if True:
-                    self.mongofs.put(f, recordstyle=record.style, recordname=record.name, databasename=self.mongodb.name)
+                    mongofs.put(f, recordname=record.name)
                     break
                 else:
                     tries += 1
             if tries == 2:
                 raise ValueError('Failed to upload archive 2 times')
-
+        
         # Remove local archive copy
         os.remove(filename)
         
     def get_tar(self, record=None, name=None, style=None, raw=False):
+        """
+        Retrives the tar archive associated with a record in the database.
+        Issues an error if exactly one matching record is not found in the 
+        database.
+        
+        Parameters
+        ----------
+        record : iprPy.Record, optional
+            The record to retrive the associated tar archive for.
+        name : str, optional
+            .The name to use in uniquely identifying the record.
+        style : str, optional
+            .The style to use in uniquely identifying the record.
+        raw : bool, optional
+            If True, return the archive as raw binary content. If 
+            False, return as an open tarfile. (Default is False)
+        
+        Returns
+        -------
+        tarfile or str
+            The tar archive as an open tarfile if raw=False, or as a binary str if
+            raw=True.
+        
+        Raises
+        ------
+        ValueError
+            If style and/or name content given with record.
+        """
+        
         # Create Record object if not given
         if record is None:
             record = self.get_record(name=name, style=style)
-
+        
         # Issue a TypeError for competing kwargs
         elif style is not None or name is not None:
             raise TypeError('kwargs style and name cannot be given with kwarg record')
-
+        
         # Verify that record exists
         else:
             record = self.get_record(name=record.name, style=record.style)
-
+        
+        # Define mongofs
+        mongofs = GridFS(self.mongodb, collection=record.style)
+        
         # Build query
         query = {}
-        query['recordstyle'] = record.style
-        query['recordname'] = record.name    
-        query['databasename'] = self.mongodb.name
+        query['recordname'] = record.name
         
         # Get tar
-        matches = list(self.mongofs.find(query))
+        matches = list(mongofs.find(query))
         if len(matches) == 1:
             tar = matches[0]
         elif len(matches) == 0:
@@ -457,24 +520,25 @@ class Mongo(Database):
         else:
             record = self.get_record(name=record.name, style=record.style)
         
+        # Define mongofs
+        mongofs = GridFS(self.mongodb, collection=record.style)
+        
         # Build query
         query = {}
-        query['recordstyle'] = record.style
-        query['recordname'] = record.name    
-        query['databasename'] = self.mongodb.name
+        query['recordname'] = record.name
         
         # Get tar
-        matches = list(self.mongofs.find(query))
+        matches = list(mongofs.find(query))
         if len(matches) == 1:
             tar = matches[0]
         elif len(matches) == 0:
             raise ValueError('No tar found for the record')
         else:
             raise ValueError('Multiple tars found for the record')
-
+        
         # Delete tar
-        self.mongofs.delete(tar._id)
-
+        mongofs.delete(tar._id)
+    
     def update_tar(self, record=None, name=None, style=None, root_dir=None):
         """
         Replaces an existing tar archive for a record with a new one.  Issues
@@ -497,7 +561,7 @@ class Mongo(Database):
         """
         
         # Delete the existing tar archive stored in the database
-        self.delete_tar(record=record, name=name)
+        self.delete_tar(record=record, name=name, style=style)
         
         # Add the new tar archive
         self.add_tar(record=record, name=name, style=style, root_dir=root_dir)
