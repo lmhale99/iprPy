@@ -3,17 +3,19 @@
 lammps_command              lmp_mpi
 mpi_command                 
 
-# Build load information from crystal_space_group results
-buildcombos                 atomicparent load_file parent
-parent_record               calculation_crystal_space_group
-parent_load_key             unit-cell-atomic-system
+# Build load information from relax_dynamic results
+buildcombos                 atomicarchive load_file archive
+
+# Specify archive parent buildcombos terms (parent record's style and the load_key to access)
+archive_record              calculation_relax_dynamic
+archive_load_key            final-system
 
 # System manipulations
 a_uvw                      
 b_uvw                      
 c_uvw                 
 atomshift                   
-sizemults                   5 5 5
+sizemults                   1 1 1
 
 # Units that input/output values are in
 length_unit                 
@@ -22,12 +24,10 @@ energy_unit
 force_unit                  
 
 # Run parameters
-energytolerance             
-forcetolerance              
-maxiterations               
-maxevaluations              
-maxatommotion               
-strainrange                  1e-5
-strainrange                  1e-6
-strainrange                  1e-7
-strainrange                  1e-8
+energytolerance             0.0
+forcetolerance              1e-10 eV/angstrom
+maxiterations               10000
+maxevaluations              100000
+maxatommotion               0.01 angstrom
+maxcycles                   100
+cycletolerance              1e-10
