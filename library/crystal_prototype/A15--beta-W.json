@@ -6,13 +6,6 @@
         "prototype": "b-W", 
         "Pearson-symbol": "cP8", 
         "Strukturbericht": "A15",
-        "identifier": {
-            "common": "beta-tungsten", 
-            "tag": "b-W", 
-            "prototype": "W", 
-            "Pearson-symbol": "cP8", 
-            "Strukturbericht": "A15"
-        }, 
         "space-group": {
             "number": 223, 
             "Hermann-Maguin": "P m -3 n", 

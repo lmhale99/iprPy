@@ -8,10 +8,10 @@
         "Strukturbericht": "A5",
         "space-group": {
             "number": 141, 
-            "Hermann-Maguin": "I 41/a m d", 
+            "Hermann-Maguin": "I 4_1/a m d", 
             "Schoenflies": "D4h^19", 
             "Wykoff": {
-                "letter": "b", 
+                "letter": "a", 
                 "multiplicity": 4
             }
         }, 

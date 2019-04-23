@@ -4,12 +4,22 @@
         "id": "L1_0--AuCu",
         "name": "AuCu", 
         "prototype": "AuCu", 
-        "Pearson-symbol": "tP4", 
+        "Pearson-symbol": "tP2", 
         "Strukturbericht": "L1_0",
         "space-group": {
             "number": 123, 
             "Hermann-Maguin": "P 4/m m m", 
-            "Schoenflies": "D4h^1"
+            "Schoenflies": "D4h^1",
+            "Wykoff": [
+                {
+                    "letter": "a", 
+                    "multiplicity": 1
+                }, 
+                {
+                    "letter": "d", 
+                    "multiplicity": 1
+                }
+            ]
         }, 
         "atomic-system": {
             "cell": {
@@ -19,7 +29,7 @@
                         "unit": "scaled"
                     }, 
                     "c": {
-                        "value": 0.926, 
+                        "value": 1.3096, 
                         "unit": "scaled"
                     }
                 }
@@ -30,28 +40,6 @@
                     "position": {
                         "value": [
                             0.0, 
-                            0.5, 
-                            0.5
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.0, 
-                            0.5
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.0, 
                             0.0, 
                             0.0
                         ], 
@@ -64,7 +52,7 @@
                         "value": [
                             0.5, 
                             0.5, 
-                            0.0
+                            0.5
                         ], 
                         "unit": "scaled"
                     }

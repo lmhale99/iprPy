@@ -3,6 +3,10 @@ from __future__ import (absolute_import, print_function,
                         division, unicode_literals)
 import os
 
+# https://github.com/usnistgov/atomman
+import atomman as am
+import atomman.unitconvert as uc
+
 # iprPy imports
 from .. import Record
 
@@ -59,15 +63,19 @@ class CrystalPrototype(Record):
         
         cell = proto['atomic-system']['cell']
         params['crystal_family'] = list(cell.keys())[0]
-        params['a'] = cell.find('a')['value']
-        try:
-            params['b'] = cell.find('b')['value']
-        except:
-            params['b'] = params['a']
-        try:
-            params['c'] = cell.find('c')['value']
-        except:
-            params['c'] = params['a']
-        params['natypes'] = max(proto['atomic-system'].finds('component'))
+        
+        ucell = am.load('system_model', self.content, key='atomic-system')
+        params['natypes'] = ucell.natypes
+        
+        if flat is True:
+            params['a'] = ucell.box.a
+            params['b'] = ucell.box.b
+            params['c'] = ucell.box.c
+            params['alpha'] = ucell.box.alpha
+            params['beta'] = ucell.box.beta
+            params['gamma'] = ucell.box.gamma
+            params['natoms'] = ucell.natoms
+        else:
+            params['ucell'] = ucell
         
         return params

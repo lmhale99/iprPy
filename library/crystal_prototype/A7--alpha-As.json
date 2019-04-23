@@ -4,27 +4,27 @@
         "id": "A7--alpha-As",
         "name": "alpha As", 
         "prototype": "a-As", 
-        "Pearson-symbol": "hR2", 
+        "Pearson-symbol": "hR6", 
         "Strukturbericht": "A7",
         "space-group": {
             "number": 166, 
             "Hermann-Maguin": "R -3 m", 
-            "Schoenflies": "D3d^5"
+            "Schoenflies": "D3d^5",
+            "Wykoff": {
+                "letter": "c", 
+                "multiplicity": 6
+            }
         }, 
         "atomic-system": {
             "cell": {
-                "orthorhombic": {
+                "hexagonal": {
                     "a": {
-                        "value": 1, 
-                        "unit": "scaled"
-                    }, 
-                    "b": {
-                        "value": 1.7320508075689, 
-                        "unit": "scaled"
+                        "value": 1.0, 
+                        "unit": "angstrom"
                     }, 
                     "c": {
-                        "value": 2.8, 
-                        "unit": "scaled"
+                        "value": 2.777, 
+                        "unit": "angstrom"
                     }
                 }
             }, 
@@ -35,7 +35,7 @@
                         "value": [
                             0.0, 
                             0.0, 
-                            0.0
+                            0.22764
                         ], 
                         "unit": "scaled"
                     }
@@ -46,7 +46,7 @@
                         "value": [
                             0.0, 
                             0.0, 
-                            0.5458
+                            0.77236
                         ], 
                         "unit": "scaled"
                     }
@@ -55,9 +55,9 @@
                     "component": 1, 
                     "position": {
                         "value": [
-                            0.0, 
-                            0.3333333333333, 
-                            0.3333333333333
+                            0.3333333333333333, 
+                            0.6666666666666666, 
+                            0.4390266666666666
                         ], 
                         "unit": "scaled"
                     }
@@ -66,9 +66,9 @@
                     "component": 1, 
                     "position": {
                         "value": [
-                            0.0, 
-                            0.3333333333333, 
-                            0.8791333333333
+                            0.3333333333333333, 
+                            0.6666666666666666, 
+                            0.8943066666666666
                         ], 
                         "unit": "scaled"
                     }
@@ -77,9 +77,9 @@
                     "component": 1, 
                     "position": {
                         "value": [
-                            0.5, 
-                            0.1666666666667, 
-                            0.6666666666667
+                            0.6666666666666666, 
+                            0.3333333333333333, 
+                            0.1056933333333333
                         ], 
                         "unit": "scaled"
                     }
@@ -88,75 +88,9 @@
                     "component": 1, 
                     "position": {
                         "value": [
-                            0.5, 
-                            0.1666666666667, 
-                            0.2124666666667
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.5, 
-                            0.0
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.5, 
-                            0.5458
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.8333333333333, 
-                            0.3333333333333
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.8333333333333, 
-                            0.8791333333333
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.6666666666667, 
-                            0.6666666666667
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.6666666666667, 
-                            0.2124666666667
+                            0.6666666666666666, 
+                            0.3333333333333333, 
+                            0.5609733333333333
                         ], 
                         "unit": "scaled"
                     }

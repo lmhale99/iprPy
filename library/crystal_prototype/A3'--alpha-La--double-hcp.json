@@ -8,18 +8,24 @@
         "Strukturbericht": "A3'", 
         "space-group": {
             "number": 194, 
-            "Hermann-Maguin": "P 63/m m c", 
-            "Schoenflies": "D6h^4"
+            "Hermann-Maguin": "P 6_3/m m c", 
+            "Schoenflies": "D6h^4",
+            "Wykoff": [
+                {
+                    "letter": "a", 
+                    "multiplicity": 2
+                }, 
+                {
+                    "letter": "c", 
+                    "multiplicity": 2
+                }
+            ]
         }, 
         "atomic-system": {
             "cell": {
-                "orthorhombic": {
+                "hexagonal": {
                     "a": {
                         "value": 1.0, 
-                        "unit": "scaled"
-                    }, 
-                    "b": {
-                        "value": 1.7320508075689, 
                         "unit": "scaled"
                     }, 
                     "c": {
@@ -44,41 +50,8 @@
                     "component": 1, 
                     "position": {
                         "value": [
-                            0.5, 
-                            0.5, 
-                            0.0
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.8333333333333, 
-                            0.25
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
                             0.0, 
-                            0.3333333333333, 
-                            0.25
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.1666666666667, 
+                            0.0, 
                             0.5
                         ], 
                         "unit": "scaled"
@@ -88,9 +61,9 @@
                     "component": 1, 
                     "position": {
                         "value": [
-                            0.0, 
-                            0.6666666666667, 
-                            0.5
+                            0.3333333333333333, 
+                            0.6666666666666666, 
+                            0.25
                         ], 
                         "unit": "scaled"
                     }
@@ -99,19 +72,8 @@
                     "component": 1, 
                     "position": {
                         "value": [
-                            0.5, 
-                            0.8333333333333, 
-                            0.75
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.3333333333333, 
+                            0.6666666666666666, 
+                            0.3333333333333333, 
                             0.75
                         ], 
                         "unit": "scaled"

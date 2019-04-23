@@ -6,13 +6,6 @@
         "prototype": "NaCl", 
         "Pearson-symbol": "cF8", 
         "Strukturbericht": "B1",
-        "identifier": {
-            "common": "rock salt", 
-            "tag": "NaCl", 
-            "prototype": "NaCl", 
-            "Pearson-symbol": "cF8", 
-            "Strukturbericht": "B1"
-        }, 
         "space-group": {
             "number": 225, 
             "Hermann-Maguin": "F m -3 m", 

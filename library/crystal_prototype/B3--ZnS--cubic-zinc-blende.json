@@ -6,13 +6,6 @@
         "prototype": "c-ZnS", 
         "Pearson-symbol": "cF8", 
         "Strukturbericht": "B3",
-        "identifier": {
-            "common": "cubic zinc-blende", 
-            "tag": "c-ZnS", 
-            "prototype": "c-ZnS", 
-            "Pearson-symbol": "cF8", 
-            "Strukturbericht": "B3"
-        }, 
         "space-group": {
             "number": 216, 
             "Hermann-Maguin": "F -4 3 m", 
