@@ -16,9 +16,10 @@ from DataModelDict import DataModelDict as DM
 # iprPy imports
 from .. import rootdir
 from ..record import loaded as record_loaded
-from ..tools import screen_input
+from ..tools import screen_input, aslist
 from .prepare import prepare
 from .runner import runner
+from .settings import load_run_directory
 
 class Database(object):
     """
@@ -268,15 +269,16 @@ class Database(object):
         """
         raise AttributeError('get_tar not defined for Database style')
     
-    def add_tar(self, record=None, name=None, style=None, root_dir=None):
+    def add_tar(self, record=None, name=None, style=None, tar=None, root_dir=None):
         """
         Archives and stores a folder associated with a record.  Issues an
         error if exactly one matching record is not found in the database, or
-        the associated record already has a tar archive. The record's name
-        must match the name of the directory being archived.
+        the associated record already has a tar archive.
         
         Parameters
         ----------
+        database_info : mdcs.MDCS
+            The MDCS class used for accessing the curator database.
         record : iprPy.Record, optional
             The record to associate the tar archive with.  If not given, then
             name and/or style necessary to uniquely identify the record are
@@ -285,19 +287,24 @@ class Database(object):
             .The name to use in uniquely identifying the record.
         style : str, optional
             .The style to use in uniquely identifying the record.
+        tar : bytes, optional
+            The bytes content of a tar file to save.  tar cannot be given
+            with root_dir.
         root_dir : str, optional
             Specifies the root directory for finding the directory to archive.
             The directory to archive is at <root_dir>/<name>.  (Default is to
-            set root_dir to the current working directory.)
+            set root_dir to the current working directory.)  tar cannot be given
+            with root_dir.
         
         Raises
         ------
-        AttributeError
-            If add_tar is not defined for database style.
+        ValueError
+            If style and/or name content given with record or the record already
+            has an archive.
         """
         raise AttributeError('add_tar not defined for Database style')
     
-    def update_tar(self, record=None, name=None, style=None, root_dir=None):
+    def update_tar(self, record=None, name=None, style=None, tar=None, root_dir=None):
         """
         Replaces an existing tar archive for a record with a new one.  Issues
         an error if exactly one matching record is not found in the database.
@@ -313,9 +320,14 @@ class Database(object):
             .The name to use in uniquely identifying the record.
         style : str, optional
             .The style to use in uniquely identifying the record.
+        tar : bytes, optional
+            The bytes content of a tar file to save.  tar cannot be given
+            with root_dir.
         root_dir : str, optional
             Specifies the root directory for finding the directory to archive.
-            The directory to archive is at <root_dir>/<name>.
+            The directory to archive is at <root_dir>/<name>.  (Default is to
+            set root_dir to the current working directory.)  tar cannot be given
+            with root_dir.
         
         Raises
         ------
@@ -347,7 +359,7 @@ class Database(object):
         """
         raise AttributeError('delete_tar not defined for Database style')
     
-    def build_refs(self, lib_directory=None):
+    def build_refs(self, lib_directory=None, refresh=False):
         """
         Adds reference records from a library to a database.
         
@@ -356,11 +368,37 @@ class Database(object):
         lib_directory : str, optional
             The directory path for the library.  If not given, then it will use
             the iprPy/library directory.
+        refresh : bool or list, optional
+            If False (default) only new reference records are added.  If True,
+            all existing reference records are refreshed by deleting the
+            current ones in the database and uploading the references in
+            lib_directory.  If a list is given, then only the reference
+            record styles named in the list are refreshed.
         """
-        # Handle parameters
+        
+        # Set default lib_directory
         if lib_directory is None:
             lib_directory = os.path.join(os.path.dirname(rootdir), 'library')
         lib_directory = os.path.abspath(lib_directory)
+        
+        # Handle refresh options
+        if refresh is False:
+            refresh_list = []
+        else:
+            all_refs = []
+            for path in glob.iglob(os.path.join(lib_directory, '*')):
+                if os.path.isdir(path):
+                    all_refs.append(os.path.basename(path))
+            if refresh is True:
+                refresh_list = all_refs
+            else:
+                refresh_list = aslist(refresh)
+                for style in refresh_list:
+                    assert style in all_refs, str(style) + ' is not a reference record style'
+        
+        # Delete records to be refreshed
+        for style in refresh_list:
+            self.destroy_records(style)
         
         # Loop over all record styles in lib_directory
         for dir in glob.iglob(os.path.join(lib_directory, '*')):
@@ -418,7 +456,7 @@ class Database(object):
                 print(' -', count, 'issued errors')
                 sys.stdout.flush()
     
-    def clean_records(self, run_directory=None, record_style=None):
+    def clean_records(self, run_directory=None, record_style=None, records=None):
         """
         Resets all records of a given style that issued errors. Useful if the
         errors are due to external conditions.
@@ -431,114 +469,141 @@ class Database(object):
         record_style : str, optional
             The record style to clean.  If not given, then the available record
             styles will be listed and the user prompted to pick one.
+        records : list, optional
+            A list of iprPy.Record obejcts from the database to clean.  Allows
+            the user full control on which records to reset.  Cannot be given
+            with record_style.
         """
         
-        if record_style is None:
+        if record_style is None and records is None:
             record_style = self.select_record_style()
+            
+        run_directory = load_run_directory(run_directory)
         
         if record_style is not None:
-            # Find all records of record_style that issued errors
-            records = self.get_records(style=record_style)
-            error_df = []
-            error_dict = {}
-            for record in records:
-                error_df.append(record.todict(full=False))
-                error_dict[record.name] = record.content
-            error_df = pd.DataFrame(error_df)
-            error_df = error_df[error_df.status == 'error']
+            if records is not None:
+                raise ValueError('record_style and records cannot both be given')
             
-            # Loop over all error records
-            for record_name in error_df.key.tolist():
-                # Check if record has saved tar
-                try:
-                    tar = self.get_tar(name=record_name, style=record_style)
-                except:
-                    pass
-                else:
-                    # Copy tar back to run_directory
-                    try:
-                        tar.extractall(run_directory)
-                    except:
-                        print('failed to extract', record_name, 'tar')
-                        tar.close()
-                    else:
-                        # Delete database version of tar
-                        tar.close()
-                        try:
-                            self.delete_tar(name=record_name, style=record_style)
-                        except:
-                            pass
-                
-                # Remove error and status from stored record
-                try:
-                    model = DM(error_dict[record_name])
-                except:
-                    pass
-                else:
-                    model_root = list(model.keys())[0]
-                    del(model[model_root]['error'])
-                    model[model_root]['status'] = 'not calculated'
-                    self.update_record(name=record_name, style=record_style,
-                                        content=model.xml())
+            # Retrieve records with errors from self
+            records = self.get_records(style=record_style, status='error')
         
-        if run_directory is not None:
-            # Remove bid files
-            for bidfile in glob.iglob(os.path.join(run_directory, '*', '*.bid')):
-                os.remove(bidfile)
+        elif records is None:
+            # Set empty list if record_style is still None and no records given
+            records = []
+        
+        print(len(records), 'records to clean')
+        
+        # Loop over all error records
+        for record in records:
+            # Check if record has saved tar
+            try:
+                tar = self.get_tar(record=record)
+            except:
+                print('failed to extract', record_name, 'tar')
+            else:
+                # Copy tar back to run_directory
+                try:
+                    tar.extractall(run_directory)
+                except:
+                    print('failed to extract', record_name, 'tar')
+                    tar.close()
+                else:
+                    # Delete database version of tar
+                    tar.close()
+                    try:
+                        self.delete_tar(record=record)
+                    except:
+                        print('failed to delete', record_name, 'tar')
             
-            # Remove results.json files
-            for bidfile in glob.iglob(os.path.join(run_directory, '*',
-                                                   'results.json')):
-                os.remove(bidfile)
-        else:
-            raise ValueError('No run_directory supplied')
+            # Remove error and status from stored record
+            model = DM(record.content)
+            model_root = list(model.keys())[0]
+            del(model[model_root]['error'])
+            model[model_root]['status'] = 'not calculated'
+            self.update_record(record=record, content=model.xml())
+        
+        # Remove bid files
+        for bidfile in glob.iglob(os.path.join(run_directory, '*', '*.bid')):
+            os.remove(bidfile)
+        
+        # Remove results.json files
+        for resultsfile in glob.iglob(os.path.join(run_directory, '*', 'results.json')):
+            os.remove(resultsfile)
     
-    def copy_records(self, dbase2, record_style=None, includetar=True):
+    def copy_records(self, dbase2, record_style=None, records=None, includetar=True, overwrite=False):
         """
-        Copies all records of a given style from one database to another.
+        Copies records from one database to another.
         
         Parameters
         ----------
         dbase2 :  iprPy.Database
             The database to copy to.
         record_style : str, optional
-            The record style to copy.  If not given, then the available record
-            styles will be listed and the user prompted to pick one.
+            The record style to copy.  If record_style and records not
+            given, then the available record styles will be listed and the
+            user prompted to pick one.  Cannot be given with records.
+        records : list, optional
+            A list of iprPy.Record obejcts from the current database to copy
+            to dbase2.  Allows the user full control on which records to
+            copy/update.  Cannot be given with record_style.
         includetar : bool, optional
             If True, the tar archives will be copied along with the records.
             If False, only the records will be copied. (Default is True).
+        overwrite : bool, optional
+            If False (default) only new records and tars will be copied.
+            If True, all existing content will be updated.
         """
-        if record_style is None:
+        if record_style is None and records is None:
+            # Prompt for record_style
             record_style = self.select_record_style()
         
         if record_style is not None:
+            if records is not None:
+                raise ValueError('record_style and records cannot both be given')
             
-            # Retrieve records from dbase1
+            # Retrieve records from self
             records = self.get_records(style=record_style)
-            
-            # Copy records
-            for record in records:
-                try:
-                    dbase2.add_record(record=record)
-                except:
-                    pass
+        
+        elif records is None:
+            # Set empty list if record_style is still None and no records given
+            records = []
+        
+        print(len(records), 'records to try to copy')
+        
+        record_count = 0
+        tar_count = 0
+        # Copy records
+        for record in records:
+            try:
+                # Add new records
+                dbase2.add_record(record=record)
+                record_count += 1
+            except:
+                # Update existing records
+                if overwrite:
+                    dbase2.update_record(record=record)
+                    record_count += 1
             
             # Copy archives
             if includetar:
-                tempdir = tempfile.mkdtemp()
-                for record in records:
+                try:
+                    # get tar if it exists
+                    tar = self.get_tar(record=record, raw=True)
+                except:
+                    pass
+                else:
                     try:
-                        tar = self.get_tar(record=record)
+                        # Add new tar
+                        dbase2.add_tar(record=record, tar=tar)
+                        tar_count += 1
                     except:
-                        pass
-                    else:
-                        tar.extractall(tempdir)
-                        try:
-                            dbase2.add_tar(record=record, root_dir=tempdir)
-                        except:
-                            pass
-                        shutil.rmtree(os.path.join(tempdir, record.name))
-                shutil.rmtree(tempdir)
+                        # Update existing tar
+                        if overwrite:
+                            dbase2.update_tar(record=record, tar=tar)
+                            tar_count += 1
+        print(record_count, 'records added/updated')
+        if includetar:
+            print(tar_count, 'tars added/updated')
     
     def destroy_records(self, record_style=None):
         """

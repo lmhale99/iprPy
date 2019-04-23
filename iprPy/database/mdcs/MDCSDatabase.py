@@ -344,12 +344,11 @@ class MDCSDatabase(Database):
         # Delete record
         self.mdcs.delete(record.name)
     
-    def add_tar(self, record=None, name=None, style=None, root_dir=None):
+    def add_tar(self, record=None, name=None, style=None, tar=None, root_dir=None):
         """
         Archives and stores a folder associated with a record.  Issues an
         error if exactly one matching record is not found in the database, or
-        the associated record already has a tar archive. The record's name
-        must match the name of the directory being archived.
+        the associated record already has a tar archive.
         
         Parameters
         ----------
@@ -363,10 +362,14 @@ class MDCSDatabase(Database):
             .The name to use in uniquely identifying the record.
         style : str, optional
             .The style to use in uniquely identifying the record.
+        tar : bytes, optional
+            The bytes content of a tar file to save.  tar cannot be given
+            with root_dir.
         root_dir : str, optional
             Specifies the root directory for finding the directory to archive.
             The directory to archive is at <root_dir>/<name>.  (Default is to
-            set root_dir to the current working directory.)
+            set root_dir to the current working directory.)  tar cannot be given
+            with root_dir.
         
         Raises
         ------
@@ -388,33 +391,51 @@ class MDCSDatabase(Database):
             record = self.get_record(name=record.name, style=record.style)
         
         # Check if an archive already exists
-        #if len(record.content.finds('archive')) > 0:
-        #    raise ValueError('Record already has an archive')
+        if len(record.content.finds('archive')) > 0:
+            raise ValueError('Record already has an archive')
         
-        # Make archive
-        shutil.make_archive(record.name, 'gztar', root_dir=root_dir,
-                            base_dir=record.name)
+        if tar is None: 
+            filename = record.name + '.tar.gz'
+            
+            # Make archive
+            shutil.make_archive(record.name, 'gztar', root_dir=root_dir,
+                                base_dir=record.name)
+            
+            # Upload archive
+            tries = 0
+            while tries < 2:
+                if True:
+                    url = self.mdcs.blob_upload(filename)
+                    break
+                else:
+                    tries += 1
+            if tries == 2:
+                raise ValueError('Failed to upload archive 2 times')
+            
+            # Remove local archive copy
+            os.remove(filename)
+            
+        elif root_dir is None:
+            # Upload archive
+            tries = 0
+            while tries < 2:
+                if True:
+                    url = self.mdcs.blob_upload(BytesIO(tar))
+                    break
+                else:
+                    tries += 1
+            if tries == 2:
+                raise ValueError('Failed to upload archive 2 times')
         
-        # Upload archive
-        tries = 0
-        while tries < 2:
-            if True:
-                url = self.mdcs.blob_upload(record.name + '.tar.gz')
-                break
-            else:
-                tries += 1
-        if tries == 2:
-            raise ValueError('Failed to upload archive 2 times')
+        else:
+            raise ValueError('tar and root_dir cannot both be given')
         
-        # Update corresponding record
+        # Update corresponding record to point to url
         root_key = list(record.content.keys())[0]
         record.content[root_key]['archive'] = DM()
         record.content[root_key]['archive']['url'] = url
         
         self.update_record(record=record)
-        
-        # Remove local archive copy
-        os.remove(record.name+'.tar.gz')
 
     def get_tar(self, record=None, name=None, style=None, raw=False):
         """
@@ -469,3 +490,92 @@ class MDCSDatabase(Database):
             return tardata
         else:
             return tarfile.open(fileobj = BytesIO(tardata))
+    
+    def update_tar(self, record=None, name=None, style=None, tar=None, root_dir=None):
+        """
+        Archives and stores a folder associated with a record.  Issues an
+        error if exactly one matching record is not found in the database, or
+        the associated record already has a tar archive.
+        
+        Parameters
+        ----------
+        database_info : mdcs.MDCS
+            The MDCS class used for accessing the curator database.
+        record : iprPy.Record, optional
+            The record to associate the tar archive with.  If not given, then
+            name and/or style necessary to uniquely identify the record are
+            needed.
+        name : str, optional
+            .The name to use in uniquely identifying the record.
+        style : str, optional
+            .The style to use in uniquely identifying the record.
+        tar : bytes, optional
+            The bytes content of a tar file to save.  tar cannot be given
+            with root_dir.
+        root_dir : str, optional
+            Specifies the root directory for finding the directory to archive.
+            The directory to archive is at <root_dir>/<name>.  (Default is to
+            set root_dir to the current working directory.)  tar cannot be given
+            with root_dir.
+        
+        Raises
+        ------
+        ValueError
+            If style and/or name content given with record or the record already
+            has an archive.
+        """
+        
+        # Create Record object if not given
+        if record is None:
+            record = self.get_record(name=name, style=style)
+        
+        # Issue a ValueError for competing kwargs
+        elif style is not None or name is not None:
+            raise ValueError('kwargs style and name cannot be given with kwarg record')
+        
+        # Verify that record exists
+        else:
+            record = self.get_record(name=record.name, style=record.style)
+        
+        if tar is None: 
+            filename = record.name + '.tar.gz'
+            
+            # Make archive
+            shutil.make_archive(record.name, 'gztar', root_dir=root_dir,
+                                base_dir=record.name)
+            
+            # Upload archive
+            tries = 0
+            while tries < 2:
+                if True:
+                    url = self.mdcs.blob_upload(filename)
+                    break
+                else:
+                    tries += 1
+            if tries == 2:
+                raise ValueError('Failed to upload archive 2 times')
+            
+            # Remove local archive copy
+            os.remove(filename)
+            
+        elif root_dir is None:
+            # Upload archive
+            tries = 0
+            while tries < 2:
+                if True:
+                    url = self.mdcs.blob_upload(BytesIO(tar))
+                    break
+                else:
+                    tries += 1
+            if tries == 2:
+                raise ValueError('Failed to upload archive 2 times')
+        
+        else:
+            raise ValueError('tar and root_dir cannot both be given')
+        
+        # Update corresponding record to point to url
+        root_key = list(record.content.keys())[0]
+        record.content[root_key]['archive'] = DM()
+        record.content[root_key]['archive']['url'] = url
+        
+        self.update_record(record=record)

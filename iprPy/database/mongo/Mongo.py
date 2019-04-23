@@ -350,15 +350,16 @@ class Mongo(Database):
         # Delete record 
         self.mongodb[record.style].delete_one(query)
 
-    def add_tar(self, record=None, name=None, style=None, root_dir=None):
+    def add_tar(self, record=None, name=None, style=None, tar=None, root_dir=None):
         """
         Archives and stores a folder associated with a record.  Issues an
         error if exactly one matching record is not found in the database, or
-        the associated record already has a tar archive. The record's name
-        must match the name of the directory being archived.
+        the associated record already has a tar archive.
         
         Parameters
         ----------
+        database_info : mdcs.MDCS
+            The MDCS class used for accessing the curator database.
         record : iprPy.Record, optional
             The record to associate the tar archive with.  If not given, then
             name and/or style necessary to uniquely identify the record are
@@ -367,10 +368,14 @@ class Mongo(Database):
             .The name to use in uniquely identifying the record.
         style : str, optional
             .The style to use in uniquely identifying the record.
+        tar : bytes, optional
+            The bytes content of a tar file to save.  tar cannot be given
+            with root_dir.
         root_dir : str, optional
             Specifies the root directory for finding the directory to archive.
             The directory to archive is at <root_dir>/<name>.  (Default is to
-            set root_dir to the current working directory.)
+            set root_dir to the current working directory.)  tar cannot be given
+            with root_dir.
         
         Raises
         ------
@@ -397,25 +402,41 @@ class Mongo(Database):
         if mongofs.exists({"recordname": record.name}):
             raise ValueError('Record already has an archive')
         
-        # Make archive
-        shutil.make_archive(record.name, 'gztar', root_dir=root_dir,
-                            base_dir=record.name)
+        if tar is None:
         
-        # Upload archive
-        filename = record.name + '.tar.gz'
-        with open(filename, 'rb') as f:
+            # Make archive
+            shutil.make_archive(record.name, 'gztar', root_dir=root_dir,
+                                base_dir=record.name)
+        
+            # Upload archive
+            filename = record.name + '.tar.gz'
+            with open(filename, 'rb') as f:
+                tries = 0
+                while tries < 2:
+                    if True:
+                        mongofs.put(f, recordname=record.name)
+                        break
+                    else:
+                        tries += 1
+                if tries == 2:
+                    raise ValueError('Failed to upload archive 2 times')
+        
+            # Remove local archive copy
+            os.remove(filename)
+            
+        elif root_dir is None:
+            # Upload archive
             tries = 0
             while tries < 2:
                 if True:
-                    mongofs.put(f, recordname=record.name)
+                    mongofs.put(tar, recordname=record.name)
                     break
                 else:
                     tries += 1
             if tries == 2:
                 raise ValueError('Failed to upload archive 2 times')
-        
-        # Remove local archive copy
-        os.remove(filename)
+        else:
+            raise ValueError('tar and root_dir cannot both be given')
         
     def get_tar(self, record=None, name=None, style=None, raw=False):
         """
@@ -534,7 +555,7 @@ class Mongo(Database):
         # Delete tar
         mongofs.delete(tar._id)
     
-    def update_tar(self, record=None, name=None, style=None, root_dir=None):
+    def update_tar(self, record=None, name=None, style=None, tar=None, root_dir=None):
         """
         Replaces an existing tar archive for a record with a new one.  Issues
         an error if exactly one matching record is not found in the database.
@@ -550,13 +571,18 @@ class Mongo(Database):
             .The name to use in uniquely identifying the record.
         style : str, optional
             .The style to use in uniquely identifying the record.
+        tar : bytes, optional
+            The bytes content of a tar file to save.  tar cannot be given
+            with root_dir.
         root_dir : str, optional
             Specifies the root directory for finding the directory to archive.
-            The directory to archive is at <root_dir>/<name>.
+            The directory to archive is at <root_dir>/<name>.  (Default is to
+            set root_dir to the current working directory.)  tar cannot be given
+            with root_dir.
         """
         
         # Delete the existing tar archive stored in the database
         self.delete_tar(record=record, name=name, style=style)
         
         # Add the new tar archive
-        self.add_tar(record=record, name=name, style=style, root_dir=root_dir)
+        self.add_tar(record=record, name=name, style=style, tar=tar, root_dir=root_dir)

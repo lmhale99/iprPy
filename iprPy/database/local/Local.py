@@ -325,15 +325,16 @@ class Local(Database):
         # Delete record file
         os.remove(record_path+'.xml')
 
-    def add_tar(self, record=None, name=None, style=None, root_dir=None):
+    def add_tar(self, record=None, name=None, style=None, tar=None, root_dir=None):
         """
         Archives and stores a folder associated with a record.  Issues an
         error if exactly one matching record is not found in the database, or
-        the associated record already has a tar archive. The record's name
-        must match the name of the directory being archived.
+        the associated record already has a tar archive.
         
         Parameters
         ----------
+        database_info : mdcs.MDCS
+            The MDCS class used for accessing the curator database.
         record : iprPy.Record, optional
             The record to associate the tar archive with.  If not given, then
             name and/or style necessary to uniquely identify the record are
@@ -342,10 +343,14 @@ class Local(Database):
             .The name to use in uniquely identifying the record.
         style : str, optional
             .The style to use in uniquely identifying the record.
+        tar : bytes, optional
+            The bytes content of a tar file to save.  tar cannot be given
+            with root_dir.
         root_dir : str, optional
             Specifies the root directory for finding the directory to archive.
             The directory to archive is at <root_dir>/<name>.  (Default is to
-            set root_dir to the current working directory.)
+            set root_dir to the current working directory.)  tar cannot be given
+            with root_dir.
         
         Raises
         ------
@@ -370,12 +375,18 @@ class Local(Database):
         record_path = os.path.join(self.host, record.style, record.name)
         
         # Check if an archive already exists
-        if os.path.isfile(record_path+'.tar.gz'):
+        if os.path.isfile(record_path + '.tar.gz'):
             raise ValueError('Record already has an archive')
         
         # Make archive
-        shutil.make_archive(record_path, 'gztar', root_dir=root_dir,
-                            base_dir=record.name)
+        if tar is None:
+            shutil.make_archive(record_path, 'gztar', root_dir=root_dir,
+                                base_dir=record.name)
+        elif root_dir is None:
+            with open(record_path + '.tar.gz', 'wb') as f:
+                f.write(tar)
+        else:
+            raise ValueError('tar and root_dir cannot both be given')
     
     def get_tar(self, record=None, name=None, style=None, raw=False):
         """
@@ -424,7 +435,7 @@ class Local(Database):
         
         # Return content
         if raw is True:
-            with open(record_path, 'rb') as f:
+            with open(record_path+'.tar.gz', 'rb') as f:
                 return f.read()
         else:
             return tarfile.open(record_path+'.tar.gz')
@@ -470,7 +481,7 @@ class Local(Database):
         if os.path.isfile(record_path+'.tar.gz'):
             os.remove(record_path+'.tar.gz')
 
-    def update_tar(self, record=None, name=None, style=None, root_dir=None):
+    def update_tar(self, record=None, name=None, style=None, tar=None, root_dir=None):
         """
         Replaces an existing tar archive for a record with a new one.  Issues
         an error if exactly one matching record is not found in the database.
@@ -486,13 +497,18 @@ class Local(Database):
             .The name to use in uniquely identifying the record.
         style : str, optional
             .The style to use in uniquely identifying the record.
+        tar : bytes, optional
+            The bytes content of a tar file to save.  tar cannot be given
+            with root_dir.
         root_dir : str, optional
             Specifies the root directory for finding the directory to archive.
-            The directory to archive is at <root_dir>/<name>.
+            The directory to archive is at <root_dir>/<name>.  (Default is to
+            set root_dir to the current working directory.)  tar cannot be given
+            with root_dir.
         """
         
         # Delete the existing tar archive stored in the database
         self.delete_tar(record=record, name=name)
         
         # Add the new tar archive
-        self.add_tar(record=record, name=name, style=style, root_dir=root_dir)
+        self.add_tar(record=record, name=name, style=style, tar=tar, root_dir=root_dir)

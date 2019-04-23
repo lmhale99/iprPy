@@ -367,4 +367,12 @@ def removecalc(dir):
                     tries += 1
     
     # Use rmtree on remaining content (hopefully only *.bid and the dir folder)
-    shutil.rmtree(dir)
+    tries = 0
+    while tries < 10:
+        try:
+            shutil.rmtree(dir)
+            break
+        except:
+            tries += 1
+            if tries == 10:
+                print('failed to delete', os.path.basename(dir))
