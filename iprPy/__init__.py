@@ -13,7 +13,7 @@ import os
 with open(os.path.join(os.path.dirname(__file__), 'VERSION')) as version_file:
     __version__ = version_file.read().strip()
 
-__all__ = ['__version__', 'rootdir', 'compatibility', 'tools', 'input',
+__all__ = ['__version__', 'rootdir', 'libdir', 'compatibility', 'tools', 'input',
            'record', 'load_record', 'calculation', 'load_calculation',
            'database', 'list_databases', 'load_database', 'set_database',
            'unset_database', 'list_run_directories',
@@ -23,6 +23,7 @@ __all__.sort()
 
 # Define root package directory
 rootdir = os.path.dirname(os.path.abspath(__file__))
+libdir = os.path.abspath(os.path.join(rootdir, '..', 'library'))
 
 # iprPy imports
 from . import compatibility
