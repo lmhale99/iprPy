@@ -43,9 +43,14 @@ def main(*args):
                                  input_dict['initialsystem'],
                                  input_dict['potential'],
                                  mpi_command = input_dict['mpi_command'],
+                                 a1vect = input_dict['shiftvector1'],
+                                 a2vect = input_dict['shiftvector2'],
+                                 ucell = input_dict['ucell'],
+                                 transform = input_dict['transformationmatrix'],
                                  cutboxvector = input_dict['stackingfault_cutboxvector'],
-                                 faultpos = input_dict['faultpos'],
-                                 faultshift = input_dict['faultshift'],
+                                 faultposrel = input_dict['faultpos'],
+                                 a1 = input_dict['stackingfault_shiftfraction1'],
+                                 a2 = input_dict['stackingfault_shiftfraction2'],
                                  etol = input_dict['energytolerance'],
                                  ftol = input_dict['forcetolerance'],
                                  maxiter = input_dict['maxiterations'],
@@ -61,10 +66,10 @@ def main(*args):
     with open('results.json', 'w') as f:
         record.content.json(fp=f, indent=4)
 
-def stackingfaultpoint(lammps_command, system, potential,
+def stackingfaultrelax(lammps_command, system, potential,
                        mpi_command=None, sim_directory=None,
-                       cutboxvector='c', faultpos=0.5,
-                       faultshift=[0.0, 0.0, 0.0], etol=0.0, ftol=0.0,
+                       cutboxvector='c',
+                       etol=0.0, ftol=0.0,
                        maxiter=10000, maxeval=100000,
                        dmax=uc.set_in_units(0.01, 'angstrom'),
                        lammps_date=None):
@@ -76,15 +81,19 @@ def stackingfaultpoint(lammps_command, system, potential,
     lammps_command :str
         Command for running LAMMPS.
     system : atomman.System
-        The system to perform the calculation on.
+        The system containing a stacking fault.
     potential : atomman.lammps.Potential
         The LAMMPS implemented potential to use.
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
         will run serially.
     sim_directory : str, optional
-        The path to the directory to perform the simuation in.  If not
+        The path to the directory to perform the simulation in.  If not
         given, will use the current working directory.
+    cutboxvector : str, optional
+        Indicates which of the three system box vectors, 'a', 'b', or 'c', has
+        the non-periodic boundary (default is 'c').  Fault plane normal is
+        defined by the cross of the other two box vectors.
     etol : float, optional
         The energy tolerance for the structure minimization. This value is
         unitless. (Default is 0.0).
@@ -101,17 +110,9 @@ def stackingfaultpoint(lammps_command, system, potential,
         The maximum distance in length units that any atom is allowed to relax
         in any direction during a single minimization iteration (default is
         0.01 Angstroms).
-    cutboxvector : str, optional
-        Indicates which of the three system box vectors, 'a', 'b', or 'c', to
-        cut with a non-periodic boundary (default is 'c').
-    faultpos : float, optional
-        The fractional position along the cutboxvector where the stacking
-        fault plane will be placed (default is 0.5).
-    faultshift : list of float, optional
-        The vector shift to apply to all atoms above the fault plane defined
-        by faultpos (default is [0,0,0], i.e. no shift applied).
     lammps_date : datetime.date or None, optional
-        The date version of the LAMMPS executable.  If None, will be identified from the lammps_command (default is None).
+        The date version of the LAMMPS executable.  If None, will be identified
+        from the lammps_command (default is None).
     
     Returns
     -------
@@ -122,85 +123,26 @@ def stackingfaultpoint(lammps_command, system, potential,
         - **'dumpfile'** (*str*) - The filename of the LAMMPS dump file
           of the relaxed system.
         - **'system'** (*atomman.System*) - The relaxed system.
-        - **'A_fault'** (*float*) - The area of the fault surface.
         - **'E_total'** (*float*) - The total potential energy of the relaxed
           system.
-        - **'disp'** (*float*) - The center of mass difference between atoms
-          above and below the fault plane in the cutboxvector direction.
     
     Raises
     ------
     ValueError
         For invalid cutboxvectors.
     """
-    
-    # Set options based on cutboxvector
+    # Get script's location
+    script_dir = os.path.dirname(__file__)
+
+    # Give correct LAMMPS fix setforce command
     if cutboxvector == 'a':
-        # Assert system is compatible with planeaxis value
-        if system.box.xy != 0.0 or system.box.xz != 0.0:
-            raise ValueError("box tilts xy and xz must be 0 for cutboxvector='a'")
-        
-        # Specify cutindex
-        cutindex = 0
-        
-        # Identify atoms above fault
-        faultpos = system.box.xlo + system.box.lx * faultpos
-        abovefault = system.atoms.pos[:, cutindex] > (faultpos)
-        
-        # Compute fault area
-        faultarea = np.linalg.norm(np.cross(system.box.bvect,
-                                            system.box.cvect))
-        
-        # Give correct LAMMPS fix setforce command
-        fix_cut_setforce = 'fix cut all setforce NULL 0 0'
-    
+        fix_cut_setforce = 'fix cut all setforce NULL 0 0'    
     elif cutboxvector == 'b':
-        # Assert system is compatible with planeaxis value
-        if system.box.yz != 0.0:
-            raise ValueError("box tilt yz must be 0 for cutboxvector='b'")
-        
-        # Specify cutindex
-        cutindex = 1
-        
-        # Identify atoms above fault
-        faultpos = system.box.ylo + system.box.ly * faultpos
-        abovefault = system.atoms.pos[:, cutindex] > (faultpos)
-        
-        # Compute fault area
-        faultarea = np.linalg.norm(np.cross(system.box.avect,
-                                            system.box.cvect))
-        
-        # Give correct LAMMPS fix setforce command
         fix_cut_setforce = 'fix cut all setforce 0 NULL 0'
-    
     elif cutboxvector == 'c':
-        # Specify cutindex
-        cutindex = 2
-        
-        # Identify atoms above fault
-        faultpos = system.box.zlo + system.box.lz * faultpos
-        abovefault = system.atoms.pos[:, cutindex] > (faultpos)
-        
-        # Compute fault area
-        faultarea = np.linalg.norm(np.cross(system.box.avect,
-                                            system.box.bvect))
-        
-        # Give correct LAMMPS fix setforce command
-        fix_cut_setforce = 'fix cut all setforce 0 0 NULL'
-        
+        fix_cut_setforce = 'fix cut all setforce 0 0 NULL'    
     else: 
         raise ValueError('Invalid cutboxvector')
-    
-    # Assert faultshift is in cut plane
-    if faultshift[cutindex] != 0.0:
-        raise ValueError('faultshift must be in cut plane')
-    
-    # Generate stacking fault system by shifting atoms above the fault
-    sfsystem = deepcopy(system)
-    sfsystem.pbc = [True, True, True]
-    sfsystem.pbc[cutindex] = False
-    sfsystem.atoms.pos[abovefault] += faultshift
-    sfsystem.wrap()
     
     if sim_directory is not None:
         # Create sim_directory if it doesn't exist
@@ -223,12 +165,12 @@ def stackingfaultpoint(lammps_command, system, potential,
     
     # Define lammps variables
     lammps_variables = {}
-    system_info = sfsystem.dump('atom_data',
-                                f=os.path.join(sim_directory, 'system.dat'),
-                                units=potential.units,
-                                atom_style=potential.atom_style)
+    system_info = system.dump('atom_data',
+                              f=os.path.join(sim_directory, 'system.dat'),
+                              units=potential.units,
+                              atom_style=potential.atom_style)
     lammps_variables['atomman_system_info'] = system_info
-    lammps_variables['atomman_pair_info'] = potential.pair_info(sfsystem.symbols)
+    lammps_variables['atomman_pair_info'] = potential.pair_info(system.symbols)
     lammps_variables['fix_cut_setforce'] = fix_cut_setforce
     lammps_variables['sim_directory'] = sim_directory
     lammps_variables['etol'] = etol
@@ -244,7 +186,7 @@ def stackingfaultpoint(lammps_command, system, potential,
         lammps_variables['dump_modify_format'] = 'float %.13e'
     
     # Write lammps input script
-    template_file = 'sfmin.template'
+    template_file = os.path.join(script_dir, 'sfmin.template')
     lammps_script = os.path.join(sim_directory, 'sfmin.in')
     with open(template_file) as f:
         template = f.read()
@@ -264,27 +206,23 @@ def stackingfaultpoint(lammps_command, system, potential,
                               lammps_units['energy'])
     
     # Load relaxed system
-    sfsystem = am.load('atom_dump', dumpfile, symbols=sfsystem.symbols)
-    
-    # Find center of mass difference in top/bottom planes
-    disp = (sfsystem.atoms.pos[abovefault, cutindex].mean()
-            - sfsystem.atoms.pos[~abovefault, cutindex].mean())
+    system = am.load('atom_dump', dumpfile, symbols=system.symbols)
     
     # Return results
     results_dict = {}
     results_dict['logfile'] = logfile
     results_dict['dumpfile'] = dumpfile
-    results_dict['system'] = sfsystem
-    results_dict['A_fault'] = faultarea
+    results_dict['system'] = system
     results_dict['E_total'] = E_total
-    results_dict['disp'] = disp
     
     return results_dict
 
-def stackingfault(lammps_command, system, potential,
-                  mpi_command=None, cutboxvector=None, faultpos=0.5,
-                  faultshift=[0.0, 0.0, 0.0], etol=0.0, ftol=0.0,
-                  maxiter=10000, maxeval=100000,
+def stackingfault(lammps_command, system, potential, 
+                  mpi_command=None,
+                  a1vect=None, a2vect=None, ucell=None,
+                  transform=None, cutboxvector=None,
+                  faultposrel=0.5, a1=0.0, a2=0.0, 
+                  etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000,
                   dmax=uc.set_in_units(0.01, 'angstrom')):
     """
     Computes the generalized stacking fault value for a single faultshift.
@@ -300,6 +238,36 @@ def stackingfault(lammps_command, system, potential,
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
         will run serially.
+    a1vect : array-like object, optional
+        A slip vector within the slip plane.  Depending on if ucellbox and
+        transform are given, this can be either a Miller crystal vector or
+        a Cartesian vector relative to the supplied system.  If a1vect is
+        not given and a2vect is, then a1vect is set to [0,0,0].
+    a2vect : array-like object, optional
+        A slip vector within the slip plane.  Depending on if ucellbox and
+        transform are given, this can be either a Miller crystal vector or
+        a Cartesian vector relative to the supplied system.  If a2vect is
+        not given and a1vect is, then a2vect is set to [0,0,0].
+    ucell : atomman.System, optional
+        If ucell is given, then the a1vect and a2vect slip vectors are
+        taken as Miller crystal vectors relative to ucell.box.  If not
+        given, then the slip vectors are taken as Cartesian vectors.
+    transform : array-like object, optional
+        A transformation tensor to apply to the a1vect and a2vect slip
+        vectors.  This is needed if system is oriented differently than
+        ucell, i.e. system is rotated.
+    cutboxvector : str, optional
+        Indicates which of the three system box vectors, 'a', 'b', or 'c', to
+        cut with a non-periodic boundary (default is 'c').
+    faultposrel : float, optional
+        The fractional position along the cutboxvector where the stacking
+        fault plane will be placed (default is 0.5).
+    a1 : float, optional
+        The fractional coordinate of a1vect to shift by. 
+        Default value is 0.0.
+    a2 : float, optional
+        The fractional coordinate of a2vect to shift by. 
+        Default value is 0.0. 
     etol : float, optional
         The energy tolerance for the structure minimization. This value is
         unitless. (Default is 0.0).
@@ -316,15 +284,6 @@ def stackingfault(lammps_command, system, potential,
         The maximum distance in length units that any atom is allowed to relax
         in any direction during a single minimization iteration (default is
         0.01 Angstroms).
-    cutboxvector : str, optional
-        Indicates which of the three system box vectors, 'a', 'b', or 'c', to
-        cut with a non-periodic boundary (default is 'c').
-    faultpos : float, optional
-        The fractional position along the cutboxvector where the stacking
-        fault plane will be placed (default is 0.5).
-    faultshift : list of float, optional
-        The vector shift to apply to all atoms above the fault plane defined
-        by faultpos (default is [0,0,0], i.e. no shift applied).
     
     Returns
     -------
@@ -350,34 +309,39 @@ def stackingfault(lammps_command, system, potential,
         - **'dumpfile_sf'** (*str*) - The name of the LAMMMPS dump file
           associated with the relaxed system after applying the faultshift.
     """
-    
+    # Construct stacking fault configuration generator
+    gsf_gen = am.defect.StackingFault(system, a1vect=a1vect, a2vect=a2vect,
+                                      ucellbox=ucell.box, transform=transform,
+                                      cutboxvector=cutboxvector, faultposrel=faultposrel)
+    abovefault = gsf_gen.abovefault
+    cutindex = gsf_gen.cutindex
+    A_fault = gsf_gen.faultarea
+
     # Evaluate the system without shifting along the fault plane
-    zeroshift = stackingfaultpoint(lammps_command, system, potential,
+    sfsystem = gsf_gen.fault(a1=0.0, a2=0.0)
+    zeroshift = stackingfaultrelax(lammps_command, sfsystem, potential,
                                    mpi_command=mpi_command,
                                    cutboxvector=cutboxvector,
-                                   faultpos=faultpos,
                                    etol=etol, ftol=ftol, maxiter=maxiter,
-                                   maxeval=maxeval, dmax=dmax,
-                                   faultshift=[0.0, 0.0, 0.0])
+                                   maxeval=maxeval, dmax=dmax)
     
     # Extract terms
     E_total_0 = zeroshift['E_total']
-    disp_0 = zeroshift['disp']
-    A_fault = zeroshift['A_fault']
+    pos_0 = zeroshift['system'].atoms.pos
     shutil.move('log.lammps', 'zeroshift-log.lammps')
     shutil.move(zeroshift['dumpfile'], 'zeroshift.dump')
-    
+
     # Evaluate the system after shifting along the fault plane
-    shifted = stackingfaultpoint(lammps_command, system, potential,
+    sfsystem = gsf_gen.fault(a1=a1, a2=a2)
+    shifted = stackingfaultrelax(lammps_command, sfsystem, potential,
                                  mpi_command=mpi_command,
                                  cutboxvector=cutboxvector,
-                                 faultpos=faultpos, etol=etol, ftol=ftol,
-                                 maxiter=maxiter, maxeval=maxeval, dmax=dmax,
-                                 faultshift=faultshift)
+                                 etol=etol, ftol=ftol, maxiter=maxiter,
+                                 maxeval=maxeval, dmax=dmax)
     
     # Extract terms
     E_total_sf = shifted['E_total']
-    disp_sf = shifted['disp']
+    pos_sf = shifted['system'].atoms.pos
     shutil.move('log.lammps', 'shifted-log.lammps')
     shutil.move(shifted['dumpfile'], 'shifted.dump')
 
@@ -385,6 +349,10 @@ def stackingfault(lammps_command, system, potential,
     E_gsf = (E_total_sf - E_total_0) / A_fault
     
     # Compute the change in displacement normal to fault plane
+    disp_0 = (pos_0[abovefault, cutindex].mean()
+            - pos_0[~abovefault, cutindex].mean())
+    disp_sf = (pos_sf[abovefault, cutindex].mean()
+             - pos_sf[~abovefault, cutindex].mean())
     delta_disp = disp_sf - disp_0
     
     # Return processed results
@@ -468,14 +436,6 @@ def process_input(input_dict, UUID=None, build=True):
     
     # Convert stackingfault parameters
     iprPy.input.interpret('stackingfaultpart2', input_dict, build=build)
-    
-    # Calculate faultshift
-    if build is True:
-        fraction1 = input_dict['stackingfault_shiftfraction1']
-        fraction2 = input_dict['stackingfault_shiftfraction2']
-        shiftvector1 = input_dict['shiftvector1']
-        shiftvector2 = input_dict['shiftvector2']
-        input_dict['faultshift'] = fraction1 * shiftvector1 + fraction2 * shiftvector2
 
 if __name__ == '__main__':
     main(*sys.argv[1:])

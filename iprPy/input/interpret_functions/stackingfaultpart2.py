@@ -65,8 +65,8 @@ def stackingfaultpart2(input_dict, build=True, **kwargs):
     # Set default keynames
     keynames = ['stackingfault_faultpos', 'stackingfault_shiftvector1',
                 'stackingfault_shiftvector2', 'stackingfault_cutboxvector',
-                'sizemults', 'ucell', 'uvws', 'faultpos', 'shiftvector1',
-                'shiftvector2', 'transformationmatrix']
+                'sizemults', 'uvws', 'faultpos', 'shiftvector1',
+                'shiftvector2']
     for keyname in keynames:
         kwargs[keyname] = kwargs.get(keyname, keyname)
     
@@ -78,24 +78,10 @@ def stackingfaultpart2(input_dict, build=True, **kwargs):
         stackingfault_shiftvector2 = input_dict[kwargs['stackingfault_shiftvector2']]
         stackingfault_cutboxvector = input_dict[kwargs['stackingfault_cutboxvector']]
         sizemults = input_dict[kwargs['sizemults']]
-        ucell = input_dict[kwargs['ucell']]
-        transform = input_dict[kwargs['transformationmatrix']]
         
         # Convert string terms to arrays
-        stackingfault_shiftvector1 = np.array(stackingfault_shiftvector1.strip().split(),
-                                              dtype=float)
-        stackingfault_shiftvector2 = np.array(stackingfault_shiftvector2.strip().split(),
-                                              dtype=float)
-        
-        # Convert shift vectors from crystallographic to Cartesian vectors
-        shiftvector1 = ucell.box.vects.T.dot(stackingfault_shiftvector1)
-        shiftvector2 = ucell.box.vects.T.dot(stackingfault_shiftvector2)
-        
-        # Transform shift vectors
-        shiftvector1 = transform.dot(shiftvector1)
-        shiftvector1[np.isclose(shiftvector1, 0.0, atol=1e-8, rtol=0.0)] = 0.0
-        shiftvector2 = transform.dot(shiftvector2)
-        shiftvector2[np.isclose(shiftvector2, 0.0, atol=1e-8, rtol=0.0)] = 0.0
+        shiftvector1 = np.array(stackingfault_shiftvector1.strip().split(), dtype=float)
+        shiftvector2 = np.array(stackingfault_shiftvector2.strip().split(), dtype=float)
         
         # Identify number of size multiples, m, along cutboxvector
         if   stackingfault_cutboxvector == 'a': 
@@ -104,7 +90,6 @@ def stackingfaultpart2(input_dict, build=True, **kwargs):
             m = sizemults[1]
         elif stackingfault_cutboxvector == 'c': 
             m = sizemults[2]
-         
         if isinstance(m, (list, tuple)):
             m = m[1] - m[0]
         

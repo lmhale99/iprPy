@@ -181,17 +181,6 @@ class CalculationStackingFaultMap2D(Record):
             gamma_model = results_dict['gamma'].model(length_unit=input_dict['length_unit'],
                                                       energyperarea_unit=energyperarea_unit)
             calc['stacking-fault-map'] = gamma_model['stacking-fault-map']
-            #calc['stacking-fault'] = sf = DM()
-            #sf['shift-vector-1'] = list(np.array(input_dict['stackingfault_shiftvector1'].split(), dtype=float))
-            #sf['shift-vector-2'] = list(np.array(input_dict['stackingfault_shiftvector2'].split(), dtype=float))
-            #sf['stacking-fault-relation'] = sfr = DM()
-            #sfr['shift-vector-1-fraction'] = list(results_dict['shift1'])
-            #sfr['shift-vector-2-fraction'] = list(results_dict['shift2'])
-            #sfr['energy'] = uc.model(results_dict['E_gsf'], 
-            #                         input_dict['energy_unit'] + '/'
-            #                         + input_dict['length_unit'] + '^2')
-            #sfr['plane-separation'] = uc.model(results_dict['delta_disp'],
-            #                                   input_dict['length_unit'])
         
         self.content = output
     
