@@ -406,7 +406,9 @@ def disl_relax(lammps_command, system, potential,
         - **'E_total'** (*float*) - The total potential energy for the
           relaxed system.
     """
-    
+    # Get script's location
+    script_dir = os.path.dirname(__file__)
+
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
     
@@ -436,7 +438,7 @@ def disl_relax(lammps_command, system, potential,
         lammps_variables['dump_modify_format'] = 'float %.13e'
     
     # Write lammps input script
-    template_file = 'disl_relax.template'
+    template_file = os.path.join(script_dir, 'disl_relax.template')
     lammps_script = 'disl_relax.in'
     with open(template_file) as f:
         template = f.read()

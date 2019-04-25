@@ -134,6 +134,9 @@ def dislocationarraystress(lammps_command, system, potential, temperature,
         - **'E_total_disl'** (*float*) - The total potential energy of the
           dislocation monopole system.
     """
+    # Get script's location
+    script_dir = os.path.dirname(__file__)
+
     # Set default values
     if bwidth is None:
         bwidth = uc.set_in_units(10, 'angstrom')
@@ -175,9 +178,9 @@ def dislocationarraystress(lammps_command, system, potential, temperature,
     
     # Write lammps input script
     if rigidbounds is True:
-        template_file = 'dislarray_rigid_stress.template'
+        template_file = os.path.join(script_dir, 'dislarray_rigid_stress.template')
     else:
-        template_file = 'dislarray_free_stress.template'
+        template_file = os.path.join(script_dir,'dislarray_free_stress.template')
     lammps_script = 'dislarray_stress.in'
     with open(template_file) as f:
         template = f.read()

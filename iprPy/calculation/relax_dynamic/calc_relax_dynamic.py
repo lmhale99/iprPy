@@ -159,6 +159,9 @@ def relax_dynamic(lammps_command, system, potential, mpi_command=None,
         - **'temp_std'** (*float*) - The standard deviation in the measured
           temperature values.
     """
+    # Get script's location
+    script_dir = os.path.dirname(__file__)
+
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
     
@@ -212,7 +215,7 @@ def relax_dynamic(lammps_command, system, potential, mpi_command=None,
         lammps_variables['dump_modify_format'] = 'float %.13e'
     
     # Write lammps input script
-    template_file = 'full_relax.template'
+    template_file = os.path.join(script_dir, 'full_relax.template')
     lammps_script = 'full_relax.in'
     with open(template_file) as f:
         template = f.read()

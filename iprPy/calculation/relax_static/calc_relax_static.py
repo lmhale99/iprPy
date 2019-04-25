@@ -156,7 +156,9 @@ def relax_static(lammps_command, system, potential, mpi_command=None,
         - **'measured_pyz'** (*float*) - The measured yz shear pressure of the
           relaxed system.
     """
-    
+    # Get script's location
+    script_dir = os.path.dirname(__file__)
+
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
     
@@ -211,7 +213,7 @@ def relax_static(lammps_command, system, potential, mpi_command=None,
             lammps_variables['dump_modify_format'] = 'float %.13e'
         
         # Write lammps input script
-        template_file = 'minbox.template'
+        template_file = os.path.join(script_dir, 'minbox.template')
         lammps_script = 'minbox.in'
         with open(template_file) as f:
             template = f.read()

@@ -221,7 +221,9 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
         - **'dumpfile_ptd'** (*str*) - The filename of the LAMMPS dump file
           for the relaxed defect system.
     """
-    
+    # Get script's location
+    script_dir = os.path.dirname(__file__)
+
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
     
@@ -248,7 +250,7 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
         lammps_variables['dump_modify_format'] = 'float %.13e'
     
     # Write lammps input script
-    template_file = 'min.template'
+    template_file = os.path.join(script_dir, 'min.template')
     lammps_script = 'min.in'
     with open(template_file) as f:
         template = f.read()

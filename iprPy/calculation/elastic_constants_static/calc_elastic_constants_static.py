@@ -118,7 +118,9 @@ def elastic_constants_static(lammps_command, system, potential, mpi_command=None
           elastic constants.
         - **'system_relaxed'** (*atomman.System*) - The relaxed system.
     """
-    
+    # Get script's location
+    script_dir = os.path.dirname(__file__)
+
     # Convert hexagonal cells to orthorhombic to avoid LAMMPS tilt issues
     if am.tools.ishexagonal(system.box):
         system = system.rotate([[2,-1,-1,0], [0, 1, -1, 0], [0,0,0,1]])
@@ -144,13 +146,13 @@ def elastic_constants_static(lammps_command, system, potential, mpi_command=None
     lammps_variables['dmax'] = uc.get_in_units(dmax, lammps_units['length'])
     
     # Fill in template files
-    template_file = 'cij.template'
+    template_file = os.path.join(script_dir, 'cij.template')
     lammps_script = 'cij.in'
     with open(template_file) as f:
         template = f.read()
     with open(lammps_script, 'w') as f:
         f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
-    template_file2 = 'potential.template'
+    template_file2 = os.path.join(script_dir, 'potential.template')
     lammps_script2 = 'potential.in'
     with open(template_file2) as f:
         template = f.read()

@@ -272,7 +272,9 @@ def calc_cij(lammps_command, system, potential,
     RuntimeError
         If any of the new box dimensions are less than zero.
     """
-    
+    # Get script's location
+    script_dir = os.path.dirname(__file__)
+
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
     
@@ -287,7 +289,7 @@ def calc_cij(lammps_command, system, potential,
     lammps_variables['steps'] = 2
     
     # Write lammps input script
-    template_file = 'cij.template'
+    template_file = os.path.join(script_dir, 'cij.template')
     lammps_script = 'cij.in'
     with open(template_file) as f:
         template = f.read()

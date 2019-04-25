@@ -161,6 +161,9 @@ def dislocationarray(lammps_command, system, potential, burgers,
         - **'E_total_disl'** (*float*) - The total potential energy of the
           dislocation monopole system.
     """
+    # Get script's location
+    script_dir = os.path.dirname(__file__)
+
     # Set default values
     if dmax is None:
         dmax = uc.set_in_units(0.01, 'angstrom')
@@ -208,7 +211,7 @@ def dislocationarray(lammps_command, system, potential, burgers,
         lammps_variables['dump_modify_format'] = 'float %.13e'
     
     # Write lammps input script
-    template_file = 'dislarray_relax.template'
+    template_file = os.path.join(script_dir, 'dislarray_relax.template')
     lammps_script = 'dislarray_relax.in'
     with open(template_file) as f:
         template = f.read()

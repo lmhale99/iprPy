@@ -136,7 +136,9 @@ def pointdiffusion(lammps_command, system, potential, point_kwargs,
           y-direction.
         - **'d'** (*float*) - The total computed diffusion constant.
     """
-    
+    # Get script's location
+    script_dir = os.path.dirname(__file__)
+
     # Add defect(s) to the initially perfect system
     if not isinstance(point_kwargs, (list, tuple)):
         point_kwargs = [point_kwargs]
@@ -197,7 +199,7 @@ def pointdiffusion(lammps_command, system, potential, point_kwargs,
             lammps_variables['dump_modify_format'] = 'float %.13e'
     
     # Write lammps input script
-    template_file = 'diffusion.template'
+    template_file = os.path.join(script_dir, 'diffusion.template')
     lammps_script = 'diffusion.in'
     with open(template_file) as f:
         template = f.read()

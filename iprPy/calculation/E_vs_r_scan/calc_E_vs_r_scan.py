@@ -102,7 +102,9 @@ def e_vs_r(lammps_command, system, potential,
         - **'min_cell'** (*list of atomman.System*) - Systems corresponding to
           the minima identified in the Ecoh_values.
     """
-    
+    # Get script's location
+    script_dir = os.path.dirname(__file__)
+
     # Make system a deepcopy of itself (protect original from changes)
     system = deepcopy(system)
     
@@ -148,7 +150,7 @@ def e_vs_r(lammps_command, system, potential,
         lammps_variables['atomman_pair_info'] = potential.pair_info(system.symbols)
         
         # Write lammps input script
-        template_file = 'run0.template'
+        template_file = os.path.join(script_dir, 'run0.template')
         lammps_script = 'run0.in'
         with open(template_file) as f:
             template = f.read()
