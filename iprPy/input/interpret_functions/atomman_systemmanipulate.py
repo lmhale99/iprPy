@@ -140,10 +140,7 @@ def atomman_systemmanipulate(input_dict, build=True, **kwargs):
         
         # Shift atoms by atomshift
         shift = list(np.array(atomshift.strip().split(), dtype=float))
-        shift = (shift[0] * initialsystem.box.avect +
-                 shift[1] * initialsystem.box.bvect +
-                 shift[2] * initialsystem.box.cvect)
-        initialsystem.atoms.pos += shift
+        initialsystem.atoms.pos += np.dot(shift, initialsystem.box.vects)
         
         # Apply sizemults
         initialsystem = initialsystem.supersize(tuple(sizemults[0]),
