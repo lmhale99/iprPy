@@ -43,7 +43,8 @@ class RelaxedCrystal(Record):
         return [
                'potential_LAMMPS_key',
                'natoms',
-               'family'
+               'family',
+               'composition',
                ]
     
     @property
@@ -153,6 +154,7 @@ class RelaxedCrystal(Record):
         params['family'] = crystal['system-info']['family']
         
         ucell = am.load('system_model', self.content, key='atomic-system')
+        params['composition'] = ucell.composition
         
         if flat is True:
             params['symbols'] = list(ucell.symbols)
