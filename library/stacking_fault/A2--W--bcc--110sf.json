@@ -4,12 +4,12 @@
         "id": "A2--W--bcc--110sf",
         "system-family": "A2--W--bcc", 
         "calculation-parameter": {
-            "a_uvw": " 1  1 -2", 
-            "b_uvw": " 1  1  1", 
+            "a_uvw": " 1  1  1", 
+            "b_uvw": " 1  1 -1", 
             "c_uvw": " 1 -1  0", 
             "atomshift": " 0.01  0.01  0.01", 
             "cutboxvector": "c",
-            "faultpos": 0.5, 
+            "faultpos": 0.0, 
             "shiftvector1": " 0.5  0.5  0.5", 
             "shiftvector2": " 0.5  0.5 -0.5"
         }

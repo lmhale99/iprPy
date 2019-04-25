@@ -4,14 +4,14 @@
         "id": "A1--Cu--fcc--111sf",
         "system-family": "A1--Cu--fcc", 
         "calculation-parameter": {
-            "a_uvw": " 1 -1  0", 
-            "b_uvw": " 1  1 -2", 
+            "a_uvw": " 0 -1  1", 
+            "b_uvw": "-1  0  1", 
             "c_uvw": " 1  1  1", 
             "atomshift": " 0.01  0.01  0.01", 
             "cutboxvector": "c",
-            "faultpos": 0.5, 
-            "shiftvector1": " 0.5 -0.5  0.0", 
-            "shiftvector2": " 0.5  0.5 -1.0"
+            "faultpos": 0.0, 
+            "shiftvector1": " 0.0 -0.5  0.5", 
+            "shiftvector2": "-0.5  0.0  0.5"
         }
     }
 }

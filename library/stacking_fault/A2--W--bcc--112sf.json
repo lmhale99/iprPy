@@ -9,7 +9,7 @@
             "c_uvw": " 1  1 -2", 
             "atomshift": " 0.01  0.01  0.01", 
             "cutboxvector": "c",
-            "faultpos": 0.5, 
+            "faultpos": 0.0, 
             "shiftvector1": " 0.5  0.5  0.5", 
             "shiftvector2": " 1.0 -1.0  0.0"
         }
