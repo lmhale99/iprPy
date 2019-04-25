@@ -7,11 +7,11 @@
             "a_uvw": " 1  0  0", 
             "b_uvw": " 0  1  0", 
             "c_uvw": " 0  0  1", 
-            "atomshift": " 0.01  0.01  0.01", 
+            "atomshift": " 0.01  0.01  0.25", 
             "cutboxvector": "c",
             "faultpos": 0.0, 
             "shiftvector1": " 1.0  0.0  0.0", 
-            "shiftvector2": " 0.5  0.5  0.0"
+            "shiftvector2": " 1.0  1.0  0.0"
         }
     }
 }

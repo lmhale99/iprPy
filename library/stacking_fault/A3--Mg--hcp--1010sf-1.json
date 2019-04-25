@@ -1,0 +1,17 @@
+{
+    "stacking-fault": {
+        "key": "c6ed539d-4b4b-44d4-9f42-427e8f16f1e1", 
+        "id": "A3--Mg--hcp--1010sf",
+        "system-family": "A3--Mg--hcp", 
+        "calculation-parameter": {
+            "a_uvw": " 0  1  0", 
+            "b_uvw": " 0  0  1", 
+            "c_uvw": " 1  0  0", 
+            "atomshift": " 0.01  0.01  0.333333333333333", 
+            "cutboxvector": "c",
+            "faultpos": 0.0, 
+            "shiftvector1": " 0.0  1.0  0.0", 
+            "shiftvector2": " 0.0  0.0  1.0"
+        }
+    }
+}

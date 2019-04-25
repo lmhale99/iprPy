@@ -1,6 +1,8 @@
 #LAMMPS input script that performs an energy minimization
 #for a system with a stacking fault
 
+box tilt large
+
 <atomman_system_info>
 
 <atomman_pair_info>

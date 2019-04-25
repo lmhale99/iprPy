@@ -4,14 +4,14 @@
         "id": "A3--Mg--hcp--1013sf",
         "system-family": "A3--Mg--hcp", 
         "calculation-parameter": {
-            "a_uvw": " 1  0  0", 
-            "b_uvw": " 1  1  2", 
-            "c_uvw": " 1  1 -2", 
-            "atomshift": " 0.01  0.01  0.01", 
+            "a_uvw": " 1  1  0", 
+            "b_uvw": " 0  1  1", 
+            "c_uvw": " 0 -1  1", 
+            "atomshift": " 0.01  0.01  0.20833333333333", 
             "cutboxvector": "c",
             "faultpos": 0.0, 
-            "shiftvector1": " 1.0  0.0  0.0", 
-            "shiftvector2": " 0.5  0.5  1.0"
+            "shiftvector1": " 1.0  1.0  0.0", 
+            "shiftvector2": " 0.0  1.0  1.0"
         }
     }
 }

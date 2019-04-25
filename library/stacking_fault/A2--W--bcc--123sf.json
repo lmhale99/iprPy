@@ -7,7 +7,7 @@
             "a_uvw": " 1  1 -1", 
             "b_uvw": " 2 -1  0", 
             "c_uvw": " 1  2  3", 
-            "atomshift": " 0.01  0.01  0.01", 
+            "atomshift": " 0.01  0.01  0.035714285714286", 
             "cutboxvector": "c",
             "faultpos": 0.0, 
             "shiftvector1": " 0.5  0.5 -0.5", 
