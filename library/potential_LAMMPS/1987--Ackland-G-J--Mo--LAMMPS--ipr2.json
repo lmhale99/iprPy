@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "0dd57c7f-ead7-46ae-b2d1-071199a06ccd", 
+        "id": "1987--Ackland-G-J--Mo--LAMMPS--ipr2", 
+        "potential": {
+            "key": "ff748ef8-f019-42b2-bdda-b5b5cadd6264", 
+            "id": "1987--Ackland-G-J-Thetford-R--Mo"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Mo", 
+            "mass": 95.94
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "mo.fs.eam.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

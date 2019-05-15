@@ -1,0 +1,29 @@
+{
+    "potential-LAMMPS": {
+        "key": "ecda1d1b-c7c6-49d2-b18b-0605485169ac", 
+        "id": "2011--Chiesa-S--Fe-33--LAMMPS--ipr1", 
+        "potential": {
+            "key": "3af85e6e-db61-4ac1-b211-1fd36768b400", 
+            "id": "2011--Chiesa-S-Derlet-P-M-Dudarev-S-L-Swygenhoven-H-V--Fe-33"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": {
+            "element": "Fe", 
+            "mass": 55.845
+        }, 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Fe_Fe.CS3_33.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}
