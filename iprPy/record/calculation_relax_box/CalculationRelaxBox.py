@@ -64,7 +64,7 @@ class CalculationRelaxBox(Record):
                 'temperature',
                 'pressure_xx',
                 'pressure_yy',
-                'pressure_zz'
+                'pressure_zz',
                 'pressure_xy',
                 'pressure_xz',
                 'pressure_yz'

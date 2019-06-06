@@ -33,6 +33,7 @@ library/potential_users_LAMMPS/
 
 # Downloaded external reference structures
 library/ref/
+library/reference_crystal/
 
 # Virtual Studio Code metadata
 .vscode/

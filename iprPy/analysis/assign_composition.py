@@ -27,7 +27,7 @@ def assign_composition(df, database, lib_directory=None):
     
     # Identify compositions
     compositions = []
-    for series in df.itertuples():
+    for i, series in df.iterrows():
         
         # Use ucell system if available (crystal_space_group)
         if 'ucell' in series:
