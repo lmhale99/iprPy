@@ -1,0 +1,47 @@
+{
+    "potential-LAMMPS": {
+        "key": "ffc7b5b2-8c0a-4c80-a576-6345050944b5", 
+        "id": "2018--Farkas-D--Fe-Ni-Cr-Co-Cu--LAMMPS--ipr2", 
+        "potential": {
+            "key": "78392771-83e9-491c-bf4c-39175befd072", 
+            "id": "2018--Farkas-D-Caro-A--Fe-Ni-Cr-Co-Cu"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Fe", 
+                "mass": 55.8
+            }, 
+            {
+                "element": "Ni", 
+                "mass": 58.7
+            }, 
+            {
+                "element": "Cr", 
+                "mass": 52.0
+            }, 
+            {
+                "element": "Co", 
+                "mass": 59.0
+            }, 
+            {
+                "element": "Cu", 
+                "mass": 63.0
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "FeNiCrCoCu-heafixed.setfl"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}
