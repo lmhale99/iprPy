@@ -1,11 +1,11 @@
 {
     "crystal-prototype": {
-        "key": "8a2eb4b8-1302-46d9-992d-4296c227d966",
-        "id": "D0_3--BiF3",
+        "key": "8a2eb4b8-1302-46d9-992d-4296c227d966", 
+        "id": "D0_3--BiF3", 
         "name": "BiF3", 
         "prototype": "BiF3", 
         "Pearson-symbol": "cF16", 
-        "Strukturbericht": "D0_3",
+        "Strukturbericht": "D0_3", 
         "space-group": {
             "number": 225, 
             "Hermann-Maguin": "F m -3 m", 
@@ -26,192 +26,61 @@
             ]
         }, 
         "atomic-system": {
-            "cell": {
-                "cubic": {
-                    "a": {
-                        "value": 1.0, 
-                        "unit": "scaled"
-                    }
+            "box": {
+                "avect": {
+                    "value": [1.0, 0.0, 0.0]
+                }, 
+                "bvect": {
+                    "value": [0.0, 1.0, 0.0]
+                }, 
+                "cvect": {
+                    "value": [0.0, 0.0, 1.0]
+                }, 
+                "origin": {
+                    "value": [0.0, 0.0, 0.0]
                 }
             }, 
-            "atom": [
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.0, 
-                            0.0
-                        ], 
-                        "unit": "scaled"
+            "periodic-boundary-condition": [true, true, true], 
+            "atom-type-symbol": [null, null], 
+            "atoms": {
+                "natoms": 16, 
+                "property": [
+                    {
+                        "name": "atype", 
+                        "data": {
+                            "value": [
+                                1, 1, 1, 1, 
+                                2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+                            ]
+                        }
+                    }, 
+                    {
+                        "name": "pos", 
+                        "data": {
+                            "value": [
+                                0.0, 0.0, 0.0, 
+                                0.0, 0.5, 0.5, 
+                                0.5, 0.0, 0.5, 
+                                0.5, 0.5, 0.0, 
+                                0.5, 0.5, 0.5, 
+                                0.5, 0.0, 0.0, 
+                                0.0, 0.5, 0.0, 
+                                0.0, 0.0, 0.5, 
+                                0.25, 0.25, 0.25, 
+                                0.25, 0.75, 0.75, 
+                                0.75, 0.25, 0.75, 
+                                0.75, 0.75, 0.25, 
+                                0.25, 0.75, 0.25, 
+                                0.25, 0.25, 0.75, 
+                                0.75, 0.75, 0.75, 
+                                0.75, 0.25, 0.25
+                            ], 
+                            "shape": [16, 3], 
+                            "unit": "angstrom"
+                        }
                     }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.5, 
-                            0.5
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.0, 
-                            0.5
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.5, 
-                            0.0
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.5, 
-                            0.5
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.0, 
-                            0.0
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.5, 
-                            0.0
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.0, 
-                            0.5
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.25, 
-                            0.25, 
-                            0.25
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.25, 
-                            0.75, 
-                            0.75
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.75, 
-                            0.25, 
-                            0.75
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.75, 
-                            0.75, 
-                            0.25
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.25, 
-                            0.75, 
-                            0.25
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.25, 
-                            0.25, 
-                            0.75
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.75, 
-                            0.75, 
-                            0.75
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.75, 
-                            0.25, 
-                            0.25
-                        ], 
-                        "unit": "scaled"
-                    }
-                }
-            ]
+                ]
+            }
         }
     }
 }

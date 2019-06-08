@@ -1,11 +1,11 @@
 {
     "crystal-prototype": {
-        "key": "f4101896-1e17-4736-a4d1-308b8934e8ce",
-        "id": "A15--Cr3Si",
+        "key": "f4101896-1e17-4736-a4d1-308b8934e8ce", 
+        "id": "A15--Cr3Si", 
         "name": "beta-tungsten", 
         "prototype": "Cr3Si", 
         "Pearson-symbol": "cP8", 
-        "Strukturbericht": "A15",
+        "Strukturbericht": "A15", 
         "space-group": {
             "number": 223, 
             "Hermann-Maguin": "P m -3 n", 
@@ -22,104 +22,53 @@
             ]
         }, 
         "atomic-system": {
-            "cell": {
-                "cubic": {
-                    "a": {
-                        "value": 1.0, 
-                        "unit": "scaled"
-                    }
+            "box": {
+                "avect": {
+                    "value": [1.0, 0.0, 0.0]
+                }, 
+                "bvect": {
+                    "value": [0.0, 1.0, 0.0]
+                }, 
+                "cvect": {
+                    "value": [0.0, 0.0, 1.0]
+                }, 
+                "origin": {
+                    "value": [0.0, 0.0, 0.0]
                 }
             }, 
-            "atom": [
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.0, 
-                            0.0
-                        ], 
-                        "unit": "scaled"
+            "periodic-boundary-condition": [true, true, true], 
+            "atom-type-symbol": [null, null], 
+            "atoms": {
+                "natoms": 8, 
+                "property": [
+                    {
+                        "name": "atype", 
+                        "data": {
+                            "value": [
+                                1, 1, 
+                                2, 2, 2, 2, 2, 2
+                            ]
+                        }
+                    }, 
+                    {
+                        "name": "pos", 
+                        "data": {
+                            "value": [
+                                0.0, 0.0, 0.0, 
+                                0.5, 0.5, 0.5, 
+                                0.25, 0.0, 0.5, 
+                                0.75, 0.0, 0.5, 
+                                0.5, 0.25, 0.0, 
+                                0.5, 0.75, 0.0, 
+                                0.0, 0.5, 0.25, 
+                                0.0, 0.5, 0.75
+                            ], 
+                            "shape": [8, 3], 
+                            "unit": "angstrom"
+                        }
                     }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.5, 
-                            0.5
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.25, 
-                            0.0, 
-                            0.5
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.75, 
-                            0.0, 
-                            0.5
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.25, 
-                            0.0
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.75, 
-                            0.0
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.5, 
-                            0.25
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.5, 
-                            0.75
-                        ], 
-                        "unit": "scaled"
-                    }
-                }
-            ]
+                ]
+            }
         }
     }
 }

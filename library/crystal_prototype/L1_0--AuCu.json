@@ -1,15 +1,15 @@
 {
     "crystal-prototype": {
-        "key": "f7b8d5d9-b0eb-401a-9cc3-038170e3ac1c",
-        "id": "L1_0--AuCu",
+        "key": "f7b8d5d9-b0eb-401a-9cc3-038170e3ac1c", 
+        "id": "L1_0--AuCu", 
         "name": "AuCu", 
         "prototype": "AuCu", 
         "Pearson-symbol": "tP2", 
-        "Strukturbericht": "L1_0",
+        "Strukturbericht": "L1_0", 
         "space-group": {
             "number": 123, 
             "Hermann-Maguin": "P 4/m m m", 
-            "Schoenflies": "D4h^1",
+            "Schoenflies": "D4h^1", 
             "Wykoff": [
                 {
                     "letter": "a", 
@@ -22,42 +22,47 @@
             ]
         }, 
         "atomic-system": {
-            "cell": {
-                "tetragonal": {
-                    "a": {
-                        "value": 1.0, 
-                        "unit": "scaled"
-                    }, 
-                    "c": {
-                        "value": 1.3096, 
-                        "unit": "scaled"
-                    }
+            "box": {
+                "avect": {
+                    "value": [1.0, 0.0, 0.0]
+                }, 
+                "bvect": {
+                    "value": [0.0, 1.0, 0.0]
+                }, 
+                "cvect": {
+                    "value": [0.0, 0.0, 1.3096]
+                }, 
+                "origin": {
+                    "value": [0.0, 0.0, 0.0]
                 }
             }, 
-            "atom": [
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.0, 
-                            0.0
-                        ], 
-                        "unit": "scaled"
+            "periodic-boundary-condition": [true, true, true], 
+            "atom-type-symbol": [null, null], 
+            "atoms": {
+                "natoms": 2, 
+                "property": [
+                    {
+                        "name": "atype", 
+                        "data": {
+                            "value": [
+                                1, 
+                                2
+                            ]
+                        }
+                    }, 
+                    {
+                        "name": "pos", 
+                        "data": {
+                            "value": [
+                                0.0, 0.0, 0.0, 
+                                0.5, 0.5, 0.6548
+                            ], 
+                            "shape": [2, 3], 
+                            "unit": "angstrom"
+                        }
                     }
-                }, 
-                {
-                    "component": 2, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.5, 
-                            0.5
-                        ], 
-                        "unit": "scaled"
-                    }
-                }
-            ]
+                ]
+            }
         }
     }
 }

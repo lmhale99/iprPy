@@ -1,101 +1,63 @@
 {
     "crystal-prototype": {
-        "key": "c1e15cf8-6998-40ce-afbd-0b1cb6271a1f",
-        "id": "A7--alpha-As",
+        "key": "c1e15cf8-6998-40ce-afbd-0b1cb6271a1f", 
+        "id": "A7--alpha-As", 
         "name": "alpha As", 
         "prototype": "a-As", 
         "Pearson-symbol": "hR6", 
-        "Strukturbericht": "A7",
+        "Strukturbericht": "A7", 
         "space-group": {
             "number": 166, 
             "Hermann-Maguin": "R -3 m", 
-            "Schoenflies": "D3d^5",
+            "Schoenflies": "D3d^5", 
             "Wykoff": {
                 "letter": "c", 
                 "multiplicity": 6
             }
         }, 
         "atomic-system": {
-            "cell": {
-                "hexagonal": {
-                    "a": {
-                        "value": 1.0, 
-                        "unit": "angstrom"
-                    }, 
-                    "c": {
-                        "value": 2.777, 
-                        "unit": "angstrom"
-                    }
+            "box": {
+                "avect": {
+                    "value": [1.0, 0.0, 0.0]
+                }, 
+                "bvect": {
+                    "value": [-0.5, 0.8660254037844388, 0.0]
+                }, 
+                "cvect": {
+                    "value": [0.0, 0.0, 2.777]
+                }, 
+                "origin": {
+                    "value": [0.0, 0.0, 0.0]
                 }
             }, 
-            "atom": [
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.0, 
-                            0.22764
-                        ], 
-                        "unit": "scaled"
+            "periodic-boundary-condition": [true, true, true], 
+            "atom-type-symbol": null, 
+            "atoms": {
+                "natoms": 6, 
+                "property": [
+                    {
+                        "name": "atype", 
+                        "data": {
+                            "value": [1, 1, 1, 1, 1, 1]
+                        }
+                    }, 
+                    {
+                        "name": "pos", 
+                        "data": {
+                            "value": [
+                                0.0, 0.0, 0.63215628, 
+                                0.0, 0.0, 2.1448437200000003, 
+                                0.0, 0.5773502691896258, 1.2191770533333333, 
+                                0.0, 0.5773502691896258, 2.483489613333333, 
+                                0.5, 0.2886751345948129, 0.2935103866666666, 
+                                0.5, 0.2886751345948129, 1.5578229466666667
+                            ], 
+                            "shape": [6, 3], 
+                            "unit": "angstrom"
+                        }
                     }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.0, 
-                            0.77236
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.3333333333333333, 
-                            0.6666666666666666, 
-                            0.4390266666666666
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.3333333333333333, 
-                            0.6666666666666666, 
-                            0.8943066666666666
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.6666666666666666, 
-                            0.3333333333333333, 
-                            0.1056933333333333
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.6666666666666666, 
-                            0.3333333333333333, 
-                            0.5609733333333333
-                        ], 
-                        "unit": "scaled"
-                    }
-                }
-            ]
+                ]
+            }
         }
     }
 }

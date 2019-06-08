@@ -1,57 +1,59 @@
 {
     "crystal-prototype": {
-        "key": "4dab7fbb-108a-425e-8adb-d55de7b1134b",
-        "id": "A3--Mg--hcp",
+        "key": "4dab7fbb-108a-425e-8adb-d55de7b1134b", 
+        "id": "A3--Mg--hcp", 
         "name": "hexagonal close-packed", 
         "prototype": "Mg", 
         "Pearson-symbol": "hP2", 
-        "Strukturbericht": "A3",
+        "Strukturbericht": "A3", 
         "space-group": {
             "number": 194, 
             "Hermann-Maguin": "P 6_3/m m c", 
-            "Schoenflies": "D6h^4",
+            "Schoenflies": "D6h^4", 
             "Wykoff": {
                 "letter": "d", 
                 "multiplicity": 2
             }
         }, 
         "atomic-system": {
-            "cell": {
-                "hexagonal": {
-                    "a": {
-                        "value": 1.0, 
-                        "unit": "scaled"
-                    }, 
-                    "c": {
-                        "value": 1.6329931618555, 
-                        "unit": "scaled"
-                    }
+            "box": {
+                "avect": {
+                    "value": [1.0, 0.0, 0.0]
+                }, 
+                "bvect": {
+                    "value": [-0.5, 0.8660254037844388, 0.0]
+                }, 
+                "cvect": {
+                    "value": [0.0, 0.0, 1.6329931618555]
+                }, 
+                "origin": {
+                    "value": [0.0, 0.0, 0.0]
                 }
             }, 
-            "atom": [
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.0, 
-                            0.0
-                        ], 
-                        "unit": "scaled"
+            "periodic-boundary-condition": [true, true, true], 
+            "atom-type-symbol": null, 
+            "atoms": {
+                "natoms": 2, 
+                "property": [
+                    {
+                        "name": "atype", 
+                        "data": {
+                            "value": [1, 1]
+                        }
+                    }, 
+                    {
+                        "name": "pos", 
+                        "data": {
+                            "value": [
+                                0.0, 0.0, 0.0, 
+                                0.0, 0.5773502691896258, 0.81649658092775
+                            ], 
+                            "shape": [2, 3], 
+                            "unit": "angstrom"
+                        }
                     }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.3333333333333333, 
-                            0.6666666666666666, 
-                            0.5
-                        ], 
-                        "unit": "scaled"
-                    }
-                }
-            ]
+                ]
+            }
         }
     }
 }

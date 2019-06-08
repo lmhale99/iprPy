@@ -1,11 +1,11 @@
 {
     "crystal-prototype": {
-        "key": "821526c5-561e-4f09-8a04-680419dc1495",
-        "id": "A5--beta-Sn",
+        "key": "821526c5-561e-4f09-8a04-680419dc1495", 
+        "id": "A5--beta-Sn", 
         "name": "white tin", 
         "prototype": "b-Sn", 
         "Pearson-symbol": "tI4", 
-        "Strukturbericht": "A5",
+        "Strukturbericht": "A5", 
         "space-group": {
             "number": 141, 
             "Hermann-Maguin": "I 4_1/a m d", 
@@ -16,64 +16,46 @@
             }
         }, 
         "atomic-system": {
-            "cell": {
-                "tetragonal": {
-                    "a": {
-                        "value": 1.0, 
-                        "unit": "scaled"
-                    }, 
-                    "c": {
-                        "value": 0.55, 
-                        "unit": "scaled"
-                    }
+            "box": {
+                "avect": {
+                    "value": [1.0, 0.0, 0.0]
+                }, 
+                "bvect": {
+                    "value": [0.0, 1.0, 0.0]
+                }, 
+                "cvect": {
+                    "value": [0.0, 0.0, 0.55]
+                }, 
+                "origin": {
+                    "value": [0.0, 0.0, 0.0]
                 }
             }, 
-            "atom": [
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.0, 
-                            0.0
-                        ], 
-                        "unit": "scaled"
+            "periodic-boundary-condition": [true, true, true], 
+            "atom-type-symbol": null, 
+            "atoms": {
+                "natoms": 4, 
+                "property": [
+                    {
+                        "name": "atype", 
+                        "data": {
+                            "value": [1, 1, 1, 1]
+                        }
+                    }, 
+                    {
+                        "name": "pos", 
+                        "data": {
+                            "value": [
+                                0.0, 0.0, 0.0, 
+                                0.5, 0.5, 0.275, 
+                                0.0, 0.5, 0.1375, 
+                                0.5, 0.0, 0.4125
+                            ], 
+                            "shape": [4, 3], 
+                            "unit": "angstrom"
+                        }
                     }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.5, 
-                            0.5
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.0, 
-                            0.5, 
-                            0.25
-                        ], 
-                        "unit": "scaled"
-                    }
-                }, 
-                {
-                    "component": 1, 
-                    "position": {
-                        "value": [
-                            0.5, 
-                            0.0, 
-                            0.75
-                        ], 
-                        "unit": "scaled"
-                    }
-                }
-            ]
+                ]
+            }
         }
     }
 }
