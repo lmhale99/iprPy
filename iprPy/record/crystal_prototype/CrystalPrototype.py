@@ -61,10 +61,11 @@ class CrystalPrototype(Record):
         params['sg_HG'] = proto['space-group']['Hermann-Maguin']
         params['sg_Schoen'] = proto['space-group']['Schoenflies']
         
-        cell = proto['atomic-system']['cell']
-        params['crystal_family'] = list(cell.keys())[0]
+       
         
         ucell = am.load('system_model', self.content, key='atomic-system')
+
+        params['crystal_family'] = am.tools.identifyfamily(ucell.box)
         params['natypes'] = ucell.natypes
         
         if flat is True:

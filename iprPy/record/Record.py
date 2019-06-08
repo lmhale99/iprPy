@@ -1,7 +1,7 @@
 # Standard Python libraries
 from __future__ import (absolute_import, print_function,
                         division, unicode_literals)
-import os
+from pathlib import Path
 import sys
 
 # http://www.numpy.org/
@@ -49,7 +49,7 @@ class Record(object):
         str
             The string representation of the record.
         """
-        return 'record style ' + self.style + ' named ' + self.name
+        return f'record style {self.style} named {self.name}'
     
     @property
     def style(self):
@@ -60,8 +60,8 @@ class Record(object):
     @property
     def directory(self):
         """str: The path to the record's directory"""
-        return os.path.dirname(os.path.abspath(self.__mod_file))
-    
+        return Path(self.__mod_file).resolve().parent
+
     @property
     def name(self):
         """str: The record's name."""
@@ -109,21 +109,21 @@ class Record(object):
         str: The absolute directory path to the .xsd file associated with the
              record style.
         """
-        raise AttributeError('schema not defined for Record style')
+        return Path(self.directory, f'record-{self.contentroot}.xsd')
     
     @property
     def compare_terms(self):
         """
         list of str: The default terms used by isnew() for comparisons.
         """
-        raise AttributeError('compare_terms not defined for Record style')
+        return []
     
     @property
     def compare_fterms(self):
         """
         list of str: The default fterms used by isnew() for comparisons.
         """
-        raise AttributeError('compare_fterms not defined for Record style')
+        return []
     
     def buildcontent(self, script, input_dict, results_dict=None):
         """
