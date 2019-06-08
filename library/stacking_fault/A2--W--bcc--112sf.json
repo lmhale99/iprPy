@@ -1,17 +1,17 @@
 {
     "stacking-fault": {
         "key": "e92a955f-dcc9-43b9-95bb-2c413d082972", 
-        "id": "A2--W--bcc--112sf",
+        "id": "A2--W--bcc--112sf", 
         "system-family": "A2--W--bcc", 
         "calculation-parameter": {
-            "a_uvw": " 1  1  1", 
-            "b_uvw": " 1 -1  0", 
-            "c_uvw": " 1  1 -2", 
-            "atomshift": " 0.01  0.01  0.08333333333", 
-            "cutboxvector": "c",
-            "faultpos": 0.0, 
-            "shiftvector1": " 0.5  0.5  0.5", 
-            "shiftvector2": " 1.0 -1.0  0.0"
+            "a_uvw": "-1  1  0", 
+            "b_uvw": "-1 -1  1", 
+            "c_uvw": " 1  1  2", 
+            "cutboxvector": "c", 
+            "atomshift": "0.0 0.0 -0.08333333333333326", 
+            "faultpos": "0.0", 
+            "shiftvector1": "-0.5 -0.5 0.5", 
+            "shiftvector2": "1.0 -1.0 0.0"
         }
     }
 }

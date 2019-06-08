@@ -1,0 +1,14 @@
+{
+    "free-surface": {
+        "key": "59b97ee4-d73c-492f-8dab-6cc996ee9a48", 
+        "id": "A6--In--bct--111", 
+        "system-family": "A6--In--bct", 
+        "calculation-parameter": {
+            "a_uvw": "-1  1  0", 
+            "b_uvw": "-1  0  1", 
+            "c_uvw": " 1  1  1", 
+            "cutboxvector": "c", 
+            "atomshift": "0.0 0.0 -0.08333333333333337"
+        }
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "stacking-fault": {
+        "key": "8b81eeac-daa7-407d-b76d-1225a2d53bef", 
+        "id": "A1--Cu--fcc--100sf", 
+        "system-family": "A1--Cu--fcc", 
+        "calculation-parameter": {
+            "a_uvw": " 0  1  0", 
+            "b_uvw": " 0  0  1", 
+            "c_uvw": " 1  0  0", 
+            "cutboxvector": "c", 
+            "atomshift": "0.0 0.0 -0.25", 
+            "faultpos": "0.0", 
+            "shiftvector1": "0.0 -0.5 0.5", 
+            "shiftvector2": "0.0 -0.5 -0.5"
+        }
+    }
+}

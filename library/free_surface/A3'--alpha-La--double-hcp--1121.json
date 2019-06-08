@@ -1,0 +1,14 @@
+{
+    "free-surface": {
+        "key": "ca32681a-c1d4-44de-9bfd-0b5edea57e73", 
+        "id": "A3'--alpha-La--double-hcp--1121", 
+        "system-family": "A3'--alpha-La--double-hcp", 
+        "calculation-parameter": {
+            "a_uvw": "-1.0 1.0 -0.0 0.0", 
+            "b_uvw": "-0.6666666666666666 0.3333333333333333 0.3333333333333333 1.0", 
+            "c_uvw": "0.3333333333333333 0.3333333333333333 -0.6666666666666666 0.0", 
+            "cutboxvector": "c", 
+            "atomshift": "0.0 0.0 -0.06250000000000006"
+        }
+    }
+}

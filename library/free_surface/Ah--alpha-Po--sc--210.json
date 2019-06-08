@@ -1,0 +1,14 @@
+{
+    "free-surface": {
+        "key": "dc8a67a0-0e50-41b5-af26-d413218bf428", 
+        "id": "Ah--alpha-Po--sc--210", 
+        "system-family": "Ah--alpha-Po--sc", 
+        "calculation-parameter": {
+            "a_uvw": " 0  0  1", 
+            "b_uvw": " 1 -2  0", 
+            "c_uvw": " 2  1  0", 
+            "cutboxvector": "c", 
+            "atomshift": "0.0 0.0 -0.09999999999999981"
+        }
+    }
+}
