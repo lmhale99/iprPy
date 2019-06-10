@@ -1,15 +1,17 @@
 # Standard Python libraries
-from __future__ import (print_function, division, absolute_import,
-                        unicode_literals)
-import os
+from pathlib import Path
+
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
+
+# http://www.numpy.org/
 import numpy as np
 
 # https://github.com/usnistgov/atomman
 import atomman as am
 
 # iprPy imports
-from .. import rootdir
+from .. import libdir
 
 def assign_composition(df, database, lib_directory=None):
     """
@@ -23,7 +25,7 @@ def assign_composition(df, database, lib_directory=None):
     
     # Set default lib_directory (for ref structures)
     if lib_directory is None:
-        lib_directory = os.path.join(os.path.dirname(rootdir), 'library')
+        lib_directory = libdir
     
     # Identify compositions
     compositions = []
@@ -47,9 +49,9 @@ def assign_composition(df, database, lib_directory=None):
             # If family is a ref
             else:
                 elements = '-'.join(np.unique(series.symbols))
-                fname = os.path.join(lib_directory, 'ref', elements, series.family + '.poscar')
+                fname = Path(lib_directory, 'reference_crystal', series.family + '.json')
                 try:
-                    ucell = am.load('poscar', fname)
+                    ucell = am.load('system_model', fname)
                 except:
                     compositions.append(np.nan)
                 else:
