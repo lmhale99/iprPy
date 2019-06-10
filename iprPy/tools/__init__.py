@@ -1,6 +1,4 @@
-# Standard Python libraries
-from __future__ import division, absolute_import, print_function
-
+# iprPy imports
 from .aslist import aslist, iaslist
 from .filltemplate import filltemplate
 from .screen_input import screen_input

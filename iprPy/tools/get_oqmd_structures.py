@@ -1,11 +1,30 @@
-from __future__ import (print_function, division, absolute_import,
-                        unicode_literals)
-import os
-import glob
+# Standard Python libraries
+from pathlib import Path
+import uuid
 
+# https://github.com/usnistgov/DataModelDict
+from DataModelDict import DataModelDict as DM
+
+# https://github.com/usnistgov/atomman
 import atomman as am
 
-from .. import rootdir
+# iprPy imports
+from .. import libdir
+
+def build_reference_crystal_model(name, ucell, sourcename, sourcelink):
+    """Generates a reference_crystal data model"""
+    model = DM()
+    model['reference-crystal'] = DM()
+    model['reference-crystal']['key'] = str(uuid.uuid4())
+    model['reference-crystal']['id'] = name
+    
+    model['reference-crystal']['source'] = DM()
+    model['reference-crystal']['source']['name'] = sourcename
+    model['reference-crystal']['source']['link'] = sourcelink
+    
+    model['reference-crystal']['atomic-system'] = ucell.model()['atomic-system']
+
+    return model
 
 def get_oqmd_structures(elements, lib_directory=None):
     """
@@ -23,31 +42,19 @@ def get_oqmd_structures(elements, lib_directory=None):
     # Function-specific imports
     import requests
     
-    # Define subset generator
-    def subsets(fullset):
-        for i, item in enumerate(fullset):
-            yield [item]
-            if len(fullset) > 1:
-                for subset in subsets(fullset[i+1:]):
-                    yield [item] + subset
-    
-    # Get default lib_directory
+    sourcename = "Open Quantum Materials Database"
+    sourcelink = "http://oqmd.org/"
+
+    # Handle lib_directory
     if lib_directory is None:
-        lib_directory = os.path.join(os.path.dirname(rootdir), 'library', 'ref')
-    lib_directory = os.path.abspath(lib_directory)
+        lib_directory = Path(libdir, 'reference_crystal')
     
-    # Set comp_directory
     elements.sort()
+
+    # Build list of downloaded entries
     have = []
-    for subelements in subsets(elements):
-        elements_string = '-'.join(subelements)
-        comp_directory = os.path.join(lib_directory, elements_string)
-        if not os.path.isdir(comp_directory):
-            os.makedirs(comp_directory)
-        
-        # Build list of downloaded entries
-        for fname in glob.iglob(os.path.join(comp_directory, 'oqmd-*.poscar')):
-            have.append(os.path.splitext(os.path.basename(fname))[0])
+    for fname in lib_directory.glob('*.json'):
+        have.append(fname.stem)
     
     # Build list of missing OQMD entries
     elements_string = '-'.join(elements)
@@ -95,13 +102,9 @@ def get_oqmd_structures(elements, lib_directory=None):
             except:
                 continue
         
-        # Save poscar
-        poscar = structure_r.text
-        system = am.load('poscar', poscar)
-        system = system.normalize()
-        elements_string = '-'.join(system.symbols)
-        structure_file = os.path.join(lib_directory, elements_string, entry_id + '.poscar')
-        
-        with open(structure_file, 'w') as f:
-            f.write(poscar)
+        # Save as model
+        ucell = am.load('poscar', structure_r.text).normalize()
+        model = build_reference_crystal_model(entry_id, ucell, sourcename, sourcelink)
+        with open(Path(lib_directory, entry_id+'.json'), 'w') as f:
+            model.json(fp=f, indent=4)
         print('Added', entry_id)

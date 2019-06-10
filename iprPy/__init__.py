@@ -4,13 +4,18 @@ Attributes
 rootdir : str
     The absolute path to the iprPy package's root directory used to locate
     contained data files.
+libdir : str
+    The absolute path to the iprPy package's library directory.
 """
 # Standard Python libraries
-from __future__ import division, absolute_import, print_function
-import os
+from pathlib import Path
+
+# Define package-specific directories
+rootdir = Path(__file__).absolute().parent
+libdir = Path(rootdir.parent, 'library')
 
 # Read version from VERSION file
-with open(os.path.join(os.path.dirname(__file__), 'VERSION')) as version_file:
+with open(Path(rootdir, 'VERSION')) as version_file:
     __version__ = version_file.read().strip()
 
 __all__ = ['__version__', 'rootdir', 'libdir', 'compatibility', 'tools', 'input',
@@ -21,13 +26,11 @@ __all__ = ['__version__', 'rootdir', 'libdir', 'compatibility', 'tools', 'input'
            'analysis', 'check_modules']
 __all__.sort()
 
-# Define root package directory
-rootdir = os.path.dirname(os.path.abspath(__file__))
-libdir = os.path.abspath(os.path.join(rootdir, '..', 'library'))
-
 # iprPy imports
 from . import compatibility
 from . import tools
+from . import analysis
+
 from . import input
 
 from . import record
@@ -41,6 +44,6 @@ from .database import (list_databases, load_database, set_database, unset_databa
                        list_run_directories, load_run_directory, set_run_directory,
                        unset_run_directory)
 
-from . import analysis
+
 
 from .check_modules import check_modules

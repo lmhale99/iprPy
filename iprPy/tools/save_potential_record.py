@@ -1,7 +1,5 @@
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 import shutil
 
 # https://github.com/usnistgov/DataModelDict
@@ -9,7 +7,7 @@ from DataModelDict import DataModelDict as DM
 
 # iprPy imports
 from . import iaslist
-from .. import rootdir
+from .. import libdir
 
 def save_potential_record(content, files=None, lib_directory=None,
                           record_style='potential_users_LAMMPS',
@@ -49,25 +47,24 @@ def save_potential_record(content, files=None, lib_directory=None,
 
     # Set default lib_directory
     if lib_directory is None:
-        lib_directory = os.path.join(os.path.dirname(rootdir), 'library')
-    lib_directory = os.path.abspath(lib_directory)
+        lib_directory = libdir
 
     # Define record paths
-    stylepath = os.path.join(lib_directory, record_style)
-    if not os.path.isdir(stylepath):
-        os.mkdir(stylepath)
-    fname = os.path.join(stylepath, title + '.json')
-    potdir = os.path.join(stylepath, title)
+    stylepath = Path(lib_directory, record_style)
+    if not stylepath.is_dir():
+        stylepath.mkdir()
+    fname = Path(stylepath, title + '.json')
+    potdir = Path(stylepath, title)
     
     # Save record
-    if replace is False and os.path.isfile(fname):
-        raise ValueError('Record ' + title + ' already exists')
+    if replace is False and fname.is_file():
+        raise ValueError(f'Record {title} already exists')
     with open(fname, 'w') as recordfile:
         content.json(fp=recordfile, indent=4)
 
     # Copy parameter files
     if files is not None:
-        if not os.path.isdir(potdir):
-            os.mkdir(potdir)
+        if not potdir.is_dir():
+            potdir.mkdir
         for fname in iaslist(files):
             shutil.copy(fname, potdir)

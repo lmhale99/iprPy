@@ -1,8 +1,6 @@
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
 import sys
+from pathlib import Path
 from importlib import import_module
 
 def dynamic_import(module_file, module_name, ignorelist=None):
@@ -24,18 +22,20 @@ def dynamic_import(module_file, module_name, ignorelist=None):
     if ignorelist is None:
         ignorelist = []
     names = []
-    dir = os.path.dirname(module_file)
+    parent = Path(module_file).parent
     ignorelist = ['__init__', '__pycache__'] + ignorelist
     loaded = {}
     failed = {}
     
-    for name in os.listdir(dir):
-        if os.path.isdir(os.path.join(dir, name)):
+    for child in parent.iterdir():
+        if child.is_dir():
+            name = child.name
             if name not in ignorelist:
                 names.append(name)
         
-        elif os.path.isfile(os.path.join(dir, name)):
-            name, ext = os.path.splitext(name)
+        elif child.is_file():
+            name = child.stem
+            ext = child.suffix
             
             if ext.lower() in ('.py', '.pyc'):
                 if name not in ignorelist and name not in names:
@@ -43,7 +43,7 @@ def dynamic_import(module_file, module_name, ignorelist=None):
     
     for name in names:
         try:
-            module = import_module('.'+name, module_name)
+            module = import_module('.' + name, module_name)
             all = getattr(module, '__all__')
             if len(all) != 1:
                 raise AttributeError("module's __all__ must have only one attribute")

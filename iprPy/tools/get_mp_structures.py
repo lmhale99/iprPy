@@ -1,12 +1,39 @@
 # Standard Python libraries
-from __future__ import (print_function, division, absolute_import,
-                        unicode_literals)
-import os
-import glob
+from pathlib import Path
+import uuid
 
+# https://github.com/usnistgov/DataModelDict
+from DataModelDict import DataModelDict as DM
+
+# https://github.com/usnistgov/atomman
 import atomman as am
 
-from .. import rootdir
+# iprPy imports
+from .. import libdir
+
+def build_reference_crystal_model(name, ucell, sourcename, sourcelink):
+    """Generates a reference_crystal data model"""
+    model = DM()
+    model['reference-crystal'] = DM()
+    model['reference-crystal']['key'] = str(uuid.uuid4())
+    model['reference-crystal']['id'] = name
+    
+    model['reference-crystal']['source'] = DM()
+    model['reference-crystal']['source']['name'] = sourcename
+    model['reference-crystal']['source']['link'] = sourcelink
+    
+    model['reference-crystal']['atomic-system'] = ucell.model()['atomic-system']
+
+    return model
+
+# Define subset generator
+def subsets(fullset):
+    """Yields element combination subsets"""
+    for i, item in enumerate(fullset):
+        yield [item]
+        if len(fullset) > 1:
+            for subset in subsets(fullset[i+1:]):
+                yield [item] + subset
 
 def get_mp_structures(elements, api_key=None, lib_directory=None):
     """
@@ -22,43 +49,32 @@ def get_mp_structures(elements, api_key=None, lib_directory=None):
         environment variable
     lib_directory : str
         Path to the lib_directory to save the poscar files to.  Default uses
-        the iprPy library/dft_structures directory.
+        the iprPy library/reference_crystal directory.
     """
     # Function-specific imports
     import pymatgen as pmg
     from pymatgen.ext.matproj import MPRester
     
-    # Define subset generator
-    def subsets(fullset):
-        for i, item in enumerate(fullset):
-            yield [item]
-            if len(fullset) > 1:
-                for subset in subsets(fullset[i+1:]):
-                    yield [item] + subset
-    
+    # Set source name and link
+    sourcename = "Materials Project"
+    sourcelink = "https://materialsproject.org/"
+
     # Handle lib_directory
     if lib_directory is None:
-        lib_directory = os.path.join(os.path.dirname(rootdir), 'library', 'ref')
-    lib_directory = os.path.abspath(lib_directory)
+        lib_directory = Path(libdir, 'reference_crystal')
     
     elements.sort()
+
+    # Build list of downloaded entries
+    have = []
+    for fname in lib_directory.glob('*.json'):
+        have.append(fname.stem)
     
     # Open connection to Materials Project
     with MPRester(api_key) as m:
         
         # Loop over subsets of elements
         for subelements in subsets(elements):
-            
-            # Set comp_directory
-            elements_string = '-'.join(subelements)
-            comp_directory = os.path.join(lib_directory, elements_string)
-            if not os.path.isdir(comp_directory):
-                os.makedirs(comp_directory)
-            
-            # Build list of downloaded entries
-            have = []
-            for fname in glob.iglob(os.path.join(comp_directory, 'mp-*.poscar')):
-                have.append(os.path.splitext(os.path.basename(fname))[0])
             
             # Query MP for all entries corresponding to the elements
             entries = m.query({"elements": subelements}, ["material_id"])
@@ -75,12 +91,13 @@ def get_mp_structures(elements, api_key=None, lib_directory=None):
             except:
                 pass
             else:
-                # Convert cif to poscar and save
+                # Convert cif to model and save
                 for entry in entries:
+                    name = entry['material_id']
                     struct = pmg.Structure.from_str(entry['cif'], fmt='cif')
                     struct = pmg.symmetry.analyzer.SpacegroupAnalyzer(struct).get_conventional_standard_structure()
-                    system = am.load('pymatgen_Structure', struct)
-                    system = system.normalize()
-                    structure_file = os.path.join(comp_directory, entry['material_id']+'.poscar')
-                    system.dump('poscar', f=structure_file)
+                    ucell = am.load('pymatgen_Structure', struct).normalize()
+                    model = build_reference_crystal_model(name, ucell, sourcename, sourcelink)
+                    with open(Path(libdir, name+'.json'), 'w') as f:
+                        model.json(fp=f, indent=4)
                     print('Added', entry['material_id'])

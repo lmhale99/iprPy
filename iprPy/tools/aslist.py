@@ -1,10 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-
-# iprPy imports
-from ..compatibility import stringtype
-
 def iaslist(term):
     """
     Iterate over items in term as if term was a list. Treats a str, unicode
@@ -20,7 +13,7 @@ def iaslist(term):
     any
         Items in the list representation of term.
     """
-    if isinstance(term, stringtype):
+    if isinstance(term, str):
         yield term
     else:
         try:

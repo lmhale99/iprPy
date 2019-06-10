@@ -1,7 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-
 def filltemplate(template, variable, s_delimiter, e_delimiter):
     """
     Takes a template and fills in values for delimited template variables.

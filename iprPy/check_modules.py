@@ -1,7 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-
 # iprPy imports
 from .input.interpret_functions import loaded as input_interpret_loaded
 from .input.interpret_functions import failed as input_interpret_failed
@@ -23,40 +19,40 @@ def check_modules():
     """
     print('input.interpret styles that passed import:')
     for style in input_interpret_loaded.keys():
-        print('-', style)
+        print(f'- {style}')
     print('input.interpret styles that failed import:')
     for style in input_interpret_failed.keys():
-        print('-', style + ':', input_interpret_failed[style])
+        print(f'- {style}: {input_interpret_failed[style]}')
     print()
     
     print('input.buildcombos styles that passed import:')
     for style in input_buildcombos_loaded.keys():
-        print('-', style)
+        print(f'- {style}')
     print('input.buildcombos styles that failed import:')
     for style in input_buildcombos_failed.keys():
-        print('-', style + ':', input_buildcombos_failed[style])
+        print(f'- {style}: {input_buildcombos_failed[style]}')
     print()
     
     print('record styles that passed import:')
     for style in record_loaded.keys():
-        print('-', style)
+        print(f'- {style}')
     print('record styles that failed import:')
     for style in record_failed.keys():
-        print('-', style + ':', record_failed[style])
+        print(f'- {style}: {record_failed[style]}')
     print()
     
     print('calculation styles that passed import:')
     for style in calculation_loaded.keys():
-        print('-', style)
+        print(f'- {style}')
     print('calculation styles that failed import:')
     for style in calculation_failed.keys():
-        print('-', style + ':', calculation_failed[style])
+        print(f'- {style}: {calculation_failed[style]}')
     print()
     
     print('database styles that passed import:')
     for style in database_loaded.keys():
-        print('-', style)
+        print(f'- {style}')
     print('database styles that failed import:')
     for style in database_failed.keys():
-        print('-', style + ':', database_failed[style])
+        print(f'- {style}: {database_failed[style]}')
     print()
