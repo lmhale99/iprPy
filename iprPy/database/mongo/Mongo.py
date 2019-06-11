@@ -1,8 +1,5 @@
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
-import glob
+from pathlib import Path
 import shutil
 import tarfile
 from collections import OrderedDict
@@ -45,7 +42,10 @@ class Mongo(Database):
         self.__mongodb = MongoClient(host=host, port=port, document_class=DM, **kwargs)[database]
         
         # Define class host using client's host, port and database name
-        host = str(self.mongodb.client.address[0]) + ':' + str(self.mongodb.client.address[1]) + '.' + self.mongodb.name
+        host = self.mongodb.client.address[0]
+        port =self.mongodb.client.address[1]
+        database = self.mongodb.name
+        host = f'{host}:{port}.{database}'
         
         # Pass host to Database initializer
         Database.__init__(self, host)
@@ -191,7 +191,7 @@ class Mongo(Database):
         if len(record) == 1:
             return record[0]
         elif len(record) == 0:
-            raise ValueError('Cannot find matching record '+ name + ' (' +style + ')')
+            raise ValueError(f'Cannot find matching record {name} ({style})')
         else:
             raise ValueError('Multiple matching records found')
 
@@ -237,7 +237,7 @@ class Mongo(Database):
 
         # Verify that there isn't already a record with a matching name
         if len(self.get_records(name=record.name, style=record.style)) > 0:
-            raise ValueError('Record ' + record.name + ' already exists')
+            raise ValueError(f'Record {record.name} already exists')
 
         # Create meta mongo entry
         entry = OrderedDict()
@@ -409,7 +409,7 @@ class Mongo(Database):
                                 base_dir=record.name)
         
             # Upload archive
-            filename = record.name + '.tar.gz'
+            filename = Path(record.name + '.tar.gz')
             with open(filename, 'rb') as f:
                 tries = 0
                 while tries < 2:
@@ -422,7 +422,7 @@ class Mongo(Database):
                     raise ValueError('Failed to upload archive 2 times')
         
             # Remove local archive copy
-            os.remove(filename)
+            filename.unlink()
             
         elif root_dir is None:
             # Upload archive

@@ -1,8 +1,5 @@
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
-import glob
+from pathlib import Path
 import shutil
 import tarfile
 
@@ -16,6 +13,7 @@ import pandas as pd
 from ...tools import aslist, iaslist
 from .. import Database
 from ... import load_record
+from ...record import loaded as record_styles
 
 class Local(Database):
     
@@ -29,11 +27,11 @@ class Local(Database):
             The host name (local directory path) for the database.
         """
         # Get absolute path to host
-        host = os.path.abspath(host)
+        host = Path(host).resolve()
         
         # Make the path if needed
-        if not os.path.isdir(host):
-            os.makedirs(host)
+        if not host.is_dir():
+            host.mkdir(parents=True)
         
         # Pass host to Database initializer
         Database.__init__(self, host)
@@ -58,28 +56,43 @@ class Local(Database):
         list of iprPy.Records
             All records from the database matching the given parameters.
         """
-        
+
         # Set default search parameters
         if style is None:
-            style = ['*']
-        if name is None:
-            name = ['*']
+            style = list(record_styles.keys())
+        else:
+            style = aslist(style)
+            for record_style in style:
+                assert record_style in list(record_styles.keys()), f'unknown record style {record_style}'
+
         if query is not None:
             raise ValueError('query not supported by this style')
         
         df = []
         records = []
         # Iterate through all files matching style, name values
-        for s in iaslist(style):
-            for n in iaslist(name):
-                for rfile in glob.iglob(os.path.join(self.host, s, n+'.xml')):
-                    rstyle = os.path.basename(os.path.dirname(rfile))
-                    rname = os.path.splitext(os.path.basename(rfile))[0]
+        for record_style in style:
+            
+            # Iterate over all names using glob
+            if name is None:
+                for record_file in Path(self.host, record_style).glob('*.xml'):
+                    record_name = record_file.stem
                     
-                    # Load as Record object
-                    record = load_record(rstyle, rname, rfile)
+                    # Load as an iprPy.Record object
+                    record = load_record(record_style, record_name, record_file)
                     records.append(record)
                     df.append(record.todict(full=False, flat=True))
+            else:
+                # Iterate over given names
+                for record_name in aslist(name):
+                    record_file = Path(self.host, record_style, record_name+'.xml')
+                    if record_file.is_file():
+                        
+                        # Load as an iprPy.Record object
+                        record = load_record(record_style, record_name, record_file)
+                        records.append(record)
+                        df.append(record.todict(full=False, flat=True))
+        
         records = np.array(records)
         df = pd.DataFrame(df)
         
@@ -110,25 +123,39 @@ class Local(Database):
             All records from the database matching the given parameters.
         """
         
-        # Set default search parameters
+       # Set default search parameters
         if style is None:
-            style = ['*']
-        if name is None:
-            name = ['*']
+            style = list(record_styles.keys())
+        else:
+            style = aslist(style)
+            for record_style in style:
+                assert record_style in list(record_styles.keys()), f'unknown record style {record_style}'
+
         if query is not None:
             raise ValueError('query not supported by this style')
         
         df = []
-        # Iterate through all files matching style, name values
-        for s in iaslist(style):
-            for n in iaslist(name):
-                for rfile in glob.iglob(os.path.join(self.host, s, n+'.xml')):
-                    rstyle = os.path.basename(os.path.dirname(rfile))
-                    rname = os.path.splitext(os.path.basename(rfile))[0]
-                    
-                    # Open record file and yield an iprPy.Record object
-                    record = load_record(rstyle, rname, rfile)
+       # Iterate through all files matching style, name values
+        for record_style in style:
+            
+            # Iterate over all names using glob
+            if name is None:
+                for record_file in Path(self.host, record_style).glob('*.xml'):
+                    record_name = record_file.stem
+
+                    # Load as an iprPy.Record object
+                    record = load_record(record_style, record_name, record_file)
                     df.append(record.todict(full=full, flat=flat))
+            else:
+                # Iterate over given names
+                for record_name in aslist(name):
+                    record_file = Path(self.host, record_style, record_name+'.xml')
+                    if record_file.is_file():
+                        
+                        # Load as an iprPy.Record object
+                        record = load_record(record_style, record_name, record_file)
+                        df.append(record.todict(full=full, flat=flat))                    
+                    
         df = pd.DataFrame(df)
         
         if len(df) > 0:
@@ -166,7 +193,7 @@ class Local(Database):
         if len(record) == 1:
             return record[0]
         elif len(record) == 0:
-            raise ValueError('Cannot find matching record '+ name + ' (' +style + ')')
+            raise ValueError(f'Cannot find matching record {name} ({style})')
         else:
             raise ValueError('Multiple matching records found')
 
@@ -212,16 +239,17 @@ class Local(Database):
         
         # Verify that there isn't already a record with a matching name
         if len(self.get_records(name=record.name, style=record.style)) > 0:
-            raise ValueError('Record ' + record.name + ' already exists')
+            raise ValueError(f'Record {record.name} already exists')
         
         # Make record style directory if needed
-        if not os.path.isdir(os.path.join(self.host, record.style)):
-            os.mkdir(os.path.join(self.host, record.style))
+        style_dir = Path(self.host, record.style)
+        if not style_dir.is_dir():
+            style_dir.mkdir()
         
         # Save content to an .xml file
-        xml_file = os.path.join(self.host, record.style, record.name+'.xml')
+        xml_file = Path(style_dir, record.name+'.xml')
         with open(xml_file, 'w') as f:
-            f.write(record.content.xml())
+            record.content.xml(fp=f)
         
         return record
 
@@ -320,10 +348,10 @@ class Local(Database):
             record = self.get_record(name=record.name, style=record.style)
         
         # Build path to record
-        record_path = os.path.join(self.host, record.style, record.name)
+        xml_path = Path(self.host, record.style, record.name+'.xml')
         
         # Delete record file
-        os.remove(record_path+'.xml')
+        xml_path.unlink()
 
     def add_tar(self, record=None, name=None, style=None, tar=None, root_dir=None):
         """
@@ -372,18 +400,19 @@ class Local(Database):
             record = self.get_record(name=record.name, style=record.style)
         
         # Build path to record
-        record_path = os.path.join(self.host, record.style, record.name)
+        record_path = Path(self.host, record.style, record.name)
+        tar_path = Path(self.host, record.style, record.name+'.tar.gz')
         
         # Check if an archive already exists
-        if os.path.isfile(record_path + '.tar.gz'):
+        if tar_path.is_file():
             raise ValueError('Record already has an archive')
         
         # Make archive
         if tar is None:
-            shutil.make_archive(record_path, 'gztar', root_dir=root_dir,
+            shutil.make_archive(record_path.as_posix(), 'gztar', root_dir=root_dir,
                                 base_dir=record.name)
         elif root_dir is None:
-            with open(record_path + '.tar.gz', 'wb') as f:
+            with open(tar_path, 'wb') as f:
                 f.write(tar)
         else:
             raise ValueError('tar and root_dir cannot both be given')
@@ -431,14 +460,14 @@ class Local(Database):
             record = self.get_record(name=record.name, style=record.style)
         
         # Build path to record
-        record_path = os.path.join(self.host, record.style, record.name)
+        tar_path = Path(self.host, record.style, record.name+'.tar.gz')
         
         # Return content
         if raw is True:
-            with open(record_path+'.tar.gz', 'rb') as f:
+            with open(tar_path, 'rb') as f:
                 return f.read()
         else:
-            return tarfile.open(record_path+'.tar.gz')
+            return tarfile.open(tar_path)
 
     def delete_tar(self, record=None, name=None, style=None):
         """
@@ -475,11 +504,11 @@ class Local(Database):
             record = self.get_record(name=record.name, style=record.style)
         
         # Build path to tar file
-        record_path = os.path.join(self.host, record.style, record.name)
+        tar_path = Path(self.host, record.style, record.name+'.tar.gz')
         
         # Delete record if it exists
-        if os.path.isfile(record_path+'.tar.gz'):
-            os.remove(record_path+'.tar.gz')
+        if tar_path.is_file():
+            tar_path.unlink()
 
     def update_tar(self, record=None, name=None, style=None, tar=None, root_dir=None):
         """

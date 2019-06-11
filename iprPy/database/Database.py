@@ -1,7 +1,5 @@
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 import sys
 import glob
 import shutil
@@ -14,7 +12,7 @@ import pandas as pd
 from DataModelDict import DataModelDict as DM
 
 # iprPy imports
-from .. import rootdir
+from .. import rootdir, libdir
 from ..record import loaded as record_loaded
 from ..tools import screen_input, aslist
 from .prepare import prepare
@@ -57,7 +55,7 @@ class Database(object):
         str
             The string representation of the database.
         """
-        return 'database style '  + self.style + ' at ' + self.host
+        return f'database style {self.style} at {self.host}'
     
     @property
     def style(self):
@@ -378,37 +376,36 @@ class Database(object):
         
         # Set default lib_directory
         if lib_directory is None:
-            lib_directory = os.path.join(os.path.dirname(rootdir), 'library')
-        lib_directory = os.path.abspath(lib_directory)
+            lib_directory = libdir
         
         # Handle refresh options
         if refresh is False:
             refresh_list = []
         else:
             all_refs = []
-            for path in glob.iglob(os.path.join(lib_directory, '*')):
-                if os.path.isdir(path):
-                    all_refs.append(os.path.basename(path))
+            for ref in lib_directory.glob('*'):
+                if ref.is_dir():
+                    all_refs.append(ref.name)
             if refresh is True:
                 refresh_list = all_refs
             else:
                 refresh_list = aslist(refresh)
                 for style in refresh_list:
-                    assert style in all_refs, str(style) + ' is not a reference record style'
+                    assert style in all_refs, f'{style} is not a reference record style'
         
         # Delete records to be refreshed
         for style in refresh_list:
             self.destroy_records(style)
         
         # Loop over all record styles in lib_directory
-        for dir in glob.iglob(os.path.join(lib_directory, '*')):
-            if os.path.isdir(dir):
-                record_style = os.path.basename(dir)
+        for ref in lib_directory.glob('*'):
+            if ref.is_dir():
+                record_style = ref.name
                 
                 # Loop over all records of one style
-                for record_file in glob.iglob(os.path.join(dir, '*')):
-                    if os.path.splitext(record_file)[1].lower() in ['.xml', '.json']:
-                        record_name = os.path.splitext(os.path.basename(record_file))[0]
+                for record_file in ref.glob('*'):
+                    if record_file.suffix.lower() in ['.xml', '.json']:
+                        record_name = record_file.stem
                         
                         # Add record if needed
                         try:
@@ -418,9 +415,9 @@ class Database(object):
                             pass
                         
                         # Add a record's tar if needed
-                        if os.path.isdir(os.path.splitext(record_file)[0]):
+                        if Path(ref, record_name).is_dir():
                             try:
-                                self.add_tar(root_dir=dir, name=record_name)
+                                self.add_tar(root_dir=ref, name=record_name)
                             except:
                                 pass
     
@@ -440,20 +437,20 @@ class Database(object):
         if record_style is not None:
             # Display information about database records
             records = self.get_records_df(style=record_style, full=False, flat=True)
-            print('In', self, ':')
-            print('-', len(records), 'of style', record_style)
+            print(f'In {self}:')
+            print(f'- {len(records)} of style {record_style}')
             sys.stdout.flush()
             if len(records) > 0 and 'calculation' in record_style:
                 count = len(records[records.status == 'finished'])
-                print(' -', count, 'are complete')
+                print(f' - {count} are complete')
                 sys.stdout.flush()
                 
                 count = len(records[records.status == 'not calculated'])
-                print(' -', count, 'still to run')
+                print(f' - {count} still to run')
                 sys.stdout.flush()
                 
                 count = len(records[records.status == 'error'])
-                print(' -', count, 'issued errors')
+                print(f' - {count} issued errors')
                 sys.stdout.flush()
     
     def clean_records(self, run_directory=None, record_style=None, records=None):
@@ -499,13 +496,13 @@ class Database(object):
             try:
                 tar = self.get_tar(record=record)
             except:
-                print('failed to extract', record_name, 'tar')
+                print(f'failed to extract {record.name} tar')
             else:
                 # Copy tar back to run_directory
                 try:
                     tar.extractall(run_directory)
                 except:
-                    print('failed to extract', record_name, 'tar')
+                    print(f'failed to extract {record.name} tar')
                     tar.close()
                 else:
                     # Delete database version of tar
@@ -513,7 +510,7 @@ class Database(object):
                     try:
                         self.delete_tar(record=record)
                     except:
-                        print('failed to delete', record_name, 'tar')
+                        print(f'failed to delete {record.name} tar')
             
             # Remove error and status from stored record
             model = DM(record.content)
@@ -523,12 +520,12 @@ class Database(object):
             self.update_record(record=record, content=model.xml())
         
         # Remove bid files
-        for bidfile in glob.iglob(os.path.join(run_directory, '*', '*.bid')):
-            os.remove(bidfile)
+        for bidfile in run_directory.glob('*/*.bid'):
+            bidfile.unlink()
         
         # Remove results.json files
-        for resultsfile in glob.iglob(os.path.join(run_directory, '*', 'results.json')):
-            os.remove(resultsfile)
+        for resultsfile in run_directory.glob('*/results.json'):
+            resultsfile.unlink()
     
     def copy_records(self, dbase2, record_style=None, records=None, includetar=True, overwrite=False):
         """
@@ -619,7 +616,7 @@ class Database(object):
             record_style = self.select_record_style()
         
         records = self.get_records(style=record_style)
-        print(len(records), 'records found for', record_style)
+        print(f'{len(records)} records found for {record_style}')
         if len(records) > 0:
             test = screen_input('Delete records? (must type yes):')
             if test == 'yes':
@@ -674,12 +671,14 @@ class Database(object):
         except:
             pass
         else:
-            for load_file in record.content.find('system-info').finds('file'):
-                d, b = os.path.split(os.path.normpath(load_file))
-                if d != '':
-                    pname = d
+            for load_file in model.finds('file'):
+                directory = Path(load_file).parent
+                name = Path(load_file).stem
+
+                if directory != '':
+                    pname = directory
                 else:
-                    pname = os.path.splitext(b)[0]
+                    pname = name
                 
                 try:
                     parent = self.get_record(name=pname)

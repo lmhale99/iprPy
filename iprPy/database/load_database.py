@@ -1,7 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-
 from ..tools import screen_input
 from . import loaded
 from .settings import load_settings
@@ -64,7 +60,7 @@ def load_database(name=None, style=None, host=None, **kwargs):
             try:
                 database_settings = settings.find('database', yes={'name':name})
             except:
-                raise KeyError('Database '+ name + ' not found')
+                raise KeyError(f'Database {name} not found')
             
             # Extract parameters
             style = database_settings['style']
@@ -80,4 +76,4 @@ def load_database(name=None, style=None, host=None, **kwargs):
     if style in loaded:
         return loaded[style](host, **kwargs)
     else:
-        raise KeyError('Unknown database style ' + style)
+        raise KeyError(f'Unknown database style {style}')

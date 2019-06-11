@@ -6,29 +6,25 @@ Collects functions that interact with the .iprPy settings file allowing
 database and run_directory information to be stored and easily accessed.
 """
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
-import sys
+from pathlib import Path
 
 # https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
 from .. import rootdir
 from ..tools import screen_input
-from ..compatibility import iteritems
 
 __all__ = ['list_databases', 'set_database', 'unset_database',
            'list_run_directories', 'load_run_directory', 'set_run_directory', 
            'unset_run_directory']
 
-settingsfile = os.path.join(rootdir, '.iprPy')
+settingsfile = Path(rootdir, '.iprPy')
 
 def load_settings():
     """Loads the .iprPy settings file."""
     
     # Load settings file if it exists
-    if os.path.isfile(settingsfile):
+    if settingsfile.is_file():
         with open(settingsfile, 'r') as f:
             settings = DM(f)
     
@@ -69,8 +65,6 @@ def list_databases():
     # Extract and return the database names
     databases = settings['iprPy-defined-parameters'].aslist('database')
     return [database['name'] for database in databases]
-    
-
 
 def set_database(name=None, style=None, host=None, **kwargs):
     """
@@ -93,9 +87,6 @@ def set_database(name=None, style=None, host=None, **kwargs):
     
     # Get information from the settings file
     settings = load_settings()
-    
-    # Find existing database definitions
-    databases = settings['iprPy-defined-parameters'].aslist('database')
     
     # Ask for name if not given
     if name is None:
@@ -131,7 +122,7 @@ def set_database(name=None, style=None, host=None, **kwargs):
     #Ask for host if not given
     if host is None:
         host = screen_input("Enter the database's host:")
-    database_settings['host'] = host
+    database_settings['host'] = str(host)
     
     # Ask for additional kwargs if not given
     if len(kwargs) == 0:
@@ -142,7 +133,7 @@ def set_database(name=None, style=None, host=None, **kwargs):
             if key == '': 
                 break
             kwargs[key] = screen_input('value:')
-    for key, value in iteritems(kwargs):
+    for key, value in kwargs.items():
         database_settings.append('params', DM([(key, value)]))
     
     save_settings(settings)
@@ -177,16 +168,16 @@ def unset_database(name=None):
                 name = databases[choice-1]['name']
         else:
             print('No databases currently set')
-            sys.exit()
+            return None
     
     # Verify listed name exists
     else:
         try:
-            database_settings = settings.find('database', yes={'name':name})
+            settings.find('database', yes={'name':name})
         except:
-            raise ValueError('Database '+ name + ' not found')
+            raise ValueError(f'Database {name} not found')
     
-    print('Database', name, 'found')
+    print(f'Database {name} found')
     test = screen_input('Delete settings? (must type yes):')
     if test == 'yes':
         if len(databases) == 1:
@@ -199,7 +190,7 @@ def unset_database(name=None):
             settings['iprPy-defined-parameters']['database'] = new['database']
             
         save_settings(settings)
-        print('Settings for database', name, 'successfully deleted')
+        print(f'Settings for database {name} successfully deleted')
 
 def list_run_directories():
     """
@@ -250,15 +241,15 @@ def load_run_directory(name=None):
                 name = run_directories[choice-1]['name']
         else:
             print('No run_directories currently set')
-            return
+            return None
     
     try:
         run_directory_settings = settings.find('run_directory', yes={'name':name})
     except:
-        raise ValueError('run_directory '+ name + ' not found')
+        raise ValueError(f'run_directory {name} not found')
     
     # Extract parameters
-    return run_directory_settings['path']
+    return Path(run_directory_settings['path'])
 
 def set_run_directory(name=None, path=None):
     """
@@ -277,9 +268,6 @@ def set_run_directory(name=None, path=None):
     # Get information from the settings file
     settings = load_settings()
     
-    # Find existing run_directory definitions
-    run_directories = settings['iprPy-defined-parameters'].aslist('run_directory')
-    
     # Ask for name if not given
     if name is None:
         name = screen_input('Enter a name for the run_directory:')
@@ -297,7 +285,7 @@ def set_run_directory(name=None, path=None):
     
     # Ask if existing run_directory should be overwritten    
     else: 
-        print('run_directory', name, 'already defined.')
+        print(f'run_directory {name} already defined.')
         option = screen_input('Overwrite? (yes or no):')
         if option in ['yes', 'y']:
             pass
@@ -309,7 +297,7 @@ def set_run_directory(name=None, path=None):
     # Ask for path if not given
     if path is None:
         path = screen_input("Enter the run_directory's path:")
-    run_directory_settings['path'] = path
+    run_directory_settings['path'] = Path(path).resolve().as_posix()
     
     save_settings(settings)
 
@@ -343,17 +331,16 @@ def unset_run_directory(name=None):
                 name = run_directories[choice-1]['name']
         else:
             print('No run_directories currently set')
-            sys.exit()
+            return None
     
     # Verify listed name exists
     else:
         try:
-            run_directory_settings = settings.find('run_directory',
-                                                   yes={'name':name})
+            settings.find('run_directory', yes={'name':name})
         except:
-            raise ValueError('run_directory '+ name + ' not found')
+            raise ValueError(f'run_directory {name} not found')
     
-    print('run_directory', name, 'found')
+    print(f'run_directory {name} found')
     test = screen_input('Delete settings? (must type yes):')
     if test == 'yes':
         if len(run_directories) == 1:
@@ -366,4 +353,4 @@ def unset_run_directory(name=None):
             settings['iprPy-defined-parameters']['run_directory'] = new['run_directory']
         
         save_settings(settings)
-        print('Settings for run_directory', name, 'successfully deleted')
+        print(f'Settings for run_directory {name} successfully deleted')

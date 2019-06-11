@@ -1,7 +1,5 @@
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 import shutil
 import tarfile
 from io import BytesIO
@@ -21,6 +19,7 @@ from DataModelDict import DataModelDict as DM
 from ...tools import aslist, iaslist
 from .. import Database
 from ... import load_record
+from ...record import loaded as record_styles
 
 class MDCSDatabase(Database):
     
@@ -45,9 +44,9 @@ class MDCSDatabase(Database):
         """
         
         # Pass parameters to mdcs object
-        if os.path.isfile(pswd):
-            with open(pswd) as pswdf:
-                pswd = pswdf.read().strip()
+        if Path(pswd).is_file():
+            with open(pswd) as f:
+                pswd = f.read().strip()
         self.mdcs = MDCS(host=host, user=user, pswd=pswd, cert=cert)
         
         # Pass host to Database initializer
@@ -190,7 +189,7 @@ class MDCSDatabase(Database):
         if len(record) == 1:
             return record[0]
         elif len(record) == 0:
-            raise ValueError('Cannot find matching record '+ name + ' (' +style + ')')
+            raise ValueError(f'Cannot find matching record {name} ({style})')
         else:
             raise ValueError('Multiple matching records found')
     
@@ -237,7 +236,7 @@ class MDCSDatabase(Database):
             
         # Verify that there isn't already a record with a matching name
         if len(self.get_records(name=record.name, style=record.style)) > 0:
-            raise ValueError('Record ' + record.name + ' already exists')
+            raise ValueError(f'Record {record.name} already exists')
         
         # Upload record to database
         self.mdcs.curate(record.content.xml(), record.name, record.style)
@@ -395,7 +394,7 @@ class MDCSDatabase(Database):
             raise ValueError('Record already has an archive')
         
         if tar is None: 
-            filename = record.name + '.tar.gz'
+            filename = Path(record.name + '.tar.gz')
             
             # Make archive
             shutil.make_archive(record.name, 'gztar', root_dir=root_dir,
@@ -405,7 +404,7 @@ class MDCSDatabase(Database):
             tries = 0
             while tries < 2:
                 if True:
-                    url = self.mdcs.blob_upload(filename)
+                    url = self.mdcs.blob_upload(filename.as_posix())
                     break
                 else:
                     tries += 1
@@ -413,7 +412,7 @@ class MDCSDatabase(Database):
                 raise ValueError('Failed to upload archive 2 times')
             
             # Remove local archive copy
-            os.remove(filename)
+            filename.unlink()
             
         elif root_dir is None:
             # Upload archive
@@ -538,7 +537,7 @@ class MDCSDatabase(Database):
             record = self.get_record(name=record.name, style=record.style)
         
         if tar is None: 
-            filename = record.name + '.tar.gz'
+            filename = Path(record.name+'.tar.gz')
             
             # Make archive
             shutil.make_archive(record.name, 'gztar', root_dir=root_dir,
@@ -548,7 +547,7 @@ class MDCSDatabase(Database):
             tries = 0
             while tries < 2:
                 if True:
-                    url = self.mdcs.blob_upload(filename)
+                    url = self.mdcs.blob_upload(filename.as_posix())
                     break
                 else:
                     tries += 1
@@ -556,7 +555,7 @@ class MDCSDatabase(Database):
                 raise ValueError('Failed to upload archive 2 times')
             
             # Remove local archive copy
-            os.remove(filename)
+            filename.unlink()
             
         elif root_dir is None:
             # Upload archive

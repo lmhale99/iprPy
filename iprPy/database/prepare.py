@@ -1,7 +1,5 @@
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 import uuid
 import shutil
 from copy import deepcopy
@@ -45,6 +43,7 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
     record_df = database.get_records_df(style=calculation.record_style,
                                         full=False, flat=True,
                                         script='calc_' + calculation.style)
+    print(len(record_df), 'existing calculation records found', flush=True)
     
     # Check multikeys
     for keyset in calculation.multikeys:
@@ -117,6 +116,8 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
     for key in calculation.singularkeys:
         calculation_dict[key] = kwargs[key]
     
+    numprepared = 0
+
     # Iterate over multidict combinations
     for subdict in itermultidict(calculation.multikeys, **kwargs):
         calculation_dict.update(subdict)
@@ -156,17 +157,18 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
         
         # Check if record is valid and new
         if new_record.isvalid() and new_record.isnew(record_df=record_df):
-            
+            numprepared += 1
+
             # Add record to database
             database.add_record(record=new_record)
             
             # Generate calculation folder
-            calc_directory = os.path.join(run_directory, calc_key)
-            os.makedirs(calc_directory)
+            calc_directory = Path(run_directory, calc_key)
+            calc_directory.mkdir(parents=True)
             
             # Save inputfile to calculation folder
             inputfile = filltemplate(calculation.template, calculation_dict, '<', '>')
-            with open(os.path.join(calc_directory, 'calc_' + calculation.style + '.in'), 'w') as f:
+            with open(Path(calc_directory, 'calc_' + calculation.style + '.in'), 'w') as f:
                 f.write(inputfile)
             
             # Add calculation files to calculation folder
@@ -177,14 +179,14 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
             for key_file in input_dict:
                 if key_file[-5:] == '_file':
                     key_content = key_file.replace('_file', '_content')
-                    dirpath = os.path.dirname(os.path.join(calc_directory, input_dict[key_file]))
-                    if not os.path.isdir(dirpath):
-                        os.makedirs(dirpath)
+                    dirpath = Path(calc_directory, input_dict[key_file]).parent
+                    if not dirpath.is_dir():
+                        dirpath.mkdir(parents=True)
                     try:
-                        with open(os.path.join(calc_directory, input_dict[key_file]), 'w') as f:
+                        with open(Path(calc_directory, input_dict[key_file]), 'w') as f:
                             f.write(input_dict[key_content])
                     except:
-                        with open(os.path.join(calc_directory, input_dict[key_file]), 'wb') as f:
+                        with open(Path(calc_directory, input_dict[key_file]), 'wb') as f:
                             f.write(input_dict[key_content])
             
             # Copy potential artifacts if needed and exist
@@ -196,6 +198,7 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
                 else:
                     tar.extractall(calc_directory)
                     tar.close()
+    print(numprepared, 'new calculations prepared')
 
 def itermultidict(multikeys, **kwargs):
     
