@@ -106,7 +106,7 @@ class MDCSDatabase(Database):
                 df = df[df[key].isin(aslist(kwargs[key]))]
         
         if return_df:
-            return list(records[df.index.tolist()]), df.reset_index()
+            return list(records[df.index.tolist()]), df.reset_index(drop=True)
         else:
             return list(records[df.index.tolist()])
     
@@ -158,7 +158,7 @@ class MDCSDatabase(Database):
             for key in kwargs:
                 df = df[df[key].isin(aslist(kwargs[key]))]
         
-        return df
+        return df.reset_index(drop=True)
     
     def get_record(self, name=None, style=None, query=None, **kwargs):
         """
