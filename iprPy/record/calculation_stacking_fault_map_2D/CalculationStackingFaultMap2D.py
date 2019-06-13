@@ -65,7 +65,7 @@ class CalculationStackingFaultMap2D(Record):
         """
         list of str: The default fterms used by isnew() for comparisons.
         """
-        return []
+        return {}
     
     def isvalid(self):
         """

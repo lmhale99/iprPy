@@ -1,6 +1,4 @@
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
 from pathlib import Path
 import sys
 
@@ -114,16 +112,16 @@ class Record(object):
     @property
     def compare_terms(self):
         """
-        list of str: The default terms used by isnew() for comparisons.
+        list: The terms to compare values absolutely.
         """
         return []
     
     @property
     def compare_fterms(self):
         """
-        list of str: The default fterms used by isnew() for comparisons.
+        dict: The terms to compare values using a tolerance.
         """
-        return []
+        return {}
     
     def buildcontent(self, script, input_dict, results_dict=None):
         """

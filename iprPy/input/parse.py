@@ -1,12 +1,8 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-
+# https://github.com/usnistgov/atomman
 from atomman.tools import uber_open_rmode
                        
 # iprPy imports
 from ..tools import aslist
-from ..compatibility import stringtype
 
 __all__ = ['parse']
 

@@ -1,6 +1,3 @@
-# Standard Python libraries
-from __future__ import division, absolute_import, print_function
-
 # Basic imports
 from .boolean import boolean
 from .parse import parse

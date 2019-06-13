@@ -1,8 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
-
 # http://www.numpy.org/
 import numpy as np
 
@@ -29,17 +24,9 @@ class CalculationElasticConstantsStatic(Record):
         return 'calculation-elastic-constants-static'
     
     @property
-    def schema(self):
-        """
-        str: The absolute directory path to the .xsd file associated with the
-             record style.
-        """
-        return os.path.join(self.directory, 'record-calculation-elastic-constants-static.xsd')
-    
-    @property
     def compare_terms(self):
         """
-        list of str: The default terms used by isnew() for comparisons.
+        list: The terms to compare values absolutely.
         """
         return [
                 'script',
@@ -58,11 +45,11 @@ class CalculationElasticConstantsStatic(Record):
     @property
     def compare_fterms(self):
         """
-        list of str: The default fterms used by isnew() for comparisons.
+        dict: The terms to compare values using a tolerance.
         """
-        return [
-                'strainrange',
-               ]
+        return {
+                'strainrange':1e-10,
+               }   
     
     def buildcontent(self, script, input_dict, results_dict=None):
         """

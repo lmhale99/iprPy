@@ -1,7 +1,5 @@
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 import sys
 from copy import deepcopy
 from importlib import import_module
@@ -26,7 +24,7 @@ class Calculation(object):
         
         # Import calculation script
         package_name = '.'.join(self.module_name.split('.')[:-1])
-        self.__script = import_module('.calc_' + self.style, package_name)
+        self.__script = import_module(f'.calc_{self.style}', package_name)
         
         # Make shortcuts to calculation's functions
         self.main = self.script.main
@@ -39,7 +37,7 @@ class Calculation(object):
         str
             The string representation of the calculation.
         """
-        return 'calculation style ' + self.style
+        return f'calculation style {self.style}'
     
     @property
     def script(self):
@@ -63,7 +61,7 @@ class Calculation(object):
     @property
     def directory(self):
         """str: The path to the calculation's directory"""
-        return os.path.dirname(os.path.abspath(self.module_file))
+        return Path(self.module_file).absolute().parent
     
     @property
     def record_style(self):
@@ -73,8 +71,7 @@ class Calculation(object):
     @property
     def template(self):
         """str: The template to use for generating calc.in files."""
-        with open(os.path.join(self.directory,
-                               'calc_' + self.style + '.template')) as template_file:
+        with open(Path(self.directory, f'calc_{self.style}.template')) as template_file:
             template = template_file.read()
         
         return template

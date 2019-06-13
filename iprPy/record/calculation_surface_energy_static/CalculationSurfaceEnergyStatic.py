@@ -1,8 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
-
 # http://www.numpy.org/
 import numpy as np
 
@@ -27,14 +22,6 @@ class CalculationSurfaceEnergyStatic(Record):
     def contentroot(self):
         """str: The root element of the content"""
         return 'calculation-surface-energy-static'
-    
-    @property
-    def schema(self):
-        """
-        str: The absolute directory path to the .xsd file associated with the
-             record style.
-        """
-        return os.path.join(self.directory, 'record-calculation-surface-energy-static')
     
     @property
     def compare_terms(self):
@@ -62,7 +49,7 @@ class CalculationSurfaceEnergyStatic(Record):
         """
         list of str: The default fterms used by isnew() for comparisons.
         """
-        return []
+        return {}
     
     def isvalid(self):
         """

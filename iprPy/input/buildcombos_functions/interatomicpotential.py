@@ -1,67 +1,52 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-
 # http://www.numpy.org/
 import numpy as np
 
+from ...analysis import assign_currentIPR
+
 __all__ = ['interatomicpotential']
 
-def interatomicpotential(database, keys=['potential_file', 'potential_content', 'potential_dir'],
-          record='potential_LAMMPS', currentIPR=True, query=None, **kwargs):
+def interatomicpotential(database, keys, content_dict=None, record='potential_LAMMPS',
+                         currentIPR=None, query=None, **kwargs):
     """
     Builds parameter sets related to interatomic potentials.
     """
+    if content_dict is None:
+        content_dict = {}
+
+    # Default currentIPR is True for default record, False otherwise
+    if currentIPR is None:
+        currentIPR = record == 'potential_LAMMPS'
+    
+    # Fetch potential records and df
     potentials, potential_df = database.get_records(style=record, return_df=True,
                                                     query=query, **kwargs)
     
-    if len(potential_df) > 0:
-        potential_content = []
-        for potential in potentials:
-            potential_content.append(potential.content)
-        potential_df['content'] = potential_content
-        
-        # Limit to only current IPR implementations
-        if currentIPR is True:
-            
-            # Extract versionstyle and versionnumber
-            versionstyle = []
-            versionnumber = []
-            for name in potential_df['id'].values:
-                version = name.split('--')[-1]
-                try:
-                    versionnumber.append(int(version[-1]))
-                except:
-                    versionnumber.append(np.nan)
-                    versionstyle.append(version)
-                else:
-                    versionstyle.append(version[:-1])
-            
-            potential_df['versionstyle'] = versionstyle
-            potential_df['versionnumber'] = versionnumber
-            
-            # Loop through unique potential id's
-            includeid = []
-            for pot_id in np.unique(potential_df.pot_id.values):
-                check_df = potential_df[potential_df.pot_id == pot_id]
-                check_df = check_df[check_df.versionstyle == 'ipr']
-                check_df = check_df[check_df.versionnumber == check_df.versionnumber.max()]
-                if len(check_df) == 1:
-                    includeid.append(check_df['id'].values[0])
-                elif len(check_df) > 1:
-                    raise ValueError('Bad currentIPR check for '+pot_id)
-            
-            # Limit df by includeid potentials
-            potential_df = potential_df[potential_df['id'].isin(includeid)]
-    
+    # Filter by currentIPR (note that DataFrame index is unchanged)
+    if currentIPR:
+        assign_currentIPR(pot_df=potential_df)
+        potential_df = potential_df[potential_df.currentIPR == True]
+
+    # Initialize inputs keys
     inputs = {}
     for key in keys:
         inputs[key] = []
     
+    # Loop over all potentials 
     for i, potential_series in potential_df.iterrows():
-        inputs['potential_file'].append(potential_series.id + '.json')
-        #inputs['potential_content'].append('record ' + potential_series.id)
-        inputs['potential_content'].append(potential_series.content.json(indent=4))
-        inputs['potential_dir'].append(potential_series.id)
+        potential = potentials[i]
+        content_dict[potential.name] = potential.content
+
+        # Loop over all input keys
+        for key in keys:
+            if key == 'potential_file':
+                inputs['potential_file'].append(f'{potential.name}.json')
+            elif key == 'potential_content':
+                inputs['potential_content'].append(f'record {potential.name}')
+            elif key == 'potential_dir':
+                inputs['potential_dir'].append(potential.name)
+            elif key == 'potential_dir_content':
+                inputs['potential_dir_content'].append(f'tar {potential.name}')
+            else:
+                inputs[key].append('')
     
-    return inputs
+    return inputs, content_dict

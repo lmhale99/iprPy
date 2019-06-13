@@ -1,8 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
-
 # http://www.numpy.org/
 import numpy as np
 
@@ -29,17 +24,9 @@ class CalculationRelaxBox(Record):
         return 'calculation-relax-box'
     
     @property
-    def schema(self):
-        """
-        str: The absolute directory path to the .xsd file associated with the
-             record style.
-        """
-        return os.path.join(self.directory, 'record-calculation-relax-box.xsd')
-    
-    @property
     def compare_terms(self):
         """
-        list of str: The default terms used by isnew() for comparisons.
+        list: The terms to compare values absolutely.
         """
         return [
                 'script',
@@ -60,15 +47,15 @@ class CalculationRelaxBox(Record):
         """
         list of str: The default fterms used by isnew() for comparisons.
         """
-        return [
-                'temperature',
-                'pressure_xx',
-                'pressure_yy',
-                'pressure_zz',
-                'pressure_xy',
-                'pressure_xz',
-                'pressure_yz'
-               ]
+        return {
+                'temperature':1e-2,
+                'pressure_xx':1e-2,
+                'pressure_yy':1e-2,
+                'pressure_zz':1e-2,
+                'pressure_xy':1e-2,
+                'pressure_xz':1e-2,
+                'pressure_yz':1e-2,
+                }
     
     def buildcontent(self, script, input_dict, results_dict=None):
         """

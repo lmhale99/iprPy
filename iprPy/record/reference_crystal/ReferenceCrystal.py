@@ -1,8 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-from pathlib import Path
-
 # http://www.numpy.org/
 import numpy as np
 
@@ -25,7 +20,7 @@ class ReferenceCrystal(Record):
     @property
     def compare_terms(self):
         """
-        list of str: The default terms used by isnew() for comparisons.
+        list: The terms to compare values absolutely.
         """
         return [
                'id',

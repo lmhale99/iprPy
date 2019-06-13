@@ -29,20 +29,12 @@ class CalculationRelaxDynamic(Record):
         return 'calculation-relax-dynamic'
     
     @property
-    def schema(self):
-        """
-        str: The absolute directory path to the .xsd file associated with the
-             record style.
-        """
-        return os.path.join(self.directory, 'record-calculation-relax-dynamic.xsd')
-    
-    @property
     def compare_terms(self):
         """
-        list of str: The default terms used by isnew() for comparisons.
+        list: The terms to compare values absolutely.
         """
         return [
-                'calc_script',
+                'script',
                 
                 'load_file',
                 'load_options',
@@ -58,17 +50,17 @@ class CalculationRelaxDynamic(Record):
     @property
     def compare_fterms(self):
         """
-        list of str: The default fterms used by isnew() for comparisons.
+        dict: The terms to compare values using a tolerance.
         """
-        return [
-                'temperature',
-                'pressure_xx',
-                'pressure_yy',
-                'pressure_zz',
-                'pressure_xy',
-                'pressure_xz',
-                'pressure_yz'
-               ]
+        return {
+                'temperature':1e-2,
+                'pressure_xx':1e-2,
+                'pressure_yy':1e-2,
+                'pressure_zz':1e-2,
+                'pressure_xy':1e-2,
+                'pressure_xz':1e-2,
+                'pressure_yz':1e-2,
+                }
     
     def buildcontent(self, script, input_dict, results_dict=None):
         """

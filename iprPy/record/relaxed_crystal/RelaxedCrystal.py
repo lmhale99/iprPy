@@ -1,8 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
-
 # http://www.numpy.org/
 import numpy as np
 
@@ -28,17 +23,9 @@ class RelaxedCrystal(Record):
         return 'relaxed-crystal'
     
     @property
-    def schema(self):
-        """
-        str: The absolute directory path to the .xsd file associated with the
-             record style.
-        """
-        return os.path.join(self.directory, 'record-relaxed-crystal.xsd')
-    
-    @property
     def compare_terms(self):
         """
-        list of str: The default terms used by isnew() for comparisons.
+        list: The terms to compare values absolutely.
         """
         return [
                'potential_LAMMPS_key',
@@ -50,16 +37,16 @@ class RelaxedCrystal(Record):
     @property
     def compare_fterms(self):
         """
-        list of str: The default fterms used by isnew() for comparisons.
+        dict: The terms to compare values using a tolerance.
         """
-        return [
-               'a',
-               'b',
-               'c',
-               'alpha',
-               'beta',
-               'gamma',
-               ]
+        return {
+               'a':1e-6,
+               'b':1e-6,
+               'c':1e-6,
+               'alpha':1e-2,
+               'beta':1e-2,
+               'gamma':1e-2,
+               }
     
     def buildcontent(self, script, input_dict):
         """
@@ -155,6 +142,7 @@ class RelaxedCrystal(Record):
         
         ucell = am.load('system_model', self.content, key='atomic-system')
         params['composition'] = ucell.composition
+        params['status'] = 'finished'
         
         if flat is True:
             params['symbols'] = list(ucell.symbols)

@@ -1,8 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
-
 # https://github.com/usnistgov/DataModelDict 
 from DataModelDict import DataModelDict as DM
 

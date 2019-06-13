@@ -1,8 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
-
 # http://www.numpy.org/
 import numpy as np
 
@@ -29,17 +24,9 @@ class CalculationEvsRScan(Record):
         return 'calculation-E-vs-r-scan'
     
     @property
-    def schema(self):
-        """
-        str: The absolute directory path to the .xsd file associated with the
-             record style.
-        """
-        return os.path.join(self.directory, 'record-calculation-E-vs-r-scan.xsd')
-    
-    @property
     def compare_terms(self):
         """
-        list of str: The default terms used by isnew() for comparisons.
+        list: The terms to compare values absolutely.
         """
         return [
                 'script',
@@ -60,12 +47,12 @@ class CalculationEvsRScan(Record):
     @property
     def compare_fterms(self):
         """
-        list of str: The default fterms used by isnew() for comparisons.
+        dict
         """
-        return [
-                #'maximum_r',
-                #'minimum_r',
-               ]
+        return {
+                #'maximum_r':0.001,
+                #'minimum_r':0.001,
+               }
     
     def buildcontent(self, script, input_dict, results_dict=None):
         """

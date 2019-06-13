@@ -77,8 +77,7 @@ def runner(dbase, run_directory, orphan_directory=None, hold_directory=None):
         bidfailcount = 0
         
         # Announce the runner's pid
-        print('Runner started with pid', pid)
-        sys.stdout.flush()
+        print(f'Runner started with pid {pid}', flush=True)
         
         # flist is the running list of calculations
         flist = os.listdir(run_directory)
@@ -209,9 +208,6 @@ def runner(dbase, run_directory, orphan_directory=None, hold_directory=None):
                         model.json(fp=f, indent=4)
                     log.write('error: %s\n' % model[record_type]['error'])
                 
-                # Read in results.json
-                #model = DM('results.json')
-                
                 # Update record
                 tries = 0
                 while tries < 10:
@@ -242,7 +238,7 @@ def runner(dbase, run_directory, orphan_directory=None, hold_directory=None):
                 
                 # Stop unproductive worker after 10 consecutive bid fails
                 if bidfailcount > 10:
-                    print("Didn't find an open simulation")
+                    print("Didn't find an open simulation", flush=True)
                     break
                 
                 # Pause for 10 seconds before trying again
@@ -252,7 +248,7 @@ def runner(dbase, run_directory, orphan_directory=None, hold_directory=None):
             flist = os.listdir(run_directory)
             log.flush()
             os.fsync(log.fileno())
-        print('No simulations left to run')
+        print('No simulations left to run', flush=True)
         os.chdir(original_dir)
 
 def bid(sim):
@@ -373,4 +369,4 @@ def removecalc(dir):
         except:
             tries += 1
             if tries == 10:
-                print('failed to delete', os.path.basename(dir))
+                print('failed to delete', os.path.basename(dir), flush=True)

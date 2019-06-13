@@ -1,20 +1,17 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-
 # https://github.com/usnistgov/DataModelDict 
 from DataModelDict import DataModelDict as DM
 
-# iprPy imports
-from ...compatibility import range
-
 __all__ = ['defect']
 
-def defect(database, keys, record=None, query=None, **kwargs):
+def defect(database, keys, record=None, content_dict=None, query=None, **kwargs):
+
+    if content_dict is None:
+        content_dict = {}
 
     defects, defect_df = database.get_records(style=record, return_df=True,
                                            query=query, **kwargs)
     
+    # Search for defect keys
     file_key = None
     content_key = None
     family_key = None
@@ -37,6 +34,7 @@ def defect(database, keys, record=None, query=None, **kwargs):
             else:
                 raise KeyError('Multiple <defect>_family keys found')
     
+    # Check that all necessary defect keys are found
     if file_key is None:
         raise KeyError('No <defect>_file key found')
     if content_key is None:
@@ -44,16 +42,19 @@ def defect(database, keys, record=None, query=None, **kwargs):
     if family_key is None:
         raise KeyError('No <defect>_family key found')
     
+    # Generate 
     for i, defect_series in defect_df.iterrows():
         defect = defects[i]
+        content_dict[defect.name] = defect.content
+
         for key in keys:
             if key == file_key:
-                inputs[key].append(defect.name + '.json')
+                inputs[key].append(f'{defect.name}.json')
             elif key == content_key:
-                inputs[key].append(defect.content.json(indent=4))
+                inputs[key].append(f'record {defect.name}')
             elif key == family_key:
                 inputs[key].append(defect_series.family)
             else:
                 inputs[key].append('')
     
-    return inputs
+    return inputs, content_dict

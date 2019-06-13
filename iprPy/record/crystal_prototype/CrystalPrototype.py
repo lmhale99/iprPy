@@ -1,8 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
-
 # https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.unitconvert as uc
@@ -16,14 +11,6 @@ class CrystalPrototype(Record):
     def contentroot(self):
         """str: The root element of the content"""
         return 'crystal-prototype'
-    
-    @property
-    def schema(self):
-        """
-        str: The absolute directory path to the .xsd file associated with the
-             record style.
-        """
-        return os.path.join(self.directory, 'record-crystal-prototype.xsd')
     
     def todict(self, full=True, flat=False):
         """
@@ -60,8 +47,6 @@ class CrystalPrototype(Record):
         params['sg_number'] = proto['space-group']['number']
         params['sg_HG'] = proto['space-group']['Hermann-Maguin']
         params['sg_Schoen'] = proto['space-group']['Schoenflies']
-        
-       
         
         ucell = am.load('system_model', self.content, key='atomic-system')
 

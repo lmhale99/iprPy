@@ -1,8 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
-
 # http://www.numpy.org/
 import numpy as np
 
@@ -15,14 +10,6 @@ class PotentialLAMMPS(Record):
     def contentroot(self):
         """str: The root element of the content"""
         return 'potential-LAMMPS'
-    
-    @property
-    def schema(self):
-        """
-        str: The absolute directory path to the .xsd file associated with the
-             record style.
-        """
-        return os.path.join(self.directory, 'record-potential-LAMMPS.xsd')
     
     def todict(self, full=True, flat=False):
         """
@@ -65,7 +52,7 @@ class PotentialLAMMPS(Record):
         for atom in pot.iteraslist('atom'):
             params['elements'].append(atom.get('element', np.nan))
             params['masses'].append(atom.get('mass', np.nan))
-            params['symbols'].append(atom.get('symbol', np.nan))
+            params['symbols'].append(atom.get('symbol', atom.get('element', np.nan)))
             params['charge'].append(atom.get('charge', np.nan))
         
         return params

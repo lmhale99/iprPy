@@ -57,7 +57,9 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
     # Build all combinations
     test_records, test_record_df, test_inputfiles, test_contents = build_testrecords(database, calculation, content_dict, **kwargs)
     print(len(test_record_df), 'record combinations to check', flush=True)
-
+    if len(test_record_df) == 0:
+        return
+    
     # Find new unique combinations
     newrecord_df = new_calculations(record_df, test_record_df, record.compare_terms, record.compare_fterms)
     print(len(newrecord_df), 'new records to prepare', flush=True)
