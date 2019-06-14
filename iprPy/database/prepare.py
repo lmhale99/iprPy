@@ -55,7 +55,7 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
     kwargs, content_dict = fill_kwargs(database, calculation, kwargs)
 
     # Build all combinations
-    test_records, test_record_df, test_inputfiles, test_contents = build_testrecords(database, calculation, content_dict, **kwargs)
+    test_records, test_record_df, test_inputfiles, test_contents, content_dict = build_testrecords(database, calculation, content_dict, **kwargs)
     print(len(test_record_df), 'record combinations to check', flush=True)
     if len(test_record_df) == 0:
         return
@@ -223,6 +223,7 @@ def build_testrecords(database, calculation, content_dict, **kwargs):
                         except:
                             crecord = database.get_record(name=record_name)
                             input_dict[key] = crecord.content.json()
+                            content_dict[record_name] = crecord.content
 
         # Build incomplete record
         try:
@@ -242,7 +243,7 @@ def build_testrecords(database, calculation, content_dict, **kwargs):
             
     new_record_df = pd.DataFrame(new_record_df)
     
-    return new_records, new_record_df, new_inputfiles, copy_contents
+    return new_records, new_record_df, new_inputfiles, copy_contents, content_dict
 
 def itermultidict(multikeys, **kwargs):
     """
