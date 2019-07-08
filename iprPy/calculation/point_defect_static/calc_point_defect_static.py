@@ -245,7 +245,7 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
     
     # Set dump_modify_format based on lammps_date
     if lammps_date < datetime.date(2016, 8, 3):
-        lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e"'
+        lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e %.13e %.13e %.13e"'
     else:
         lammps_variables['dump_modify_format'] = 'float %.13e'
     
@@ -265,6 +265,14 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
     E_total_base = uc.set_in_units(thermo.PotEng.values[-1],
                                    lammps_units['energy'])
     E_coh = E_total_base / system.natoms
+    
+    pxx = uc.set_in_units(thermo.Pxx.values[-1], lammps_units['pressure'])
+    pyy = uc.set_in_units(thermo.Pyy.values[-1], lammps_units['pressure'])
+    pzz = uc.set_in_units(thermo.Pzz.values[-1], lammps_units['pressure'])
+    pxy = uc.set_in_units(thermo.Pxy.values[-1], lammps_units['pressure'])
+    pxz = uc.set_in_units(thermo.Pxz.values[-1], lammps_units['pressure'])
+    pyz = uc.set_in_units(thermo.Pyz.values[-1], lammps_units['pressure'])
+    pressure_base = np.array([[pxx, pxy, pxz], [pxy, pyy, pyz], [pxz, pyz, pzz]])
     
     # Rename log file
     shutil.move('log.lammps', 'min-perfect-log.lammps')
@@ -301,6 +309,13 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
     thermo = output.simulations[0]['thermo']
     E_total_ptd = uc.set_in_units(thermo.PotEng.values[-1],
                                   lammps_units['energy'])
+    pxx = uc.set_in_units(thermo.Pxx.values[-1], lammps_units['pressure'])
+    pyy = uc.set_in_units(thermo.Pyy.values[-1], lammps_units['pressure'])
+    pzz = uc.set_in_units(thermo.Pzz.values[-1], lammps_units['pressure'])
+    pxy = uc.set_in_units(thermo.Pxy.values[-1], lammps_units['pressure'])
+    pxz = uc.set_in_units(thermo.Pxz.values[-1], lammps_units['pressure'])
+    pyz = uc.set_in_units(thermo.Pyz.values[-1], lammps_units['pressure'])
+    pressure_ptd = np.array([[pxx, pxy, pxz], [pxy, pyy, pyz], [pxz, pyz, pzz]])
     
     # Rename log file
     shutil.move('log.lammps', 'min-defect-log.lammps')
@@ -315,6 +330,9 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
     # Compute defect formation energy
     E_ptd_f = E_total_ptd - E_coh * system_ptd.natoms
     
+    # Compute strain tensor
+    pij = -(pressure_base - pressure_ptd) * system_base.box.volume
+    
     # Cleanup files
     for fname in glob.iglob('atom.*'):
         os.remove(fname)
@@ -327,6 +345,7 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
     results_dict['E_ptd_f'] = E_ptd_f
     results_dict['E_total_base'] = E_total_base
     results_dict['E_total_ptd'] = E_total_ptd
+    results_dict['pij_tensor'] = pij
     results_dict['system_base'] = system_base
     results_dict['system_ptd'] = system_ptd
     results_dict['dumpfile_base'] = 'perfect.dump'

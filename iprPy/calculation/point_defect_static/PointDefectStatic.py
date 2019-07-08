@@ -55,6 +55,7 @@ class PointDefectStatic(Calculation):
                     'potential_file',
                     'potential_content',
                     'potential_dir',
+                    'potential_dir_content',
                     'load_file',
                     'load_content',
                     'load_style',

@@ -6,7 +6,7 @@ box tilt large
 
 <atomman_pair_info>
 
-thermo_style custom step lx ly lz pxx pyy pzz pe
+thermo_style custom step lx ly lz pxx pyy pzz pxy pxz pyz pe
 thermo_modify format float %.13e
 
 compute peatom all pe/atom 

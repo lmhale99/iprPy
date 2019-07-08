@@ -62,7 +62,7 @@ class CalculationPointDefectStatic(Record):
         """
         list of str: The default fterms used by isnew() for comparisons.
         """
-        return []
+        return {}
     
     def isvalid(self):
         """
@@ -181,6 +181,8 @@ class CalculationPointDefectStatic(Record):
             calc['number-of-atoms'] = results_dict['system_ptd'].natoms
             calc['defect-formation-energy'] = uc.model(results_dict['E_ptd_f'],
                                                        input_dict['energy_unit'])
+            calc['defect-elastic-dipole-tensor'] = uc.model(results_dict['pij_tensor'],
+                                                        input_dict['energy_unit'])
             
             # Save the reconfiguration checks
             calc['reconfiguration-check'] = r_c = DM()
@@ -263,6 +265,7 @@ class CalculationPointDefectStatic(Record):
         if full is True and params['status'] == 'finished':
         
             params['E_f'] = uc.value_unit(calc['defect-formation-energy'])
+            params['pij'] = uc.value_unit(calc['defect-elastic-dipole-tensor'])
             params['natoms'] = calc['number-of-atoms']
             
             r_c = calc['reconfiguration-check']
