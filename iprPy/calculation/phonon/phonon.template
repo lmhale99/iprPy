@@ -1,0 +1,15 @@
+# LAMMPS input script that evaluates atomic forces without relaxing
+
+box tilt large
+
+<atomman_system_info>
+
+<atomman_pair_info>
+
+thermo_style custom step pe
+thermo_modify format float %.13e
+
+dump dumpy all custom 1 forces.dump id type x y z fx fy fz
+dump_modify dumpy format <dump_modify_format>
+
+run 0

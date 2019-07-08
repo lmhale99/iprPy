@@ -1,0 +1,30 @@
+# Input script for calc_phonon.py
+
+# Command lines for LAMMPS and MPI
+lammps_command              <lammps_command>
+mpi_command                 <mpi_command>
+
+# Potential definition and directory containing associated files
+potential_file              <potential_file>
+potential_dir               <potential_dir>
+
+# Initial system configuration to load
+load_file                   <load_file>
+load_style                  <load_style>
+load_options                <load_options>
+family                      <family>
+symbols                     <symbols>
+box_parameters              <box_parameters>
+
+# System manipulations
+sizemults                   <sizemults>
+
+# Units for input/output values
+length_unit                 <length_unit>
+pressure_unit               <pressure_unit>
+energy_unit                 <energy_unit>
+force_unit                  <force_unit>
+
+# Run parameters
+displacementdistance        <displacementdistance>
+symmetryprecision           <symmetryprecision>
