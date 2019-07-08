@@ -436,7 +436,7 @@ class Database(object):
         
         if record_style is not None:
             # Display information about database records
-            records = self.get_records_df(style=record_style, full=False, flat=True)
+            records = self.get_records_df(style=record_style, full=False, flat=True) #pylint: disable=assignment-from-no-return
             print(f'In {self}:')
             print(f'- {len(records)} of style {record_style}')
             sys.stdout.flush()
@@ -467,22 +467,29 @@ class Database(object):
             The record style to clean.  If not given, then the available record
             styles will be listed and the user prompted to pick one.
         records : list, optional
-            A list of iprPy.Record obejcts from the database to clean.  Allows
+            A list of iprPy.Record objects from the database to clean.  Allows
             the user full control on which records to reset.  Cannot be given
             with record_style.
         """
-        
+        # Check for run_directory first by name then by path
+        try:
+            run_directory = load_run_directory(run_directory)
+        except:
+            run_directory = Path(run_directory).resolve()
+            if not run_directory.is_dir():
+                raise ValueError('run_directory not found/set')
+
+        # Select record_style if needed
         if record_style is None and records is None:
             record_style = self.select_record_style()
-            
-        run_directory = load_run_directory(run_directory)
-        
+
+        # Get records by record_style
         if record_style is not None:
             if records is not None:
                 raise ValueError('record_style and records cannot both be given')
             
             # Retrieve records with errors from self
-            records = self.get_records(style=record_style, status='error')
+            records = self.get_records(style=record_style, status='error') #pylint: disable=assignment-from-no-return
         
         elif records is None:
             # Set empty list if record_style is still None and no records given
@@ -494,7 +501,7 @@ class Database(object):
         for record in records:
             # Check if record has saved tar
             try:
-                tar = self.get_tar(record=record)
+                tar = self.get_tar(record=record) #pylint: disable=assignment-from-no-return
             except:
                 print(f'failed to extract {record.name} tar')
             else:
@@ -559,7 +566,7 @@ class Database(object):
                 raise ValueError('record_style and records cannot both be given')
             
             # Retrieve records from self
-            records = self.get_records(style=record_style)
+            records = self.get_records(style=record_style) #pylint: disable=assignment-from-no-return
         
         elif records is None:
             # Set empty list if record_style is still None and no records given
@@ -585,7 +592,7 @@ class Database(object):
             if includetar:
                 try:
                     # get tar if it exists
-                    tar = self.get_tar(record=record, raw=True)
+                    tar = self.get_tar(record=record, raw=True) #pylint: disable=assignment-from-no-return
                 except:
                     pass
                 else:
@@ -615,7 +622,7 @@ class Database(object):
         if record_style is None:
             record_style = self.select_record_style()
         
-        records = self.get_records(style=record_style)
+        records = self.get_records(style=record_style) #pylint: disable=assignment-from-no-return
         print(f'{len(records)} records found for {record_style}')
         if len(records) > 0:
             test = screen_input('Delete records? (must type yes):')
@@ -661,7 +668,7 @@ class Database(object):
         Returns all records that are parents to the given one
         """
         if record is None:
-            record = self.get_record(name=name, style=style)
+            record = self.get_record(name=name, style=style) #pylint: disable=assignment-from-no-return
         elif name is not None or style is not None:
             raise ValueError('record cannot be given with name/style')
         
@@ -681,7 +688,7 @@ class Database(object):
                     pname = name
                 
                 try:
-                    parent = self.get_record(name=pname)
+                    parent = self.get_record(name=pname) #pylint: disable=assignment-from-no-return
                 except:
                     pass
                 else:
