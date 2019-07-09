@@ -83,27 +83,26 @@ def main(*args):
     
     results_dict = DM()
     
-    results_dict['neb_log'] = calc_neb(input_dict['lammps_command'],
-                            input_dict['initialsystem'],
-                            input_dict['potential'],
-                            input_dict['pointdefect_number'],
-                            input_dict['defectpair_number'],
-                            input_dict['point_kwargs'],
-                            input_dict['defect_pairs'],
-                            input_dict['allSymbols'],
-                            sourcedir,
-                            mpi_command = input_dict['mpi_command'],
-                            etol = input_dict['energytolerance'], #From lammps_min
-                            ftol = input_dict['forcetolerance'], #From lammps_min
-                            dmax = input_dict['maxatommotion'], #From lammps_min
-                            nreplicas = input_dict['numberreplicas'],  #New Thing
-                            springconst = input_dict['springconstant'], #New Thing
-                            thermosteps = input_dict['thermosteps'],  #New Thing
-                            dumpsteps = input_dict['dumpsteps'], #New Thing
-                            timestep = input_dict['timestep'], #New Thing
-                            minsteps = input_dict['minsteps'], #New Thing
-                            climbsteps = input_dict['climbsteps'] #New Thing
-                            )
+    results_dict['neb_log'] = calc_neb( input_dict['lammps_command'],
+                                        input_dict['initialsystem'],
+                                        input_dict['potential'],
+                                        input_dict['initialdefect_number'],
+                                        input_dict['defect_pair_number'],
+                                        input_dict['point_mobility_kwargs'],
+                                        input_dict['allSymbols'],
+                                        sourcedir,
+                                        mpi_command = input_dict['mpi_command'],
+                                        etol = input_dict['energytolerance'], #From lammps_min
+                                        ftol = input_dict['forcetolerance'], #From lammps_min
+                                        dmax = input_dict['maxatommotion'], #From lammps_min
+                                        nreplicas = input_dict['numberreplicas'],  #New Thing
+                                        springconst = input_dict['springconstant'], #New Thing
+                                        thermosteps = input_dict['thermosteps'],  #New Thing
+                                        dumpsteps = input_dict['dumpsteps'], #New Thing
+                                        timestep = input_dict['timestep'], #New Thing
+                                        minsteps = input_dict['minsteps'], #New Thing
+                                        climbsteps = input_dict['climbsteps'] #New Thing
+                                        )
 
 #Following are values to parse for in a future interpret function for neb systems
 
@@ -209,60 +208,49 @@ def main(*args):
     with open('results.json', 'w') as f:
         record.content.json(fp=f, indent=4)
     
-def calc_neb(lammps_command, system_info, potential, point_defect_number, defect_pair_number,point_kwargs,
-             defect_pair_info, allSymbols, sourcedir, mpi_command = None, etol=0.0, ftol=1e-4, dmax =uc.set_in_units(0.01, 'angstrom'),
+def calc_neb(lammps_command, system_info, potential, initial_defect_number, defect_pair_number,defect_mobility_kwargs, allSymbols, sourcedir, mpi_command = None, etol=0.0, ftol=1e-4, dmax =uc.set_in_units(0.01, 'angstrom'),
              nreplicas=11, springconst = 5, thermosteps = 100,
              dumpsteps = 10000, timestep = 0.01, minsteps = 10000,
              climbsteps = 10000):
 
     #Section for making alterations to the overall simulation structure
     
-    system = system_info
+
+    initial_system = system_info
     
-    
-    for defectIndex in range(int(point_defect_number)):
-        for pairIndex in range(int(defect_pair_number)):
-            pairKey = 'defectpair_'+str(pairIndex+1)
-            startNum = defect_pair_info[pairIndex][0]
-            endNum = defect_pair_info[pairIndex][1]
-            startNum = int(startNum)
-            endNum = int(endNum)
-            if ((defectIndex != startNum) and (defectIndex != endNum)):
-                if point_kwargs[defectIndex]['ptd_type'].lower() == 'v':
-                    system = am.defect.vacancy(system, pos=point_kwargs[defectIndex]['pos'])
-                elif point_kwargs[defectIndex]['ptd_type'].lower() == 'i':
-                    system = am.defect.interstitial(system, pos=point_kwargs[defectIndex]['pos'],atype = point_kwargs[defectIndex]['atype'])
-                elif point_kwargs[defectIndex]['ptd_type'].lower() == 's':
-                    system = am.defect.substitutional(system, pos=point_kwargs[defectIndex]['pos'],atype = point_kwargs[defectIndex]['atype'])
-                else:
-                    system = am.defect.dumbbell(system, pos=point_kwargs[defectIndex]['pos'],db_vect=point_kwargs[defectIndex]['db_vect'])
+    for defectIndex in range(int(initial_defect_number)):
+        point_kwargs = defect_mobility_kwargs['initial'][defectIndex]
+        if point_kwargs['ptd_type'].lower() == 'v':
+            initial_system = am.defect.vacancy(initial_system, pos=point_kwargs['pos'])
+        elif point_kwargs['ptd_type'].lower() == 'i':
+            initial_system = am.defect.interstitial(initial_system, pos=point_kwargs['pos'],atype = point_kwargs['atype'])
+        elif point_kwargs['ptd_type'].lower() == 's':
+            initial_system = am.defect.substitutional(initial_system, pos=point_kwargs['pos'],atype = point_kwargs['atype'])
+        elif point_kwargs['ptd_type'].lower() == 'db':
+            initial_system = am.defect.dumbbell(initial_system, pos=point_kwargs['pos'],db_vect=point_kwargs['db_vect'])
+        else:
+            raise ValueError('Invalid Defect Type')
     currentSymbols = []
     
-    for x in range(system.natypes):
+    for x in range(initial_system.natypes):
         currentSymbols.append(allSymbols[x])
     
-    system.symbols = currentSymbols
+    initial_system.symbols = currentSymbols
     
-    start_system = system
+    start_system = initial_system
 
-    for defectIndex in range(int(point_defect_number)):
-        for pairIndex in range(int(defect_pair_number)):
-            pairKey = 'defectpair_'+str(pairIndex+1)
-            startNum = defect_pair_info[pairIndex][0]
-            endNum = defect_pair_info[pairIndex][1]
-            startNum = int(startNum)
-            endNum = int(endNum)
-            if (defectIndex == startNum):
-                if point_kwargs[defectIndex]['ptd_type'].lower() == 'v':
-                    start_system = am.defect.vacancy(start_system, pos=point_kwargs[endNum]['pos'])
-                elif point_kwargs[defectIndex]['ptd_type'].lower() == 'i':
-                    start_system = am.defect.interstitial(start_system, pos=point_kwargs[defectIndex]['pos'],atype = point_kwargs[defectIndex]['atype'])
-                elif point_kwargs[defectIndex]['ptd_type'].lower() == 'db':
-                    start_system = am.defect.dumbbell(start_system, pos=point_kwargs[defectIndex]['pos'],db_vect=point_kwargs[defectIndex]['db_vect'])
-                elif point_kwargs[defectIndex]['ptd_type'].lower() == 's':
-                    raise ValueError('substitutional defects are not implemented for this situation')
-                else:
-                    raise ValueError('Invalid Defect Type')
+    for defectIndex in range(int(defect_pair_number)):
+        point_kwargs = defect_mobility_kwargs['start'][defectIndex]
+        if point_kwargs['ptd_type'].lower() == 'v':
+            start_system = am.defect.vacancy(start_system, pos=point_kwargs['pos'])
+        elif point_kwargs['ptd_type'].lower() == 'i':
+            start_system = am.defect.interstitial(start_system, pos=point_kwargs['pos'],atype = point_kwargs['atype'])
+        elif point_kwargs['ptd_type'].lower() == 'db':
+            start_system = am.defect.dumbbell(start_system, pos=point_kwargs['pos'],db_vect=point_kwargs['db_vect'])
+        elif point_kwargs['ptd_type'].lower() == 's':
+            raise ValueError('substitutional defects are not implemented for this situation')
+        else:
+            raise ValueError('Invalid Defect Type')
     
     currentSymbols = []
     for x in range(start_system.natypes):
@@ -276,56 +264,51 @@ def calc_neb(lammps_command, system_info, potential, point_defect_number, defect
     
     final_system = start_system
     movedAtomIndexes = []
-    for defectIndex in range(int(point_defect_number)):
-        for pairIndex in range(int(defect_pair_number)):
-            pairKey = 'defectpair_'+str(pairIndex+1)
-            startNum = defect_pair_info[pairIndex][0]
-            endNum = defect_pair_info[pairIndex][1]
-            startNum = int(startNum)
-            endNum = int(endNum)
-            if (defectIndex == endNum):
-                if point_kwargs[defectIndex]['ptd_type'].lower() == 'v':
-                    for x in range(start_natoms):
-                        xPos = round(start_system_atoms.pos[x,0],3) == round(point_kwargs[startNum]['pos'][0],3)
-                        yPos = round(start_system_atoms.pos[x,1],3) == round(point_kwargs[startNum]['pos'][1],3)
-                        zPos = round(start_system_atoms.pos[x,2],3) == round(point_kwargs[startNum]['pos'][2],3)
-                        if ((xPos and yPos) and zPos):
-                            final_system.atoms.pos[x] = point_kwargs[endNum]['pos']
-                            movedAtomIndexes.append(x)
-                elif point_kwargs[defectIndex]['ptd_type'].lower() == 'i':
-                    for x in range(start_natoms):
-                        xPos = round(start_system_atoms.pos[x,0],3) == round(point_kwargs[startNum]['pos'][0],3)
-                        yPos = round(start_system_atoms.pos[x,1],3) == round(point_kwargs[startNum]['pos'][1],3)
-                        zPos = round(start_system_atoms.pos[x,2],3) == round(point_kwargs[startNum]['pos'][2],3)
-                        if ((xPos and yPos) and zPos):
-                            final_system.atoms.pos[x] = point_kwargs[endNum]['pos']
-                            movedAtomIndexes.append(x)
-                elif point_kwargs[defectIndex]['ptd_type'].lower() == 'db':
-                    for x in range(start_natoms):
-                        xPos = round(start_system_atoms.pos[x,0],3) == round(point_kwargs[startNum]['pos'][0]-point_kwargs[startNum]['db_vect'][0],3)
-                        yPos = round(start_system_atoms.pos[x,1],3) == round(point_kwargs[startNum]['pos'][1]-point_kwargs[startNum]['db_vect'][1],3)
-                        zPos = round(start_system_atoms.pos[x,2],3) == round(point_kwargs[startNum]['pos'][2]-point_kwargs[startNum]['db_vect'][2],3)
-                        if ((xPos and yPos) and zPos):
-                            final_system.atoms.pos[x] = point_kwargs[startNum]['pos']
-                            movedAtomIndexes.append(x)
-                    for y in range(start_natoms):
-                        xPos = round(start_system_atoms.pos[y,0],3) == round(point_kwargs[startNum]['pos'][0]+point_kwargs[startNum]['db_vect'][0],3)
-                        yPos = round(start_system_atoms.pos[y,1],3) == round(point_kwargs[startNum]['pos'][1]+point_kwargs[startNum]['db_vect'][1],3)
-                        zPos = round(start_system_atoms.pos[y,2],3) == round(point_kwargs[startNum]['pos'][2]+point_kwargs[startNum]['db_vect'][2],3)
-                        if ((xPos and yPos) and zPos):
-                            final_system.atoms.pos[y] = point_kwargs[endNum]['pos']-point_kwargs[endNum]['db_vect']
-                            movedAtomIndexes.append(y)
-                    for z in range(start_natoms):
-                        xPos = round(start_system_atoms.pos[z,0],3) == round(point_kwargs[endNum]['pos'][0],3)
-                        yPos = round(start_system_atoms.pos[z,1],3) == round(point_kwargs[endNum]['pos'][1],3)
-                        zPos = round(start_system_atoms.pos[z,2],3) == round(point_kwargs[endNum]['pos'][2],3)
-                        if ((xPos and yPos) and zPos):
-                            final_system.atoms.pos[z] = point_kwargs[endNum]['pos']+point_kwargs[endNum]['db_vect']
-                            movedAtomIndexes.append(z)
-                elif point_kwargs[defectIndex]['ptd_type'].lower() == 's':
-                    raise ValueError('substitutional defects are not implemented for this situation')
-                else:   
-                    raise ValueError('Invalid Defect Type')
+    for defectIndex in range(int(defect_pair_number)):
+        point_kwargs = defect_mobility_kwargs['end'][defectIndex]
+        point_kwargs_start = defect_mobility_kwargs['start'][defectIndex]
+        if point_kwargs['ptd_type'].lower() == 'v':
+            for x in range(start_natoms):
+                xPos = round(start_system_atoms.pos[x,0],3) == round(point_kwargs['pos'][0],3)
+                yPos = round(start_system_atoms.pos[x,1],3) == round(point_kwargs['pos'][1],3)
+                zPos = round(start_system_atoms.pos[x,2],3) == round(point_kwargs['pos'][2],3)
+                if ((xPos and yPos) and zPos):
+                    final_system.atoms.pos[x] = point_kwargs_start['pos']
+                    movedAtomIndexes.append(x)
+        elif point_kwargs['ptd_type'].lower() == 'i':
+            for x in range(start_natoms):
+                xPos = round(start_system_atoms.pos[x,0],3) == round(point_kwargs_start['pos'][0],3)
+                yPos = round(start_system_atoms.pos[x,1],3) == round(point_kwargs_start['pos'][1],3)
+                zPos = round(start_system_atoms.pos[x,2],3) == round(point_kwargs_start['pos'][2],3)
+                if ((xPos and yPos) and zPos):
+                    final_system.atoms.pos[x] = point_kwargs['pos']
+                    movedAtomIndexes.append(x)
+        elif point_kwargs['ptd_type'].lower() == 'db':
+            for x in range(start_natoms):
+                xPos = round(start_system_atoms.pos[x,0],3) == round(point_kwargs_start['pos'][0]-point_kwargs_start['db_vect'][0],3)
+                yPos = round(start_system_atoms.pos[x,1],3) == round(point_kwargs_start['pos'][1]-point_kwargs_start['db_vect'][1],3)
+                zPos = round(start_system_atoms.pos[x,2],3) == round(point_kwargs_start['pos'][2]-point_kwargs_start['db_vect'][2],3)
+                if ((xPos and yPos) and zPos):
+                    final_system.atoms.pos[x] = point_kwargs['pos']
+                    movedAtomIndexes.append(x)
+            for y in range(start_natoms):
+                xPos = round(start_system_atoms.pos[y,0],3) == round(point_kwargs_start['pos'][0]+point_kwargs_start['db_vect'][0],3)
+                yPos = round(start_system_atoms.pos[y,1],3) == round(point_kwargs_start['pos'][1]+point_kwargs_start['db_vect'][1],3)
+                zPos = round(start_system_atoms.pos[y,2],3) == round(point_kwargs_start['pos'][2]+point_kwargs_start['db_vect'][2],3)
+                if ((xPos and yPos) and zPos):
+                    final_system.atoms.pos[y] = point_kwargs['pos']-point_kwargs['db_vect']
+                    movedAtomIndexes.append(y)
+            for z in range(start_natoms):
+                xPos = round(start_system_atoms.pos[z,0],3) == round(point_kwargs['pos'][0],3)
+                yPos = round(start_system_atoms.pos[z,1],3) == round(point_kwargs['pos'][1],3)
+                zPos = round(start_system_atoms.pos[z,2],3) == round(point_kwargs['pos'][2],3)
+                if ((xPos and yPos) and zPos):
+                    final_system.atoms.pos[z] = point_kwargs['pos']+point_kwargs['db_vect']
+                    movedAtomIndexes.append(z)
+        elif point_kwargs['ptd_type'].lower() == 's':
+            raise ValueError('substitutional defects are not implemented for this situation')
+        else:   
+            raise ValueError('Invalid Defect Type')
     
     final_system_pos = final_system.atoms.pos[movedAtomIndexes]
     movedAtomIds = [x+1 for x in movedAtomIndexes]
@@ -446,23 +429,8 @@ def process_input(input_dict, UUID=None, build=True):
     
     #Using pointdefect to define initial and final positions for atoms in the strucutre
     
-    iprPy.input.interpret('pointdefect', input_dict, build=build)
-
-    input_dict['defectpair_number'] = input_dict.get('defectpair_number', '0')
-    
-    if int(input_dict['defectpair_number']) > 0:
-        defect_pairs = {}
-        input_dict['defect_pairs']={}
-        for y in range(int(input_dict['defectpair_number'])):
-            pairKey = 'defectpair_'+str(y+1)
-            defect_pairs[pairKey] = input_dict.get(pairKey)
-            input_dict['defect_pairs'][y] = {}
-            input_dict['defect_pairs'][y][0],input_dict['defect_pairs'][y][1] = defect_pairs[pairKey].split(' ')
-    else:
-        input_dict['defect_pairs'] = None
+    iprPy.input.interpret('pointdefectmobility', input_dict, build=build)
 
     
-    input_dict['allSymbols'] = input_dict.get('allSymbols', input_dict['symbols']).split(' ')
-            
 if __name__ == '__main__':
     main(*sys.argv[1:])
