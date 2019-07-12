@@ -62,6 +62,8 @@ def get_mp_structures(elements, api_key=None, lib_directory=None):
     # Handle lib_directory
     if lib_directory is None:
         lib_directory = Path(libdir, 'reference_crystal')
+    if not lib_directory.is_dir():
+        lib_directory.mkdir()
     
     elements.sort()
 
@@ -98,6 +100,6 @@ def get_mp_structures(elements, api_key=None, lib_directory=None):
                     struct = pmg.symmetry.analyzer.SpacegroupAnalyzer(struct).get_conventional_standard_structure()
                     ucell = am.load('pymatgen_Structure', struct).normalize()
                     model = build_reference_crystal_model(name, ucell, sourcename, sourcelink)
-                    with open(Path(libdir, name+'.json'), 'w') as f:
+                    with open(Path(lib_directory, name+'.json'), 'w') as f:
                         model.json(fp=f, indent=4)
                     print('Added', entry['material_id'])
