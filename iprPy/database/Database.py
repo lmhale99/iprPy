@@ -679,21 +679,22 @@ class Database(object):
             pass
         else:
             for load_file in model.finds('file'):
-                directory = Path(load_file).parent
+                directory = Path(load_file).parent.stem
                 name = Path(load_file).stem
 
                 if directory != '':
                     pname = directory
                 else:
                     pname = name
-                
+
                 try:
                     parent = self.get_record(name=pname) #pylint: disable=assignment-from-no-return
                 except:
                     pass
                 else:
                     parents.append(parent)
-                    parents.extend(self.get_parent_records(parent))
+                    grandparents = self.get_parent_records(record=parent)
+                    parents.extend(grandparents)
         return parents
     
     def prepare(self, run_directory, calculation, **kwargs):
