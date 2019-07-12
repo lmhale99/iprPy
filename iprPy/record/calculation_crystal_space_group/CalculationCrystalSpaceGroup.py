@@ -122,15 +122,9 @@ class CalculationCrystalSpaceGroup(Record):
                 wykoff['multiplicity'] = int(mult)
                 calc['space-group'].append('Wykoff', wykoff)
             calc['space-group']['Wyckoff-fingerprint'] = results_dict['wyckoff_fingerprint']
-
-            if 'charge' in results_dict['ucell'].atoms_prop():
-                prop_units = {'charge': 'e'}
-            else:
-                prop_units = {}
             
             system_model = results_dict['ucell'].dump('system_model',
-                                                       box_unit=input_dict['length_unit'],
-                                                       prop_units=prop_units)
+                                                       box_unit=input_dict['length_unit'])
             calc['unit-cell-atomic-system'] = system_model['atomic-system']
         
         self.content = output
@@ -192,6 +186,7 @@ class CalculationCrystalSpaceGroup(Record):
             params['spacegroup_international'] = calc['space-group']['Hermann-Maguin']
             params['spacegroup_Schoenflies'] = calc['space-group']['Schoenflies']
             params['wykoff_fingerprint'] = calc['space-group']['Wyckoff-fingerprint']
+            params['composition'] = ucell.composition
             
             if flat is True:
                 params['a'] = ucell.box.a

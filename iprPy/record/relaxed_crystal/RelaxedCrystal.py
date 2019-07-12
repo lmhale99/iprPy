@@ -92,14 +92,8 @@ class RelaxedCrystal(Record):
         crystal['system-info'] = DM()
         crystal['system-info']['family'] = input_dict['family']
         
-        if 'charge' in input_dict['ucell'].atoms_prop():
-            prop_units = {'charge': 'e'}
-        else:
-            prop_units = {}
-        
         system_model = input_dict['ucell'].dump('system_model',
-                                                box_unit=input_dict['length_unit'],
-                                                prop_units=prop_units)
+                                                box_unit=input_dict['length_unit'])
         crystal['atomic-system'] = system_model['atomic-system']
         
         self.content = output
