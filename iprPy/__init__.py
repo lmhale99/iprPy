@@ -23,7 +23,7 @@ __all__ = ['__version__', 'rootdir', 'libdir', 'compatibility', 'tools', 'input'
            'database', 'list_databases', 'load_database', 'set_database',
            'unset_database', 'list_run_directories',
            'load_run_directory', 'set_run_directory', 'unset_run_directory',
-           'analysis', 'check_modules']
+           'analysis', 'workflow', 'check_modules']
 __all__.sort()
 
 # iprPy imports
@@ -45,5 +45,6 @@ from .database import (list_databases, load_database, set_database, unset_databa
                        unset_run_directory)
 
 
+from . import workflow
 
 from .check_modules import check_modules
