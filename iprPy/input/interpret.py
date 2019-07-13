@@ -5,6 +5,6 @@ __all__ = ['interpret']
 
 def interpret(style, input_dict, build=True, **kwargs):
     """
-    
+    Wrapper function for the modular interpret styles
     """
     loaded[style](input_dict, build=build, **kwargs)

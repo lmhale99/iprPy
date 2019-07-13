@@ -1,7 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-
 # http://www.numpy.org/
 import numpy as np
 

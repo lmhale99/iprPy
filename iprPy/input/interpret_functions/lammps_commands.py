@@ -1,10 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
-import shutil
-import tempfile
-
 # https://github.com/usnistgov/atomman
 import atomman.lammps as lmp
 

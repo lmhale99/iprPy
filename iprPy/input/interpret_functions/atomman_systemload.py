@@ -1,7 +1,5 @@
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 
 # http://www.numpy.org/
 import numpy as np
@@ -172,9 +170,9 @@ def atomman_systemload(input_dict, build=True, **kwargs):
     if len(symbols) == 1:
         symbols = symbols[0]
     
-    # If no family given/found, use load_file's basename
+    # If no family given/found, use load_file's stem
     if family is None:
-        family = os.path.splitext(os.path.basename(input_dict[kwargs['load_file']]))[0]
+        family = Path(input_dict[kwargs['load_file']]).stem
     
     # Save processed terms
     input_dict[kwargs['load_style']] = load_style

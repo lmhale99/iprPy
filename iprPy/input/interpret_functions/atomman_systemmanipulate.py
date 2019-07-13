@@ -1,16 +1,8 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-from copy import deepcopy
-
 # http://www.numpy.org/
 import numpy as np
 
 # https://github.com/usnistgov/atomman
 import atomman as am
-
-# iprPy imports
-from ...compatibility import range, int
 
 __all__ = ['atomman_systemmanipulate']
 
