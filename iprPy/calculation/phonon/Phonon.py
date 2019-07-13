@@ -3,6 +3,7 @@ from pathlib import Path
 
 # iprPy imports
 from .. import Calculation
+from ...input import keyset
 
 class Phonon(Calculation):
     """
@@ -32,7 +33,7 @@ class Phonon(Calculation):
 
         # Specify calculation-specific keys 
         files = [
-                 'phonon.template',
+                    'phonon.template',
                 ]
         for i in range(len(files)):
             files[i] = Path(self.directory, files[i])
@@ -49,15 +50,7 @@ class Phonon(Calculation):
         universalkeys = super().singularkeys
         
         # Specify calculation-specific key sets 
-        keys = [
-                'lammps_command',
-                'mpi_command',
-                
-                'length_unit',
-                'pressure_unit',
-                'energy_unit',
-                'force_unit',
-               ]
+        keys = keyset('lammps_commands') + keyset('units') + []
                
         # Join and return
         return universalkeys + keys
@@ -71,28 +64,14 @@ class Phonon(Calculation):
         universalkeys = super().multikeys
         
         # Specify calculation-specific key sets 
-        keys = [
+        keys =  [
+                    keyset('lammps_potential') + keyset('atomman_systemload'),
+                    keyset('atomman_systemmanipulate'),
                     [
-                    'potential_file',
-                    'potential_content',
-                    'potential_dir',
-                    'potential_dir_content',
-                    'load_file',
-                    'load_content',
-                    'load_style',
-                    'family',
-                    'load_options',
-                    'symbols',
-                    'box_parameters',
-                   ],
-                   [
-                    'sizemults'
-                   ],
-                   [
-                    'displacementdistance',
-                    'symmetryprecision',
-                   ],
-               ]
+                        'displacementdistance',
+                        'symmetryprecision',
+                    ],
+                ]
           
         # Join and return
         return universalkeys + keys

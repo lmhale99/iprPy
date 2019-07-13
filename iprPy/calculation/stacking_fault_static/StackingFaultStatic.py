@@ -3,6 +3,7 @@ from pathlib import Path
 
 # iprPy imports
 from .. import Calculation
+from ...input import keyset
 
 class StackingFaultStatic(Calculation):
     """
@@ -31,7 +32,7 @@ class StackingFaultStatic(Calculation):
 
         # Specify calculation-specific keys 
         files = [
-                 'sfmin.template',
+                    'sfmin.template',
                 ]
         for i in range(len(files)):
             files[i] = Path(self.directory, files[i])
@@ -48,14 +49,7 @@ class StackingFaultStatic(Calculation):
         universalkeys = super().singularkeys
         
         # Specify calculation-specific key sets 
-        keys = [
-                'lammps_command',
-                'mpi_command',
-                'length_unit',
-                'pressure_unit',
-                'energy_unit',
-                'force_unit',
-               ]
+        keys = keyset('lammps_commands') + keyset('units') + []
         
         # Join and return
         return universalkeys + keys
@@ -69,45 +63,15 @@ class StackingFaultStatic(Calculation):
         universalkeys = super().multikeys
         
         # Specify calculation-specific key sets 
-        keys = [
-                   [
-                    'potential_file',
-                    'potential_content',
-                    'potential_dir',
-                    'load_file',
-                    'load_content',
-                    'load_style',
-                    'family',
-                    'load_options',
-                    'symbols',
-                    'box_parameters',
-                   ],
-                   [
-                    'a_uvw',
-                    'b_uvw',
-                    'c_uvw',
-                    'atomshift',
-                    'sizemults',
-                   ],
-                   [
-                    'stackingfault_shiftfraction1',
-                    'stackingfault_shiftfraction2',
-                    'stackingfault_file',
-                    'stackingfault_content',
-                    'stackingfault_family',
-                    'stackingfault_cutboxvector',
-                    'stackingfault_faultpos',
-                    'stackingfault_shiftvector1',
-                    'stackingfault_shiftvector2',
+        keys =  [
+                    keyset('lammps_potential') + keyset('atomman_systemload'),
+                    keyset('atomman_systemmanipulate'),
+                    keyset('stackingfault') + [
+                        'stackingfault_shiftfraction1',
+                        'stackingfault_shiftfraction2',
                     ],
-                    [
-                    'energytolerance',
-                    'forcetolerance',
-                    'maxiterations',
-                    'maxevaluations',
-                    'maxatommotion',
-                    ],
-               ]
+                    keyset('lammps_minimize'),
+                ]
                
         # Join and return
         return universalkeys + keys

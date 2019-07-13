@@ -3,6 +3,7 @@ from pathlib import Path
 
 # iprPy imports
 from .. import Calculation
+from ...input import keyset
 
 class SurfaceEnergyStatic(Calculation):
     """
@@ -31,7 +32,7 @@ class SurfaceEnergyStatic(Calculation):
 
         # Specify calculation-specific keys 
         files = [
-                 'min.template',
+                    'min.template',
                 ]
         for i in range(len(files)):
             files[i] = Path(self.directory, files[i])
@@ -48,14 +49,7 @@ class SurfaceEnergyStatic(Calculation):
         universalkeys = super().singularkeys
         
         # Specify calculation-specific key sets 
-        keys = [
-                'lammps_command',
-                'mpi_command',
-                'length_unit',
-                'pressure_unit',
-                'energy_unit',
-                'force_unit',
-               ]
+        keys = keyset('lammps_commands') + keyset('units') + []
         
         # Join and return
         return universalkeys + keys
@@ -69,40 +63,11 @@ class SurfaceEnergyStatic(Calculation):
         universalkeys = super().multikeys
         
         # Specify calculation-specific key sets 
-        keys = [
-                    [
-                    'potential_file',
-                    'potential_content',
-                    'potential_dir',
-                    'potential_dir_content',
-                    'load_file',
-                    'load_content',
-                    'load_style',
-                    'family',
-                    'load_options',
-                    'symbols',
-                    'box_parameters',
-                   ],
-                   [
-                    'a_uvw',
-                    'b_uvw',
-                    'c_uvw',
-                    'atomshift',
-                    'sizemults',
-                   ],
-                   [
-                    'surface_file',
-                    'surface_content',
-                    'surface_family',
-                    'surface_cutboxvector',
-                    ],
-                    [
-                    'energytolerance',
-                    'forcetolerance',
-                    'maxiterations',
-                    'maxevaluations',
-                    'maxatommotion',
-                    ],
+        keys =  [
+                    keyset('lammps_potential') + keyset('atomman_systemload'),
+                    keyset('atomman_systemmanipulate'),
+                    keyset('freesurface'),
+                    keyset('lammps_minimize'),
                ]
                
         # Join and return

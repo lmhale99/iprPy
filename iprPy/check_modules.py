@@ -3,6 +3,8 @@ from .input.interpret_functions import loaded as input_interpret_loaded
 from .input.interpret_functions import failed as input_interpret_failed
 from .input.buildcombos_functions import loaded as input_buildcombos_loaded
 from .input.buildcombos_functions import failed as input_buildcombos_failed
+from .input.keyset_functions import loaded as input_keyset_loaded
+from .input.keyset_functions import failed as input_keyset_failed
 from .record import loaded as record_loaded
 from .record import failed as record_failed
 from .calculation import loaded as calculation_loaded
@@ -33,6 +35,14 @@ def check_modules():
         print(f'- {style}: {input_buildcombos_failed[style]}')
     print()
     
+    print('input.keyset styles that passed import:')
+    for style in input_keyset_loaded.keys():
+        print(f'- {style}')
+    print('input.keyset styles that failed import:')
+    for style in input_keyset_failed.keys():
+        print(f'- {style}: {input_keyset_failed[style]}')
+    print()
+
     print('record styles that passed import:')
     for style in record_loaded.keys():
         print(f'- {style}')

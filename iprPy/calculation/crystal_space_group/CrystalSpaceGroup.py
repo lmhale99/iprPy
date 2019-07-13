@@ -3,6 +3,7 @@ from pathlib import Path
 
 # iprPy imports
 from .. import Calculation
+from ...input import keyset
 
 class CrystalSpaceGroup(Calculation):
     """
@@ -31,8 +32,7 @@ class CrystalSpaceGroup(Calculation):
         universalfiles = super().files
 
         # Specify calculation-specific keys 
-        files = [
-                ]
+        files = []
         for i in range(len(files)):
             files[i] = Path(self.directory, files[i])
         
@@ -48,12 +48,7 @@ class CrystalSpaceGroup(Calculation):
         universalkeys = super().singularkeys
         
         # Specify calculation-specific keys 
-        keys = [
-                'length_unit',
-                'pressure_unit',
-                'energy_unit',
-                'force_unit',
-               ]
+        keys = keyset('units') + []
 
         # Join and return
         return universalkeys + keys
@@ -68,15 +63,7 @@ class CrystalSpaceGroup(Calculation):
         
         # Specify calculation-specific key sets 
         keys = [
-                   [
-                    'load_file',
-                    'load_content',
-                    'load_style',
-                    'family',
-                    'load_options',
-                    'symbols',
-                    'box_parameters',
-                   ],
+                   keyset('atomman_systemload'),
                    [
                     'symmetryprecision',
                     'primitivecell',

@@ -102,7 +102,7 @@ class Calculation(object):
         """
         # Universal files (calc_*.py)
         files = [
-                f'calc_{self.style}.py',
+                    f'calc_{self.style}.py',
                 ]
         for i in range(len(files)):
             files[i] = Path(self.directory, files[i])
@@ -115,9 +115,9 @@ class Calculation(object):
         list: Calculation keys that can have single values during prepare.
         """
         # Universal singular keys for all calculations
-        return [
-                'branch',
-               ]
+        return  [
+                    'branch',
+                ]
     
     @property
     def multikeys(self):

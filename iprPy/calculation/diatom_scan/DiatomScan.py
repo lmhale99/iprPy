@@ -3,6 +3,7 @@ from pathlib import Path
 
 # iprPy imports
 from .. import Calculation
+from ...input import keyset
 
 class DiatomScan(Calculation):
     """
@@ -32,7 +33,7 @@ class DiatomScan(Calculation):
 
         # Specify calculation-specific keys 
         files = [
-                 'run0.template',
+                    'run0.template',
                 ]
         for i in range(len(files)):
             files[i] = Path(self.directory, files[i])
@@ -49,14 +50,7 @@ class DiatomScan(Calculation):
         universalkeys = super().singularkeys
         
         # Specify calculation-specific key sets 
-        keys = [
-                'lammps_command',
-                'mpi_command',
-                'length_unit',
-                'pressure_unit',
-                'energy_unit',
-                'force_unit',
-               ]
+        keys = keyset('lammps_commands') + keyset('units') + []
         
         # Join and return
         return universalkeys + keys
@@ -70,20 +64,16 @@ class DiatomScan(Calculation):
         universalkeys = super().multikeys
         
         # Specify calculation-specific key sets 
-        keys = [
-                   [
-                    'potential_file',
-                    'potential_content',
-                    'potential_dir',
-                    'potential_dir_content',
-                    'symbols',
-                   ],
-                   [
-                    'minimum_r',
-                    'maximum_r',
-                    'number_of_steps_r',
-                   ],
-               ]
+        keys =  [
+                    keyset('lammps_potential') + [
+                        'symbols',
+                    ],
+                    [
+                        'minimum_r',
+                        'maximum_r',
+                        'number_of_steps_r',
+                    ],
+                ]
         
         # Join and return
         return universalkeys + keys

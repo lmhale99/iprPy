@@ -11,3 +11,7 @@ from .interpret import interpret
 # buildcombos functions
 from . import buildcombos_functions
 from .buildcombos import buildcombos
+
+# keyset functions
+from . import keyset_functions
+from .keyset import keyset
