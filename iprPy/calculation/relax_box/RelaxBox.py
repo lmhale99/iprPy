@@ -1,7 +1,5 @@
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 
 # iprPy imports
 from .. import Calculation
@@ -14,9 +12,11 @@ class RelaxBox(Calculation):
     iprPy.calculations submodule.
     """
     def __init__(self):
-        
+        """
+        Initializes a Calculation object for a given style.
+        """
         # Call parent constructor
-        Calculation.__init__(self)
+        super().__init__()
 
         # Define calc shortcut
         self.calc = self.script.relax_box
@@ -26,19 +26,29 @@ class RelaxBox(Calculation):
         """
         iter of str: Path to each file required by the calculation.
         """
+        # Fetch universal files from parent
+        universalfiles = super().files
+
+        # Specify calculation-specific keys 
         files = [
-                 'calc_' + self.style + '.py',
                  'cij.template',
                 ]
         for i in range(len(files)):
-            files[i] = os.path.join(self.directory, files[i])
+            files[i] = Path(self.directory, files[i])
         
-        return files
+        # Join and return
+        return universalfiles + files
     
     @property
     def singularkeys(self):
-        """list: Calculation keys that can have single values during prepare."""
-        return [
+        """
+        list: Calculation keys that can have single values during prepare.
+        """
+        # Fetch universal key sets from parent
+        universalkeys = super().singularkeys
+        
+        # Specify calculation-specific key sets 
+        keys = [
                 'lammps_command',
                 'mpi_command',
                 'length_unit',
@@ -46,11 +56,20 @@ class RelaxBox(Calculation):
                 'energy_unit',
                 'force_unit',
                ]
-    
+        
+        # Join and return
+        return universalkeys + keys
+
     @property
     def multikeys(self):
-        """list: Calculation keys that can have multiple values during prepare."""
-        return [
+        """
+        list: Calculation key sets that can have multiple values during prepare.
+        """
+        # Fetch universal key sets from parent
+        universalkeys = super().multikeys
+        
+        # Specify calculation-specific key sets 
+        keys = [
                    [
                     'potential_file',
                     'potential_content',
@@ -80,3 +99,6 @@ class RelaxBox(Calculation):
                     'strainrange',
                    ]
                ]
+               
+        # Join and return
+        return universalkeys + keys
