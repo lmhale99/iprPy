@@ -2,26 +2,26 @@ from pathlib import Path
 
 from multiprocessing import Pool
 
-from multi_runners import multi_runners
-import workflow_prepare as prepare
-from process_relax import process_relax 
+from iprPy.workflow import prepare, multi_runners, process
 
 from iprPy.tools import aslist
 
 if __name__ == '__main__':
     
     # Database, run directory and number of processors to use
-    database_name = 'demo'
-    run_directory_name = 'master_2'
+    database_name = 'test'
+    run_directory_name = 'test_1'
     np = 4
 
     # Lammps and mpi commands
-    lammps_command = 'lmp_mpi'
-    mpi_command = f'c:\\Program Files\\MPICH2\\bin\\mpiexec -localonly {np}' # Used for big/long sims
+    lammps_command = 'lmp_serial'
+    #mpi_command = f'c:\\Program Files\\MPICH2\\bin\\mpiexec -localonly {np}' # Used for big/long sims
     
     # Potential-based modifiers
     pot_kwargs = {}
-    pot_kwargs['id'] = '1999--Mishin-Y--Ni--LAMMPS--ipr1'
+    pot_kwargs['id'] = ['1999--Mishin-Y--Al--LAMMPS--ipr1',
+                        '1999--Mishin-Y--Ni--LAMMPS--ipr1']
+
     #pot_kwargs['currentIPR'] = 'False'
     #pot_kwargs['pair_style'] = ['eam', 'eam/alloy', 'eam/fs', 'eam/cd']
 
@@ -30,11 +30,9 @@ if __name__ == '__main__':
     #family = None
 
     # Paths to compiled results
-    crystal_match_file = Path('reference_prototype_match.csv')
-    all_crystals_file = Path(f'{database_name}_all_crystals.csv')
-    unique_crystals_file = Path(f'{database_name}_unique_crystals.csv')
-
-
+    crystal_match_file = Path('..', 'reference_prototype_match.csv')
+    all_crystals_file = Path('..', f'{database_name}_all_crystals.csv')
+    unique_crystals_file = Path('..', f'{database_name}_unique_crystals.csv')
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     # Initialize pool of workers
@@ -68,9 +66,10 @@ if __name__ == '__main__':
     # Prepare relax_dynamic at 0 K
     kwargs = {}
     kwargs['lammps_command'] = lammps_command
-    kwargs['mpi_command'] = mpi_command
+    #kwargs['mpi_command'] = mpi_command
     for key in pot_kwargs:
-        kwargs[f'reference_potential_{key}'] = pot_kwargs[key]   
+        kwargs[f'reference_potential_{key}'] = pot_kwargs[key]  
+        kwargs[f'reference_id'] = 'None'
         kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
     
     if family is not None:
@@ -79,13 +78,15 @@ if __name__ == '__main__':
     prepare.relax_dynamic.main(database_name, run_directory_name, **kwargs)
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #        
     # Run relax_dynamic
-    multi_runners(database_name, run_directory_name, 1)
+    #multi_runners(database_name, run_directory_name, 1)
+    multi_runners(database_name, run_directory_name, np, pool=pool)
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     # Prepare relax_box
     kwargs = {}
     kwargs['lammps_command'] = lammps_command
     for key in pot_kwargs:
-        kwargs[f'reference_potential_{key}'] = pot_kwargs[key]   
+        kwargs[f'reference_potential_{key}'] = pot_kwargs[key] 
+        kwargs[f'reference_id'] = 'None'  
         kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
 
     if family is not None:
@@ -98,6 +99,7 @@ if __name__ == '__main__':
     kwargs['lammps_command'] = lammps_command
     for key in pot_kwargs:
         kwargs[f'reference_potential_{key}'] = pot_kwargs[key]   
+        kwargs[f'reference_id'] = 'None'
         kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
     
     if family is not None:
@@ -133,4 +135,4 @@ if __name__ == '__main__':
         pool.close()
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     # Call process relaxation results and generate relaxed_crystal records
-    process_relax(database_name, crystal_match_file, all_crystals_file, unique_crystals_file)
+    process.relaxed(database_name, crystal_match_file, all_crystals_file, unique_crystals_file)

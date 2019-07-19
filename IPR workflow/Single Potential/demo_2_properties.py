@@ -1,18 +1,17 @@
 from multiprocessing import Pool
 
-from multi_runners import multi_runners
-import workflow_prepare as prepare
+from iprPy.workflow import prepare, multi_runners, process
 
 if __name__ == '__main__':
     
     # Database, run directory and number of processors to use
-    database_name = 'demo'
-    run_directory_name = 'master_2'
+    database_name = 'test'
+    run_directory_name = 'test_1'
     np = 4
 
     # Lammps and mpi commands
-    lammps_command = 'lmp_mpi'
-    mpi_command = f'c:\\Program Files\\MPICH2\\bin\\mpiexec -localonly {np}' # local
+    lammps_command = 'lmp_serial'
+    #mpi_command = f'c:\\Program Files\\MPICH2\\bin\\mpiexec -localonly {np}' # local
     #mpi_command = f'mpirun -np {np}' # cluster
     
     # Potential-based modifiers
@@ -35,7 +34,7 @@ if __name__ == '__main__':
     # Prepare relax_dynamic at temperature
     kwargs = {}
     kwargs['lammps_command'] = lammps_command
-    kwargs['mpi_command'] = mpi_command
+    #kwargs['mpi_command'] = mpi_command
     for key in pot_kwargs:
         kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
     if family is not None:
@@ -54,7 +53,8 @@ if __name__ == '__main__':
     prepare.phonon.main(database_name, run_directory_name, **kwargs)
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     # Run big sims
-    multi_runners(database_name, run_directory_name, 1)
+    #multi_runners(database_name, run_directory_name, 1)
+    multi_runners(database_name, run_directory_name, np, pool=pool)
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     # Prepare elastic_constants_static
     kwargs = {}
