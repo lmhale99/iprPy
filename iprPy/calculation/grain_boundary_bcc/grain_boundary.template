@@ -1,0 +1,86 @@
+log <mesh_dir>/log.lammps
+
+# *************** Assign variable values *************** 
+variable alat equal <alat>
+
+variable xdim equal <xsize>
+variable zdim equal <zsize>
+
+variable xshift equal <xshift>
+variable zshift equal <zshift>
+
+variable ydimmin equal -30
+variable ydimmax equal 30
+
+variable yfreedimmin equal -20
+variable yfreedimmax equal 20
+
+
+# ************** Build a bicrystal system **************
+boundary p s p 
+units <units> 
+atom_style <atom_style>
+
+lattice bcc ${alat}
+region whole block 0.000000 ${xdim} ${ydimmin} ${ydimmax} 0.000000 ${zdim} units box
+create_box 3 whole 
+
+region upper block INF INF -0.05 ${ydimmax} INF INF units box 
+lattice bcc ${alat} orient x <x_axis_1> orient y <y_axis_1> orient z <z_axis_1>
+
+create_atoms 1 region upper 
+
+
+region lower block INF INF ${ydimmin} 0.05 INF INF units box 
+lattice bcc ${alat} orient x <x_axis_2> orient y <y_axis_2> orient z <z_axis_2>
+
+create_atoms 2 region lower 
+
+region uplayer block INF INF ${yfreedimmax} ${ydimmax} INF INF units box 
+region lowlayer block INF INF ${ydimmin} ${yfreedimmin} INF INF units box 
+
+
+group upper region upper
+group lower region lower
+
+group uplayer region uplayer
+group lowlayer region lowlayer
+
+group rigbody union uplayer lowlayer
+group gbregion subtract all rigbody
+
+set group lowlayer type 1
+set group gbregion type 2
+set group uplayer type 3
+
+
+# ***********  Define potential information ************
+<atomman_pair_info>
+
+neighbor 2.0 bin 
+neigh_modify delay 10 check yes 
+
+# ****   Apply rigid translations *****
+
+displace_atoms upper move ${xshift} 0 ${zshift} units box
+delete_atoms overlap 0.1 lower upper
+ 
+compute eng all pe/atom 
+compute eatoms gbregion reduce sum c_eng 
+variable natoms equal count(gbregion)
+
+thermo 0
+thermo_style custom step pe lx ly lz press pxx pyy pzz c_eatoms v_natoms
+
+fix f1 lowlayer setforce 0.0 0.0 0.0
+fix f2 uplayer aveforce 0.0 0.0 0.0
+min_style cg 
+minimize 1e-15 1e-15 10000 10000 
+
+reset_timestep 0 
+
+dump	1 all custom 100 <mesh_dir>/rel.chkpt id type mass x y z c_eng
+
+restart 1 <mesh_dir>/rel.restart
+
+run 1

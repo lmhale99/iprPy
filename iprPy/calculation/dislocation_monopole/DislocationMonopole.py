@@ -1,10 +1,9 @@
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 
 # iprPy imports
 from .. import Calculation
+from ...input import subset
 
 class DislocationMonopole(Calculation):
     """
@@ -17,7 +16,7 @@ class DislocationMonopole(Calculation):
     def __init__(self):
         
         # Call parent constructor
-        Calculation.__init__(self)
+        super().__init__()
 
         # Define calc shortcut
         self.calc = self.script.dislocationmonopole
@@ -27,98 +26,99 @@ class DislocationMonopole(Calculation):
         """
         iter of str: Path to each file required by the calculation.
         """
+        # Fetch universal files from parent
+        universalfiles = super().files
+
+        # Specify calculation-specific keys 
         files = [
-                 'calc_' + self.style + '.py',
-                 'disl_relax.template',
-                ]
+            'disl_relax.template',
+        ]
         for i in range(len(files)):
-            files[i] = os.path.join(self.directory, files[i])
+            files[i] = Path(self.directory, files[i])
         
-        return files
+        # Join and return
+        return universalfiles + files
     
     @property
+    def template(self):
+        """
+        str: The template to use for generating calc.in files.
+        """
+        # Specify the subsets to include in the template
+        subsets = [
+            'lammps_commands', 
+            'lammps_potential',
+            'atomman_systemload',
+            'atomman_systemmanipulate',
+            'atomman_elasticconstants',
+            'dislocation',
+            'units',
+            'lammps_minimize',
+        ]
+        
+        # Specify the calculation-specific run parameters
+        runkeys = [
+            'annealtemperature',
+            'annealsteps',
+            'randomseed',
+            'dislocation_boundarywidth',
+            'dislocation_boundaryshape',
+        ]
+        
+        return self._buildtemplate(subsets, runkeys)
+
+    @property
     def singularkeys(self):
-        """list: Calculation keys that can have single values during prepare."""
-        return [
-                'lammps_command',
-                'mpi_command',
-                'length_unit',
-                'pressure_unit',
-                'energy_unit',
-                'force_unit',
+        """
+        list: Calculation keys that can have single values during prepare.
+        """
+        # Fetch universal key sets from parent
+        universalkeys = super().singularkeys
+        
+        # Specify calculation-specific key sets 
+        keys = (
+            subset('lammps_commands').keyset 
+            + subset('units').keyset 
+            + [
                 'dislocation_boundarywidth',
                 'dislocation_boundaryshape',
-               ]
+            ]
+        )
+
+        # Join and return
+        return universalkeys + keys
     
     @property
     def multikeys(self):
-        """list: Calculation keys that can have multiple values during prepare."""
-        return [
-                   [
-                    'potential_file',
-                    'potential_content',
-                    'potential_dir',
-                    'load_file',
-                    'load_content',
-                    'load_style',
-                    'family',
-                    'load_options',
-                    'symbols',
-                    'box_parameters',
-                    'elasticconstants_file',
-                    'elasticconstants_content',
-                    'C11',
-                    'C12',
-                    'C13',
-                    'C14',
-                    'C15',
-                    'C16',
-                    'C22',
-                    'C23',
-                    'C24',
-                    'C25',
-                    'C26',
-                    'C33',
-                    'C34',
-                    'C35',
-                    'C36',
-                    'C44',
-                    'C45',
-                    'C46',
-                    'C55',
-                    'C56',
-                    'C66',
-                    'C_M',
-                    'C_lambda',
-                    'C_mu',
-                    'C_E',
-                    'C_nu',
-                    'C_K',
-                   ],
-                   [
+        """
+        list: Calculation key sets that can have multiple values during prepare.
+        """
+        # Fetch universal key sets from parent
+        universalkeys = super().multikeys
+        
+        # Specify calculation-specific key sets 
+        keys = [
+            (
+                subset('lammps_potential').keyset 
+                + subset('atomman_systemload').keyset
+                + subset('atomman_elasticconstants').keyset
+            ),
+            (
+                [
                     'sizemults',
-                   ],
-                   [
-                    'dislocation_file',
-                    'dislocation_content',
-                    'dislocation_family',
-                    'dislocation_burgersvector',
-                    'dislocation_stroh_m',
-                    'dislocation_stroh_n',
-                    'dislocation_lineboxvector',
-                    'a_uvw',
-                    'b_uvw',
-                    'c_uvw',
-                    'atomshift',
-                    ],
-                    [
+                ]
+            ),     
+            (
+                subset('dislocation').keyset
+            ),        
+            (   subset('lammps_minimize').keyset 
+                + [
                     'randomseed',
                     'annealtemperature',
                     'annealsteps',
-                    'energytolerance',
-                    'forcetolerance',
-                    'maxiterations',
-                    'maxevaluations',
-                    'maxatommotion',
-                    ],
-               ]
+                ]
+            )
+        ]
+                    
+        # Join and return
+        return universalkeys + keys

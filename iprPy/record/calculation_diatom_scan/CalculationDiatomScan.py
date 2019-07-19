@@ -12,11 +12,11 @@ import atomman as am
 import atomman.unitconvert as uc
 
 # iprPy imports
-from ... import __version__ as iprPy_version
-from .. import Record
+from .. import CalculationRecord
 from ...tools import aslist
+from ...input import subset
 
-class CalculationDiatomScan(Record):
+class CalculationDiatomScan(CalculationRecord):
     
     @property
     def contentroot(self):
@@ -29,10 +29,10 @@ class CalculationDiatomScan(Record):
         list: The terms to compare values absolutely.
         """
         return [
-                'script',
-                'symbols',
-                'potential_LAMMPS_key',
-               ]
+            'script',
+            'symbols',
+            'potential_LAMMPS_key',
+        ]
     
     @property
     def compare_fterms(self):
@@ -65,22 +65,14 @@ class CalculationDiatomScan(Record):
         AttributeError
             If buildcontent is not defined for record style.
         """
-        # Create the root of the DataModelDict
-        output = DM()
-        output[self.contentroot] = calc = DM()
+        # Build universal content
+        super().buildcontent(script, input_dict, results_dict=results_dict)
         
-        # Assign uuid
-        calc['key'] = input_dict['calc_key']
+        # Load content after root
+        calc = self.content[self.contentroot]
         
-        # Save calculation parameters
-        calc['calculation'] = DM()
-        calc['calculation']['iprPy-version'] = iprPy_version
-        calc['calculation']['atomman-version'] = am.__version__
-        calc['calculation']['LAMMPS-version'] = input_dict['lammps_version']
-        
-        calc['calculation']['script'] = script
+        # Assign calculation-specific run parameters
         calc['calculation']['run-parameter'] = run_params = DM()
-        
         run_params['minimum_r'] = uc.model(input_dict['minimum_r'],
                                            input_dict['length_unit'])
         run_params['maximum_r'] = uc.model(input_dict['maximum_r'],
@@ -88,17 +80,13 @@ class CalculationDiatomScan(Record):
         run_params['number_of_steps_r'] = input_dict['number_of_steps_r']
         
         # Copy over potential data model info
-        calc['potential-LAMMPS'] = DM()
-        calc['potential-LAMMPS']['key'] = input_dict['potential'].key
-        calc['potential-LAMMPS']['id'] = input_dict['potential'].id
-        calc['potential-LAMMPS']['potential'] = DM()
-        calc['potential-LAMMPS']['potential']['key'] = input_dict['potential'].potkey
-        calc['potential-LAMMPS']['potential']['id'] = input_dict['potential'].potid
+        subset('lammps_potential').buildcontent(calc, input_dict, results_dict=results_dict)
         
         # Save info on system file loaded
         calc['system-info'] = DM()
         calc['system-info']['symbol'] = input_dict['symbols']
         
+        # Save results
         if results_dict is None:
             calc['status'] = 'not calculated'
         else:
@@ -107,8 +95,6 @@ class CalculationDiatomScan(Record):
                                                              input_dict['length_unit'])
             calc['diatom-energy-relation']['potential-energy'] = uc.model(results_dict['energy_values'],
                                                                            input_dict['energy_unit'])
-        
-        self.content = output
     
     def todict(self, full=True, flat=False):
         """
@@ -133,32 +119,31 @@ class CalculationDiatomScan(Record):
             A dictionary representation of the record's content.
         """
         
-        calc = self.content[self.contentroot]
-        params = {}
-        params['key'] = calc['key']
-        params['script'] = calc['calculation']['script']
-        params['iprPy_version'] = calc['calculation']['iprPy-version']
-        params['LAMMPS_version'] = calc['calculation']['LAMMPS-version']
+        # Extract universal content
+        params = super().todict(full=full, flat=flat)
         
+        calc = self.content[self.contentroot]
+        
+        # Extract calculation-specific run parameters
         params['minimum_r'] = uc.value_unit(calc['calculation']['run-parameter']['minimum_r'])
         params['maximum_r'] = uc.value_unit(calc['calculation']['run-parameter']['maximum_r'])
         params['number_of_steps_r'] = calc['calculation']['run-parameter']['number_of_steps_r']
         
-        params['potential_LAMMPS_key'] = calc['potential-LAMMPS']['key']
-        params['potential_LAMMPS_id'] = calc['potential-LAMMPS']['id']
-        params['potential_key'] = calc['potential-LAMMPS']['potential']['key']
-        params['potential_id'] = calc['potential-LAMMPS']['potential']['id']
-        
+        # Extract potential info
+        subset('lammps_potential').todict(calc, params, full=full, flat=flat)
+
+        # Extract symbols info
         symbols = aslist(calc['system-info']['symbol'])
-        
         if flat is True:
             params['symbols'] = ' '.join(symbols)
         else:
             params['symbols'] = symbols
         
+        # Set calculation status
         params['status'] = calc.get('status', 'finished')
         params['error'] = calc.get('error', np.nan)
         
+        # Extract results
         if full is True and params['status'] == 'finished':
         
             if flat is False:

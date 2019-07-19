@@ -1,8 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
-
 # iprPy imports
 from .. import Record
 
@@ -12,14 +7,6 @@ class FreeSurface(Record):
     def contentroot(self):
         """str: The root element of the content"""
         return 'free-surface'
-    
-    @property
-    def schema(self):
-        """
-        str: The absolute directory path to the .xsd file associated with the
-             record style.
-        """
-        return os.path.join(self.directory, 'record-free-surface.xsd')
     
     def todict(self, full=True, flat=False):
         """
@@ -43,11 +30,10 @@ class FreeSurface(Record):
         dict
             A dictionary representation of the record's content.
         """
-        
+        # Fetch universal record params
+        params = super().todict(full=full, flat=flat)
+
         surf = self.content[self.contentroot]
-        params = {}
-        params['key'] = surf['key']
-        params['id'] = surf['id']
         params['family'] = surf['system-family']
         
         calcparam = surf['calculation-parameter']

@@ -3,7 +3,7 @@ from pathlib import Path
 
 # iprPy imports
 from .. import Calculation
-from ...input import keyset
+from ...input import subset
 
 class CrystalSpaceGroup(Calculation):
     """
@@ -40,6 +40,26 @@ class CrystalSpaceGroup(Calculation):
         return universalfiles + files
 
     @property
+    def template(self):
+        """
+        str: The template to use for generating calc.in files.
+        """
+        # Specify the subsets to include in the template
+        subsets = [
+            'atomman_systemload', 
+            'units'
+        ]
+        
+        # Specify the calculation-specific run parameters
+        runkeys = [
+            'symmetryprecision', 
+            'primitivecell', 
+            'idealcell'
+        ]
+        
+        return self._buildtemplate(subsets, runkeys)
+
+    @property
     def singularkeys(self):
         """
         list: Calculation keys that can have single values during prepare.
@@ -48,7 +68,7 @@ class CrystalSpaceGroup(Calculation):
         universalkeys = super().singularkeys
         
         # Specify calculation-specific keys 
-        keys = keyset('units') + []
+        keys = subset('units').keyset + []
 
         # Join and return
         return universalkeys + keys
@@ -63,13 +83,13 @@ class CrystalSpaceGroup(Calculation):
         
         # Specify calculation-specific key sets 
         keys = [
-                   keyset('atomman_systemload'),
-                   [
-                    'symmetryprecision',
-                    'primitivecell',
-                    'idealcell',
-                   ],
-               ]
+            subset('atomman_systemload').keyset,
+            [
+            'symmetryprecision',
+            'primitivecell',
+            'idealcell',
+            ],
+        ]
         
         # Join and return
         return universalkeys + keys

@@ -3,7 +3,7 @@ from pathlib import Path
 
 # iprPy imports
 from .. import Calculation
-from ...input import keyset
+from ...input import subset
 
 class StackingFaultMap2D(Calculation):
     """
@@ -32,14 +32,38 @@ class StackingFaultMap2D(Calculation):
 
         # Specify calculation-specific keys 
         files = [
-                    'sfmin.template',
-                ]
+            'sfmin.template',
+        ]
         for i in range(len(files)):
             files[i] = Path(self.directory, files[i])
         
         # Join and return
         return universalfiles + files
     
+    @property
+    def template(self):
+        """
+        str: The template to use for generating calc.in files.
+        """
+        # Specify the subsets to include in the template
+        subsets = [
+            'lammps_commands', 
+            'lammps_potential',
+            'atomman_systemload',
+            'atomman_systemmanipulate',
+            'stackingfault',
+            'units',
+            'lammps_minimize',
+        ]
+        
+        # Specify the calculation-specific run parameters
+        runkeys = [
+            'stackingfault_numshifts1', 
+            'stackingfault_numshifts2', 
+        ]
+        
+        return self._buildtemplate(subsets, runkeys)
+
     @property
     def singularkeys(self):
         """
@@ -49,7 +73,11 @@ class StackingFaultMap2D(Calculation):
         universalkeys = super().singularkeys
         
         # Specify calculation-specific key sets 
-        keys = keyset('lammps_commands') + keyset('units') + []
+        keys = (
+            subset('lammps_commands').keyset 
+            + subset('units').keyset
+            + []
+        )
         
         # Join and return
         return universalkeys + keys
@@ -64,15 +92,28 @@ class StackingFaultMap2D(Calculation):
         
         # Specify calculation-specific key sets 
         keys =   [
-                    keyset('lammps_potential') + keyset('atomman_systemload'),
-                    keyset('atomman_systemmanipulate'),
-                    keyset('stackingfault'),
-                    [
-                        'stackingfault_numshifts1',
-                        'stackingfault_numshifts2',
-                    ],
-                    keyset('lammps_minimize'),
+            (
+                subset('lammps_potential').keyset 
+                + subset('atomman_systemload').keyset
+            ),
+            (
+                [
+                    'sizemults',
                 ]
+            ),
+            (
+                subset('stackingfault').keyset
+            ),
+            (
+                [
+                    'stackingfault_numshifts1',
+                    'stackingfault_numshifts2',
+                ]
+            ),
+            (
+                subset('lammps_minimize').keyset
+            ),
+        ]
                
         # Join and return
         return universalkeys + keys

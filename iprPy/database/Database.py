@@ -427,7 +427,7 @@ class Database(object):
                     # Add a record's tar if needed
                     if Path(style_path, record_name).is_dir():
                         try:
-                            self.add_tar(root_dir=ref, name=record_name)
+                            self.add_tar(root_dir=style_path, name=record_name)
                         except:
                             pass
     

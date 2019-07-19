@@ -3,9 +3,7 @@
 # Python script created by Lucas Hale
 
 # Standard library imports
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 import sys
 import uuid
 import glob
@@ -26,7 +24,6 @@ import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/iprPy
 import iprPy
-from iprPy.compatibility import range
 
 # Define record_style
 record_style = 'calculation_relax_static'
@@ -62,7 +59,7 @@ def main(*args):
                                 ctol = input_dict['cycletolerance'])
     
     # Save data model of results
-    script = os.path.splitext(os.path.basename(__file__))[0]
+    script = Path(__file__).stem
     
     record = iprPy.load_record(record_style)
     record.buildcontent(script, input_dict, results_dict)
@@ -157,7 +154,7 @@ def relax_static(lammps_command, system, potential, mpi_command=None,
           relaxed system.
     """
     # Get script's location
-    script_dir = os.path.dirname(__file__)
+    script_dir = Path(__file__).parent
 
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
@@ -213,7 +210,7 @@ def relax_static(lammps_command, system, potential, mpi_command=None,
             lammps_variables['dump_modify_format'] = 'float %.13e'
         
         # Write lammps input script
-        template_file = os.path.join(script_dir, 'minbox.template')
+        template_file = Path(script_dir, 'minbox.template')
         lammps_script = 'minbox.in'
         with open(template_file) as f:
             template = f.read()
@@ -226,7 +223,7 @@ def relax_static(lammps_command, system, potential, mpi_command=None,
         thermo = output.simulations[0]['thermo']
         
         # Clean up dump files
-        os.remove('0.dump')
+        Path('0.dump').unlink()
         last_dump_file = str(thermo.Step.values[-1]) + '.dump'
         renamed_dump_file = 'relax_static-' + str(cycle) + '.dump'
         shutil.move(last_dump_file, renamed_dump_file)
@@ -319,7 +316,7 @@ def process_input(input_dict, UUID=None, build=True):
         input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
     # Set default input/output units
-    iprPy.input.interpret('units', input_dict)
+    iprPy.input.subset('units').interpret(input_dict)
     
     # These are calculation-specific default strings
     input_dict['sizemults'] = input_dict.get('sizemults', '1 1 1')
@@ -360,22 +357,19 @@ def process_input(input_dict, UUID=None, build=True):
                                     default_term='0.0 angstrom')
     
     # Check lammps_command and mpi_command
-    iprPy.input.interpret('lammps_commands', input_dict)
+    iprPy.input.subset('lammps_commands').interpret(input_dict)
     
     # Set default system minimization parameters
-    iprPy.input.interpret('lammps_minimize', input_dict)
+    iprPy.input.subset('lammps_minimize').interpret(input_dict)
     
     # Load potential
-    iprPy.input.interpret('lammps_potential', input_dict)
+    iprPy.input.subset('lammps_potential').interpret(input_dict)
     
-    # Load ucell system
-    iprPy.input.interpret('atomman_systemload', input_dict, build=build)
-    
-    # Add atomic charges
-    iprPy.input.interpret('lammps_atomcharges', input_dict, build=build)
+    # Load system
+    iprPy.input.subset('atomman_systemload').interpret(input_dict, build=build)
     
     # Construct initialsystem by manipulating ucell system
-    iprPy.input.interpret('atomman_systemmanipulate', input_dict, build=build)
+    iprPy.input.subset('atomman_systemmanipulate').interpret(input_dict, build=build)
 
 if __name__ == '__main__':
     main(*sys.argv[1:])

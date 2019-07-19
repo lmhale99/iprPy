@@ -66,28 +66,15 @@ def relaxed(database_name, crystal_match_file, all_crystals_file, unique_crystal
         print('Stopping as no calculations to process')
         return
 
-    # build lists of load_files from proto and ref parents
-    proto_parents = []
-    for proto in proto_records.id:
-        proto_parents.append(f'{proto}.json')
-    ref_parents = []
-    for ref in ref_records.id:
-        ref_parents.append(f'{ref}.json')
-
-    # Identify record_type as calc, reference or prototype
-    spg_records['record_type'] = 'calc'
-    spg_records.loc[spg_records.load_file.isin(proto_parents), 'record_type'] = 'prototype'
-    spg_records.loc[spg_records.load_file.isin(ref_parents), 'record_type'] = 'reference'
-
-    # Separate records by parent type
-    prototype_records = spg_records[spg_records.record_type == 'prototype']
-    reference_records = spg_records[spg_records.record_type == 'reference']
-    family_records = spg_records[(spg_records.record_type == 'prototype') 
-                                |(spg_records.record_type == 'reference')]
+    # Separate records by branch
+    prototype_records = spg_records[spg_records.branch == 'prototype']
+    reference_records = spg_records[spg_records.branch == 'reference']
+    family_records = spg_records[(spg_records.branch == 'prototype') 
+                                |(spg_records.branch == 'reference')]
     print(f' -{len(prototype_records)} are for prototypes', flush=True)
     print(f' -{len(reference_records)} are for references', flush=True)
 
-    calc_records = spg_records[spg_records.record_type == 'calc'].reset_index(drop=True)
+    calc_records = spg_records[spg_records.branch == 'relax'].reset_index(drop=True)
     print(f' -{len(calc_records)} are for calculations', flush=True)
     print()
 

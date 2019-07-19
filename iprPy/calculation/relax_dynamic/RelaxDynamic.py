@@ -3,7 +3,7 @@ from pathlib import Path
 
 # iprPy imports
 from .. import Calculation
-from ...input import keyset
+from ...input import subset
 
 class RelaxDynamic(Calculation):
     """
@@ -32,14 +32,47 @@ class RelaxDynamic(Calculation):
 
         # Specify calculation-specific keys 
         files = [
-                    'full_relax.template',
-                ]
+            'full_relax.template',
+        ]
         for i in range(len(files)):
             files[i] = Path(self.directory, files[i])
         
         # Join and return
         return universalfiles + files
     
+    @property
+    def template(self):
+        """
+        str: The template to use for generating calc.in files.
+        """
+        # Specify the subsets to include in the template
+        subsets = [
+            'lammps_commands', 
+            'lammps_potential',
+            'atomman_systemload',
+            'atomman_systemmanipulate',
+            'units',
+        ]
+        
+        # Specify the calculation-specific run parameters
+        runkeys = [
+            'temperature',
+            'pressure_xx',
+            'pressure_yy',
+            'pressure_zz',
+            'pressure_xy',
+            'pressure_xz',
+            'pressure_yz',
+            'integrator',
+            'thermosteps',
+            'dumpsteps',
+            'runsteps',
+            'equilsteps',
+            'randomseed',
+        ]
+        
+        return self._buildtemplate(subsets, runkeys)
+
     @property
     def singularkeys(self):
         """
@@ -49,7 +82,8 @@ class RelaxDynamic(Calculation):
         universalkeys = super().singularkeys
         
         # Specify calculation-specific key sets 
-        keys = keyset('lammps_commands') + keyset('units') + []
+        keys = (subset('lammps_commands').keyset 
+               +subset('units').keyset + [])
         
         # Join and return
         return universalkeys + keys
@@ -64,28 +98,29 @@ class RelaxDynamic(Calculation):
         
         # Specify calculation-specific key sets 
         keys =  [
-                    keyset('lammps_potential') + keyset('atomman_systemload'),
-                    keyset('atomman_systemmanipulate'),
-                    [
-                        'pressure_xx',
-                        'pressure_yy',
-                        'pressure_zz',
-                        'pressure_xy',
-                        'pressure_xz',
-                        'pressure_yz',
-                    ],
-                    [
-                        'temperature',
-                    ],
-                    [
-                        'integrator',
-                        'thermosteps',
-                        'dumpsteps',
-                        'runsteps',
-                        'equilsteps',
-                        'randomseed',
-                    ],
-                ]
+            (subset('lammps_potential').keyset 
+            +subset('atomman_systemload').keyset),
+            subset('atomman_systemmanipulate').keyset,
+            [
+                'pressure_xx',
+                'pressure_yy',
+                'pressure_zz',
+                'pressure_xy',
+                'pressure_xz',
+                'pressure_yz',
+            ],
+            [
+                'temperature',
+            ],
+            [
+                'integrator',
+                'thermosteps',
+                'dumpsteps',
+                'runsteps',
+                'equilsteps',
+                'randomseed',
+            ],
+        ]
                
         # Join and return
         return universalkeys + keys

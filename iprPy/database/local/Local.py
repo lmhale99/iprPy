@@ -401,7 +401,7 @@ class Local(Database):
         
         # Build path to record
         record_path = Path(self.host, record.style, record.name)
-        tar_path = Path(self.host, record.style, record.name+'.tar.gz')
+        tar_path = Path(self.host, record.style, f'{record.name}.tar.gz')
         
         # Check if an archive already exists
         if tar_path.is_file():
@@ -409,8 +409,14 @@ class Local(Database):
         
         # Make archive
         if tar is None:
-            shutil.make_archive(record_path.as_posix(), 'gztar', root_dir=root_dir,
-                                base_dir=record.name)
+            if root_dir is None:
+                root_dir = '.'
+            target = Path(root_dir, record.name)
+
+            tar = tarfile.open(tar_path, 'w:gz')
+            tar.add(target, target.name)
+            tar.close()
+            
         elif root_dir is None:
             with open(tar_path, 'wb') as f:
                 f.write(tar)

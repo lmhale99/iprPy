@@ -3,7 +3,7 @@ from pathlib import Path
 
 # iprPy imports
 from .. import Calculation
-from ...input import keyset
+from ...input import subset
 
 class DiatomScan(Calculation):
     """
@@ -33,14 +33,36 @@ class DiatomScan(Calculation):
 
         # Specify calculation-specific keys 
         files = [
-                    'run0.template',
-                ]
+            'run0.template',
+        ]
         for i in range(len(files)):
             files[i] = Path(self.directory, files[i])
         
         # Join and return
         return universalfiles + files
     
+    @property
+    def template(self):
+        """
+        str: The template to use for generating calc.in files.
+        """
+        # Specify the subsets to include in the template
+        subsets = [
+            'lammps_commands', 
+            'lammps_potential', 
+            'units'
+        ]
+        
+        # Specify the calculation-specific run parameters
+        runkeys = [
+            'symbols', 
+            'minimum_r', 
+            'maximum_r', 
+            'number_of_steps_r'
+        ]
+        
+        return self._buildtemplate(subsets, runkeys)
+
     @property
     def singularkeys(self):
         """
@@ -50,7 +72,8 @@ class DiatomScan(Calculation):
         universalkeys = super().singularkeys
         
         # Specify calculation-specific key sets 
-        keys = keyset('lammps_commands') + keyset('units') + []
+        keys = (subset('lammps_commands').keyset
+               +subset('units').keyset + [])
         
         # Join and return
         return universalkeys + keys
@@ -65,15 +88,15 @@ class DiatomScan(Calculation):
         
         # Specify calculation-specific key sets 
         keys =  [
-                    keyset('lammps_potential') + [
-                        'symbols',
-                    ],
-                    [
-                        'minimum_r',
-                        'maximum_r',
-                        'number_of_steps_r',
-                    ],
-                ]
+            subset('lammps_potential').keyset + [
+                'symbols',
+            ],
+            [
+                'minimum_r',
+                'maximum_r',
+                'number_of_steps_r',
+            ],
+        ]
         
         # Join and return
         return universalkeys + keys

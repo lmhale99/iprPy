@@ -1,3 +1,7 @@
+# Standard Python libraries
+import sys
+
+# iprPy imports
 from . import prepare
 
 calculation_name = 'relax_static'
@@ -22,7 +26,9 @@ def main(database_name, run_directory_name, lammps_command, **kwargs):
     **kwargs : str or list, optional
         Values for any additional or replacement prepare parameters. 
     """
-    
+    # Set default branch value to match current function's name
+    kwargs['branch'] = kwargs.get('branch', sys._getframe().f_code.co_name)
+
     script = "\n".join(
         [
         # Build load information based on reference structures
@@ -73,7 +79,9 @@ def from_dynamic(database_name, run_directory_name, lammps_command, **kwargs):
     **kwargs : str or list, optional
         Values for any additional or replacement prepare parameters. 
     """
-    
+    # Set default branch value to match current function's name
+    kwargs['branch'] = kwargs.get('branch', sys._getframe().f_code.co_name)
+
     script = "\n".join(
         [
         # Build load information from relax_dynamic results
@@ -81,6 +89,7 @@ def from_dynamic(database_name, run_directory_name, lammps_command, **kwargs):
 
         # Specify archive parent buildcombos terms (parent record's style and the load_key to access)
         'archive_record              calculation_relax_dynamic',
+        'archive_branch              main',
         'archive_load_key            final-system',
 
         # System manipulations             

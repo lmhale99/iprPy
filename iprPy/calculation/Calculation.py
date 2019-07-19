@@ -4,6 +4,8 @@ import sys
 from copy import deepcopy
 from importlib import import_module
 
+from ..input import subset
+
 class Calculation(object):
     """
     Class for handling different calculation styles in the same fashion.  The
@@ -84,10 +86,13 @@ class Calculation(object):
         """
         str: The template to use for generating calc.in files.
         """
-        with open(Path(self.directory, f'calc_{self.style}.template')) as template_file:
-            template = template_file.read()
+        # Specify the subsets to include in the template
+        subsets = []
         
-        return template
+        # Specify the calculation-specific run parameters
+        runkeys = []
+        
+        return self._buildtemplate(subsets, runkeys)
     
     def calc(self, *args, **kwargs):
         """
@@ -138,3 +143,33 @@ class Calculation(object):
             allkeys.extend(keyset)
         
         return allkeys
+
+    def _buildtemplate(self, subsets, runkeys):
+        # Set the template header
+        template = f'# Input script for calc_{self.style}.py\n'
+        
+        # Add metadata fields
+        template += '\n# Calculation metadata\n'
+        metakeys = ['branch']
+        for key in metakeys:
+            spacelen = 32 - len(key)
+            if spacelen < 1:
+                spacelen = 1
+            space = ' ' * spacelen
+            template += f'{key}{space}<{key}>\n'       
+
+        # Add subset components
+        for key in subsets:
+            template += subset(key).template() + '\n'
+                
+        # Add calculation-specific components
+        if len(runkeys) > 0:
+            template += '\n# Run parameters\n'
+            for key in runkeys:
+                spacelen = 32 - len(key)
+                if spacelen < 1:
+                    spacelen = 1
+                space = ' ' * spacelen
+                template += f'{key}{space}<{key}>\n'
+        
+        return template

@@ -1,0 +1,144 @@
+{
+    "calculation-dislocation-monopole": {
+        "calculation": {
+            "id": "ec3db2c6-7831-49d3-8eab-471a65e1ac61", 
+            "script": "calc_dislocation_monopole", 
+            "run-parameter": {
+                "a-multiplyer": [
+                    -12, 
+                    12
+                ], 
+                "b-multiplyer": [
+                    -20, 
+                    20
+                ], 
+                "c-multiplyer": [
+                    0, 
+                    1
+                ], 
+                "anneal_temperature": 100.0, 
+                "boundary_width": 3.0, 
+                "boundary_shape": "rect", 
+                "energy_tolerance": 0.0, 
+                "force_tolerance": 9.9999999999999995e-07, 
+                "maximum_iterations": 100000, 
+                "maximum_evaluations": 100000
+            }
+        }, 
+        "potential": {
+            "key": "3837b6da-05c4-4148-97cd-90b26a2092df", 
+            "id": "2006--Chamati-M--Fe"
+        }, 
+        "system-info": {
+            "artifact": {
+                "file": "522c8437-eceb-480d-8f0c-77f83cdb3125.json", 
+                "format": "system_model", 
+                "family": "A2--W--bcc"
+            }, 
+            "symbols": [
+                "Fe", 
+                "Fe"
+            ]
+        }, 
+        "elastic-constants": {
+            "C": [
+                {
+                    "stiffness": {
+                        "value": 241.10724085204834, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "1 1"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 146.84414154256055, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "1 2"
+                }, 
+                {
+                    "stiffness": {
+                        "value": 114.04433279326656, 
+                        "unit": "GPa"
+                    }, 
+                    "ij": "4 4"
+                }
+            ]
+        }, 
+        "dislocation-monopole-parameters": {
+            "dislocation": {
+                "key": "17d4954d-4832-4997-9a39-fa084c64c105", 
+                "id": "111-screw"
+            }, 
+            "character": {
+                "type": "screw", 
+                "burgersVector": "a/2[ 1, 1, 1]", 
+                "slipPlane": [
+                    -1, 
+                    0, 
+                    1
+                ], 
+                "lineDirection": [
+                    1, 
+                    1, 
+                    1
+                ]
+            }, 
+            "system-family": "A2--W--bcc", 
+            "atomman-defect-Stroh-parameters": {
+                "burgers": [
+                    0.5, 
+                    0.5, 
+                    0.5
+                ], 
+                "crystallographic-axes": {
+                    "x-axis": [
+                        -1, 
+                        2, 
+                        -1
+                    ], 
+                    "y-axis": [
+                        -1, 
+                        0, 
+                        1
+                    ], 
+                    "z-axis": [
+                        1, 
+                        1, 
+                        1
+                    ]
+                }, 
+                "shift": [
+                    0.0, 
+                    0.66666666666667, 
+                    0.0
+                ]
+            }
+        }, 
+        "defect-free-system": {
+            "artifact": {
+                "file": "base.dat", 
+                "format": "atom_data"
+            }, 
+            "symbols": "Fe"
+        }, 
+        "defect-system": {
+            "artifact": {
+                "file": "disl.dump", 
+                "format": "atom_dump"
+            }, 
+            "symbols": [
+                "Fe", 
+                "Fe"
+            ]
+        }, 
+        "potential-energy": {
+            "value": -49229.436999999998, 
+            "unit": "eV"
+        }, 
+        "pre-ln-factor": {
+            "value": 0.19063628390489767, 
+            "unit": "eV/angstrom"
+        }
+    }
+}

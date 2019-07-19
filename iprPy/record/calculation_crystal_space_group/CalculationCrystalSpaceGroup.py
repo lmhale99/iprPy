@@ -1,13 +1,5 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
-
 # http://www.numpy.org/
 import numpy as np
-
-# https://pandas.pydata.org/
-import pandas as pd
 
 # https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
@@ -17,11 +9,11 @@ import atomman as am
 import atomman.unitconvert as uc
 
 # iprPy imports
-from ... import __version__ as iprPy_version
-from .. import Record
+from .. import CalculationRecord
 from ...tools import aslist
+from ...input import subset
 
-class CalculationCrystalSpaceGroup(Record):
+class CalculationCrystalSpaceGroup(CalculationRecord):
     
     @property
     def contentroot(self):
@@ -34,14 +26,14 @@ class CalculationCrystalSpaceGroup(Record):
         list: The terms to compare values absolutely.
         """
         return [
-                'script',
-                
-                'load_file',
-                'load_options',
-                
-                'primitivecell',
-                'idealcell',
-               ]
+            'script',
+            
+            'load_file',
+            'load_options',
+            
+            'primitivecell',
+            'idealcell',
+        ]
     
     @property
     def compare_fterms(self):
@@ -49,8 +41,8 @@ class CalculationCrystalSpaceGroup(Record):
         dict: The terms to compare values using a tolerance.
         """
         return {
-                'symmetryprecision':1e-5,
-               }
+            'symmetryprecision':1e-5,
+        }
     
     def buildcontent(self, script, input_dict, results_dict=None):
         """
@@ -76,33 +68,20 @@ class CalculationCrystalSpaceGroup(Record):
         AttributeError
             If buildcontent is not defined for record style.
         """
-        # Create the root of the DataModelDict
-        output = DM()
-        output[self.contentroot] = calc = DM()
+        # Build universal content
+        super().buildcontent(script, input_dict, results_dict=results_dict)
         
-        # Assign uuid
-        calc['key'] = input_dict['calc_key']
+        # Load content after root
+        calc = self.content[self.contentroot]
         
-        # Save calculation parameters
-        calc['calculation'] = DM()
-        calc['calculation']['iprPy-version'] = iprPy_version
-        calc['calculation']['atomman-version'] = am.__version__
-        
-        calc['calculation']['script'] = script
+        # Assign calculation-specific run parameters
         calc['calculation']['run-parameter'] = run_params = DM()
-        
         run_params['symmetryprecision'] = input_dict['symmetryprecision']
         run_params['primitivecell'] = input_dict['primitivecell']
         run_params['idealcell'] = input_dict['idealcell']
         
-        # Save info on system files loaded
-        calc['system-info'] = DM()
-        calc['system-info']['family'] = input_dict['family']
-        calc['system-info']['artifact'] = DM()
-        calc['system-info']['artifact']['file'] = input_dict['load_file']
-        calc['system-info']['artifact']['format'] = input_dict['load_style']
-        calc['system-info']['artifact']['load_options'] = input_dict['load_options']
-        calc['system-info']['symbol'] = input_dict['symbols']
+        # Copy over system info data model info
+        subset('atomman_systemload').buildcontent(calc, input_dict, results_dict=results_dict)
         
         if results_dict is None:
             calc['status'] = 'not calculated'
@@ -126,8 +105,6 @@ class CalculationCrystalSpaceGroup(Record):
             system_model = results_dict['ucell'].dump('system_model',
                                                        box_unit=input_dict['length_unit'])
             calc['unit-cell-atomic-system'] = system_model['atomic-system']
-        
-        self.content = output
     
     def todict(self, full=True, flat=False):
         """
@@ -152,29 +129,17 @@ class CalculationCrystalSpaceGroup(Record):
             A dictionary representation of the record's content.
         """
         
+        # Extract universal content
+        params = super().todict(full=full, flat=flat)
+        
         calc = self.content[self.contentroot]
-        params = {}
-        params['key'] = calc['key']
-        params['script'] = calc['calculation']['script']
-        params['iprPy_version'] = calc['calculation']['iprPy-version']
         
         params['symmetryprecision'] = calc['calculation']['run-parameter']['symmetryprecision']
         params['primitivecell'] = calc['calculation']['run-parameter']['primitivecell']
         params['idealcell'] = calc['calculation']['run-parameter']['idealcell']
         
-        params['load_file'] = calc['system-info']['artifact']['file']
-        params['load_style'] = calc['system-info']['artifact']['format']
-        params['load_options'] = calc['system-info']['artifact']['load_options']
-        params['family'] = calc['system-info']['family']
-        
-        symbols = aslist(calc['system-info']['symbol'])
-        if flat is True:
-            try:
-                params['symbols'] = ' '.join(symbols)
-            except:
-                params['symbols'] = np.nan
-        else:
-            params['symbols'] = symbols
+        # Extract system info
+        subset('atomman_systemload').todict(calc, params, full=full, flat=flat)
         
         params['status'] = calc.get('status', 'finished')
         params['error'] = calc.get('error', np.nan)

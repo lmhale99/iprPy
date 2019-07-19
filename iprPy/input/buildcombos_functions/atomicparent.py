@@ -12,8 +12,8 @@ def atomicparent(database, keys, content_dict=None, record=None,
     if content_dict is None:
         content_dict = {}
 
-    if 'elasticconstants_file' in keys:
-        raise ValueError('Use buildcombos elasticparent instead')
+    #if 'elasticconstants_file' in keys:
+    #    raise ValueError('Use buildcombos elasticparent instead')
 
     # Check if potential info is in keys
     if 'potential_file' in keys or 'potential_content' in keys or 'potential_dir' in keys:

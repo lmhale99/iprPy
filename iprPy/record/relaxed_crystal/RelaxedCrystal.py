@@ -14,6 +14,7 @@ import atomman.unitconvert as uc
 # iprPy imports
 from .. import Record
 from ...tools import aslist
+from ...input import subset
 
 class RelaxedCrystal(Record):
     
@@ -81,12 +82,7 @@ class RelaxedCrystal(Record):
         crystal['method'] = input_dict['method']
         
         # Copy over potential data model info
-        crystal['potential-LAMMPS'] = DM()
-        crystal['potential-LAMMPS']['key'] = input_dict['potential'].key
-        crystal['potential-LAMMPS']['id'] = input_dict['potential'].id
-        crystal['potential-LAMMPS']['potential'] = DM()
-        crystal['potential-LAMMPS']['potential']['key'] = input_dict['potential'].potkey
-        crystal['potential-LAMMPS']['potential']['id'] = input_dict['potential'].potid
+        subset('lammps_potential').buildcontent(crystal, input_dict)
         
         # Save info on system files loaded
         crystal['system-info'] = DM()
@@ -120,17 +116,14 @@ class RelaxedCrystal(Record):
         dict
             A dictionary representation of the record's content.
         """
+        # Fetch universal record params
+        params = super().todict(full=full, flat=flat)
         
         crystal = self.content[self.contentroot]
-        params = {}
-        params['key'] = crystal['key']
-        
         params['method'] = crystal['method']
         
-        params['potential_LAMMPS_key'] = crystal['potential-LAMMPS']['key']
-        params['potential_LAMMPS_id'] = crystal['potential-LAMMPS']['id']
-        params['potential_key'] = crystal['potential-LAMMPS']['potential']['key']
-        params['potential_id'] = crystal['potential-LAMMPS']['potential']['id']
+        # Extract potential info
+        subset('lammps_potential').todict(crystal, params, full=full, flat=flat)
         
         params['family'] = crystal['system-info']['family']
         

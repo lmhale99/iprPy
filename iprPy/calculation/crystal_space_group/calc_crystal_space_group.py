@@ -3,9 +3,7 @@
 # Python script created by Lucas Hale
 
 # Standard library imports
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 import sys
 import uuid
 import random
@@ -49,7 +47,7 @@ def main(*args):
                                        no_idealize=not input_dict['idealcell'])
     
     # Save data model of results
-    script = os.path.splitext(os.path.basename(__file__))[0]
+    script = Path(__file__).stem
     
     record = iprPy.load_record(record_style)
     record.buildcontent(script, input_dict, results_dict)
@@ -182,7 +180,7 @@ def process_input(input_dict, UUID=None, build=True):
         input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
     # Set default input/output units
-    iprPy.input.interpret('units', input_dict)
+    iprPy.input.subset('units').interpret(input_dict)
     
     # These are calculation-specific default strings
     # None for this calculation
@@ -205,7 +203,7 @@ def process_input(input_dict, UUID=None, build=True):
                                             default_term='0.01 angstrom')
     
     # Load system
-    iprPy.input.interpret('atomman_systemload', input_dict, build=build)
+    iprPy.input.subset('atomman_systemload').interpret(input_dict, build=build)
 
 if __name__ == '__main__':
     main(*sys.argv[1:])

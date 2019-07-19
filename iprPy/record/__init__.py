@@ -2,17 +2,16 @@
 Attributes
 ----------
 loaded : dict
-    Dictionary of the derived classes
-databases_dict : dict
-    Dictionary of the database styles that successfully loaded. The
+    Dictionary of the record styles that were successfully imported. The
     dictionary keys are the database style names, and the values are the
     loaded modules.
+failed : dict
+    Dictionary listing the record styles that failed import. Values
+    contain the error messages thrown by the style.
 """
-# Standard Python libraries
-from __future__ import division, absolute_import, print_function
-
 from ..tools import dynamic_import
 from .Record import Record
+from .CalculationRecord import CalculationRecord
 
 ignorelist = ['Record']
 loaded, failed = dynamic_import(__file__, __name__, ignorelist=ignorelist)

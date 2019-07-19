@@ -1,3 +1,7 @@
+# Standard Python libraries
+import sys
+
+# iprPy imports
 from . import prepare
 
 calculation_name = 'elastic_constants_static'
@@ -22,7 +26,9 @@ def main(database_name, run_directory_name, lammps_command, **kwargs):
     **kwargs : str or list, optional
         Values for any additional or replacement prepare parameters. 
     """
-    
+    # Set default branch value to match current function's name
+    kwargs['branch'] = kwargs.get('branch', sys._getframe().f_code.co_name)
+
     script = "\n".join(
         [
         # Build load information from crystal_space_group results

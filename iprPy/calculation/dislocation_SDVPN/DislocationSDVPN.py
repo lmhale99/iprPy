@@ -1,10 +1,8 @@
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 
-from .calc_dislocation_SDVPN import peierlsnabarro
 from .. import Calculation
+from ...input import subset
 
 class DislocationSDVPN(Calculation):
     """
@@ -15,88 +13,113 @@ class DislocationSDVPN(Calculation):
     """
 
     def __init__(self):
-        self.calc = peierlsnabarro
 
-        Calculation.__init__(self)
+        # Call parent constructor
+        super().__init__()
+
+        # Define calc shortcut
+        self.calc = self.script.peierlsnabarro
 
     @property
     def files(self):
         """
         iter of str: Path to each file required by the calculation.
         """
-        files = [
-                 'calc_' + self.style + '.py',
-                ]
+        # Fetch universal files from parent
+        universalfiles = super().files
+
+        # Specify calculation-specific keys 
+        files = []
         for i in range(len(files)):
-            files[i] = os.path.join(self.directory, files[i])
+            files[i] = Path(self.directory, files[i])
         
-        return files
+        # Join and return
+        return universalfiles + files
     
     @property
+    def template(self):
+        """
+        str: The template to use for generating calc.in files.
+        """
+        # Specify the subsets to include in the template
+        subsets = [
+            'atomman_systemload',
+            'atomman_gammasurface',
+            'atomman_elasticconstants',
+            'dislocation',
+            'units',
+        ]
+        
+        # Specify the calculation-specific run parameters
+        runkeys = [
+            'a_uvw',
+            'b_uvw',
+            'c_uvw',
+            'xmax',
+            'xstep',
+            'xnum',
+            'minimize_style',
+            'minimize_options',
+            'minimize_cycles',
+            'cutofflongrange',
+            'tau_xy',
+            'tau_yy',
+            'tau_yz',
+            'alpha',
+            'beta_xx',
+            'beta_yy',
+            'beta_zz',
+            'beta_xy',
+            'beta_xz',
+            'beta_yz',
+            'cdiffelastic',
+            'cdiffsurface',
+            'cdiffstress',
+            'halfwidth',
+            'normalizedisreg',
+            'fullstress',
+        ]
+        
+        return self._buildtemplate(subsets, runkeys)
+
+    @property
     def singularkeys(self):
-        """list: Calculation keys that can have single values during prepare."""
-        return [
-                'lammps_command',
-                'mpi_command',
-                'length_unit',
-                'pressure_unit',
-                'energy_unit',
-                'force_unit',
-               ]
+        """
+        list: Calculation keys that can have single values during prepare.
+        """
+        # Fetch universal key sets from parent
+        universalkeys = super().singularkeys
+        
+        # Specify calculation-specific key sets 
+        keys = (
+            subset('lammps_commands').keyset 
+            + subset('units').keyset 
+            + []
+        )
+
+        # Join and return
+        return universalkeys + keys
     
     @property
     def multikeys(self):
-        """list: Calculation keys that can have multiple values during prepare."""
-        return [
-                   [
-                    'load_file',
-                    'load_content',
-                    'load_style',
-                    'family',
-                    'load_options',
-                    'symbols',
-                    'box_parameters',
-                    'gammasurface_file',
-                    'gammasurface_content',
-                    'elasticconstants_file',
-                    'elasticconstants_content',
-                    'C11',
-                    'C12',
-                    'C13',
-                    'C14',
-                    'C15',
-                    'C16',
-                    'C22',
-                    'C23',
-                    'C24',
-                    'C25',
-                    'C26',
-                    'C33',
-                    'C34',
-                    'C35',
-                    'C36',
-                    'C44',
-                    'C45',
-                    'C46',
-                    'C55',
-                    'C56',
-                    'C66',
-                   ],
-                   [
-                    'dislocation_file',
-                    'dislocation_content',
-                    'dislocation_family',
-                    'dislocation_burgersvector',
-                    'dislocation_boundarywidth',
-                    'dislocation_boundaryshape',
-                    'dislocation_stroh_m',
-                    'dislocation_stroh_n',
-                    'dislocation_lineboxvector',
-                    'a_uvw',
-                    'b_uvw',
-                    'c_uvw',
-                    ],
-                    [
+        """
+        list: Calculation key sets that can have multiple values during prepare.
+        """
+        # Fetch universal key sets from parent
+        universalkeys = super().multikeys
+        
+        # Specify calculation-specific key sets 
+        keys = [
+                   (
+                subset('atomman_systemload').keyset
+                + subset('atomman_elasticconstants').keyset
+                + subset('atomman_gammasurface').keyset
+            ),
+            (
+                subset('dislocation').keyset
+            ),
+            (
+                [
                     'xmax',
                     'xstep',
                     'xnum',
@@ -120,5 +143,9 @@ class DislocationSDVPN(Calculation):
                     'halfwidth',
                     'normalizedisreg',
                     'fullstress',
-                    ],
-               ]
+                ]
+            )
+        ]
+                   
+        # Join and return
+        return universalkeys + keys

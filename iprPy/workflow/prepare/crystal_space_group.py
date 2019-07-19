@@ -1,3 +1,7 @@
+# Standard Python libraries
+import sys
+
+# iprPy imports
 from . import prepare
 
 calculation_name = 'crystal_space_group'
@@ -20,7 +24,9 @@ def relax(database_name, run_directory_name, **kwargs):
     **kwargs : str or list, optional
         Values for any additional or replacement prepare parameters. 
     """
-    
+    # Set default branch value to match current function's name
+    kwargs['branch'] = kwargs.get('branch', sys._getframe().f_code.co_name)
+
     script = "\n".join(
         [
         # Build load information from relax_static results
@@ -47,13 +53,45 @@ def relax(database_name, run_directory_name, **kwargs):
     prepare(database_name, run_directory_name, calculation_name,
             script, **kwargs)
 
-def protoref(database_name, run_directory_name, **kwargs):
+def prototype(database_name, run_directory_name, **kwargs):
     """
-    Prepares crystal_space_group calculations from crystal_prototype and
-    reference_crystal records.
+    Prepares crystal_space_group calculations from crystal_prototype records.
 
     buildcombos
     - proto : crystalprototype from crystal_prototype
+
+    Parameters
+    ----------
+    database_name : str
+        The name of the pre-set database to use.
+    run_directory_name : str
+        The name of the pre-set run_directory to use.
+    **kwargs : str or list, optional
+        Values for any additional or replacement prepare parameters. 
+    """
+    # Set default branch value to match current function's name
+    kwargs['branch'] = kwargs.get('branch', sys._getframe().f_code.co_name)
+
+    script = "\n".join(
+        [
+        # Build load information based on prototype records
+        "buildcombos                 crystalprototype load_file proto",
+        
+        # Run parameters
+        "symmetryprecision           ",
+        "primitivecell               ",
+        "idealcell                   ",
+        ])
+
+    # Prepare 
+    prepare(database_name, run_directory_name, calculation_name,
+                 script, **kwargs)
+
+def reference(database_name, run_directory_name, **kwargs):
+    """
+    Prepares crystal_space_group calculations from reference_crystal records.
+
+    buildcombos
     - ref : atomicreference from reference_crystal
 
     Parameters
@@ -65,12 +103,11 @@ def protoref(database_name, run_directory_name, **kwargs):
     **kwargs : str or list, optional
         Values for any additional or replacement prepare parameters. 
     """
-    
+    # Set default branch value to match current function's name
+    kwargs['branch'] = kwargs.get('branch', sys._getframe().f_code.co_name)
+
     script = "\n".join(
         [
-        # Build load information based on prototype records
-        "buildcombos                 crystalprototype load_file proto",
-        
         # Build load information based on reference structures
         "buildcombos                 atomicreference load_file ref",
         
@@ -79,7 +116,7 @@ def protoref(database_name, run_directory_name, **kwargs):
         "primitivecell               ",
         "idealcell                   ",
         ])
-    
+
     # Prepare 
     prepare(database_name, run_directory_name, calculation_name,
                  script, **kwargs)

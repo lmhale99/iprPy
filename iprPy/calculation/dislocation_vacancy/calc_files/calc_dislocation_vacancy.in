@@ -1,0 +1,30 @@
+#Run script for calc_refine_structure_static.py
+
+#Command lines for LAMMPS (and MPI).
+#For lammps_command, exclude passing in a script, i.e. no "-in term" or "< term"
+lammps_command              lmp_serial
+mpi_command                 
+
+#Paths to the potential data model file, and directory containing potential parameters
+potential_file              C:/Users/lmh1/Documents/iprPy/reference-libraries/potentials/2006--Chamati-M--Fe.json
+potential_dir               C:/Users/lmh1/Documents/iprPy/reference-libraries/potentials/2006--Chamati-M--Fe
+
+#File systems to load
+base_file
+disl_file
+symbols
+
+#Units that input/output values are in
+length_unit                 
+pressure_unit               
+energy_unit                 
+force_unit                  
+
+#Run parameters
+radial_distance
+z_slice_width
+anneal_temperature
+energy_tolerance            
+force_tolerance             
+maximum_iterations          
+maximum_evaluations         

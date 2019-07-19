@@ -24,9 +24,13 @@ def prepare(database_name, run_directory_name, calculation_name,
     print()
 
 from . import crystal_space_group
+from . import dislocation_monopole
+from . import dislocation_periodic_array
+from . import dislocation_SDVPN
 from . import E_vs_r_scan 
 from . import elastic_constants_static
 from . import phonon
+from . import point_defect_diffusion
 from . import point_defect_static
 from . import relax_box 
 from . import relax_dynamic 

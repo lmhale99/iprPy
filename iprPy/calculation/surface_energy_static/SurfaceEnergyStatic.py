@@ -3,7 +3,7 @@ from pathlib import Path
 
 # iprPy imports
 from .. import Calculation
-from ...input import keyset
+from ...input import subset
 
 class SurfaceEnergyStatic(Calculation):
     """
@@ -32,14 +32,35 @@ class SurfaceEnergyStatic(Calculation):
 
         # Specify calculation-specific keys 
         files = [
-                    'min.template',
-                ]
+            'min.template',
+        ]
         for i in range(len(files)):
             files[i] = Path(self.directory, files[i])
         
         # Join and return
         return universalfiles + files
     
+    @property
+    def template(self):
+        """
+        str: The template to use for generating calc.in files.
+        """
+        # Specify the subsets to include in the template
+        subsets = [
+            'lammps_commands', 
+            'lammps_potential',
+            'atomman_systemload',
+            'atomman_systemmanipulate',
+            'freesurface',
+            'units',
+            'lammps_minimize',
+        ]
+        
+        # Specify the calculation-specific run parameters
+        runkeys = []
+        
+        return self._buildtemplate(subsets, runkeys)
+
     @property
     def singularkeys(self):
         """
@@ -49,7 +70,11 @@ class SurfaceEnergyStatic(Calculation):
         universalkeys = super().singularkeys
         
         # Specify calculation-specific key sets 
-        keys = keyset('lammps_commands') + keyset('units') + []
+        keys = (
+            subset('lammps_commands').keyset 
+            + subset('units').keyset 
+            + []
+        )
         
         # Join and return
         return universalkeys + keys
@@ -64,11 +89,22 @@ class SurfaceEnergyStatic(Calculation):
         
         # Specify calculation-specific key sets 
         keys =  [
-                    keyset('lammps_potential') + keyset('atomman_systemload'),
-                    keyset('atomman_systemmanipulate'),
-                    keyset('freesurface'),
-                    keyset('lammps_minimize'),
-               ]
+            (
+                subset('lammps_potential').keyset 
+                + subset('atomman_systemload').keyset
+            ),
+            (
+                [
+                    'sizemults',
+                ]
+            ),
+            (
+                subset('freesurface').keyset
+            ),
+            (
+                subset('lammps_minimize').keyset
+            ),
+        ]
                
         # Join and return
         return universalkeys + keys

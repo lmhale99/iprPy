@@ -1,0 +1,39 @@
+#Run script for calc_dynamic_elastic.py
+
+#Command lines for LAMMPS (and MPI).
+#For lammps_command, exclude passing in a script, i.e. no "-in term"
+lammps_command              lmp_mpi
+mpi_command                 mpiexec -localonly 4
+
+#Paths to the potential data model file, and directory containing potential parameters
+potential_file              ../../../library/LAMMPS-potential/2003--Mendelev-M-I--Fe-5.json
+potential_dir               ../../../library/LAMMPS-potential/2003--Mendelev-M-I--Fe-5
+
+#Initial system configuration to load
+load                        system_model ../../../library/crystal-prototype/A2--W--bcc.json
+load_options                
+symbols                     Fe
+box_parameters              2.8553 2.8553 2.8553
+
+#System manipulations
+x_axis                      
+y_axis                      
+z_axis                      
+atomshift                   
+sizemults                   8 8 8
+
+#Units that input/output values are in
+length_unit                 
+pressure_unit               
+energy_unit                 
+force_unit                  
+
+#Run parameters
+strainrange                 
+temperature                 0
+integrator                  
+thermosteps                 1
+dumpsteps                   
+runsteps                    11000
+equilsteps                  1000
+randomseed                  

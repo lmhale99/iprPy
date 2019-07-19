@@ -1,8 +1,3 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
-
 # iprPy imports
 from .. import Record
 
@@ -12,14 +7,6 @@ class PerPotentialProperties(Record):
     def contentroot(self):
         """str: The root element of the content"""
         return 'per-potential-properties'
-    
-    @property
-    def schema(self):
-        """
-        str: The absolute directory path to the .xsd file associated with the
-             record style.
-        """
-        return os.path.join(self.directory, 'record-per-potential-properties.xsd')
     
     def todict(self, full=True, flat=False):
         """

@@ -4,15 +4,9 @@
 # Built around LAMMPS script by Steve Plimpton
 
 # Standard library imports
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 import sys
 import uuid
-import glob
-import shutil
-import datetime
-from copy import deepcopy
 
 # http://www.numpy.org/
 import numpy as np
@@ -27,7 +21,6 @@ import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/iprPy
 import iprPy
-from iprPy.compatibility import range
 
 # Define record_style
 record_style = 'calculation_elastic_constants_static'
@@ -55,7 +48,7 @@ def main(*args):
                                             dmax = input_dict['maxatommotion'])
     
     # Save data model of results
-    script = os.path.splitext(os.path.basename(__file__))[0]
+    script = Path(__file__).stem
     
     record = iprPy.load_record(record_style)
     record.buildcontent(script, input_dict, results_dict)
@@ -119,7 +112,7 @@ def elastic_constants_static(lammps_command, system, potential, mpi_command=None
         - **'system_relaxed'** (*atomman.System*) - The relaxed system.
     """
     # Get script's location
-    script_dir = os.path.dirname(__file__)
+    script_dir = Path(__file__).parent
 
     # Convert hexagonal cells to orthorhombic to avoid LAMMPS tilt issues
     if am.tools.ishexagonal(system.box):
@@ -146,13 +139,13 @@ def elastic_constants_static(lammps_command, system, potential, mpi_command=None
     lammps_variables['dmax'] = uc.get_in_units(dmax, lammps_units['length'])
     
     # Fill in template files
-    template_file = os.path.join(script_dir, 'cij.template')
+    template_file = Path(script_dir, 'cij.template')
     lammps_script = 'cij.in'
     with open(template_file) as f:
         template = f.read()
     with open(lammps_script, 'w') as f:
         f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
-    template_file2 = os.path.join(script_dir, 'potential.template')
+    template_file2 = Path(script_dir, 'potential.template')
     lammps_script2 = 'potential.in'
     with open(template_file2) as f:
         template = f.read()
@@ -246,7 +239,7 @@ def process_input(input_dict, UUID=None, build=True):
         input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
     # Set default input/output units
-    iprPy.input.interpret('units', input_dict)
+    iprPy.input.subset('units').interpret(input_dict)
     
     # These are calculation-specific default strings
     input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
@@ -266,19 +259,19 @@ def process_input(input_dict, UUID=None, build=True):
     # None for this calculation
     
     # Check lammps_command and mpi_command
-    iprPy.input.interpret('lammps_commands', input_dict)
+    iprPy.input.subset('lammps_commands').interpret(input_dict)
     
     # Set default system minimization parameters
-    iprPy.input.interpret('lammps_minimize', input_dict)
+    iprPy.input.subset('lammps_minimize').interpret(input_dict)
     
     # Load potential
-    iprPy.input.interpret('lammps_potential', input_dict)
+    iprPy.input.subset('lammps_potential').interpret(input_dict)
     
-    # Load ucell system
-    iprPy.input.interpret('atomman_systemload', input_dict, build=build)
+    # Load system
+    iprPy.input.subset('atomman_systemload').interpret(input_dict, build=build)
     
     # Construct initialsystem by manipulating ucell system
-    iprPy.input.interpret('atomman_systemmanipulate', input_dict, build=build)
+    iprPy.input.subset('atomman_systemmanipulate').interpret(input_dict, build=build)
 
 if __name__ == '__main__':
     main(*sys.argv[1:])

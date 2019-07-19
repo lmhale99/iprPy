@@ -33,11 +33,10 @@ class PotentialOpenKIMLAMMPS(Record):
         dict
             A dictionary representation of the record's content.
         """
-        
+        # Fetch universal record params
+        params = super().todict(full=full, flat=flat)
+
         pot = self.content[self.contentroot]
-        params = {}
-        params['key'] = pot['key']
-        params['id'] = pot['id']
         params['pot_key'] = pot['potential']['key']
         params['pot_id'] = pot['potential']['id']
         params['units'] = pot['units']

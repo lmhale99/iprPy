@@ -1,3 +1,7 @@
+# Standard Python libraries
+import sys
+
+# iprPy imports
 from . import prepare
 
 calculation_name = 'E_vs_r_scan'
@@ -20,7 +24,9 @@ def main(database_name, run_directory_name, lammps_command, **kwargs):
     **kwargs : str or list, optional
         Values for any additional or replacement prepare parameters. 
     """
-    
+    # Set default branch value to match current function's name
+    kwargs['branch'] = kwargs.get('branch', sys._getframe().f_code.co_name)
+
     script = "\n".join(
         [
         # Build load information based on prototype records
@@ -63,7 +69,9 @@ def bop(database_name, run_directory_name, lammps_command, **kwargs):
     **kwargs : str or list, optional
         Values for any additional or replacement prepare parameters. 
     """
-    
+    # Set default branch value to match current function's name
+    kwargs['branch'] = kwargs.get('branch', sys._getframe().f_code.co_name)
+
     script = "\n".join(
         [
         # Build load information based on prototype records
@@ -80,7 +88,6 @@ def bop(database_name, run_directory_name, lammps_command, **kwargs):
         'maximum_r                   6.0',
         'number_of_steps_r           201',
         ]) 
-
 
     # Add additional required terms to kwargs
     kwargs['lammps_command'] = lammps_command
