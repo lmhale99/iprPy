@@ -1,3 +1,5 @@
+# Standard Python libraries
+from pathlib import Path
 import sys
 
 class Subset():
@@ -16,8 +18,9 @@ class Subset():
         """
         # Get module information for current class
         self_module = sys.modules[self.__module__]
-        self.__mod_name = self_module.__name__
-        if self.__mod_name == 'iprPy.input.subset_classes.Subset':
+        self._mod_file = self_module.__file__
+        self._mod_name = self_module.__name__
+        if self._mod_name == 'iprPy.input.subset_classes.Subset':
             raise TypeError("Don't use Subset itself, only use derived classes")
         self.__prefix = prefix
 
@@ -26,8 +29,19 @@ class Subset():
         """
         str: The calculation style
         """
-        pkgname = self.__mod_name.split('.')
+        pkgname = self._mod_name.split('.')
         return pkgname[3]
+
+    @property
+    def directory(self):
+        """str: The path to the subset's directory"""
+        return Path(self._mod_file).resolve().parent
+
+    @property
+    def parameters_doc(self):
+        """str: The markdown doc describing the associated input parameters"""
+        with open(Path(self.directory, 'parameters.md')) as f:
+            return f.read()
 
     @property
     def prefix(self):
