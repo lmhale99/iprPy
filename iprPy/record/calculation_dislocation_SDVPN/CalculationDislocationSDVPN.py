@@ -1,13 +1,8 @@
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 
 # http://www.numpy.org/
 import numpy as np
-
-# https://pandas.pydata.org/
-import pandas as pd
 
 # https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
@@ -18,11 +13,11 @@ import atomman.unitconvert as uc
 from atomman.defect import pn_arctan_disregistry
 
 # iprPy imports
-from ... import __version__ as iprPy_version
-from .. import Record
+from .. import CalculationRecord
 from ...tools import aslist
+from ...input import subset
 
-class CalculationDislocationSDVPN(Record):
+class CalculationDislocationSDVPN(CalculationRecord):
     
     @property
     def contentroot(self):
@@ -30,53 +25,60 @@ class CalculationDislocationSDVPN(Record):
         return 'calculation-dislocation-SDVPN'
     
     @property
-    def schema(self):
-        """
-        str: The absolute directory path to the .xsd file associated with the
-             record style.
-        """
-        return os.path.join(self.directory, 'record-calculation-dislocation-SDVPN.xsd')
-    
-    @property
     def compare_terms(self):
         """
         list of str: The default terms used by isnew() for comparisons.
         """
         return [
-                'script',
-                
-                'xnum',
-                
-                'load_file',
-                'load_options',
-                'symbols',
-                
-                'dislocation_key',
-                'gammasurface_calc_key',
-                
-                'cdiffelastic',
-                'cdiffsurface',
-                'cdiffstress',
-                
-                'fullstress',
-                'min_method',
-                'min_options',
-               ]
+            'script',
+            
+            'xnum',
+            
+            'load_file',
+            'load_options',
+            'symbols',
+            
+            'dislocation_key',
+            'gammasurface_calc_key',
+            
+            'cdiffelastic',
+            'cdiffsurface',
+            'cdiffstress',
+            
+            'fullstress',
+            'min_method',
+            'min_options',
+        ]
     
     @property
     def compare_fterms(self):
         """
-        list of str: The default fterms used by isnew() for comparisons.
+        dict: The terms to compare values using a tolerance.
         """
-        return [
-                'xmax',
-                'xstep',
-                'cutofflongrange',
-                'K11', 'K12', 'K13', 'K22', 'K23', 'K33',
-                'tau11', 'tau12', 'tau13', 'tau22', 'tau23', 'tau33',
-                'beta11', 'beta12', 'beta13', 'beta22', 'beta23', 'beta33',
-                'alpha1',
-               ]
+        return {
+            'xmax':1e-2,
+            'xstep':1e-2,
+            'cutofflongrange':1e-2,
+            'K11':1e-2, 
+            'K12':1e-2, 
+            'K13':1e-2, 
+            'K22':1e-2, 
+            'K23':1e-2, 
+            'K33':1e-2,
+            'tau11':1e-2, 
+            'tau12':1e-2, 
+            'tau13':1e-2, 
+            'tau22':1e-2, 
+            'tau23':1e-2, 
+            'tau33':1e-2,
+            'beta11':1e-2, 
+            'beta12':1e-2, 
+            'beta13':1e-2, 
+            'beta22':1e-2, 
+            'beta23':1e-2, 
+            'beta33':1e-2,
+            'alpha1':1e-2,
+        }
     
     def buildcontent(self, script, input_dict, results_dict=None):
         """
@@ -102,19 +104,11 @@ class CalculationDislocationSDVPN(Record):
         AttributeError
             If buildcontent is not defined for record style.
         """
-        # Create the root of the DataModelDict
-        output = DM()
-        output[self.contentroot] = calc = DM()
-        
-        # Assign uuid
-        calc['key'] = input_dict['calc_key']
-        
-        # Save calculation parameters
-        calc['calculation'] = DM()
-        calc['calculation']['iprPy-version'] = iprPy_version
-        calc['calculation']['atomman-version'] = am.__version__
-        
-        calc['calculation']['script'] = script
+        # Build universal content
+        super().buildcontent(script, input_dict, results_dict=results_dict)
+
+        # Load content after root
+        calc = self.content[self.contentroot]
         calc['calculation']['run-parameter'] = run_params = DM()
         run_params['halfwidth'] = uc.model(input_dict['halfwidth'],
                                            input_dict['length_unit'])
@@ -129,13 +123,7 @@ class CalculationDislocationSDVPN(Record):
         run_params['min_cycles'] = input_dict['minimize_numcycles']
 
         # Save info on system file loaded
-        calc['system-info'] = DM()
-        calc['system-info']['family'] = input_dict['family']
-        calc['system-info']['artifact'] = DM()
-        calc['system-info']['artifact']['file'] = input_dict['load_file']
-        calc['system-info']['artifact']['format'] = input_dict['load_style']
-        calc['system-info']['artifact']['load_options'] = input_dict['load_options']
-        calc['system-info']['symbol'] = input_dict['symbols']
+        subset('atomman_systemload').buildcontent(calc, input_dict, results_dict=results_dict)
         
         #Save defect parameters
         calc['dislocation-monopole'] = disl = DM()
@@ -156,9 +144,7 @@ class CalculationDislocationSDVPN(Record):
         cp['burgersvector'] = input_dict['dislocation_burgersvector']
         
         calc['gamma-surface'] = DM()
-        calc['gamma-surface']['calc_key'] = os.path.splitext(
-                                             os.path.basename(
-                                              input_dict['gammasurface_file']))[0]
+        calc['gamma-surface']['calc_key'] = Path(input_dict['gammasurface_file']).stem
         
         calc['stress-state'] = uc.model(input_dict['tau'], input_dict['pressure_unit'])
         
@@ -205,8 +191,6 @@ class CalculationDislocationSDVPN(Record):
             calc['nonlocal-energy'] = uc.model(pnsolution.nonlocal_energy(), e_per_l_unit)
             calc['total-energy'] = uc.model(pnsolution.total_energy(), e_per_l_unit)
             calc['total-energy-per-cycle'] = uc.model(results_dict['minimization_energies'], e_per_l_unit)
-        
-        self.content = output
     
     def todict(self, full=True, flat=False):
         """
@@ -231,12 +215,9 @@ class CalculationDislocationSDVPN(Record):
             A dictionary representation of the record's content.
         """
         
+        # Extract universal content
+        params = super().todict(full=full, flat=flat)
         calc = self.content[self.contentroot]
-        params = {}
-        params['key'] = calc['key']
-        params['script'] = calc['calculation']['script']
-        params['iprPy_version'] = calc['calculation']['iprPy-version']
-        params['atomman_version'] = calc['calculation']['atomman-version']
         
         rp = calc['calculation']['run-parameter']
         params['halfwidth'] = uc.value_unit(rp['halfwidth'])
@@ -244,11 +225,8 @@ class CalculationDislocationSDVPN(Record):
         params['xnum'] = rp['xnum']
         params['xstep'] = rp['xstep']
         
-        params['load_file'] = calc['system-info']['artifact']['file']
-        params['load_style'] = calc['system-info']['artifact']['format']
-        params['load_options'] = calc['system-info']['artifact']['load_options']
-        params['family'] = calc['system-info']['family']
-        symbols = aslist(calc['system-info']['symbol'])
+        # Extract system info
+        subset('atomman_systemload').todict(calc, params, full=full, flat=flat)
         
         params['dislocation_key'] = calc['dislocation-monopole']['key']
         params['dislocation_id'] = calc['dislocation-monopole']['id']
@@ -272,7 +250,6 @@ class CalculationDislocationSDVPN(Record):
         params['min_options'] = pnp['min_options']
         
         if flat is True:
-            params['symbols'] = ' '.join(symbols)
             for i in range(3):
                 for j in range(i,3):
                     try:
@@ -286,32 +263,23 @@ class CalculationDislocationSDVPN(Record):
             for i in range(len(alpha)):
                 params['alpha'+str(i+1)] = alpha[i]
         else:
-            params['symbols'] = symbols
             params['K_tensor'] = K_tensor
             params['tau'] = tau
             params['alpha'] = alpha
             params['beta'] = beta
         
-        params['status'] = calc.get('status', 'finished')
-        
-        if full is True:
-            if params['status'] == 'error':
-                params['error'] = calc['error']
-            
-            elif params['status'] == 'not calculated':
+        if full is True and params['status'] == 'finished':
+            if flat is True:
                 pass
             else:
-                if flat is True:
-                    pass
+                try:
+                    params['C'] = am.ElasticConstants(model=calc)
+                except:
+                    params['C'] = np.nan
+                if True:
+                    params['SDVPN_model'] = DM()
+                    params['SDVPN_model']['semidiscrete-variational-Peierls-Nabarro'] = calc.find('semidiscrete-variational-Peierls-Nabarro')
                 else:
-                    try:
-                        params['C'] = am.ElasticConstants(model=calc)
-                    except:
-                        params['C'] = np.nan
-                    if True:
-                        params['SDVPN_model'] = DM()
-                        params['SDVPN_model']['semidiscrete-variational-Peierls-Nabarro'] = calc.find('semidiscrete-variational-Peierls-Nabarro')
-                    else:
-                        params['SDVPN_model'] = np.nan
+                    params['SDVPN_model'] = np.nan
         
         return params

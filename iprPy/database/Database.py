@@ -357,7 +357,7 @@ class Database(object):
         """
         raise AttributeError('delete_tar not defined for Database style')
     
-    def build_refs(self, lib_directory=None, refresh=False):
+    def build_refs(self, lib_directory=None, refresh=False, include=None):
         """
         Adds reference records from a library to a database.
         
@@ -365,61 +365,71 @@ class Database(object):
         ----------
         lib_directory : str, optional
             The directory path for the library.  If not given, then it will use
-            the iprPy/library directory.
+            the iprPy library directory.
         refresh : bool or list, optional
             If False (default) only new reference records are added.  If True,
             all existing reference records are refreshed by deleting the
             current ones in the database and uploading the references in
             lib_directory.  If a list is given, then only the reference
             record styles named in the list are refreshed.
+        include : str or list, optional
+            The reference record style(s) to copy to the database.  If not
+            given will upload all record styles found in lib_directory.
         """
         
         # Set default lib_directory
         if lib_directory is None:
             lib_directory = libdir
         
+        # Build list of all reference record styles
+        all_styles = []
+        for ref in lib_directory.glob('*'):
+            if ref.is_dir():
+                all_styles.append(ref.name)
+
         # Handle refresh options
         if refresh is False:
             refresh_list = []
+        elif refresh is True:
+            refresh_list = all_styles
         else:
-            all_refs = []
-            for ref in lib_directory.glob('*'):
-                if ref.is_dir():
-                    all_refs.append(ref.name)
-            if refresh is True:
-                refresh_list = all_refs
-            else:
-                refresh_list = aslist(refresh)
-                for style in refresh_list:
-                    assert style in all_refs, f'{style} is not a reference record style'
-        
+            refresh_list = aslist(refresh)
+            for record_style in refresh_list:
+                assert record_style in all_styles, f'{record_style} record style not found in lib_directory'
+
+        # Handle include options
+        if include is None:
+            include_list = all_styles
+        else:
+            include_list = aslist(include)
+            for record_style in include_list:
+                assert record_style in all_styles, f'{record_style} record style not found in lib_directory'
+
         # Delete records to be refreshed
-        for style in refresh_list:
-            self.destroy_records(style)
+        for record_style in refresh_list:
+            self.destroy_records(record_style)
         
-        # Loop over all record styles in lib_directory
-        for ref in lib_directory.glob('*'):
-            if ref.is_dir():
-                record_style = ref.name
+        # Loop over record styles to add
+        for record_style in include_list:
+            style_path = Path(lib_directory, record_style)
                 
-                # Loop over all records of one style
-                for record_file in ref.glob('*'):
-                    if record_file.suffix.lower() in ['.xml', '.json']:
-                        record_name = record_file.stem
-                        
-                        # Add record if needed
+            # Loop over all records of one style
+            for record_file in style_path.glob('*'):
+                if record_file.suffix.lower() in ['.xml', '.json']:
+                    record_name = record_file.stem
+                    
+                    # Add record if needed
+                    try:
+                        self.add_record(content=record_file, style=record_style, name=record_name)
+                    except:
+                        pass
+                    
+                    # Add a record's tar if needed
+                    if Path(style_path, record_name).is_dir():
                         try:
-                            self.add_record(content=record_file, style=record_style,
-                                             name=record_name)
+                            self.add_tar(root_dir=style_path, name=record_name)
                         except:
                             pass
-                        
-                        # Add a record's tar if needed
-                        if Path(ref, record_name).is_dir():
-                            try:
-                                self.add_tar(root_dir=ref, name=record_name)
-                            except:
-                                pass
     
     def check_records(self, record_style=None):
         """
@@ -679,21 +689,22 @@ class Database(object):
             pass
         else:
             for load_file in model.finds('file'):
-                directory = Path(load_file).parent
+                directory = Path(load_file).parent.stem
                 name = Path(load_file).stem
 
                 if directory != '':
                     pname = directory
                 else:
                     pname = name
-                
+
                 try:
                     parent = self.get_record(name=pname) #pylint: disable=assignment-from-no-return
                 except:
                     pass
                 else:
                     parents.append(parent)
-                    parents.extend(self.get_parent_records(parent))
+                    grandparents = self.get_parent_records(record=parent)
+                    parents.extend(grandparents)
         return parents
     
     def prepare(self, run_directory, calculation, **kwargs):

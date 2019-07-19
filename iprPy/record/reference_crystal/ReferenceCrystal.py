@@ -1,9 +1,3 @@
-# http://www.numpy.org/
-import numpy as np
-
-# https://github.com/usnistgov/DataModelDict
-from DataModelDict import DataModelDict as DM
-
 # https://github.com/usnistgov/atomman
 import atomman as am
 
@@ -15,16 +9,7 @@ class ReferenceCrystal(Record):
     @property
     def contentroot(self):
         """str: The root element of the content"""
-        return 'reference-crystal'
-    
-    @property
-    def compare_terms(self):
-        """
-        list: The terms to compare values absolutely.
-        """
-        return [
-               'id',
-               ]    
+        return 'reference-crystal'   
     
     def todict(self, full=True, flat=False):
         """
@@ -48,12 +33,10 @@ class ReferenceCrystal(Record):
         dict
             A dictionary representation of the record's content.
         """
+        # Fetch universal record params
+        params = super().todict(full=full, flat=flat)
         
         crystal = self.content[self.contentroot]
-        params = {}
-        params['key'] = crystal['key']
-        params['id'] = crystal['id']
-        
         params['sourcename'] = crystal['source']['name']
         params['sourcelink'] = crystal['source']['link']
         

@@ -8,7 +8,7 @@ __all__ = ['atomicarchive']
 
 def atomicarchive(database, keys, content_dict=None, record=None, load_key='atomic-system',
                   query=None, **kwargs):
-    
+
     if content_dict is None:
         content_dict = {}
 

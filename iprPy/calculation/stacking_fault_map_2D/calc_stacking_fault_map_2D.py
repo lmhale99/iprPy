@@ -3,9 +3,7 @@
 # Python script created by Lucas Hale and Norman Luu.
 
 # Standard library imports
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 import sys
 import uuid
 import shutil
@@ -58,7 +56,7 @@ def main(*args):
                                      dmax = input_dict['maxatommotion'])
 
     # Save data model of results
-    script = os.path.splitext(os.path.basename(__file__))[0]
+    script = Path(__file__).stem
     
     record = iprPy.load_record(record_style)
     record.buildcontent(script, input_dict, results_dict)
@@ -132,7 +130,7 @@ def stackingfaultrelax(lammps_command, system, potential,
         For invalid cutboxvectors.
     """
     # Get script's location
-    script_dir = os.path.dirname(__file__)
+    script_dir = Path(__file__).parent
 
     # Give correct LAMMPS fix setforce command
     if cutboxvector == 'a':
@@ -146,12 +144,10 @@ def stackingfaultrelax(lammps_command, system, potential,
     
     if sim_directory is not None:
         # Create sim_directory if it doesn't exist
-        if not os.path.isdir(sim_directory):
-            os.mkdir(sim_directory)
-        
-        # Add '/' to end of sim_directory string if needed
-        if sim_directory[-1] != '/': 
-            sim_directory = sim_directory + '/'
+        sim_directory = Path(sim_directory)
+        if not sim_directory.is_dir():
+            sim_directory.mkdir()
+        sim_directory = sim_directory.as_posix()+'/'
     else:
         # Set sim_directory if is None
         sim_directory = ''
@@ -166,7 +162,7 @@ def stackingfaultrelax(lammps_command, system, potential,
     # Define lammps variables
     lammps_variables = {}
     system_info = system.dump('atom_data',
-                              f=os.path.join(sim_directory, 'system.dat'),
+                              f=Path(sim_directory, 'system.dat').as_posix(),
                               units=potential.units,
                               atom_style=potential.atom_style)
     lammps_variables['atomman_system_info'] = system_info
@@ -186,8 +182,8 @@ def stackingfaultrelax(lammps_command, system, potential,
         lammps_variables['dump_modify_format'] = 'float %.13e'
     
     # Write lammps input script
-    template_file = os.path.join(script_dir, 'sfmin.template')
-    lammps_script = os.path.join(sim_directory, 'sfmin.in')
+    template_file = Path(script_dir, 'sfmin.template')
+    lammps_script = Path(sim_directory, 'sfmin.in')
     with open(template_file) as f:
         template = f.read()
     with open(lammps_script, 'w') as f:
@@ -195,13 +191,13 @@ def stackingfaultrelax(lammps_command, system, potential,
                                          '<', '>'))
     
     # Run LAMMPS
-    output = lmp.run(lammps_command, lammps_script, mpi_command,
-                     logfile=os.path.join(sim_directory, 'log.lammps'))
+    output = lmp.run(lammps_command, lammps_script.as_posix(), mpi_command,
+                     logfile=Path(sim_directory, 'log.lammps').as_posix())
     
     # Extract output values
     thermo = output.simulations[-1]['thermo']
-    logfile = os.path.join(sim_directory, 'log.lammps')
-    dumpfile = os.path.join(sim_directory, '%i.dump' % thermo.Step.values[-1])
+    logfile = Path(sim_directory, 'log.lammps').as_posix()
+    dumpfile = Path(sim_directory, '%i.dump' % thermo.Step.values[-1]).as_posix()
     E_total = uc.set_in_units(thermo.PotEng.values[-1],
                               lammps_units['energy'])
     
@@ -318,7 +314,7 @@ def stackingfaultmap(lammps_command, system, potential,
         a2vals.append(a2)
 
         # Evaluate the system at the shift
-        sim_directory = 'a%.10f-b%.10f' % (a1, a2)
+        sim_directory = Path('a%.10f-b%.10f' % (a1, a2))
         relax = stackingfaultrelax(lammps_command, sfsystem, potential,
                                    mpi_command=mpi_command, 
                                    sim_directory=sim_directory,
@@ -388,7 +384,7 @@ def process_input(input_dict, UUID=None, build=True):
         input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
     # Set default input/output units
-    iprPy.input.interpret('units', input_dict)
+    iprPy.input.subset('units').interpret(input_dict)
     
     # These are calculation-specific default strings
     input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
@@ -409,25 +405,25 @@ def process_input(input_dict, UUID=None, build=True):
     # None for this calculation
     
     # Check lammps_command and mpi_command
-    iprPy.input.interpret('lammps_commands', input_dict)
+    iprPy.input.subset('lammps_commands').interpret(input_dict)
     
     # Set default system minimization parameters
-    iprPy.input.interpret('lammps_minimize', input_dict)
+    iprPy.input.subset('lammps_minimize').interpret(input_dict)
     
     # Load potential
-    iprPy.input.interpret('lammps_potential', input_dict)
+    iprPy.input.subset('lammps_potential').interpret(input_dict)
     
-    # Load ucell system
-    iprPy.input.interpret('atomman_systemload', input_dict, build=build)
+    # Load system
+    iprPy.input.subset('atomman_systemload').interpret(input_dict, build=build)
     
     # Load stackingfault parameters
-    iprPy.input.interpret('stackingfaultpart1', input_dict)
+    iprPy.input.subset('stackingfault').interpret(input_dict)
     
     # Construct initialsystem by manipulating ucell system
-    iprPy.input.interpret('atomman_systemmanipulate', input_dict, build=build)
+    iprPy.input.subset('atomman_systemmanipulate').interpret(input_dict, build=build)
     
     # Convert stackingfault parameters
-    iprPy.input.interpret('stackingfaultpart2', input_dict, build=build)
+    iprPy.input.subset('stackingfault').interpret2(input_dict, build=build)
 
 if __name__ == '__main__':
     main(*sys.argv[1:])

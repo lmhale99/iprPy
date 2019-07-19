@@ -6,8 +6,11 @@ from .interatomicpotential import interatomicpotential
 
 __all__ = ['elasticparent']
 
-def elasticparent(database, keys, record=None, load_key='atomic-system',
-                  query=None, **kwargs):
+def elasticparent(database, keys, content_dict=None, record=None,
+                  load_key='atomic-system', query=None, **kwargs):
+    
+    if content_dict is None:
+        content_dict = {}
     
     # Setup
     inputs = {}

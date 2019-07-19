@@ -3,10 +3,7 @@
 # Python script created by Lucas Hale
 
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-from collections import OrderedDict
-import os
+from pathlib import Path
 import sys
 import uuid
 
@@ -15,9 +12,6 @@ import numpy as np
 
 # http://pandas.pydata.org/
 import pandas as pd
-
-# https://scipy.org/
-from scipy.optimize import minimize_scalar
 
 # https://github.com/usnistgov/atomman
 import atomman as am
@@ -64,7 +58,7 @@ def main(*args):
                                   min_cycles=input_dict['minimize_numcycles'])
     
     # Save data model of results
-    script = os.path.splitext(os.path.basename(__file__))[0]
+    script = Path(__file__).stem
     
     record = iprPy.load_record(record_style)
     record.buildcontent(script, input_dict, results_dict)
@@ -282,20 +276,20 @@ def process_input(input_dict, UUID=None, build=True):
             min_options[floatkey] = float(min_options[floatkey])
     input_dict['minimize_options'] = min_options
     
-    # Load ucell system
-    iprPy.input.interpret('atomman_systemload', input_dict, build=build)
+    # Load system
+    iprPy.input.subset('atomman_systemload').interpret(input_dict, build=build)
     
     # Load dislocation parameters
-    iprPy.input.interpret('dislocationmonopole', input_dict)
+    iprPy.input.subset('dislocation').interpret(input_dict)
     
     # Load elastic constants
-    iprPy.input.interpret('atomman_elasticconstants', input_dict, build=build)
+    iprPy.input.subset('atomman_elasticconstants').interpret(input_dict, build=build)
     
     # Construct initialsystem by manipulating ucell system
-    iprPy.input.interpret('atomman_systemmanipulate', input_dict, build=build)
+    iprPy.input.subset('atomman_systemmanipulate').interpret(input_dict, build=build)
     
     # Load gamma surface
-    iprPy.input.interpret('atomman_gammasurface', input_dict, build=build)
+    iprPy.input.subset('atomman_gammasurface').interpret(input_dict, build=build)
 
 if __name__ == '__main__':
     main(*sys.argv[1:])

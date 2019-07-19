@@ -4,7 +4,6 @@
 
 # Standard Python libraries
 from pathlib import Path
-import os
 import sys
 import uuid
 import datetime
@@ -176,7 +175,7 @@ def process_input(input_dict, UUID=None, build=True):
         input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
     # Set default input/output units
-    iprPy.input.interpret('units', input_dict)
+    iprPy.input.subset('units').interpret(input_dict)
     
     # These are calculation-specific default strings
     input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
@@ -196,39 +195,16 @@ def process_input(input_dict, UUID=None, build=True):
                                                 default_term='0.01 angstrom')
 
     # Check lammps_command and mpi_command
-    iprPy.input.interpret('lammps_commands', input_dict)
+    iprPy.input.subset('lammps_commands').interpret(input_dict)
     
     # Load potential
-    iprPy.input.interpret('lammps_potential', input_dict)
+    iprPy.input.subset('lammps_potential').interpret(input_dict)
     
-    # Load ucell system
-    iprPy.input.interpret('atomman_systemload', input_dict, build=build)
-    
-    # Add atomic charges
-    iprPy.input.interpret('lammps_atomcharges', input_dict, build=build)
+    # Load system
+    iprPy.input.subset('atomman_systemload').interpret(input_dict, build=build)
 
-    # Convert sizemults values to lists of numbers
-    sizemults = input_dict['sizemults'].strip().split()
-    for i in range(len(sizemults)):
-        sizemults[i] = int(sizemults[i])
-
-    # Properly divide up sizemults if 6 terms given
-    if len(sizemults) == 6:
-        input_dict['a_mult'] = sizemults[1] - sizemults[0]
-        input_dict['b_mult'] = sizemults[3] - sizemults[2]
-        input_dict['c_mult'] = sizemults[5] - sizemults[4]
-    
-    # Properly divide up sizemults if 3 terms given
-    elif len(sizemults) == 3:
-        input_dict['a_mult'] = sizemults[0]
-        input_dict['b_mult'] = sizemults[1]
-        input_dict['c_mult'] = sizemults[2]
+    # Construct initialsystem by manipulating ucell system
+    iprPy.input.subset('atomman_systemmanipulate').interpret(input_dict, build=build)
         
-    else:
-        raise ValueError('Invalid sizemults command')
-    
-    if input_dict['a_mult'] <= 0 or input_dict['b_mult'] <= 0 or input_dict['c_mult'] <= 0:
-        raise ValueError('Invalid sizemults command')
-
 if __name__ == '__main__':
     main(*sys.argv[1:])

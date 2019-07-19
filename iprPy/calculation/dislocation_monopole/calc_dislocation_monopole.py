@@ -3,9 +3,7 @@
 # Python script created by Lucas Hale
 
 # Standard library imports
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 import sys
 import uuid
 import glob
@@ -63,7 +61,7 @@ def main(*args):
                                        bwidth = input_dict['boundarywidth'])
     
     # Save data model of results
-    script = os.path.splitext(os.path.basename(__file__))[0]
+    script = Path(__file__).stem
     
     record = iprPy.load_record(record_style)
     record.buildcontent(script, input_dict, results_dict)
@@ -196,10 +194,10 @@ def dislocationmonopole(lammps_command, system, potential, burgers,
     results_dict['E_total_disl'] = relaxed['E_total']
     
     # Cleanup files
-    os.remove('0.dump')
-    os.remove(relaxed['dumpfile'])
-    for dumpjsonfile in glob.iglob('*.dump.json'):
-        os.remove(dumpjsonfile)
+    Path('0.dump').unlink()
+    Path(relaxed['dumpfile']).unlink()
+    for dumpjsonfile in Path('.').glob('*.dump.json'):
+        dumpjsonfile.unlink()
     
     return results_dict
 
@@ -407,7 +405,7 @@ def disl_relax(lammps_command, system, potential,
           relaxed system.
     """
     # Get script's location
-    script_dir = os.path.dirname(__file__)
+    script_dir = Path(__file__).parent
 
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
@@ -438,7 +436,7 @@ def disl_relax(lammps_command, system, potential,
         lammps_variables['dump_modify_format'] = 'float %.13e'
     
     # Write lammps input script
-    template_file = os.path.join(script_dir, 'disl_relax.template')
+    template_file = Path(script_dir, 'disl_relax.template')
     lammps_script = 'disl_relax.in'
     with open(template_file) as f:
         template = f.read()
@@ -532,7 +530,7 @@ def process_input(input_dict, UUID=None, build=True):
         input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
     # Set default input/output units
-    iprPy.input.interpret('units', input_dict)
+    iprPy.input.subset('units').interpret(input_dict)
     
     # These are calculation-specific default strings
     input_dict['sizemults'] = input_dict.get('sizemults', '0 3 -20 20 -20 20')
@@ -563,29 +561,29 @@ def process_input(input_dict, UUID=None, build=True):
         input_dict['annealsteps'] = int(input_dict.get('annealsteps', 10000))
 
     # Check lammps_command and mpi_command
-    iprPy.input.interpret('lammps_commands', input_dict)
+    iprPy.input.subset('lammps_commands').interpret(input_dict)
     
     # Set default system minimization parameters
-    iprPy.input.interpret('lammps_minimize', input_dict)
+    iprPy.input.subset('lammps_minimize').interpret(input_dict)
     
     # Load potential
-    iprPy.input.interpret('lammps_potential', input_dict)
+    iprPy.input.subset('lammps_potential').interpret(input_dict)
     
-    # Load ucell system
-    iprPy.input.interpret('atomman_systemload', input_dict, build=build)
+    # Load system
+    iprPy.input.subset('atomman_systemload').interpret(input_dict, build=build)
     
     # Load dislocation parameters
-    iprPy.input.interpret('dislocationmonopole', input_dict)
+    iprPy.input.subset('dislocation').interpret(input_dict)
     
     # Multiply boundarywidth by alat
     if input_dict['ucell'] is not None:
         input_dict['boundarywidth'] = input_dict['ucell'].box.a * input_dict['dislocation_boundarywidth']
 
     # Load elastic constants
-    iprPy.input.interpret('atomman_elasticconstants', input_dict, build=build)
+    iprPy.input.subset('atomman_elasticconstants').interpret(input_dict, build=build)
     
     # Construct initialsystem by manipulating ucell system
-    iprPy.input.interpret('atomman_systemmanipulate', input_dict, build=build)
+    iprPy.input.subset('atomman_systemmanipulate').interpret(input_dict, build=build)
 
 if __name__ == '__main__':
     main(*sys.argv[1:])

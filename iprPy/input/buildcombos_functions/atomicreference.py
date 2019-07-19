@@ -31,11 +31,15 @@ def atomicreference(database, keys, content_dict=None,
     # Fetch reference records
     references, reference_df = database.get_records(style=record, return_df=True,
                                                     query=query, **kwargs)
-    
+
     # Initialize inputs keys
     inputs = {}
     for key in keys:
         inputs[key] = []
+    
+    # Do nothing if no references found
+    if len(references) == 0:
+        return inputs, content_dict
 
     # Build with potentials
     if include_potentials:

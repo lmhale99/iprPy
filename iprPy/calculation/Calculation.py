@@ -4,6 +4,8 @@ import sys
 from copy import deepcopy
 from importlib import import_module
 
+from ..input import subset
+
 class Calculation(object):
     """
     Class for handling different calculation styles in the same fashion.  The
@@ -32,49 +34,65 @@ class Calculation(object):
     
     def __str__(self):
         """
-        Returns
-        -------
-        str
-            The string representation of the calculation.
+        str : The string representation of the calculation.
         """
         return f'calculation style {self.style}'
     
     @property
     def script(self):
+        """
+        module : shortcut to the imported calc_*.py module
+        """
         return self.__script
 
     @property
     def module_file(self):
+        """
+        pathlib.Path: The path to the Calculation class file
+        """
         return self.__module_file
 
     @property
     def module_name(self):
-        """str: The calculation style"""
+        """
+        str: The calculation style
+        """
         return self.__module_name
 
     @property
     def style(self):
-        """str: The calculation style"""
+        """
+        str: The calculation style
+        """
         pkgname = self.module_name.split('.')
         return pkgname[2]
     
     @property
     def directory(self):
-        """str: The path to the calculation's directory"""
+        """
+        str: The path to the calculation's directory
+        """
         return Path(self.module_file).absolute().parent
     
     @property
     def record_style(self):
-        """str: The record style associated with the calculation."""
+        """
+        str: The record style associated with the calculation.
+        """
         return self.script.record_style
     
     @property
     def template(self):
-        """str: The template to use for generating calc.in files."""
-        with open(Path(self.directory, f'calc_{self.style}.template')) as template_file:
-            template = template_file.read()
+        """
+        str: The template to use for generating calc.in files.
+        """
+        # Specify the subsets to include in the template
+        subsets = []
         
-        return template
+        # Specify the calculation-specific run parameters
+        runkeys = []
+        
+        return self._buildtemplate(subsets, runkeys)
     
     def calc(self, *args, **kwargs):
         """
@@ -85,26 +103,73 @@ class Calculation(object):
     @property
     def files(self):
         """
-        iter of str: Path to each file required by the calculation.
+        list: Path to each file required by the calculation.
         """
-        raise AttributeError('files not defined for Calculation style')
+        # Universal files (calc_*.py)
+        files = [
+                    f'calc_{self.style}.py',
+                ]
+        for i in range(len(files)):
+            files[i] = Path(self.directory, files[i])
+
+        return files
     
     @property
     def singularkeys(self):
-        """list: Calculation keys that can have single values during prepare."""
-        raise AttributeError('singularkeys not defined for Calculation style')
+        """
+        list: Calculation keys that can have single values during prepare.
+        """
+        # Universal singular keys for all calculations
+        return  [
+                    'branch',
+                ]
     
     @property
     def multikeys(self):
-        """list: Calculation keys that can have multiple values during prepare."""
-        raise AttributeError('multikeys not defined for Calculation style')
+        """
+        list: Calculation key sets that can have multiple values during prepare.
+        """
+        # Universal multi key sets for all calculations
+        return []
     
     @property
     def allkeys(self):
-        """list: All keys used by the calculation."""
+        """
+        list: All keys used by the calculation.
+        """
         # Build list of all keys
         allkeys = deepcopy(self.singularkeys)
         for keyset in self.multikeys:
             allkeys.extend(keyset)
         
         return allkeys
+
+    def _buildtemplate(self, subsets, runkeys):
+        # Set the template header
+        template = f'# Input script for calc_{self.style}.py\n'
+        
+        # Add metadata fields
+        template += '\n# Calculation metadata\n'
+        metakeys = ['branch']
+        for key in metakeys:
+            spacelen = 32 - len(key)
+            if spacelen < 1:
+                spacelen = 1
+            space = ' ' * spacelen
+            template += f'{key}{space}<{key}>\n'       
+
+        # Add subset components
+        for key in subsets:
+            template += subset(key).template() + '\n'
+                
+        # Add calculation-specific components
+        if len(runkeys) > 0:
+            template += '\n# Run parameters\n'
+            for key in runkeys:
+                spacelen = 32 - len(key)
+                if spacelen < 1:
+                    spacelen = 1
+                space = ' ' * spacelen
+                template += f'{key}{space}<{key}>\n'
+        
+        return template

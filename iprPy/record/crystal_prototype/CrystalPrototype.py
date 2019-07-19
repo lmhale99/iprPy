@@ -1,6 +1,5 @@
 # https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.unitconvert as uc
 
 # iprPy imports
 from .. import Record
@@ -34,11 +33,10 @@ class CrystalPrototype(Record):
         dict
             A dictionary representation of the record's content.
         """
-        
+        # Fetch universal record params
+        params = super().todict(full=full, flat=flat)
+
         proto = self.content[self.contentroot]
-        params = {}
-        params['key'] = proto['key']
-        params['id'] = proto['id']
         params['name'] = proto['name']
         params['prototype'] = proto['prototype']
         params['Pearson_symbol'] = proto['Pearson-symbol']

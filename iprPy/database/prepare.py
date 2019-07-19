@@ -194,7 +194,7 @@ def build_testrecords(database, calculation, content_dict, **kwargs):
     new_record_df = []
     new_inputfiles = []
     copy_contents = []
-
+    
     # Iterate over multidict combinations
     for subdict in itermultidict(calculation.multikeys, **kwargs):
         calculation_dict.update(subdict)
@@ -226,11 +226,11 @@ def build_testrecords(database, calculation, content_dict, **kwargs):
                             content_dict[record_name] = crecord.content
 
         # Build incomplete record
-        try:
-            calculation.process_input(input_dict, calc_key, build=False)
-        except:
-            continue
-
+        #try:
+        calculation.process_input(input_dict, calc_key, build=False)
+        #except:
+        #    continue
+        
         new_record = load_record(style=calculation.record_style, name=calc_key)
         new_record.buildcontent('calc_' + calculation.style, input_dict)
 

@@ -3,9 +3,7 @@
 # Python script created by Lucas Hale
 
 # Standard library imports
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 import sys
 import uuid
 import shutil
@@ -25,7 +23,6 @@ import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/iprPy
 import iprPy
-from iprPy.compatibility import range
 
 # Define record_style
 record_style = 'calculation_relax_box'
@@ -54,7 +51,7 @@ def main(*args):
                              strainrange = input_dict['strainrange'])
     
     # Save data model of results
-    script = os.path.splitext(os.path.basename(__file__))[0]
+    script = Path(__file__).stem
     
     record = iprPy.load_record(record_style)
     record.buildcontent(script, input_dict, results_dict)
@@ -273,7 +270,7 @@ def calc_cij(lammps_command, system, potential,
         If any of the new box dimensions are less than zero.
     """
     # Get script's location
-    script_dir = os.path.dirname(__file__)
+    script_dir = Path(__file__).parent
 
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
@@ -289,7 +286,7 @@ def calc_cij(lammps_command, system, potential,
     lammps_variables['steps'] = 2
     
     # Write lammps input script
-    template_file = os.path.join(script_dir, 'cij.template')
+    template_file = Path(script_dir, 'cij.template')
     lammps_script = 'cij.in'
     with open(template_file) as f:
         template = f.read()
@@ -406,7 +403,7 @@ def process_input(input_dict, UUID=None, build=True):
         input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
     # Set default input/output units
-    iprPy.input.interpret('units', input_dict)
+    iprPy.input.subset('units').interpret(input_dict)
     
     # These are calculation-specific default strings
     input_dict['sizemults'] = input_dict.get('sizemults', '1 1 1')
@@ -442,19 +439,16 @@ def process_input(input_dict, UUID=None, build=True):
                                     default_term='0.0 GPa')
     
     # Check lammps_command and mpi_command
-    iprPy.input.interpret('lammps_commands', input_dict)
+    iprPy.input.subset('lammps_commands').interpret(input_dict)
     
     # Load potential
-    iprPy.input.interpret('lammps_potential', input_dict)
+    iprPy.input.subset('lammps_potential').interpret(input_dict)
     
-    # Load ucell system
-    iprPy.input.interpret('atomman_systemload', input_dict, build=build)
-    
-    # Add atomic charges
-    iprPy.input.interpret('lammps_atomcharges', input_dict, build=build)
+    # Load system
+    iprPy.input.subset('atomman_systemload').interpret(input_dict, build=build)
     
     # Construct initialsystem by manipulating ucell system
-    iprPy.input.interpret('atomman_systemmanipulate', input_dict, build=build)
-
+    iprPy.input.subset('atomman_systemmanipulate').interpret(input_dict, build=build)
+        
 if __name__ == '__main__':
     main(*sys.argv[1:])

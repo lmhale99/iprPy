@@ -48,6 +48,8 @@ def get_oqmd_structures(elements, lib_directory=None):
     # Handle lib_directory
     if lib_directory is None:
         lib_directory = Path(libdir, 'reference_crystal')
+    if not lib_directory.is_dir():
+        lib_directory.mkdir()
     
     elements.sort()
 

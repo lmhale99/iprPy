@@ -3,9 +3,7 @@
 # Python script created by Lucas Hale
 
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
+from pathlib import Path
 import sys
 import uuid
 import shutil
@@ -25,7 +23,6 @@ import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/iprPy
 import iprPy
-from iprPy.compatibility import range, int
 
 # Define record_style
 record_style = 'calculation_E_vs_r_scan'
@@ -51,7 +48,7 @@ def main(*args):
                           rsteps = input_dict['number_of_steps_r'])
     
     # Save data model of results
-    script = os.path.splitext(os.path.basename(__file__))[0]
+    script = Path(__file__).stem
     
     record = iprPy.load_record(record_style)
     record.buildcontent(script, input_dict, results_dict)
@@ -103,7 +100,7 @@ def e_vs_r(lammps_command, system, potential,
           the minima identified in the Ecoh_values.
     """
     # Get script's location
-    script_dir = os.path.dirname(__file__)
+    script_dir = Path(__file__).parent
 
     # Make system a deepcopy of itself (protect original from changes)
     system = deepcopy(system)
@@ -150,7 +147,7 @@ def e_vs_r(lammps_command, system, potential,
         lammps_variables['atomman_pair_info'] = potential.pair_info(system.symbols)
         
         # Write lammps input script
-        template_file = os.path.join(script_dir, 'run0.template')
+        template_file = Path(script_dir, 'run0.template')
         lammps_script = 'run0.in'
         with open(template_file) as f:
             template = f.read()
@@ -255,7 +252,7 @@ def process_input(input_dict, UUID=None, build=True):
         input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
     # Set default input/output units
-    iprPy.input.interpret('units', input_dict)
+    iprPy.input.subset('units').interpret(input_dict)
     
     # These are calculation-specific default strings
     input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
@@ -279,19 +276,16 @@ def process_input(input_dict, UUID=None, build=True):
                                       default_term='6.0 angstrom')
     
     # Check lammps_command and mpi_command
-    iprPy.input.interpret('lammps_commands', input_dict)
+    iprPy.input.subset('lammps_commands').interpret(input_dict)
     
     # Load potential
-    iprPy.input.interpret('lammps_potential', input_dict)
+    iprPy.input.subset('lammps_potential').interpret(input_dict)
     
-    # Load ucell system
-    iprPy.input.interpret('atomman_systemload', input_dict, build=build)
-    
-    # Add atomic charges
-    iprPy.input.interpret('lammps_atomcharges', input_dict, build=build)
+    # Load system
+    iprPy.input.subset('atomman_systemload').interpret(input_dict, build=build)
     
     # Construct initialsystem by manipulating ucell system
-    iprPy.input.interpret('atomman_systemmanipulate', input_dict, build=build)
+    iprPy.input.subset('atomman_systemmanipulate').interpret(input_dict, build=build)
 
 if __name__ == '__main__':
     main(*sys.argv[1:])
