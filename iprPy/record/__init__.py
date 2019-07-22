@@ -13,7 +13,7 @@ from ..tools import dynamic_import
 from .Record import Record
 from .CalculationRecord import CalculationRecord
 
-ignorelist = ['Record']
+ignorelist = ['Record', 'CalculationRecord']
 loaded, failed = dynamic_import(__file__, __name__, ignorelist=ignorelist)
 
 def load_record(style, name=None, content=None):

@@ -1,4 +1,4 @@
-raise ValueError('NEEDS REIMPLEMENTING!')
+raise NotImplementedError('Needs updating')
 import os
 from prepare import prepare
 from data_model import data_model
