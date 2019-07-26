@@ -4,6 +4,23 @@ buildcombos styles
 
 This file provides documentation for the various implemented buildcombos function styles/options.
 
+interatomicpotential
+--------------------
+
+The interatomicpotential option builds prepare input parameter value sets for loading interatomic potentials.  This option should be used for building combos based on interatomic potentials that are not tied to loading atomic configurations.
+
+The 'atomicarchive', 'atomicparent', 'atomicreference', and 'crystalprototype' buildcombos styles internally use 'interatomicpotential' if the given keyset contains 'potential_file' or 'potential_dir'.  To access the options below from the other buildcombos styles, add "potential_" to the buildcombo key.  For example if you define a atomicparent with buildcombo name "parent", the currentIPR value can be set using the prepare input key parent_potential_currentIPR.
+
+Allowed option keys:
+
+- **record**: the potential record style.  Default value is "potential_LAMMPS"
+
+- **currentIPR**: boolean indicating if only the most recent potential implementations within IPR are to be used (True), or if all implementations should be considered (False).  Note that False will ignore all non-IPR potentials (those that have ids that do not end with '--ipr-#').  Default value is True if record="potential_LAMMPS", False otherwise.
+
+- **query**: a database-style-specific query option for selecting records.
+
+- any other keyword arguments are used to limit which records of the specified style are included.
+
 atomicarchive
 -------------
 
@@ -23,7 +40,7 @@ Allowed option keys:
 
 - **query**: a database-style-specific query option for selecting records.
 
-- any other keyword arguments are used to limit which records of the specified style are included.
+- any other keyword arguments are used to limit which records of the specified style are included.  
 
 atomicparent
 ------------
@@ -48,27 +65,17 @@ Allowed option keys:
 atomicreference
 ---------------
 
-The atomicreference style builds prepare input parameter value sets for loading atomic configurations within a specified directory, and pairing them with compatible interatomic potentials if needed by the child calculation.  This allows for external (non-record) configurations to be used.  The configuration files should be divided into subdirectories that list the contained element model symbols in alphabetical order.  This allows for quick selection of the files based on the elements that they contain.
-
-The atomman.load() format of the files is inferred using the file extension.
-
-- .xml, .json -> system_model
-
-- .dump -> atom_dump
-
-- .dat -> atom_data
-
-- .poscar -> poscar
-
-- .cif -> cif
+The atomicreference style builds prepare input parameter value sets for reference crystal atomic configurations, and pairing them with compatible interatomic potentials if needed by the child calculation.  This allows for crystal structures obtained from external sources to be used.
 
 Allowed option keys:
 
-- **lib_directory**: the path to the directory containing the reference files.
+- **record**: the reference record style. Default value is 'reference_crystal'.
 
-- **elements**: the name of the element within the parent records that contains information on the atomic configuration files to access.  Default value is "atomic-system".
+- **elements**: specifies element sets to use in limiting which reference crystals are included.
 
-- any other keyword arguments are used to limit which potentials and which references (by name) to include.
+- **query**: a database-style-specific query option for selecting records.
+
+- any other keyword arguments are used to limit which records of the specified style are included.
 
 crystalprototype
 ----------------
@@ -77,7 +84,9 @@ The crystalprototype option builds prepare input parameter value sets for loadin
 
 Allowed option keys:
 
-- **record**: the reference record style.  Default value is "crystal_prototype".
+- **record**: the prototype record style.  Default value is "crystal_prototype".
+
+- **query**: a database-style-specific query option for selecting records.
 
 - any other keyword arguments are used to limit which records of the specified style are included.
 
@@ -93,20 +102,3 @@ Allowed option keys:
 - **query**: a database-style-specific query option for selecting records.
 
 - any other keyword arguments are used to limit which records of the specified style are included.
-
-interatomicpotential
---------------------
-
-The interatomicpotential option builds prepare input parameter value sets for loading interatomic potentials.  Typically, this option would not be called directly but is called within one of the atomic- options and the crystalprototype option.
-
-Allowed option keys:
-
-- **record**: the reference record style.  Default value is "potential_LAMMPS"
-
-- **currentIPR**: indicates if only the most recent implementation versions within IPR should be used.
-
-- **query**: a database-style-specific query option for selecting records.
-
-- any other keyword arguments are used to limit which records of the specified style are included.
-
-Note: to use these keys when the option is called by one of the atomic- or crystalprototype options, add "potential_" to the buildcombo key.  For example, if you define a atomicparent with buildcombo name "parent", the currentIPR value can be set to the prepare input key parent_potential_currentIPR.
