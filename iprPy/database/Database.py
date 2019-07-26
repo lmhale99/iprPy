@@ -708,7 +708,23 @@ class Database(object):
         return parents
     
     def prepare(self, run_directory, calculation, **kwargs):
+        # Check for run_directory first by name then by path
+        try:
+            run_directory = load_run_directory(run_directory)
+        except:
+            run_directory = Path(run_directory).resolve()
+            if not run_directory.is_dir():
+                raise ValueError('run_directory not found/set')
+        
         prepare(self, run_directory, calculation, **kwargs)
     
     def runner(self, run_directory, orphan_directory=None, hold_directory=None):
+        # Check for run_directory first by name then by path
+        try:
+            run_directory = load_run_directory(run_directory)
+        except:
+            run_directory = Path(run_directory).resolve()
+            if not run_directory.is_dir():
+                raise ValueError('run_directory not found/set')
+        
         runner(self, run_directory, orphan_directory=None, hold_directory=None)
