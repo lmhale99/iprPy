@@ -3,7 +3,7 @@ from DataModelDict import DataModelDict as DM
 
 __all__ = ['defect']
 
-def defect(database, keys, record=None, content_dict=None, query=None, **kwargs):
+def defect(database, keys, content_dict=None, record=None, query=None, **kwargs):
 
     if content_dict is None:
         content_dict = {}
