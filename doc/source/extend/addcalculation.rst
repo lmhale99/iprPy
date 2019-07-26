@@ -1,122 +1,246 @@
-============
-Calculations
-============
+=============================
+Adding new calculation styles
+=============================
 
-This section describes the components of a Calculation style in more detail as well as tips for those wanting to add a new Calculation style to the framework.
+The basic steps associated with implementing a new calculation style in iprPy
+are
 
-Calculation directories
------------------------
+#. Create a new subdirectory in iprPy/calculation named for the new calculation
+   style.  For the style name, use lowercase letters except where important and
+   separate words with underscores.  The name should be clear and distinct as
+   to what the calculation does.
 
-All calculations are stored in subdirectories of the iprPy/calculation directory, with directory named for the calculation, i.e. [calcname].  Each directory contains:
+#. Create the calculation script calc\_[style].py within the calculation
+   style directory.
 
-- **calc_[calcname].py**: The Python calculation script.
+#. Add the Python function(s) that perform the calculation to the calculation
+   script.
 
-- **calc_[calcname].template**: A template version of the input parameter file that the calculation script reads.
+#. Define a process_input() function within the script that generates the
+   inputs for the calculation function(s) based on a text input file.
 
-- **[CalcName].py**: Includes the definition of a Python class that is a subclass of iprPy.calculation.Calculation.  This defines how the iprPy codebase interacts with the calculation.
+#. If any sets of input keys can or are used by multiple calculation styles and
+   are not already collected in a subset style, think about creating one.
 
-- **README.md and THEORY.md**: Descriptions of the calculation and underlying theory.
+#. Add a main() function that calls process_input followed by the calculation
+   function(s).  Add the "if \_\_name\_\_ == '\_\_main\_\_':" check that calls
+   main() and passes it any command line arguments.
 
-- **calc_[calcname]_template.ipynb**: A template version of the demonstration Jupyter Notebook with fields for auto-filling content.
+#. Place copies of any other files that the calculation needs (excluding input
+   files) in the calculation folder.
 
-- **\_\_init\_\_.py**: The Python init file allowing Python to interpret the calculation directory as a submodule of the iprPy package.
+#. Create a separate file that defines the Calculation subclass.  Name the file
+   after the subclass name, typically by converting the style name to upper
+   camel case (each word capitalized with no separators).
+
+#. Define the subclass methods and attributes specific to the calculation
+   style.
+
+#. Create an "\_\_init\_\_.py" file that imports the subclass.
+
+#. Create a record style for collecting the calculation results (see
+   addrecord documentation).
+
+#. Test single runs of the calculation using Calculation.calc(), and
+   Calculation.main() or by running the calculation script.
+
+#. Test preparing the new calculation style for a limited number of conditions.
+
+#. In a terminal, go into one of the prepared calculations in the run directory
+   and run the calculation script directly.  Doing this helps check that all
+   components of the calculation were properly copied during prepare.
+
+#. Run all of the prepared calculations with runners and check the results.
+
+#. Write documentation for the calculation style in the README.md, theory.md,
+   and parameters.md files.  Create an empty calc\_[style].in input file.
+
+Files in the calculation style directories
+------------------------------------------
+
+- **calc\_[style].py**: The Python calculation script.
+
+- **calc\_[style].in**: The input file for the calculation with all input keys
+  and no values.
+
+- **[Style].py**: Defines the Calculation subclass for the calculation style.
+  This defines how the iprPy codebase interacts with the calculation.
+
+- **\_\_init\_\_.py**: Allows Python to identify the calculation directory as
+  a sub-package and be able to import the calculation subclass into iprPy.
+
+- **README.md**: A general overview description of the calculation.
+
+- **theory.md**: A detailed description of the calculation theory and
+   methodology.
+
+- **parameters.md**: Lists and describes the input parameters recognized by the
+  calculation style.
 
 - Copies of any other files required by the calculation.
 
-Calculation script
-------------------
+calc\_[style].py
+~~~~~~~~~~~~~~~~
 
-The calculation script is the primary component of the calculation file as it contains the code for performing the calculation.  To work within the iprPy framework, the calculation script needs to have the following requirements.
+The calculation scripts have a number of components that are common across the
+different styles.  This section lists those common components to assist with
+the rapid implementation of new calculation styles.
 
-- It needs to be called "calc_[calcname].py", where [calcname] matches the name of the calculation directory that it is within.
+record_style
+............
 
-- All variable parameters are read in by passing it an input file as a command line argument.
+The record style used by the calculation for constructing the results.json file
+is listed at the top of the file just before defining the main() function.
+While record_style does not need to be a global variable, it is useful to place
+it here for clarity.
 
-- Upon successful completion, it creates a "results.json" results record.
+main()
+......
 
-Script design
-~~~~~~~~~~~~~
+The calculation script's main() function
 
-The currently implemented scripts all follow the same basic internal design ensuring that they properly work with the iprPy framework.
+#. Opens and parses an input parameter file with the iprPy.input.parse()
+   function.  This returns a dictionary of the key-value terms, with the values
+   as strings.
 
-- The "results.json" file that is produced by the calculation script follows the schema of one of the implemented record styles.  This "record_style" is defined at the beginning of the calculation script.
+#. Calls process_input() to interpret the string values of the input dictionary
+   as Python values and objects.  The interpreted values are added to the input
+   dictionary.
 
-- Next, the calculation script defines a main() function that
+#. Calls the calculation function(s) using the processed terms in the input
+   dictionary as input parameters.
 
-    - Opens and parses an input parameter file with the iprPy.input.parse() function.  This returns a dictionary of the key-value terms, with the values as strings.
-    
-    - Calls a process_input() function that interprets the string values of the input dictionary as Python values and objects.  The interpreted values are added to the input dictionary.
-    
-    - One or more calculation functions are called that use the processed terms in the input dictionary as input parameters.
-    
-    - The input terms and any results produced by the calculation functions are passed to the associated Record style's buildcontent() method.
-    
-    - The generated record content is saved to "results.json".
+#. The formatted results content is generated by passing the input dict and any
+   results produced by the calculation function(s) to the record style's
+   buildcontent() method.
 
-- The calculation functions are listed next, which take Python objects as arguments.  All results are returned within a dictionary such that the produced values can be accessed by name.
+#. The formatted results content is saved to "results.json".
 
-- The process_input() function is defined next, which processes the string input values contained within an input dictionary, and assigns default values for any parameters that were not included in the input.  The processed values either update the values already in the input dictionary, or are added to the dictionary as new keys.  The iprPy.input submodule contains a number of useful functions for interpreting the input files in a common manner.
+Calculation function(s)
+.......................
 
-    - iprPy.input.boolean() will interpret (ignoring case sensitivity) 'true', 't', 'false', and 'f' strings as bools, and will pass through values that are already bools.
+The calculation functions are listed next, which take Python objects as
+arguments.  All results are returned within a dictionary such that the produced
+values can be accessed by name.
 
-    - iprPy.input.value() can be used to interpret and set default values for parameters that may include units information, e.g. "5 nm".
+process_input()
+...............
 
-    - iprPy.input.interpret() functions are modularly defined functions that can be used to interpret a set of input parameter terms.  Putting these functions in the iprPy codebase makes it easy for similar calculations to interpret input parameters in a common and consistent manner.  See ASER for more information and for a list of implemented interpret styles.
+The process_input() function is defined next, which processes the string input
+values contained within an input dictionary, and assigns default values for any
+parameters that were not included in the input.  The processed values either
+update the values already in the input dictionary, or are added to the
+dictionary as new keys.
 
-- Finally, the script is told to call the main function if executed directly, i.e.::
+The function takes the parameters
+
+- input_dict: The dictionary of input values to interpret.
+
+- UUID: The UUID4 calculation key to use.  If not given, a new one will be
+  generated.
+
+- build: A boolean flag, which indicates if the function should build all
+  objects interpreted from the inputs (True, default), or only those necessary
+  to define the calculation (False).  Setting build=False allows for
+  process_input() to be used during high-throughput prepare without the
+  overhead of creating complex objects that are not used until the calculation
+  is executed.
+
+To interpret subset keys similarly across different calculations, use the
+Subset.interpret() method for the subset styles you want to include.
+
+For calculation-specific keys, the iprPy.input submodule contains a few
+useful functions for interpreting the input files in a common manner.
+
+- iprPy.input.boolean() will interpret (ignoring case sensitivity) 'true',
+  't', 'false', and 'f' strings as Python bool values, and will pass
+  through values that are already bool.
+
+- iprPy.input.value() can be used to interpret and set default values and
+  units for parameters that may include units information, e.g. "5 nm".
+
+Main script option
+..................
+
+Finally, the script is told to call the main function if executed directly,
+i.e.
+
+.. code-block:: python
 
     if __name__ == '__main__':
         main(sys.args[1:])
 
+calc\_[style].in
+~~~~~~~~~~~~~~~~
 
-Calculation input template
---------------------------
+The included example input file should list all allowed input keys without any
+values assigned.  This allows for another user to simply add the values they
+want and run the calculation script for themselves.  This example input script
+can be automatically generated using XXX if template is defined
+for the Calculation subclass.
 
-To work with prepare, a template version of an input parameter file for the calculation has to be included.  The prepare function will read this file in and replace any terms surrounded by angular brackets, e.g. <termname>, with a value that the prepare function received for the "termname" term.
+[Style].py
+~~~~~~~~~~
 
-The key-value format used by the current calculation input files results in the template file having lines such as::
+The iprPy package interacts with the calculation style through the defined
+Calculation subclass.  Considerable work has gone into making it easy to
+define new subclass definitions by modifying values in pre-existing subclass
+definitions.  This section describes the different components of defining a
+Calculation subclass.
 
-    termname  <termname>
+Inheritance
+...........
 
-This not only provides the same standard input file format, but it also ensures that the key names supported by the calculation are the same as the key names supported by the prepare function for that calculation.
+The class should be a child of iprPy.calculation.Calculation.
 
-Calculation class
------------------
+\_\_init\_\_()
+..............
 
-The iprPy codebase needs to be able to interact with the calculation and obtain some metadata for the prepare function to work with it.  This is done by defining a subclass of the iprPy.calculation.Calculation class, and saving the definition as CalcName.py within the calculation directory.
+The \_\_init\_\_() function calls the parent class' \_\_init\_\_() function and
+defines which function from the calculation script to assign to the calc()
+method.  Note that the parent Calculation class loads the calculation script as
+a module, which can be accessed with self.script.
 
-Common Calculation properties
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+files
+.....
 
-- **style** is the Calculation's style.
+The files attribute provides a list of the absolute paths to all files
+necessary to run the calculation.  If copied from another Calculation subclass,
+only the "files" list defined inside the property function should be changed.
+This list should be the file names (without path) of the necessary files
+besides the calculation script.
 
-- **directory** is the absolute path to calculation directory.
+template
+........
 
-- **record_style** is the style for the Record associated with the results file generated by the calculation script.
+The template attribute returns a string template of the input file used by the
+calculation script.  If copied from another Calculation subclass, the template
+will be automatically generated based on the values in the "subsets" and
+"runkeys" lists.  The subsets list gives the names of subsets to include keys
+for, while the runkeys list gives the calculation-specific input keys.
 
-- **template** is the absolute path to the input parameter template file.
+singularkeys
+............
 
-- **files** is a list of absolute paths to every single file that should be included in each prepared instance of the calculation.
+The singularkeys attribute lists all prepare input keys recognized by the
+calculation that are limited to having single values.  This can be generated by
+joining subset keysets with a list of calculation-specific keys.
 
-- **singularkeys** is a list of all input parameter keys that are restricted to having only one value for the prepare function.
+multi keys
+..........
 
-- **multikeys** is a list of all multi-valued key sets for the prepare function.
+The multikeys attribute lists all sets of prepare input keys recognized by the
+calculation that can be assigned multiple values.  The key sets can be
+generated by joining subset keysets with lists of calculation-specific keys.
 
-- **allkeys** is a flat list of all keys in singularkeys and multikeys.
+\_\_init\_\_.py
+~~~~~~~~~~~~~~~
 
-Common Calculation methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+The \_\_init\_\_.py file simply needs to tell Python to include the Calculation
+subclass.  For instance, if the subclass is called "Style", then
+\_\_init\_\_.py contains
 
-- **main()** accesses the Python script's main() function, allowing for the calculation to be executed without generating a separate instance.
+.. code-block:: python
 
-- **process_input()** calls the Python script's process_input() function.  Making this available is important as it allows the prepare function to generate incomplete records for the calculation instances it creates using the default values that get assigned by the calculation.
-
-Defining a new Calculation class
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Many of a Calculation style class' properties and methods are inherited from the parent class or inferred based on directory information.  The only components that need to be overrided by the subclass are files, singularkeys, and multikeys as their associated values are unique to each calculation.
-
-The last step is to make it so that the Calculation subclass can be imported by Python, which is done simply by importing the CalcName class within the __init__.py file in the calculation directory::
-
-    from .CalcName import CalcName
-    __all__ = ['CalcName']
+    from .Style import Style
+    __all__ = ['Style']

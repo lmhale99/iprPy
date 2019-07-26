@@ -10,10 +10,10 @@ design of scientific calculations that
 
 - are open source with minimum barriers for usage,
 - have transparent methodologies supporting knowledge transfer and education,
-- produce results that are both human and machine readable, 
+- produce results that are both human and machine readable,
 - allow investigations into method and parameter sensitivity,
 - and can be integrated into workflows.
- 
+
 The framework was originally created to support the NIST Interatomic Potential
 Repository by evaluating basic materials properties across multiple classical
 interatomic potentials.  Because of this, many of the included calculations
@@ -26,7 +26,7 @@ Documentation Sections
 
 A quick introduction describing why you would want to use the iprPy framework.
 
-:any:`setup` 
+:any:`setup`
 
 Describes the basics of iprPy for performing calculations.
 
@@ -70,6 +70,7 @@ Package Tutorials
 
     intro
     setup
+    overview
     run/index
     extend/index
 

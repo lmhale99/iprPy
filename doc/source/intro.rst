@@ -32,26 +32,26 @@ completely different organization.
 
 - Can the original scientist locate all LAMMPS scripts, setup and analysis
   tools, and plotting files (Excel, Matlab, etc.) that were used?
-  
+
 - Are the located resources in a format that can easily be shared with other
   researchers?
-  
+
 - Are the resources clearly documented so that the methodology can be
   learned (or relearned)?
-  
+
 - How much content is missing and how long will it take to replace?
 
 - Does the associated publication have enough detail that any missing
-  content can be reimplemented? 
-  
-- Can the results of the original work be reproduced? 
+  content can be reimplemented?
 
-- If not, can the source of the discrepancy be identified (implememtation
+- Can the results of the original work be reproduced?
+
+- If not, can the source of the discrepancy be identified (implementation
   error, statistical error, parameter sensitivity, invalid model, etc.)?
 
 - Is the original data available for validation and verification of the
   original work?
-  
+
 - How easily can the original process be adapted for the new study?
 
 All these complications lead to wasted time and money. If you develop a new
@@ -62,7 +62,7 @@ It’s all in the design
 ======================
 
 With iprPy, the idea is to avoid these complications beforehand through
-proper calculation design. 
+proper calculation design.
 
 - Python calculation scripts are used to collect
   specific calculation processes (steps 2-5 of the research workflow above)
@@ -70,13 +70,13 @@ proper calculation design.
   calculation allows for the entire calculation technique and knowledge behind
   the technique to be contained within a single file or folder that can easily
   be archived and/or shared.
-  
+
 - All of a calculation script’s variable parameters are read in through a
   simple input parameter file. This highlights the
   important parameters of the calculation allowing parameter sensitivity
   studies. The simple standard input also opens the calculations to being
   implemented into high-throughput workflow managers.
-  
+
 - Upon successful completion, the calculation scripts produce XML- or
   JSON-formatted results records. Records in these
   formats can automatically be uploaded to databases for storing, processing,
@@ -98,8 +98,8 @@ barriers for usage.  We want that initial cost as low as possible to reap
 the rewards.
 
 - :any:`Setup <setup>` requirements are minimal. The basic framework only
-  requires Python 3.6 and a few extra packages.
-  
+  requires Python 3.6+ and a few extra packages.
+
 - All calculation scripts can be directly executed.
 
 - Demonstration Jupyter Notebooks are provided for each calculation.
@@ -107,7 +107,7 @@ the rewards.
 - The high-throughput tools can be directly executed from stand-alone
   scripts, called as Python functions, or accessed with inline console
   commands.
-  
-- New calculation, record, and database styles can be easily added in a modular fashion.
-  
+
+- New content can be easily added in a modular fashion.
+
 - Where possible, common codebase is developed for similar calculations.
