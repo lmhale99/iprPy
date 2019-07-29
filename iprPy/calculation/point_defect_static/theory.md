@@ -2,11 +2,19 @@
 
 The method starts with a bulk initial system, and relaxes the atomic positions with a LAMMPS simulation that performs an energy/force minimization.  The cohesive energy, $E_{coh}$, is taken by dividing the system's total energy by the number of atoms in the system.
 
-A corresponding defect system is then constructed using the atomman.defect.point() function.  The defect system is relaxed using the same energy/force minimization as was done with the bulk system.  The formation energy of the defect, $E_{ptd}^f$, is obtained as
+A corresponding defect system is then constructed using the atomman.defect.point() function.  The defect system is relaxed using the same energy/force minimization as was done with the bulk system.  The formation energy of the defect, $E_{f}^{ptd}$, is obtained as
 
-$$E_{ptd}^f = E_{ptd}^{total} - E_{coh} * n_{ptd},$$
+$$E_{f}^{ptd} = E_{total}^{ptd} - E_{coh} * N^{ptd},$$
 
-where $E_{ptd}^{total}$ is the total potential energy of the relaxed defect system, and $n_{ptd}$ is the number of atoms in the defect system.
+where $E_{total}^{ptd}$ is the total potential energy of the relaxed defect system, and $N^{ptd}$ is the number of atoms in the defect system.
+
+The elastic dipole tensor, $P_{ij}$, is also estimated for the point defect. $P_{ij}$ is a symmetric second rank tensor that characterizes the elastic nature of the defect.  Here, $P_{ij}$ is estimated using \[[1](https://doi.org/10.1080/01418618108239410), [2](https://doi.org/10.1080/01418618308244326)\]
+
+$$ P_{ij} = -V \langle \sigma_{ij} \rangle,$$
+
+where $V$ is the system cell volume and $\langle \sigma_{ij} \rangle$ is the residual stress on the system due to the defect, which is computed using the measured cell stresses (pressures) of the defect-free system, $\sigma_{ij}^{0}$, and the defect-containing system, $\sigma_{ij}^{ptd}$
+
+$$\langle \sigma_{ij} \rangle = \sigma_{ij}^{ptd} - \sigma_{ij}^{0}.$$
 
 The atomman.defect.point() method allows for the generation of four types of point defects:
 

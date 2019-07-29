@@ -1,28 +1,19 @@
-# stacking_fault Record style
+# stacking_fault record style
 
---------------------------------------------------------------------------------
+**Lucas M. Hale**, [lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), *Materials Science and Engineering Division, NIST*.
 
-**Lucas M. Hale**, 
-[lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), 
-*Materials Science and Engineering Division, NIST*.
-
-**Chandler A. Becker**, 
-[chandler.becker@nist.gov](mailto:chandler.becker@nist.gov?Subject=ipr-demo), 
-*Office of Data and Informatics, NIST*.
-
-**Zachary T. Trautt**, 
-[zachary.trautt@nist.gov](mailto:zachary.trautt@nist.gov?Subject=ipr-demo), 
-*Materials Measurement Science Division, NIST*.
-
-Version: 2017-05-01
-
-[Disclaimers](http://www.nist.gov/public_affairs/disclaimer.cfm) 
- 
---------------------------------------------------------------------------------
+Description updated: 2019-07-26
 
 ## Introduction
 
-The stacking_fault Record style is used for representing a specific 
-fault plane as stored in the iprPy reference library. Each record is
-associated with a specific stacking fault plane and contains characterization 
-metadata and parameters associated with generating the defect in a simulation.
+The stacking_fault record style is used for representing a specific fault plane as stored in the iprPy reference library. Each record is associated with a specific stacking fault plane and contains characterization metadata and parameters associated with generating the defect in a simulation.
+
+### Version notes
+
+- iprPy version 0.9: the library records have been regenerated based on atomman.defect.free_surface_basis
+
+### Additional dependencies
+
+### Disclaimers
+
+- [NIST disclaimers](http://www.nist.gov/public_affairs/disclaimer.cfm)

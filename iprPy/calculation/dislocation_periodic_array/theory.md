@@ -23,4 +23,4 @@ Note that with dislocations containing an edge component, a half-plane of atoms 
 
 ### Using dislocation solutions
 
-A slightly more complicated, but ultimately more efficient, way of creating a periodic array of dislocations system is to combine the linear displacements solultion above with a more accurate linear elastic dislocation solution.  The linear solution is used for the atoms at the free surfaces in the $z$ direction, and for ensuring periodicity across the $\vec{b}$ box vector direction.  The linear elastic dislocation solution is then used for atoms in the middle of the system to construct an initial dislocation.  
+A slightly more complicated, but ultimately more efficient, way of creating a periodic array of dislocations system is to combine the linear displacements solultion above with a more accurate linear elastic dislocation solution.  The linear solution is used for the atoms at the free surfaces in the $z$ direction, and for ensuring periodicity across the $\vec{b}$ box vector direction.  The linear elastic dislocation solution is then used for atoms in the middle of the system to construct an initial dislocation.

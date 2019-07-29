@@ -1,19 +1,21 @@
-# calculation_dislocation_periodic_array Record style
+# calculation_dislocation_periodic_array record style
 
 **Lucas M. Hale**, [lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), *Materials Science and Engineering Division, NIST*.
 
-**Chandler A. Becker**, [chandler.becker@nist.gov](mailto:chandler.becker@nist.gov?Subject=ipr-demo), *Office of Data and Informatics, NIST*.
-
-**Zachary T. Trautt**, [zachary.trautt@nist.gov](mailto:zachary.trautt@nist.gov?Subject=ipr-demo), *Materials Measurement Science Division, NIST*.
-
-Version: 2018-10-23
-
-[Disclaimers](http://www.nist.gov/public_affairs/disclaimer.cfm)
+Description updated: 2019-07-26
 
 ## Introduction
 
-The calculation_dislocation_periodic_array Record style is for a calculation that generates a periodic array of dislocations system.
+The calculation_dislocation_periodic_array record style is for a calculation that generates a periodic array of dislocations system.
 
-Calculation styles that use this Record style:
+### Version notes
+
+### Additional dependencies
+
+### Calculation styles that use this record style
 
 - dislocation_periodic_array
+
+### Disclaimers
+
+- [NIST disclaimers](http://www.nist.gov/public_affairs/disclaimer.cfm)

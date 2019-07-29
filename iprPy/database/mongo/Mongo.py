@@ -30,13 +30,18 @@ class Mongo(Database):
         
         Parameters
         ----------
-        host : dict
-            
+        host : str
+            The mongo host to connect to.  Default value is 'localhost'.
+        port : int
+            Then port to use in connecting to the mongo host.  Default value
+            is 27017.
+        database : str
+            The name of the database in the mongo host to interact with.
+            Default value is 'iprPy'
         **kwargs : dict, optional
-            Any keyword arguments allowed in initializing a pymongo.MongoClient
-            object.
+            Any extra keyword arguments needed to initialize a
+            pymongo.MongoClient object.
         """
-        
         
         # Connect to underlying class
         self.__mongodb = MongoClient(host=host, port=port, document_class=DM, **kwargs)[database]
