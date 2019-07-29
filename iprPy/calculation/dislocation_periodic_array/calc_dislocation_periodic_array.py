@@ -159,8 +159,12 @@ def dislocationarray(lammps_command, system, potential, burgers,
         - **'E_total_disl'** (*float*) - The total potential energy of the
           dislocation monopole system.
     """
-    # Get script's location
-    script_dir = Path(__file__).parent
+    try:
+        # Get script's location if __file__ exists
+        script_dir = Path(__file__).parent
+    except:
+        # Use cwd otherwise
+        script_dir = Path.cwd()
 
     # Set default values
     if dmax is None:

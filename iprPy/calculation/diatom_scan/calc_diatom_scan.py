@@ -90,8 +90,12 @@ def diatom(lammps_command, potential, symbols,
         - **'energy_values'** (*numpy.array of float*) - The computed potential
           energies for each r value.
     """
-    # Get script's location
-    script_dir = Path(__file__).parent
+    try:
+        # Get script's location if __file__ exists
+        script_dir = Path(__file__).parent
+    except:
+        # Use cwd otherwise
+        script_dir = Path.cwd()
  
     # Build lists of values
     r_values = np.linspace(rmin, rmax, rsteps)

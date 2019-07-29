@@ -153,9 +153,13 @@ def relax_static(lammps_command, system, potential, mpi_command=None,
         - **'measured_pyz'** (*float*) - The measured yz shear pressure of the
           relaxed system.
     """
-    # Get script's location
-    script_dir = Path(__file__).parent
-
+    try:
+        # Get script's location if __file__ exists
+        script_dir = Path(__file__).parent
+    except:
+        # Use cwd otherwise
+        script_dir = Path.cwd()
+    
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
     

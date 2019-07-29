@@ -99,8 +99,12 @@ def e_vs_r(lammps_command, system, potential,
         - **'min_cell'** (*list of atomman.System*) - Systems corresponding to
           the minima identified in the Ecoh_values.
     """
-    # Get script's location
-    script_dir = Path(__file__).parent
+    try:
+        # Get script's location if __file__ exists
+        script_dir = Path(__file__).parent
+    except:
+        # Use cwd otherwise
+        script_dir = Path.cwd()
 
     # Make system a deepcopy of itself (protect original from changes)
     system = deepcopy(system)

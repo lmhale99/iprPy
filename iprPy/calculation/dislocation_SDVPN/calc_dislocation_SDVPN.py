@@ -162,7 +162,7 @@ def process_input(input_dict, UUID=None, build=True):
         input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
     
     # Set default input/output units
-    iprPy.input.interpret('units', input_dict)
+    iprPy.input.subset('units').interpret(input_dict)
     pl_unit = input_dict['pressure_unit']+'*'+input_dict['length_unit']
     p_per_l_unit = input_dict['pressure_unit']+'/'+input_dict['length_unit']
     

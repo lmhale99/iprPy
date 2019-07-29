@@ -218,8 +218,12 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
         - **'dumpfile_ptd'** (*str*) - The filename of the LAMMPS dump file
           for the relaxed defect system.
     """
-    # Get script's location
-    script_dir = Path(__file__).parent
+    try:
+        # Get script's location if __file__ exists
+        script_dir = Path(__file__).parent
+    except:
+        # Use cwd otherwise
+        script_dir = Path.cwd()
 
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)

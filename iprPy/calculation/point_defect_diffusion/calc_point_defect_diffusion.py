@@ -134,8 +134,12 @@ def pointdiffusion(lammps_command, system, potential, point_kwargs,
           y-direction.
         - **'d'** (*float*) - The total computed diffusion constant.
     """
-    # Get script's location
-    script_dir = Path(__file__).parent
+    try:
+        # Get script's location if __file__ exists
+        script_dir = Path(__file__).parent
+    except:
+        # Use cwd otherwise
+        script_dir = Path.cwd()
 
     # Add defect(s) to the initially perfect system
     if not isinstance(point_kwargs, (list, tuple)):

@@ -1,0 +1,38 @@
+# Input script for calc_E_vs_r_scan.py
+
+# Calculation metadata
+branch                          
+
+# Command lines for LAMMPS and MPI
+lammps_command                  
+mpi_command                     
+
+# Potential definition and directory containing associated files
+potential_file                  
+potential_dir                   
+
+# Initial system configuration to load
+load_file                       
+load_style                      
+load_options                    
+family                          
+symbols                         
+box_parameters                  
+
+# System manipulations
+a_uvw                           
+b_uvw                           
+c_uvw                           
+atomshift                       
+sizemults                       
+
+# Units for input/output values
+length_unit                     
+pressure_unit                   
+energy_unit                     
+force_unit                      
+
+# Run parameters
+minimum_r                       
+maximum_r                       
+number_of_steps_r               

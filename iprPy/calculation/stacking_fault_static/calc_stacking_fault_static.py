@@ -129,9 +129,13 @@ def stackingfaultrelax(lammps_command, system, potential,
     ValueError
         For invalid cutboxvectors.
     """
-    # Get script's location
-    script_dir = Path(__file__).parent
-
+    try:
+        # Get script's location if __file__ exists
+        script_dir = Path(__file__).parent
+    except:
+        # Use cwd otherwise
+        script_dir = Path.cwd()
+    
     # Give correct LAMMPS fix setforce command
     if cutboxvector == 'a':
         fix_cut_setforce = 'fix cut all setforce NULL 0 0'    

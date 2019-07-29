@@ -12,10 +12,13 @@ from copy import deepcopy
 # http://www.numpy.org/
 import numpy as np
 
+# https://matplotlib.org/
 import matplotlib.pyplot as plt
 
+# https://atztogo.github.io/phonopy/phonopy-module.html
 import phonopy
 
+# https://atztogo.github.io/spglib/python-spglib.html
 import spglib
 
 # https://github.com/usnistgov/DataModelDict 
@@ -42,7 +45,7 @@ def main(*args):
     # Interpret and process input parameters
     process_input(input_dict, *args[1:])
     
-    # Run e_vs_r
+    # Run phonon
     results_dict = phonon(input_dict['lammps_command'],
                           input_dict['ucell'],
                           input_dict['potential'],
@@ -65,6 +68,13 @@ def main(*args):
 def phonon(lammps_command, ucell, potential, mpi_command=None, a_mult=5, b_mult=5, c_mult=5,
            distance=0.01, symprec=1e-5):
     
+    try:
+        # Get script's location if __file__ exists
+        script_dir = Path(__file__).parent
+    except:
+        # Use cwd otherwise
+        script_dir = Path.cwd()
+
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
     
@@ -103,7 +113,7 @@ def phonon(lammps_command, ucell, potential, mpi_command=None, a_mult=5, b_mult=
             lammps_variables['dump_modify_format'] = 'float %.13e'
 
         # Write lammps input script
-        template_file = 'phonon.template'
+        template_file = Path(script_dir, 'phonon.template')
         lammps_script = 'phonon.in'
         with open(template_file) as f:
             template = f.read()

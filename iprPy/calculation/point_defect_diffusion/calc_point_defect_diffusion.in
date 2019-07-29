@@ -1,0 +1,49 @@
+# Input script for calc_point_defect_diffusion.py
+
+# Calculation metadata
+branch                          
+
+# Command lines for LAMMPS and MPI
+lammps_command                  
+mpi_command                     
+
+# Potential definition and directory containing associated files
+potential_file                  
+potential_dir                   
+
+# Initial system configuration to load
+load_file                       
+load_style                      
+load_options                    
+family                          
+symbols                         
+box_parameters                  
+
+# System manipulations
+a_uvw                           
+b_uvw                           
+c_uvw                           
+atomshift                       
+sizemults                       
+
+# Point defect parameters
+pointdefect_file                
+pointdefect_type                
+pointdefect_atype               
+pointdefect_pos                 
+pointdefect_dumbbell_vect       
+pointdefect_scale               
+
+# Units for input/output values
+length_unit                     
+pressure_unit                   
+energy_unit                     
+force_unit                      
+
+# Run parameters
+temperature                     
+thermosteps                     
+dumpsteps                       
+runsteps                        
+equilsteps                      
+randomseed                      

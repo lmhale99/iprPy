@@ -1,0 +1,86 @@
+# Input script for calc_dislocation_SDVPN.py
+
+# Calculation metadata
+branch                          
+
+# Initial system configuration to load
+load_file                       
+load_style                      
+load_options                    
+family                          
+symbols                         
+box_parameters                  
+
+# Gamma surface parameters
+gammasurface_file               
+
+# Elastic constants
+elasticconstants_file           
+C11                             
+C12                             
+C13                             
+C14                             
+C15                             
+C16                             
+C22                             
+C23                             
+C24                             
+C25                             
+C26                             
+C33                             
+C34                             
+C35                             
+C36                             
+C44                             
+C45                             
+C46                             
+C55                             
+C56                             
+C66                             
+C_M                             
+C_lambda                        
+C_mu                            
+C_E                             
+C_nu                            
+C_K                             
+
+# Dislocation defect parameters
+dislocation_file                
+dislocation_stroh_m             
+dislocation_stroh_n             
+dislocation_lineboxvector       
+dislocation_burgersvector       
+
+# Units for input/output values
+length_unit                     
+pressure_unit                   
+energy_unit                     
+force_unit                      
+
+# Run parameters
+a_uvw                           
+b_uvw                           
+c_uvw                           
+xmax                            
+xstep                           
+xnum                            
+minimize_style                  
+minimize_options                
+minimize_cycles                 
+cutofflongrange                 
+tau_xy                          
+tau_yy                          
+tau_yz                          
+alpha                           
+beta_xx                         
+beta_yy                         
+beta_zz                         
+beta_xy                         
+beta_xz                         
+beta_yz                         
+cdiffelastic                    
+cdiffsurface                    
+cdiffstress                     
+halfwidth                       
+normalizedisreg                 
+fullstress                      

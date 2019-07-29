@@ -106,7 +106,7 @@ class StackingFaultStatic(Calculation):
                 + [
                     'stackingfault_shiftfraction1',
                     'stackingfault_shiftfraction2',
-                ],
+                ]
             ),
             (
                 subset('lammps_minimize').keyset

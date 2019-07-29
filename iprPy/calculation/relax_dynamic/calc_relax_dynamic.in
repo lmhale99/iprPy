@@ -1,0 +1,48 @@
+# Input script for calc_relax_dynamic.py
+
+# Calculation metadata
+branch                          
+
+# Command lines for LAMMPS and MPI
+lammps_command                  
+mpi_command                     
+
+# Potential definition and directory containing associated files
+potential_file                  
+potential_dir                   
+
+# Initial system configuration to load
+load_file                       
+load_style                      
+load_options                    
+family                          
+symbols                         
+box_parameters                  
+
+# System manipulations
+a_uvw                           
+b_uvw                           
+c_uvw                           
+atomshift                       
+sizemults                       
+
+# Units for input/output values
+length_unit                     
+pressure_unit                   
+energy_unit                     
+force_unit                      
+
+# Run parameters
+temperature                     
+pressure_xx                     
+pressure_yy                     
+pressure_zz                     
+pressure_xy                     
+pressure_xz                     
+pressure_yz                     
+integrator                      
+thermosteps                     
+dumpsteps                       
+runsteps                        
+equilsteps                      
+randomseed                      

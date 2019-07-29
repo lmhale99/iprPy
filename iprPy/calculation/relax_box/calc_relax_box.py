@@ -269,8 +269,12 @@ def calc_cij(lammps_command, system, potential,
     RuntimeError
         If any of the new box dimensions are less than zero.
     """
-    # Get script's location
-    script_dir = Path(__file__).parent
+    try:
+        # Get script's location if __file__ exists
+        script_dir = Path(__file__).parent
+    except:
+        # Use cwd otherwise
+        script_dir = Path.cwd()
 
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)

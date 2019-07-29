@@ -1,0 +1,24 @@
+# Input script for calc_diatom_scan.py
+
+# Calculation metadata
+branch                          
+
+# Command lines for LAMMPS and MPI
+lammps_command                  
+mpi_command                     
+
+# Potential definition and directory containing associated files
+potential_file                  
+potential_dir                   
+
+# Units for input/output values
+length_unit                     
+pressure_unit                   
+energy_unit                     
+force_unit                      
+
+# Run parameters
+symbols                         
+minimum_r                       
+maximum_r                       
+number_of_steps_r               
