@@ -1,26 +1,36 @@
-#!/usr/bin/env python
-from __future__ import absolute_import, division, print_function
-
 import io
 import os
+import sys
 import glob
-import iprPy
-from iprPy.compatibility import range
+from pathlib import Path
 
-def main():
+import iprPy
+
+def main(*calcnames):
+    """
+    Generates Jupyter Notebooks from the templates.  Note that this overwrites
+    the Jupyter Notebooks that have templates!  If you only want to update one
+    or two, give the calculation names as inline arguments.
     
+    Parameters
+    calcnames : list
+        Indicates that a limited set of Jupyter Notebooks is to be generated
+        from the templates.  An empty list (default value) will generate all
+        Notebooks
+    """
     # Specify directory paths
-    iprPydir = os.path.join(iprPy.rootdir, '..')
-    notebookdir = os.path.join(iprPydir, 'notebook')
-    templatedir = os.path.join(iprPydir, 'notebook', 'template')
-    calcdir = os.path.join(iprPy.rootdir, 'calculation')
+    iprPydir = Path(iprPy.rootdir, '..')
+    notebookdir = Path(iprPydir, 'notebook')
+    templatedir = Path(iprPydir, 'notebook', 'template')
+    calcdir = Path(iprPy.rootdir, 'calculation')
     
     # Loop over all template Notebooks
-    templatepaths = os.path.join(templatedir, '*.ipynb')
-    for templatepath in glob.iglob(templatepaths):
+    for templatepath in templatedir.glob('*.ipynb'):
         
         # Get calculation's name
-        calcname = os.path.splitext(os.path.basename(templatepath))[0]
+        calcname = templatepath.stem
+        if len(calcnames) > 0 and calcname not in calcnames:
+            continue
         
         # Read in template file
         with io.open(templatepath, encoding='UTF-8') as templatefile:
@@ -28,10 +38,9 @@ def main():
         
         # Build content_dict containing calculation content
         content_dict = {}
-        for contentpath in glob.iglob(os.path.join(calcdir, calcname, '*')):
-            if (os.path.isfile(contentpath) 
-                and os.path.splitext(contentpath)[1] not in ['.pyc','.pyd']):
-                contentname = os.path.basename(contentpath)
+        for contentpath in Path(calcdir, calcname).glob('*'):
+            if (contentpath.is_file() and contentpath.suffix not in ['.pyc','.pyd']):
+                contentname = contentpath.name
                 
                 # Save full file contents according to the file's name
                 with io.open(contentpath, encoding='UTF-8') as contentfile:
@@ -39,16 +48,15 @@ def main():
                 content_dict[contentname] = ipynbformat(lines)
                 
                 # Save functions as file's name plus function name
-                if os.path.splitext(contentname)[1] == '.py':
+                if contentpath.suffix == '.py':
                 
                     for functionname, functionlines in parsefunctions(lines):
-                        name = contentname+'('+functionname+')'
+                        name = f'{contentname}({functionname})'
                         content_dict[name] = ipynbformat(functionlines)
         
         # Fill in template and save complete Notebook
-        notebook = iprPy.tools.filltemplate(template, content_dict,
-                                            '^fill^', '^here^')
-        notebookpath = os.path.join(notebookdir, calcname+'.ipynb')
+        notebook = iprPy.tools.filltemplate(template, content_dict, '^fill^', '^here^')
+        notebookpath = Path(notebookdir, f'{calcname}.ipynb')
         with io.open(notebookpath, 'w', encoding='UTF-8') as notebookfile:
             notebookfile.write(notebook)
     
@@ -58,15 +66,14 @@ def build_index(notebookdir):
     
     index = '# List of Jupyter Calculation Notebooks'
     
-    notebookpaths = os.path.join(notebookdir, '*.ipynb')
-    for notebookpath in glob.iglob(notebookpaths):
+    for notebookpath in notebookdir.glob('*.ipynb'):
     
         # Get calculation's name
-        calcname = os.path.splitext(os.path.basename(notebookpath))[0]
+        calcname = notebookpath.stem
         
         index += '\n\n## ['+calcname+']('+calcname+'.ipynb)'
     
-    indexpath = os.path.join(notebookdir, 'README.md')
+    indexpath = Path(notebookdir, 'README.md')
     with open(indexpath, 'w') as indexfile:
         indexfile.write(index)
 
@@ -100,4 +107,4 @@ def parsefunctions(lines):
                 name = lines[i][4:].split('(')[0].strip()
                 
 if __name__ == '__main__':
-    main()
+    main(*sys.argv[1:])

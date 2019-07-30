@@ -2,146 +2,170 @@
 
 This is a list of the implemented calculations and the status of the associated scripts and documentation.
 
-__bain_transformation_map__
+## bain_transformation_map
 
 - script: Needs updated (last update version 0.6-0.7?)
 - workflow: Not implemented
 - docs: Missing
+- Notebook: Missing
 
-__crystal_space_group__
+## crystal_space_group
 
 - script: Current
 - workflow: Current
-- docs: Needs updating (last update version 0.82)
+- docs: Current
+- Notebook: Current
 
-__diatom_scan__
+## diatom_scan
 
 - script: Current
 - workflow: Not implemented (easy to add)
-- docs: Missing
+- docs: Current
+- Notebook: Current
 
-__dislocation_crss__
+## dislocation_crss
 
 - script: Incomplete: needs updating and testing
 - workflow: Not implemented
 - docs: Missing
+- Notebook: Missing
 
-__dislocation_monopole__
-
-- script: Current
-- workflow: Current
-- docs: Needs updating (last update version 0.82)
-
-__dislocation_periodic_array__
+## dislocation_monopole
 
 - script: Current
 - workflow: Current
-- docs: Missing
+- docs: Current
+- Notebook: Current
 
-__dislocation_periodic_array_stress__
+## dislocation_periodic_array
+
+- script: Current
+- workflow: Current
+- docs: Current
+- Notebook: Current
+
+## dislocation_periodic_array_stress
 
 - script: Incomplete: needs updating and testing
-- workflow: Not implemented 
+- workflow: Not implemented
 - docs: Missing
+- Notebook: Missing
 
-__dislocation_SDVPN__
+## dislocation_SDVPN
 
 - script: Current
 - workflow: Not implemented (needs gamma surfaces and elastic constants)
-- docs: Needs updating (last update version 0.82)
+- docs: Current
+- Notebook: Current
 
-__dislocation_SDVPN_stress__
+## dislocation_SDVPN_stress
 
 - script: Incomplete: needs updating and testing
-- workflow: Not implemented 
+- workflow: Not implemented
 - docs: Missing
+- Notebook: Missing
 
-__dislocation_vacancy__
+## dislocation_vacancy
 
 - script: Needs updating (last update working branch of version 0.7)
-- workflow: Not implemented 
+- workflow: Not implemented
 - docs: Missing
+- Notebook: Missing
 
-__E_vs_r_scan__
+## E_vs_r_scan
 
 - script: Current
 - workflow: Current
-- docs: Needs updating (last update version 0.82)
+- docs: Current
+- Notebook: Current
 
-__elastic_constants_dynamic__
+## elastic_constants_dynamic
 
 - script: Unfinished, maybe multiple methods?
 - workflow: Not implemented
 - docs: Missing
+- Notebook: Missing
 
-__elastic_constants_static__
+## elastic_constants_static
 
 - script: Current
 - workflow: Current
-- docs: Needs updating (last update version 0.82)
+- docs: Current
+- Notebook: Current
 
-__grain_boundary_bcc__
+## grain_boundary_bcc
 
 - script: Needs updated (last update version 0.6-0.7?)
 - workflow: Not implemented
 - docs: Missing
+- Notebook: Missing
 
-__grain_boundary_search__
+## grain_boundary_search
 
 - script: Unfinished
 - workflow: Not implemented
 - docs: Missing
+- Notebook: Missing
 
-__phonon__
+## phonon
 
 - script: Current
 - workflow: Current
-- docs: Missing
+- docs: Current
+- Notebook: Current
 
-__point_defect_diffusion__
+## point_defect_diffusion
 
 - script: Current
 - workflow: Not implemented (needs temperature relaxations)
-- docs: Needs updating (last update version 0.82)
+- docs: Current
+- Notebook: Current
 
-__point_defect_static__
-
-- script: Current
-- workflow: Current
-- docs: Needs updating (last update version 0.82)
-
-__relax_box__
+## point_defect_static
 
 - script: Current
 - workflow: Current
-- docs: Needs updating (last update version 0.82)
+- docs: Current
+- Notebook: Current
 
-__relax_dynamic__
-
-- script: Current
-- workflow: Current
-- docs: Needs updating (last update version 0.82)
-
-__relax_static__
+## relax_box
 
 - script: Current
 - workflow: Current
-- docs: Needs updating (last update version 0.82)
+- docs: Current
+- Notebook: Current
 
-__stacking_fault_map_2D__
+## relax_dynamic
 
 - script: Current
 - workflow: Current
-- docs: Needs updating (last update version 0.82)
+- docs: Current
+- Notebook: Current
 
-__stacking_fault_static__
+## relax_static
+
+- script: Current
+- workflow: Current
+- docs: Current
+- Notebook: Current
+
+## stacking_fault_map_2D
+
+- script: Current
+- workflow: Current
+- docs: Current
+- Notebook: Current
+
+## stacking_fault_static
 
 - script: Current
 - workflow: Not implemented (redundant)
-- docs: Needs updating (last update version 0.82)
+- docs: Current
+- Notebook: Current
 
-__surface_energy_static__
+## surface_energy_static
 
 - script: Current
 - workflow: Current
-- docs: Needs updating (last update version 0.82)
+- docs: Current
+- Notebook: Current
