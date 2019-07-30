@@ -60,7 +60,7 @@ Calculation script functions
             # Create index.rst
             d = {}
             d['nameheader'] = '\n'.join(['=' * len(name), name, '='*len(name)])
-            with open(os.path.join(docdir, 'index.rst'), 'w') as f:
+            with open(os.path.join(docdir, 'index.rst'), 'w', encoding='UTF-8', newline='\n') as f:
                 f.write(iprPy.tools.filltemplate(indextemplate, d,'<', '>'))
             
             # Create calc.rst
@@ -68,7 +68,7 @@ Calculation script functions
             pyname = 'calc_' + name + '.py'
             d['scriptheader'] = '\n'.join(['=' * len(pyname), pyname, '='*len(pyname)])
             d['name'] = name
-            with open(os.path.join(docdir, 'calc.rst'), 'w') as f:
+            with open(os.path.join(docdir, 'calc.rst'), 'w', encoding='UTF-8', newline='\n') as f:
                 f.write(iprPy.tools.filltemplate(scripttemplate, d, '<', '>'))
             
             # copy README.md to intro.rst
@@ -117,7 +117,7 @@ def buildrecords():
             # Create index.rst
             d = {}
             d['nameheader'] = '\n'.join(['=' * len(name), name, '='*len(name)])
-            with open(os.path.join(docdir, 'index.rst'), 'w') as f:
+            with open(os.path.join(docdir, 'index.rst'), 'w', encoding='UTF-8', newline='\n') as f:
                 f.write(iprPy.tools.filltemplate(indextemplate, d,'<', '>'))
             
             # copy README.md to intro.rst
@@ -158,7 +158,7 @@ def builddatabases():
             # Create index.rst
             d = {}
             d['nameheader'] = '\n'.join(['=' * len(name), name, '='*len(name)])
-            with open(os.path.join(docdir, 'index.rst'), 'w') as f:
+            with open(os.path.join(docdir, 'index.rst'), 'w', encoding='UTF-8', newline='\n') as f:
                 f.write(iprPy.tools.filltemplate(indextemplate, d,'<', '>'))
             
             # copy README.md to intro.rst
@@ -205,7 +205,7 @@ def copy_md2rst(infile, outfile):
     
     # Read infile
     try:
-        with open(infile) as f:
+        with open(infile, encoding='UTF-8') as f:
             text = f.read()
     except:
         text = ''
@@ -217,8 +217,8 @@ def copy_md2rst(infile, outfile):
         pass
     
     # Write to outfile
-    with open(outfile, 'w') as f:
-        f.write(pypandoc.convert_text(text, 'rst', format='md').replace('\r\n', '\n'))
+    with open(outfile, 'w', newline='\n', encoding='UTF-8') as f:
+        f.write(pypandoc.convert_text(text, 'rst', format='md', encoding='UTF-8').replace('\r\n', '\n'))
 
 def parsemath(st):
     """Alters the Latex encoding so that it is properly interpreted by Sphinx"""

@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.abspath('../iprPy'))
 # -- Project information -----------------------------------------------------
 
 project = 'iprPy'
-copyright = '2018, Lucas Hale'
+copyright = '2019, Lucas Hale'
 author = 'Lucas Hale'
 
 import iprPy

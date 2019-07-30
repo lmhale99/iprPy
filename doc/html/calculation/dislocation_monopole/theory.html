@@ -4,30 +4,23 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Method and Theory &#8212; iprPy 0.8.2 documentation</title>
+    <title>Method and Theory &#8212; iprPy 0.9.0 documentation</title>
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '0.8.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Input script parameters" href="parameters.html" />
     <link rel="prev" title="Introduction" href="intro.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -43,7 +36,7 @@
         <li class="right" >
           <a href="intro.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">dislocation_monopole</a> &#187;</li> 
       </ul>
@@ -67,34 +60,37 @@ documentation.</p>
 <p>One of the most important considerations in defining an atomistic system
 containing a dislocation monopole system is the system’s orientation. In
 particular, care is needed to properly align the system’s Cartesian
-axes, <span class="math">\(x, y, z\)</span>, the system’s box vectors, <span class="math">\(a, b, c\)</span>, and
-the Stroh solution’s axes, <span class="math">\(u, m, n\)</span>.</p>
+axes, <span class="math notranslate nohighlight">\(x, y, z\)</span>, the system’s box vectors, <span class="math notranslate nohighlight">\(a, b, c\)</span>, and
+the Stroh solution’s axes, <span class="math notranslate nohighlight">\(u, m, n\)</span>.</p>
 <ul class="simple">
 <li>In order for the dislocation to remain perfectly straight in the
-atomic system, the dislocation line, <span class="math">\(u\)</span>, must correspond to
+atomic system, the dislocation line, <span class="math notranslate nohighlight">\(u\)</span>, must correspond to
 one of the system’s box vectors. The resulting dislocation monopole
 system will be periodic along the box direction corresponding to
-<span class="math">\(u\)</span>, and non-periodic in the other two box directions.</li>
+<span class="math notranslate nohighlight">\(u\)</span>, and non-periodic in the other two box directions.</li>
 <li>The Stroh solution is invariant along the dislocation line direction,
-<span class="math">\(u\)</span>, thereby the solution is 2 dimensional. <span class="math">\(m\)</span> and
-<span class="math">\(n\)</span> are the unit vectors for the 2D axis system used by the
-Stroh solution. As such, <span class="math">\(u, m\)</span> and <span class="math">\(n\)</span> are all normal to
-each other. The plane defined by the <span class="math">\(um\)</span> vectors is the
-dislocation’s slip plane, i.e. <span class="math">\(n\)</span> is normal to the slip plane.</li>
+<span class="math notranslate nohighlight">\(u\)</span>, thereby the solution is 2 dimensional. <span class="math notranslate nohighlight">\(m\)</span> and
+<span class="math notranslate nohighlight">\(n\)</span> are the unit vectors for the 2D axis system used by the
+Stroh solution. As such, <span class="math notranslate nohighlight">\(u, m\)</span> and <span class="math notranslate nohighlight">\(n\)</span> are all normal to
+each other. The plane defined by the <span class="math notranslate nohighlight">\(um\)</span> vectors is the
+dislocation’s slip plane, i.e. <span class="math notranslate nohighlight">\(n\)</span> is normal to the slip plane.</li>
 <li>For LAMMPS simulations, the system’s box vectors are limited such
-that <span class="math">\(a\)</span> is parallel to the <span class="math">\(x\)</span>-axis, and <span class="math">\(b\)</span> is in
-the <span class="math">\(xy\)</span>-plane (i.e. has no <span class="math">\(z\)</span> component). Based on this
+that <span class="math notranslate nohighlight">\(a\)</span> is parallel to the <span class="math notranslate nohighlight">\(x\)</span>-axis, and <span class="math notranslate nohighlight">\(b\)</span> is in
+the <span class="math notranslate nohighlight">\(xy\)</span>-plane (i.e.&nbsp;has no <span class="math notranslate nohighlight">\(z\)</span> component). Based on this
 and the previous two points, the most convenient, and therefore the
-default, orientation for a generic dislocation is to</li>
-<li>Make <span class="math">\(u\)</span> and <span class="math">\(a\)</span> parallel, which also places <span class="math">\(u\)</span>
-parallel to the <span class="math">\(x\)</span>-axis.</li>
-<li>Select <span class="math">\(b\)</span> such that it is within the slip plane. As <span class="math">\(u\)</span>
-and <span class="math">\(a\)</span> must also be in the slip plane, the plane itself is
-defined by <span class="math">\(a \times b\)</span>.</li>
-<li>Given that neither <span class="math">\(a\)</span> nor <span class="math">\(b\)</span> have <span class="math">\(z\)</span> components,
-the normal to the slip plane will be perpendicular to <span class="math">\(z\)</span>. From
-this, it naturally follows that <span class="math">\(m\)</span> can be taken as parallel to
-the <span class="math">\(y\)</span>-axis, and <span class="math">\(n\)</span> parallel to the <span class="math">\(z\)</span>-axis.</li>
+default, orientation for a generic dislocation is to<ul>
+<li>Make <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(a\)</span> parallel, which also places <span class="math notranslate nohighlight">\(u\)</span>
+parallel to the <span class="math notranslate nohighlight">\(x\)</span>-axis.</li>
+<li>Select <span class="math notranslate nohighlight">\(b\)</span> such that it is within the slip plane. As
+<span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(a\)</span> must also be in the slip plane, the plane
+itself is defined by <span class="math notranslate nohighlight">\(a \times b\)</span>.</li>
+<li>Given that neither <span class="math notranslate nohighlight">\(a\)</span> nor <span class="math notranslate nohighlight">\(b\)</span> have <span class="math notranslate nohighlight">\(z\)</span>
+components, the normal to the slip plane will be perpendicular to
+<span class="math notranslate nohighlight">\(z\)</span>. From this, it naturally follows that <span class="math notranslate nohighlight">\(m\)</span> can be
+taken as parallel to the <span class="math notranslate nohighlight">\(y\)</span>-axis, and <span class="math notranslate nohighlight">\(n\)</span> parallel to
+the <span class="math notranslate nohighlight">\(z\)</span>-axis.</li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="section" id="calculation-methodology">
@@ -104,8 +100,8 @@ the <span class="math">\(y\)</span>-axis, and <span class="math">\(n\)</span> pa
 <em>atomshift</em>, and <em>sizemults</em> input parameters. This initial system is
 saved as base.dump.</li>
 <li>The atomman.defect.Stroh class is used to obtain the dislocation
-solution based on the defined <span class="math">\(m\)</span> and <span class="math">\(n\)</span> vectors,
-<span class="math">\(C_{ij}\)</span>, and the dislocation’s Burgers vector, <span class="math">\(b_i\)</span>.</li>
+solution based on the defined <span class="math notranslate nohighlight">\(m\)</span> and <span class="math notranslate nohighlight">\(n\)</span> vectors,
+<span class="math notranslate nohighlight">\(C_{ij}\)</span>, and the dislocation’s Burgers vector, <span class="math notranslate nohighlight">\(b_i\)</span>.</li>
 <li>The dislocation is inserted into the system by displacing all atoms
 according to the Stroh solution’s displacements. The dislocation line
 is placed parallel to the specified <em>dislocation_lineboxvector</em> and
@@ -134,7 +130,7 @@ results record.</li>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <h3><a href="../../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Method and Theory</a><ul>
 <li><a class="reference internal" href="#stroh-theory">Stroh theory</a></li>
@@ -169,13 +165,13 @@ results record.</li>
         <li class="right" >
           <a href="intro.html" title="Introduction"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >dislocation_monopole</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

@@ -1,0 +1,171 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Method and Theory &#8212; iprPy 0.9.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Input script parameters" href="parameters.html" />
+    <link rel="prev" title="Introduction" href="intro.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parameters.html" title="Input script parameters"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">dislocation_periodic_array</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="method-and-theory">
+<h1>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="system-orientation-considerations">
+<h2>System orientation considerations<a class="headerlink" href="#system-orientation-considerations" title="Permalink to this headline">¶</a></h2>
+<p>Properly constructing a periodic array of dislocations atomic
+configuration requires careful consideration of dislocation solutions
+and atomic system boundaries. Solutions for straight dislocations based
+on elasticity often follow the convention of using a Cartesian system
+(<span class="math notranslate nohighlight">\(x', y', z'\)</span>) in which the dislocation line is oriented along the
+<span class="math notranslate nohighlight">\(z'\)</span>-axis, and the slip plane taken to be the <span class="math notranslate nohighlight">\(y'=0\)</span> plane.
+The dislocation’s Burgers vector, <span class="math notranslate nohighlight">\(\vec{b}\)</span>, is then in the
+<span class="math notranslate nohighlight">\(x'z'\)</span>-plane, with edge component in the <span class="math notranslate nohighlight">\(x'\)</span>-direction and
+screw component in the <span class="math notranslate nohighlight">\(z'\)</span>-direction. When the dislocation slips,
+the dislocation line will move in the <span class="math notranslate nohighlight">\(x'\)</span>-direction.</p>
+<p>For any such dislocation solution, there will be a shearing along the
+slip plane resulting in disregistry, i.e.&nbsp;a relative displacement
+between the top and bottom halves. This disregistry has limits such that
+it is <span class="math notranslate nohighlight">\(0\)</span> for <span class="math notranslate nohighlight">\(x' \to -\infty\)</span> and <span class="math notranslate nohighlight">\(\vec{b}\)</span> for
+<span class="math notranslate nohighlight">\(x' \to +\infty\)</span>.</p>
+<p>Within an atomic system, the dislocation line should be aligned with one
+of the system’s box vectors making the dislocation infinitely long and
+initially perfectly straight. The slip plane can then be defined as
+containing that box vector and another one. This results in the third
+box vector being the only one with a component parallel to the slip
+plane’s normal.</p>
+<p>For LAMMPS-based simulations, the most convenient orientation to use is
+to align the dislocation with the <span class="math notranslate nohighlight">\(\vec{a}\)</span> box vector, and to
+define the slip plane as containing both <span class="math notranslate nohighlight">\(\vec{a}\)</span> and
+<span class="math notranslate nohighlight">\(\vec{b}\)</span>. Given the limits that LAMMPS places on how system boxes
+can be defined, this results in favorable alignment of the system to the
+LAMMPS Cartesian system (<span class="math notranslate nohighlight">\(x, y, z\)</span>). The dislocation line will be
+along the <span class="math notranslate nohighlight">\(x\)</span>-axis, the slip plane normal parallel to the
+<span class="math notranslate nohighlight">\(z\)</span>-axis, and dislocation motion will be in the <span class="math notranslate nohighlight">\(y\)</span>
+direction. Thus, the LAMMPS coordinates corresponds to a rotation of the
+theory coordinates such that <span class="math notranslate nohighlight">\(x'=y, y'=z, z'=x\)</span>.</p>
+</div>
+<div class="section" id="linear-displacements-solution">
+<h2>Linear displacements solution<a class="headerlink" href="#linear-displacements-solution" title="Permalink to this headline">¶</a></h2>
+<p>The simplest way to insert a dislocation is to cut the system in half
+along the slip plane and apply equal but opposite linear displacements,
+<span class="math notranslate nohighlight">\(\vec{u}\)</span>, to the two halves with end conditions</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(\vec{u}(y=-\frac{Ly}{2}) = 0\)</span></li>
+<li><span class="math notranslate nohighlight">\(\vec{u}(y=\frac{Ly}{2}) = \pm \frac{\vec{b}}{2}\)</span></li>
+</ul>
+<p>Applying these displacements results in a disregistry along the slip
+plane that ranges from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(\vec{b}\)</span>. While the two
+<span class="math notranslate nohighlight">\(y\)</span> boundaries of the system both correspond to a perfect crystal,
+they are misaligned from each other by <span class="math notranslate nohighlight">\(\frac{\vec{b}}{2}\)</span>. A
+coherent periodic boundary along the <span class="math notranslate nohighlight">\(\vec{b}\)</span> box vector can be
+established by adding or subtracting <span class="math notranslate nohighlight">\(\frac{\vec{b}}{2}\)</span> from
+<span class="math notranslate nohighlight">\(\vec{b}\)</span>.</p>
+<p>Note that with dislocations containing an edge component, a half-plane
+of atoms either needs to be inserted or removed to ensure boundary
+compatibility. Here, this is accomplished by always shifting
+<span class="math notranslate nohighlight">\(\vec{b}\)</span> to be shorter in the <span class="math notranslate nohighlight">\(y\)</span> direction, and removing
+excess atoms by identifying (near) duplicates.</p>
+</div>
+<div class="section" id="using-dislocation-solutions">
+<h2>Using dislocation solutions<a class="headerlink" href="#using-dislocation-solutions" title="Permalink to this headline">¶</a></h2>
+<p>A slightly more complicated, but ultimately more efficient, way of
+creating a periodic array of dislocations system is to combine the
+linear displacements solultion above with a more accurate linear elastic
+dislocation solution. The linear solution is used for the atoms at the
+free surfaces in the <span class="math notranslate nohighlight">\(z\)</span> direction, and for ensuring periodicity
+across the <span class="math notranslate nohighlight">\(\vec{b}\)</span> box vector direction. The linear elastic
+dislocation solution is then used for atoms in the middle of the system
+to construct an initial dislocation.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Method and Theory</a><ul>
+<li><a class="reference internal" href="#system-orientation-considerations">System orientation considerations</a></li>
+<li><a class="reference internal" href="#linear-displacements-solution">Linear displacements solution</a></li>
+<li><a class="reference internal" href="#using-dislocation-solutions">Using dislocation solutions</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="intro.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="parameters.html"
+                        title="next chapter">Input script parameters</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parameters.html" title="Input script parameters"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >dislocation_periodic_array</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

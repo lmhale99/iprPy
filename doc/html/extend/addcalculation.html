@@ -4,30 +4,23 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Calculations &#8212; iprPy 0.8.2 documentation</title>
+    <title>Adding new calculation styles &#8212; iprPy 0.9.0 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.8.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Modular functions" href="addfunctions.html" />
-    <link rel="prev" title="Records" href="addrecord.html" /> 
-  </head>
-  <body>
+    <link rel="next" title="Adding new record styles" href="addrecord.html" />
+    <link rel="prev" title="Reference Library" href="addreference.html" /> 
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,12 +31,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="addfunctions.html" title="Modular functions"
+          <a href="addrecord.html" title="Adding new record styles"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="addrecord.html" title="Records"
+          <a href="addreference.html" title="Reference Library"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Extending iprPy</a> &#187;</li> 
       </ul>
     </div>  
@@ -53,105 +46,205 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="calculations">
-<h1>Calculations<a class="headerlink" href="#calculations" title="Permalink to this headline">¶</a></h1>
-<p>This section describes the components of a Calculation style in more detail as well as tips for those wanting to add a new Calculation style to the framework.</p>
-<div class="section" id="calculation-directories">
-<h2>Calculation directories<a class="headerlink" href="#calculation-directories" title="Permalink to this headline">¶</a></h2>
-<p>All calculations are stored in subdirectories of the iprPy/calculation directory, with directory named for the calculation, i.e. [calcname].  Each directory contains:</p>
+  <div class="section" id="adding-new-calculation-styles">
+<h1>Adding new calculation styles<a class="headerlink" href="#adding-new-calculation-styles" title="Permalink to this headline">¶</a></h1>
+<p>The basic steps associated with implementing a new calculation style in iprPy
+are</p>
+<ol class="arabic simple">
+<li>Create a new subdirectory in iprPy/calculation named for the new calculation
+style.  For the style name, use lowercase letters except where important and
+separate words with underscores.  The name should be clear and distinct as
+to what the calculation does.</li>
+<li>Create the calculation script calc_[style].py within the calculation
+style directory.</li>
+<li>Add the Python function(s) that perform the calculation to the calculation
+script.</li>
+<li>Define a process_input() function within the script that generates the
+inputs for the calculation function(s) based on a text input file.</li>
+<li>If any sets of input keys can or are used by multiple calculation styles and
+are not already collected in a subset style, think about creating one.</li>
+<li>Add a main() function that calls process_input followed by the calculation
+function(s).  Add the “if __name__ == ‘__main__’:” check that calls
+main() and passes it any command line arguments.</li>
+<li>Place copies of any other files that the calculation needs (excluding input
+files) in the calculation folder.</li>
+<li>Create a separate file that defines the Calculation subclass.  Name the file
+after the subclass name, typically by converting the style name to upper
+camel case (each word capitalized with no separators).</li>
+<li>Define the subclass methods and attributes specific to the calculation
+style.</li>
+<li>Create an “__init__.py” file that imports the subclass.</li>
+<li>Create a record style for collecting the calculation results (see
+addrecord documentation).</li>
+<li>Test single runs of the calculation using Calculation.calc(), and
+Calculation.main() or by running the calculation script.</li>
+<li>Test preparing the new calculation style for a limited number of conditions.</li>
+<li>In a terminal, go into one of the prepared calculations in the run directory
+and run the calculation script directly.  Doing this helps check that all
+components of the calculation were properly copied during prepare.</li>
+<li>Run all of the prepared calculations with runners and check the results.</li>
+<li>Write documentation for the calculation style in the README.md, theory.md,
+and parameters.md files.  Create an empty calc_[style].in input file.</li>
+</ol>
+<div class="section" id="files-in-the-calculation-style-directories">
+<h2>Files in the calculation style directories<a class="headerlink" href="#files-in-the-calculation-style-directories" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>calc_[calcname].py</strong>: The Python calculation script.</li>
-<li><strong>calc_[calcname].template</strong>: A template version of the input parameter file that the calculation script reads.</li>
-<li><strong>[CalcName].py</strong>: Includes the definition of a Python class that is a subclass of iprPy.calculation.Calculation.  This defines how the iprPy codebase interacts with the calculation.</li>
-<li><strong>README.md and THEORY.md</strong>: Descriptions of the calculation and underlying theory.</li>
-<li><strong>calc_[calcname]_template.ipynb</strong>: A template version of the demonstration Jupyter Notebook with fields for auto-filling content.</li>
-<li><strong>__init__.py</strong>: The Python init file allowing Python to interpret the calculation directory as a submodule of the iprPy package.</li>
+<li><strong>calc_[style].py</strong>: The Python calculation script.</li>
+<li><strong>calc_[style].in</strong>: The input file for the calculation with all input keys
+and no values.</li>
+<li><strong>[Style].py</strong>: Defines the Calculation subclass for the calculation style.
+This defines how the iprPy codebase interacts with the calculation.</li>
+<li><strong>__init__.py</strong>: Allows Python to identify the calculation directory as
+a sub-package and be able to import the calculation subclass into iprPy.</li>
+<li><strong>README.md</strong>: A general overview description of the calculation.</li>
+<li><dl class="first docutils">
+<dt><strong>theory.md</strong>: A detailed description of the calculation theory and</dt>
+<dd>methodology.</dd>
+</dl>
+</li>
+<li><strong>parameters.md</strong>: Lists and describes the input parameters recognized by the
+calculation style.</li>
 <li>Copies of any other files required by the calculation.</li>
 </ul>
+<div class="section" id="calc-style-py">
+<h3>calc_[style].py<a class="headerlink" href="#calc-style-py" title="Permalink to this headline">¶</a></h3>
+<p>The calculation scripts have a number of components that are common across the
+different styles.  This section lists those common components to assist with
+the rapid implementation of new calculation styles.</p>
+<div class="section" id="record-style">
+<h4>record_style<a class="headerlink" href="#record-style" title="Permalink to this headline">¶</a></h4>
+<p>The record style used by the calculation for constructing the results.json file
+is listed at the top of the file just before defining the main() function.
+While record_style does not need to be a global variable, it is useful to place
+it here for clarity.</p>
 </div>
-<div class="section" id="calculation-script">
-<h2>Calculation script<a class="headerlink" href="#calculation-script" title="Permalink to this headline">¶</a></h2>
-<p>The calculation script is the primary component of the calculation file as it contains the code for performing the calculation.  To work within the iprPy framework, the calculation script needs to have the following requirements.</p>
+<div class="section" id="main">
+<h4>main()<a class="headerlink" href="#main" title="Permalink to this headline">¶</a></h4>
+<p>The calculation script’s main() function</p>
+<ol class="arabic simple">
+<li>Opens and parses an input parameter file with the iprPy.input.parse()
+function.  This returns a dictionary of the key-value terms, with the values
+as strings.</li>
+<li>Calls process_input() to interpret the string values of the input dictionary
+as Python values and objects.  The interpreted values are added to the input
+dictionary.</li>
+<li>Calls the calculation function(s) using the processed terms in the input
+dictionary as input parameters.</li>
+<li>The formatted results content is generated by passing the input dict and any
+results produced by the calculation function(s) to the record style’s
+buildcontent() method.</li>
+<li>The formatted results content is saved to “results.json”.</li>
+</ol>
+</div>
+<div class="section" id="calculation-function-s">
+<h4>Calculation function(s)<a class="headerlink" href="#calculation-function-s" title="Permalink to this headline">¶</a></h4>
+<p>The calculation functions are listed next, which take Python objects as
+arguments.  All results are returned within a dictionary such that the produced
+values can be accessed by name.</p>
+</div>
+<div class="section" id="process-input">
+<h4>process_input()<a class="headerlink" href="#process-input" title="Permalink to this headline">¶</a></h4>
+<p>The process_input() function is defined next, which processes the string input
+values contained within an input dictionary, and assigns default values for any
+parameters that were not included in the input.  The processed values either
+update the values already in the input dictionary, or are added to the
+dictionary as new keys.</p>
+<p>The function takes the parameters</p>
 <ul class="simple">
-<li>It needs to be called “calc_[calcname].py”, where [calcname] matches the name of the calculation directory that it is within.</li>
-<li>All variable parameters are read in by passing it an input file as a command line argument.</li>
-<li>Upon successful completion, it creates a “results.json” results record.</li>
+<li>input_dict: The dictionary of input values to interpret.</li>
+<li>UUID: The UUID4 calculation key to use.  If not given, a new one will be
+generated.</li>
+<li>build: A boolean flag, which indicates if the function should build all
+objects interpreted from the inputs (True, default), or only those necessary
+to define the calculation (False).  Setting build=False allows for
+process_input() to be used during high-throughput prepare without the
+overhead of creating complex objects that are not used until the calculation
+is executed.</li>
 </ul>
-<div class="section" id="script-design">
-<h3>Script design<a class="headerlink" href="#script-design" title="Permalink to this headline">¶</a></h3>
-<p>The currently implemented scripts all follow the same basic internal design ensuring that they properly work with the iprPy framework.</p>
-<ul>
-<li><p class="first">The “results.json” file that is produced by the calculation script follows the schema of one of the implemented record styles.  This “record_style” is defined at the beginning of the calculation script.</p>
-</li>
-<li><p class="first">Next, the calculation script defines a main() function that</p>
-<blockquote>
-<div><ul class="simple">
-<li>Opens and parses an input parameter file with the iprPy.input.parse() function.  This returns a dictionary of the key-value terms, with the values as strings.</li>
-<li>Calls a process_input() function that interprets the string values of the input dictionary as Python values and objects.  The interpreted values are added to the input dictionary.</li>
-<li>One or more calculation functions are called that use the processed terms in the input dictionary as input parameters.</li>
-<li>The input terms and any results produced by the calculation functions are passed to the associated Record style’s buildcontent() method.</li>
-<li>The generated record content is saved to “results.json”.</li>
+<p>To interpret subset keys similarly across different calculations, use the
+Subset.interpret() method for the subset styles you want to include.</p>
+<p>For calculation-specific keys, the iprPy.input submodule contains a few
+useful functions for interpreting the input files in a common manner.</p>
+<ul class="simple">
+<li>iprPy.input.boolean() will interpret (ignoring case sensitivity) ‘true’,
+‘t’, ‘false’, and ‘f’ strings as Python bool values, and will pass
+through values that are already bool.</li>
+<li>iprPy.input.value() can be used to interpret and set default values and
+units for parameters that may include units information, e.g. “5 nm”.</li>
 </ul>
-</div></blockquote>
-</li>
-<li><p class="first">The calculation functions are listed next, which take Python objects as arguments.  All results are returned within a dictionary such that the produced values can be accessed by name.</p>
-</li>
-<li><p class="first">The process_input() function is defined next, which processes the string input values contained within an input dictionary, and assigns default values for any parameters that were not included in the input.  The processed values either update the values already in the input dictionary, or are added to the dictionary as new keys.  The iprPy.input submodule contains a number of useful functions for interpreting the input files in a common manner.</p>
-<blockquote>
-<div><ul class="simple">
-<li>iprPy.input.boolean() will interpret (ignoring case sensitivity) ‘true’, ‘t’, ‘false’, and ‘f’ strings as bools, and will pass through values that are already bools.</li>
-<li>iprPy.input.value() can be used to interpret and set default values for parameters that may include units information, e.g. “5 nm”.</li>
-<li>iprPy.input.interpret() functions are modularly defined functions that can be used to interpret a set of input parameter terms.  Putting these functions in the iprPy codebase makes it easy for similar calculations to interpret input parameters in a common and consistent manner.  See ASER for more information and for a list of implemented interpret styles.</li>
-</ul>
-</div></blockquote>
-</li>
-<li><p class="first">Finally, the script is told to call the main function if executed directly, i.e.:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+</div>
+<div class="section" id="main-script-option">
+<h4>Main script option<a class="headerlink" href="#main-script-option" title="Permalink to this headline">¶</a></h4>
+<p>Finally, the script is told to call the main function if executed directly,
+i.e.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
 </pre></div>
 </div>
-</li>
-</ul>
 </div>
 </div>
-<div class="section" id="calculation-input-template">
-<h2>Calculation input template<a class="headerlink" href="#calculation-input-template" title="Permalink to this headline">¶</a></h2>
-<p>To work with prepare, a template version of an input parameter file for the calculation has to be included.  The prepare function will read this file in and replace any terms surrounded by angular brackets, e.g. &lt;termname&gt;, with a value that the prepare function received for the “termname” term.</p>
-<p>The key-value format used by the current calculation input files results in the template file having lines such as:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">termname</span>  <span class="o">&lt;</span><span class="n">termname</span><span class="o">&gt;</span>
-</pre></div>
+<div class="section" id="calc-style-in">
+<h3>calc_[style].in<a class="headerlink" href="#calc-style-in" title="Permalink to this headline">¶</a></h3>
+<p>The included example input file should list all allowed input keys without any
+values assigned.  This allows for another user to simply add the values they
+want and run the calculation script for themselves.  This example input script
+can be automatically generated using XXX if template is defined
+for the Calculation subclass.</p>
 </div>
-<p>This not only provides the same standard input file format, but it also ensures that the key names supported by the calculation are the same as the key names supported by the prepare function for that calculation.</p>
+<div class="section" id="style-py">
+<h3>[Style].py<a class="headerlink" href="#style-py" title="Permalink to this headline">¶</a></h3>
+<p>The iprPy package interacts with the calculation style through the defined
+Calculation subclass.  Considerable work has gone into making it easy to
+define new subclass definitions by modifying values in pre-existing subclass
+definitions.  This section describes the different components of defining a
+Calculation subclass.</p>
+<div class="section" id="inheritance">
+<h4>Inheritance<a class="headerlink" href="#inheritance" title="Permalink to this headline">¶</a></h4>
+<p>The class should be a child of iprPy.calculation.Calculation.</p>
 </div>
-<div class="section" id="calculation-class">
-<h2>Calculation class<a class="headerlink" href="#calculation-class" title="Permalink to this headline">¶</a></h2>
-<p>The iprPy codebase needs to be able to interact with the calculation and obtain some metadata for the prepare function to work with it.  This is done by defining a subclass of the iprPy.calculation.Calculation class, and saving the definition as CalcName.py within the calculation directory.</p>
-<div class="section" id="common-calculation-properties">
-<h3>Common Calculation properties<a class="headerlink" href="#common-calculation-properties" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><strong>style</strong> is the Calculation’s style.</li>
-<li><strong>directory</strong> is the absolute path to calculation directory.</li>
-<li><strong>record_style</strong> is the style for the Record associated with the results file generated by the calculation script.</li>
-<li><strong>template</strong> is the absolute path to the input parameter template file.</li>
-<li><strong>files</strong> is a list of absolute paths to every single file that should be included in each prepared instance of the calculation.</li>
-<li><strong>singularkeys</strong> is a list of all input parameter keys that are restricted to having only one value for the prepare function.</li>
-<li><strong>multikeys</strong> is a list of all multi-valued key sets for the prepare function.</li>
-<li><strong>allkeys</strong> is a flat list of all keys in singularkeys and multikeys.</li>
-</ul>
+<div class="section" id="init">
+<h4>__init__()<a class="headerlink" href="#init" title="Permalink to this headline">¶</a></h4>
+<p>The __init__() function calls the parent class’ __init__() function and
+defines which function from the calculation script to assign to the calc()
+method.  Note that the parent Calculation class loads the calculation script as
+a module, which can be accessed with self.script.</p>
 </div>
-<div class="section" id="common-calculation-methods">
-<h3>Common Calculation methods<a class="headerlink" href="#common-calculation-methods" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><strong>main()</strong> accesses the Python script’s main() function, allowing for the calculation to be executed without generating a separate instance.</li>
-<li><strong>process_input()</strong> calls the Python script’s process_input() function.  Making this available is important as it allows the prepare function to generate incomplete records for the calculation instances it creates using the default values that get assigned by the calculation.</li>
-</ul>
+<div class="section" id="files">
+<h4>files<a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h4>
+<p>The files attribute provides a list of the absolute paths to all files
+necessary to run the calculation.  If copied from another Calculation subclass,
+only the “files” list defined inside the property function should be changed.
+This list should be the file names (without path) of the necessary files
+besides the calculation script.</p>
 </div>
-<div class="section" id="defining-a-new-calculation-class">
-<h3>Defining a new Calculation class<a class="headerlink" href="#defining-a-new-calculation-class" title="Permalink to this headline">¶</a></h3>
-<p>Many of a Calculation style class’ properties and methods are inherited from the parent class or inferred based on directory information.  The only components that need to be overrided by the subclass are files, singularkeys, and multikeys as their associated values are unique to each calculation.</p>
-<p>The last step is to make it so that the Calculation subclass can be imported by Python, which is done simply by importing the CalcName class within the __init__.py file in the calculation directory:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">.CalcName</span> <span class="k">import</span> <span class="n">CalcName</span>
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CalcName&#39;</span><span class="p">]</span>
+<div class="section" id="template">
+<h4>template<a class="headerlink" href="#template" title="Permalink to this headline">¶</a></h4>
+<p>The template attribute returns a string template of the input file used by the
+calculation script.  If copied from another Calculation subclass, the template
+will be automatically generated based on the values in the “subsets” and
+“runkeys” lists.  The subsets list gives the names of subsets to include keys
+for, while the runkeys list gives the calculation-specific input keys.</p>
+</div>
+<div class="section" id="singularkeys">
+<h4>singularkeys<a class="headerlink" href="#singularkeys" title="Permalink to this headline">¶</a></h4>
+<p>The singularkeys attribute lists all prepare input keys recognized by the
+calculation that are limited to having single values.  This can be generated by
+joining subset keysets with a list of calculation-specific keys.</p>
+</div>
+<div class="section" id="multi-keys">
+<h4>multi keys<a class="headerlink" href="#multi-keys" title="Permalink to this headline">¶</a></h4>
+<p>The multikeys attribute lists all sets of prepare input keys recognized by the
+calculation that can be assigned multiple values.  The key sets can be
+generated by joining subset keysets with lists of calculation-specific keys.</p>
+</div>
+</div>
+<div class="section" id="init-py">
+<h3>__init__.py<a class="headerlink" href="#init-py" title="Permalink to this headline">¶</a></h3>
+<p>The __init__.py file simply needs to tell Python to include the Calculation
+subclass.  For instance, if the subclass is called “Style”, then
+__init__.py contains</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">.Style</span> <span class="kn">import</span> <span class="n">Style</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Style&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -164,19 +257,29 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Calculations</a><ul>
-<li><a class="reference internal" href="#calculation-directories">Calculation directories</a></li>
-<li><a class="reference internal" href="#calculation-script">Calculation script</a><ul>
-<li><a class="reference internal" href="#script-design">Script design</a></li>
+<li><a class="reference internal" href="#">Adding new calculation styles</a><ul>
+<li><a class="reference internal" href="#files-in-the-calculation-style-directories">Files in the calculation style directories</a><ul>
+<li><a class="reference internal" href="#calc-style-py">calc_[style].py</a><ul>
+<li><a class="reference internal" href="#record-style">record_style</a></li>
+<li><a class="reference internal" href="#main">main()</a></li>
+<li><a class="reference internal" href="#calculation-function-s">Calculation function(s)</a></li>
+<li><a class="reference internal" href="#process-input">process_input()</a></li>
+<li><a class="reference internal" href="#main-script-option">Main script option</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#calculation-input-template">Calculation input template</a></li>
-<li><a class="reference internal" href="#calculation-class">Calculation class</a><ul>
-<li><a class="reference internal" href="#common-calculation-properties">Common Calculation properties</a></li>
-<li><a class="reference internal" href="#common-calculation-methods">Common Calculation methods</a></li>
-<li><a class="reference internal" href="#defining-a-new-calculation-class">Defining a new Calculation class</a></li>
+<li><a class="reference internal" href="#calc-style-in">calc_[style].in</a></li>
+<li><a class="reference internal" href="#style-py">[Style].py</a><ul>
+<li><a class="reference internal" href="#inheritance">Inheritance</a></li>
+<li><a class="reference internal" href="#init">__init__()</a></li>
+<li><a class="reference internal" href="#files">files</a></li>
+<li><a class="reference internal" href="#template">template</a></li>
+<li><a class="reference internal" href="#singularkeys">singularkeys</a></li>
+<li><a class="reference internal" href="#multi-keys">multi keys</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#init-py">__init__.py</a></li>
 </ul>
 </li>
 </ul>
@@ -184,11 +287,11 @@
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="addrecord.html"
-                        title="previous chapter">Records</a></p>
+  <p class="topless"><a href="addreference.html"
+                        title="previous chapter">Reference Library</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="addfunctions.html"
-                        title="next chapter">Modular functions</a></p>
+  <p class="topless"><a href="addrecord.html"
+                        title="next chapter">Adding new record styles</a></p>
         </div>
       </div>
       <div class="clearer"></div>
@@ -203,17 +306,17 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="addfunctions.html" title="Modular functions"
+          <a href="addrecord.html" title="Adding new record styles"
              >next</a> |</li>
         <li class="right" >
-          <a href="addrecord.html" title="Records"
+          <a href="addreference.html" title="Reference Library"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Extending iprPy</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

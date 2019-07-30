@@ -4,30 +4,23 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>iprPy package &#8212; iprPy 0.8.2 documentation</title>
+    <title>iprPy package &#8212; iprPy 0.9.0 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.8.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="iprPy.calculation package" href="calculation.html" />
-    <link rel="prev" title="Introduction" href="../database/local/intro.html" /> 
-  </head>
-  <body>
+    <link rel="prev" title="Introduction" href="../database/mongo/intro.html" /> 
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -41,9 +34,9 @@
           <a href="calculation.html" title="iprPy.calculation package"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="../database/local/intro.html" title="Introduction"
+          <a href="../database/mongo/intro.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -59,7 +52,6 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="calculation.html">iprPy.calculation package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="compatibility.html">iprPy.compatibility package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">iprPy.database package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input.html">iprPy.input package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="record.html">iprPy.record package</a></li>
@@ -72,8 +64,30 @@
 <dl class="attribute">
 <dt id="iprPy.rootdir">
 <code class="descname">rootdir</code><a class="headerlink" href="#iprPy.rootdir" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – The absolute path to the iprPy package’s root directory used to locate
+<dd><p>The absolute path to the iprPy package’s root directory used to locate
 contained data files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iprPy.libdir">
+<code class="descname">libdir</code><a class="headerlink" href="#iprPy.libdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>The absolute path to the iprPy package’s library directory.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -84,9 +98,54 @@ successfully and unsuccessfully loaded when iprPy was initialized.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="iprPy.list_databases">
+<code class="descname">list_databases</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.list_databases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gives a list of the pre-defined database names</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>list</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">The names associated with the pre-defined databases.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.list_run_directories">
+<code class="descname">list_run_directories</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.list_run_directories" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gives a list of the pre-defined run_directory names</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>list</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">The names associated with the pre-defined run_directories.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="iprPy.load_calculation">
 <code class="descname">load_calculation</code><span class="sig-paren">(</span><em>style</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.load_calculation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Loads a Calculation subclass associated with a given calculation style</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The calculation style</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A Calculation object for the style</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">subclass of iprPy.calculation.Calculation</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="iprPy.load_database">
@@ -120,7 +179,27 @@ Allowed keywords are database style-specific.</li>
 <dl class="function">
 <dt id="iprPy.load_record">
 <code class="descname">load_record</code><span class="sig-paren">(</span><em>style</em>, <em>name=None</em>, <em>content=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.load_record" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Loads a Record subclass associated with a given record style</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The record style</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name to give to the specific record</li>
+<li><strong>content</strong> – The record’s data model content</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A Record object for the style</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">subclass of iprPy.record.Record</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="iprPy.load_run_directory">
@@ -142,7 +221,7 @@ Allowed keywords are database style-specific.</li>
 
 <dl class="function">
 <dt id="iprPy.set_database">
-<code class="descname">set_database</code><span class="sig-paren">(</span><em>name=None</em>, <em>style=None</em>, <em>host=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.set_database" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_database</code><span class="sig-paren">(</span><em>name=None</em>, <em>style=None</em>, <em>host=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.set_database" title="Permalink to this definition">¶</a></dt>
 <dd><p>Allows for database information to be defined in the settings file. Screen
 prompts will be given to allow any necessary database parameters to be
 entered.</p>
@@ -222,7 +301,7 @@ file.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">iprPy package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
@@ -232,7 +311,7 @@ file.</p>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="../database/local/intro.html"
+  <p class="topless"><a href="../database/mongo/intro.html"
                         title="previous chapter">Introduction</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="calculation.html"
@@ -254,13 +333,13 @@ file.</p>
           <a href="calculation.html" title="iprPy.calculation package"
              >next</a> |</li>
         <li class="right" >
-          <a href="../database/local/intro.html" title="Introduction"
+          <a href="../database/mongo/intro.html" title="Introduction"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

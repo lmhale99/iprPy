@@ -1,0 +1,1092 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>diatom_scan calculation style &#8212; iprPy 0.9.0 documentation</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="dislocation_SDVPN calculation style" href="dislocation_SDVPN.html" />
+    <link rel="prev" title="crystal_space_group calculation style" href="crystal_space_group.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dislocation_SDVPN.html" title="dislocation_SDVPN calculation style"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="crystal_space_group.html" title="crystal_space_group calculation style"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 7ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="diatom_scan-calculation-style">
+<h1>diatom_scan calculation style<a class="headerlink" href="#diatom_scan-calculation-style" title="Permalink to this headline">¶</a></h1>
+<p><strong>Lucas M. Hale</strong>, <a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>, <em>Materials Science and Engineering Division, NIST</em>.</p>
+<p>Description updated: 2019-07-26</p>
+<div class="section" id="Introduction">
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<p>The diatom_scan calculation style evaluates the interaction energy between two atoms at varying distances. This provides a measure of the isolated pair interaction of two atoms providing insights into the strengths of the attraction/repulsion and the effective range of interatomic spacings. This scan also gives insight into the computational smoothness of the potential’s functional form.</p>
+<div class="section" id="Version-notes">
+<h3>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="Additional-dependencies">
+<h3>Additional dependencies<a class="headerlink" href="#Additional-dependencies" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="Disclaimers">
+<h3>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST disclaimers</a></li>
+<li>No 3+ body interactions are explored with this calculation as only two atoms are used.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="Method-and-Theory">
+<h2>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this headline">¶</a></h2>
+<p>Two atoms are placed in an otherwise empty system. The total energy of the system is evaluated for different interatomic spacings.</p>
+</div>
+<div class="section" id="Demonstration">
+<h2>Demonstration<a class="headerlink" href="#Demonstration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="1.-Setup">
+<h3>1. Setup<a class="headerlink" href="#1.-Setup" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="1.1.-Library-imports">
+<h4>1.1. Library imports<a class="headerlink" href="#1.1.-Library-imports" title="Permalink to this headline">¶</a></h4>
+<p>Import libraries needed by the calculation. The external libraries used are:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.numpy.org/">numpy</a></li>
+<li><a class="reference external" href="https://github.com/usnistgov/DataModelDict">DataModelDict</a></li>
+<li><a class="reference external" href="https://github.com/usnistgov/atomman">atomman</a></li>
+<li><a class="reference external" href="https://github.com/usnistgov/iprPy">iprPy</a></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Standard library imports</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">floor</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+
+<span class="c1"># http://www.numpy.org/</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># https://github.com/usnistgov/DataModelDict</span>
+<span class="kn">from</span> <span class="nn">DataModelDict</span> <span class="k">import</span> <span class="n">DataModelDict</span> <span class="k">as</span> <span class="n">DM</span>
+
+<span class="c1"># https://github.com/usnistgov/atomman</span>
+<span class="kn">import</span> <span class="nn">atomman</span> <span class="k">as</span> <span class="nn">am</span>
+<span class="kn">import</span> <span class="nn">atomman.lammps</span> <span class="k">as</span> <span class="nn">lmp</span>
+<span class="kn">import</span> <span class="nn">atomman.unitconvert</span> <span class="k">as</span> <span class="nn">uc</span>
+
+<span class="c1"># https://github.com/usnistgov/iprPy</span>
+<span class="kn">import</span> <span class="nn">iprPy</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Notebook last executed on&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">(),</span> <span class="s1">&#39;using iprPy version&#39;</span><span class="p">,</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Notebook last executed on 2019-07-29 using iprPy version 0.9.0
+</pre></div></div>
+</div>
+<p>Import additional libraries for plotting. The external libraries used are:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://bokeh.pydata.org/">bokeh</a></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">bokeh</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Bokeh version =&#39;</span><span class="p">,</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="k">import</span> <span class="n">figure</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">show</span>
+<span class="kn">from</span> <span class="nn">bokeh.embed</span> <span class="k">import</span> <span class="n">components</span>
+<span class="kn">from</span> <span class="nn">bokeh.resources</span> <span class="k">import</span> <span class="n">Resources</span>
+<span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="k">import</span> <span class="n">output_notebook</span>
+<span class="n">output_notebook</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Bokeh version = 1.0.4
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div class="bk-root">
+    <a href="https://bokeh.pydata.org" target="_blank" class="bk-logo bk-logo-small bk-logo-notebook"></a>
+    <span id="1001">Loading BokehJS ...</span>
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div></div>
+<script type="text/javascript">
+var element = document.currentScript.previousSibling.previousSibling;
+
+(function(root) {
+  function now() {
+    return new Date();
+  }
+
+  var force = true;
+
+  if (typeof (root._bokeh_onload_callbacks) === "undefined" || force === true) {
+    root._bokeh_onload_callbacks = [];
+    root._bokeh_is_loading = undefined;
+  }
+
+  var JS_MIME_TYPE = 'application/javascript';
+  var HTML_MIME_TYPE = 'text/html';
+  var EXEC_MIME_TYPE = 'application/vnd.bokehjs_exec.v0+json';
+  var CLASS_NAME = 'output_bokeh rendered_html';
+
+  /**
+   * Render data to the DOM node
+   */
+  function render(props, node) {
+    var script = document.createElement("script");
+    node.appendChild(script);
+  }
+
+  /**
+   * Handle when an output is cleared or removed
+   */
+  function handleClearOutput(event, handle) {
+    var cell = handle.cell;
+
+    var id = cell.output_area._bokeh_element_id;
+    var server_id = cell.output_area._bokeh_server_id;
+    // Clean up Bokeh references
+    if (id != null && id in Bokeh.index) {
+      Bokeh.index[id].model.document.clear();
+      delete Bokeh.index[id];
+    }
+
+    if (server_id !== undefined) {
+      // Clean up Bokeh references
+      var cmd = "from bokeh.io.state import curstate; print(curstate().uuid_to_server['" + server_id + "'].get_sessions()[0].document.roots[0]._id)";
+      cell.notebook.kernel.execute(cmd, {
+        iopub: {
+          output: function(msg) {
+            var id = msg.content.text.trim();
+            if (id in Bokeh.index) {
+              Bokeh.index[id].model.document.clear();
+              delete Bokeh.index[id];
+            }
+          }
+        }
+      });
+      // Destroy server and session
+      var cmd = "import bokeh.io.notebook as ion; ion.destroy_server('" + server_id + "')";
+      cell.notebook.kernel.execute(cmd);
+    }
+  }
+
+  /**
+   * Handle when a new output is added
+   */
+  function handleAddOutput(event, handle) {
+    var output_area = handle.output_area;
+    var output = handle.output;
+
+    // limit handleAddOutput to display_data with EXEC_MIME_TYPE content only
+    if ((output.output_type != "display_data") || (!output.data.hasOwnProperty(EXEC_MIME_TYPE))) {
+      return
+    }
+
+    var toinsert = output_area.element.find("." + CLASS_NAME.split(' ')[0]);
+
+    if (output.metadata[EXEC_MIME_TYPE]["id"] !== undefined) {
+      toinsert[toinsert.length - 1].firstChild.textContent = output.data[JS_MIME_TYPE];
+      // store reference to embed id on output_area
+      output_area._bokeh_element_id = output.metadata[EXEC_MIME_TYPE]["id"];
+    }
+    if (output.metadata[EXEC_MIME_TYPE]["server_id"] !== undefined) {
+      var bk_div = document.createElement("div");
+      bk_div.innerHTML = output.data[HTML_MIME_TYPE];
+      var script_attrs = bk_div.children[0].attributes;
+      for (var i = 0; i < script_attrs.length; i++) {
+        toinsert[toinsert.length - 1].firstChild.setAttribute(script_attrs[i].name, script_attrs[i].value);
+      }
+      // store reference to server id on output_area
+      output_area._bokeh_server_id = output.metadata[EXEC_MIME_TYPE]["server_id"];
+    }
+  }
+
+  function register_renderer(events, OutputArea) {
+
+    function append_mime(data, metadata, element) {
+      // create a DOM node to render to
+      var toinsert = this.create_output_subarea(
+        metadata,
+        CLASS_NAME,
+        EXEC_MIME_TYPE
+      );
+      this.keyboard_manager.register_events(toinsert);
+      // Render to node
+      var props = {data: data, metadata: metadata[EXEC_MIME_TYPE]};
+      render(props, toinsert[toinsert.length - 1]);
+      element.append(toinsert);
+      return toinsert
+    }
+
+    /* Handle when an output is cleared or removed */
+    events.on('clear_output.CodeCell', handleClearOutput);
+    events.on('delete.Cell', handleClearOutput);
+
+    /* Handle when a new output is added */
+    events.on('output_added.OutputArea', handleAddOutput);
+
+    /**
+     * Register the mime type and append_mime function with output_area
+     */
+    OutputArea.prototype.register_mime_type(EXEC_MIME_TYPE, append_mime, {
+      /* Is output safe? */
+      safe: true,
+      /* Index of renderer in `output_area.display_order` */
+      index: 0
+    });
+  }
+
+  // register the mime type if in Jupyter Notebook environment and previously unregistered
+  if (root.Jupyter !== undefined) {
+    var events = require('base/js/events');
+    var OutputArea = require('notebook/js/outputarea').OutputArea;
+
+    if (OutputArea.prototype.mime_types().indexOf(EXEC_MIME_TYPE) == -1) {
+      register_renderer(events, OutputArea);
+    }
+  }
+
+
+  if (typeof (root._bokeh_timeout) === "undefined" || force === true) {
+    root._bokeh_timeout = Date.now() + 5000;
+    root._bokeh_failed_load = false;
+  }
+
+  var NB_LOAD_WARNING = {'data': {'text/html':
+     "<div style='background-color: #fdd'>\n"+
+     "<p>\n"+
+     "BokehJS does not appear to have successfully loaded. If loading BokehJS from CDN, this \n"+
+     "may be due to a slow or bad network connection. Possible fixes:\n"+
+     "</p>\n"+
+     "<ul>\n"+
+     "<li>re-rerun `output_notebook()` to attempt to load from CDN again, or</li>\n"+
+     "<li>use INLINE resources instead, as so:</li>\n"+
+     "</ul>\n"+
+     "<code>\n"+
+     "from bokeh.resources import INLINE\n"+
+     "output_notebook(resources=INLINE)\n"+
+     "</code>\n"+
+     "</div>"}};
+
+  function display_loaded() {
+    var el = document.getElementById("1001");
+    if (el != null) {
+      el.textContent = "BokehJS is loading...";
+    }
+    if (root.Bokeh !== undefined) {
+      if (el != null) {
+        el.textContent = "BokehJS " + root.Bokeh.version + " successfully loaded.";
+      }
+    } else if (Date.now() < root._bokeh_timeout) {
+      setTimeout(display_loaded, 100)
+    }
+  }
+
+
+  function run_callbacks() {
+    try {
+      root._bokeh_onload_callbacks.forEach(function(callback) { callback() });
+    }
+    finally {
+      delete root._bokeh_onload_callbacks
+    }
+    console.info("Bokeh: all callbacks have finished");
+  }
+
+  function load_libs(js_urls, callback) {
+    root._bokeh_onload_callbacks.push(callback);
+    if (root._bokeh_is_loading > 0) {
+      console.log("Bokeh: BokehJS is being loaded, scheduling callback at", now());
+      return null;
+    }
+    if (js_urls == null || js_urls.length === 0) {
+      run_callbacks();
+      return null;
+    }
+    console.log("Bokeh: BokehJS not loaded, scheduling load and callback at", now());
+    root._bokeh_is_loading = js_urls.length;
+    for (var i = 0; i < js_urls.length; i++) {
+      var url = js_urls[i];
+      var s = document.createElement('script');
+      s.src = url;
+      s.async = false;
+      s.onreadystatechange = s.onload = function() {
+        root._bokeh_is_loading--;
+        if (root._bokeh_is_loading === 0) {
+          console.log("Bokeh: all BokehJS libraries loaded");
+          run_callbacks()
+        }
+      };
+      s.onerror = function() {
+        console.warn("failed to load library " + url);
+      };
+      console.log("Bokeh: injecting script tag for BokehJS library: ", url);
+      document.getElementsByTagName("head")[0].appendChild(s);
+    }
+  };var element = document.getElementById("1001");
+  if (element == null) {
+    console.log("Bokeh: ERROR: autoload.js configured with elementid '1001' but no matching script tag was found. ")
+    return false;
+  }
+
+  var js_urls = ["https://cdn.pydata.org/bokeh/release/bokeh-1.0.4.min.js", "https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.0.4.min.js", "https://cdn.pydata.org/bokeh/release/bokeh-tables-1.0.4.min.js", "https://cdn.pydata.org/bokeh/release/bokeh-gl-1.0.4.min.js"];
+
+  var inline_js = [
+    function(Bokeh) {
+      Bokeh.set_log_level("info");
+    },
+
+    function(Bokeh) {
+
+    },
+    function(Bokeh) {
+      console.log("Bokeh: injecting CSS: https://cdn.pydata.org/bokeh/release/bokeh-1.0.4.min.css");
+      Bokeh.embed.inject_css("https://cdn.pydata.org/bokeh/release/bokeh-1.0.4.min.css");
+      console.log("Bokeh: injecting CSS: https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.0.4.min.css");
+      Bokeh.embed.inject_css("https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.0.4.min.css");
+      console.log("Bokeh: injecting CSS: https://cdn.pydata.org/bokeh/release/bokeh-tables-1.0.4.min.css");
+      Bokeh.embed.inject_css("https://cdn.pydata.org/bokeh/release/bokeh-tables-1.0.4.min.css");
+    }
+  ];
+
+  function run_inline_js() {
+
+    if ((root.Bokeh !== undefined) || (force === true)) {
+      for (var i = 0; i < inline_js.length; i++) {
+        inline_js[i].call(root, root.Bokeh);
+      }if (force === true) {
+        display_loaded();
+      }} else if (Date.now() < root._bokeh_timeout) {
+      setTimeout(run_inline_js, 100);
+    } else if (!root._bokeh_failed_load) {
+      console.log("Bokeh: BokehJS failed to load within specified timeout.");
+      root._bokeh_failed_load = true;
+    } else if (force !== true) {
+      var cell = $(document.getElementById("1001")).parents('.cell').data().cell;
+      cell.output_area.append_execute_result(NB_LOAD_WARNING)
+    }
+
+  }
+
+  if (root._bokeh_is_loading === 0) {
+    console.log("Bokeh: BokehJS loaded, going straight to plotting");
+    run_inline_js();
+  } else {
+    load_libs(js_urls, function() {
+      console.log("Bokeh: BokehJS plotting callback run at", now());
+      run_inline_js();
+    });
+  }
+}(window));
+</script></div>
+</div>
+</div>
+<div class="section" id="1.2.-Default-calculation-setup">
+<h4>1.2. Default calculation setup<a class="headerlink" href="#1.2.-Default-calculation-setup" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Specify calculation style</span>
+<span class="n">calc_style</span> <span class="o">=</span> <span class="s1">&#39;diatom_scan&#39;</span>
+
+<span class="c1"># If workingdir is already set, then do nothing (already in correct folder)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">workingdir</span> <span class="o">=</span> <span class="n">workingdir</span>
+
+<span class="c1"># Change to workingdir if not already there</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">workingdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;calculationfiles&#39;</span><span class="p">,</span> <span class="n">calc_style</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">workingdir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="n">workingdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="2.-Assign-values-for-the-calculation’s-run-parameters">
+<h3>2. Assign values for the calculation’s run parameters<a class="headerlink" href="#2.-Assign-values-for-the-calculation’s-run-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="2.1.-Specify-system-specific-paths">
+<h4>2.1. Specify system-specific paths<a class="headerlink" href="#2.1.-Specify-system-specific-paths" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>lammps_command</strong> is the LAMMPS command to use (required).</li>
+<li><strong>mpi_command</strong> MPI command for running LAMMPS in parallel. A value of None will run simulations serially.</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lammps_command</span> <span class="o">=</span> <span class="s1">&#39;lmp_serial&#39;</span>
+<span class="n">mpi_command</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="2.2.-Load-interatomic-potential">
+<h4>2.2. Load interatomic potential<a class="headerlink" href="#2.2.-Load-interatomic-potential" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>potential_name</strong> gives the name of the potential_LAMMPS reference record in the iprPy library to use for the calculation.</li>
+<li><strong>potential_file</strong> gives the path to the potential_LAMMPS reference record to use. Here, this parameter is automatically generated using potential_name and librarydir.</li>
+<li><strong>potential_dir</strong> gives the path for the folder containing the artifacts associated with the potential (i.e.&nbsp;eam.alloy file). Here, this parameter is automatically generated using potential_name and librarydir.</li>
+<li><strong>potential</strong> is an atomman.lammps.Potential object (required). Here, this parameter is automatically generated from potential_file and potential_dir.</li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">potential_name</span> <span class="o">=</span> <span class="s1">&#39;1999--Mishin-Y--Ni--LAMMPS--ipr1&#39;</span>
+
+<span class="c1"># Define potential_file and potential_dir using librarydir and potential_name</span>
+<span class="n">potential_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;potential_LAMMPS&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{potential_name}</span><span class="s1">.json&#39;</span><span class="p">)</span>
+<span class="n">potential_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;potential_LAMMPS&#39;</span><span class="p">,</span> <span class="n">potential_name</span><span class="p">)</span>
+
+<span class="c1"># Initialize Potential object using potential_file and potential_dir.</span>
+<span class="n">potential</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">Potential</span><span class="p">(</span><span class="n">potential_file</span><span class="p">,</span> <span class="n">potential_dir</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Successfully loaded potential&#39;</span><span class="p">,</span> <span class="n">potential</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Successfully loaded potential 1999--Mishin-Y--Ni--LAMMPS--ipr1
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="2.3.-Specify-calculation-specific-run-parameters">
+<h4>2.3. Specify calculation-specific run parameters<a class="headerlink" href="#2.3.-Specify-calculation-specific-run-parameters" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>symbols</strong> is the element or pair of element model symbols to use for the diatom.</li>
+<li><strong>rmin</strong> is the minimum r spacing to use.</li>
+<li><strong>rmax</strong> is the minimum r spacing to use.</li>
+<li><strong>rsteps</strong> is the number of r spacing steps to evaluate.</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">symbols</span> <span class="o">=</span> <span class="s1">&#39;Ni&#39;</span>
+<span class="n">rmin</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.02</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
+<span class="n">rmax</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">6.0</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
+<span class="n">rsteps</span> <span class="o">=</span> <span class="mi">300</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="3.-Define-calculation-function(s)-and-generate-template-LAMMPS-script(s)">
+<h3>3. Define calculation function(s) and generate template LAMMPS script(s)<a class="headerlink" href="#3.-Define-calculation-function(s)-and-generate-template-LAMMPS-script(s)" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="3.1.-run0.template">
+<h4>3.1. run0.template<a class="headerlink" href="#3.1.-run0.template" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;run0.template&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;#LAMMPS input script that evaluates a system&#39;s energy without relaxing</span>
+
+<span class="s2">&lt;atomman_system_info&gt;</span>
+
+<span class="s2">&lt;atomman_pair_info&gt;</span>
+
+<span class="s2">thermo_style custom step pe</span>
+<span class="s2">thermo_modify format float </span><span class="si">%.13e</span><span class="s2"></span>
+
+<span class="s2">run 0&quot;&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="3.2.-diatom_scan()">
+<h4>3.2. diatom_scan()<a class="headerlink" href="#3.2.-diatom_scan()" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">diatom</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span>
+           <span class="n">mpi_command</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+           <span class="n">rmin</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.02</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">),</span>
+           <span class="n">rmax</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">6.0</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">),</span> <span class="n">rsteps</span><span class="o">=</span><span class="mi">300</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs a diatom energy scan over a range of interatomic spaces, r.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lammps_command :str</span>
+<span class="sd">        Command for running LAMMPS.</span>
+<span class="sd">    potential : atomman.lammps.Potential</span>
+<span class="sd">        The LAMMPS implemented potential to use.</span>
+<span class="sd">    symbols : list</span>
+<span class="sd">        The potential symbols associated with the two atoms in the diatom.</span>
+<span class="sd">    mpi_command : str, optional</span>
+<span class="sd">        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS</span>
+<span class="sd">        will run serially.</span>
+<span class="sd">    rmin : float, optional</span>
+<span class="sd">        The minimum r spacing to use (default value is 0.02 angstroms).</span>
+<span class="sd">    rmax : float, optional</span>
+<span class="sd">        The maximum r spacing to use (default value is 6.0 angstroms).</span>
+<span class="sd">    rsteps : int, optional</span>
+<span class="sd">        The number of r spacing steps to evaluate (default value is 300).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Dictionary of results consisting of keys:</span>
+
+<span class="sd">        - **&#39;r_values&#39;** (*numpy.array of float*) - All interatomic spacings,</span>
+<span class="sd">          r, explored.</span>
+<span class="sd">        - **&#39;energy_values&#39;** (*numpy.array of float*) - The computed potential</span>
+<span class="sd">          energies for each r value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Get script&#39;s location if __file__ exists</span>
+        <span class="n">script_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="c1"># Use cwd otherwise</span>
+        <span class="n">script_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+
+    <span class="c1"># Build lists of values</span>
+    <span class="n">r_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">rmin</span><span class="p">,</span> <span class="n">rmax</span><span class="p">,</span> <span class="n">rsteps</span><span class="p">)</span>
+    <span class="n">energy_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">rsteps</span><span class="p">)</span>
+
+    <span class="c1"># Define atype based on symbols</span>
+    <span class="n">symbols</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">aslist</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">atype</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">atype</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;symbols must have one or two values&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Initialize system (will shift second atom&#39;s position later...)</span>
+    <span class="n">box</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">Box</span><span class="o">.</span><span class="n">cubic</span><span class="p">(</span><span class="n">a</span> <span class="o">=</span> <span class="n">rmax</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">Atoms</span><span class="p">(</span><span class="n">atype</span><span class="o">=</span><span class="n">atype</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]])</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">System</span><span class="p">(</span><span class="n">atoms</span><span class="o">=</span><span class="n">atoms</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="n">box</span><span class="p">,</span> <span class="n">pbc</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="n">symbols</span><span class="o">=</span><span class="n">symbols</span><span class="p">)</span>
+
+    <span class="c1"># Get lammps units</span>
+    <span class="n">lammps_units</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+
+    <span class="c1"># Define lammps variables</span>
+    <span class="n">lammps_variables</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_pair_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">potential</span><span class="o">.</span><span class="n">pair_info</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span>
+
+    <span class="c1"># Loop over values</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rsteps</span><span class="p">):</span>
+
+        <span class="c1"># Shift second atom&#39;s x position</span>
+        <span class="n">system</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span> <span class="o">+</span> <span class="n">r_values</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">])</span>
+
+        <span class="c1"># Save configuration</span>
+        <span class="n">system_info</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;atom_data&#39;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="s1">&#39;diatom.dat&#39;</span><span class="p">,</span>
+                                  <span class="n">units</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">,</span>
+                                  <span class="n">atom_style</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">atom_style</span><span class="p">)</span>
+        <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_system_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_info</span>
+
+        <span class="c1"># Write lammps input script</span>
+        <span class="n">template_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span> <span class="s1">&#39;run0.template&#39;</span><span class="p">)</span>
+        <span class="n">lammps_script</span> <span class="o">=</span> <span class="s1">&#39;run0.in&#39;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">template_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lammps_script</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">filltemplate</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">lammps_variables</span><span class="p">,</span>
+                                             <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
+
+        <span class="c1"># Run lammps and extract data</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">lammps_script</span><span class="p">,</span> <span class="n">mpi_command</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">energy_values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">energy</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">simulations</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;thermo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">PotEng</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">energy_values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;energy&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">energy_values</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">energy_values</span><span class="p">)])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;All LAMMPS runs failed. Potential likely invalid or incompatible.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Collect results</span>
+    <span class="n">results_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;r_values&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">r_values</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;energy_values&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">energy_values</span>
+
+    <span class="k">return</span> <span class="n">results_dict</span>
+
+
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="4.-Run-calculation-function(s)">
+<h3>4. Run calculation function(s)<a class="headerlink" href="#4.-Run-calculation-function(s)" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">results_dict</span> <span class="o">=</span> <span class="n">diatom</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span>
+                      <span class="n">mpi_command</span> <span class="o">=</span> <span class="n">mpi_command</span><span class="p">,</span>
+                      <span class="n">rmin</span> <span class="o">=</span> <span class="n">rmin</span><span class="p">,</span>
+                      <span class="n">rmax</span> <span class="o">=</span> <span class="n">rmax</span><span class="p">,</span>
+                      <span class="n">rsteps</span> <span class="o">=</span> <span class="n">rsteps</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">results_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>dict_keys([&#39;r_values&#39;, &#39;energy_values&#39;])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="5.-Report-results">
+<h3>5. Report results<a class="headerlink" href="#5.-Report-results" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="5.1.-Define-units-for-outputting-values">
+<h4>5.1. Define units for outputting values<a class="headerlink" href="#5.1.-Define-units-for-outputting-values" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>length_unit</strong> is the unit of length to display values in.</li>
+<li><strong>energy_unit</strong> is the unit of energy to display values in.</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">length_unit</span> <span class="o">=</span> <span class="s1">&#39;angstrom&#39;</span>
+<span class="n">energy_unit</span> <span class="o">=</span> <span class="s1">&#39;eV&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="5.2.-Plot-E-vs-r">
+<h4>5.2. Plot E vs r<a class="headerlink" href="#5.2.-Plot-E-vs-r" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">energy</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;energy_values&#39;</span><span class="p">],</span> <span class="n">energy_unit</span><span class="p">)</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;r_values&#39;</span><span class="p">],</span> <span class="n">length_unit</span><span class="p">)</span>
+
+<span class="n">Emin</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">energy</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+<span class="k">if</span> <span class="n">Emin</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">10</span><span class="p">:</span>
+    <span class="n">Emin</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span>
+
+<span class="n">plot</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;Diatom energy scan for </span><span class="si">{potential_name}</span><span class="s1">&#39;</span><span class="p">,</span>
+              <span class="n">plot_width</span> <span class="o">=</span> <span class="mi">800</span><span class="p">,</span>
+              <span class="n">plot_height</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
+              <span class="n">x_range</span> <span class="o">=</span> <span class="p">[</span><span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">rmin</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">),</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">rmax</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)],</span>
+              <span class="n">y_range</span> <span class="o">=</span> <span class="p">[</span><span class="n">Emin</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+              <span class="n">x_axis_label</span><span class="o">=</span><span class="n">f</span><span class="s1">&#39;r (</span><span class="si">{length_unit}</span><span class="s1">)&#39;</span><span class="p">,</span>
+              <span class="n">y_axis_label</span><span class="o">=</span><span class="n">f</span><span class="s1">&#39;Cohesive Energy (</span><span class="si">{energy_unit}</span><span class="s1">/atom)&#39;</span><span class="p">)</span>
+
+<span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">legend</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="s2">&quot;bottom_right&quot;</span>
+
+<span class="n">show</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div class="bk-root" id="770d071c-8afa-4aef-bd90-768f54b20ae4" data-root-id="1003"></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div></div>
+<script type="text/javascript">
+var element = document.currentScript.previousSibling.previousSibling;
+(function(root) {
+  function embed_document(root) {
+
+  var docs_json = {"e15e03bd-79a7-41f2-a003-4a2653655ad5":{"roots":{"references":[{"attributes":{"below":[{"id":"1013","type":"LinearAxis"}],"left":[{"id":"1018","type":"LinearAxis"}],"plot_width":800,"renderers":[{"id":"1013","type":"LinearAxis"},{"id":"1017","type":"Grid"},{"id":"1018","type":"LinearAxis"},{"id":"1022","type":"Grid"},{"id":"1031","type":"BoxAnnotation"},{"id":"1049","type":"Legend"},{"id":"1041","type":"GlyphRenderer"}],"title":{"id":"1002","type":"Title"},"toolbar":{"id":"1029","type":"Toolbar"},"x_range":{"id":"1005","type":"Range1d"},"x_scale":{"id":"1009","type":"LinearScale"},"y_range":{"id":"1007","type":"Range1d"},"y_scale":{"id":"1011","type":"LinearScale"}},"id":"1003","subtype":"Figure","type":"Plot"},{"attributes":{},"id":"1044","type":"BasicTickFormatter"},{"attributes":{"line_alpha":0.1,"line_color":"#1f77b4","line_width":2,"x":{"field":"x"},"y":{"field":"y"}},"id":"1040","type":"Line"},{"attributes":{},"id":"1046","type":"BasicTickFormatter"},{"attributes":{},"id":"1028","type":"HelpTool"},{"attributes":{},"id":"1009","type":"LinearScale"},{"attributes":{"axis_label":"Cohesive Energy (eV/atom)","formatter":{"id":"1046","type":"BasicTickFormatter"},"plot":{"id":"1003","subtype":"Figure","type":"Plot"},"ticker":{"id":"1019","type":"BasicTicker"}},"id":"1018","type":"LinearAxis"},{"attributes":{},"id":"1027","type":"ResetTool"},{"attributes":{"bottom_units":"screen","fill_alpha":{"value":0.5},"fill_color":{"value":"lightgrey"},"left_units":"screen","level":"overlay","line_alpha":{"value":1.0},"line_color":{"value":"black"},"line_dash":[4,4],"line_width":{"value":2},"plot":null,"render_mode":"css","right_units":"screen","top_units":"screen"},"id":"1031","type":"BoxAnnotation"},{"attributes":{"axis_label":"r (angstrom)","formatter":{"id":"1044","type":"BasicTickFormatter"},"plot":{"id":"1003","subtype":"Figure","type":"Plot"},"ticker":{"id":"1014","type":"BasicTicker"}},"id":"1013","type":"LinearAxis"},{"attributes":{"plot":{"id":"1003","subtype":"Figure","type":"Plot"},"ticker":{"id":"1014","type":"BasicTicker"}},"id":"1017","type":"Grid"},{"attributes":{},"id":"1026","type":"SaveTool"},{"attributes":{"items":[{"id":"1050","type":"LegendItem"}],"location":"bottom_right","plot":{"id":"1003","subtype":"Figure","type":"Plot"}},"id":"1049","type":"Legend"},{"attributes":{"data_source":{"id":"1038","type":"ColumnDataSource"},"glyph":{"id":"1039","type":"Line"},"hover_glyph":null,"muted_glyph":null,"nonselection_glyph":{"id":"1040","type":"Line"},"selection_glyph":null,"view":{"id":"1042","type":"CDSView"}},"id":"1041","type":"GlyphRenderer"},{"attributes":{},"id":"1011","type":"LinearScale"},{"attributes":{"source":{"id":"1038","type":"ColumnDataSource"}},"id":"1042","type":"CDSView"},{"attributes":{},"id":"1057","type":"UnionRenderers"},{"attributes":{},"id":"1023","type":"PanTool"},{"attributes":{"callback":null,"end":0,"start":-1},"id":"1007","type":"Range1d"},{"attributes":{},"id":"1024","type":"WheelZoomTool"},{"attributes":{"callback":null,"data":{"x":{"__ndarray__":"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","dtype":"float64","shape":[300]},"y":{"__ndarray__":"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","dtype":"float64","shape":[300]}},"selected":{"id":"1056","type":"Selection"},"selection_policy":{"id":"1057","type":"UnionRenderers"}},"id":"1038","type":"ColumnDataSource"},{"attributes":{"line_color":"#1f77b4","line_width":2,"x":{"field":"x"},"y":{"field":"y"}},"id":"1039","type":"Line"},{"attributes":{},"id":"1014","type":"BasicTicker"},{"attributes":{"callback":null,"end":6.0,"start":0.02},"id":"1005","type":"Range1d"},{"attributes":{"active_drag":"auto","active_inspect":"auto","active_multi":null,"active_scroll":"auto","active_tap":"auto","tools":[{"id":"1023","type":"PanTool"},{"id":"1024","type":"WheelZoomTool"},{"id":"1025","type":"BoxZoomTool"},{"id":"1026","type":"SaveTool"},{"id":"1027","type":"ResetTool"},{"id":"1028","type":"HelpTool"}]},"id":"1029","type":"Toolbar"},{"attributes":{"plot":null,"text":"Diatom energy scan for 1999--Mishin-Y--Ni--LAMMPS--ipr1"},"id":"1002","type":"Title"},{"attributes":{},"id":"1056","type":"Selection"},{"attributes":{"label":{"value":"Ni"},"renderers":[{"id":"1041","type":"GlyphRenderer"}]},"id":"1050","type":"LegendItem"},{"attributes":{"dimension":1,"plot":{"id":"1003","subtype":"Figure","type":"Plot"},"ticker":{"id":"1019","type":"BasicTicker"}},"id":"1022","type":"Grid"},{"attributes":{"overlay":{"id":"1031","type":"BoxAnnotation"}},"id":"1025","type":"BoxZoomTool"},{"attributes":{},"id":"1019","type":"BasicTicker"}],"root_ids":["1003"]},"title":"Bokeh Application","version":"1.0.4"}};
+  var render_items = [{"docid":"e15e03bd-79a7-41f2-a003-4a2653655ad5","roots":{"1003":"770d071c-8afa-4aef-bd90-768f54b20ae4"}}];
+  root.Bokeh.embed.embed_items_notebook(docs_json, render_items);
+
+  }
+  if (root.Bokeh !== undefined) {
+    embed_document(root);
+  } else {
+    var attempts = 0;
+    var timer = setInterval(function(root) {
+      if (root.Bokeh !== undefined) {
+        embed_document(root);
+        clearInterval(timer);
+      }
+      attempts++;
+      if (attempts > 100) {
+        console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
+        clearInterval(timer);
+      }
+    }, 10, root)
+  }
+})(window);
+</script></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">diatom_scan calculation style</a><ul>
+<li><a class="reference internal" href="#Introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#Version-notes">Version notes</a></li>
+<li><a class="reference internal" href="#Additional-dependencies">Additional dependencies</a></li>
+<li><a class="reference internal" href="#Disclaimers">Disclaimers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Method-and-Theory">Method and Theory</a></li>
+<li><a class="reference internal" href="#Demonstration">Demonstration</a><ul>
+<li><a class="reference internal" href="#1.-Setup">1. Setup</a><ul>
+<li><a class="reference internal" href="#1.1.-Library-imports">1.1. Library imports</a></li>
+<li><a class="reference internal" href="#1.2.-Default-calculation-setup">1.2. Default calculation setup</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#2.-Assign-values-for-the-calculation’s-run-parameters">2. Assign values for the calculation’s run parameters</a><ul>
+<li><a class="reference internal" href="#2.1.-Specify-system-specific-paths">2.1. Specify system-specific paths</a></li>
+<li><a class="reference internal" href="#2.2.-Load-interatomic-potential">2.2. Load interatomic potential</a></li>
+<li><a class="reference internal" href="#2.3.-Specify-calculation-specific-run-parameters">2.3. Specify calculation-specific run parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#3.-Define-calculation-function(s)-and-generate-template-LAMMPS-script(s)">3. Define calculation function(s) and generate template LAMMPS script(s)</a><ul>
+<li><a class="reference internal" href="#3.1.-run0.template">3.1. run0.template</a></li>
+<li><a class="reference internal" href="#3.2.-diatom_scan()">3.2. diatom_scan()</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#4.-Run-calculation-function(s)">4. Run calculation function(s)</a></li>
+<li><a class="reference internal" href="#5.-Report-results">5. Report results</a><ul>
+<li><a class="reference internal" href="#5.1.-Define-units-for-outputting-values">5.1. Define units for outputting values</a></li>
+<li><a class="reference internal" href="#5.2.-Plot-E-vs-r">5.2. Plot E vs r</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="crystal_space_group.html"
+                        title="previous chapter">crystal_space_group calculation style</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="dislocation_SDVPN.html"
+                        title="next chapter">dislocation_SDVPN calculation style</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dislocation_SDVPN.html" title="dislocation_SDVPN calculation style"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="crystal_space_group.html" title="crystal_space_group calculation style"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

@@ -4,30 +4,23 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>iprPy.input package &#8212; iprPy 0.8.2 documentation</title>
+    <title>iprPy.input package &#8212; iprPy 0.9.0 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.8.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="iprPy.record package" href="record.html" />
     <link rel="prev" title="iprPy.database package" href="database.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -43,7 +36,7 @@
         <li class="right" >
           <a href="database.html" title="iprPy.database package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">iprPy package</a> &#187;</li> 
       </ul>
     </div>  
@@ -57,6 +50,190 @@
 <h1>iprPy.input package<a class="headerlink" href="#iprpy-input-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-iprPy.input">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-iprPy.input" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="iprPy.input.boolean">
+<code class="descname">boolean</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.input.boolean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows conversion of strings to Booleans.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If str, then ‘true’ and ‘t’ become True and ‘false’ and ‘f’ become
+false. If bool, simply return the value.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Equivalent bool of value.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If value is unrecognized.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.input.parse">
+<code class="descname">parse</code><span class="sig-paren">(</span><em>inscript</em>, <em>singularkeys=[]</em>, <em>allsingular=False</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.input.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses an input file and returns a dictionary of parameter terms.</p>
+<p>These are the parsing rules:</p>
+<ul class="simple">
+<li>The first word in a line is taken as the key name of the parameter.</li>
+<li>All other words are joined together into a single string value for the
+parameter.</li>
+<li>Words that start with # indicate comments with that word and all words
+to the right of it in the same line being ignored.</li>
+<li>Any lines with less than two non-comment terms are ignored. In other
+words, blank lines and lines with keys but not values are skipped over.</li>
+<li>Multiple values can be assigned to the same term by repeating the key
+name on a different line.</li>
+<li>The keyword arguments can be used to issue an error if multiple values
+are trying to be assigned to terms that should only have a single
+values.</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>inscript</strong> (<em>string</em><em> or </em><em>file-like-object</em>) – The file, path to file, or contents of the input script to parse.</li>
+<li><strong>singularkeys</strong> (<em>list of str</em><em>, </em><em>optional</em>) – List of term keys that should not have multiple values.</li>
+<li><strong>allsingular</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if all term keys should be singular (Default is False).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> – Dictionary of parsed input key-value pairs</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If both singularkeys and allsingular are given, or if multiple values
+found for a singular key.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.input.termtodict">
+<code class="descname">termtodict</code><span class="sig-paren">(</span><em>term</em>, <em>keys</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.input.termtodict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a str term and parses it into a dictionary of key-value pairs
+based on the supplied key list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>term</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>unicode</em>) – The str term to parse.</li>
+<li><strong>keys</strong> (<em>list of str</em>) – The list of keys to parse by.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Dictionary of parsed key-value terms.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If any key appears multiple times or the first word in term does not
+match a key.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.input.value">
+<code class="descname">value</code><span class="sig-paren">(</span><em>input_dict</em>, <em>key</em>, <em>default_unit=None</em>, <em>default_term=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.input.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interprets a calculation parameter by converting it from a string to a
+float in working units.</p>
+<p>The parameter being converted is a str with one of two formats:
+- ‘&lt;number&gt;’
+- ‘&lt;number&gt; &lt;unit&gt;’</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary containing input parameter key-value pairs.</li>
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The key of input_dict to evaluate.</li>
+<li><strong>default_unit</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Default unit to use if not specified in the parameter value.  If not
+given, then no unit conversion will be done on unitless parameter
+values.</li>
+<li><strong>default_term</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Default str parameter value to use if key not in input_dict.  Can be
+specified as ‘&lt;value&gt; &lt;unit&gt;’ to ensure that the default value is
+always the same regardless of the working units or default_unit.  If
+not given, then key must be in input_dict.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The interpreted value of the input parameter’s str value in the
+working units.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.input.buildcombos">
+<code class="descname">buildcombos</code><span class="sig-paren">(</span><em>style</em>, <em>database</em>, <em>keys</em>, <em>content_dict=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.input.buildcombos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper function for the modular buildcombos styles</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The buildcombos style to use</li>
+<li><strong>database</strong> (<a class="reference internal" href="database.html#iprPy.database.Database" title="iprPy.database.Database"><em>iprPy.database.Database</em></a>) – The database to use in building combos</li>
+<li><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – The calculation multikey set to build combos for</li>
+<li><strong>content_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) – Contains loaded file content.  If not given, an empty
+dict will be created</li>
+<li><strong>kwargs</strong> (<em>any</em>) – Additional keyword arguments will be used to limit which records from
+the database are used in building combos values.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>inputs</strong> (<em>dict</em>) – Contains the values generated for each key</li>
+<li><strong>content_dict</strong> (<em>dict</em>) – Contains loaded file content</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.input.subset">
+<code class="descname">subset</code><span class="sig-paren">(</span><em>style</em>, <em>prefix=''</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.input.subset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper function for the modular subset styles</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The subset style to access</li>
+<li><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The prefix to add to all keys of the subset</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">iprPy.input.subset_classes.Subset subclass</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 </div>
 
@@ -66,7 +243,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">iprPy.input package</a><ul>
 <li><a class="reference internal" href="#module-iprPy.input">Module contents</a></li>
@@ -99,12 +276,12 @@
         <li class="right" >
           <a href="database.html" title="iprPy.database package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >iprPy package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

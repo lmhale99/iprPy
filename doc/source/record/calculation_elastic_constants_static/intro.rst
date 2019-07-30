@@ -1,10 +1,23 @@
 Introduction
 ============
 
-The calculation\_elastic\_constants\_static Record style is for a
+The calculation_elastic_constants_static record style is for a
 calculation that evaluates the elastic constants for a crystal using
 small strain states and static relaxations.
 
-Calculation styles that use this Record style:
+Version notes
+~~~~~~~~~~~~~
 
--  elastic\_constants\_static
+Additional dependencies
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Calculation styles that use this record style
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  elastic_constants_static
+
+Disclaimers
+~~~~~~~~~~~
+
+-  `NIST
+   disclaimers <http://www.nist.gov/public_affairs/disclaimer.cfm>`__

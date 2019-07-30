@@ -1,9 +1,22 @@
 Introduction
 ============
 
-The calculation\_point\_defect\_static Record style is for a calculation
+The calculation_point_defect_static Record style is for a calculation
 that generates a point defect and evaluates its formation energy.
 
-Calculation styles that use this Record style:
+Version notes
+~~~~~~~~~~~~~
 
--  point\_defect\_static
+Additional dependencies
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Calculation styles that use this record style
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  point_defect_static
+
+Disclaimers
+~~~~~~~~~~~
+
+-  `NIST
+   disclaimers <http://www.nist.gov/public_affairs/disclaimer.cfm>`__

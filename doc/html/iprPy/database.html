@@ -4,30 +4,23 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>iprPy.database package &#8212; iprPy 0.8.2 documentation</title>
+    <title>iprPy.database package &#8212; iprPy 0.9.0 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.8.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="iprPy.input package" href="input.html" />
-    <link rel="prev" title="iprPy.compatibility package" href="compatibility.html" /> 
-  </head>
-  <body>
+    <link rel="prev" title="iprPy.calculation package" href="calculation.html" /> 
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -41,9 +34,9 @@
           <a href="input.html" title="iprPy.input package"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="compatibility.html" title="iprPy.compatibility package"
+          <a href="calculation.html" title="iprPy.calculation package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">iprPy package</a> &#187;</li> 
       </ul>
     </div>  
@@ -60,21 +53,37 @@
 <dl class="attribute">
 <dt id="iprPy.database.loaded">
 <code class="descname">loaded</code><a class="headerlink" href="#iprPy.database.loaded" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Dictionary of the derived classes</p>
+<dd><p>Dictionary of the derived classes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="iprPy.database.databases_dict">
 <code class="descname">databases_dict</code><a class="headerlink" href="#iprPy.database.databases_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Dictionary of the database styles that successfully loaded. The
+<dd><p>Dictionary of the database styles that successfully loaded. The
 dictionary keys are the database style names, and the values are the
 loaded modules.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="class">
 <dt id="iprPy.database.Database">
 <em class="property">class </em><code class="descname">Database</code><span class="sig-paren">(</span><em>host</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class for handling different database styles in the same fashion.  The
 class defines the common methods and attributes, which are then uniquely
 implemented for each style.  The available styles are loaded from the
@@ -107,7 +116,7 @@ and content.</p>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">iprPy.Record</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If add_record is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AttributeError</span></code></a> – If add_record is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -116,28 +125,32 @@ and content.</p>
 
 <dl class="method">
 <dt id="iprPy.database.Database.add_tar">
-<code class="descname">add_tar</code><span class="sig-paren">(</span><em>record=None</em>, <em>name=None</em>, <em>style=None</em>, <em>root_dir=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.add_tar" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_tar</code><span class="sig-paren">(</span><em>record=None</em>, <em>name=None</em>, <em>style=None</em>, <em>tar=None</em>, <em>root_dir=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.add_tar" title="Permalink to this definition">¶</a></dt>
 <dd><p>Archives and stores a folder associated with a record.  Issues an
 error if exactly one matching record is not found in the database, or
-the associated record already has a tar archive. The record’s name
-must match the name of the directory being archived.</p>
+the associated record already has a tar archive.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>database_info</strong> (<em>mdcs.MDCS</em>) – The MDCS class used for accessing the curator database.</li>
 <li><strong>record</strong> (<em>iprPy.Record</em><em>, </em><em>optional</em>) – The record to associate the tar archive with.  If not given, then
 name and/or style necessary to uniquely identify the record are
 needed.</li>
 <li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – .The name to use in uniquely identifying the record.</li>
 <li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – .The style to use in uniquely identifying the record.</li>
+<li><strong>tar</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)"><em>bytes</em></a><em>, </em><em>optional</em>) – The bytes content of a tar file to save.  tar cannot be given
+with root_dir.</li>
 <li><strong>root_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Specifies the root directory for finding the directory to archive.
 The directory to archive is at &lt;root_dir&gt;/&lt;name&gt;.  (Default is to
-set root_dir to the current working directory.)</li>
+set root_dir to the current working directory.)  tar cannot be given
+with root_dir.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If add_tar is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If style and/or name content given with record or the record already
+has an archive.</p>
 </td>
 </tr>
 </tbody>
@@ -146,14 +159,24 @@ set root_dir to the current working directory.)</li>
 
 <dl class="method">
 <dt id="iprPy.database.Database.build_refs">
-<code class="descname">build_refs</code><span class="sig-paren">(</span><em>lib_directory=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.build_refs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">build_refs</code><span class="sig-paren">(</span><em>lib_directory=None</em>, <em>refresh=False</em>, <em>include=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.build_refs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds reference records from a library to a database.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>lib_directory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The directory path for the library.  If not given, then it will use
-the iprPy/library directory.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>lib_directory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The directory path for the library.  If not given, then it will use
+the iprPy library directory.</li>
+<li><strong>refresh</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – If False (default) only new reference records are added.  If True,
+all existing reference records are refreshed by deleting the
+current ones in the database and uploading the references in
+lib_directory.  If a list is given, then only the reference
+record styles named in the list are refreshed.</li>
+<li><strong>include</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – The reference record style(s) to copy to the database.  If not
+given will upload all record styles found in lib_directory.</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
@@ -176,7 +199,7 @@ styles will be listed and the user prompted to pick one.</td>
 
 <dl class="method">
 <dt id="iprPy.database.Database.clean_records">
-<code class="descname">clean_records</code><span class="sig-paren">(</span><em>run_directory=None</em>, <em>record_style=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.clean_records" title="Permalink to this definition">¶</a></dt>
+<code class="descname">clean_records</code><span class="sig-paren">(</span><em>run_directory=None</em>, <em>record_style=None</em>, <em>records=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.clean_records" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resets all records of a given style that issued errors. Useful if the
 errors are due to external conditions.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -188,6 +211,9 @@ errors are due to external conditions.</p>
 returned.</li>
 <li><strong>record_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to clean.  If not given, then the available record
 styles will be listed and the user prompted to pick one.</li>
+<li><strong>records</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – A list of iprPy.Record objects from the database to clean.  Allows
+the user full control on which records to reset.  Cannot be given
+with record_style.</li>
 </ul>
 </td>
 </tr>
@@ -197,18 +223,24 @@ styles will be listed and the user prompted to pick one.</li>
 
 <dl class="method">
 <dt id="iprPy.database.Database.copy_records">
-<code class="descname">copy_records</code><span class="sig-paren">(</span><em>dbase2</em>, <em>record_style=None</em>, <em>includetar=True</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.copy_records" title="Permalink to this definition">¶</a></dt>
-<dd><p>Copies all records of a given style from one database to another.</p>
+<code class="descname">copy_records</code><span class="sig-paren">(</span><em>dbase2</em>, <em>record_style=None</em>, <em>records=None</em>, <em>includetar=True</em>, <em>overwrite=False</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.copy_records" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies records from one database to another.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>dbase2</strong> (<em>iprPy.Database</em>) – The database to copy to.</li>
-<li><strong>record_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to copy.  If not given, then the available record
-styles will be listed and the user prompted to pick one.</li>
+<li><strong>record_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to copy.  If record_style and records not
+given, then the available record styles will be listed and the
+user prompted to pick one.  Cannot be given with records.</li>
+<li><strong>records</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – A list of iprPy.Record obejcts from the current database to copy
+to dbase2.  Allows the user full control on which records to
+copy/update.  Cannot be given with record_style.</li>
 <li><strong>includetar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the tar archives will be copied along with the records.
 If False, only the records will be copied. (Default is True).</li>
+<li><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If False (default) only new records and tars will be copied.
+If True, all existing content will be updated.</li>
 </ul>
 </td>
 </tr>
@@ -233,7 +265,7 @@ style are needed to uniquely define the record to delete.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If delete_record is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AttributeError</span></code></a> – If delete_record is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -258,7 +290,7 @@ the record are needed.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If delete_tar is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AttributeError</span></code></a> – If delete_tar is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -307,7 +339,7 @@ if multiple or no matching records are found.</p>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">iprPy.Record</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If get_record is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AttributeError</span></code></a> – If get_record is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -334,7 +366,7 @@ if multiple or no matching records are found.</p>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">list of iprPy.Records</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If get_records is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AttributeError</span></code></a> – If get_records is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -368,7 +400,7 @@ values can be of any data type, which is convenient for analysis.
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">pandas.DataFrame</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If get_record is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AttributeError</span></code></a> – If get_record is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -398,10 +430,10 @@ False, return as an open tarfile. (Default is False)</li>
 str if raw=True.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/tarfile.html#module-tarfile" title="(in Python v3.7)">tarfile</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">tarfile or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If get_tar is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AttributeError</span></code></a> – If get_tar is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -411,7 +443,15 @@ str if raw=True.</p>
 <dl class="attribute">
 <dt id="iprPy.database.Database.host">
 <code class="descname">host</code><a class="headerlink" href="#iprPy.database.Database.host" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – The database’s host.</p>
+<dd><p>The database’s host.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -433,7 +473,15 @@ str if raw=True.</p>
 <dl class="attribute">
 <dt id="iprPy.database.Database.style">
 <code class="descname">style</code><a class="headerlink" href="#iprPy.database.Database.style" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – The database style</p>
+<dd><p>The database style</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -464,7 +512,7 @@ and content.</p>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">iprPy.Record</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If update_record is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AttributeError</span></code></a> – If update_record is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
@@ -473,7 +521,7 @@ and content.</p>
 
 <dl class="method">
 <dt id="iprPy.database.Database.update_tar">
-<code class="descname">update_tar</code><span class="sig-paren">(</span><em>record=None</em>, <em>name=None</em>, <em>style=None</em>, <em>root_dir=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.update_tar" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_tar</code><span class="sig-paren">(</span><em>record=None</em>, <em>name=None</em>, <em>style=None</em>, <em>tar=None</em>, <em>root_dir=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.update_tar" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replaces an existing tar archive for a record with a new one.  Issues
 an error if exactly one matching record is not found in the database.
 The record’s name must match the name of the directory being archived.</p>
@@ -487,18 +535,54 @@ name and/or style necessary to uniquely identify the record are
 needed.</li>
 <li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – .The name to use in uniquely identifying the record.</li>
 <li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – .The style to use in uniquely identifying the record.</li>
+<li><strong>tar</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)"><em>bytes</em></a><em>, </em><em>optional</em>) – The bytes content of a tar file to save.  tar cannot be given
+with root_dir.</li>
 <li><strong>root_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Specifies the root directory for finding the directory to archive.
-The directory to archive is at &lt;root_dir&gt;/&lt;name&gt;.</li>
+The directory to archive is at &lt;root_dir&gt;/&lt;name&gt;.  (Default is to
+set root_dir to the current working directory.)  tar cannot be given
+with root_dir.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If update_tar is not defined for database style.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AttributeError</span></code></a> – If update_tar is not defined for database style.</p>
 </td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.database.list_databases">
+<code class="descname">list_databases</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.list_databases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gives a list of the pre-defined database names</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>list</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">The names associated with the pre-defined databases.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iprPy.database.list_run_directories">
+<code class="descname">list_run_directories</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.list_run_directories" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gives a list of the pre-defined run_directory names</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>list</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">The names associated with the pre-defined run_directories.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -550,7 +634,7 @@ Allowed keywords are database style-specific.</li>
 
 <dl class="function">
 <dt id="iprPy.database.set_database">
-<code class="descname">set_database</code><span class="sig-paren">(</span><em>name=None</em>, <em>style=None</em>, <em>host=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.set_database" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_database</code><span class="sig-paren">(</span><em>name=None</em>, <em>style=None</em>, <em>host=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.set_database" title="Permalink to this definition">¶</a></dt>
 <dd><p>Allows for database information to be defined in the settings file. Screen
 prompts will be given to allow any necessary database parameters to be
 entered.</p>
@@ -630,7 +714,7 @@ file.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">iprPy.database package</a><ul>
 <li><a class="reference internal" href="#module-iprPy.database">Module contents</a></li>
@@ -639,8 +723,8 @@ file.</p>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="compatibility.html"
-                        title="previous chapter">iprPy.compatibility package</a></p>
+  <p class="topless"><a href="calculation.html"
+                        title="previous chapter">iprPy.calculation package</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="input.html"
                         title="next chapter">iprPy.input package</a></p>
@@ -661,14 +745,14 @@ file.</p>
           <a href="input.html" title="iprPy.input package"
              >next</a> |</li>
         <li class="right" >
-          <a href="compatibility.html" title="iprPy.compatibility package"
+          <a href="calculation.html" title="iprPy.calculation package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >iprPy package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

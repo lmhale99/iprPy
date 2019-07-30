@@ -117,25 +117,25 @@ def calc(lammps_command, system, potential, point_kwargs, cutoff,
         - **'E_coh'** (*float*) - The cohesive energy of the bulk system.
         - **'E_ptd_f'** (*float*) - The point.defect formation energy.
         - **'E_total_base'** (*float*) - The total potential energy of the
-        relaxed bulk system.
+          relaxed bulk system.
         - **'E_total_ptd'** (*float*) - The total potential energy of the
-        relaxed defect system.
+          relaxed defect system.
         - **'system_base'** (*atomman.System*) - The relaxed bulk system.
         - **'system_ptd'** (*atomman.System*) - The relaxed defect system.
         - **'dumpfile_base'** (*str*) - The filename of the LAMMPS dump file
-        for the relaxed bulk system.
+          for the relaxed bulk system.
         - **'dumpfile_ptd'** (*str*) - The filename of the LAMMPS dump file
-        for the relaxed defect system.
+          for the relaxed defect system.
         - **'has_reconfigured'** (*bool*) - Flag indicating if the structure
-        has been identified as relaxing to a different defect configuration.
+          has been identified as relaxing to a different defect configuration.
         - **'centrosummation'** (*numpy.array of float*) - The centrosummation
-        parameter used for evaluating if the configuration has relaxed.
+          parameter used for evaluating if the configuration has relaxed.
         - **'position_shift'** (*numpy.array of float*) - The position_shift
-        parameter used for evaluating if the configuration has relaxed.
-        Only given for interstitial and substitutional-style defects.
+          parameter used for evaluating if the configuration has relaxed.
+          Only given for interstitial and substitutional-style defects.
         - **'db_vect_shift'** (*numpy.array of float*) - The db_vect_shift
-        parameter used for evaluating if the configuration has relaxed.
-        Only given for dumbbell-style defects.
+          parameter used for evaluating if the configuration has relaxed.
+          Only given for dumbbell-style defects.
     """
     
     # Run ptd_energy to refine values

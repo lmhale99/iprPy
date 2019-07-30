@@ -4,30 +4,23 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>crystal_space_group Calculation &#8212; iprPy 0.8.2 documentation</title>
+    <title>crystal_space_group calculation style &#8212; iprPy 0.9.0 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.8.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="dislocation_SDVPN Calculation" href="dislocation_SDVPN.html" />
-    <link rel="prev" title="E_vs_r_scan Calculation" href="E_vs_r_scan.html" /> 
-  </head>
-  <body>
+    <link rel="next" title="diatom_scan calculation style" href="diatom_scan.html" />
+    <link rel="prev" title="E_vs_r_scan calculation style" href="E_vs_r_scan.html" /> 
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,12 +31,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="dislocation_SDVPN.html" title="dislocation_SDVPN Calculation"
+          <a href="diatom_scan.html" title="diatom_scan calculation style"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="E_vs_r_scan.html" title="E_vs_r_scan Calculation"
+          <a href="E_vs_r_scan.html" title="E_vs_r_scan calculation style"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>  
@@ -108,18 +101,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #303F9F;
+    color: #307FC1;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #D84315;
+    color: #BF5B3D;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 9ex;
+    min-width: 7ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -159,9 +152,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #cfcfcf;
+    border: 1px solid #e0e0e0;
     border-radius: 2px;
-    background: #f7f7f7;
+    background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
@@ -169,7 +162,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.pngmath center alignment in output cells */
+/* override sphinx.ext.imgmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -218,48 +211,69 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
 </style>
-<div class="section" id="crystal_space_group-Calculation">
-<h1>crystal_space_group Calculation<a class="headerlink" href="#crystal_space_group-Calculation" title="Permalink to this headline">¶</a></h1>
-<p><strong>Lucas M. Hale</strong>,
-<a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>,
-<em>Materials Science and Engineering Division, NIST</em>.</p>
-<p><strong>Chandler A. Becker</strong>,
-<a class="reference external" href="mailto:chandler&#46;becker&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">chandler<span>&#46;</span>becker<span>&#64;</span>nist<span>&#46;</span>gov</a>,
-<em>Office of Data and Informatics, NIST</em>.</p>
-<p><strong>Zachary T. Trautt</strong>,
-<a class="reference external" href="mailto:zachary&#46;trautt&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">zachary<span>&#46;</span>trautt<span>&#64;</span>nist<span>&#46;</span>gov</a>,
-<em>Materials Measurement Science Division, NIST</em>.</p>
-<p>Version: 2018-06-24</p>
-<p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">Disclaimers</a></p>
+<div class="section" id="crystal_space_group-calculation-style">
+<h1>crystal_space_group calculation style<a class="headerlink" href="#crystal_space_group-calculation-style" title="Permalink to this headline">¶</a></h1>
+<p><strong>Lucas M. Hale</strong>, <a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>, <em>Materials Science and Engineering Division, NIST</em>.</p>
+<p>Description updated: 2019-07-26</p>
 <div class="section" id="Introduction">
 <h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
-<p>The crystal_space_group calculation characterizes a bulk atomic system
-(configuration) by determining its space group by evaluating symmetry
-elements of the box dimensions and atomic position. This is useful for
-analyzing relaxed systems to determine if they have transformed to a
-different crystal structure. An ideal unit cell based on the identified
-space group and the system’s box dimensions is also generated.</p>
-<p><strong>Additional dependencies</strong>: This calculation uses the Python spglib
-package to perform the space group analysis. Installing the package is
-required for this calculation.</p>
-<p><strong>Disclaimer #1</strong>: The results are sensitive to the symmetryprecision
-parameter as it defines the tolerance for identifying which atomic
-positions and box dimensions are symmetrically equivalent. A small
-symmetryprecision value may be able to differentiate between ideal and
-distorted crystals, but it will cause the calculation to fail if smaller
-than the variability in the associated system properties.</p>
+<p>The crystal_space_group calculation style characterizes a bulk atomic system (configuration) by determining its space group by evaluating symmetry elements of the box dimensions and atomic position. This is useful for analyzing relaxed systems to determine if they have transformed to a different crystal structure. An ideal unit cell based on the identified space group and the system’s box dimensions is also generated.</p>
+<div class="section" id="Version-notes">
+<h3>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="Additional-dependencies">
+<h3>Additional dependencies<a class="headerlink" href="#Additional-dependencies" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="https://atztogo.github.io/spglib/python-spglib.html">spglib</a></li>
+</ul>
+</div>
+<div class="section" id="Disclaimers">
+<h3>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST disclaimers</a></li>
+<li>The results are sensitive to the symmetryprecision parameter as it defines the tolerance for identifying which atomic positions and box dimensions are symmetrically equivalent. A small symmetryprecision value may be able to differentiate between ideal and distorted crystals, but it will cause the calculation to fail if smaller than the variability in the associated system properties.</li>
+</ul>
+</div>
 </div>
 <div class="section" id="Method-and-Theory">
 <h2>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this headline">¶</a></h2>
-<p>The calculation relies on the spglib Python package, which itself is a
-wrapper around the spglib library. The library analyzes an atomic
-configuration to determine symmetry elements within a precision
-tolerance for the atomic positions and the box dimensions. It also
-contains a database of information related to the different space
-groups.</p>
-<p>More information can be found at the <a class="reference external" href="https://atztogo.github.io/spglib/">spglib
-homepage</a>.</p>
+<p>The calculation relies on the spglib Python package, which itself is a wrapper around the spglib library. The library analyzes an atomic configuration to determine symmetry elements within a precision tolerance for the atomic positions and the box dimensions. It also contains a database of information related to the different space groups.</p>
+<p>More information can be found at the <a class="reference external" href="https://atztogo.github.io/spglib/">spglib homepage</a>.</p>
 </div>
 <div class="section" id="Demonstration">
 <h2>Demonstration<a class="headerlink" href="#Demonstration" title="Permalink to this headline">¶</a></h2>
@@ -267,8 +281,7 @@ homepage</a>.</p>
 <h3>1. Setup<a class="headerlink" href="#1.-Setup" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="1.1.-Library-imports">
 <h4>1.1. Library imports<a class="headerlink" href="#1.1.-Library-imports" title="Permalink to this headline">¶</a></h4>
-<p>Import libraries needed by the calculation. The external libraries used
-are:</p>
+<p>Import libraries needed by the calculation. The external libraries used are:</p>
 <ul class="simple">
 <li><a class="reference external" href="http://www.numpy.org/">numpy</a></li>
 <li><a class="reference external" href="https://github.com/usnistgov/DataModelDict">DataModelDict</a></li>
@@ -277,17 +290,15 @@ are:</p>
 <li><a class="reference external" href="https://atztogo.github.io/spglib/python-spglib.html">spglib</a></li>
 </ul>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># Standard library imports</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
@@ -318,18 +329,17 @@ are:</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Notebook last executed on 2018-09-24 using iprPy version 0.8.2
+Notebook last executed on 2019-07-29 using iprPy version 0.9.0
 </pre></div></div>
 </div>
 </div>
 <div class="section" id="1.2.-Default-calculation-setup">
 <h4>1.2. Default calculation setup<a class="headerlink" href="#1.2.-Default-calculation-setup" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># Specify calculation style</span>
 <span class="n">calc_style</span> <span class="o">=</span> <span class="s1">&#39;crystal_space_group&#39;</span>
 
@@ -339,53 +349,39 @@ Notebook last executed on 2018-09-24 using iprPy version 0.8.2
 
 <span class="c1"># Change to workingdir if not already there</span>
 <span class="k">except</span><span class="p">:</span>
-    <span class="n">workingdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;calculationfiles&#39;</span><span class="p">,</span> <span class="n">calc_style</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">)</span>
+    <span class="n">workingdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;calculationfiles&#39;</span><span class="p">,</span> <span class="n">calc_style</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">workingdir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="n">workingdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">)</span>
-
-<span class="c1"># Default iprPy library directory</span>
-<span class="n">librarydir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">rootdir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;library&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 </div>
-<div class="section" id="2.-Assign-values-for-the-calculation's-run-parameters">
-<h3>2. Assign values for the calculation’s run parameters<a class="headerlink" href="#2.-Assign-values-for-the-calculation's-run-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="2.-Assign-values-for-the-calculation’s-run-parameters">
+<h3>2. Assign values for the calculation’s run parameters<a class="headerlink" href="#2.-Assign-values-for-the-calculation’s-run-parameters" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="2.1.-Load-initial-unit-cell-system">
 <h4>2.1. Load initial unit cell system<a class="headerlink" href="#2.1.-Load-initial-unit-cell-system" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>prototype_name</strong> gives the name of the crystal_prototype
-reference record in the iprPy library to load.</li>
-<li><strong>symbols</strong> is a list of the potential’s elemental model symbols to
-associate with the unique atom types of the loaded system.</li>
-<li><strong>box_parameters</strong> is a list of the a, b, c lattice constants to
-assign to the loaded file.</li>
-<li><strong>load_file</strong> gives the path to the atomic configuration file to
-load for the ucell system. Here, this is generated automatically
-using prototype_name and librarydir.</li>
-<li><strong>load_style</strong> specifies the format of load_file. Here, this is
-automatically set for crystal_prototype records.</li>
-<li><strong>load_options</strong> specifies any other keyword options for properly
-loading the load_file. Here, this is automatically set for
-crystal_prototype records.</li>
-<li><strong>ucell</strong> is an atomman.System representing a fundamental unit cell
-of the system (required). Here, this is generated using the load_*
-parameters and symbols.</li>
+<li><strong>prototype_name</strong> gives the name of the crystal_prototype reference record in the iprPy library to load.</li>
+<li><strong>symbols</strong> is a list of the potential’s elemental model symbols to associate with the unique atom types of the loaded system.</li>
+<li><strong>box_parameters</strong> is a list of the a, b, c lattice constants to assign to the loaded file.</li>
+<li><strong>load_file</strong> gives the path to the atomic configuration file to load for the ucell system. Here, this is generated automatically using prototype_name and librarydir.</li>
+<li><strong>load_style</strong> specifies the format of load_file. Here, this is automatically set for crystal_prototype records.</li>
+<li><strong>load_options</strong> specifies any other keyword options for properly loading the load_file. Here, this is automatically set for crystal_prototype records.</li>
+<li><strong>ucell</strong> is an atomman.System representing a fundamental unit cell of the system (required). Here, this is generated using the load parameters and symbols.</li>
 </ul>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">prototype_name</span> <span class="o">=</span> <span class="s1">&#39;A1--Cu--fcc&#39;</span>
 <span class="n">symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ni&#39;</span><span class="p">]</span>
 <span class="n">box_parameters</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">([</span><span class="mf">3.52</span><span class="p">,</span> <span class="mf">3.52</span><span class="p">,</span> <span class="mf">3.52</span><span class="p">],</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
 
 <span class="c1"># Define load_file using librarydir and prototype_name</span>
-<span class="n">load_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">librarydir</span><span class="p">,</span> <span class="s1">&#39;crystal_prototype&#39;</span><span class="p">,</span> <span class="n">prototype_name</span><span class="o">+</span><span class="s1">&#39;.json&#39;</span><span class="p">)</span>
+<span class="n">load_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;crystal_prototype&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{prototype_name}</span><span class="s1">.json&#39;</span><span class="p">)</span>
 
 <span class="c1"># Define load_style and load_options for crystal_prototype records</span>
 <span class="n">load_style</span> <span class="o">=</span> <span class="s1">&#39;system_model&#39;</span>
@@ -414,6 +410,7 @@ natoms = 4
 natypes = 1
 symbols = (&#39;Ni&#39;,)
 pbc = [ True  True  True]
+per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
      id |   atype |  pos[0] |  pos[1] |  pos[2]
       0 |       1 |   0.000 |   0.000 |   0.000
       1 |       1 |   0.000 |   1.760 |   1.760
@@ -425,23 +422,15 @@ pbc = [ True  True  True]
 <div class="section" id="2.5.-Specify-calculation-specific-run-parameters">
 <h4>2.5. Specify calculation-specific run parameters<a class="headerlink" href="#2.5.-Specify-calculation-specific-run-parameters" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>symmetryprecision</strong> is a precision tolerance used for the atomic
-positions and box dimensions for determining symmetry elements.
-Default value is ‘0.01 angstrom’.</li>
-<li><strong>primitivecell</strong> is a boolean flag indicating if the returned unit
-cell is to be primitive (True) or conventional (False). Default value
-is False.</li>
-<li><strong>idealcell</strong> is a boolean flag indicating if the box dimensions and
-atomic positions are to be idealized based on the space group (True)
-or averaged based on their actual values (False). Default value is
-True.</li>
+<li><strong>symmetryprecision</strong> is a precision tolerance used for the atomic positions and box dimensions for determining symmetry elements. Default value is ‘0.01 angstrom’.</li>
+<li><strong>primitivecell</strong> is a boolean flag indicating if the returned unit cell is to be primitive (True) or conventional (False). Default value is False.</li>
+<li><strong>idealcell</strong> is a boolean flag indicating if the box dimensions and atomic positions are to be idealized based on the space group (True) or averaged based on their actual values (False). Default value is True.</li>
 </ul>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">symmetryprecision</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
 <span class="n">primitivecell</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">idealcell</span> <span class="o">=</span> <span class="kc">True</span>
@@ -455,11 +444,10 @@ True.</li>
 <div class="section" id="3.1.-crystal_space_group()">
 <h4>3.1. crystal_space_group()<a class="headerlink" href="#3.1.-crystal_space_group()" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="k">def</span> <span class="nf">crystal_space_group</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">symprec</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">to_primitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                         <span class="n">no_idealize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -487,6 +475,7 @@ True.</li>
 <span class="sd">        unit cell system.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Identify the standardized unit cell representation</span>
+    <span class="n">sym_data</span> <span class="o">=</span> <span class="n">spglib</span><span class="o">.</span><span class="n">get_symmetry_dataset</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;spglib_cell&#39;</span><span class="p">),</span> <span class="n">symprec</span><span class="o">=</span><span class="n">symprec</span><span class="p">)</span>
     <span class="n">ucell</span> <span class="o">=</span> <span class="n">spglib</span><span class="o">.</span><span class="n">standardize_cell</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;spglib_cell&#39;</span><span class="p">),</span>
                                     <span class="n">to_primitive</span><span class="o">=</span><span class="n">to_primitive</span><span class="p">,</span>
                                     <span class="n">no_idealize</span><span class="o">=</span><span class="n">no_idealize</span><span class="p">,</span> <span class="n">symprec</span><span class="o">=</span><span class="n">symprec</span><span class="p">)</span>
@@ -495,6 +484,16 @@ True.</li>
     <span class="n">ucell</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;spglib_cell&#39;</span><span class="p">,</span> <span class="n">ucell</span><span class="p">,</span> <span class="n">symbols</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">symbols</span><span class="p">)</span>
     <span class="n">ucell</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">pos</span> <span class="o">-=</span> <span class="n">ucell</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">ucell</span> <span class="o">=</span> <span class="n">ucell</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+
+    <span class="c1"># Average extra per-atom properties by mappings to primitive</span>
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">sym_data</span><span class="p">[</span><span class="s1">&#39;mapping_to_primitive&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">system</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">prop</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;atype&#39;</span><span class="p">,</span> <span class="s1">&#39;pos&#39;</span><span class="p">]:</span>
+                <span class="k">continue</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">view</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">sym_data</span><span class="p">[</span><span class="s1">&#39;mapping_to_primitive&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ucell</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">prop</span><span class="p">():</span>
+                <span class="n">ucell</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">view</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">ucell</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">view</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">sym_data</span><span class="p">[</span><span class="s1">&#39;std_mapping_to_primitive&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="c1"># Get space group metadata</span>
     <span class="n">sym_data</span> <span class="o">=</span> <span class="n">spglib</span><span class="o">.</span><span class="n">get_symmetry_dataset</span><span class="p">(</span><span class="n">ucell</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;spglib_cell&#39;</span><span class="p">))</span>
@@ -521,12 +520,29 @@ True.</li>
     <span class="n">natoms</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ucell</span><span class="o">.</span><span class="n">natoms</span><span class="p">)</span>
     <span class="n">pearson</span> <span class="o">=</span> <span class="n">crystalclass</span> <span class="o">+</span> <span class="n">latticetype</span> <span class="o">+</span> <span class="n">natoms</span>
 
+    <span class="c1"># Generate Wyckoff fingerprint</span>
+    <span class="n">fingerprint_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">usites</span><span class="p">,</span> <span class="n">uindices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">sym_data</span><span class="p">[</span><span class="s1">&#39;equivalent_atoms&#39;</span><span class="p">],</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">usite</span><span class="p">,</span> <span class="n">uindex</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">usites</span><span class="p">,</span> <span class="n">uindices</span><span class="p">):</span>
+        <span class="n">atype</span> <span class="o">=</span> <span class="n">ucell</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">atype</span><span class="p">[</span><span class="n">uindex</span><span class="p">]</span>
+        <span class="n">wykoff</span> <span class="o">=</span> <span class="n">sym_data</span><span class="p">[</span><span class="s1">&#39;wyckoffs&#39;</span><span class="p">][</span><span class="n">uindex</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">atype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fingerprint_dict</span><span class="p">:</span>
+            <span class="n">fingerprint_dict</span><span class="p">[</span><span class="n">atype</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">wykoff</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fingerprint_dict</span><span class="p">[</span><span class="n">atype</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wykoff</span><span class="p">)</span>
+    <span class="n">fingerprint</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">atype</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">fingerprint_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="n">fingerprint</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">fingerprint_dict</span><span class="p">[</span><span class="n">atype</span><span class="p">])))</span>
+    <span class="n">fingerprint</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fingerprint</span><span class="p">)</span>
+
     <span class="c1"># Return results</span>
     <span class="n">results_dict</span> <span class="o">=</span> <span class="n">spg_type</span>
     <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;ucell&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ucell</span>
     <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;hall_number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sym_data</span><span class="p">[</span><span class="s1">&#39;hall_number&#39;</span><span class="p">]</span>
     <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;wyckoffs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sym_data</span><span class="p">[</span><span class="s1">&#39;wyckoffs&#39;</span><span class="p">]</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;equivalent_atoms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sym_data</span><span class="p">[</span><span class="s1">&#39;equivalent_atoms&#39;</span><span class="p">]</span>
     <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;pearson&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pearson</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;wyckoff_fingerprint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fingerprint</span>
 
     <span class="k">return</span> <span class="n">results_dict</span>
 
@@ -537,12 +553,11 @@ True.</li>
 </div>
 <div class="section" id="4.-Run-calculation-function(s)">
 <h3>4. Run calculation function(s)<a class="headerlink" href="#4.-Run-calculation-function(s)" title="Permalink to this headline">¶</a></h3>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [6]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">results_dict</span> <span class="o">=</span> <span class="n">crystal_space_group</span><span class="p">(</span><span class="n">ucell</span><span class="p">,</span>
                                    <span class="n">symprec</span><span class="o">=</span><span class="n">symmetryprecision</span><span class="p">,</span>
                                    <span class="n">to_primitive</span><span class="o">=</span><span class="n">primitivecell</span><span class="p">,</span>
@@ -550,27 +565,16 @@ True.</li>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="stderr output_area docutils container">
-<div class="highlight"><pre>
-c:\users\lmh1\documents\python-packages\atomman\atomman\lammps\normalize.py:60: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
-To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
-  transformation = np.linalg.lstsq(vects, system.box.vects)[0].T
-</pre></div></div>
-</div>
 </div>
 <div class="section" id="5.-Report-results">
 <h3>5. Report results<a class="headerlink" href="#5.-Report-results" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="5.1.-Display-space-group-information">
 <h4>5.1. Display space group information<a class="headerlink" href="#5.1.-Display-space-group-information" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">results_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
@@ -625,6 +629,7 @@ natoms = 1
 natypes = 1
 symbols = (&#39;Ni&#39;,)
 pbc = [ True  True  True]
+per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
      id |   atype |  pos[0] |  pos[1] |  pos[2]
       0 |       1 |   0.000 |   0.000 |   0.000
 
@@ -634,8 +639,14 @@ hall_number
 wyckoffs
 [&#39;a&#39;]
 
+equivalent_atoms
+[0]
+
 pearson
 cF1
+
+wyckoff_fingerprint
+a
 
 </pre></div></div>
 </div>
@@ -650,10 +661,15 @@ cF1
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">crystal_space_group Calculation</a><ul>
-<li><a class="reference internal" href="#Introduction">Introduction</a></li>
+<li><a class="reference internal" href="#">crystal_space_group calculation style</a><ul>
+<li><a class="reference internal" href="#Introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#Version-notes">Version notes</a></li>
+<li><a class="reference internal" href="#Additional-dependencies">Additional dependencies</a></li>
+<li><a class="reference internal" href="#Disclaimers">Disclaimers</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#Method-and-Theory">Method and Theory</a></li>
 <li><a class="reference internal" href="#Demonstration">Demonstration</a><ul>
 <li><a class="reference internal" href="#1.-Setup">1. Setup</a><ul>
@@ -661,7 +677,7 @@ cF1
 <li><a class="reference internal" href="#1.2.-Default-calculation-setup">1.2. Default calculation setup</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#2.-Assign-values-for-the-calculation's-run-parameters">2. Assign values for the calculation’s run parameters</a><ul>
+<li><a class="reference internal" href="#2.-Assign-values-for-the-calculation’s-run-parameters">2. Assign values for the calculation’s run parameters</a><ul>
 <li><a class="reference internal" href="#2.1.-Load-initial-unit-cell-system">2.1. Load initial unit cell system</a></li>
 <li><a class="reference internal" href="#2.5.-Specify-calculation-specific-run-parameters">2.5. Specify calculation-specific run parameters</a></li>
 </ul>
@@ -683,10 +699,10 @@ cF1
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="E_vs_r_scan.html"
-                        title="previous chapter">E_vs_r_scan Calculation</a></p>
+                        title="previous chapter">E_vs_r_scan calculation style</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="dislocation_SDVPN.html"
-                        title="next chapter">dislocation_SDVPN Calculation</a></p>
+  <p class="topless"><a href="diatom_scan.html"
+                        title="next chapter">diatom_scan calculation style</a></p>
         </div>
       </div>
       <div class="clearer"></div>
@@ -701,17 +717,17 @@ cF1
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="dislocation_SDVPN.html" title="dislocation_SDVPN Calculation"
+          <a href="diatom_scan.html" title="diatom_scan calculation style"
              >next</a> |</li>
         <li class="right" >
-          <a href="E_vs_r_scan.html" title="E_vs_r_scan Calculation"
+          <a href="E_vs_r_scan.html" title="E_vs_r_scan calculation style"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

@@ -4,30 +4,23 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>iprPy.calculation package &#8212; iprPy 0.8.2 documentation</title>
+    <title>iprPy.calculation package &#8212; iprPy 0.9.0 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.8.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="iprPy.compatibility package" href="compatibility.html" />
+    <link rel="next" title="iprPy.database package" href="database.html" />
     <link rel="prev" title="iprPy package" href="index.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,12 +31,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="compatibility.html" title="iprPy.compatibility package"
+          <a href="database.html" title="iprPy.database package"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="iprPy package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">iprPy package</a> &#187;</li> 
       </ul>
     </div>  
@@ -60,21 +53,37 @@
 <dl class="attribute">
 <dt id="iprPy.calculation.loaded">
 <code class="descname">loaded</code><a class="headerlink" href="#iprPy.calculation.loaded" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Dictionary of the derived classes</p>
+<dd><p>Dictionary of the derived classes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="iprPy.calculation.databases_dict">
 <code class="descname">databases_dict</code><a class="headerlink" href="#iprPy.calculation.databases_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Dictionary of the database styles that successfully loaded. The
+<dd><p>Dictionary of the database styles that successfully loaded. The
 dictionary keys are the database style names, and the values are the
 loaded modules.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="class">
 <dt id="iprPy.calculation.Calculation">
 <em class="property">class </em><code class="descname">Calculation</code><a class="headerlink" href="#iprPy.calculation.Calculation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class for handling different calculation styles in the same fashion.  The
 class defines the common methods and attributes, which are then uniquely
 implemented for each style.  The available styles are loaded from the
@@ -82,60 +91,88 @@ iprPy.calculations submodule.</p>
 <dl class="attribute">
 <dt id="iprPy.calculation.Calculation.allkeys">
 <code class="descname">allkeys</code><a class="headerlink" href="#iprPy.calculation.Calculation.allkeys" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> – All keys used by the calculation.</p>
+<dd><p>All keys used by the calculation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="iprPy.calculation.Calculation.calc">
 <code class="descname">calc</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.calc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calls the primary calculation function(s).
-This needs to be defined for each calculation.</p>
+<dd><p>Calls the calculation’s primary function(s)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="iprPy.calculation.Calculation.directory">
 <code class="descname">directory</code><a class="headerlink" href="#iprPy.calculation.Calculation.directory" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – The path to the calculation’s directory</p>
+<dd><p>The path to the calculation’s directory</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="iprPy.calculation.Calculation.files">
 <code class="descname">files</code><a class="headerlink" href="#iprPy.calculation.Calculation.files" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>iter of str</em> – Path to each file required by the calculation.</p>
+<dd><p>Path to each file required by the calculation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.main">
-<code class="descname">main</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calls the calculation’s main function.</p>
+<dl class="attribute">
+<dt id="iprPy.calculation.Calculation.module_file">
+<code class="descname">module_file</code><a class="headerlink" href="#iprPy.calculation.Calculation.module_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>The path to the Calculation class file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.7)">pathlib.Path</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iprPy.calculation.Calculation.module_name">
+<code class="descname">module_name</code><a class="headerlink" href="#iprPy.calculation.Calculation.module_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The calculation style</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="iprPy.calculation.Calculation.multikeys">
 <code class="descname">multikeys</code><a class="headerlink" href="#iprPy.calculation.Calculation.multikeys" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> – Calculation keys that can have multiple values during prepare.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.process_input">
-<code class="descname">process_input</code><span class="sig-paren">(</span><em>input_dict</em>, <em>UUID=None</em>, <em>build=True</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.process_input" title="Permalink to this definition">¶</a></dt>
-<dd><p>Processes str input parameters, assigns default values if needed, and
-generates new, more complex terms as used by the calculation.</p>
+<dd><p>Calculation key sets that can have multiple values during prepare.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary containing the calculation input parameters with string
-values.  The allowed keys depends on the calculation style.</li>
-<li><strong>UUID</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Unique identifier to use for the calculation instance.  If not
-given and a ‘UUID’ key is not in input_dict, then a random UUID4
-hash tag will be assigned.</li>
-<li><strong>build</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if all complex terms are to be built.  A value of False
-allows for default values to be assigned even if some inputs
-required by the calculation are incomplete. (Default is True.)</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
 </tr>
 </tbody>
 </table>
@@ -144,25 +181,71 @@ required by the calculation are incomplete. (Default is True.)</li>
 <dl class="attribute">
 <dt id="iprPy.calculation.Calculation.record_style">
 <code class="descname">record_style</code><a class="headerlink" href="#iprPy.calculation.Calculation.record_style" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – The record style associated with the calculation.</p>
+<dd><p>The record style associated with the calculation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iprPy.calculation.Calculation.script">
+<code class="descname">script</code><a class="headerlink" href="#iprPy.calculation.Calculation.script" title="Permalink to this definition">¶</a></dt>
+<dd><p>shortcut to the imported calc_*.py module</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">module</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="iprPy.calculation.Calculation.singularkeys">
 <code class="descname">singularkeys</code><a class="headerlink" href="#iprPy.calculation.Calculation.singularkeys" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> – Calculation keys that can have single values during prepare.</p>
+<dd><p>Calculation keys that can have single values during prepare.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="iprPy.calculation.Calculation.style">
 <code class="descname">style</code><a class="headerlink" href="#iprPy.calculation.Calculation.style" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – The calculation style</p>
+<dd><p>The calculation style</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="iprPy.calculation.Calculation.template">
 <code class="descname">template</code><a class="headerlink" href="#iprPy.calculation.Calculation.template" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – The template to use for generating calc.in files.</p>
+<dd><p>The template to use for generating calc.in files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -170,7 +253,20 @@ required by the calculation are incomplete. (Default is True.)</li>
 <dl class="function">
 <dt id="iprPy.calculation.load_calculation">
 <code class="descname">load_calculation</code><span class="sig-paren">(</span><em>style</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.load_calculation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Loads a Calculation subclass associated with a given calculation style</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The calculation style</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A Calculation object for the style</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">subclass of iprPy.calculation.Calculation</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </div>
 </div>
@@ -181,7 +277,7 @@ required by the calculation are incomplete. (Default is True.)</li>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">iprPy.calculation package</a><ul>
 <li><a class="reference internal" href="#module-iprPy.calculation">Module contents</a></li>
@@ -193,8 +289,8 @@ required by the calculation are incomplete. (Default is True.)</li>
   <p class="topless"><a href="index.html"
                         title="previous chapter">iprPy package</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="compatibility.html"
-                        title="next chapter">iprPy.compatibility package</a></p>
+  <p class="topless"><a href="database.html"
+                        title="next chapter">iprPy.database package</a></p>
         </div>
       </div>
       <div class="clearer"></div>
@@ -209,17 +305,17 @@ required by the calculation are incomplete. (Default is True.)</li>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="compatibility.html" title="iprPy.compatibility package"
+          <a href="database.html" title="iprPy.database package"
              >next</a> |</li>
         <li class="right" >
           <a href="index.html" title="iprPy package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >iprPy package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

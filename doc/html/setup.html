@@ -4,30 +4,23 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Setup &#8212; iprPy 0.8.2 documentation</title>
+    <title>Setup &#8212; iprPy 0.9.0 documentation</title>
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.8.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Calculations" href="run/index.html" />
+    <link rel="next" title="iprPy Package Components" href="overview.html" />
     <link rel="prev" title="Introduction to iprPy" href="intro.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,12 +31,12 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="run/index.html" title="Calculations"
+          <a href="overview.html" title="iprPy Package Components"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="intro.html" title="Introduction to iprPy"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.8.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.9.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -55,13 +48,13 @@
   <div class="section" id="setup">
 <h1>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h1>
 <p>A key principle of iprPy is to minimize barriers for usage.  As such, the only
-requirements for running the framework are Python 2.7, and a few extra (mostly
+requirements for running the framework are Python 3.6+, and a few extra (mostly
 standard) Python packages.  All of the required packages should be compatible
 with any operating system that Python runs on.</p>
 <div class="section" id="installing-iprpy">
 <h2>Installing iprPy<a class="headerlink" href="#installing-iprpy" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
-<li><p class="first">Install Python 2.7/3.6 and the <a class="reference external" href="https://www.scipy.org/">scipy</a> family of Python packages.  If you
+<li><p class="first">Install Python 3.6+ and the <a class="reference external" href="https://www.scipy.org/">scipy</a> family of Python packages.  If you
 don’t already have Python, the easiest way to do this is to install
 <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a>.  The standard Anaconda distribution automatically adds the
 scipy packages.  For miniconda or a new environment of an existing anaconda
@@ -72,14 +65,14 @@ stable versions is available at <a class="reference external" href="https://gith
 </li>
 <li><p class="first">In a terminal, go into the local iprPy root directory and install the iprPy
 package to Python with the command</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">python setup.py develop</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python setup.py develop</span>
 </pre></div>
 </div>
 <p>This should automatically install any other required Python packages.</p>
 </li>
 <li><p class="first">To test if the framework is working, in a terminal go into the iprPy/bin
 directory and enter the command</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">python iprPy check_modules</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python iprPy check_modules</span>
 </pre></div>
 </div>
 <p>If you see a list of included calculation, record, and database styles,
@@ -101,7 +94,7 @@ it makes updating slightly more complicated.</p>
 <ol class="arabic">
 <li><p class="first">Development of the <a class="reference external" href="https://github.com/usnistgov/atomman/">atomman</a> Python package is closely aligned to iprPy.
 As such, atomman should be updated using pip whenever iprPy is updated</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">pip install -U atomman</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install -U atomman</span>
 </pre></div>
 </div>
 </li>
@@ -129,7 +122,7 @@ Python, move iprPy to a new directory.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Setup</a><ul>
 <li><a class="reference internal" href="#installing-iprpy">Installing iprPy</a></li>
@@ -143,8 +136,8 @@ Python, move iprPy to a new directory.</p>
   <p class="topless"><a href="intro.html"
                         title="previous chapter">Introduction to iprPy</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="run/index.html"
-                        title="next chapter">Calculations</a></p>
+  <p class="topless"><a href="overview.html"
+                        title="next chapter">iprPy Package Components</a></p>
         </div>
       </div>
       <div class="clearer"></div>
@@ -159,16 +152,16 @@ Python, move iprPy to a new directory.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="run/index.html" title="Calculations"
+          <a href="overview.html" title="iprPy Package Components"
              >next</a> |</li>
         <li class="right" >
           <a href="intro.html" title="Introduction to iprPy"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.8.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.9.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

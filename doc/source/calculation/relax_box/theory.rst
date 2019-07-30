@@ -7,7 +7,7 @@ orthogonal box vectors.
 
 An initial system (and corresponding unit cell system) is supplied with
 box dimensions, :math:`a_i^0`, close to the equilibrium values. A LAMMPS
-simulation is performed that evaluates the system's pressures,
+simulation is performed that evaluates the system’s pressures,
 :math:`P_{i}`, for the initial system as given, and subjected to twelve
 different strain states corresponding to one of :math:`\epsilon_{i}`
 being given a value of :math:`\frac{\Delta \epsilon}{2}`, where

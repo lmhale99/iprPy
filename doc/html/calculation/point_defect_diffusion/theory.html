@@ -4,30 +4,23 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Method and Theory &#8212; iprPy 0.8.2 documentation</title>
+    <title>Method and Theory &#8212; iprPy 0.9.0 documentation</title>
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '0.8.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Input script parameters" href="parameters.html" />
     <link rel="prev" title="Introduction" href="intro.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -43,7 +36,7 @@
         <li class="right" >
           <a href="intro.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">point_defect_diffusion</a> &#187;</li> 
       </ul>
@@ -71,17 +64,17 @@ measured as a function of time.</li>
 <p>Between the two runs, the atomic velocities are scaled such that the
 average temperature of the nve run is closer to the target temperature.</p>
 <p>The mean square displacement of the defect,
-<span class="math">\(\left&lt; \Delta r_{ptd}^2 \right&gt;\)</span> is then estimated using the mean
-square displacement of the atoms <span class="math">\(\left&lt; \Delta r_{i}^2 \right&gt;\)</span>.
+<span class="math notranslate nohighlight">\(\left&lt; \Delta r_{ptd}^2 \right&gt;\)</span> is then estimated using the mean
+square displacement of the atoms <span class="math notranslate nohighlight">\(\left&lt; \Delta r_{i}^2 \right&gt;\)</span>.
 Under the assumption that all diffusion is associated with the single
 point defect, the defect’s mean square displacement can be taken as the
 summed square displacement of the atoms</p>
-<div class="math">
+<div class="math notranslate nohighlight">
 \[\left&lt; \Delta r_{ptd}^2 \right&gt; \approx \sum_i^N \Delta r_{i}^2 = N \left&lt; \Delta r_{i}^2 \right&gt;,\]</div>
-<p>where <span class="math">\(N\)</span> is the number of atoms in the system. The diffusion
+<p>where <span class="math notranslate nohighlight">\(N\)</span> is the number of atoms in the system. The diffusion
 constant is then estimated by linearly fitting the change in mean square
 displacement with time</p>
-<div class="math">
+<div class="math notranslate nohighlight">
 \[\left&lt; \Delta r_{ptd}^2 \right&gt; = 2 d D_{ptd} \Delta t,\]</div>
 <p>where d is the number of dimensions included.</p>
 </div>
@@ -117,13 +110,13 @@ displacement with time</p>
         <li class="right" >
           <a href="intro.html" title="Introduction"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >point_defect_diffusion</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

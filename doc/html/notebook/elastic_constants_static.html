@@ -4,30 +4,23 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>elastic_constants_static Calculation &#8212; iprPy 0.8.2 documentation</title>
+    <title>elastic_constants_static calculation style &#8212; iprPy 0.9.0 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.8.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="point_defect_diffusion Calculation" href="point_defect_diffusion.html" />
-    <link rel="prev" title="dislocation_monopole Calculation" href="dislocation_monopole.html" /> 
-  </head>
-  <body>
+    <link rel="next" title="phonon calculation style" href="phonon.html" />
+    <link rel="prev" title="dislocation_periodic_array calculation style" href="dislocation_periodic_array.html" /> 
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,12 +31,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="point_defect_diffusion.html" title="point_defect_diffusion Calculation"
+          <a href="phonon.html" title="phonon calculation style"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="dislocation_monopole.html" title="dislocation_monopole Calculation"
+          <a href="dislocation_periodic_array.html" title="dislocation_periodic_array calculation style"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>  
@@ -108,18 +101,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #303F9F;
+    color: #307FC1;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #D84315;
+    color: #BF5B3D;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 9ex;
+    min-width: 7ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -159,9 +152,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #cfcfcf;
+    border: 1px solid #e0e0e0;
     border-radius: 2px;
-    background: #f7f7f7;
+    background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
@@ -169,7 +162,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.pngmath center alignment in output cells */
+/* override sphinx.ext.imgmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -218,74 +211,83 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
 </style>
-<div class="section" id="elastic_constants_static-Calculation">
-<h1>elastic_constants_static Calculation<a class="headerlink" href="#elastic_constants_static-Calculation" title="Permalink to this headline">¶</a></h1>
-<p><strong>Lucas M. Hale</strong>,
-<a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>,
-<em>Materials Science and Engineering Division, NIST</em>.</p>
-<p><strong>Chandler A. Becker</strong>,
-<a class="reference external" href="mailto:chandler&#46;becker&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">chandler<span>&#46;</span>becker<span>&#64;</span>nist<span>&#46;</span>gov</a>,
-<em>Office of Data and Informatics, NIST</em>.</p>
-<p><strong>Zachary T. Trautt</strong>,
-<a class="reference external" href="mailto:zachary&#46;trautt&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">zachary<span>&#46;</span>trautt<span>&#64;</span>nist<span>&#46;</span>gov</a>,
-<em>Materials Measurement Science Division, NIST</em>.</p>
-<p>Version: 2018-06-24</p>
-<p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">Disclaimers</a></p>
+<div class="section" id="elastic_constants_static-calculation-style">
+<h1>elastic_constants_static calculation style<a class="headerlink" href="#elastic_constants_static-calculation-style" title="Permalink to this headline">¶</a></h1>
+<p><strong>Lucas M. Hale</strong>, <a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>, <em>Materials Science and Engineering Division, NIST</em>.</p>
+<p>Description updated: 2019-07-26</p>
 <div class="section" id="Introduction">
 <h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
-<p>The elastic_constants_static calculation computes the elastic
-constants, <span class="math">\(C_{ij}\)</span>, for a system by applying small strains and
-performing static energy minimizations of the initial and strained
-configurations. Three estimates of the elastic constants are returned:
-one for applying positive strains, one for applying negative strains,
-and a normalized estimate that averages the ± strains and the symmetric
-components of the <span class="math">\(C_{ij}\)</span> tensor.</p>
-<p><strong>Version notes</strong>: This calculation and relax_static replace the
-previous LAMMPS_ELASTIC calculation style.</p>
-<p><strong>Disclaimer #1</strong>: Unlike the previous LAMMPS_ELASTIC calculation, this
-calculation does <em>not</em> perform a box relaxation on the system prior to
-evaluating the elastic constants. This allows for the static elastic
-constants to be evaluated for systems that are relaxed to different
-pressures.</p>
-<p><strong>Disclaimer #2</strong>: The elastic constants are estimated using small
-strains. Depending on the potential, the values for the elastic
-constants may vary with the size of the strain. This can come about
-either if the strain exceeds the linear elastic regime.</p>
-<p><strong>Disclaimer #3</strong>: Some classical interatomic potentials have
-discontinuities in the fourth derivative of the energy function with
-respect to position. If the strained states straddle one of these
-discontinuities the resulting static elastic constants values will be
-nonsense.</p>
+<p>The elastic_constants_static calculation style computes the elastic constants, <span class="math notranslate nohighlight">\(C_{ij}\)</span>, for a system by applying small strains and performing static energy minimizations of the initial and strained configurations. Three estimates of the elastic constants are returned: one for applying positive strains, one for applying negative strains, and a normalized estimate that averages the ± strains and the symmetric components of the <span class="math notranslate nohighlight">\(C_{ij}\)</span> tensor.</p>
+<div class="section" id="Version-notes">
+<h3>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>This calculation style and relax_static replace the previous LAMMPS_ELASTIC calculation style.</li>
+</ul>
+</div>
+<div class="section" id="Additional-dependencies">
+<h3>Additional dependencies<a class="headerlink" href="#Additional-dependencies" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="Disclaimers">
+<h3>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST disclaimers</a></li>
+<li>Unlike the previous LAMMPS_ELASTIC calculation, this calculation does <em>not</em> perform a box relaxation on the system prior to evaluating the elastic constants. This allows for the static elastic constants to be evaluated for systems that are relaxed to different pressures.</li>
+<li>The elastic constants are estimated using small strains. Depending on the potential, the values for the elastic constants may vary with the size of the strain. This can come about either if the strain exceeds the linear elastic regime.</li>
+<li>Some classical interatomic potentials have discontinuities in the fourth derivative of the energy function with respect to position. If the strained states straddle one of these discontinuities the resulting static elastic constants values will be nonsense.</li>
+</ul>
+</div>
 </div>
 <div class="section" id="Method-and-Theory">
 <h2>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this headline">¶</a></h2>
-<p>The calculation method used here for computing elastic constants is
-based on the method used in the ELASTIC demonstration script created by
-Steve Plimpton and distributed with LAMMPS.</p>
-<p>The math in this section uses Voigt notation, where indicies i,j
-correspond to 1=xx, 2=yy, 3=zz, 4=yz, 5=xz, and 6=xy, and x, y and z are
-orthogonal box vectors.</p>
+<p>The calculation method used here for computing elastic constants is based on the method used in the ELASTIC demonstration script created by Steve Plimpton and distributed with LAMMPS.</p>
+<p>The math in this section uses Voigt notation, where indicies i,j correspond to 1=xx, 2=yy, 3=zz, 4=yz, 5=xz, and 6=xy, and x, y and z are orthogonal box vectors.</p>
 <p>A LAMMPS simulation performs thirteen energy/force minimizations</p>
 <ul class="simple">
 <li>One for relaxing the initial system.</li>
-<li>Twelve for relaxing systems in which a small strain of magnitude
-<span class="math">\(\Delta \epsilon\)</span> is applied to the system in both the positive
-and negative directions of the six Voigt strain components,
-<span class="math">\(\pm \Delta \epsilon_{i}\)</span>.</li>
+<li>Twelve for relaxing systems in which a small strain of magnitude <span class="math notranslate nohighlight">\(\Delta \epsilon\)</span> is applied to the system in both the positive and negative directions of the six Voigt strain components, <span class="math notranslate nohighlight">\(\pm \Delta \epsilon_{i}\)</span>.</li>
 </ul>
-<p>The system virial pressures, <span class="math">\(P_{i}\)</span>, are recorded for each of the
-thirteen relaxed configurations. Two estimates for the <span class="math">\(C_{ij}\)</span>
-matrix for the system are obtained as</p>
-<div class="math">
+<p>The system virial pressures, <span class="math notranslate nohighlight">\(P_{i}\)</span>, are recorded for each of the thirteen relaxed configurations. Two estimates for the <span class="math notranslate nohighlight">\(C_{ij}\)</span> matrix for the system are obtained as</p>
+<div class="math notranslate nohighlight">
 \[C_{ij}^+ = - \frac{P_i(\Delta \epsilon_j) - P_i(0)}{\Delta \epsilon},\]</div>
-<div class="math">
+<div class="math notranslate nohighlight">
 \[C_{ij}^- = - \frac{P_i(0) - P_i(-\Delta \epsilon_j)}{\Delta \epsilon}.\]</div>
-<p>The negative out front comes from the fact that the system-wide stress
-state is <span class="math">\(\sigma_i = -P_i\)</span>. A normalized, average estimate is also
-obtained by averaging the positive and negative strain estimates, as
-well as the symmetric components of the tensor</p>
-<div class="math">
+<p>The negative out front comes from the fact that the system-wide stress state is <span class="math notranslate nohighlight">\(\sigma_i = -P_i\)</span>. A normalized, average estimate is also obtained by averaging the positive and negative strain estimates, as well as the symmetric components of the tensor</p>
+<div class="math notranslate nohighlight">
 \[C_{ij} = \frac{C_{ij}^+ + C_{ij}^- + C_{ji}^+ + C_{ji}^-}{4}.\]</div>
 </div>
 <div class="section" id="Demonstration">
@@ -294,8 +296,7 @@ well as the symmetric components of the tensor</p>
 <h3>1. Setup<a class="headerlink" href="#1.-Setup" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="1.1.-Library-imports">
 <h4>1.1. Library imports<a class="headerlink" href="#1.1.-Library-imports" title="Permalink to this headline">¶</a></h4>
-<p>Import libraries needed by the calculation. The external libraries used
-are:</p>
+<p>Import libraries needed by the calculation. The external libraries used are:</p>
 <ul class="simple">
 <li><a class="reference external" href="http://www.numpy.org/">numpy</a></li>
 <li><a class="reference external" href="https://github.com/usnistgov/DataModelDict">DataModelDict</a></li>
@@ -303,17 +304,15 @@ are:</p>
 <li><a class="reference external" href="https://github.com/usnistgov/iprPy">iprPy</a></li>
 </ul>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># Standard library imports</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
@@ -341,18 +340,17 @@ are:</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Notebook last executed on 2018-09-24 using iprPy version 0.8.2
+Notebook last executed on 2019-07-29 using iprPy version 0.9.0
 </pre></div></div>
 </div>
 </div>
 <div class="section" id="1.2.-Default-calculation-setup">
 <h4>1.2. Default calculation setup<a class="headerlink" href="#1.2.-Default-calculation-setup" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># Specify calculation style</span>
 <span class="n">calc_style</span> <span class="o">=</span> <span class="s1">&#39;elastic_constants_static&#39;</span>
 
@@ -362,33 +360,28 @@ Notebook last executed on 2018-09-24 using iprPy version 0.8.2
 
 <span class="c1"># Change to workingdir if not already there</span>
 <span class="k">except</span><span class="p">:</span>
-    <span class="n">workingdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;calculationfiles&#39;</span><span class="p">,</span> <span class="n">calc_style</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">)</span>
+    <span class="n">workingdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;calculationfiles&#39;</span><span class="p">,</span> <span class="n">calc_style</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">workingdir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="n">workingdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">)</span>
-
-<span class="c1"># Default iprPy library directory</span>
-<span class="n">librarydir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">rootdir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;library&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 </div>
-<div class="section" id="2.-Assign-values-for-the-calculation's-run-parameters">
-<h3>2. Assign values for the calculation’s run parameters<a class="headerlink" href="#2.-Assign-values-for-the-calculation's-run-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="2.-Assign-values-for-the-calculation’s-run-parameters">
+<h3>2. Assign values for the calculation’s run parameters<a class="headerlink" href="#2.-Assign-values-for-the-calculation’s-run-parameters" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="2.1.-Specify-system-specific-paths">
 <h4>2.1. Specify system-specific paths<a class="headerlink" href="#2.1.-Specify-system-specific-paths" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><strong>lammps_command</strong> is the LAMMPS command to use (required).</li>
-<li><strong>mpi_command</strong> MPI command for running LAMMPS in parallel. A value
-of None will run simulations serially.</li>
+<li><strong>mpi_command</strong> MPI command for running LAMMPS in parallel. A value of None will run simulations serially.</li>
 </ul>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">lammps_command</span> <span class="o">=</span> <span class="s1">&#39;lmp_serial&#39;</span>
 <span class="n">mpi_command</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
@@ -398,30 +391,21 @@ of None will run simulations serially.</li>
 <div class="section" id="2.2.-Load-interatomic-potential">
 <h4>2.2. Load interatomic potential<a class="headerlink" href="#2.2.-Load-interatomic-potential" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>potential_name</strong> gives the name of the potential_LAMMPS reference
-record in the iprPy library to use for the calculation.</li>
-<li><strong>potential_file</strong> gives the path to the potential_LAMMPS reference
-record to use. Here, this parameter is automatically generated using
-potential_name and librarydir.</li>
-<li><strong>potential_dir</strong> gives the path for the folder containing the
-artifacts associated with the potential (i.e. eam.alloy file). Here,
-this parameter is automatically generated using potential_name and
-librarydir.</li>
-<li><strong>potential</strong> is an atomman.lammps.Potential object (required). Here,
-this parameter is automatically generated from potential_file and
-potential_dir.</li>
+<li><strong>potential_name</strong> gives the name of the potential_LAMMPS reference record in the iprPy library to use for the calculation.</li>
+<li><strong>potential_file</strong> gives the path to the potential_LAMMPS reference record to use. Here, this parameter is automatically generated using potential_name and librarydir.</li>
+<li><strong>potential_dir</strong> gives the path for the folder containing the artifacts associated with the potential (i.e.&nbsp;eam.alloy file). Here, this parameter is automatically generated using potential_name and librarydir.</li>
+<li><strong>potential</strong> is an atomman.lammps.Potential object (required). Here, this parameter is automatically generated from potential_file and potential_dir.</li>
 </ul>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">potential_name</span> <span class="o">=</span> <span class="s1">&#39;1999--Mishin-Y--Ni--LAMMPS--ipr1&#39;</span>
 
 <span class="c1"># Define potential_file and potential_dir using librarydir and potential_name</span>
-<span class="n">potential_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">librarydir</span><span class="p">,</span> <span class="s1">&#39;potential_LAMMPS&#39;</span><span class="p">,</span> <span class="n">potential_name</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span>
-<span class="n">potential_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">librarydir</span><span class="p">,</span> <span class="s1">&#39;potential_LAMMPS&#39;</span><span class="p">,</span> <span class="n">potential_name</span><span class="p">)</span>
+<span class="n">potential_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;potential_LAMMPS&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{potential_name}</span><span class="s1">.json&#39;</span><span class="p">)</span>
+<span class="n">potential_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;potential_LAMMPS&#39;</span><span class="p">,</span> <span class="n">potential_name</span><span class="p">)</span>
 
 <span class="c1"># Initialize Potential object using potential_file and potential_dir.</span>
 <span class="n">potential</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">Potential</span><span class="p">(</span><span class="n">potential_file</span><span class="p">,</span> <span class="n">potential_dir</span><span class="p">)</span>
@@ -441,36 +425,25 @@ Successfully loaded potential 1999--Mishin-Y--Ni--LAMMPS--ipr1
 <div class="section" id="2.3.-Load-initial-unit-cell-system">
 <h4>2.3. Load initial unit cell system<a class="headerlink" href="#2.3.-Load-initial-unit-cell-system" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>prototype_name</strong> gives the name of the crystal_prototype
-reference record in the iprPy library to load.</li>
-<li><strong>symbols</strong> is a list of the potential’s elemental model symbols to
-associate with the unique atom types of the loaded system.</li>
-<li><strong>box_parameters</strong> is a list of the a, b, c lattice constants to
-assign to the loaded file.</li>
-<li><strong>load_file</strong> gives the path to the atomic configuration file to
-load for the ucell system. Here, this is generated automatically
-using prototype_name and librarydir.</li>
-<li><strong>load_style</strong> specifies the format of load_file. Here, this is
-automatically set for crystal_prototype records.</li>
-<li><strong>load_options</strong> specifies any other keyword options for properly
-loading the load_file. Here, this is automatically set for
-crystal_prototype records.</li>
-<li><strong>ucell</strong> is an atomman.System representing a fundamental unit cell
-of the system (required). Here, this is generated using the load_*
-parameters and symbols.</li>
+<li><strong>prototype_name</strong> gives the name of the crystal_prototype reference record in the iprPy library to load.</li>
+<li><strong>symbols</strong> is a list of the potential’s elemental model symbols to associate with the unique atom types of the loaded system.</li>
+<li><strong>box_parameters</strong> is a list of the a, b, c lattice constants to assign to the loaded file.</li>
+<li><strong>load_file</strong> gives the path to the atomic configuration file to load for the ucell system. Here, this is generated automatically using prototype_name and librarydir.</li>
+<li><strong>load_style</strong> specifies the format of load_file. Here, this is automatically set for crystal_prototype records.</li>
+<li><strong>load_options</strong> specifies any other keyword options for properly loading the load_file. Here, this is automatically set for crystal_prototype records.</li>
+<li><strong>ucell</strong> is an atomman.System representing a fundamental unit cell of the system (required). Here, this is generated using the load parameters and symbols.</li>
 </ul>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">prototype_name</span> <span class="o">=</span> <span class="s1">&#39;A1--Cu--fcc&#39;</span>
 <span class="n">symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ni&#39;</span><span class="p">]</span>
 <span class="n">box_parameters</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">([</span><span class="mf">3.51999948</span><span class="p">,</span> <span class="mf">3.51999948</span><span class="p">,</span> <span class="mf">3.51999948</span><span class="p">],</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
 
 <span class="c1"># Define load_file using librarydir and prototype_name</span>
-<span class="n">load_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">librarydir</span><span class="p">,</span> <span class="s1">&#39;crystal_prototype&#39;</span><span class="p">,</span> <span class="n">prototype_name</span><span class="o">+</span><span class="s1">&#39;.json&#39;</span><span class="p">)</span>
+<span class="n">load_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;crystal_prototype&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{prototype_name}</span><span class="s1">.json&#39;</span><span class="p">)</span>
 
 <span class="c1"># Define load_style and load_options for crystal_prototype records</span>
 <span class="n">load_style</span> <span class="o">=</span> <span class="s1">&#39;system_model&#39;</span>
@@ -499,6 +472,7 @@ natoms = 4
 natypes = 1
 symbols = (&#39;Ni&#39;,)
 pbc = [ True  True  True]
+per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
      id |   atype |  pos[0] |  pos[1] |  pos[2]
       0 |       1 |   0.000 |   0.000 |   0.000
       1 |       1 |   0.000 |   1.760 |   1.760
@@ -510,17 +484,14 @@ pbc = [ True  True  True]
 <div class="section" id="2.4.-Modify-system">
 <h4>2.4. Modify system<a class="headerlink" href="#2.4.-Modify-system" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>sizemults</strong> list of three integers specifying how many times the
-ucell vectors of <span class="math">\(a\)</span>, <span class="math">\(b\)</span> and <span class="math">\(c\)</span> are replicated in
-creating system.</li>
+<li><strong>sizemults</strong> list of three integers specifying how many times the ucell vectors of <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span> and <span class="math notranslate nohighlight">\(c\)</span> are replicated in creating system.</li>
 <li><strong>system</strong> is an atomman.System to perform the scan on (required).</li>
 </ul>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">sizemults</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
 
 <span class="c1"># Generate system by supersizing ucell</span>
@@ -541,25 +512,18 @@ creating system.</li>
 <div class="section" id="2.5.-Specify-calculation-specific-run-parameters">
 <h4>2.5. Specify calculation-specific run parameters<a class="headerlink" href="#2.5.-Specify-calculation-specific-run-parameters" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>strainrange</strong> specifies the <span class="math">\(\Delta \epsilon\)</span> strain range to
-use in estimating <span class="math">\(C_{ij}\)</span>.</li>
-<li><strong>energytolerance</strong> is the energy tolerance to use during the
-minimizations. This is unitless.</li>
-<li><strong>forcetolerance</strong> is the force tolerance to use during the
-minimizations. This is in energy/length units.</li>
-<li><strong>maxiterations</strong> is the maximum number of minimization iterations to
-use.</li>
-<li><strong>maxevaluations</strong> is the maximum number of minimization evaluations
-to use.</li>
-<li><strong>maxatommotion</strong> is the largest distance that an atom is allowed to
-move during a minimization iteration. This is in length units.</li>
+<li><strong>strainrange</strong> specifies the <span class="math notranslate nohighlight">\(\Delta \epsilon\)</span> strain range to use in estimating <span class="math notranslate nohighlight">\(C_{ij}\)</span>.</li>
+<li><strong>energytolerance</strong> is the energy tolerance to use during the minimizations. This is unitless.</li>
+<li><strong>forcetolerance</strong> is the force tolerance to use during the minimizations. This is in energy/length units.</li>
+<li><strong>maxiterations</strong> is the maximum number of minimization iterations to use.</li>
+<li><strong>maxevaluations</strong> is the maximum number of minimization evaluations to use.</li>
+<li><strong>maxatommotion</strong> is the largest distance that an atom is allowed to move during a minimization iteration. This is in length units.</li>
 </ul>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">strainrange</span> <span class="o">=</span> <span class="mf">1e-7</span>
 <span class="n">energytolerance</span> <span class="o">=</span> <span class="mf">1e-8</span>
 <span class="n">forcetolerance</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;eV/angstrom&#39;</span><span class="p">)</span>
@@ -576,11 +540,10 @@ move during a minimization iteration. This is in length units.</li>
 <div class="section" id="3.1.-cij.template">
 <h4>3.1. cij.template<a class="headerlink" href="#3.1.-cij.template" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;cij.template&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;# Performs simulations to statically evaluate elastic constants using small strains</span>
 <span class="s2"># Based on the LAMMPS_ELASTIC script by Aidan Thompson (Sandia, athomps@sandia.gov)</span>
@@ -731,11 +694,10 @@ move during a minimization iteration. This is in length units.</li>
 <div class="section" id="3.2.-potential.template">
 <h4>3.2. potential.template<a class="headerlink" href="#3.2.-potential.template" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;potential.template&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;# NOTE: This script can be modified for different pair styles</span>
 <span class="s2"># See in.elastic for more info.</span>
@@ -757,11 +719,10 @@ move during a minimization iteration. This is in length units.</li>
 <div class="section" id="3.3.-elastic_constants_static()">
 <h4>3.3. elastic_constants_static()<a class="headerlink" href="#3.3.-elastic_constants_static()" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="k">def</span> <span class="nf">elastic_constants_static</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">mpi_command</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                              <span class="n">strainrange</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">etol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
                              <span class="n">maxeval</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">dmax</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)):</span>
@@ -817,6 +778,12 @@ move during a minimization iteration. This is in length units.</li>
 <span class="sd">          elastic constants.</span>
 <span class="sd">        - **&#39;system_relaxed&#39;** (*atomman.System*) - The relaxed system.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Get script&#39;s location if __file__ exists</span>
+        <span class="n">script_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="c1"># Use cwd otherwise</span>
+        <span class="n">script_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
 
     <span class="c1"># Convert hexagonal cells to orthorhombic to avoid LAMMPS tilt issues</span>
     <span class="k">if</span> <span class="n">am</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">ishexagonal</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="p">):</span>
@@ -843,13 +810,13 @@ move during a minimization iteration. This is in length units.</li>
     <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dmax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">dmax</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">])</span>
 
     <span class="c1"># Fill in template files</span>
-    <span class="n">template_file</span> <span class="o">=</span> <span class="s1">&#39;cij.template&#39;</span>
+    <span class="n">template_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span> <span class="s1">&#39;cij.template&#39;</span><span class="p">)</span>
     <span class="n">lammps_script</span> <span class="o">=</span> <span class="s1">&#39;cij.in&#39;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">template_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">template</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lammps_script</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">filltemplate</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">lammps_variables</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
-    <span class="n">template_file2</span> <span class="o">=</span> <span class="s1">&#39;potential.template&#39;</span>
+    <span class="n">template_file2</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span> <span class="s1">&#39;potential.template&#39;</span><span class="p">)</span>
     <span class="n">lammps_script2</span> <span class="o">=</span> <span class="s1">&#39;potential.in&#39;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">template_file2</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">template</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -883,7 +850,7 @@ move during a minimization iteration. This is in length units.</li>
 
         <span class="c1"># Calculate cij_n using stress changes</span>
         <span class="n">cij_n</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">pxx</span> <span class="o">-</span> <span class="n">pxx0</span><span class="p">,</span> <span class="n">pyy</span> <span class="o">-</span> <span class="n">pyy0</span><span class="p">,</span> <span class="n">pzz</span> <span class="o">-</span> <span class="n">pzz0</span><span class="p">,</span>
-                             <span class="n">pyz</span> <span class="o">-</span> <span class="n">pyz0</span><span class="p">,</span> <span class="n">pxz</span> <span class="o">-</span> <span class="n">pxz0</span><span class="p">,</span> <span class="n">pxy</span> <span class="o">-</span> <span class="n">pxy0</span><span class="p">])</span><span class="o">/</span> <span class="n">strainrange</span>
+                             <span class="n">pyz</span> <span class="o">-</span> <span class="n">pyz0</span><span class="p">,</span> <span class="n">pxz</span> <span class="o">-</span> <span class="n">pxz0</span><span class="p">,</span> <span class="n">pxy</span> <span class="o">-</span> <span class="n">pxy0</span><span class="p">])</span> <span class="o">/</span> <span class="n">strainrange</span>
 
     <span class="c1"># Positive strains</span>
     <span class="n">cij_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
@@ -899,8 +866,8 @@ move during a minimization iteration. This is in length units.</li>
         <span class="n">pxy</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">Pxy</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">])</span>
 
         <span class="c1"># Calculate cij_p using stress changes</span>
-        <span class="n">cij_p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">pxx</span> <span class="o">-</span> <span class="n">pxx0</span><span class="p">,</span> <span class="n">pyy</span> <span class="o">-</span> <span class="n">pyy0</span><span class="p">,</span> <span class="n">pzz</span> <span class="o">-</span> <span class="n">pzz0</span><span class="p">,</span>
-                              <span class="n">pyz</span> <span class="o">-</span> <span class="n">pyz0</span><span class="p">,</span> <span class="n">pxz</span> <span class="o">-</span> <span class="n">pxz0</span><span class="p">,</span> <span class="n">pxy</span> <span class="o">-</span> <span class="n">pxy0</span><span class="p">])</span><span class="o">/</span> <span class="n">strainrange</span>
+        <span class="n">cij_p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">pxx</span> <span class="o">-</span> <span class="n">pxx0</span><span class="p">,</span> <span class="n">pyy</span> <span class="o">-</span> <span class="n">pyy0</span><span class="p">,</span> <span class="n">pzz</span> <span class="o">-</span> <span class="n">pzz0</span><span class="p">,</span>
+                              <span class="n">pyz</span> <span class="o">-</span> <span class="n">pyz0</span><span class="p">,</span> <span class="n">pxz</span> <span class="o">-</span> <span class="n">pxz0</span><span class="p">,</span> <span class="n">pxy</span> <span class="o">-</span> <span class="n">pxy0</span><span class="p">])</span> <span class="o">/</span> <span class="o">-</span><span class="n">strainrange</span>
 
     <span class="c1"># Average symmetric values</span>
     <span class="n">cij</span> <span class="o">=</span> <span class="p">(</span><span class="n">cij_n</span> <span class="o">+</span> <span class="n">cij_p</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
@@ -925,11 +892,10 @@ move during a minimization iteration. This is in length units.</li>
 <div class="section" id="4.-Run-calculation-function(s)">
 <h3>4. Run calculation function(s)<a class="headerlink" href="#4.-Run-calculation-function(s)" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">results_dict</span> <span class="o">=</span> <span class="n">elastic_constants_static</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span>
                                         <span class="n">mpi_command</span> <span class="o">=</span> <span class="n">mpi_command</span><span class="p">,</span>
                                         <span class="n">strainrange</span> <span class="o">=</span> <span class="n">strainrange</span><span class="p">,</span>
@@ -942,21 +908,19 @@ move during a minimization iteration. This is in length units.</li>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">results_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>Out[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="output_area highlight-none"><div class="highlight"><pre>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
 <span></span>dict_keys([&#39;raw_cij_negative&#39;, &#39;raw_cij_positive&#39;, &#39;C&#39;])
 </pre></div>
 </div>
@@ -970,24 +934,22 @@ move during a minimization iteration. This is in length units.</li>
 <li><strong>pressure_unit</strong> is the unit of pressure to display values in.</li>
 </ul>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">pressure_unit</span> <span class="o">=</span> <span class="s1">&#39;GPa&#39;</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="section" id="5.2.-Print-raw-Cij-values-for--states">
-<h4>5.2. Print raw Cij values for <span class="math">\(\pm \Delta \epsilon\)</span> states<a class="headerlink" href="#5.2.-Print-raw-Cij-values-for--states" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="5.2.-Print-raw-Cij-values-for-\pm-\Delta-\epsilon-states">
+<h4>5.2. Print raw Cij values for <span class="math notranslate nohighlight">\(\pm \Delta \epsilon\)</span> states<a class="headerlink" href="#5.2.-Print-raw-Cij-values-for-\pm-\Delta-\epsilon-states" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Raw Cij for negative strains (&#39;</span><span class="o">+</span><span class="n">pressure_unit</span><span class="o">+</span><span class="s1">&#39;) =&#39;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">Ci</span> <span class="ow">in</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;raw_cij_negative&#39;</span><span class="p">],</span> <span class="n">pressure_unit</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%9.4f</span><span class="s1"> </span><span class="si">%9.4f</span><span class="s1"> </span><span class="si">%9.4f</span><span class="s1"> </span><span class="si">%9.4f</span><span class="s1"> </span><span class="si">%9.4f</span><span class="s1"> </span><span class="si">%9.4f</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">Ci</span><span class="p">))</span>
@@ -1025,11 +987,10 @@ Raw Cij for positive strains (GPa) =
 <div class="section" id="5.3.-Print-averaged-and-refined-Cij-values">
 <h4>5.3. Print averaged and refined Cij values<a class="headerlink" href="#5.3.-Print-averaged-and-refined-Cij-values" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Cij (&#39;</span><span class="o">+</span><span class="n">pressure_unit</span><span class="o">+</span><span class="s1">&#39;) =&#39;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">Ci</span> <span class="ow">in</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">Cij</span><span class="p">,</span> <span class="n">pressure_unit</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%9.4f</span><span class="s1"> </span><span class="si">%9.4f</span><span class="s1"> </span><span class="si">%9.4f</span><span class="s1"> </span><span class="si">%9.4f</span><span class="s1"> </span><span class="si">%9.4f</span><span class="s1"> </span><span class="si">%9.4f</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">Ci</span><span class="p">))</span>
@@ -1061,10 +1022,15 @@ Cij (GPa) =
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">elastic_constants_static Calculation</a><ul>
-<li><a class="reference internal" href="#Introduction">Introduction</a></li>
+<li><a class="reference internal" href="#">elastic_constants_static calculation style</a><ul>
+<li><a class="reference internal" href="#Introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#Version-notes">Version notes</a></li>
+<li><a class="reference internal" href="#Additional-dependencies">Additional dependencies</a></li>
+<li><a class="reference internal" href="#Disclaimers">Disclaimers</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#Method-and-Theory">Method and Theory</a></li>
 <li><a class="reference internal" href="#Demonstration">Demonstration</a><ul>
 <li><a class="reference internal" href="#1.-Setup">1. Setup</a><ul>
@@ -1072,7 +1038,7 @@ Cij (GPa) =
 <li><a class="reference internal" href="#1.2.-Default-calculation-setup">1.2. Default calculation setup</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#2.-Assign-values-for-the-calculation's-run-parameters">2. Assign values for the calculation’s run parameters</a><ul>
+<li><a class="reference internal" href="#2.-Assign-values-for-the-calculation’s-run-parameters">2. Assign values for the calculation’s run parameters</a><ul>
 <li><a class="reference internal" href="#2.1.-Specify-system-specific-paths">2.1. Specify system-specific paths</a></li>
 <li><a class="reference internal" href="#2.2.-Load-interatomic-potential">2.2. Load interatomic potential</a></li>
 <li><a class="reference internal" href="#2.3.-Load-initial-unit-cell-system">2.3. Load initial unit cell system</a></li>
@@ -1089,7 +1055,7 @@ Cij (GPa) =
 <li><a class="reference internal" href="#4.-Run-calculation-function(s)">4. Run calculation function(s)</a></li>
 <li><a class="reference internal" href="#5.-Report-results">5. Report results</a><ul>
 <li><a class="reference internal" href="#5.1.-Define-units-for-outputting-values">5.1. Define units for outputting values</a></li>
-<li><a class="reference internal" href="#5.2.-Print-raw-Cij-values-for--states">5.2. Print raw Cij values for <span class="math">\(\pm \Delta \epsilon\)</span> states</a></li>
+<li><a class="reference internal" href="#5.2.-Print-raw-Cij-values-for-\pm-\Delta-\epsilon-states">5.2. Print raw Cij values for <span class="math notranslate nohighlight">\(\pm \Delta \epsilon\)</span> states</a></li>
 <li><a class="reference internal" href="#5.3.-Print-averaged-and-refined-Cij-values">5.3. Print averaged and refined Cij values</a></li>
 </ul>
 </li>
@@ -1100,11 +1066,11 @@ Cij (GPa) =
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="dislocation_monopole.html"
-                        title="previous chapter">dislocation_monopole Calculation</a></p>
+  <p class="topless"><a href="dislocation_periodic_array.html"
+                        title="previous chapter">dislocation_periodic_array calculation style</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="point_defect_diffusion.html"
-                        title="next chapter">point_defect_diffusion Calculation</a></p>
+  <p class="topless"><a href="phonon.html"
+                        title="next chapter">phonon calculation style</a></p>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1119,17 +1085,17 @@ Cij (GPa) =
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="point_defect_diffusion.html" title="point_defect_diffusion Calculation"
+          <a href="phonon.html" title="phonon calculation style"
              >next</a> |</li>
         <li class="right" >
-          <a href="dislocation_monopole.html" title="dislocation_monopole Calculation"
+          <a href="dislocation_periodic_array.html" title="dislocation_periodic_array calculation style"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

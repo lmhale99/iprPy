@@ -1,8 +1,5 @@
 #!/bin/bash
 
 rm -r html
-rm -r rst
 python source/buildstyledocs.py
 sphinx-build -b html source html
-sphinx-build -b rst source rst
-python source/copymath.py

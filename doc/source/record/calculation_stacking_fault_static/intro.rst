@@ -1,9 +1,22 @@
 Introduction
 ============
 
-The calculation\_stacking\_fault\_static Record style is for a
-calculation that generates a single planar fault.
+The calculation_stacking_fault_static record style is for a calculation
+that generates a single planar fault.
 
-Calculation styles that use this Record style:
+Version notes
+~~~~~~~~~~~~~
 
--  stacking\_fault\_static
+Additional dependencies
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Calculation styles that use this record style
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  stacking_fault_static
+
+Disclaimers
+~~~~~~~~~~~
+
+-  `NIST
+   disclaimers <http://www.nist.gov/public_affairs/disclaimer.cfm>`__

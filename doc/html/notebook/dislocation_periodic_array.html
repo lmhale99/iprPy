@@ -1,0 +1,1130 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>dislocation_periodic_array calculation style &#8212; iprPy 0.9.0 documentation</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="elastic_constants_static calculation style" href="elastic_constants_static.html" />
+    <link rel="prev" title="dislocation_monopole calculation style" href="dislocation_monopole.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="elastic_constants_static.html" title="elastic_constants_static calculation style"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dislocation_monopole.html" title="dislocation_monopole calculation style"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 7ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="dislocation_periodic_array-calculation-style">
+<h1>dislocation_periodic_array calculation style<a class="headerlink" href="#dislocation_periodic_array-calculation-style" title="Permalink to this headline">¶</a></h1>
+<p><strong>Lucas M. Hale</strong>, <a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>, <em>Materials Science and Engineering Division, NIST</em>.</p>
+<p>Description updated: 2019-07-26</p>
+<div class="section" id="Introduction">
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<p>The dislocation_periodic_array calculation constructs an atomic system with a periodic array of dislocations configuration. A single dislocation is inserted into an otherwise perfect crystal, and the system is kept periodic in the two system box directions that are within the dislocation’s slip plane. The system is then statically relaxed with the atoms at the boundary perpendicular to the slip plane held fixed. The generated system can then be used by the other “dislocation_periodic_array_*”
+calculations for examining the slip response of a dislocation to applied stresses or strain rates.</p>
+<div class="section" id="Version-notes">
+<h3>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="Additional-dependencies">
+<h3>Additional dependencies<a class="headerlink" href="#Additional-dependencies" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="Disclaimers">
+<h3>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST disclaimers</a></li>
+<li>This calculation was designed to be general enough to properly generate a dislocation for any crystal system, but has so far only been tested with cubic systems. The resulting system should be carefully examined if the base system in which the dislocation is inserted is not orthorhombic. In particular, the method may need adjusting if the <span class="math notranslate nohighlight">\(\vec{c}\)</span> box vector has a large <span class="math notranslate nohighlight">\(y\)</span> component.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="Method-and-Theory">
+<h2>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="System-orientation-considerations">
+<h3>System orientation considerations<a class="headerlink" href="#System-orientation-considerations" title="Permalink to this headline">¶</a></h3>
+<p>Properly constructing a periodic array of dislocations atomic configuration requires careful consideration of dislocation solutions and atomic system boundaries. Solutions for straight dislocations based on elasticity often follow the convention of using a Cartesian system (<span class="math notranslate nohighlight">\(x', y', z'\)</span>) in which the dislocation line is oriented along the <span class="math notranslate nohighlight">\(z'\)</span>-axis, and the slip plane taken to be the <span class="math notranslate nohighlight">\(y'=0\)</span> plane. The dislocation’s Burgers vector, <span class="math notranslate nohighlight">\(\vec{b}\)</span>, is then in the
+<span class="math notranslate nohighlight">\(x'z'\)</span>-plane, with edge component in the <span class="math notranslate nohighlight">\(x'\)</span>-direction and screw component in the <span class="math notranslate nohighlight">\(z'\)</span>-direction. When the dislocation slips, the dislocation line will move in the <span class="math notranslate nohighlight">\(x'\)</span>-direction.</p>
+<p>For any such dislocation solution, there will be a shearing along the slip plane resulting in disregistry, i.e.&nbsp;a relative displacement between the top and bottom halves. This disregistry has limits such that it is <span class="math notranslate nohighlight">\(0\)</span> for <span class="math notranslate nohighlight">\(x' \to -\infty\)</span> and <span class="math notranslate nohighlight">\(\vec{b}\)</span> for <span class="math notranslate nohighlight">\(x' \to +\infty\)</span>.</p>
+<p>Within an atomic system, the dislocation line should be aligned with one of the system’s box vectors making the dislocation infinitely long and initially perfectly straight. The slip plane can then be defined as containing that box vector and another one. This results in the third box vector being the only one with a component parallel to the slip plane’s normal.</p>
+<p>For LAMMPS-based simulations, the most convenient orientation to use is to align the dislocation with the <span class="math notranslate nohighlight">\(\vec{a}\)</span> box vector, and to define the slip plane as containing both <span class="math notranslate nohighlight">\(\vec{a}\)</span> and <span class="math notranslate nohighlight">\(\vec{b}\)</span>. Given the limits that LAMMPS places on how system boxes can be defined, this results in favorable alignment of the system to the LAMMPS Cartesian system (<span class="math notranslate nohighlight">\(x, y, z\)</span>). The dislocation line will be along the <span class="math notranslate nohighlight">\(x\)</span>-axis, the slip plane normal parallel to the <span class="math notranslate nohighlight">\(z\)</span>-axis,
+and dislocation motion will be in the <span class="math notranslate nohighlight">\(y\)</span> direction. Thus, the LAMMPS coordinates corresponds to a rotation of the theory coordinates such that <span class="math notranslate nohighlight">\(x'=y, y'=z, z'=x\)</span>.</p>
+</div>
+<div class="section" id="Linear-displacements-solution">
+<h3>Linear displacements solution<a class="headerlink" href="#Linear-displacements-solution" title="Permalink to this headline">¶</a></h3>
+<p>The simplest way to insert a dislocation is to cut the system in half along the slip plane and apply equal but opposite linear displacements, <span class="math notranslate nohighlight">\(\vec{u}\)</span>, to the two halves with end conditions</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(\vec{u}(y=-\frac{Ly}{2}) = 0\)</span></li>
+<li><span class="math notranslate nohighlight">\(\vec{u}(y=\frac{Ly}{2}) = \pm \frac{\vec{b}}{2}\)</span></li>
+</ul>
+<p>Applying these displacements results in a disregistry along the slip plane that ranges from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(\vec{b}\)</span>. While the two <span class="math notranslate nohighlight">\(y\)</span> boundaries of the system both correspond to a perfect crystal, they are misaligned from each other by <span class="math notranslate nohighlight">\(\frac{\vec{b}}{2}\)</span>. A coherent periodic boundary along the <span class="math notranslate nohighlight">\(\vec{b}\)</span> box vector can be established by adding or subtracting <span class="math notranslate nohighlight">\(\frac{\vec{b}}{2}\)</span> from <span class="math notranslate nohighlight">\(\vec{b}\)</span>.</p>
+<p>Note that with dislocations containing an edge component, a half-plane of atoms either needs to be inserted or removed to ensure boundary compatibility. Here, this is accomplished by always shifting <span class="math notranslate nohighlight">\(\vec{b}\)</span> to be shorter in the <span class="math notranslate nohighlight">\(y\)</span> direction, and removing excess atoms by identifying (near) duplicates.</p>
+</div>
+<div class="section" id="Using-dislocation-solutions">
+<h3>Using dislocation solutions<a class="headerlink" href="#Using-dislocation-solutions" title="Permalink to this headline">¶</a></h3>
+<p>A slightly more complicated, but ultimately more efficient, way of creating a periodic array of dislocations system is to combine the linear displacements solultion above with a more accurate linear elastic dislocation solution. The linear solution is used for the atoms at the free surfaces in the <span class="math notranslate nohighlight">\(z\)</span> direction, and for ensuring periodicity across the <span class="math notranslate nohighlight">\(\vec{b}\)</span> box vector direction. The linear elastic dislocation solution is then used for atoms in the middle of the system to
+construct an initial dislocation.</p>
+</div>
+</div>
+<div class="section" id="Demonstration">
+<h2>Demonstration<a class="headerlink" href="#Demonstration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="1.-Setup">
+<h3>1. Setup<a class="headerlink" href="#1.-Setup" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="1.1.-Library-imports">
+<h4>1.1. Library imports<a class="headerlink" href="#1.1.-Library-imports" title="Permalink to this headline">¶</a></h4>
+<p>Import libraries needed by the calculation. The external libraries used are:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.numpy.org/">numpy</a></li>
+<li><a class="reference external" href="https://github.com/usnistgov/DataModelDict">DataModelDict</a></li>
+<li><a class="reference external" href="https://github.com/usnistgov/atomman">atomman</a></li>
+<li><a class="reference external" href="https://github.com/usnistgov/iprPy">iprPy</a></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Standard library imports</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+
+<span class="c1"># http://www.numpy.org/</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># https://matplotlib.org/</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="c1"># https://github.com/usnistgov/DataModelDict</span>
+<span class="kn">from</span> <span class="nn">DataModelDict</span> <span class="k">import</span> <span class="n">DataModelDict</span> <span class="k">as</span> <span class="n">DM</span>
+
+<span class="c1"># https://github.com/usnistgov/atomman</span>
+<span class="kn">import</span> <span class="nn">atomman</span> <span class="k">as</span> <span class="nn">am</span>
+<span class="kn">import</span> <span class="nn">atomman.lammps</span> <span class="k">as</span> <span class="nn">lmp</span>
+<span class="kn">import</span> <span class="nn">atomman.unitconvert</span> <span class="k">as</span> <span class="nn">uc</span>
+
+<span class="c1"># https://github.com/usnistgov/iprPy</span>
+<span class="kn">import</span> <span class="nn">iprPy</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Notebook last executed on&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">(),</span> <span class="s1">&#39;using iprPy version&#39;</span><span class="p">,</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Notebook last executed on 2019-07-29 using iprPy version 0.9.0
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="1.2.-Default-calculation-setup">
+<h4>1.2. Default calculation setup<a class="headerlink" href="#1.2.-Default-calculation-setup" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Specify calculation style</span>
+<span class="n">calc_style</span> <span class="o">=</span> <span class="s1">&#39;dislocation_periodic_array&#39;</span>
+
+<span class="c1"># If workingdir is already set, then do nothing (already in correct folder)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">workingdir</span> <span class="o">=</span> <span class="n">workingdir</span>
+
+<span class="c1"># Change to workingdir if not already there</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">workingdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;calculationfiles&#39;</span><span class="p">,</span> <span class="n">calc_style</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">workingdir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="n">workingdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="2.-Assign-values-for-the-calculation’s-run-parameters">
+<h3>2. Assign values for the calculation’s run parameters<a class="headerlink" href="#2.-Assign-values-for-the-calculation’s-run-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="2.1.-Specify-system-specific-paths">
+<h4>2.1. Specify system-specific paths<a class="headerlink" href="#2.1.-Specify-system-specific-paths" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>lammps_command</strong> (required) is the LAMMPS command to use.</li>
+<li><strong>mpi_command</strong> MPI command for running LAMMPS in parallel. A value of None will run simulations serially.</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lammps_command</span> <span class="o">=</span> <span class="s1">&#39;lmp_serial&#39;</span>
+<span class="n">mpi_command</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="2.2.-Load-interatomic-potential">
+<h4>2.2. Load interatomic potential<a class="headerlink" href="#2.2.-Load-interatomic-potential" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>potential_name</strong> gives the name of the potential_LAMMPS reference record in the iprPy library to use for the calculation.</li>
+<li><strong>potential_file</strong> gives the path to the potential_LAMMPS reference record to use. Here, this parameter is automatically generated using potential_name and librarydir.</li>
+<li><strong>potential_dir</strong> gives the path for the folder containing the artifacts associated with the potential (i.e.&nbsp;eam.alloy file). Here, this parameter is automatically generated using potential_name and librarydir.</li>
+<li><strong>potential</strong> is an atomman.lammps.Potential object (required). Here, this parameter is automatically generated from potential_file and potential_dir.</li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">potential_name</span> <span class="o">=</span> <span class="s1">&#39;1999--Mishin-Y--Ni--LAMMPS--ipr1&#39;</span>
+
+<span class="c1"># Define potential_file and potential_dir using librarydir and potential_name</span>
+<span class="n">potential_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;potential_LAMMPS&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{potential_name}</span><span class="s1">.json&#39;</span><span class="p">)</span>
+<span class="n">potential_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;potential_LAMMPS&#39;</span><span class="p">,</span> <span class="n">potential_name</span><span class="p">)</span>
+
+<span class="c1"># Initialize Potential object using potential_file and potential_dir.</span>
+<span class="n">potential</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">Potential</span><span class="p">(</span><span class="n">potential_file</span><span class="p">,</span> <span class="n">potential_dir</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Successfully loaded potential&#39;</span><span class="p">,</span> <span class="n">potential</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Successfully loaded potential 1999--Mishin-Y--Ni--LAMMPS--ipr1
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="2.3.-Load-initial-unit-cell-system">
+<h4>2.3. Load initial unit cell system<a class="headerlink" href="#2.3.-Load-initial-unit-cell-system" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>prototype_name</strong> gives the name of the crystal_prototype reference record in the iprPy library to load.</li>
+<li><strong>symbols</strong> is a list of the potential’s elemental model symbols to associate with the unique atom types of the loaded system.</li>
+<li><strong>box_parameters</strong> is a list of the a, b, c lattice constants to assign to the loaded file.</li>
+<li><strong>load_file</strong> gives the path to the atomic configuration file to load for the ucell system. Here, this is generated automatically using prototype_name and librarydir.</li>
+<li><strong>load_style</strong> specifies the format of load_file. Here, this is automatically set for crystal_prototype records.</li>
+<li><strong>load_options</strong> specifies any other keyword options for properly loading the load_file. Here, this is automatically set for crystal_prototype records.</li>
+<li><strong>ucell</strong> is an atomman.System representing a fundamental unit cell of the system (required). Here, this is generated using the load parameters and symbols.</li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">prototype_name</span> <span class="o">=</span> <span class="s1">&#39;A1--Cu--fcc&#39;</span>
+<span class="n">symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ni&#39;</span><span class="p">]</span>
+<span class="n">box_parameters</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">([</span><span class="mf">3.52</span><span class="p">,</span> <span class="mf">3.52</span><span class="p">,</span> <span class="mf">3.52</span><span class="p">],</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
+
+<span class="c1"># Define load_file using librarydir and prototype_name</span>
+<span class="n">load_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;crystal_prototype&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{prototype_name}</span><span class="s1">.json&#39;</span><span class="p">)</span>
+
+<span class="c1"># Define load_style and load_options for crystal_prototype records</span>
+<span class="n">load_style</span> <span class="o">=</span> <span class="s1">&#39;system_model&#39;</span>
+<span class="n">load_options</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># Create ucell by loading prototype record</span>
+<span class="n">ucell</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">load_style</span><span class="p">,</span> <span class="n">load_file</span><span class="p">,</span> <span class="n">symbols</span><span class="o">=</span><span class="n">symbols</span><span class="p">,</span> <span class="o">**</span><span class="n">load_options</span><span class="p">)</span>
+
+<span class="c1"># Rescale ucell using box_parameters</span>
+<span class="n">ucell</span><span class="o">.</span><span class="n">box_set</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">b</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">ucell</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+avect =  [ 3.520,  0.000,  0.000]
+bvect =  [ 0.000,  3.520,  0.000]
+cvect =  [ 0.000,  0.000,  3.520]
+origin = [ 0.000,  0.000,  0.000]
+natoms = 4
+natypes = 1
+symbols = (&#39;Ni&#39;,)
+pbc = [ True  True  True]
+per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
+     id |   atype |  pos[0] |  pos[1] |  pos[2]
+      0 |       1 |   0.000 |   0.000 |   0.000
+      1 |       1 |   0.000 |   1.760 |   1.760
+      2 |       1 |   1.760 |   0.000 |   1.760
+      3 |       1 |   1.760 |   1.760 |   0.000
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="2.4-Specify-material-elastic-constants">
+<h4>2.4 Specify material elastic constants<a class="headerlink" href="#2.4-Specify-material-elastic-constants" title="Permalink to this headline">¶</a></h4>
+<p>Simple input parameters:</p>
+<ul class="simple">
+<li><strong>C_dict</strong> is a dictionary containing the unique elastic constants for the potential and crystal structure defined above.</li>
+</ul>
+<p>Derived parameters</p>
+<ul class="simple">
+<li><strong>C</strong> is an atomman.ElasticConstants object built from C_dict.</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">C_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">C_dict</span><span class="p">[</span><span class="s1">&#39;C11&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">247.86</span><span class="p">,</span> <span class="s1">&#39;GPa&#39;</span><span class="p">)</span>
+<span class="n">C_dict</span><span class="p">[</span><span class="s1">&#39;C12&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">147.83</span><span class="p">,</span> <span class="s1">&#39;GPa&#39;</span><span class="p">)</span>
+<span class="n">C_dict</span><span class="p">[</span><span class="s1">&#39;C44&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">124.84</span><span class="p">,</span> <span class="s1">&#39;GPa&#39;</span><span class="p">)</span>
+
+<span class="c1"># -------------- Derived parameters -------------- #</span>
+<span class="c1"># Build ElasticConstants object from C_dict terms</span>
+<span class="n">C</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">ElasticConstants</span><span class="p">(</span><span class="o">**</span><span class="n">C_dict</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="2.5-Specify-the-defect-parameters">
+<h4>2.5 Specify the defect parameters<a class="headerlink" href="#2.5-Specify-the-defect-parameters" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>dislocation_name</strong> gives the name of the dislocation_monopole reference record in the iprPy library to use for potential.</li>
+<li><strong>dislocation_file</strong> gives the path to a dislocation_monopole reference containing defect input parameters. Here, this is built automatically using dislocation_name and librarydir.</li>
+<li><strong>dislocation_kwargs</strong> is a dictionary containing parameters for generating the defect. Values are extracted from the dislocation_model record and uniquely define a type of stacking fault. Included keywords are:<ul>
+<li><strong>burgers</strong> is the crystallographic Burgers vector for the dislocation</li>
+<li><strong>a_uvw, b_uvw, c_uvw</strong> specifies how to orient the system by defining the crystal vectors of ucell to place along the three system box vectors.</li>
+<li><strong>atomshift</strong> is a 3D vector rigid-body shift to apply to atoms in the system. The atomshift vector is relative to the rotated unit cell’s box vectors.</li>
+<li><strong>stroh_m</strong> a Cartesian unit vector used by the Stroh method to define the created dislocation’s orientation and type. This vector is in the dislocation’s slip plane and perpendicular to the dislocation’s line direction. Default value is [0, 1, 0], i.e.&nbsp;along the y-axis.</li>
+<li><strong>stroh_n</strong> a Cartesian unit vector used by the Stroh method to define the created dislocation’s orientation and type. This vector is normal to the dislocation’s slip plane. Default value is [0, 0, 1], i.e.&nbsp;along the z-axis.</li>
+<li><strong>lineboxvector</strong> the system box vector, ‘a’, ‘b’, or ‘c’, along which the dislocation line is placed parallel to. Default value is ‘a’.</li>
+</ul>
+</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#dislocation_name = &#39;A1--Cu--fcc--a-2-110--0-screw--{111}&#39;</span>
+<span class="c1">#dislocation_name = &#39;A1--Cu--fcc--a-2-110--90-edge--{100}&#39;</span>
+<span class="n">dislocation_name</span> <span class="o">=</span> <span class="s1">&#39;A1--Cu--fcc--a-2-110--90-edge--</span><span class="si">{111}</span><span class="s1">&#39;</span>
+
+<span class="c1"># Define dislocation_fi;e using librarydir and dislocation_name</span>
+<span class="n">dislocation_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;dislocation&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{dislocation_name}</span><span class="s1">.json&#39;</span><span class="p">)</span>
+
+<span class="c1"># Create dictionary of input parameters related to the defect</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ucell&#39;</span><span class="p">:</span><span class="n">ucell</span><span class="p">,</span> <span class="s1">&#39;dislocation_file&#39;</span><span class="p">:</span><span class="n">dislocation_file</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="2.6-Specify-calculation-specific-run-parameters">
+<h4>2.6 Specify calculation-specific run parameters<a class="headerlink" href="#2.6-Specify-calculation-specific-run-parameters" title="Permalink to this headline">¶</a></h4>
+<p>Simple input parameters:</p>
+<ul class="simple">
+<li><strong>boundarywidth</strong> sets the minimum width of the fixed-atom boundary region. This is taken in units of the a lattice parameter of the unit cell.</li>
+<li><strong>annealtemperature</strong> is the temperature at which to relax (anneal) the dislocation system. If annealtemperature is 0.0, then only a static relaxation will be performed. Default value is 0.0.</li>
+<li><strong>annealsteps</strong> is the number of nvt iteration steps to perform at the given temperature. Default value is 0 if annealtemperature is zero, 10000 otherwise.</li>
+<li><strong>randomseed</strong> allows for the random seed used in generating initial atomic velocities for a dynamic relaxation to be specified. This is an integer between 1 and 900000000. Default value is None, which will randomly pick a number in that range.</li>
+<li><strong>duplicatecutoff</strong> Cutoff distance to use for identifying duplicate atoms to remove. For dislocations with an edge component, applying the displacements creates an extra half-plane of atoms that will have (nearly) identical positions with other atoms after altering the boundary conditions. Default cutoff value is 0.5 Angstrom.</li>
+<li><strong>onlyuselinear</strong> boolean flag. If False (default) the atoms in the middle of the system will be displaced according to an elasticity solution for a dislocation core and boundary atoms displaced by a linear gradient. If True, all atoms are displaced by the linear gradient.</li>
+<li><strong>energytolerance</strong> is the energy tolerance to use during the minimizations. This is unitless.</li>
+<li><strong>forcetolerance</strong> is the force tolerance to use during the minimizations. This is in energy/length units.</li>
+<li><strong>maxiterations</strong> is the maximum number of minimization iterations to use.</li>
+<li><strong>maxevaluations</strong> is the maximum number of minimization evaluations to use.</li>
+<li><strong>maxatommotion</strong> is the largest distance that an atom is allowed to move during a minimization iteration. This is in length units.</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">boundarywidth</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">ucell</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">a</span>
+
+<span class="n">annealtemperature</span> <span class="o">=</span> <span class="mf">50.0</span>
+<span class="n">annealsteps</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">randomseed</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">duplicatecutoff</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
+<span class="n">onlyuselinear</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="n">energytolerance</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">forcetolerance</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">1e-6</span><span class="p">,</span> <span class="s1">&#39;eV/angstrom&#39;</span><span class="p">)</span>
+<span class="n">maxiterations</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">maxevaluations</span> <span class="o">=</span> <span class="mi">100000</span>
+<span class="n">maxatommotion</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="2.7-Process-defect-input-parameters">
+<h4>2.7 Process defect input parameters<a class="headerlink" href="#2.7-Process-defect-input-parameters" title="Permalink to this headline">¶</a></h4>
+<p>Here, the defect parameters are read in and processed.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">subset</span><span class="p">(</span><span class="s1">&#39;dislocation&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">interpret</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+
+<span class="c1"># Show inputs</span>
+<span class="n">inputs</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>{&#39;ucell&#39;: &lt;atomman.core.System.System at 0x234ad1daf28&gt;,
+ &#39;dislocation_file&#39;: WindowsPath(&#39;c:/users/lmh1/documents/python-packages/iprpy/library/dislocation/A1--Cu--fcc--a-2-110--90-edge--{111}.json&#39;),
+ &#39;dislocation_family&#39;: &#39;A1--Cu--fcc&#39;,
+ &#39;dislocation_stroh_m&#39;: &#39;0 1 0&#39;,
+ &#39;dislocation_stroh_n&#39;: &#39;0 0 1&#39;,
+ &#39;dislocation_lineboxvector&#39;: &#39;a&#39;,
+ &#39;a_uvw&#39;: &#39;-1 -1  2&#39;,
+ &#39;b_uvw&#39;: &#39; 1 -1  0&#39;,
+ &#39;c_uvw&#39;: &#39; 1  1  1&#39;,
+ &#39;atomshift&#39;: &#39; 0.00 0.00 0.5&#39;,
+ &#39;dislocation_burgersvector&#39;: &#39; 0.5 -0.5  0.0&#39;,
+ &#39;dislocation_model&#39;: DataModelDict([(&#39;key&#39;,
+                 &#39;d59f2382-17e5-4fbd-b398-407c75e6009a&#39;),
+                (&#39;id&#39;, &#39;A1--Cu--fcc--a-2-110--90-edge--{111}&#39;),
+                (&#39;character&#39;, &#39;edge&#39;),
+                (&#39;Burgers-vector&#39;, &#39;a/2[ 1,-1, 0]&#39;),
+                (&#39;slip-plane&#39;, [1, 1, 1]),
+                (&#39;line-direction&#39;, [-1, -1, 2]),
+                (&#39;system-family&#39;, &#39;A1--Cu--fcc&#39;),
+                (&#39;calculation-parameter&#39;,
+                 DataModelDict([(&#39;stroh_m&#39;, &#39;0 1 0&#39;),
+                                (&#39;stroh_n&#39;, &#39;0 0 1&#39;),
+                                (&#39;lineboxvector&#39;, &#39;a&#39;),
+                                (&#39;a_uvw&#39;, &#39;-1 -1  2&#39;),
+                                (&#39;b_uvw&#39;, &#39; 1 -1  0&#39;),
+                                (&#39;c_uvw&#39;, &#39; 1  1  1&#39;),
+                                (&#39;atomshift&#39;, &#39; 0.00 0.00 0.5&#39;),
+                                (&#39;burgersvector&#39;, &#39; 0.5 -0.5  0.0&#39;)]))]),
+ &#39;burgersvector&#39;: array([ 1.76, -1.76,  0.  ]),
+ &#39;stroh_m&#39;: array([0., 1., 0.]),
+ &#39;stroh_n&#39;: array([0., 0., 1.])}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="2.8.-Modify-system">
+<h4>2.8. Modify system<a class="headerlink" href="#2.8.-Modify-system" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>sizemults</strong> list of three sets of two integers specifying how many times the ucell vectors of <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span> and <span class="math notranslate nohighlight">\(c\)</span> are replicated in positive and negative directions when creating system.</li>
+<li><strong>a_uvw, b_uvw, c_uvw</strong> specifies how to orient the system by defining the crystal vectors of ucell to place along the three system box vectors.</li>
+<li><strong>atomshift</strong> is a 3D vector rigid-body shift to apply to atoms in the system. The atomshift vector is relative to the rotated unit cell’s box vectors.</li>
+<li><strong>system</strong> is an atomman.System to insert the dislocation into.</li>
+<li><strong>axes</strong> specifies the transformation matrix used to rotate the ucell to the system’s orientation.</li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">sizemults</span> <span class="o">=</span> <span class="s1">&#39;0 1 -50 50 -10 10&#39;</span>
+
+<span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;sizemults&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sizemults</span>
+<span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">subset</span><span class="p">(</span><span class="s1">&#39;atomman_systemmanipulate&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">interpret</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+
+<span class="n">system</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;initialsystem&#39;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;# of atoms in system =&#39;</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">natoms</span><span class="p">)</span>
+
+<span class="n">axes</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;transformationmatrix&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+# of atoms in system = 48000
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="3.-Define-calculation-function(s)-and-generate-template-LAMMPS-script(s)">
+<h3>3. Define calculation function(s) and generate template LAMMPS script(s)<a class="headerlink" href="#3.-Define-calculation-function(s)-and-generate-template-LAMMPS-script(s)" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="3.1.-dislarray_relax.template">
+<h4>3.1. dislarray_relax.template<a class="headerlink" href="#3.1.-dislarray_relax.template" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;dislarray_relax.template&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;#LAMMPS input script for relaxing a periodic array of dislocations system</span>
+
+<span class="s2">&lt;atomman_system_info&gt;</span>
+
+<span class="s2">&lt;atomman_pair_info&gt;</span>
+
+<span class="s2"># Simulation input parameters</span>
+<span class="s2">variable bwidth equal &lt;bwidth&gt;</span>
+
+<span class="s2"># Derived variables</span>
+<span class="s2">variable topcut equal zhi-$</span><span class="si">{bwidth}</span><span class="s2"></span>
+<span class="s2">variable botcut equal zlo+$</span><span class="si">{bwidth}</span><span class="s2"></span>
+
+<span class="s2"># Define boundary groups</span>
+<span class="s2">region rtop block INF INF INF INF $</span><span class="si">{topcut}</span><span class="s2"> INF</span>
+<span class="s2">region rbot block INF INF INF INF INF $</span><span class="si">{botcut}</span><span class="s2"></span>
+<span class="s2">group top region rtop</span>
+<span class="s2">group bot region rbot</span>
+<span class="s2">group mid subtract all top bot</span>
+<span class="s2">group bounds union top bot</span>
+
+<span class="s2">compute peatom all pe/atom</span>
+
+<span class="s2">dump first all custom &lt;maxeval&gt; *.dump id type x y z c_peatom</span>
+<span class="s2">dump_modify first format &lt;dump_modify_format&gt;</span>
+<span class="s2">thermo_style custom step pe</span>
+
+<span class="s2">fix boundary bounds setforce 0.0 0.0 0.0</span>
+
+<span class="s2">&lt;anneal_info&gt;</span>
+
+<span class="s2">min_modify dmax &lt;dmax&gt;</span>
+
+<span class="s2">minimize &lt;etol&gt; &lt;ftol&gt; &lt;maxiter&gt; &lt;maxeval&gt;&quot;&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="3.2.-dislocationarray()">
+<h4>3.2. dislocationarray()<a class="headerlink" href="#3.2.-dislocationarray()" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">dislocationarray</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">burgers</span><span class="p">,</span>
+                     <span class="n">C</span><span class="p">,</span> <span class="n">mpi_command</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+                     <span class="n">etol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">maxeval</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">dmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">annealtemp</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">annealsteps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">randomseed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">bwidth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">onlyuselinear</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates and relaxes a dislocation monopole system.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lammps_command :str</span>
+<span class="sd">        Command for running LAMMPS.</span>
+<span class="sd">    system : atomman.System</span>
+<span class="sd">        The bulk system to add the defect to.</span>
+<span class="sd">    potential : atomman.lammps.Potential</span>
+<span class="sd">        The LAMMPS implemented potential to use.</span>
+<span class="sd">    burgers : list or numpy.array of float</span>
+<span class="sd">        The burgers vector for the dislocation being added.</span>
+<span class="sd">    C : atomman.ElasticConstants</span>
+<span class="sd">        The system&#39;s elastic constants.</span>
+<span class="sd">    mpi_command : str or None, optional</span>
+<span class="sd">        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS</span>
+<span class="sd">        will run serially.</span>
+<span class="sd">    axes : numpy.array of float or None, optional</span>
+<span class="sd">        The 3x3 axes used to rotate the system by during creation.  If given,</span>
+<span class="sd">        will be used to transform burgers and C from the standard</span>
+<span class="sd">        crystallographic orientations to the system&#39;s Cartesian units.</span>
+<span class="sd">    randomseed : int or None, optional</span>
+<span class="sd">        Random number seed used by LAMMPS in creating velocities and with</span>
+<span class="sd">        the Langevin thermostat.  Default is None which will select a</span>
+<span class="sd">        random int between 1 and 900000000.</span>
+<span class="sd">    etol : float, optional</span>
+<span class="sd">        The energy tolerance for the structure minimization. This value is</span>
+<span class="sd">        unitless. (Default is 0.0).</span>
+<span class="sd">    ftol : float, optional</span>
+<span class="sd">        The force tolerance for the structure minimization. This value is in</span>
+<span class="sd">        units of force. (Default is 0.0).</span>
+<span class="sd">    maxiter : int, optional</span>
+<span class="sd">        The maximum number of minimization iterations to use (default is</span>
+<span class="sd">        10000).</span>
+<span class="sd">    maxeval : int, optional</span>
+<span class="sd">        The maximum number of minimization evaluations to use (default is</span>
+<span class="sd">        100000).</span>
+<span class="sd">    dmax : float, optional</span>
+<span class="sd">        The maximum distance in length units that any atom is allowed to relax</span>
+<span class="sd">        in any direction during a single minimization iteration (default is</span>
+<span class="sd">        0.01 Angstroms).</span>
+<span class="sd">    annealtemp : float, optional</span>
+<span class="sd">        The temperature to perform a dynamic relaxation at. Default is 0.0,</span>
+<span class="sd">        which will skip the dynamic relaxation.</span>
+<span class="sd">    annealsteps : int, optional</span>
+<span class="sd">        The number of time steps to run the dynamic relaxation for.  Default</span>
+<span class="sd">        is None, which will run for 10000 steps if annealtemp is not 0.0.</span>
+<span class="sd">    bshape : str, optional</span>
+<span class="sd">        The shape to make the boundary region.  Options are &#39;circle&#39; and</span>
+<span class="sd">        &#39;rect&#39; (default is &#39;circle&#39;).</span>
+<span class="sd">    cutoff : float, optional</span>
+<span class="sd">        Cutoff distance to use for identifying duplicate atoms to remove.</span>
+<span class="sd">        For dislocations with an edge component, applying the displacements</span>
+<span class="sd">        creates an extra half-plane of atoms that will have (nearly) identical</span>
+<span class="sd">        positions with other atoms after altering the boundary conditions.</span>
+<span class="sd">        Default cutoff value is 0.5 Angstrom.</span>
+<span class="sd">    useonlylinear : bool, optional</span>
+<span class="sd">        If False (default) the atoms in the middle of the system will be</span>
+<span class="sd">        displaced according to an elasticity solution for a dislocation core</span>
+<span class="sd">        and boundary atoms displaced by a linear gradient.  If True, all</span>
+<span class="sd">        atoms are displaced by the linear gradient.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Dictionary of results consisting of keys:</span>
+
+<span class="sd">        - **&#39;dumpfile_base&#39;** (*str*) - The filename of the LAMMPS dump file</span>
+<span class="sd">          for the relaxed base system.</span>
+<span class="sd">        - **&#39;symbols_base&#39;** (*list of str*) - The list of element-model</span>
+<span class="sd">          symbols for the Potential that correspond to the base system&#39;s</span>
+<span class="sd">          atypes.</span>
+<span class="sd">        - **&#39;Stroh_preln&#39;** (*float*) - The pre-logarithmic factor in the</span>
+<span class="sd">          dislocation&#39;s self-energy expression.</span>
+<span class="sd">        - **&#39;Stroh_K_tensor&#39;** (*numpy.array of float*) - The energy</span>
+<span class="sd">          coefficient tensor based on the dislocation&#39;s Stroh solution.</span>
+<span class="sd">        - **&#39;dumpfile_disl&#39;** (*str*) - The filename of the LAMMPS dump file</span>
+<span class="sd">          for the relaxed dislocation monopole system.</span>
+<span class="sd">        - **&#39;symbols_disl&#39;** (*list of str*) - The list of element-model</span>
+<span class="sd">          symbols for the Potential that correspond to the dislocation</span>
+<span class="sd">          monopole system&#39;s atypes.</span>
+<span class="sd">        - **&#39;E_total_disl&#39;** (*float*) - The total potential energy of the</span>
+<span class="sd">          dislocation monopole system.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Get script&#39;s location if __file__ exists</span>
+        <span class="n">script_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="c1"># Use cwd otherwise</span>
+        <span class="n">script_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+
+    <span class="c1"># Set default values</span>
+    <span class="k">if</span> <span class="n">dmax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dmax</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Save base system</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;atom_dump&#39;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="s1">&#39;base.dump&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Generate periodic array of dislocations</span>
+    <span class="k">if</span> <span class="n">onlyuselinear</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="n">dislsol</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">defect</span><span class="o">.</span><span class="n">solve_volterra_dislocation</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">burgers</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">dislsystem</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">defect</span><span class="o">.</span><span class="n">dislocation_array</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">dislsol</span><span class="o">=</span><span class="n">dislsol</span><span class="p">,</span> <span class="n">bwidth</span><span class="o">=</span><span class="n">bwidth</span><span class="p">,</span>
+                                                 <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">axes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">T</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">axes_check</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span>
+            <span class="n">burgers</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">burgers</span><span class="p">)</span>
+        <span class="n">dislsystem</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">defect</span><span class="o">.</span><span class="n">dislocation_array</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">burgers</span><span class="o">=</span><span class="n">burgers</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">)</span>
+
+    <span class="c1"># Get lammps units</span>
+    <span class="n">lammps_units</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+
+    <span class="c1">#Get lammps version date</span>
+    <span class="n">lammps_date</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">checkversion</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">)[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Define lammps variables</span>
+    <span class="n">lammps_variables</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">system_info</span> <span class="o">=</span> <span class="n">dislsystem</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;atom_data&#39;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="s1">&#39;initial.dat&#39;</span><span class="p">,</span>
+                                  <span class="n">units</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">,</span>
+                                  <span class="n">atom_style</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">atom_style</span><span class="p">)</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_system_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_info</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_pair_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">potential</span><span class="o">.</span><span class="n">pair_info</span><span class="p">(</span><span class="n">dislsystem</span><span class="o">.</span><span class="n">symbols</span><span class="p">)</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;anneal_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">anneal_info</span><span class="p">(</span><span class="n">annealtemp</span><span class="p">,</span> <span class="n">annealsteps</span><span class="p">,</span>
+                                                  <span class="n">randomseed</span><span class="p">,</span> <span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;etol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">etol</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;ftol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">ftol</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;force&#39;</span><span class="p">])</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxiter</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;maxeval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxeval</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dmax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dmax</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;bwidth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">bwidth</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Set dump_modify format based on dump_modify_version</span>
+    <span class="k">if</span> <span class="n">lammps_date</span> <span class="o">&lt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+        <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&quot;</span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1">&quot;&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;float </span><span class="si">%.13e</span><span class="s1">&#39;</span>
+
+    <span class="c1"># Write lammps input script</span>
+    <span class="n">template_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span> <span class="s1">&#39;dislarray_relax.template&#39;</span><span class="p">)</span>
+    <span class="n">lammps_script</span> <span class="o">=</span> <span class="s1">&#39;dislarray_relax.in&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">template_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lammps_script</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">filltemplate</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">lammps_variables</span><span class="p">,</span>
+                                         <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
+
+    <span class="c1"># Run LAMMPS</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">lammps_script</span><span class="p">,</span> <span class="n">mpi_command</span><span class="p">)</span>
+    <span class="n">thermo</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">simulations</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;thermo&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Extract output values</span>
+    <span class="n">results_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;logfile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;log.lammps&#39;</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;dumpfile_base&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;base.dump&#39;</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;symbols_base&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">symbols</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;dumpfile_disl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%i</span><span class="s1">.dump&#39;</span> <span class="o">%</span> <span class="n">thermo</span><span class="o">.</span><span class="n">Step</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;symbols_disl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dislsystem</span><span class="o">.</span><span class="n">symbols</span>
+
+    <span class="k">return</span> <span class="n">results_dict</span>
+
+
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="3.3-anneal_info()">
+<h4>3.3 anneal_info()<a class="headerlink" href="#3.3-anneal_info()" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">anneal_info</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">runsteps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">randomseed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;metal&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates LAMMPS commands for thermo anneal.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    temperature : float, optional</span>
+<span class="sd">        The temperature to relax at (default is 0.0).</span>
+<span class="sd">    randomseed : int or None, optional</span>
+<span class="sd">        Random number seed used by LAMMPS in creating velocities and with</span>
+<span class="sd">        the Langevin thermostat.  (Default is None which will select a</span>
+<span class="sd">        random int between 1 and 900000000.)</span>
+<span class="sd">    units : str, optional</span>
+<span class="sd">        The LAMMPS units style to use (default is &#39;metal&#39;).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The generated LAMMPS input lines for performing a dynamic relax.</span>
+<span class="sd">        Will be &#39;&#39; if temperature==0.0.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Return nothing if temperature is 0.0 (don&#39;t do thermo anneal)</span>
+    <span class="k">if</span> <span class="n">temperature</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="c1"># Generate velocity, fix nvt, and run LAMMPS command lines</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">randomseed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">randomseed</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">900000000</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">runsteps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">runsteps</span> <span class="o">=</span> <span class="mi">10000</span>
+
+        <span class="n">start_temp</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">temperature</span>
+        <span class="n">tdamp</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">timestep</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
+        <span class="n">timestep</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">timestep</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="s1">&#39;velocity mid create </span><span class="si">%f</span><span class="s1"> </span><span class="si">%i</span><span class="s1"> mom yes rot yes dist gaussian&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">start_temp</span><span class="p">,</span> <span class="n">randomseed</span><span class="p">),</span>
+            <span class="s1">&#39;fix nvt all nvt temp </span><span class="si">%f</span><span class="s1"> </span><span class="si">%f</span><span class="s1"> </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span>
+                                               <span class="n">tdamp</span><span class="p">),</span>
+            <span class="s1">&#39;timestep </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">timestep</span><span class="p">),</span>
+            <span class="s1">&#39;thermo </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">runsteps</span><span class="p">),</span>
+            <span class="s1">&#39;run </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">runsteps</span><span class="p">),</span>
+            <span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">info</span>
+
+
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="4.-Run-calculation-function(s)">
+<h3>4. Run calculation function(s)<a class="headerlink" href="#4.-Run-calculation-function(s)" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">results_dict</span> <span class="o">=</span> <span class="n">dislocationarray</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;burgersvector&#39;</span><span class="p">],</span> <span class="n">C</span><span class="p">,</span>
+                                <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span>
+                                <span class="n">mpi_command</span> <span class="o">=</span> <span class="n">mpi_command</span><span class="p">,</span>
+                                <span class="n">m</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;stroh_m&#39;</span><span class="p">],</span>
+                                <span class="n">n</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;stroh_n&#39;</span><span class="p">],</span>
+                                <span class="n">etol</span> <span class="o">=</span> <span class="n">energytolerance</span><span class="p">,</span>
+                                <span class="n">ftol</span> <span class="o">=</span> <span class="n">forcetolerance</span><span class="p">,</span>
+                                <span class="n">maxiter</span> <span class="o">=</span> <span class="n">maxiterations</span><span class="p">,</span>
+                                <span class="n">maxeval</span> <span class="o">=</span> <span class="n">maxevaluations</span><span class="p">,</span>
+                                <span class="n">dmax</span> <span class="o">=</span> <span class="n">maxatommotion</span><span class="p">,</span>
+                                <span class="n">annealtemp</span> <span class="o">=</span> <span class="n">annealtemperature</span><span class="p">,</span>
+                                <span class="n">annealsteps</span> <span class="o">=</span> <span class="n">annealsteps</span><span class="p">,</span>
+                                <span class="n">randomseed</span> <span class="o">=</span> <span class="n">randomseed</span><span class="p">,</span>
+                                <span class="n">bwidth</span> <span class="o">=</span> <span class="n">boundarywidth</span><span class="p">,</span>
+                                <span class="n">cutoff</span> <span class="o">=</span> <span class="n">duplicatecutoff</span><span class="p">,</span>
+                                <span class="n">onlyuselinear</span> <span class="o">=</span> <span class="n">onlyuselinear</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">results_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>dict_keys([&#39;logfile&#39;, &#39;dumpfile_base&#39;, &#39;symbols_base&#39;, &#39;dumpfile_disl&#39;, &#39;symbols_disl&#39;])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="5.-Report-results">
+<h3>5. Report results<a class="headerlink" href="#5.-Report-results" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="5.1-List-dump-files">
+<h4>5.1 List dump files<a class="headerlink" href="#5.1-List-dump-files" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Perfect system is saved as&#39;</span><span class="p">,</span> <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;dumpfile_base&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Defect system is saved as&#39;</span><span class="p">,</span>  <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;dumpfile_disl&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Perfect system is saved as base.dump
+Defect system is saved as 10882.dump
+</pre></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">dislocation_periodic_array calculation style</a><ul>
+<li><a class="reference internal" href="#Introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#Version-notes">Version notes</a></li>
+<li><a class="reference internal" href="#Additional-dependencies">Additional dependencies</a></li>
+<li><a class="reference internal" href="#Disclaimers">Disclaimers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Method-and-Theory">Method and Theory</a><ul>
+<li><a class="reference internal" href="#System-orientation-considerations">System orientation considerations</a></li>
+<li><a class="reference internal" href="#Linear-displacements-solution">Linear displacements solution</a></li>
+<li><a class="reference internal" href="#Using-dislocation-solutions">Using dislocation solutions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Demonstration">Demonstration</a><ul>
+<li><a class="reference internal" href="#1.-Setup">1. Setup</a><ul>
+<li><a class="reference internal" href="#1.1.-Library-imports">1.1. Library imports</a></li>
+<li><a class="reference internal" href="#1.2.-Default-calculation-setup">1.2. Default calculation setup</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#2.-Assign-values-for-the-calculation’s-run-parameters">2. Assign values for the calculation’s run parameters</a><ul>
+<li><a class="reference internal" href="#2.1.-Specify-system-specific-paths">2.1. Specify system-specific paths</a></li>
+<li><a class="reference internal" href="#2.2.-Load-interatomic-potential">2.2. Load interatomic potential</a></li>
+<li><a class="reference internal" href="#2.3.-Load-initial-unit-cell-system">2.3. Load initial unit cell system</a></li>
+<li><a class="reference internal" href="#2.4-Specify-material-elastic-constants">2.4 Specify material elastic constants</a></li>
+<li><a class="reference internal" href="#2.5-Specify-the-defect-parameters">2.5 Specify the defect parameters</a></li>
+<li><a class="reference internal" href="#2.6-Specify-calculation-specific-run-parameters">2.6 Specify calculation-specific run parameters</a></li>
+<li><a class="reference internal" href="#2.7-Process-defect-input-parameters">2.7 Process defect input parameters</a></li>
+<li><a class="reference internal" href="#2.8.-Modify-system">2.8. Modify system</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#3.-Define-calculation-function(s)-and-generate-template-LAMMPS-script(s)">3. Define calculation function(s) and generate template LAMMPS script(s)</a><ul>
+<li><a class="reference internal" href="#3.1.-dislarray_relax.template">3.1. dislarray_relax.template</a></li>
+<li><a class="reference internal" href="#3.2.-dislocationarray()">3.2. dislocationarray()</a></li>
+<li><a class="reference internal" href="#3.3-anneal_info()">3.3 anneal_info()</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#4.-Run-calculation-function(s)">4. Run calculation function(s)</a></li>
+<li><a class="reference internal" href="#5.-Report-results">5. Report results</a><ul>
+<li><a class="reference internal" href="#5.1-List-dump-files">5.1 List dump files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="dislocation_monopole.html"
+                        title="previous chapter">dislocation_monopole calculation style</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="elastic_constants_static.html"
+                        title="next chapter">elastic_constants_static calculation style</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="elastic_constants_static.html" title="elastic_constants_static calculation style"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dislocation_monopole.html" title="dislocation_monopole calculation style"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

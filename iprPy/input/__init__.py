@@ -11,3 +11,6 @@ from .buildcombos import buildcombos
 # keyset functions
 from . import subset_classes
 from .subset import subset
+
+__all__ = ['boolean', 'parse', 'termtodict', 'value', 'buildcombos_functions',
+           'buildcombos', 'subset_classes', 'subset']

@@ -4,30 +4,23 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Introduction &#8212; iprPy 0.8.2 documentation</title>
+    <title>Introduction &#8212; iprPy 0.9.0 documentation</title>
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '0.8.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Method and Theory" href="theory.html" />
     <link rel="prev" title="crystal_space_group" href="index.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -43,7 +36,7 @@
         <li class="right" >
           <a href="index.html" title="crystal_space_group"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">crystal_space_group</a> &#187;</li> 
       </ul>
@@ -56,21 +49,35 @@
             
   <div class="section" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>The crystal_space_group calculation characterizes a bulk atomic system
-(configuration) by determining its space group by evaluating symmetry
-elements of the box dimensions and atomic position. This is useful for
-analyzing relaxed systems to determine if they have transformed to a
-different crystal structure. An ideal unit cell based on the identified
-space group and the system’s box dimensions is also generated.</p>
-<p><strong>Additional dependencies</strong>: This calculation uses the Python spglib
-package to perform the space group analysis. Installing the package is
-required for this calculation.</p>
-<p><strong>Disclaimer #1</strong>: The results are sensitive to the symmetryprecision
-parameter as it defines the tolerance for identifying which atomic
-positions and box dimensions are symmetrically equivalent. A small
-symmetryprecision value may be able to differentiate between ideal and
-distorted crystals, but it will cause the calculation to fail if smaller
-than the variability in the associated system properties.</p>
+<p>The crystal_space_group calculation style characterizes a bulk atomic
+system (configuration) by determining its space group by evaluating
+symmetry elements of the box dimensions and atomic position. This is
+useful for analyzing relaxed systems to determine if they have
+transformed to a different crystal structure. An ideal unit cell based
+on the identified space group and the system’s box dimensions is also
+generated.</p>
+<div class="section" id="version-notes">
+<h2>Version notes<a class="headerlink" href="#version-notes" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="additional-dependencies">
+<h2>Additional dependencies<a class="headerlink" href="#additional-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="https://atztogo.github.io/spglib/python-spglib.html">spglib</a></li>
+</ul>
+</div>
+<div class="section" id="disclaimers">
+<h2>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST
+disclaimers</a></li>
+<li>The results are sensitive to the symmetryprecision parameter as it
+defines the tolerance for identifying which atomic positions and box
+dimensions are symmetrically equivalent. A small symmetryprecision
+value may be able to differentiate between ideal and distorted
+crystals, but it will cause the calculation to fail if smaller than
+the variability in the associated system properties.</li>
+</ul>
+</div>
 </div>
 
 
@@ -79,6 +86,16 @@ than the variability in the associated system properties.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#version-notes">Version notes</a></li>
+<li><a class="reference internal" href="#additional-dependencies">Additional dependencies</a></li>
+<li><a class="reference internal" href="#disclaimers">Disclaimers</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
                         title="previous chapter">crystal_space_group</a></p>
@@ -104,13 +121,13 @@ than the variability in the associated system properties.</p>
         <li class="right" >
           <a href="index.html" title="crystal_space_group"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >crystal_space_group</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

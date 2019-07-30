@@ -10,7 +10,7 @@ The calculation script allows for the use of different integration
 methods:
 
 -  nve integrates atomic positions without changing box dimensions or
-   the system's total energy.
+   the system’s total energy.
 
 -  npt integrates atomic positions and applies Nose-Hoover style
    thermostat and barostat (equilibriate to specified T and P).

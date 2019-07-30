@@ -22,7 +22,7 @@ The mean square displacement of the defect,
 :math:`\left< \Delta r_{ptd}^2 \right>` is then estimated using the mean
 square displacement of the atoms :math:`\left< \Delta r_{i}^2 \right>`.
 Under the assumption that all diffusion is associated with the single
-point defect, the defect's mean square displacement can be taken as the
+point defect, the defect’s mean square displacement can be taken as the
 summed square displacement of the atoms
 
 .. math::  \left< \Delta r_{ptd}^2 \right> \approx \sum_i^N \Delta r_{i}^2 = N \left< \Delta r_{i}^2 \right>, 

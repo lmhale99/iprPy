@@ -1,9 +1,22 @@
 Introduction
 ============
 
-The calculation\_surface\_energy\_static Record style is for a
-calculation that generates and analyzes a free surface.
+The calculation_surface_energy_static record style is for a calculation
+that generates and analyzes a free surface.
 
-Calculation styles that use this Record style:
+Version notes
+~~~~~~~~~~~~~
 
--  surface\_energy\_static
+Additional dependencies
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Calculation styles that use this record style
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  surface_energy_static
+
+Disclaimers
+~~~~~~~~~~~
+
+-  `NIST
+   disclaimers <http://www.nist.gov/public_affairs/disclaimer.cfm>`__

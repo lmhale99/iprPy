@@ -1,0 +1,228 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>iprPy Package Components &#8212; iprPy 0.9.0 documentation</title>
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Calculations" href="run/index.html" />
+    <link rel="prev" title="Setup" href="setup.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="run/index.html" title="Calculations"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="setup.html" title="Setup"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.9.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="iprpy-package-components">
+<h1>iprPy Package Components<a class="headerlink" href="#iprpy-package-components" title="Permalink to this headline">¶</a></h1>
+<p>This page provides a general overview of the different components of the iprPy
+framework and how they work together.</p>
+<div class="section" id="calculations">
+<h2>Calculations<a class="headerlink" href="#calculations" title="Permalink to this headline">¶</a></h2>
+<p>Calculations are the heart of the iprPy framework.  Each unique calculation
+methodology is referred to as a <em>calculation style</em>, and exists as a
+Python script that performs an independent unit of work in isolation from any
+other calculation style.  Calculations can be accessed and executed in a
+variety of ways:</p>
+<ul class="simple">
+<li>The Python calculation scripts can be directly executed by passing in an
+input parameter file.  Upon completion, the generated results will be
+collected in results.json.</li>
+<li>A demonstration Jupyter Notebook exists for the implemented calculation
+styles which contains copies of the calculation functions from the Python
+script, documentation on the calculation style’s theory, methodology and
+parameters, and a working example.</li>
+<li>The iprPy package contains a Calculation subclass for each calculation
+style.  These Calculation classes define metadata associated with each
+style and provide a means of accessing the different underlying functions.</li>
+</ul>
+<p>New calculation styles can be added to the iprPy framework in a modular fashion
+by defining a Calculation subclass and placing the subclass script and the
+calculation script in a subdirectory of iprPy/calculation.</p>
+</div>
+<div class="section" id="records">
+<h2>Records<a class="headerlink" href="#records" title="Permalink to this headline">¶</a></h2>
+<p>Performing calculations in high-throughput requires collecting and managing
+data sets associated with a variety of different concepts.  Meaningful inputs
+for calculations are often best collected together as parameter sets.  Also,
+each calculation style produces a different set of results.  In iprPy, each
+unique data set (reference and results) is associated with a different
+<em>record style</em>.</p>
+<p>Each record style has a Record subclass defined for it.  These Record classes
+provide details of the contained data, and conversion tools between different
+representations.  The primary representation is as a tree-like data model that
+is equivalently expressed as JSON, XML, and a Python dictionary.  Class methods
+convert raw calculation data into the data model format, and allow for the data
+model content to be transformed to a flat dictionary representation.</p>
+<p>New record styles can be added to the iprPy framework in a modular fashion
+by defining a Record subclass and placing the subclass script in a subdirectory
+of iprPy/record.</p>
+</div>
+<div class="section" id="databases">
+<h2>Databases<a class="headerlink" href="#databases" title="Permalink to this headline">¶</a></h2>
+<p>The various records need to be collected and stored within databases allowing
+for the high-throughput tools to find and access the information.  In iprPy,
+multiple databases of the same or different styles can be used allowing for
+the results of different investigations to be kept together or separate.  A
+<em>database style</em> refers to a specific type of database, such as a MongoDB or a
+local collection of files.  Each database style is associated with a Database
+subclass that defines how to perform common interactions with that type of
+database.</p>
+<p>The parent Database class also defines methods for the high-throughput actions
+as these actions all require accessing and/or changing the records in a
+database.  These high-throughput methods can be accessed from within Python,
+or by using the iprPy command line available in the bin/ directory.</p>
+<p>New database styles can be added to the iprPy framework in a modular fashion
+by defining a Database subclass and placing the subclass script in a
+subdirectory of iprPy/database.</p>
+</div>
+<div class="section" id="reference-library">
+<h2>Reference library<a class="headerlink" href="#reference-library" title="Permalink to this headline">¶</a></h2>
+<p>The iprPy/library directory is meant to provide a central location of reference
+records that can be copied to any database.  The reference library
+automatically contains some reference records, and more can be easily imported
+and/or built from other sources.</p>
+</div>
+<div class="section" id="subsets">
+<h2>Subsets<a class="headerlink" href="#subsets" title="Permalink to this headline">¶</a></h2>
+<p>Related calculation methods often require similar inputs.  To help with the
+development of new calculation styles and provide consistency in input
+parameters across calculations, sets of inputs are collected together as
+<em>subset styles</em>.  A Subset subclass is defined for each subset style that
+defines methods for interpreting the associated input terms, and for how the
+input terms get handled by the records.</p>
+<p>New subset styles can be added to the iprPy framework in a modular fashion
+by defining a Subset subclass and placing the subclass script in a
+subdirectory of iprPy/input/Subset_classes.</p>
+</div>
+<div class="section" id="buildcombos">
+<h2>buildcombos<a class="headerlink" href="#buildcombos" title="Permalink to this headline">¶</a></h2>
+<p>High-throughput calculation runs require iterating over combinations of
+calculation input values.  The default behavior of iprPy is that the different
+values of a given input to iterate over are supplied as a list when the
+high-throughput calculations are prepared.  However, this can be impractical
+when multiple inputs all need to be set simultaneously and/or a large number of
+input values need to be iterated over.</p>
+<p>To address this problem, buildcombos functions can be defined that can then be
+used within prepare input files.  Each <em>buildcombos style</em> is a function that
+allows for the generation of multiple prepare input lines based on the
+available records within a database.  By generating inputs based on existing
+database records, the buildcombos functions make it possible to develop
+calculation workflows with the results of one calculation being used as input
+for others.</p>
+<p>New buildcombos styles can be added to the iprPy framework in a modular fashion
+by defining a buildcombos function and placing the function script in a
+subdirectory of iprPy/input/buildcombos_functions.</p>
+</div>
+<div class="section" id="workflow-scripts">
+<h2>Workflow scripts<a class="headerlink" href="#workflow-scripts" title="Permalink to this headline">¶</a></h2>
+<p>The IPR workflow directory contains Jupyter Notebooks and scripts that perform
+calculations using the same workflow as is done for the Interatomic Potentials
+Repository.  These scripts perform the calculations in a set order using
+default input parameter values.</p>
+</div>
+<div class="section" id="other-supporting-code">
+<h2>Other supporting code<a class="headerlink" href="#other-supporting-code" title="Permalink to this headline">¶</a></h2>
+<p>The iprPy package also contains other support functions for developing,
+running, and analyzing calculations.  The submodules of the iprPy package are</p>
+<ul class="simple">
+<li>analysis: tools for analyzing and processing calculation records.</li>
+<li>calculation: defines the Calculation class and subclasses.</li>
+<li>database: defines the Database class and subclasses.</li>
+<li>input: support functions for handling input files and values.  Includes the
+definition for the Subset class and subclasses, as well as the buildcombos
+functions.</li>
+<li>record: defines the Record class and subclasses.</li>
+<li>tools: utility functions that don’t have homes elsewhere.</li>
+<li>workflow: functions that support the IPR workflow scripts by preparing
+calculations with default inputs, and processing the results in the same way.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">iprPy Package Components</a><ul>
+<li><a class="reference internal" href="#calculations">Calculations</a></li>
+<li><a class="reference internal" href="#records">Records</a></li>
+<li><a class="reference internal" href="#databases">Databases</a></li>
+<li><a class="reference internal" href="#reference-library">Reference library</a></li>
+<li><a class="reference internal" href="#subsets">Subsets</a></li>
+<li><a class="reference internal" href="#buildcombos">buildcombos</a></li>
+<li><a class="reference internal" href="#workflow-scripts">Workflow scripts</a></li>
+<li><a class="reference internal" href="#other-supporting-code">Other supporting code</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="setup.html"
+                        title="previous chapter">Setup</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="run/index.html"
+                        title="next chapter">Calculations</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="run/index.html" title="Calculations"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="setup.html" title="Setup"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.9.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

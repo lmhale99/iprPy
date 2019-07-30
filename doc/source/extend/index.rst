@@ -8,7 +8,8 @@ This section gives details for anyone wishing to extend the iprPy package.
     :maxdepth: 2
 
     addreference
-    addrecord
     addcalculation
-    addfunctions
+    addrecord
+    addsubset
+    addbuildcombos
     adddatabase

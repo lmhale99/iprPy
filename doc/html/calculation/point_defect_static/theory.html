@@ -4,30 +4,23 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Method and Theory &#8212; iprPy 0.8.2 documentation</title>
+    <title>Method and Theory &#8212; iprPy 0.9.0 documentation</title>
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '0.8.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Input script parameters" href="parameters.html" />
     <link rel="prev" title="Introduction" href="intro.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -43,7 +36,7 @@
         <li class="right" >
           <a href="intro.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">point_defect_static</a> &#187;</li> 
       </ul>
@@ -58,17 +51,31 @@
 <h1>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this headline">¶</a></h1>
 <p>The method starts with a bulk initial system, and relaxes the atomic
 positions with a LAMMPS simulation that performs an energy/force
-minimization. The cohesive energy, <span class="math">\(E_{coh}\)</span>, is taken by dividing
+minimization. The cohesive energy, <span class="math notranslate nohighlight">\(E_{coh}\)</span>, is taken by dividing
 the system’s total energy by the number of atoms in the system.</p>
 <p>A corresponding defect system is then constructed using the
 atomman.defect.point() function. The defect system is relaxed using the
 same energy/force minimization as was done with the bulk system. The
-formation energy of the defect, <span class="math">\(E_{ptd}^f\)</span>, is obtained as</p>
-<div class="math">
-\[E_{ptd}^f = E_{ptd}^{total} - E_{coh} * n_{ptd},\]</div>
-<p>where <span class="math">\(E_{ptd}^{total}\)</span> is the total potential energy of the
-relaxed defect system, and <span class="math">\(n_{ptd}\)</span> is the number of atoms in the
+formation energy of the defect, <span class="math notranslate nohighlight">\(E_{f}^{ptd}\)</span>, is obtained as</p>
+<div class="math notranslate nohighlight">
+\[E_{f}^{ptd} = E_{total}^{ptd} - E_{coh} * N^{ptd},\]</div>
+<p>where <span class="math notranslate nohighlight">\(E_{total}^{ptd}\)</span> is the total potential energy of the
+relaxed defect system, and <span class="math notranslate nohighlight">\(N^{ptd}\)</span> is the number of atoms in the
 defect system.</p>
+<p>The elastic dipole tensor, <span class="math notranslate nohighlight">\(P_{ij}\)</span>, is also estimated for the
+point defect. <span class="math notranslate nohighlight">\(P_{ij}\)</span> is a symmetric second rank tensor that
+characterizes the elastic nature of the defect. Here, <span class="math notranslate nohighlight">\(P_{ij}\)</span> is
+estimated using [<a class="reference external" href="https://doi.org/10.1080/01418618108239410">1</a>,
+<a class="reference external" href="https://doi.org/10.1080/01418618308244326">2</a>]</p>
+<div class="math notranslate nohighlight">
+\[P_{ij} = -V \langle \sigma_{ij} \rangle,\]</div>
+<p>where <span class="math notranslate nohighlight">\(V\)</span> is the system cell volume and
+<span class="math notranslate nohighlight">\(\langle \sigma_{ij} \rangle\)</span> is the residual stress on the system
+due to the defect, which is computed using the measured cell stresses
+(pressures) of the defect-free system, <span class="math notranslate nohighlight">\(\sigma_{ij}^{0}\)</span>, and the
+defect-containing system, <span class="math notranslate nohighlight">\(\sigma_{ij}^{ptd}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\langle \sigma_{ij} \rangle = \sigma_{ij}^{ptd} - \sigma_{ij}^{0}.\]</div>
 <p>The atomman.defect.point() method allows for the generation of four
 types of point defects:</p>
 <ul class="simple">
@@ -96,7 +103,7 @@ hydrostatically displaces neighbor atoms, then the centrosummation
 should also be zero for the defect system. This is computed for all
 defect types.</li>
 </ul>
-<div class="math">
+<div class="math notranslate nohighlight">
 \[\vec{cs} = \sum_i^N{\left( \vec{r}_i - \vec{r}_{ptd} \right)}\]</div>
 <ul class="simple">
 <li><strong>position_shift</strong> is the change in position of an interstitial or
@@ -104,7 +111,7 @@ substitutional atom following relaxation of the system. A non-zero
 value indicates that the defect atom has moved from its initially
 ideal position.</li>
 </ul>
-<div class="math">
+<div class="math notranslate nohighlight">
 \[\Delta \vec{r} = \vec{r}_{ptd} - \vec{r}_{ptd}^{0}\]</div>
 <ul class="simple">
 <li><strong>db_vect_shift</strong> compares the unit vector associated with the pair
@@ -112,7 +119,7 @@ of atoms in a dumbbell interstitial before and after relaxation. A
 non-zero value indicates that the dumbbell has rotated from its ideal
 configuration.</li>
 </ul>
-<div class="math">
+<div class="math notranslate nohighlight">
 \[\Delta \vec{db} = \frac{\vec{r}_{db1} - \vec{r}_{db2}}{|\vec{r}_{db1} - \vec{r}_{db2}|} - \frac{\vec{r}_{db1}^0 - \vec{r}_{db2}^0}{|\vec{r}_{db1}^0 - \vec{r}_{db2}^0|}\]</div>
 <p>If any of the metrics have values not close to (0,0,0), then there was
 likely an atomic configuration relaxation.</p>
@@ -153,13 +160,13 @@ and the values of any of the reconfiguration metrics used.</p>
         <li class="right" >
           <a href="intro.html" title="Introduction"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >point_defect_static</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

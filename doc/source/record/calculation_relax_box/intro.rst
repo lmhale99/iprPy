@@ -1,10 +1,23 @@
 Introduction
 ============
 
-The calculation\_relax\_box Record style is for a calculation that
-relaxes the dimensions of a crystal system while keeping atoms at ideal
+The calculation_relax_box record style is for a calculation that relaxes
+the dimensions of a crystal system while keeping atoms at ideal
 positions.
 
-Calculation styles that use this Record style:
+Version notes
+~~~~~~~~~~~~~
 
--  relax\_box
+Additional dependencies
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Calculation styles that use this record style
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  relax_box
+
+Disclaimers
+~~~~~~~~~~~
+
+-  `NIST
+   disclaimers <http://www.nist.gov/public_affairs/disclaimer.cfm>`__

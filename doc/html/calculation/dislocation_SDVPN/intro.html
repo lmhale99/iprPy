@@ -4,30 +4,23 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Introduction &#8212; iprPy 0.8.2 documentation</title>
+    <title>Introduction &#8212; iprPy 0.9.0 documentation</title>
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '0.8.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Method and Theory" href="theory.html" />
     <link rel="prev" title="dislocation_SDVPN" href="index.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -43,7 +36,7 @@
         <li class="right" >
           <a href="index.html" title="dislocation_SDVPN"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">dislocation_SDVPN</a> &#187;</li> 
       </ul>
@@ -56,7 +49,7 @@
             
   <div class="section" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>The <strong>dislocation_SDVPN</strong> calculation predicts a dislocation’s planar
+<p>The dislocation_SDVPN calculation style predicts a dislocation’s planar
 spreading using the semidiscrete variational Peierls-Nabarro method. The
 solution finds the disregistry (difference in displacement above and
 below the slip plane) that minimizes the dislocation’s energy. The
@@ -64,17 +57,30 @@ energy term consists of two primary components: an elastic component due
 to the dislocation interacting with itself, and a misfit component
 arising from the formation of a generalized stacking fault along the
 dislocation’s spreading.</p>
-<p><strong>Disclaimer #1</strong>: The calculation method solves the problem using a 2D
-generalized stacking fault energy map. Better results may be possible by
-measuring a full 3D map, but that would require adding a new calculation
-for the 3D variation.</p>
-<p><strong>Disclaimer #2</strong>: The implemented method is suited for dislocations
-with planar spreading. It is not suited for dislocations that spread on
-multiple atomic planes, like the a/2&lt;111&gt; bcc screw dislocation.</p>
-<p><strong>Disclaimer #3</strong>: While the solution is taken at discrete points that
-(typically) correspond to atomic sites, the underlying method is still a
-continuum solution that does not fully account for the atomic nature of
-the dislocation.</p>
+<div class="section" id="version-notes">
+<h2>Version notes<a class="headerlink" href="#version-notes" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="additional-dependencies">
+<h2>Additional dependencies<a class="headerlink" href="#additional-dependencies" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="disclaimers">
+<h2>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST
+disclaimers</a></li>
+<li>The calculation method solves the problem using a 2D generalized
+stacking fault energy map. Better results may be possible by
+measuring a full 3D map, but that would require adding a new
+calculation for the 3D variation.</li>
+<li>The implemented method is suited for dislocations with planar
+spreading. It is not suited for dislocations that spread on multiple
+atomic planes, like the a/2&lt;111&gt; bcc screw dislocation.</li>
+<li>While the solution is taken at discrete points that (typically)
+correspond to atomic sites, the underlying method is still a
+continuum solution that does not fully account for the atomic nature
+of the dislocation.</li>
+</ul>
+</div>
 </div>
 
 
@@ -83,6 +89,16 @@ the dislocation.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#version-notes">Version notes</a></li>
+<li><a class="reference internal" href="#additional-dependencies">Additional dependencies</a></li>
+<li><a class="reference internal" href="#disclaimers">Disclaimers</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
                         title="previous chapter">dislocation_SDVPN</a></p>
@@ -108,13 +124,13 @@ the dislocation.</p>
         <li class="right" >
           <a href="index.html" title="dislocation_SDVPN"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >dislocation_SDVPN</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

@@ -4,30 +4,23 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Records &#8212; iprPy 0.8.2 documentation</title>
+    <title>Adding new record styles &#8212; iprPy 0.9.0 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.8.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Calculations" href="addcalculation.html" />
-    <link rel="prev" title="Reference Library" href="addreference.html" /> 
-  </head>
-  <body>
+    <link rel="next" title="Adding new subset styles" href="addsubset.html" />
+    <link rel="prev" title="Adding new calculation styles" href="addcalculation.html" /> 
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,12 +31,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="addcalculation.html" title="Calculations"
+          <a href="addsubset.html" title="Adding new subset styles"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="addreference.html" title="Reference Library"
+          <a href="addcalculation.html" title="Adding new calculation styles"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Extending iprPy</a> &#187;</li> 
       </ul>
     </div>  
@@ -53,106 +46,160 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="records">
-<h1>Records<a class="headerlink" href="#records" title="Permalink to this headline">¶</a></h1>
-<p>The iprPy framework uses individual record files for representing reference information and calculation results.</p>
-<div class="section" id="record-directories">
-<h2>Record directories<a class="headerlink" href="#record-directories" title="Permalink to this headline">¶</a></h2>
-<p>All records are stored in subdirectories of the iprPy/record directory, with directory named for the record, i.e. [recordname].  Each directory contains:</p>
+  <div class="section" id="adding-new-record-styles">
+<h1>Adding new record styles<a class="headerlink" href="#adding-new-record-styles" title="Permalink to this headline">¶</a></h1>
+<p>The basic steps associated with implementing a new record style in iprPy are</p>
+<ol class="arabic simple">
+<li>Create a new subdirectory in iprPy/record named for the new record
+style.</li>
+<li>Create a file that defines the Record subclass.  Name the file
+after the subclass name, typically by converting the style name to upper
+camel case (each word capitalized with no separators).</li>
+<li>Define the Record subclass contentroot attribute and the todict() method.
+For record styles of calculation results, also define the compare_terms and
+compare_fterms attributes and the buildcontent() method.</li>
+<li>Create an “__init__.py” file that imports the subclass.</li>
+<li>Create an XSD schema for the record when represented in XML format.  Save
+the schema to record-[style].xsd, where any underscores in the style name
+are replaced with hyphens.</li>
+<li>Write documentation for the record style in the README.md file.</li>
+</ol>
+<div class="section" id="files-in-the-record-style-directories">
+<h2>Files in the record style directories<a class="headerlink" href="#files-in-the-record-style-directories" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>record-[record-name].xsd</strong>: The XSD schema for the record’s XML content.</li>
-<li><strong>[RecordName].py</strong>: Includes the definition of a Python class that is a subclass of iprPy.record.Record.  This defines how the iprPy codebase interacts with the record.</li>
+<li><strong>[Style].py</strong>: Defines the Record subclass for the record style.
+This defines how the iprPy codebase interacts with the record.</li>
+<li><strong>__init__.py</strong>: Allows Python to identify the record directory as
+a sub-package and be able to import the Record subclass into iprPy.</li>
+<li><strong>record-[style].xsd</strong>: The XSD schema for the record’s XML content.</li>
 <li><strong>README.md</strong>: Descriptions of the record format and what it represents.</li>
-<li><strong>__init__.py</strong>: The Python init file allowing Python to interpret the record directory as a submodule of the iprPy package.</li>
 </ul>
+<div class="section" id="style-py">
+<h3>[Style].py<a class="headerlink" href="#style-py" title="Permalink to this headline">¶</a></h3>
+<p>The iprPy package interacts with the record style through the defined
+Record subclass.  Considerable work has gone into making it easy to
+define new subclass definitions by modifying values in pre-existing subclass
+definitions.  This section describes the different components of defining a
+Record subclass.</p>
+<div class="section" id="inheritance">
+<h4>Inheritance<a class="headerlink" href="#inheritance" title="Permalink to this headline">¶</a></h4>
+<p>For general records, like the reference records in the iprPy/library directory,
+the class should be a child of iprPy.record.Record.</p>
+<p>For records associated with calculations, the class should be a child of
+iprPy.record.CalculationRecord.  Note that CalculationRecord is itself a child
+of Record, but it contains additional components.</p>
 </div>
-<div class="section" id="record-format">
-<h2>Record format<a class="headerlink" href="#record-format" title="Permalink to this headline">¶</a></h2>
-<p>The iprPy framework uses reference and results records that have schemas allowing for equivalent representation in JSON, XML and Python.  This supports compatibility across different software tools, such as different types of databases.  This equivalent representation does require a few format restrictions.</p>
-<p>Many pre-defined reference records can be found in the iprPy/library/directory.</p>
-<div class="section" id="reusable-types">
-<h3>Reusable types<a class="headerlink" href="#reusable-types" title="Permalink to this headline">¶</a></h3>
-<p>XML and JSON were selected as their tree-like structures allow for the use of reusable types.  A reusable type can be thought of a mini-schema that describes a certain concept or object.  These small types can be put together to form larger, more complex types eventually leading to full schemas.  Constructing schemas from types is advantageous as types can be reused in multiple schemas.  This makes constructing new schemas faster and easier. It also allows for the development of more adaptable software for reading records that can search for and extract information from contained types without requiring a rigid definition of the full schema.</p>
-<p>An example of this in the iprPy framework is that there is a type that defines an atomic configuration.  This same “atomic-system” type is present in the “crystal_prototype” reference records as well as many of the calculation results records.  The same functions can be used for interpreting and loading the “atomic-system” regardless of which record style that it came from.  Doing so makes it possible for the results records of one calculation to be used as a reference for another calculation.</p>
+<div class="section" id="contentroot">
+<h4>contentroot<a class="headerlink" href="#contentroot" title="Permalink to this headline">¶</a></h4>
+<p>Defined for both Record and CalculationRecord subclasses.</p>
+<p>The contentroot attribute is the name of the single root element of the record
+style’s schema.  Typically, this corresponds to the record style but with
+underscores replaced with hyphens.</p>
 </div>
-<div class="section" id="common-components-and-design">
-<h3>Common components and design<a class="headerlink" href="#common-components-and-design" title="Permalink to this headline">¶</a></h3>
-<p>The schemas for all of the Record styles share some common components and design choices.</p>
-<div class="section" id="root-element">
-<h4>Root element<a class="headerlink" href="#root-element" title="Permalink to this headline">¶</a></h4>
-<p>To be XML-compliant, each Record style must have exactly one root element.  For simplicity, the root element should match the calculation style, just with underscores replaced with dashes, e.g. the potential_LAMMPS Record style has root element “potential-LAMMPS”.</p>
-</div>
-<div class="section" id="unique-identifiers">
-<h4>Unique identifiers<a class="headerlink" href="#unique-identifiers" title="Permalink to this headline">¶</a></h4>
-<p>The first subelement within the root element is “key”: a UUID4 unique identifier.  This gives each record a unique machine-readable name.  For non-calculation reference records, the next subelement is “id”.  The record’s id is a human-readable name which should also be unique (at least for the record style).  When a record is saved to a file or database, the record’s name corresponds to the record “id” if it has one or the record “key” if it does not making it possible to easily search for and identify matches.</p>
-</div>
-<div class="section" id="system-family">
-<h4>System family<a class="headerlink" href="#system-family" title="Permalink to this headline">¶</a></h4>
-<p>A special “family” element is also used for linking calculations together based on their atomic system ancestry.  The “family” corresponds to the name of the original reference file containing atomic configuration information that was loaded in by the first calculation in a given lineage, and is passed down from one generation to the next.  Defining a “family” is useful because</p>
+<div class="section" id="todict">
+<h4>todict()<a class="headerlink" href="#todict" title="Permalink to this headline">¶</a></h4>
+<p>Defined for both Record and CalculationRecord subclasses.</p>
+<p>The todict() method converts the tree-like JSON/XML content into a flat
+Python dictionary.  Content common to all similar records can be interpreted
+by the parent class’ todict() method.  Also, any terms associated with inputs
+from subsets can be generated in a common way by using the subsets’ todict()
+methods.</p>
+<p>For values with units, the atomman.unitconvert.value_unit() function will
+perform the proper unit conversions.  This function is the inverse operation
+of the atomman.unitconvert.model() function.</p>
+<p>The todict() method has two optional boolean parameters</p>
 <ul class="simple">
-<li>It helps identify calculations that share the same base structure.  Without the family element, classifying a calculation’s system would require retracing the calculation lineage.</li>
-<li>It supports intelligent high-throughput calculation preparation by avoiding meaningless calculations.  For example, the dislocation_monopole calculation takes a reference structure and elastic constants, and parameters for a specific dislocation type.  It would be pointless to use the parameters for a bcc a/2&lt;111&gt; dislocation with an hcp reference crystal.</li>
+<li>full: Primarily used by calculation records.  If True (default), dictionary
+keys associated with the calculation’s results will be included.  If False,
+only the keys associated with the calculation’s inputs and status will be
+included.</li>
+<li>flat: If True, the returned dictionary will only contain values that are
+basic Python types, like str, int, bool, and float.  If False (default),
+then the dictionary values can be more complex Python objects.  Depending on
+the values, some terms might be excluded for Flat=True.</li>
 </ul>
 </div>
+<div class="section" id="compare-terms">
+<h4>compare_terms<a class="headerlink" href="#compare-terms" title="Permalink to this headline">¶</a></h4>
+<p>Defined for CalculationRecord subclasses.</p>
+<p>The compare_terms attribute is a list of the terms in the todict()
+representation of the record that are to be exactly compared to determine the
+record’s uniqueness.</p>
+</div>
+<div class="section" id="compare-fterms">
+<h4>compare_fterms<a class="headerlink" href="#compare-fterms" title="Permalink to this headline">¶</a></h4>
+<p>Defined for CalculationRecord subclasses.</p>
+<p>The compare_fterms attribute is a dictionary of the terms in the todict()
+representation of the record that are to be approximately compared to determine
+the record’s uniqueness.  The keys of compare_fterms are the terms to compare,
+and the corresponding values give the absolute tolerances to use.</p>
+</div>
+<div class="section" id="buildcontent">
+<h4>buildcontent()<a class="headerlink" href="#buildcontent" title="Permalink to this headline">¶</a></h4>
+<p>Defined for CalculationRecord subclasses.</p>
+<p>The buildcontent() method generates a record’s content in the correct format
+based on supplied dictionaries of input and results values.  The content is
+constructed as a DataModelDict.DataModelDict object.  Content common to all
+calculation records can be built by the parent class’ buildcontent() method.
+Also, any terms associated with inputs from subsets can be generated in a
+common way by using the subsets’ buildcontent() methods.</p>
+<p>For values with units, the atomman.unitconvert.model()  function will output
+elements that properly capture the value’s shape and units.  This function is
+the inverse operation of the atomman.unitconvert.value_unit() function.</p>
 </div>
 </div>
-<div class="section" id="record-classes">
-<h2>Record Classes<a class="headerlink" href="#record-classes" title="Permalink to this headline">¶</a></h2>
-<p>A Record class contains methods for generating, comparing and evaluating records.  The root class, from which all Record styles are subclasses of, is iprPy.record.Record.  The code containing the class is saved in the Record directory in a RecordName.py file.</p>
-<div class="section" id="common-record-properties">
-<h3>Common Record properties<a class="headerlink" href="#common-record-properties" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><strong>style</strong> is the Record’s style.</li>
-<li><strong>directory</strong> is the directory path to where the Record definition is located.</li>
-<li><strong>name</strong> is the name assigned to the specific implementation of the Record, i.e. file name or id.</li>
-<li><strong>contentroot</strong> is the name of the record model’s root element.</li>
-<li><strong>content</strong> is the content of the record as a DataModelDict.</li>
-<li><strong>schema</strong> returns the path to the XSD file that defines the record style’s schema.</li>
-<li><strong>compare_terms</strong> lists the terms in the dictionary representation (see todict() below) that are to be checked for exact equivalence when determining if two records are identical.</li>
-<li><strong>compare_fterms</strong> lists the floating point terms in the dictionary representation (see todict() below) that are to be checked for near-equivalence  when determining if two records are identical.</li>
-</ul>
-</div>
-<div class="section" id="common-record-methods">
-<h3>Common Record methods<a class="headerlink" href="#common-record-methods" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><strong>buildcontent()</strong> generates a calculation record’s content based on input parameters (and calculation results).</li>
-<li><strong>todict()</strong> returns a flattened dictionary representation of the record in which all key-values are at the same level as opposed to the tiered tree-like structure of the XML/JSON format.</li>
-<li><strong>isvalid()</strong> performs a self-consistency check on the record to determine if any terms associated with input parameters are incompatible.  Returns True if the combination of input parameters is allowed, and False otherwise.</li>
-<li><strong>isnew()</strong> compares the record in question to a database/list of records to determine if a matching record already exists.  Returns True if no match is found, and False otherwise.</li>
-<li><strong>match_df()</strong> compares the record in question to a database/list of records and returns all matching records from the database/list.</li>
-</ul>
-</div>
-<div class="section" id="defining-a-new-record-class">
-<h3>Defining a new Record class<a class="headerlink" href="#defining-a-new-record-class" title="Permalink to this headline">¶</a></h3>
-<p>Many of a Record style class’ properties and methods are inherited from the parent class or inferred based on directory information.  For reference records, the only components that need to be overrided by the subclass are contentroot, schema, and todict().  For calculation results records, those components as well as compare_terms, compare_fterms, buildcontent(), and optionally isvalid() also need to be defined.</p>
-<ul class="simple">
-<li><strong>buildcontent()</strong>: The function takes two dictionaries as parameters: one containing inputs for a calculation and one containing results for the calculation.  If the results dictionary is not given, then the record content should be for an incomplete record containing only the input information and a status element with value “not calculated”.  The current records all use DataModelDict to build a Python dictionary that can be easily converted into either JSON or XML.</li>
-<li><strong>todict()</strong>: This extracts terms from the tiered record content and returns a single-tiered dictionary of values.  How the results are represented depend on two options: full and flat.  If full is False, then only the input terms, status and error should be included in the dictionary, while Full is True will also include results terms.  If flat is True, then the values for all terms in the returned dictionary should be simple, single-valued types that can easily be displayed in a spreadsheet.  With flat being False, the values can be more complex objects that are easier to work with in Python.</li>
-<li><strong>isvalid()</strong>: This looks at specific elements in the record content and returns False if the values of the elements are incompatible for proper/valid calculations.  The parent Record.isvalid() method always returns True, so the subclass’ method only needs to be defined if prepare can build invalid calculations.</li>
-</ul>
-<p>The last step is to make it so that the Record subclass can be imported by Python, which is done simply by importing the RecordName class within the __init__.py file in the calculation directory:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">.RecordName</span> <span class="k">import</span> <span class="n">RecordName</span>
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;RecordName&#39;</span><span class="p">]</span>
+<div class="section" id="init-py">
+<h3>__init__.py<a class="headerlink" href="#init-py" title="Permalink to this headline">¶</a></h3>
+<p>The __init__.py file simply needs to tell Python to include the Database
+subclass.  For instance, if the subclass is called “Style”, then
+__init__.py contains</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">.Style</span> <span class="kn">import</span> <span class="n">Style</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Style&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
+<div class="section" id="record-style-xsd">
+<h3>record-[style].xsd<a class="headerlink" href="#record-style-xsd" title="Permalink to this headline">¶</a></h3>
+<p>The record’s XSD schema is saved here.  Currently, all of the record schemas
+use a generic format that allows for any terms to be given after the root
+element simply because the record schemas are not finalized.  For a new style,
+this generic format can be copied, and only the root element and the file name
+needs to be changed.  However, a more specific record schema can be included if
+available.</p>
 </div>
+</div>
+<div class="section" id="record-format">
+<h2>Record format<a class="headerlink" href="#record-format" title="Permalink to this headline">¶</a></h2>
+<p>The iprPy framework uses reference and results records that have schemas
+allowing for equivalent representation in JSON, XML and Python.  This supports
+compatibility across different software tools, such as different types of
+databases.  This equivalent representation does require a few format
+restrictions.</p>
+<p>XML and JSON were selected as their tree-like structures allow for the use of
+reusable types.  A reusable type can be thought of a mini-schema that describes
+a certain concept or object.  These small types can be put together to form
+larger, more complex types eventually leading to full schemas.  Constructing
+schemas from types is advantageous as types can be reused in multiple schemas.
+This makes constructing new schemas faster and easier. It also allows for the
+definition of the subsets that allow for common interpretation of values across
+different records.</p>
 <div class="section" id="record-format-limitations">
-<h2>Record format limitations<a class="headerlink" href="#record-format-limitations" title="Permalink to this headline">¶</a></h2>
-<p>This section lists the format limitations to ensure that the record content is equivalently represented in JSON, XML and Python.</p>
+<h3>Record format limitations<a class="headerlink" href="#record-format-limitations" title="Permalink to this headline">¶</a></h3>
+<p>This section lists the format limitations to ensure that the record content is
+equivalently represented in JSON, XML and Python.</p>
 <div class="section" id="limitations-to-xml">
-<h3>Limitations to XML<a class="headerlink" href="#limitations-to-xml" title="Permalink to this headline">¶</a></h3>
+<h4>Limitations to XML<a class="headerlink" href="#limitations-to-xml" title="Permalink to this headline">¶</a></h4>
 <ul>
 <li><p class="first">Elements embedded into value fields are not allowed.</p>
 <p>Allowed:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;root&gt;
-  &lt;element&gt;This is text without embded elements&lt;/element&gt;
+  &lt;element&gt;This is text without embedded elements&lt;/element&gt;
 &lt;/root&gt;
 </pre></div>
 </div>
 <p>Not allowed:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;root&gt;
   &lt;element&gt;This is text with an &lt;embed&gt;embedded&lt;/embed&gt; element.&lt;/element&gt;
 &lt;/root&gt;
@@ -162,7 +209,7 @@
 <li><p class="first">If an element contains multiple subelements of the same name, they must be
 consecutively placed.</p>
 <p>Allowed:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;root&gt;
   &lt;element&gt;
     &lt;value&gt;1&lt;/value&gt;
@@ -173,7 +220,7 @@ consecutively placed.</p>
 </pre></div>
 </div>
 <p>Not allowed:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;root&gt;
   &lt;element&gt;
     &lt;value&gt;1&lt;/value&gt;
@@ -190,11 +237,11 @@ consecutively placed.</p>
 </ul>
 </div>
 <div class="section" id="limitations-to-json">
-<h3>Limitations to JSON<a class="headerlink" href="#limitations-to-json" title="Permalink to this headline">¶</a></h3>
+<h4>Limitations to JSON<a class="headerlink" href="#limitations-to-json" title="Permalink to this headline">¶</a></h4>
 <ul>
 <li><p class="first">There can only be one root key.</p>
 <p>Allowed:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;root&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;element1&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
         <span class="s2">&quot;element2&quot;</span><span class="p">:</span> <span class="mi">7</span>
@@ -203,7 +250,7 @@ consecutively placed.</p>
 </pre></div>
 </div>
 <p>Not allowed:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;root1&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;element1&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
         <span class="s2">&quot;element2&quot;</span><span class="p">:</span> <span class="mi">7</span>
@@ -213,9 +260,10 @@ consecutively placed.</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Elements can be arrays only if they are one-dimensional, i.e. no arrays of arrays.</p>
+<li><p class="first">Elements can be arrays only if they are one-dimensional, i.e. no arrays of
+arrays.</p>
 <p>Allowed:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;root&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;element&quot;</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span>
     <span class="p">}</span>
@@ -223,7 +271,7 @@ consecutively placed.</p>
 </pre></div>
 </div>
 <p>Not allowed:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;root&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;element&quot;</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]]</span>
     <span class="p">}</span>
@@ -234,11 +282,13 @@ consecutively placed.</p>
 </ul>
 </div>
 <div class="section" id="limitations-to-python-dictionaries">
-<h3>Limitations to Python dictionaries<a class="headerlink" href="#limitations-to-python-dictionaries" title="Permalink to this headline">¶</a></h3>
+<h4>Limitations to Python dictionaries<a class="headerlink" href="#limitations-to-python-dictionaries" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li>All limitations for JSON also apply to the Python representation.</li>
-<li>The data types of element values are limited to dict, list, tuple, unicode (str), long (int), float, bool, and None.</li>
+<li>The data types of element values are limited to dict, list, tuple, unicode
+(str), long (int), float, bool, and None.</li>
 </ul>
+</div>
 </div>
 </div>
 </div>
@@ -249,26 +299,24 @@ consecutively placed.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Records</a><ul>
-<li><a class="reference internal" href="#record-directories">Record directories</a></li>
+<li><a class="reference internal" href="#">Adding new record styles</a><ul>
+<li><a class="reference internal" href="#files-in-the-record-style-directories">Files in the record style directories</a><ul>
+<li><a class="reference internal" href="#style-py">[Style].py</a><ul>
+<li><a class="reference internal" href="#inheritance">Inheritance</a></li>
+<li><a class="reference internal" href="#contentroot">contentroot</a></li>
+<li><a class="reference internal" href="#todict">todict()</a></li>
+<li><a class="reference internal" href="#compare-terms">compare_terms</a></li>
+<li><a class="reference internal" href="#compare-fterms">compare_fterms</a></li>
+<li><a class="reference internal" href="#buildcontent">buildcontent()</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#init-py">__init__.py</a></li>
+<li><a class="reference internal" href="#record-style-xsd">record-[style].xsd</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#record-format">Record format</a><ul>
-<li><a class="reference internal" href="#reusable-types">Reusable types</a></li>
-<li><a class="reference internal" href="#common-components-and-design">Common components and design</a><ul>
-<li><a class="reference internal" href="#root-element">Root element</a></li>
-<li><a class="reference internal" href="#unique-identifiers">Unique identifiers</a></li>
-<li><a class="reference internal" href="#system-family">System family</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#record-classes">Record Classes</a><ul>
-<li><a class="reference internal" href="#common-record-properties">Common Record properties</a></li>
-<li><a class="reference internal" href="#common-record-methods">Common Record methods</a></li>
-<li><a class="reference internal" href="#defining-a-new-record-class">Defining a new Record class</a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#record-format-limitations">Record format limitations</a><ul>
 <li><a class="reference internal" href="#limitations-to-xml">Limitations to XML</a></li>
 <li><a class="reference internal" href="#limitations-to-json">Limitations to JSON</a></li>
@@ -278,13 +326,15 @@ consecutively placed.</p>
 </ul>
 </li>
 </ul>
+</li>
+</ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="addreference.html"
-                        title="previous chapter">Reference Library</a></p>
-  <h4>Next topic</h4>
   <p class="topless"><a href="addcalculation.html"
-                        title="next chapter">Calculations</a></p>
+                        title="previous chapter">Adding new calculation styles</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="addsubset.html"
+                        title="next chapter">Adding new subset styles</a></p>
         </div>
       </div>
       <div class="clearer"></div>
@@ -299,17 +349,17 @@ consecutively placed.</p>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="addcalculation.html" title="Calculations"
+          <a href="addsubset.html" title="Adding new subset styles"
              >next</a> |</li>
         <li class="right" >
-          <a href="addreference.html" title="Reference Library"
+          <a href="addcalculation.html" title="Adding new calculation styles"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Extending iprPy</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

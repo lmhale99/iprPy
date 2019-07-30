@@ -4,30 +4,23 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>iprPy.record package &#8212; iprPy 0.8.2 documentation</title>
+    <title>iprPy.record package &#8212; iprPy 0.9.0 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.8.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="iprPy.tools package" href="tools.html" />
     <link rel="prev" title="iprPy.input package" href="input.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -43,7 +36,7 @@
         <li class="right" >
           <a href="input.html" title="iprPy.input package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">iprPy package</a> &#187;</li> 
       </ul>
     </div>  
@@ -60,192 +53,79 @@
 <dl class="attribute">
 <dt id="iprPy.record.loaded">
 <code class="descname">loaded</code><a class="headerlink" href="#iprPy.record.loaded" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Dictionary of the derived classes</p>
+<dd><p>Dictionary of the record styles that were successfully imported. The
+dictionary keys are the database style names, and the values are the
+loaded modules.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="iprPy.record.databases_dict">
-<code class="descname">databases_dict</code><a class="headerlink" href="#iprPy.record.databases_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Dictionary of the database styles that successfully loaded. The
-dictionary keys are the database style names, and the values are the
-loaded modules.</p>
+<dt id="iprPy.record.failed">
+<code class="descname">failed</code><a class="headerlink" href="#iprPy.record.failed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary listing the record styles that failed import. Values
+contain the error messages thrown by the style.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="class">
 <dt id="iprPy.record.Record">
 <em class="property">class </em><code class="descname">Record</code><span class="sig-paren">(</span><em>name=None</em>, <em>content=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.record.Record" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class for handling different record styles in the same fashion.  The
 class defines the common methods and attributes, which are then uniquely
 implemented for each style.  The available styles are loaded from the
 iprPy.records submodule.</p>
-<dl class="method">
-<dt id="iprPy.record.Record.buildcontent">
-<code class="descname">buildcontent</code><span class="sig-paren">(</span><em>script</em>, <em>input_dict</em>, <em>results_dict=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.record.Record.buildcontent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Builds a data model of the specified record style based on input (and
-results) parameters.</p>
+<dl class="attribute">
+<dt id="iprPy.record.Record.content">
+<code class="descname">content</code><a class="headerlink" href="#iprPy.record.Record.content" title="Permalink to this definition">¶</a></dt>
+<dd><p>The record’s content.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>script</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the calculation script used.</li>
-<li><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary of all input parameter terms.</li>
-<li><strong>results_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) – Dictionary containing any results produced by the calculation.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Data model consistent with the record’s schema format.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">DataModelDict</p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If buildcontent is not defined for record style.</p>
-</td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">DataModelDict</td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="iprPy.record.Record.compare_fterms">
-<code class="descname">compare_fterms</code><a class="headerlink" href="#iprPy.record.Record.compare_fterms" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list of str</em> – The default fterms used by isnew() for comparisons.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="iprPy.record.Record.compare_terms">
-<code class="descname">compare_terms</code><a class="headerlink" href="#iprPy.record.Record.compare_terms" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list of str</em> – The default terms used by isnew() for comparisons.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="iprPy.record.Record.content">
-<code class="descname">content</code><a class="headerlink" href="#iprPy.record.Record.content" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>DataModelDict</em> – The record’s content.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="iprPy.record.Record.contentroot">
 <code class="descname">contentroot</code><a class="headerlink" href="#iprPy.record.Record.contentroot" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – The root element of the content</p>
+<dd><p>The root element of the content</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="iprPy.record.Record.directory">
 <code class="descname">directory</code><a class="headerlink" href="#iprPy.record.Record.directory" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – The path to the record’s directory</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.record.Record.isnew">
-<code class="descname">isnew</code><span class="sig-paren">(</span><em>record_df=None</em>, <em>record_list=None</em>, <em>database=None</em>, <em>terms=None</em>, <em>fterms=None</em>, <em>atol=0.0</em>, <em>rtol=1e-08</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.record.Record.isnew" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks the record versus a database, list of records, or DataFrame of
-records to see if any records exists with matching terms and fterms.</p>
+<dd><p>The path to the record’s directory</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>record_df</strong> (<em>pandas.DataFrame</em><em>, </em><em>optional</em>) – DataFrame to compare record againts.  record_df must be built by
-converting records to dictionaries using Record.todict(full=False,
-flat=True), then converting the list of dictionaries to a
-DataFrame.  Either record_df, record_list or database must be given.</li>
-<li><strong>record_list</strong> (<em>list of iprPy.Records</em><em>, </em><em>optional</em>) – List of Records to compare against.  Either record_df, record_list
-or database must be given.</li>
-<li><strong>database</strong> (<em>iprPy.Database</em><em>, </em><em>optional</em>) – Database containing records of record.style to compare against.
-All records of record.style contained in the database will be
-checked.  Either record_df, record_list or database must be given.</li>
-<li><strong>terms</strong> (<em>list of str</em><em>, </em><em>optional</em>) – The keys of the dictionary produced by Record.todict(full=False,
-flat=True) to check for equivalency, i.e. use == comparisons for
-terms with str and int values. If not given, will use the record
-style’s compare_terms.</li>
-<li><strong>fterms</strong> (<em>list of str</em><em>, </em><em>optional</em>) – The keys of the dictionary produced by Record.todict(full=False,
-flat=True) to check for approximately equal values, i.e. use
-numpy.isclose() for terms with float values. If not given, will
-use the record style’s compare_fterms.</li>
-<li><strong>atol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The absolute tolerance to use in numpy.isclose() for comparing
-fterms (Default value is 0.0).</li>
-<li><strong>rtol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The relative tolerance to use in numpy.isclose() for comparing
-fterms (Default value is 1e-8).</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> – If more than one of record_df, record_list, and database are
-given.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.record.Record.isvalid">
-<code class="descname">isvalid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.record.Record.isvalid" title="Permalink to this definition">¶</a></dt>
-<dd><p>Looks at the values of elements in the record to determine if the
-associated calculation would be a valid one to run.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if element combinations are valid, False if not.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.record.Record.match_df">
-<code class="descname">match_df</code><span class="sig-paren">(</span><em>record_df=None</em>, <em>record_list=None</em>, <em>database=None</em>, <em>terms=None</em>, <em>fterms=None</em>, <em>atol=0.0</em>, <em>rtol=1e-08</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.record.Record.match_df" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks the record versus a database, list of records, or DataFrame of
-records to see if any records exists with matching terms and fterms.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>record_df</strong> (<em>pandas.DataFrame</em><em>, </em><em>optional</em>) – DataFrame to compare record againts.  record_df must be built by
-converting records to dictionaries using Record.todict(full=False,
-flat=True), then converting the list of dictionaries to a
-DataFrame.  Either record_df, record_list or database must be given.</li>
-<li><strong>record_list</strong> (<em>list of iprPy.Records</em><em>, </em><em>optional</em>) – List of Records to compare against.  Either record_df, record_list
-or database must be given.</li>
-<li><strong>database</strong> (<em>iprPy.Database</em><em>, </em><em>optional</em>) – Database containing records of record.style to compare against.
-All records of record.style contained in the database will be
-checked.  Either record_df, record_list or database must be given.</li>
-<li><strong>terms</strong> (<em>list of str</em><em>, </em><em>optional</em>) – The keys of the dictionary produced by Record.todict(full=False,
-flat=True) to check for equivalency, i.e. use == comparisons for
-terms with str and int values. If not given, will use the record
-style’s compare_terms.</li>
-<li><strong>fterms</strong> (<em>list of str</em><em>, </em><em>optional</em>) – The keys of the dictionary produced by Record.todict(full=False,
-flat=True) to check for approximately equal values, i.e. use
-numpy.isclose() for terms with float values. If not given, will
-use the record style’s compare_fterms.</li>
-<li><strong>atol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The absolute tolerance to use in numpy.isclose() for comparing
-fterms (Default value is 0.0).</li>
-<li><strong>rtol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The relative tolerance to use in numpy.isclose() for comparing
-fterms (Default value is 1e-8).</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> – If more than one of record_df, record_list, and database are
-given.</p>
-</td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
 </tr>
 </tbody>
 </table>
@@ -254,20 +134,44 @@ given.</p>
 <dl class="attribute">
 <dt id="iprPy.record.Record.name">
 <code class="descname">name</code><a class="headerlink" href="#iprPy.record.Record.name" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – The record’s name.</p>
+<dd><p>The record’s name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="iprPy.record.Record.schema">
 <code class="descname">schema</code><a class="headerlink" href="#iprPy.record.Record.schema" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – The absolute directory path to the .xsd file associated with the
+<dd><p>The absolute directory path to the .xsd file associated with the
 record style.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="iprPy.record.Record.style">
 <code class="descname">style</code><a class="headerlink" href="#iprPy.record.Record.style" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – The record style</p>
+<dd><p>The record style</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -293,10 +197,7 @@ values can be of any data type, which is convenient for analysis.
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A dictionary representation of the record’s content.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If todict is not defined for record style.</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
 </td>
 </tr>
 </tbody>
@@ -308,7 +209,27 @@ values can be of any data type, which is convenient for analysis.
 <dl class="function">
 <dt id="iprPy.record.load_record">
 <code class="descname">load_record</code><span class="sig-paren">(</span><em>style</em>, <em>name=None</em>, <em>content=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.record.load_record" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Loads a Record subclass associated with a given record style</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The record style</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name to give to the specific record</li>
+<li><strong>content</strong> – The record’s data model content</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A Record object for the style</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">subclass of iprPy.record.Record</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </div>
 </div>
@@ -319,7 +240,7 @@ values can be of any data type, which is convenient for analysis.
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">iprPy.record package</a><ul>
 <li><a class="reference internal" href="#module-iprPy.record">Module contents</a></li>
@@ -352,12 +273,12 @@ values can be of any data type, which is convenient for analysis.
         <li class="right" >
           <a href="input.html" title="iprPy.input package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.8.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >iprPy package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

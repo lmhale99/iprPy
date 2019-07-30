@@ -1,0 +1,237 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Adding new subset styles &#8212; iprPy 0.9.0 documentation</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Adding new buildcombos styles" href="addbuildcombos.html" />
+    <link rel="prev" title="Adding new record styles" href="addrecord.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="addbuildcombos.html" title="Adding new buildcombos styles"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="addrecord.html" title="Adding new record styles"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Extending iprPy</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="adding-new-subset-styles">
+<h1>Adding new subset styles<a class="headerlink" href="#adding-new-subset-styles" title="Permalink to this headline">¶</a></h1>
+<p>The basic steps associated with implementing a new subset style in iprPy are</p>
+<ol class="arabic simple">
+<li>Create a new subdirectory in iprPy/input/subset_classes named for the new
+subset style.</li>
+<li>Create a file that defines the Subset subclass.  Name the file
+after the subclass name, typically by converting the style name to upper
+camel case (each word capitalized with no separators).</li>
+<li>Define the Subset subclass templatekeys, preparekeys and interpretkeys
+attributes and template, interpret, buildcontent and todict methods.</li>
+<li>Create an “__init__.py” file that imports the subclass.</li>
+<li>Create a parameters.md file that describes the templatekeys.</li>
+</ol>
+<div class="section" id="files-in-the-subset-style-directories">
+<h2>Files in the subset style directories<a class="headerlink" href="#files-in-the-subset-style-directories" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>[Style].py</strong>: Defines the Subset subclass for the subset style.
+This defines how the iprPy codebase interacts with the subset.</li>
+<li><strong>__init__.py</strong>: Allows Python to identify the subset directory as
+a sub-package and be able to import the Subset subclass into iprPy.</li>
+<li><strong>parameters.md</strong>: Descriptions of the keys in templatekeys.</li>
+</ul>
+<div class="section" id="style-py">
+<h3>[Style].py<a class="headerlink" href="#style-py" title="Permalink to this headline">¶</a></h3>
+<p>The iprPy package interacts with the subset style through the defined
+Subset subclass.  Considerable work has gone into making it easy to
+define new subclass definitions by modifying values in pre-existing subclass
+definitions.  This section describes the different components of defining a
+Subset subclass.</p>
+<p>Each Subset class can be initialized with an optional prefix indicating that
+all recognized keys should have the prefix added.  This allows for multiple
+subsets of the same style to be called by the same calculation if needed.  For
+the key attributes listed below, all values in the lists should be given as
+they appear without a prefix.</p>
+<div class="section" id="inheritance">
+<h4>Inheritance<a class="headerlink" href="#inheritance" title="Permalink to this headline">¶</a></h4>
+<p>The class should be a child of iprPy.input.subset_classes.Subset.</p>
+</div>
+<div class="section" id="templatekeys">
+<h4>templatekeys<a class="headerlink" href="#templatekeys" title="Permalink to this headline">¶</a></h4>
+<p>The templatekeys attribute is the list of calculation keys associated with the
+subset that appear in in the calculation’s input file.</p>
+</div>
+<div class="section" id="preparekeys">
+<h4>preparekeys<a class="headerlink" href="#preparekeys" title="Permalink to this headline">¶</a></h4>
+<p>The preparekeys attribute is the list of calculation keys associated with the
+subset that appear in the prepare keys set, i.e. will be included in a
+calculation’s singularkeys or multikeys.  This list is typically templatekeys
+plus a few extras, like _content keys associated with _file keys.</p>
+</div>
+<div class="section" id="interpretkeys">
+<h4>interpretkeys<a class="headerlink" href="#interpretkeys" title="Permalink to this headline">¶</a></h4>
+<p>The interpretkeys attribute is the list of calculation keys associated with the
+interpret() method that may have the Subset’s prefix applied to them by a
+calculation.  This list is typically preparekeys plus any new keys generated by
+interpret().  Keys that are not officially part of the set but used by
+interpret() may also be included if the key could have the same prefix.</p>
+</div>
+<div class="section" id="template">
+<h4>template()<a class="headerlink" href="#template" title="Permalink to this headline">¶</a></h4>
+<p>The template method returns a string of the input file template lines
+associated with this subset.  If copying from another subset style, typically
+the only thing that needs to be changed is the default header comment for the
+input lines.</p>
+</div>
+<div class="section" id="interpret">
+<h4>interpret()<a class="headerlink" href="#interpret" title="Permalink to this headline">¶</a></h4>
+<p>The interpret() method interprets the calculation input parameter terms
+associated with the subset.</p>
+<ul>
+<li><p class="first">The function takes the input_dict dictionary of input parameters as the
+first argument.</p>
+</li>
+<li><p class="first">The function only operates on the parameters contained within input_dict.
+Each function reads input parameters from pre-defined keys of input_dict and
+saves the processed values to input_dict.  No calculation parameters are
+returned by the function.</p>
+<blockquote>
+<div><ul class="simple">
+<li>Basic input parameters can be modified by the function by assigning
+default values if needed, and simple conversion of string inputs to
+numerical values.</li>
+<li>Terms generated by the functions should be saved to new input_dict keys
+as opposed to overwriting the keys the function uses as inputs.  This is
+so that the original format can be retained whenever possible.</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">The class’ keymap attribute maps the default key names without prefix to the
+key names with the prefix added.  So, input_dict[self.keymap[‘keyname1’]]
+will access the input_dict value for ‘prefix + keyname1’.</p>
+</li>
+<li><p class="first">The function may have an optional <em>build</em> keyword parameter that takes a
+boolean value.  Giving <em>build</em> a value of False keeps the function from
+generating complex data structures and objects based on the inputs and only
+processes the simple terms.  This is useful in preparing calculations where
+input terms that appear in the calculation’s record need to be processed, but
+other complex input terms are not needed.  For instance, parameters defining
+a system (e.g. size multipliers and axis orientations) are important for
+defining the calculation and therefore need to appear in the calculation’s
+record when it is prepared, but the actual generated atomic system is not
+needed until the calculation is later performed.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="buildcontent">
+<h4>buildcontent()<a class="headerlink" href="#buildcontent" title="Permalink to this headline">¶</a></h4>
+<p>The buildcontent method constructs the record content associated with the
+subset input keys.  The function takes parameters record_model, the record’s
+content after the root element, and adds new elements to record_model based
+on the values in the input_dict and results_dict dictionaries.  As the method
+operates on record_model, the function does not need to return anything.</p>
+</div>
+<div class="section" id="todict">
+<h4>todict()<a class="headerlink" href="#todict" title="Permalink to this headline">¶</a></h4>
+<p>The todict method interprets record content record_model, and converts terms
+associated with the subset into key-values to add to the params dictionary.  In
+other words, this method interprets the record content generated by the
+buildcontent method and converts it into accessible values.
+The method can take the full and flat flags that the Record.todict()
+method uses which can alter which and how the params keys values are given.  As
+the method adds terms to the params dictionary, no values are returned.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Adding new subset styles</a><ul>
+<li><a class="reference internal" href="#files-in-the-subset-style-directories">Files in the subset style directories</a><ul>
+<li><a class="reference internal" href="#style-py">[Style].py</a><ul>
+<li><a class="reference internal" href="#inheritance">Inheritance</a></li>
+<li><a class="reference internal" href="#templatekeys">templatekeys</a></li>
+<li><a class="reference internal" href="#preparekeys">preparekeys</a></li>
+<li><a class="reference internal" href="#interpretkeys">interpretkeys</a></li>
+<li><a class="reference internal" href="#template">template()</a></li>
+<li><a class="reference internal" href="#interpret">interpret()</a></li>
+<li><a class="reference internal" href="#buildcontent">buildcontent()</a></li>
+<li><a class="reference internal" href="#todict">todict()</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="addrecord.html"
+                        title="previous chapter">Adding new record styles</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="addbuildcombos.html"
+                        title="next chapter">Adding new buildcombos styles</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="addbuildcombos.html" title="Adding new buildcombos styles"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="addrecord.html" title="Adding new record styles"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Extending iprPy</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

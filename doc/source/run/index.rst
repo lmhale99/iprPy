@@ -15,7 +15,7 @@ allowing numerous runs to be prepared and executed in series.
 .. toctree::
     :maxdepth: 2
 
-    notebook
     single
+    notebook
     htp
     inline

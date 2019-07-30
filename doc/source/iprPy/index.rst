@@ -8,7 +8,6 @@ Subpackages
     :maxdepth: 1
    
     calculation
-    compatibility
     database
     input
     record
