@@ -1,25 +1,13 @@
-# Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
-import os
-
 # iprPy imports
 from .. import Record
 
-class PointDefect(Record):
+class PointDefectMobility(Record):
     
     @property
     def contentroot(self):
         """str: The root element of the content"""
-        return 'point-defect'
+        return 'point-defect-mobility'
     
-    @property
-    def schema(self):
-        """
-        str: The absolute directory path to the .xsd file associated with the
-             record style.
-        """
-        return os.path.join(self.directory, 'record-point-defect.xsd')
     
     def todict(self, full=True, flat=False):
         """
@@ -49,6 +37,7 @@ class PointDefect(Record):
         params['key'] = ptd['key']
         params['id'] = ptd['id']
         params['family'] = ptd['system-family']
+        params['initial-defect-number'] = ptd['initial-defect-number']
         
         params['ptd_type'] = []
         params['pos'] = []

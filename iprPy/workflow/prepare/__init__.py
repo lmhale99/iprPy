@@ -32,6 +32,7 @@ from . import elastic_constants_static
 from . import phonon
 from . import point_defect_diffusion
 from . import point_defect_static
+from . import point_defect_mobility
 from . import relax_box 
 from . import relax_dynamic 
 from . import relax_static 

@@ -1,0 +1,24 @@
+{
+    "point-defect-mobility": {
+        "key": "d27df45a-1931-4412-b1ee-ac3aec3280d2",
+        "id": "A2--W--bcc-2nn-vacancy",
+        "system-family": "A2--W--bcc",
+        "initial-defect-number": "0",
+        "defect-pair-number": "1",
+        "halfway": false,
+        "start-calculation-parameters": [
+            {
+                "ptd_type": "v", 
+                "pos": "0.0000000000000 0.0000000000000 0.0000000000000", 
+                "scale": true
+            }
+        ],
+        "end-calculation-parameters": [
+            {
+                "ptd_type": "v", 
+                "pos": "1.000000000000 0.0000000000000 0.0000000000000", 
+                "scale": true
+            }
+        ]
+    }
+}

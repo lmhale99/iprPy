@@ -39,7 +39,7 @@ dump_modify dumpy format float %.13e
 
 # thermo definition
 thermo ${thermosteps}
-thermo_style custom step pe
+thermo_style custom step lx ly lz pe
 thermo_modify format float %.13e
 
 # minimization definition

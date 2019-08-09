@@ -1,14 +1,14 @@
 from multiprocessing import Pool
 
-from multi_runners import multi_runners
-import workflow_prepare as prepare
+from iprPy.workflow import multi_runners
+import iprPy.workflow.prepare as prepare
 
 if __name__ == '__main__':
     
     # Database, run directory and number of processors to use
-    database_name = 'master'
-    run_directory_name = 'master_4'
-    np = 0
+    database_name = 'testDB'
+    run_directory_name = 'testDB_1'
+    np = 3
 
     # Lammps and mpi commands
     lammps_command = 'lmp_mpi'
@@ -16,16 +16,16 @@ if __name__ == '__main__':
     
     # Potential-based modifiers
     pot_kwargs = {}
-    #pot_kwargs['id'] = '1999--Mishin-Y--Al--LAMMPS--ipr1'
+    pot_kwargs['id'] = '2002--Mishin-Y--Ni-Al--LAMMPS--ipr1'
     pot_kwargs['currentIPR'] = 'False'
-    pot_kwargs['pair_style'] = ['eam', 'eam/alloy', 'eam/fs', 'eam/cd']
+    #pot_kwargs['pair_style'] = ['eam', 'eam/alloy', 'eam/fs', 'eam/cd']
 
     # Prototype-based modifiers
     families = [
-       # 'A1--Cu--fcc',
+        'A1--Cu--fcc',
        # 'A2--W--bcc',
-        'A3--Mg--hcp', 
-        'A4--C--dc'
+       # 'A3--Mg--hcp', 
+       # 'A4--C--dc'
         ]
 
     # Initialize pool of workers

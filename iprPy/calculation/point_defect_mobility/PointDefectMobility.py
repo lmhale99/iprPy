@@ -4,6 +4,7 @@ from __future__ import (absolute_import, print_function,
 import os
 
 from .. import Calculation
+from ...input import subset
 
 class PointDefectMobility(Calculation):
     """
@@ -19,106 +20,101 @@ class PointDefectMobility(Calculation):
         """
         files = [
                  'calc_' + self.style + '.py',
-                 'min.template',
+                 'neb_lammps.template',
                 ]
         for i in range(len(files)):
             files[i] = os.path.join(self.directory, files[i])
         
         return files
-    
+    @property
+    def template(self):
+        """
+        str: The template to use for generating calc.in files.
+        """
+        # Specify the subsets to include in the template
+        subsets = [
+            'lammps_commands', 
+            'lammps_potential',
+            'atomman_systemload',
+            'atomman_systemmanipulate',
+            'pointdefectmobility',
+            'units',
+            'lammps_minimize',
+        ]
+        
+        # Specify the calculation-specific run parameters
+        runkeys = [
+            'numberreplicas',
+            'springconst',
+            'thermosteps',
+            'timestep',
+            'dumpsteps',
+            'minsteps',
+            'climbsteps'
+        ]
+        
+        return self._buildtemplate(subsets, runkeys)   
     @property
     def singularkeys(self):
         """list: Calculation keys that can have single values during prepare."""
-        return [
-                'lammps_command',
-                'mpi_command',
-                'length_unit',
-                'pressure_unit',
-                'energy_unit',
-                'force_unit',
-               ]
+        #Fetch universal key sets from parents
+        universalkeys = super().singularkeys
+        
+        # Specify calculation-specific key sets 
+        keys = (
+             subset('units').keyset 
+            +   [
+                'branch',
+                'maxiterations',
+                'maxevaluations',
+                'defectmobility_allowable_impurity_numbers',
+                'defectmobility_impurity_list',
+                'defectmobility_impurity_blacklist'
+                ]
+        )
+        # Join and return
+        
+        return universalkeys + keys
+        
+        
+
     
     @property
     def multikeys(self):
         """list: Calculation keys that can have multiple values during prepare."""
-        return [
-                   [
-                    'potential_file',
-                    'potential_dir',
-                    'load_file',
-                    'load_style',
-                    'family',
-                    'load_options',
-                    'symbols',
-                    'box_parameters',
-                    'allSymbols',
-                   ],
-                   [
-                    'a_uvw',
-                    'b_uvw',
-                    'c_uvw',
-                    'atomshift',
-                    'sizemults',
-                   ],
-                   [
-                    'pointdefect_file',
-                    'pointdefect_type',
-                    'pointdefect_atype',
-                    'pointdefect_pos',
-                    'pointdefect_dumbbell_vect',
-                    'pointdefect_scale',
-                    'pointdefect_file_1',
-                    'pointdefect_type_1',
-                    'pointdefect_atype_1',
-                    'pointdefect_pos_1',
-                    'pointdefect_dumbbell_vect_1',
-                    'pointdefect_scale_1',
-                    'pointdefect_file_2',
-                    'pointdefect_type_2',
-                    'pointdefect_atype_2',
-                    'pointdefect_pos_2',
-                    'pointdefect_dumbbell_vect_2',
-                    'pointdefect_scale_2',
-                    'pointdefect_file_3',
-                    'pointdefect_type_3',
-                    'pointdefect_atype_3',
-                    'pointdefect_pos_3',
-                    'pointdefect_dumbbell_vect_3',
-                    'pointdefect_scale_3',
-                    'pointdefect_file_4',
-                    'pointdefect_type_4',
-                    'pointdefect_atype_4',
-                    'pointdefect_pos_4',
-                    'pointdefect_dumbbell_vect_4',
-                    'pointdefect_scale_4',
-                    'pointdefect_file_5',
-                    'pointdefect_type_5',
-                    'pointdefect_atype_5',
-                    'pointdefect_pos_5',
-                    'pointdefect_dumbbell_vect_5',
-                    'pointdefect_scale_5',
-                    'pointdefect_file_6',
-                    'pointdefect_type_6',
-                    'pointdefect_atype_6',
-                    'pointdefect_pos_6',
-                    'pointdefect_dumbbell_vect_6',
-                    'pointdefect_scale_6',
-                    'pointdefect_number',
-                    'defectpair_number',
-                    'defectpair_1',
-                    'defectpair_2',
-                    'defectpair_3',
-                    ],
-                    [
-                    'energytolerance',
-                    'forcetolerance',
-                    'maxatommotion',
-                    'numberreplicas',
-                    'springconstant',
+        # Fetch universal key sets from parent
+        universalkeys = super().multikeys
+        
+        # Because of the way that the system is currently defined, alot of the multikey combinations are
+        # actually generated in the input\buildcombos_function\defectmobility.py script, not in the prepare
+        # script like normal.  This is because of the requirement of defining different types of impurity elements
+        # for allSymbols, which is in pointdefectmobility, is reliant on specific information from lammps_potential
+        
+        # Specify calculation-specific key sets 
+        keys =  [
+            (
+                subset('lammps_commands').keyset + ['numberreplicas']
+            ),
+            (
+                subset('pointdefectmobility').keyset
+                + subset('lammps_potential').keyset 
+                + subset('atomman_systemload').keyset
+            ),
+            (
+                subset('atomman_systemmanipulate').keyset
+            ),
+            (
+                subset('lammps_minimize').keyset + 
+                [
+                    'springconst',
                     'thermosteps',
                     'dumpsteps',
                     'timestep',
-                    'minimumsteps',
+                    'minsteps',
                     'climbsteps',
-                    ],
-               ]
+                ]
+            ),
+        ]
+              
+        # Join and return
+        return universalkeys + keys

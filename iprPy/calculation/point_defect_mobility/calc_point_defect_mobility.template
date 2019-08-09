@@ -1,90 +1,83 @@
-# Input script with settings for calc_neb.py
+# Input script with settings for calcu_point_defect_mobility.py
+
+#Calculation Metadata
+branch                                          <branch>
 
 #Command Lines for LAMMPS (and MPI)
-lammps_command              <lammps_command>
-mpi_command                 <mpi_command>
+lammps_command                                  <lammps_command>       
+mpi_command                                     <mpi_command>
 
 # Potential definition and directory containing associated files
-potential_file              <potential_file>
-potential_dir               <potential_dir>
+potential_file                                  <potential_file>
+potential_dir                                   <potential_dir>
 
 # Initial system configuration to load
-load_file                   <load_file>
-load_style                  <load_style>
-load_options                <load_options>
-family                      <family>
-symbols                     <symbols>
-box_parameters              <box_parameters>
+load_file                                       <load_file>
+load_style                                      <load_style>
+load_options                                    <load_options>
+family                                          <family>
+symbols                                         <symbols>
+box_parameters                                  <box_parameters>
 
 # System manipulations
-a_uvw                       <a_uvw>
-b_uvw                       <b_uvw>
-c_uvw                       <c_uvw>
-atomshift                   <atomshift>
-sizemults                   <sizemults>
+a_uvw                                           <a_uvw>
+b_uvw                                           <b_uvw>
+c_uvw                                           <c_uvw>
+atomshift                                       <atomshift>
+sizemults                                       <sizemults>
 
 # Defect parameters - use for a single defect or a defect file
-pointdefect_file            <pointdefect_file>
-pointdefect_type            <pointdefect_type>
-pointdefect_atype           <pointdefect_atype>
-pointdefect_pos             <pointdefect_pos>
-pointdefect_dumbbell_vect   <pointdefect_dumbbell_vect>
-pointdefect_scale           <pointdefect_scale>
 
-# Manual defect inputs - use for the addition of a large number of inputs
+allSymbols                                      <allSymbols>
 
-pointdefect_type_1            <pointdefect_type_1>
-pointdefect_atype_1           <pointdefect_atype_1>
-pointdefect_pos_1             <pointdefect_pos_1>
-pointdefect_dumbbell_vect_1   <pointdefect_dumbbell_vect_1>
-pointdefect_scale_1           <pointdefect_scale_1>
+pointdefect_mobility_file                       <pointdefect_mobility_file>    
 
-pointdefect_type_2            <pointdefect_type_2>
-pointdefect_atype_2           <pointdefect_atype_2>
-pointdefect_pos_2             <pointdefect_pos_2>
-pointdefect_dumbbell_vect_2   <pointdefect_dumbbell_vect_2>
-pointdefect_scale_2           <pointdefect_scale_2>
+initialdefect_number                            <initialdefect_number>    
 
-pointdefect_type_3            <pointdefect_type_3>
-pointdefect_atype_3           <pointdefect_atype_3>
-pointdefect_pos_3             <pointdefect_pos_3>
-pointdefect_dumbbell_vect_3   <pointdefect_dumbbell_vect_3>
-pointdefect_scale_3           <pointdefect_scale_3>
+initial_pointdefectmobility_type                <initial_pointdefectmobility_type>
+initial_pointdefectmobility_atype               <initial_pointdefectmobility_atype>
+initial_pointdefectmobility_pos                 <initial_pointdefectmobility_pos>
+initial_pointdefectmobility_dumbbell_vect       <initial_pointdefectmobility_dumbbell_vect>
+initial_pointdefectmobility_scale               <initial_pointdefectmobility_scale>
 
-pointdefect_type_4            <pointdefect_type_4>
-pointdefect_atype_4           <pointdefect_atype_4>
-pointdefect_pos_4             <pointdefect_pos_4>
-pointdefect_dumbbell_vect_4   <pointdefect_dumbbell_vect_4>
-pointdefect_scale_4           <pointdefect_scale_4>
+defectpair_number                               <defectpair_number>             
 
-pointdefect_type_5            <pointdefect_type_5>
-pointdefect_atype_5           <pointdefect_atype_5>
-pointdefect_pos_5             <pointdefect_pos_5>
-pointdefect_dumbbell_vect_5   <pointdefect_dumbbell_vect_5>
-pointdefect_scale_5           <pointdefect_scale_5>
+start_pointdefectmobility_type                  <start_pointdefectmobility_type>
+start_pointdefectmobility_atype                 <start_pointdefectmobility_atype>
+start_pointdefectmobility_pos                   <start_pointdefectmobility_pos>
+start_pointdefectmobility_dumbbell_vect         <start_pointdefectmobility_dumbbell_vect>
+start_pointdefectmobility_scale                 <start_pointdefectmobility_scale>
 
-pointdefect_type_6            <pointdefect_type_6>
-pointdefect_atype_6           <pointdefect_atype_6>
-pointdefect_pos_6             <pointdefect_pos_6>
-pointdefect_dumbbell_vect_6   <pointdefect_dumbbell_vect_6>
-pointdefect_scale_6           <pointdefect_scale_6>
+end_pointdefectmobility_type                    <end_pointdefectmobility_type>   
+end_pointdefectmobility_atype                   <end_pointdefectmobility_atype>    
+end_pointdefectmobility_pos                     <end_pointdefectmobility_pos>
+end_pointdefectmobility_dumbbell_vect           <end_pointdefectmobility_dumbbell_vect>
+end_pointdefectmobility_scale                   <end_pointdefectmobility_scale>         
+
+
+# Defect Pair Characteristics -
+# Defect pairs are used to define changes in 
+# the system from the initial to the final state
+# The first one is used in the initial system, the second in the final
+# The number refers to the number in the eventual kwargs object
+
 
 # Units for input/output values
-length_unit                 <length_unit>
-pressure_unit               <pressure_unit>
-energy_unit                 <energy_unit>
-force_unit                  <force_unit>
+length_unit                                     <length_unit>
+pressure_unit                                   <pressure_unit>
+energy_unit                                     <energy_unit>
+force_unit                                      <force_unit>
 
 # Values parsed by lammps_minimize
-energytolerance             <energytolerance>
-forcetolerance              <forcetolerance>  
-maxatommotion               <maxatommotion>
+energytolerance                                 <energytolerance>
+forcetolerance                                  <forcetolerance>
+maxatommotion                                   <maxatommotion>
 
 # NEB Calculation parameters
-numberreplicas              <numberreplicas>
-springconstant              <springconstant>
-thermosteps                 <thermosteps>
-dumpsteps                   <dumpsteps>
-timestep                    <timestep>
-minimumsteps                <minimumsteps>
-climbsteps                  <climbsteps>
+numberreplicas                                  <numberreplicas>
+springconstant                                  <springconstant>
+thermosteps                                     <thermosteps>    
+dumpsteps                                       <dumpsteps>
+timestep                                        <timestep>
+minimumsteps                                    <minimumsteps>
+climbsteps                                      <climbsteps>

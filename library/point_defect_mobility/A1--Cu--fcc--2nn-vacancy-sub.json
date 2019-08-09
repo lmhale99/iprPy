@@ -1,0 +1,32 @@
+{
+    "point-defect-mobility": {
+        "key": "ec320025-adec-4c61-bea9-72a6ce9acc5f",
+        "id": "A1--Cu--fcc--2nn-vacancy-sub",
+        "system-family": "A1--Cu--fcc",
+        "initial-defect-number": "1",
+        "defect-pair-number": "1",
+        "halfway": false,
+        "initial-calculation-parameters": [
+            {
+                "ptd_type": "s",
+                "atype": "2",
+                "pos": "1.0000000000000 0.0000000000000 0.0000000000000", 
+                "scale": true
+            }
+        ],
+        "start-calculation-parameters": [
+            {
+                "ptd_type": "v", 
+                "pos": "0.0000000000000 0.0000000000000 0.0000000000000", 
+                "scale": true
+            }
+        ],
+        "end-calculation-parameters": [
+            {
+                "ptd_type": "v", 
+                "pos": "1.0000000000000 0.0000000000000 0.0000000000000", 
+                "scale": true
+            }
+        ]
+    }
+}

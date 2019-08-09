@@ -74,10 +74,10 @@ class PointDefectStatic(Calculation):
         keys = (
             subset('lammps_commands').keyset 
             + subset('units').keyset 
-            + []
+            + ['branch']
         )
-    
         # Join and return
+        
         return universalkeys + keys
 
     @property
