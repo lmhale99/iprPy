@@ -139,8 +139,8 @@ def at_temp(database_name, run_directory_name, lammps_command, **kwargs):
         'integrator                  npt',
         'thermosteps                 100',
         'dumpsteps                   ',
-        'runsteps                    22000',
-        'equilsteps                  2000',
+        'runsteps                    220000',
+        'equilsteps                  20000',
         'randomseed                  ',
         ])
 
