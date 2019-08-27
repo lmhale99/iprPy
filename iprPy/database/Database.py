@@ -714,7 +714,10 @@ class Database(object):
         except:
             run_directory = Path(run_directory).resolve()
             if not run_directory.is_dir():
-                raise ValueError('run_directory not found/set')
+                try:
+                    run_directory.mkdir(parents=True)
+                except:
+                    raise ValueError('run_directory not created/accessible')
         
         prepare(self, run_directory, calculation, **kwargs)
     
