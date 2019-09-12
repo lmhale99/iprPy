@@ -34,7 +34,7 @@ def main(database_name, run_directory_name, lammps_command, **kwargs):
         'parent_record               relaxed_crystal',
 
         # System manipulations
-        'sizemults                   5 5 5',
+        'sizemults                   3 3 3',
 
         # Run parameters
         'displacementdistance        ',
@@ -43,7 +43,7 @@ def main(database_name, run_directory_name, lammps_command, **kwargs):
 
     # Add additional required terms to kwargs
     kwargs['lammps_command'] = lammps_command
-
+    
     # Prepare 
     prepare(database_name, run_directory_name, calculation_name,
                  script, **kwargs)

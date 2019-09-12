@@ -50,9 +50,9 @@ def main(*args):
                           input_dict['ucell'],
                           input_dict['potential'],
                           mpi_command = input_dict['mpi_command'],
-                          a_mult = input_dict['a_mult'],
-                          b_mult = input_dict['b_mult'],
-                          c_mult = input_dict['c_mult'],
+                          a_mult = input_dict['sizemults'][0][1] - input_dict['sizemults'][0][0],
+                          b_mult = input_dict['sizemults'][1][1] - input_dict['sizemults'][1][0],
+                          c_mult = input_dict['sizemults'][2][1] - input_dict['sizemults'][2][0],
                           distance = input_dict['displacementdistance'],
                           symprec = input_dict['symmetryprecision'])
     
@@ -65,7 +65,7 @@ def main(*args):
     with open('results.json', 'w') as f:
         record.content.json(fp=f, indent=4)
 
-def phonon(lammps_command, ucell, potential, mpi_command=None, a_mult=5, b_mult=5, c_mult=5,
+def phonon(lammps_command, ucell, potential, mpi_command=None, a_mult=3, b_mult=3, c_mult=3,
            distance=0.01, symprec=1e-5):
     
     try:
@@ -137,7 +137,8 @@ def phonon(lammps_command, ucell, potential, mpi_command=None, a_mult=5, b_mult=
     # Compute band structure    
     phonon.produce_force_constants()
     phonon.auto_band_structure(plot=True)
-    plt.savefig('band.png', dpi=400)
+    
+    plt.savefig(Path('.', 'band.png'), dpi=400)
     plt.close()
     
     # Compute total density of states
