@@ -101,7 +101,7 @@ class StackingFault(Subset):
                         'stackingfault_shiftvector1',
                         'stackingfault_shiftvector2'):
                 assert keymap[key] not in input_dict, (keymap[key] + ' and '
-                                                    + keymap['dislocation_model']
+                                                    + keymap['stackingfault_file']
                                                     + ' cannot both be supplied')
             
             # Load defect model
