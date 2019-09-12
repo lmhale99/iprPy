@@ -22,12 +22,9 @@ and tools are designed towards molecular dynamics simulations.
 Documentation
 -------------
 
-**NOTE**: The current documentation is old and will be updated for version 0.8
-over the next few weeks.
-
 Demonstration versions of all implemented calculations can be found in 
 docs/demonstrations.
 
-Documentation can be found in the docs/html folder.  You will have to
-download the repository to view them as GitHub shows the raw html.  Permanent
-URL for the code coming soon.
+Online documentation for the calculations and the supporting code package
+can be found at https://www.ctcms.nist.gov/potentials/iprPy/. 
+The raw documentation files can also be found in the docs/html folder.
