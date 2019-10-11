@@ -14,6 +14,7 @@ import pandas as pd
 from ... import load_database, load_record
 
 def relaxed(database_name, crystal_match_file, all_crystals_file, unique_crystals_file):
+    
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!! Load records !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
 
     database = load_database(database_name)
@@ -30,31 +31,35 @@ def relaxed(database_name, crystal_match_file, all_crystals_file, unique_crystal
     ref_records = database.get_records_df(style='reference_crystal')
     print(f'{len(ref_records)} reference records found', flush=True)
 
-    # Get key lists for relax_* calculations
+    # Load relax_box records
     raw_df = database.get_records_df(style='calculation_relax_box',
-                                    full=False, flat=True)
+                                    full=True, flat=True)
     print(f'{len(raw_df)} calculation_relax_box records found', flush=True)
-    try:
-        box_keys = raw_df.key.tolist()
-    except:
-        box_keys = []
 
+    if len(raw_df) > 0:
+        box_df = raw_df[raw_df.branch=='main'].reset_index(drop=True)
+        box_df['method'] = 'box'
+        print(f" - {len(box_df)} are branch main", flush=True)
+    else:
+        box_df = pd.DataFrame()
+
+    # Load relax_static records      
     raw_df = database.get_records_df(style='calculation_relax_static',
-                                    full=False, flat=True)
+                                    full=True, flat=True)
     print(f'{len(raw_df)} calculation_relax_static records found', flush=True)
-    try:
-        static_keys = raw_df.key.tolist()
-    except:
-        static_keys = []
 
-    raw_df = database.get_records_df(style='calculation_relax_dynamic',
-                                    full=False, flat=True)
-    print(f'{len(raw_df)} calculation_relax_dynamic records found', flush=True)
-    try:
-        dynamic_keys = raw_df.key.tolist()
-    except:
-        dynamic_keys = []
-    print()
+    if len(raw_df) > 0:
+        static_df = raw_df[raw_df.branch=='main'].reset_index(drop=True)
+        static_df['method'] = 'static'
+        print(f" - {len(static_df)} are branch main", flush=True)
+        dynamic_df = raw_df[raw_df.branch=='from_dynamic'].reset_index(drop=True)
+        dynamic_df['method'] = 'dynamic'
+        print(f" - {len(dynamic_df)} are branch from_dynamic", flush=True)
+    else:
+        static_df = pd.DataFrame()
+        dynamic_df = pd.DataFrame()
+
+    parent_df = pd.concat([box_df, static_df, dynamic_df], ignore_index=True, sort=False)
 
     # Get space group results
     spg_records = database.get_records_df(style='calculation_crystal_space_group',
@@ -62,32 +67,38 @@ def relaxed(database_name, crystal_match_file, all_crystals_file, unique_crystal
     print(f'{len(spg_records)} calculation_crystal_space_group records found',
         flush=True)
 
-    if len(spg_records) == 0:
+    if len(spg_records) > 0:
+        
+        # Separate records using branch
+        prototype_records = spg_records[spg_records.branch == 'prototype']
+        print(f' - {len(prototype_records)} are for prototypes', flush=True)
+        
+        reference_records = spg_records[spg_records.branch == 'reference']
+        print(f' - {len(reference_records)} are for references', flush=True)
+        
+        family_records = spg_records[(spg_records.branch == 'prototype') 
+                                    |(spg_records.branch == 'reference')]
+        
+        calc_records = spg_records[spg_records.branch == 'relax'].reset_index(drop=True)
+        print(f' - {len(calc_records)} are for calculations', flush=True)
+
+    else:
         print('Stopping as no calculations to process')
-        return
-
-    # Separate records by branch
-    prototype_records = spg_records[spg_records.branch == 'prototype']
-    reference_records = spg_records[spg_records.branch == 'reference']
-    family_records = spg_records[(spg_records.branch == 'prototype') 
-                                |(spg_records.branch == 'reference')]
-    print(f' -{len(prototype_records)} are for prototypes', flush=True)
-    print(f' -{len(reference_records)} are for references', flush=True)
-
-    calc_records = spg_records[spg_records.branch == 'relax'].reset_index(drop=True)
-    print(f' -{len(calc_records)} are for calculations', flush=True)
-    print()
 
     if len(calc_records) == 0:
         print('Stopping as no calculations to process')
-        return
-
+        
     if len(family_records) == 0:
         print('Stopping as prototype/reference records needed')
-        return
+
+    # Get existing relaxed_records
+    relaxed_records = database.get_records_df(style='relaxed_crystal', full=True, flat=False)
+    print(len(relaxed_records), 'relaxed records found')
+    print(f' - {len(relaxed_records[relaxed_records.standing=="good"])} good and unique')
 
     # !!!!!!!!!!!!!!!!!!!!!!!!!! Load saved results !!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
 
+    # Load crystal_match_file
     try:
         ref_proto_match = pd.read_csv(crystal_match_file)
     except:
@@ -95,187 +106,169 @@ def relaxed(database_name, crystal_match_file, all_crystals_file, unique_crystal
         ref_proto_match = pd.DataFrame(columns=columns)
     print(f'{len(ref_proto_match)} references matched to prototypes', flush=True)
 
-    try:
-        results = pd.read_csv(all_crystals_file)
-    except:
-        columns = ['calc_key', 'potential_LAMMPS_key', 'potential_LAMMPS_id',
-                'potential_key', 'potential_id', 'composition', 'prototype',
-                'family', 'method', 'transformed', 'E_coh', 'a', 'b', 'c',
-                    'alpha', 'beta', 'gamma']
-        results = pd.DataFrame(columns=columns)
-    print(f'{len(results)} previous results found', flush=True)
+    # !!!!!!!!!!!!!!! Merge DataFrames and extract  results !!!!!!!!!!!!!!!!!!!!! #
 
-    try:
-        unique = pd.read_csv(unique_crystals_file)
-    except:
-        columns = ['calc_key', 'potential_LAMMPS_key', 'potential_LAMMPS_id',
-                'potential_key', 'potential_id', 'composition', 'prototype',
-                'family', 'method', 'transformed', 'E_coh', 'a', 'b', 'c',
-                    'alpha', 'beta', 'gamma']
-        unique = pd.DataFrame(columns=columns)
-    print(f'{len(unique)} previous unique results found', flush=True)
+    # Get parent keys (relax_*) for space_group calculations
+    def get_parent(series):
+        return series.load_file.split('/')[0]
+    calc_records['parent'] = calc_records.apply(get_parent, axis=1)
 
-    print()
+    # Merge calc_records, family_records and ref_proto_match
+    merged_df = pd.merge(
+                    pd.merge(
+                        pd.merge(calc_records, parent_df, left_on='parent', right_on='key', suffixes=('', '_parent'), validate='one_to_one'),
+                        family_records, on='family', suffixes=('', '_family'), validate="many_to_one"),
+                    ref_proto_match, how='left', left_on='family', right_on='reference', suffixes=('', '_ref'))
 
-    # !!!!!!!!!!!!!!!!!!!!!!!!! Process new results !!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
+    # Direct copy values from merged_df to results
+    results = {}
+    results['calc_key'] = merged_df.key
+    results['potential_LAMMPS_key'] = merged_df.potential_LAMMPS_key
+    results['potential_LAMMPS_id'] = merged_df.potential_LAMMPS_id
+    results['potential_key'] = merged_df.potential_key
+    results['potential_id'] = merged_df.potential_id
+    results['composition'] = merged_df.composition
+    results['family'] = merged_df.family
+    results['method'] = merged_df.method
+    results['parent_key'] = merged_df.parent
+    results['E_coh'] = merged_df.E_cohesive
+    results['prototype'] = merged_df.prototype
+    results['ucell'] = merged_df.ucell
+    results['ucell_family'] = merged_df.ucell_family
 
-    newresults = []
-    old_keys = results.calc_key.values
-    for series in calc_records.itertuples():
-        if series.key in old_keys:
-            continue
-            
-        results_dict = {}
-        
-        # Copy over values in series    
-        results_dict['calc_key'] = series.key
-        results_dict['composition'] = series.composition
-        results_dict['family'] = series.family
-        results_dict['a'] = series.ucell.box.a
-        results_dict['b'] = series.ucell.box.b
-        results_dict['c'] = series.ucell.box.c
-        results_dict['alpha'] = series.ucell.box.alpha
-        results_dict['beta'] = series.ucell.box.beta
-        results_dict['gamma'] = series.ucell.box.gamma
-        
+    # Identify transformed structures by comparing spacegroup info before/after relax
+    def get_transformed(series):
+        return (not (series.spacegroup_number_family == series.spacegroup_number
+                    and series.pearson_symbol_family == series.pearson_symbol))
+    results['transformed'] = merged_df.apply(get_transformed, axis=1)
+
+    # Set prototype as prototype (if given) or family
+    def get_prototype(series):
         # Identify prototype
-        try:
-            results_dict['prototype'] = ref_proto_match[ref_proto_match.reference==series.family].prototype.values[0]
-        except:
-            results_dict['prototype'] = series.family
+        if pd.isnull(series.prototype):
+            return series.family
         else:
-            if pd.isnull(results_dict['prototype']):
-                results_dict['prototype'] = series.family
+            return series.prototype
+    results['prototype'] = merged_df.apply(get_prototype, axis=1)
+
+    # Extract lattice constants from ucell
+    def get_a(series):
+        return series.ucell.box.a
+    def get_b(series):
+        return series.ucell.box.b
+    def get_c(series):
+        return series.ucell.box.c
+    def get_alpha(series):
+        return series.ucell.box.alpha
+    def get_beta(series):
+        return series.ucell.box.beta
+    def get_gamma(series):
+        return series.ucell.box.gamma
+    results['a'] = merged_df.apply(get_a, axis=1)
+    results['b'] = merged_df.apply(get_b, axis=1)
+    results['c'] = merged_df.apply(get_c, axis=1)
+    results['alpha'] = merged_df.apply(get_alpha, axis=1)
+    results['beta'] = merged_df.apply(get_beta, axis=1)
+    results['gamma'] = merged_df.apply(get_gamma, axis=1)
+
+    # Create results DataFrame and save to all_crystals_file
+    results_keys = ['calc_key', 'potential_LAMMPS_key', 'potential_LAMMPS_id', 'potential_key',
+                    'potential_id', 'composition', 'prototype', 'family', 'parent_key', 'method',
+                    'transformed', 'E_coh', 'a', 'b', 'c', 'alpha', 'beta', 'gamma', 'ucell', 'ucell_family']
+    sort_keys = ['potential_LAMMPS_id', 'composition', 'prototype', 'family', 'E_coh']
+    results = pd.DataFrame(results, columns=results_keys).sort_values(sort_keys)
+    results[results_keys[:-2]].to_csv(all_crystals_file, index=False)
+    print(all_crystals_file, 'updated')
+
+    # !!!!!!!!!!!!!!!! Add new records to relaxed_crystal !!!!!!!!!!!!!!! #
+
+    results = results[~results.transformed]
+    print(len(results), 'results remained untransformed')
+
+    results['added'] = results.calc_key.isin(relaxed_records.parent_key)
+
+    def set_parent_type(series):
+        if series.family[0] == 'm' or series.family[0] == 'o':
+            return 'reference'
+        else:
+            return 'prototype'
+    results['parent_type'] = results.apply(set_parent_type, axis=1)
+
+    def set_method_int(series):
+        if series.method == 'dynamic':
+            return 1
+        elif series.method == 'static':
+            return 2
+        else:
+            return 3
+    results['method_int'] = results.apply(set_method_int, axis=1)
+
+    newresults = results[~results['added']]
+    print(f' - {len(newresults)} new results to add')
+
+    # Loop over all new records
+    for i, series in newresults.sort_values(['method_int', 'parent_type']).iterrows():
+        oldresults = results[results.added]
         
-        # Check if structure has transformed relative to reference
-        family_series = family_records[family_records.family == series.family].iloc[0]
-        results_dict['transformed'] = (not (family_series.spacegroup_number == series.spacegroup_number
-                                    and family_series.pearson_symbol == series.pearson_symbol))
+        # Create new record
+        key = str(uuid.uuid4())
+        record = load_record('relaxed_crystal', name=key)
         
-        # Extract info from parent calculations
-        for parent in database.get_parent_records(name=series.key):
-            
-            parent_dict = parent.todict()
-
-            if parent_dict['key'] in box_keys:
-                results_dict['method'] = 'box'
-                results_dict['E_coh'] = parent_dict['E_cohesive']
-                results_dict['potential_LAMMPS_key'] = parent_dict['potential_LAMMPS_key']
-                continue
-
-            elif parent_dict['key'] in dynamic_keys:
-                results_dict['method'] = 'dynamic'
-                continue
-
-            elif parent_dict['key'] in static_keys:
-                results_dict['method'] = 'static'
-                results_dict['E_coh'] = parent_dict['E_cohesive']
-                results_dict['potential_LAMMPS_key'] = parent_dict['potential_LAMMPS_key']
-
-        pot_record = pot_records[pot_records.key == results_dict['potential_LAMMPS_key']].iloc[0]
-        results_dict['potential_id'] = pot_record.pot_id
-        results_dict['potential_key'] = pot_record.pot_key
-        results_dict['potential_LAMMPS_id'] = pot_record.id
+        # Set simple properties
+        input_dict = {}
+        input_dict['key'] = key
+        input_dict['method'] = series.method
+        input_dict['family'] = series.family
+        input_dict['parent_key'] = series.calc_key
+        input_dict['length_unit'] = 'angstrom'
         
-        newresults.append(results_dict)
-
-    print(f'{len(newresults)} new results added')
-    if len(newresults) > 0:
-        results = results.append(newresults, ignore_index=True)
-        results.to_csv(all_crystals_file, index=False)
-
-    # !!!!!!!!!!!!!!!!!!!!!!!!! Find unique results !!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
-
-    new_unique = pd.DataFrame(columns=results.columns)
-
-    # Loop over all potential implementations
-    for implememtation_key in np.unique(results.potential_LAMMPS_key):
-        imp_results = results[results.potential_LAMMPS_key == implememtation_key]
+        # Set potential
+        potential_record = database.get_record(style='potential_LAMMPS', key=series.potential_LAMMPS_key)
+        input_dict['potential'] = lmp.Potential(potential_record.content)
         
-        # Loop over all compositions
-        for composition in np.unique(results.composition):
-            comp_unique = unique[unique.composition == composition].reset_index(drop=True)
-            comp_results = imp_results[imp_results.composition == composition]
-            
-            # Loop over all prototypes
-            for prototype in np.unique(comp_results.prototype):
-                proto_results = comp_results[comp_results.prototype == prototype]
-                
-                # Loop over calculation methods from most robust to least
-                for method in ['dynamic', 'static', 'box']:
-                    
-                    # First try matching results where prototype == family
-                    for i, series in proto_results[(proto_results.prototype == proto_results.family)
-                                                &(proto_results.method == method)
-                                                &(~proto_results.transformed)].iterrows():
-                        try:
-                            matches = comp_unique[(np.isclose(comp_unique.E_coh, series.E_coh))
-                                                &(np.isclose(comp_unique.a, series.a))
-                                                &(np.isclose(comp_unique.b, series.b))
-                                                &(np.isclose(comp_unique.c, series.c))
-                                                &(np.isclose(comp_unique.alpha, series.alpha))
-                                                &(np.isclose(comp_unique.beta, series.beta))
-                                                &(np.isclose(comp_unique.gamma, series.gamma))]
-                        except:
-                            matches = []
-                        if len(matches) == 0:
-                            comp_unique = comp_unique.append(series)
-                            new_unique = new_unique.append(series)
-                            
-                    # Next try matching results where prototype != family
-                    for i, series in proto_results[(proto_results.prototype != proto_results.family)
-                                                &(proto_results.method == method)
-                                                &(~proto_results.transformed)].iterrows():
-                        try:
-                            matches = comp_unique[(np.isclose(comp_unique.E_coh, series.E_coh))
-                                                &(np.isclose(comp_unique.a, series.a))
-                                                &(np.isclose(comp_unique.b, series.b))
-                                                &(np.isclose(comp_unique.c, series.c))
-                                                &(np.isclose(comp_unique.alpha, series.alpha))
-                                                &(np.isclose(comp_unique.beta, series.beta))
-                                                &(np.isclose(comp_unique.gamma, series.gamma))]
-                        except:
-                            matches = []
-                        if len(matches) == 0:
-                            comp_unique = comp_unique.append(series)
-                            new_unique = new_unique.append(series)
-                            
-    print(f'{len(new_unique)} new unique results added')       
-    if len(new_unique) > 0:
-        unique = unique.append(new_unique)
-        unique.to_csv(unique_crystals_file, index=False)
-
-    # !!!!!!!!!!!!!!!!!!! Generate relaxed_crystal records !!!!!!!!!!!!!!!!!!!!!! #
-
-    for row in new_unique.itertuples():
-        
-        crystal_terms = {}
-        crystal_terms['key'] = str(uuid.uuid4())
-        crystal_terms['method'] = row.method
-        crystal_terms['family'] = row.family
-        crystal_terms['length_unit'] = 'angstrom'
-        
-        pot_record = database.get_record(name = pot_records[pot_records.key == row.potential_LAMMPS_key].id)
-        crystal_terms['potential'] = lmp.Potential(pot_record.content)
-        
-        c_record = calc_records[calc_records.key == row.calc_key].iloc[0]
-        
+        # Set ucell
         # Use spg crystals for ref and α-As
-        if (row.prototype[:3] == 'mp-' or
-            row.prototype[:4] == 'mvc-' or
-            row.prototype[:5] == 'oqmd-' or
-            row.prototype == 'A7--alpha-As'):
-            crystal_terms['ucell'] = c_record.ucell
-        
+        if (series.prototype[:3] == 'mp-' or
+            series.prototype[:4] == 'mvc-' or
+            series.prototype[:5] == 'oqmd-' or
+            series.prototype == 'A7--alpha-As'):
+            ucell = series.ucell
+
         # Use scaled prototype crystals for the rest
         else:
-            p_record = proto_records[proto_records.id == row.prototype].iloc[0]
-            crystal_terms['ucell'] = p_record.ucell
-            crystal_terms['ucell'].symbols = c_record.symbols
-            crystal_terms['ucell'].box_set(a=row.a, b=row.b, c=row.c, alpha=row.alpha, beta=row.beta, gamma=row.gamma, scale=True)
+            ucell = series.ucell_family
+            ucell.symbols = series.ucell.symbols
+            ucell.box_set(vects=series.ucell.box.vects, scale=True)
+        input_dict['ucell'] = ucell
         
-        relaxrecord = load_record('relaxed_crystal')
-        relaxrecord.buildcontent('b', crystal_terms)
-        relaxrecord.name = crystal_terms['key']
+        # Check for existing duplicates
+        matches = (
+            (series.potential_LAMMPS_key == oldresults.potential_LAMMPS_key)
+        &(series.composition == oldresults.composition)
+        &np.isclose(series.E_coh, oldresults.E_coh)
+        &np.isclose(series.a, oldresults.a)
+        &np.isclose(series.b, oldresults.b)
+        &np.isclose(series.c, oldresults.c)
+        &np.isclose(series.alpha, oldresults.alpha)
+        &np.isclose(series.beta, oldresults.beta)
+        &np.isclose(series.gamma, oldresults.gamma))
         
-        database.add_record(relaxrecord)
+        # Set standing
+        if series.E_coh < -1e-5 and matches.sum() == 0:
+            input_dict['standing'] = 'good'
+        else:
+            input_dict['standing'] = 'bad'
+        
+        # Build content and upload
+        record.buildcontent('noscript', input_dict)
+        database.add_record(record=record)
+
+    relaxed_records = database.get_records_df(style='relaxed_crystal', full=True, flat=False)
+    print(len(relaxed_records), 'relaxed records found')
+    print(f' - {len(relaxed_records[relaxed_records.standing=="good"])} good and unique')
+
+    unique_results = pd.merge(results, relaxed_records, left_on='calc_key', right_on='parent_key', suffixes=('', '_dup'), validate='one_to_one')
+    unique_results = unique_results[unique_results.standing=='good'].sort_values(sort_keys)
+
+    unique_results[results_keys[:-2]].to_csv(unique_crystals_file, index=False)
+    print(unique_crystals_file, 'updated')

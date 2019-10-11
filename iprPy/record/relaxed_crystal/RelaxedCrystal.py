@@ -80,6 +80,7 @@ class RelaxedCrystal(Record):
         
         # Specify source method
         crystal['method'] = input_dict['method']
+        crystal['standing'] = input_dict['standing']
         
         # Copy over potential data model info
         subset('lammps_potential').buildcontent(crystal, input_dict)
@@ -87,6 +88,7 @@ class RelaxedCrystal(Record):
         # Save info on system files loaded
         crystal['system-info'] = DM()
         crystal['system-info']['family'] = input_dict['family']
+        crystal['system-info']['parent_key'] = input_dict['parent_key']
         
         system_model = input_dict['ucell'].dump('system_model',
                                                 box_unit=input_dict['length_unit'])
@@ -121,15 +123,16 @@ class RelaxedCrystal(Record):
         
         crystal = self.content[self.contentroot]
         params['method'] = crystal['method']
+        params['standing'] = crystal['standing']
         
         # Extract potential info
         subset('lammps_potential').todict(crystal, params, full=full, flat=flat)
         
         params['family'] = crystal['system-info']['family']
+        params['parent_key'] = crystal['system-info']['parent_key']
         
         ucell = am.load('system_model', self.content, key='atomic-system')
         params['composition'] = ucell.composition
-        params['status'] = 'finished'
         
         if flat is True:
             params['symbols'] = list(ucell.symbols)
