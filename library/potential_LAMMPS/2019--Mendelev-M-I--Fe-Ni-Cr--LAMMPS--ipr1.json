@@ -1,0 +1,39 @@
+{
+    "potential-LAMMPS": {
+        "key": "43aa1b40-dce4-48cf-8e4f-fb0e079180b6", 
+        "id": "2019--Mendelev-M-I--Fe-Ni-Cr--LAMMPS--ipr1", 
+        "potential": {
+            "key": "6c5d342a-7e25-467f-a234-d937301f6bc4", 
+            "id": "2019--Mendelev-M-I--Fe-Ni-Cr"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Fe", 
+                "mass": 55.845
+            }, 
+            {
+                "element": "Ni", 
+                "mass": 58.6934
+            }, 
+            {
+                "element": "Cr", 
+                "mass": 51.9961
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/fs"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Fe-Ni-Cr_fcc.eam.fs"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}
