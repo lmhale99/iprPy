@@ -10,31 +10,41 @@
         "atom_style": "atomic", 
         "atom": [
             {
-                "element": "Li"
+                "element": "Li",
+                "mass": 6.9410
             }, 
             {
-                "element": "Na"
+                "element": "Na",
+                "mass": 22.990
             }, 
             {
-                "element": "K"
+                "element": "K",
+                "mass": 39.100
             }, 
             {
-                "element": "Rb"
+                "element": "Rb",
+                "mass": 85.470
             }, 
             {
-                "element": "Cs"
+                "element": "Cs",
+                "mass": 132.90
             }, 
             {
-                "element": "F"
+                "element": "F",
+                "mass": 19.000
             }, 
             {
-                "element": "Cl"
+                "element": "Cl",
+                "mass": 35.450
             }, 
             {
-                "element": "Br"
+                "element": "Br",
+                "mass": 79.900
             }, 
             {
-                "element": "I"
+                "symbol": "Id",
+                "element": "I",
+                "mass": 126.90
             }
         ], 
         "pair_style": {

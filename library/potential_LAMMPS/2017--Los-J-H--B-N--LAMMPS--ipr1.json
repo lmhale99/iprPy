@@ -8,6 +8,7 @@
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
+        "allsymbols": "True",
         "atom": [
             {
                 "element": "B"

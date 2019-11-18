@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "daf31b18-c1e6-4c0f-a8e2-671edb4a1427", 
+        "id": "2016--Samolyuk-G-D--Ni-Pd--LAMMPS--ipr1", 
+        "potential": {
+            "key": "da8eac6d-8c82-4430-8464-154964ca235b", 
+            "id": "2016--Samolyuk-G-D-Beland-L-K-Stocks-G-M-Stoller-R-E--Ni-Pd"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ni", 
+                "mass": 58.71
+            }, 
+            {
+                "element": "Pd", 
+                "mass": 106.4
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "NiPdArtur.eam"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}

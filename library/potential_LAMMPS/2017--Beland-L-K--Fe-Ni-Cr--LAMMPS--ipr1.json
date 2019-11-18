@@ -1,31 +1,34 @@
 {
     "potential-LAMMPS": {
-        "key": "3a5de314-63a6-4abe-bfb2-4fc9c3dab62c", 
-        "id": "2009--Stukowski-A--Fe-Cr--LAMMPS--ipr1", 
+        "key": "5f437367-7020-434b-9a50-0256c4dbd1d3", 
+        "id": "2017--Beland-L-K--Fe-Ni-Cr--LAMMPS--ipr1", 
         "potential": {
-            "key": "6b4ff48c-de09-4146-90e9-f34c892a66f6", 
-            "id": "2009--Stukowski-A-Sadigh-B-Erhart-P-Caro-A--Fe-Cr"
+            "key": "444cdb82-6c02-47da-8a4a-4008888645ec", 
+            "id": "2017--Beland-L-K-Tamm-A-Mu-S-et-al--Fe-Ni-Cr"
         }, 
         "units": "metal", 
         "atom_style": "atomic", 
-        "allsymbols": "True",
         "atom": [
+            {
+                "element": "Ni", 
+                "mass": 58.71
+            }, 
             {
                 "element": "Fe", 
                 "mass": 55.845
             }, 
             {
                 "element": "Cr", 
-                "mass": 51.996
+                "mass": 51.9961
             }
         ], 
         "pair_style": {
-            "type": "eam/cd"
+            "type": "eam/alloy"
         }, 
         "pair_coeff": {
             "term": [
                 {
-                    "file": "FeCr.cdeam"
+                    "file": "FeNiCr_ArturV3.eam"
                 }, 
                 {
                     "symbols": "True"

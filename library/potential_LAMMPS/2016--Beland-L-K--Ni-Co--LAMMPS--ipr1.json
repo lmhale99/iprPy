@@ -1,0 +1,35 @@
+{
+    "potential-LAMMPS": {
+        "key": "fae88fec-37b2-4e96-95b6-81356dc3289a", 
+        "id": "2016--Beland-L-K--Ni-Co--LAMMPS--ipr1", 
+        "potential": {
+            "key": "8435450a-75e2-4c19-885f-ad2bb8ca34e6", 
+            "id": "2016--Beland-L-K-Lu-C-Osetskiy-Y-N-et-al--Ni-Co"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ni", 
+                "mass": 58.6934
+            }, 
+            {
+                "element": "Co", 
+                "mass": 58.9332
+            }
+        ], 
+        "pair_style": {
+            "type": "eam/alloy"
+        }, 
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "NiCo-lammps-2014.alloy"
+                }, 
+                {
+                    "symbols": "True"
+                }
+            ]
+        }
+    }
+}
