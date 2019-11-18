@@ -145,10 +145,9 @@ def e_vs_r(lammps_command, system, potential,
         # Define lammps variables
         lammps_variables = {}
         system_info = system.dump('atom_data', f='atom.dat',
-                                  units=potential.units,
-                                  atom_style=potential.atom_style)
-        lammps_variables['atomman_system_info'] = system_info
-        lammps_variables['atomman_pair_info'] = potential.pair_info(system.symbols)
+                                  potential=potential,
+                                  return_pair_info=True)
+        lammps_variables['atomman_system_pair_info'] = system_info
         
         # Write lammps input script
         template_file = Path(script_dir, 'run0.template')

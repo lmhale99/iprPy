@@ -81,15 +81,15 @@ def atomicparent(database, keys, content_dict=None, record=None,
             content_dict[potential.name] = potential.content
 
         # Determine number of systems in parent to iterate over
-        if parent_series.status == 'not calculated':
-            nparents = 1
-        elif parent_series.status == 'error':
-            nparents = 0
-        elif parent_series.status == 'finished':
+        if 'status' not in parent_series or parent_series.status == 'finished':
             if 'load_options' in keys:
                 nparents = len(parent.content.finds(load_key))
             else:
                 nparents = 1
+        elif parent_series.status == 'not calculated':
+            nparents = 1
+        elif parent_series.status == 'error':
+            nparents = 0
         else:
             raise ValueError('Unsupported record status')
         

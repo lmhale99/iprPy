@@ -2,9 +2,7 @@
 
 box tilt large
 
-<atomman_system_info>
-
-<atomman_pair_info>
+<atomman_system_pair_info>
 
 variable peatom equal pe/atoms
 
