@@ -115,12 +115,15 @@ def diatom(lammps_command, potential, symbols,
     atoms = am.Atoms(atype=atype, pos=[[0.1, 0.1, 0.1], [0.1, 0.1, 0.1]])
     system = am.System(atoms=atoms, box=box, pbc=[False, False, False], symbols=symbols)
 
+    # Add charges if required
+    if potential.atom_style == 'charge':
+        system.atoms.prop_atype('charge', potential.charges(system.symbols))
+
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
 
     # Define lammps variables
     lammps_variables = {}
-    lammps_variables['atomman_pair_info'] = potential.pair_info(symbols)
 
     # Loop over values
     for i in range(rsteps):
@@ -130,9 +133,9 @@ def diatom(lammps_command, potential, symbols,
 
         # Save configuration
         system_info = system.dump('atom_data', f='diatom.dat',
-                                  units=potential.units,
-                                  atom_style=potential.atom_style)
-        lammps_variables['atomman_system_info'] = system_info
+                                  potential=potential,
+                                  return_pair_info=True)
+        lammps_variables['atomman_system_pair_info'] = system_info
         
         # Write lammps input script
         template_file = Path(script_dir, 'run0.template')
