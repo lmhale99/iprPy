@@ -2,6 +2,7 @@
     "potential-LAMMPS": {
         "key": "7fdf9c6b-beb6-4c7f-b8ab-fe60820cbc44", 
         "id": "2007--Mendelev-M-I--Zr-3--LAMMPS--ipr1", 
+        "status": "superseded", 
         "potential": {
             "key": "bd58ae4c-dc17-40e4-91f0-db3eae46f933", 
             "id": "2007--Mendelev-M-I-Ackland-G-J--Zr-3"

@@ -2,6 +2,7 @@
     "potential-LAMMPS": {
         "key": "e75dc1ae-b430-4ad5-9731-f6e2c8944d08", 
         "id": "2003--Mendelev-M-I--Fe-2--LAMMPS--ipr1", 
+        "status": "superseded", 
         "potential": {
             "key": "06bf7ccd-ea6a-4744-bfbc-adefa5bcdd60", 
             "id": "2003--Mendelev-M-I-Han-S-Srolovitz-D-J-et-al--Fe-2"

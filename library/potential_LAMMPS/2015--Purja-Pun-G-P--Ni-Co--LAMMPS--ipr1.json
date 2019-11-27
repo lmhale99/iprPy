@@ -2,6 +2,7 @@
     "potential-LAMMPS": {
         "key": "beb35d7a-eb97-4c9d-b141-2b1b83879a29", 
         "id": "2015--Purja-Pun-G-P--Ni-Co--LAMMPS--ipr1", 
+        "status": "superseded", 
         "potential": {
             "key": "20fa46b5-6b6f-4e6e-9400-66edb643c679", 
             "id": "2015--Purja-Pun-G-P-Yamakov-V-Mishin-Y--Ni-Co"

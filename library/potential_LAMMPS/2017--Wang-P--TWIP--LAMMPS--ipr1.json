@@ -2,6 +2,7 @@
     "potential-LAMMPS": {
         "key": "c6bbc01f-77ce-488e-8997-3a7b6e9c9f99", 
         "id": "2017--Wang-P--TWIP--LAMMPS--ipr1", 
+        "status": "superseded", 
         "potential": {
             "key": "4a8890c8-1ff4-4346-bdd7-72250e853a56", 
             "id": "2017--Wang-P-Xu-S-Liu-J-et-al--TWIP"

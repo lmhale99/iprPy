@@ -2,6 +2,7 @@
     "potential-LAMMPS": {
         "key": "dde865b2-0583-4369-92fb-4319eabdc6f6", 
         "id": "2018--Starikov-S-V--U-Mo--LAMMPS--ipr1", 
+        "status": "superseded", 
         "potential": {
             "key": "0363c268-9d42-4d82-9cc7-5a610c707c6c", 
             "id": "2018--Starikov-S-V-Kolotova-L-N-Kuksin-A-Y-et-al--U-Mo"

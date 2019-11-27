@@ -2,6 +2,7 @@
     "potential-LAMMPS": {
         "key": "49bad37b-f0b2-48a0-bc00-9fd4f73b5dcc", 
         "id": "2004--Zhou-X-W--Mg--LAMMPS--ipr1", 
+        "status": "superseded", 
         "potential": {
             "key": "816ed50d-9e0c-4bd2-8a9a-dca83d4e0bb8", 
             "id": "2004--Zhou-X-W-Johnson-R-A-Wadley-H-N-G--Mg"
