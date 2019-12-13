@@ -265,6 +265,13 @@ class AtommanSystemLoad(Subset):
         params[f'{prefix}family'] = system['family']
         symbols = aslist(system['symbol'])
         
+        parent_file = Path(system['artifact']['file'])
+        if parent_file.parent.as_posix() == '.':
+            parent = parent_file.stem
+        else:
+            parent = parent_file.parent.as_posix()
+        params[f'{prefix}parent_key'] = parent
+
         if flat is True:
             try:
                 params[f'{prefix}symbols'] = ' '.join(symbols)

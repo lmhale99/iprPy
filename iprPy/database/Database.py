@@ -619,21 +619,39 @@ class Database(object):
         if includetar:
             print(tar_count, 'tars added/updated')
     
-    def destroy_records(self, record_style=None):
+    def destroy_records(self, record_style=None, records=None):
         """
-        Permanently deletes all records of a given style.
+        Permanently deletes multiple records and their associated tars all at
+        once.
         
         Parameters
         ----------
         record_style : str, optional
-            The record style to delete.  If not given, then the available record
-            styles will be listed and the user prompted to pick one.
+            The record style to delete.  If given, all records of that style
+            will be deleted. If neither record_style nor records given, then
+            the available record styles will be listed and the user prompted
+            to pick one.
+        records : list, optional
+            A list of pre-selected records to delete. 
         """
-        if record_style is None:
+        # Select record_style if needed
+        if record_style is None and records is None:
             record_style = self.select_record_style()
+
+        # Get records by record_style
+        if record_style is not None:
+            if records is not None:
+                raise ValueError('record_style and records cannot both be given')
+            
+            # Retrieve records with errors from self
+            records = self.get_records(style=record_style) #pylint: disable=assignment-from-no-return
         
-        records = self.get_records(style=record_style) #pylint: disable=assignment-from-no-return
-        print(f'{len(records)} records found for {record_style}')
+        elif records is None:
+            # Set empty list if record_style is still None and no records given
+            records = []
+
+        print(f'{len(records)} records found to be destroyed')
+
         if len(records) > 0:
             test = screen_input('Delete records? (must type yes):')
             if test == 'yes':

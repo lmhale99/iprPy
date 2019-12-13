@@ -3,6 +3,7 @@ from DataModelDict import DataModelDict as DM
 
 # iprPy imports
 from ...analysis import assign_currentIPR
+from .. import boolean
 
 __all__ = ['atomicparent']
 
@@ -29,6 +30,7 @@ def atomicparent(database, keys, content_dict=None, record=None,
         potential_record = potential_kwargs.pop('record', 'potential_LAMMPS')
         potential_query = potential_kwargs.pop('query', None)
         currentIPR = potential_kwargs.pop('currentIPR', potential_record=='potential_LAMMPS')
+        currentIPR = boolean(currentIPR)
         
         # Fetch potential records 
         potentials, potential_df = database.get_records(style=potential_record, return_df=True,

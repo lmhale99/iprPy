@@ -2,6 +2,7 @@
 import numpy as np
 
 from ...analysis import assign_currentIPR
+from .. import boolean
 
 __all__ = ['interatomicpotential']
 
@@ -16,6 +17,8 @@ def interatomicpotential(database, keys, content_dict=None, record='potential_LA
     # Default currentIPR is True for default record, False otherwise
     if currentIPR is None:
         currentIPR = record == 'potential_LAMMPS'
+    else:
+        currentIPR = boolean(currentIPR)
     
     # Fetch potential records and df
     potentials, potential_df = database.get_records(style=record, return_df=True,

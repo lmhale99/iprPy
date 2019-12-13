@@ -2,11 +2,9 @@
 
 box tilt large
 
-<atomman_system_info>
+<atomman_system_pair_info>
 
 change_box all triclinic
-
-<atomman_pair_info>
 
 compute pe all pe/atom
 compute ke all ke/atom
