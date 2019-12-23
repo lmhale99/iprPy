@@ -1,7 +1,0 @@
-# meam data from vax files fcc,bcc,dia    ###Nickel
-# elt        lat     z       ielement     atwt 
-# alpha      b0      b1      b2           b3    alat    esub    asub 
-# t0         t1              t2           t3            rozero  ibar 
-'Ni'    'fcc'    12    28    58.690 
-5.080    2.56    1.50    6.000000    1.500     3.5213917     4.450    0.9900
-1.000000        3.10        1.80       2.20     1.000000      3.000000 
