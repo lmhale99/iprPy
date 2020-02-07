@@ -4,11 +4,9 @@
 
 box tilt large
 
-<atomman_system_info>
+<atomman_system_pair_info>
 
 change_box all triclinic
-
-<atomman_pair_info>
 
 # Specify strain range and number of points to examine in the range
 variable delta equal <delta>

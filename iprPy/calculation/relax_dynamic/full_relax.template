@@ -19,5 +19,6 @@ timestep 0.001
 
 dump dumpit all custom <dumpsteps> *.dump <dump_keys>
 dump_modify dumpit format <dump_modify_format>
+restart <runsteps> *.restart
 
 run <runsteps> upto
