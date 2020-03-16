@@ -50,7 +50,7 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
                                         full=False, flat=True,
                                         script='calc_' + calculation.style)
     print(len(record_df), 'existing calculation records found', flush=True)
-    
+
     # Complete kwargs with default values and buildcombos actions
     kwargs, content_dict = fill_kwargs(database, calculation, kwargs)
 
@@ -167,7 +167,7 @@ def fill_kwargs(database, calculation, kwargs):
             for key in list(kwargs.keys()):
                 if key[:len(bname_)] == bname_:
                     bkwargs[key[len(bname_):]] = kwargs.pop(key)
-            
+
             inputs, content_dict = buildcombos(bstyle, database, bkeys, content_dict=content_dict, **bkwargs)
 
             for key in inputs:
@@ -224,7 +224,7 @@ def build_testrecords(database, calculation, content_dict, **kwargs):
                             crecord = database.get_record(name=record_name)
                             input_dict[key] = crecord.content.json()
                             content_dict[record_name] = crecord.content
-
+        
         # Build incomplete record
         #try:
         calculation.process_input(input_dict, calc_key, build=False)

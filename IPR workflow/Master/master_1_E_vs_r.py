@@ -36,6 +36,7 @@ if __name__ == '__main__':
     # Potential-based modifiers
     pot_kwargs = {}
     #pot_kwargs['id'] = ['2015--Thompson-A-P--Ta--LAMMPS--ipr2']
+    pot_kwargs['id'] = ['1998--Meyer-R--Fe--ipr-1', '2009--Molinero-V--water--ipr-1']
     pot_kwargs['currentIPR'] = 'False'
     #pot_kwargs['pair_style'] = ['eam', 'eam/alloy', 'eam/fs', 'eam/cd']
 
@@ -54,9 +55,9 @@ if __name__ == '__main__':
     kwargs = deepcopy(global_kwargs)
     for key in pot_kwargs:
         kwargs[f'prototype_potential_{key}'] = pot_kwargs[key]
-
+    
     if 'pair_style' not in pot_kwargs:
-        prepare.E_vs_r_scan.bop(database_name, run_directory_name, **kwargs)
+        #prepare.E_vs_r_scan.bop(database_name, run_directory_name, **kwargs)
         prepare.E_vs_r_scan.main(database_name, run_directory_name, **kwargs)
     else:
         if 'bop' in aslist(pot_kwargs['pair_style']):
