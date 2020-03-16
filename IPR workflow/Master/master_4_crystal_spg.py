@@ -53,4 +53,4 @@ if __name__ == '__main__':
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     
     # Call process relaxation results and generate relaxed_crystal records
-    process.relaxed(database_name, crystal_match_file, all_crystals_file, unique_crystals_file)
+    #process.relaxed(database_name, crystal_match_file, all_crystals_file, unique_crystals_file)
