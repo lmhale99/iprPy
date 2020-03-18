@@ -80,7 +80,7 @@ class RelaxedCrystal(Record):
         
         # Specify source method
         crystal['method'] = input_dict['method']
-        crystal['standing'] = input_dict['standing']
+        crystal['standing'] = input_dict.get('standing', 'good')
         
         # Copy over potential data model info
         subset('lammps_potential').buildcontent(crystal, input_dict)
