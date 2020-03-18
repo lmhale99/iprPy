@@ -180,10 +180,14 @@ class CalculationRelaxDynamic(CalculationRecord):
                                           input_dict['pressure_unit'],
                                           results_dict['measured_pyz_std'])
             
-            # Save the final cohesive energy
+            # Save the final cohesive and total energies
             calc['cohesive-energy'] = uc.model(results_dict['E_coh'],
                                                input_dict['energy_unit'],
                                                results_dict.get('E_coh_std', None))
+            if 'E_total' in results_dict:
+                calc['average-total-energy'] = uc.model(results_dict['E_total'],
+                                                input_dict['energy_unit'],
+                                                results_dict.get('E_total_std', None))
     
     def todict(self, full=True, flat=False):
         """
@@ -244,6 +248,10 @@ class CalculationRelaxDynamic(CalculationRecord):
             
             params['E_cohesive'] = uc.value_unit(calc['cohesive-energy'])
             params['E_cohesive_std'] = uc.error_unit(calc['cohesive-energy'])
+            if 'average-total-energy' in calc:
+                params['E_total_ave'] = uc.value_unit(calc['average-total-energy'])
+                params['E_total_std'] = uc.error_unit(calc['average-total-energy'])
+
             params['measured_temperature'] = uc.value_unit(calc['measured-phase-state']['temperature'])
             params['measured_pressure_xx'] = uc.value_unit(calc['measured-phase-state']['pressure-xx'])
             params['measured_pressure_xx_std'] = uc.error_unit(calc['measured-phase-state']['pressure-xx'])

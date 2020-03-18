@@ -248,6 +248,9 @@ def relax_dynamic(lammps_command, system, potential, mpi_command=None,
     natoms = system.natoms
     results['E_coh'] = uc.set_in_units(thermo.PotEng.mean() / natoms, lammps_units['energy'])
     results['E_coh_std'] = uc.set_in_units(thermo.PotEng.std() / natoms, lammps_units['energy'])
+
+    results['E_total'] = uc.set_in_units(thermo.TotEng.mean() / natoms, lammps_units['energy'])
+    results['E_total_std'] = uc.set_in_units(thermo.TotEng.std() / natoms, lammps_units['energy'])
     
     results['lx'] = uc.set_in_units(thermo.Lx.mean(), lammps_units['length'])
     results['lx_std'] = uc.set_in_units(thermo.Lx.std(), lammps_units['length'])
