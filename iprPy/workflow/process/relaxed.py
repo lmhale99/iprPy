@@ -221,6 +221,8 @@ def relaxed(database_name, crystal_match_file, all_crystals_file, unique_crystal
         input_dict['family'] = series.family
         input_dict['parent_key'] = series.calc_key
         input_dict['length_unit'] = 'angstrom'
+        input_dict['energy_unit'] = 'eV'
+        input_dict['E_coh'] = series.E_coh
         
         # Set potential
         potential_record = database.get_record(style='potential_LAMMPS', key=series.potential_LAMMPS_key)

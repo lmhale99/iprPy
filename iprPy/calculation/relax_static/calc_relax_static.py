@@ -182,10 +182,10 @@ def relax_static(lammps_command, system, potential, mpi_command=None,
         # Define lammps variables
         lammps_variables = {}
         system_info = system.dump('atom_data', f='init.dat',
-                                  units=potential.units,
-                                  atom_style=potential.atom_style)
-        lammps_variables['atomman_system_info'] = system_info
-        lammps_variables['atomman_pair_info'] = potential.pair_info(system.symbols)
+                                  potential=potential,
+                                  return_pair_info=True)
+        lammps_variables['atomman_system_pair_info'] = system_info
+        
         lammps_variables['p_xx'] = uc.get_in_units(p_xx, lammps_units['pressure'])
         lammps_variables['p_yy'] = uc.get_in_units(p_yy, lammps_units['pressure'])
         lammps_variables['p_zz'] = uc.get_in_units(p_zz, lammps_units['pressure'])

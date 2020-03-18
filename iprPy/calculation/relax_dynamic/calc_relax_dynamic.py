@@ -177,10 +177,10 @@ def relax_dynamic(lammps_command, system, potential, mpi_command=None,
     # Define lammps variables
     lammps_variables = {}
     system_info = system.dump('atom_data', f='init.dat',
-                              units=potential.units,
-                              atom_style=potential.atom_style)
-    lammps_variables['atomman_system_info'] = system_info
-    lammps_variables['atomman_pair_info'] = potential.pair_info(system.symbols)
+                              potential=potential,
+                              return_pair_info=True)
+    lammps_variables['atomman_system_pair_info'] = system_info
+    
     integ_info = integrator_info(integrator=integrator,
                                  p_xx=p_xx, p_yy=p_yy, p_zz=p_zz,
                                  p_xy=p_xy, p_xz=p_xz, p_yz=p_yz,

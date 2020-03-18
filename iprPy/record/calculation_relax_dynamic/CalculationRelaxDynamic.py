@@ -28,7 +28,7 @@ class CalculationRelaxDynamic(CalculationRecord):
         return [
             'script',
             
-            'load_file',
+            'parent_key',
             'load_options',
             'symbols',
             

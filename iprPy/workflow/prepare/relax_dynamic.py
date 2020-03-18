@@ -94,7 +94,8 @@ def at_temp(database_name, run_directory_name, lammps_command, **kwargs):
         # Build load information from crystal_space_group results
         'buildcombos                 atomicparent load_file parent',
         'parent_record               relaxed_crystal',
-        'parent_method               dynamic',
+        #'parent_method               dynamic',
+        'parent_method               manual',
 
         # System manipulations  
         'sizemults                   10 10 10',

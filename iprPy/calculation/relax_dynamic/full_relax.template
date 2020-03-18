@@ -2,11 +2,9 @@
 
 box tilt large
 
-<atomman_system_info>
+<atomman_system_pair_info>
 
 change_box all triclinic
-
-<atomman_pair_info>
 
 compute pe all pe/atom
 compute ke all ke/atom
@@ -21,5 +19,6 @@ timestep 0.001
 
 dump dumpit all custom <dumpsteps> *.dump <dump_keys>
 dump_modify dumpit format <dump_modify_format>
+restart <runsteps> *.restart
 
 run <runsteps> upto

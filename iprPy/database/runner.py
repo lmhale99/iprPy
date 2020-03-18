@@ -186,6 +186,10 @@ def runner(dbase, run_directory, orphan_directory=None, hold_directory=None):
                     run = subprocess.Popen([py_exe, calc_py, calc_in, sim],
                                            stderr=subprocess.PIPE)
                     error_message = run.stderr.read()
+                    try:
+                        error_message = error_message.decode('UTF-8')
+                    except:
+                        pass
                     
                     # Load results.json
                     try:

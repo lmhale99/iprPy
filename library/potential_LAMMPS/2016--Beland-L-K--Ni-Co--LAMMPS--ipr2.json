@@ -1,0 +1,100 @@
+{
+    "potential-LAMMPS": {
+        "key": "1cb880e7-0cef-462f-8dde-9e891ada27e5", 
+        "id": "2016--Beland-L-K--Ni-Co--LAMMPS--ipr2", 
+        "potential": {
+            "key": "8435450a-75e2-4c19-885f-ad2bb8ca34e6", 
+            "id": "2016--Beland-L-K-Lu-C-Osetskiy-Y-N-et-al--Ni-Co"
+        }, 
+        "units": "metal", 
+        "atom_style": "atomic", 
+        "atom": [
+            {
+                "element": "Ni", 
+                "mass": 58.6934
+            }, 
+            {
+                "element": "Co", 
+                "mass": 58.9332
+            }
+        ], 
+        "pair_style": {
+            "type": "hybrid/overlay",
+            "term": {
+                "option": "zbl 0.5 2.0 eam/alloy"
+            }
+        }, 
+        "pair_coeff": [
+            {
+                "interaction": {
+                    "symbol": [
+                        "Ni", 
+                        "Ni"
+                    ]
+                }, 
+                "term": [
+                    {
+                        "option": "zbl"
+                    }, 
+                    {
+                        "parameter": "28"
+                    }, 
+                    {
+                        "parameter": "28"
+                    }
+                ]
+            },
+            {
+                "interaction": {
+                    "symbol": [
+                        "Ni", 
+                        "Co"
+                    ]
+                }, 
+                "term": [
+                    {
+                        "option": "zbl"
+                    }, 
+                    {
+                        "parameter": "28"
+                    }, 
+                    {
+                        "parameter": "27"
+                    }
+                ]
+            },
+            {
+                "interaction": {
+                    "symbol": [
+                        "Co", 
+                        "Co"
+                    ]
+                }, 
+                "term": [
+                    {
+                        "option": "zbl"
+                    }, 
+                    {
+                        "parameter": "27"
+                    }, 
+                    {
+                        "parameter": "27"
+                    }
+                ]
+            },
+            {
+                "term": [
+                    {
+                        "option": "eam/alloy"
+                    },
+                    {
+                        "file": "NiCo-lammps-2014.alloy"
+                    }, 
+                    {
+                        "symbols": "True"
+                    }
+                ]
+            }
+        ]
+    }
+}

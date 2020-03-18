@@ -1,4 +1,6 @@
 from copy import deepcopy
+from pathlib import Path
+
 from multiprocessing import Pool
 
 from iprPy.workflow import prepare, multi_runners, process
@@ -31,15 +33,14 @@ if __name__ == '__main__':
             global_kwargs['mpi_command'] = f'/cluster/deb9/bin/mpirun -n {np_per_runner}' 
 
     # Set other generic settings
-    #global_kwargs['prototype_id'] = 'A1--Cu--fcc'
-    #global_kwargs['maximum_r'] = '10.0',
-    #global_kwargs['number_of_steps_r'] = '500'
+    #global_kwargs['parent_family'] = 'A2--W--bcc'
+    #global_kwargs['reference_'] = 
 
     # Potential-based modifiers
     pot_kwargs = {}
     pot_kwargs['id'] = ['1998--Meyer-R--Fe--ipr-1', '2009--Molinero-V--water--ipr-1']
+    pot_kwargs['currentIPR'] = 'False'
     #pot_kwargs['pair_style'] = ['eam', 'eam/alloy', 'eam/fs', 'eam/cd']
-
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     
@@ -48,24 +49,20 @@ if __name__ == '__main__':
         pool = Pool(num_runners)
     else:
         pool = None
-
+  
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
-
-    # Prepare diatom_scan
+    
+    # Prepare relax_dynamic at 0 K
     kwargs = deepcopy(global_kwargs)
     for key in pot_kwargs:
-        kwargs[f'potential_{key}'] = pot_kwargs[key]
+        kwargs[f'reference_potential_{key}'] = pot_kwargs[key]  
+        kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
 
-    #try:
-    #    prepare.diatom_scan.bop(database_name, run_directory_name, **kwargs)
-    #except:
-    #    pass        
-    
-    prepare.diatom_scan.main(database_name, run_directory_name, **kwargs)
+    prepare.relax_dynamic.main(database_name, run_directory_name, **kwargs)
 
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! # 
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #        
 
-    # Run diatom_scan
+    # Run relax_dynamic
     multi_runners(database_name, run_directory_name, num_runners, pool=pool)
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #

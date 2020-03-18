@@ -37,6 +37,7 @@ def fcc_screw(database_name, run_directory_name, lammps_command, **kwargs):
         'parent_record               calculation_elastic_constants_static',
         'parent_load_key             system-info',
         'parent_strainrange          1e-7',
+        'parent_family               A1--Cu--fcc',
 
         # Build defect records
         'buildcombos                 defect dislocation_file',
@@ -97,6 +98,7 @@ def fcc_edge(database_name, run_directory_name, lammps_command, **kwargs):
         'parent_record               calculation_elastic_constants_static',
         'parent_load_key             system-info',
         'parent_strainrange          1e-7',
+        'parent_family               A1--Cu--fcc',
 
         # Build defect records
         'buildcombos                 defect dislocation_file',
@@ -157,6 +159,7 @@ def fcc_edge_100(database_name, run_directory_name, lammps_command, **kwargs):
         'parent_record               calculation_elastic_constants_static',
         'parent_load_key             system-info',
         'parent_strainrange          1e-7',
+        'parent_family               A1--Cu--fcc',
 
         # Build defect records
         'buildcombos                 defect dislocation_file',
@@ -217,6 +220,7 @@ def bcc_screw(database_name, run_directory_name, lammps_command, **kwargs):
         'parent_record               calculation_elastic_constants_static',
         'parent_load_key             system-info',
         'parent_strainrange          1e-7',
+        'parent_family               A2--W--bcc',
 
         # Build defect records
         'buildcombos                 defect dislocation_file',
@@ -277,6 +281,7 @@ def bcc_edge(database_name, run_directory_name, lammps_command, **kwargs):
         'parent_record               calculation_elastic_constants_static',
         'parent_load_key             system-info',
         'parent_strainrange          1e-7',
+        'parent_family               A2--W--bcc',
 
         # Build defect records
         'buildcombos                 defect dislocation_file',
@@ -337,6 +342,7 @@ def bcc_edge_112(database_name, run_directory_name, lammps_command, **kwargs):
         'parent_record               calculation_elastic_constants_static',
         'parent_load_key             system-info',
         'parent_strainrange          1e-7',
+        'parent_family               A2--W--bcc',
 
         # Build defect records
         'buildcombos                 defect dislocation_file',
@@ -354,8 +360,8 @@ def bcc_edge_112(database_name, run_directory_name, lammps_command, **kwargs):
         'randomseed                  ',
         'energytolerance             ',
         'forcetolerance              ',
-        'maxiterations               ',
-        'maxevaluations              ',
+        'maxiterations               10000',
+        'maxevaluations              100000',
         'maxatommotion               ',
         ])        
 
