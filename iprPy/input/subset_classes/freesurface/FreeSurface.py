@@ -89,7 +89,7 @@ class FreeSurface(Subset):
             for key in ('atomshift', 'a_uvw', 'b_uvw', 'c_uvw', 
                         'surface_cutboxvector'):
                 assert keymap[key] not in input_dict, (keymap[key] + ' and '
-                                                    + keymap['dislocation_model']
+                                                    + keymap['surface_model']
                                                     + ' cannot both be supplied')
             
             # Load defect model
