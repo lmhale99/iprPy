@@ -27,6 +27,9 @@ import iprPy
 # Define record_style
 record_style = 'calculation_diatom_scan'
 
+# Specify module name if loaded from iprPy
+pkg_name = 'iprPy.calculation.diatom_scan.calc_diatom_scan'
+
 def main(*args):
     """Main function called when script is executed directly."""
     
@@ -90,12 +93,13 @@ def diatom(lammps_command, potential, symbols,
         - **'energy_values'** (*numpy.array of float*) - The computed potential
           energies for each r value.
     """
-    try:
-        # Get script's location if __file__ exists
-        script_dir = Path(__file__).parent
-    except:
-        # Use cwd otherwise
-        script_dir = Path.cwd()
+    
+    # Check if function was called from iprPy
+    if __name__ == pkg_name:
+        calc = iprPy.load_calculation(pkg_name.split('.')[-2])
+        filedict = calc.filedict
+    else:
+        filedict = {}
  
     # Build lists of values
     r_values = np.linspace(rmin, rmax, rsteps)
@@ -138,10 +142,9 @@ def diatom(lammps_command, potential, symbols,
         lammps_variables['atomman_system_pair_info'] = system_info
         
         # Write lammps input script
-        template_file = Path(script_dir, 'run0.template')
+        template_file = 'run0.template'
         lammps_script = 'run0.in'
-        with open(template_file) as f:
-            template = f.read()
+        template = iprPy.tools.read_calc_file(template_file, filedict)
         with open(lammps_script, 'w') as f:
             f.write(iprPy.tools.filltemplate(template, lammps_variables,
                                              '<', '>'))

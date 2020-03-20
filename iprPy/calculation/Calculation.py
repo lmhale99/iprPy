@@ -2,7 +2,7 @@
 from pathlib import Path
 import sys
 from copy import deepcopy
-from importlib import import_module
+from importlib import import_module, resources
 
 from ..input import subset
 
@@ -17,16 +17,19 @@ class Calculation(object):
         """
         Initializes a Calculation object for a given style.
         """
-        # Get module information for current class
-        self_module = sys.modules[self.__module__]
-        self.__module_file = self_module.__file__
-        self.__module_name = self_module.__name__
-        if self.module_name == 'iprPy.calculation.Calculation':
+        module = self.__module__
+
+        # Throw error for default class
+        if module == 'iprPy.calculation.Calculation':
             raise TypeError("Don't use Calculation itself, only use derived classes")
         
+        # Extract module-based property values
+        module_terms = module.split('.')
+        self.__parent_module = '.'.join(module_terms[:-1])
+        self.__style = module_terms[-2]
+
         # Import calculation script
-        package_name = '.'.join(self.module_name.split('.')[:-1])
-        self.__script = import_module(f'.calc_{self.style}', package_name)
+        self.__script = import_module(f'.calc_{self.style}', self.parent_module)
         
         # Make shortcuts to calculation's functions
         self.main = self.script.main
@@ -46,34 +49,16 @@ class Calculation(object):
         return self.__script
 
     @property
-    def module_file(self):
-        """
-        pathlib.Path: The path to the Calculation class file
-        """
-        return self.__module_file
-
-    @property
-    def module_name(self):
-        """
-        str: The calculation style
-        """
-        return self.__module_name
-
-    @property
     def style(self):
         """
         str: The calculation style
         """
-        pkgname = self.module_name.split('.')
-        return pkgname[2]
+        return self.__style
     
     @property
-    def directory(self):
-        """
-        str: The path to the calculation's directory
-        """
-        return Path(self.module_file).absolute().parent
-    
+    def parent_module(self):
+        return self.__parent_module
+
     @property
     def record_style(self):
         """
@@ -103,17 +88,24 @@ class Calculation(object):
     @property
     def files(self):
         """
-        list: Path to each file required by the calculation.
+        list: the names of each file required by the calculation.
         """
         # Universal files (calc_*.py)
         files = [
                     f'calc_{self.style}.py',
                 ]
-        for i in range(len(files)):
-            files[i] = Path(self.directory, files[i])
 
         return files
     
+    @property
+    def filedict(self):
+        """dict: the names and contents of all required files."""
+        filedict = {}
+        for filename in self.files:
+            filedict[filename] = resources.read_text(self.parent_module, filename)
+        
+        return filedict
+
     @property
     def singularkeys(self):
         """
