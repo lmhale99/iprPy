@@ -9,14 +9,15 @@ libdir : str
 """
 # Standard Python libraries
 from pathlib import Path
+from importlib import resources
 
 # Define package-specific directories
 rootdir = Path(__file__).absolute().parent
-libdir = Path(rootdir.parent, 'library')
+contentdir = Path(Path.home(), '.iprPy')
+libdir = Path(contentdir, 'library')
 
 # Read version from VERSION file
-with open(Path(rootdir, 'VERSION')) as version_file:
-    __version__ = version_file.read().strip()
+__version__ = resources.read_text('iprPy', 'VERSION').strip()
 
 __all__ = ['__version__', 'rootdir', 'libdir', 'tools', 'input',
            'record', 'load_record', 'calculation', 'load_calculation',
