@@ -10,6 +10,6 @@ failed : dict
 """
 from ...tools import dynamic_import
 
-loaded, failed = dynamic_import(__file__, __name__)
+loaded, failed = dynamic_import(__name__)
 
 __all__ = ['failed', 'loaded']

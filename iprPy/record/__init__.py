@@ -14,7 +14,7 @@ from .Record import Record
 from .CalculationRecord import CalculationRecord
 
 ignorelist = ['Record', 'CalculationRecord']
-loaded, failed = dynamic_import(__file__, __name__, ignorelist=ignorelist)
+loaded, failed = dynamic_import(__name__, ignorelist=ignorelist)
 
 def load_record(style, name=None, content=None):
     """

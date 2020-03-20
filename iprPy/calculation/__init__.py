@@ -13,7 +13,7 @@ from ..tools import dynamic_import
 from .Calculation import Calculation
 
 ignorelist = ['Calculation']
-loaded, failed = dynamic_import(__file__, __name__, ignorelist=ignorelist)
+loaded, failed = dynamic_import(__name__, ignorelist=ignorelist)
 
 def load_calculation(style):
     """

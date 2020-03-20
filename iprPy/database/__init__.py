@@ -16,7 +16,7 @@ from .settings import __all__ as settings_all
 from .Database import Database
 
 ignorelist = ['Database', 'prepare', 'runner', 'settings', 'load_database']
-loaded, failed = dynamic_import(__file__, __name__, ignorelist=ignorelist)
+loaded, failed = dynamic_import(__name__, ignorelist=ignorelist)
 
 from .load_database import load_database
 

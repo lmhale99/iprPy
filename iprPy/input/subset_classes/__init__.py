@@ -13,6 +13,6 @@ from ...tools import dynamic_import
 from .Subset import Subset
 
 ignorelist = ['Subset']
-loaded, failed = dynamic_import(__file__, __name__, ignorelist=ignorelist)
+loaded, failed = dynamic_import(__name__, ignorelist=ignorelist)
 
 __all__ = ['Subset', 'failed', 'loaded']
