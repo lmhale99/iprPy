@@ -1,3 +1,5 @@
+# coding: utf-8
+
 # Standard Python libraries
 from pathlib import Path
 
@@ -11,7 +13,7 @@ import numpy as np
 import atomman as am
 
 # iprPy imports
-from .. import libdir
+from .. import Settings
 
 def assign_composition(df, database, lib_directory=None):
     """
@@ -25,11 +27,12 @@ def assign_composition(df, database, lib_directory=None):
     
     # Set default lib_directory (for ref structures)
     if lib_directory is None:
-        lib_directory = libdir
+        lib_directory = Settings().library_directory
     
     # Identify compositions
     compositions = []
-    for i, series in df.iterrows():
+    for i in range(len(df)):
+        series = df.iloc[i]
         
         # Use ucell system if available (crystal_space_group)
         if 'ucell' in series:
@@ -48,7 +51,6 @@ def assign_composition(df, database, lib_directory=None):
             
             # If family is a ref
             else:
-                elements = '-'.join(np.unique(series.symbols))
                 fname = Path(lib_directory, 'reference_crystal', series.family + '.json')
                 try:
                     ucell = am.load('system_model', fname)
