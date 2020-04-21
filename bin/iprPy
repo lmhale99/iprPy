@@ -1,7 +1,6 @@
 #!/usr/bin/env python
+# coding: utf-8
 # Standard Python libraries
-from __future__ import (absolute_import, print_function,
-                        division, unicode_literals)
 import argparse
 
 # https://github.com/usnistgov/iprPy
@@ -57,20 +56,66 @@ def main(args):
     
     # Actions for subcommand set_database
     elif args.action == 'set_database':
-        iprPy.set_database(args.name)
+        iprPy.Settings().set_database(args.name)
     
     # Actions for subcommand unset_database
     elif args.action == 'unset_database':
-        iprPy.unset_database(args.name)
+        iprPy.Settings().unset_database(args.name)
     
+    # Actions for list_databases
+    elif args.action == 'list_databases':
+        for name in iprPy.Settings().list_databases:
+            print(name)
+
     # Actions for subcommand set_run_directory
     elif args.action == 'set_run_directory':
-        iprPy.set_run_directory(args.name)
+        iprPy.Settings().set_run_directory(args.name)
     
     # Actions for subcommand unset_run_directory
     elif args.action == 'unset_run_directory':
-        iprPy.unset_run_directory(args.name)
+        iprPy.Settings().unset_run_directory(args.name)
     
+    # Actions for list_run_directories
+    elif args.action == 'list_run_directories':
+        for name in iprPy.Settings().list_run_directories:
+            print(name)
+
+    # Actions for directory
+    elif args.action == 'directory':
+        print(iprPy.Settings().directory)
+
+    # Actions for set_directory
+    elif args.action == 'set_directory':
+        iprPy.Settings().set_directory(args.path)
+
+    # Actions for unset_directory
+    elif args.action == 'unset_directory':
+        iprPy.Settings().unset_directory()
+
+    # Actions for library_directory
+    elif args.action == 'library_directory':
+        print(iprPy.Settings().library_directory)
+
+    # Actions for set_library_directory
+    elif args.action == 'set_library_directory':
+        iprPy.Settings().set_library_directory(args.path)
+
+    # Actions for unset_library_directory
+    elif args.action == 'unset_library_directory':
+        iprPy.Settings().unset_library_directory()
+
+    # Actions for runner_log_directory
+    elif args.action == 'runner_log_directory':
+        print(iprPy.Settings().runner_log_directory)
+
+    # Actions for set_runner_log_directory
+    elif args.action == 'set_runner_log_directory':
+        iprPy.Settings().set_runner_log_directory(args.path)
+
+    # Actions for unset_runner_log_directory
+    elif args.action == 'unset_runner_log_directory':
+        iprPy.Settings().unset_runner_log_directory()
+
     else:
         raise ValueError('Unknown action argument')
     
@@ -82,95 +127,145 @@ def iprPy_command_line_parser():
     subparsers = parser.add_subparsers(title='actions', dest='action')
     
     # Define subparser for build_refs
-    parser_build = subparsers.add_parser('build_refs', 
+    subparser = subparsers.add_parser('build_refs', 
                         help='add library reference records to a database')
-    parser_build.add_argument('database', nargs='?', default=None, 
+    subparser.add_argument('database', nargs='?', default=None, 
                         help='database name')
     
     # Define subparser for check_records
-    parser_check = subparsers.add_parser('check_records', 
+    subparser = subparsers.add_parser('check_records', 
                         help='checks status of a run_directory or database')
-    parser_check.add_argument('database', nargs='?', default=None,
+    subparser.add_argument('database', nargs='?', default=None,
                         help='database name')
-    parser_check.add_argument('record_style', nargs='?', default=None,
+    subparser.add_argument('record_style', nargs='?', default=None,
                         help='optional record style to limit by')
     
     # Define subparser for check_modules
-    parser_check_modules = subparsers.add_parser('check_modules',
+    subparser = subparsers.add_parser('check_modules',
                         help='prints load status of all modules in iprPy')
     
     # Define subparser for clean_records
-    parser_clean = subparsers.add_parser('clean_records',
+    subparser = subparsers.add_parser('clean_records',
                         help='resets prepared calculations for running again')
-    parser_clean.add_argument('database', nargs='?', default=None,
+    subparser.add_argument('database', nargs='?', default=None,
                         help='database name')
-    parser_clean.add_argument('run_directory', nargs='?', default=None,
+    subparser.add_argument('run_directory', nargs='?', default=None,
                         help='run_directory name')
-    parser_clean.add_argument('record_style', nargs='?', default=None,
+    subparser.add_argument('record_style', nargs='?', default=None,
                         help='optional record style')
     
     # Define subparser for copy_records
-    parser_copy = subparsers.add_parser('copy_records',
+    subparser = subparsers.add_parser('copy_records',
                         help='copy records of a given style from one database to another')
-    parser_copy.add_argument('database1', nargs='?', default=None,
+    subparser.add_argument('database1', nargs='?', default=None,
                         help='database name to copy from')
-    parser_copy.add_argument('database2', nargs='?', default=None,
+    subparser.add_argument('database2', nargs='?', default=None,
                         help='database name to copy to')
-    parser_copy.add_argument('record_style', nargs='?', default=None,
+    subparser.add_argument('record_style', nargs='?', default=None,
                         help='optional record style')
     
     # Define subparser for destroy_records
-    parser_destroy = subparsers.add_parser('destroy_records',
+    subparser = subparsers.add_parser('destroy_records',
                         help='delete all records of a given style from a database')
-    parser_destroy.add_argument('database', nargs='?', default=None,
+    subparser.add_argument('database', nargs='?', default=None,
                         help='database name')
-    parser_destroy.add_argument('record_style', nargs='?', default=None,
+    subparser.add_argument('record_style', nargs='?', default=None,
                         help='record style')
     
     # Define subparser for prepare
-    parser_prepare = subparsers.add_parser('prepare',
+    subparser = subparsers.add_parser('prepare',
                         help='prepare calculations')
-    parser_prepare.add_argument('database',
+    subparser.add_argument('database',
                         help='database name')
-    parser_prepare.add_argument('run_directory',
+    subparser.add_argument('run_directory',
                         help='run_directory name')
-    parser_prepare.add_argument('calculation',
+    subparser.add_argument('calculation',
                         help='calculation name')
-    parser_prepare.add_argument('input_script',
+    subparser.add_argument('input_script',
                         help='input parameter script')
     
     # Define subparser for runner
-    parser_runner = subparsers.add_parser('runner',
+    subparser = subparsers.add_parser('runner',
                         help='start runner working on prepared calculations')
-    parser_runner.add_argument('database', nargs='?', default=None,
+    subparser.add_argument('database', nargs='?', default=None,
                         help='database name')
-    parser_runner.add_argument('run_directory', nargs='?', default=None,
+    subparser.add_argument('run_directory', nargs='?', default=None,
                         help='run_directory name')
     
+    # Define subparser for list_databases
+    subparser = subparsers.add_parser('list_databases',
+                        help='prints the names of all set databases')
+
     # Define subparser for set_database
-    parser_set = subparsers.add_parser('set_database',
+    subparser = subparsers.add_parser('set_database',
                         help='define database access information')
-    parser_set.add_argument('name', nargs='?', default=None,
+    subparser.add_argument('name', nargs='?', default=None,
                         help='name to assign to the database')
     
     # Define subparser for unset_database
-    parser_set = subparsers.add_parser('unset_database',
+    subparser = subparsers.add_parser('unset_database',
                         help='forget settings for a defined database')
-    parser_set.add_argument('name', nargs='?', default=None,
+    subparser.add_argument('name', nargs='?', default=None,
                         help='name assigned to the database')
     
+    # Define subparser for list_run_directories
+    subparser = subparsers.add_parser('list_run_directories',
+                        help='prints the names of all set run_directory paths')
+
     # Define subparser for set_run_directory
-    parser_set = subparsers.add_parser('set_run_directory',
+    subparser = subparsers.add_parser('set_run_directory',
                         help='define run_directory path')
-    parser_set.add_argument('name', nargs='?', default=None,
+    subparser.add_argument('name', nargs='?', default=None,
                         help='name to assign to the run_directory')
     
     # Define subparser for unset_run_directory
-    parser_set = subparsers.add_parser('unset_run_directory',
+    subparser = subparsers.add_parser('unset_run_directory',
                         help='forget settings for a defined run_directory')
-    parser_set.add_argument('name', nargs='?', default=None,
+    subparser.add_argument('name', nargs='?', default=None,
                         help='name assigned to the run_directory')
     
+    # Define subparser for directory
+    subparser = subparsers.add_parser('directory',
+                        help='prints the path where iprPy settings are saved')
+
+    # Define subparser for set_directory
+    subparser = subparsers.add_parser('set_directory',
+                        help='define directory path where iprPy settings are saved')
+    subparser.add_argument('path', nargs='?', default=None,
+                        help='path for the directory')
+    
+    # Define subparser for unset_directory
+    subparser = subparsers.add_parser('unset_directory',
+                        help="revert to using iprPy's default settings directory path <home>/.iprPy/")
+
+    # Define subparser for library_directory
+    subparser = subparsers.add_parser('library_directory',
+                        help='prints the path where the iprPy library is located')
+
+    # Define subparser for set_library_directory
+    subparser = subparsers.add_parser('set_library_directory',
+                        help='define the path where the iprPy library is located')
+    subparser.add_argument('path', nargs='?', default=None,
+                        help='path for the directory')
+    
+    # Define subparser for unset_library_directory
+    subparser = subparsers.add_parser('unset_library_directory',
+                        help="revert to using default location of <directory>/library/")
+
+    # Define subparser for runner_log_directory
+    subparser = subparsers.add_parser('runner_log_directory',
+                        help='prints the path where runner scripts will save their log files to')
+
+    # Define subparser for set_library_directory
+    subparser = subparsers.add_parser('set_library_directory',
+                        help='define the path where runner scripts will save their log files to')
+    subparser.add_argument('path', nargs='?', default=None,
+                        help='path for the directory')
+    
+    # Define subparser for unset_library_directory
+    subparser = subparsers.add_parser('unset_library_directory',
+                        help="revert to using default location of <directory>/runner-logs/")
+
     # Parse command line arguments
     return parser.parse_args()
 
