@@ -1,3 +1,4 @@
+# coding: utf-8
 from importlib import import_module, resources
 from pathlib import Path
 import sys

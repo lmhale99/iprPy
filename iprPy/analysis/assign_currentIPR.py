@@ -3,7 +3,7 @@
 # Standard Python libraries
 from copy import deepcopy
 
-# http://www.numpy.org/                        
+# http://www.numpy.org/
 import numpy as np
 
 __all__ = ['assign_currentIPR', 'current_ipr_potential_keys']

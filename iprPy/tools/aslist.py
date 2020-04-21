@@ -1,3 +1,4 @@
+# coding: utf-8
 def iaslist(term):
     """
     Iterate over items in term as if term was a list. Treats a str, unicode

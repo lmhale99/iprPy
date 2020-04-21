@@ -1,3 +1,4 @@
+# coding: utf-8
 def screen_input(prompt=''):
     """
     Replacement input function that is compatible with the mingw terminal.

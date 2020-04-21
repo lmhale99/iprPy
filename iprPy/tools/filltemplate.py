@@ -1,3 +1,4 @@
+# coding: utf-8
 def filltemplate(template, variable, s_delimiter, e_delimiter):
     """
     Takes a template and fills in values for delimited template variables.
