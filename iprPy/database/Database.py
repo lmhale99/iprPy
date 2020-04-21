@@ -1,3 +1,4 @@
+# coding: utf-8
 # Standard Python libraries
 from pathlib import Path
 import sys
@@ -12,12 +13,12 @@ import pandas as pd
 from DataModelDict import DataModelDict as DM
 
 # iprPy imports
-from .. import rootdir, libdir
+from .. import Settings, load_run_directory
 from ..record import loaded as record_loaded
 from ..tools import screen_input, aslist
 from .prepare import prepare
 from .runner import runner
-from .settings import load_run_directory
+
 
 class Database(object):
     """
@@ -363,7 +364,7 @@ class Database(object):
         
         Parameters
         ----------
-        lib_directory : str, optional
+        lib_directory : str or path, optional
             The directory path for the library.  If not given, then it will use
             the iprPy library directory.
         refresh : bool or list, optional
@@ -379,7 +380,9 @@ class Database(object):
         
         # Set default lib_directory
         if lib_directory is None:
-            lib_directory = libdir
+            lib_directory = Settings().library_directory
+        else:
+            lib_directory = Path(lib_directory)
         
         # Build list of all reference record styles
         all_styles = []

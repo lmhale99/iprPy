@@ -1,3 +1,4 @@
+# coding: utf-8
 # iprPy imports
-from .Mongo import Mongo
-__all__ = ['Mongo']
+from .MongoDatabase import MongoDatabase
+__all__ = ['MongoDatabase']

@@ -1,3 +1,4 @@
+# coding: utf-8
 # iprPy imports
-from .Local import Local
-__all__ = ['Local']
+from .LocalDatabase import LocalDatabase
+__all__ = ['LocalDatabase']

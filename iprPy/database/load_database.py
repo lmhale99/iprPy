@@ -1,6 +1,7 @@
+# coding: utf-8
 from ..tools import screen_input
 from . import loaded
-from .settings import load_settings
+from .. import Settings
 
 __all__ = ['load_database']
 
@@ -28,52 +29,44 @@ def load_database(name=None, style=None, host=None, **kwargs):
         The database object.
     """
     
-    # Ask for name if no parameters given
-    if name is None and style is None and host is None and len(kwargs) == 0:
-        
-        # Get information from settings file
-        settings = load_settings()
-        
-        # Find matching database name
-        databases = settings['iprPy-defined-parameters'].aslist('database')
-        if len(databases) > 0:
-            print('Select a database:')
-            for i, database in enumerate(databases):
-                print(i+1, database['name'])
-            choice = screen_input(':')
-            try:
-                choice = int(choice)
-            except:
-                name = choice
-            else:
-                name = databases[choice-1]['name']
+    # Create new Database based on parameters
+    if style is not None:
+        assert name is None, 'name and style cannot both be given'
+
+        if style in loaded:
+            return loaded[style](host, **kwargs)
         else:
-            raise KeyError('No databases currently set')
-    
-    if name is not None:
-        if style is None and host is None and len(kwargs) == 0:
-            
-            # Get information from settings file
-            settings = load_settings()
-            
-            # Get the appropriate database
-            try:
-                database_settings = settings.find('database', yes={'name':name})
-            except:
-                raise KeyError(f'Database {name} not found')
-            
-            # Extract parameters
-            style = database_settings['style']
-            host = database_settings['host']
-            kwargs = {}
-            for param in database_settings.aslist('params'):
-                key = list(param.keys())[0]
-                kwargs[key] = param[key]
-        else:
-            raise ValueError('name cannot be given with any other parameters')
-    
-    # return database
-    if style in loaded:
-        return loaded[style](host, **kwargs)
+            raise KeyError(f'Unknown database style {style}')
+
+    # Load Database from saved info
     else:
-        raise KeyError(f'Unknown database style {style}')
+        assert host is None and len(kwargs) == 0, 'style must be given with host, kwargs'
+
+        # Get information from settings file
+        databases = Settings().databases
+        database_names = list(databases.keys())
+        
+        # Ask for name if not given
+        if name is None:
+            if len(database_names) > 0:
+                print('Select a database:')
+                for i, database in enumerate(database_names):
+                    print(i+1, database)
+                choice = screen_input(':')
+                try:
+                    choice = int(choice)
+                except:
+                    name = choice
+                else:
+                    name = database_names[choice-1]
+            else:
+                raise KeyError('No databases currently set')
+        
+        try:
+            database = databases[name]
+        except:
+            raise ValueError(f'database {name} not found')
+
+        style = database.pop('style')
+        return loaded[style](**database)
+    

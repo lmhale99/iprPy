@@ -1,3 +1,4 @@
+# coding: utf-8
 # Standard Python libraries
 from pathlib import Path
 import uuid
@@ -35,7 +36,7 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
         Input parameters for preparing the calculation.  Values must be strings
         or list of strings if allowed by the calculation.
     """
-    
+    filedict = calculation.filedict
     record = load_record(calculation.record_style)
 
     # Parse input_script to kwargs if given
@@ -80,8 +81,10 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
             f.write(inputfile)
 
         # Copy calculation files to calculation folder
-        for calc_file in calculation.files:
-            shutil.copy(calc_file, calc_directory)
+        for filename in filedict:
+            calc_file = Path(calc_directory, filename)
+            with open(calc_file, 'w') as f:
+                f.write(filedict[filename])
 
         # Copy/generate content files keys
         for content in copy_content:
@@ -187,6 +190,7 @@ def build_testrecords(database, calculation, content_dict, **kwargs):
 
     # Start calculation_dict with all singularkeys
     calculation_dict = {}
+    calculation_dict['script'] = 'calc_' + calculation.style
     for key in calculation.singularkeys:
         calculation_dict[key] = kwargs[key]
 
@@ -232,7 +236,7 @@ def build_testrecords(database, calculation, content_dict, **kwargs):
         #    continue
         
         new_record = load_record(style=calculation.record_style, name=calc_key)
-        new_record.buildcontent('calc_' + calculation.style, input_dict)
+        new_record.buildcontent(input_dict)
 
         # Check if record is valid
         if new_record.isvalid():

@@ -2,63 +2,48 @@
 from pathlib import Path
 import shutil
 import tarfile
-from collections import OrderedDict
+from io import BytesIO
 
-# http://www.numpy.org/
-import numpy as np
+from cdcs import CDCS
 
 # https://pandas.pydata.org/
 import pandas as pd
-
-# https://api.mongodb.com/python/current/
-from pymongo import MongoClient
-from gridfs import GridFS
-
-from DataModelDict import DataModelDict as DM
 
 # iprPy imports
 from ...tools import aslist, iaslist
 from .. import Database
 from ... import load_record
-from ...record import loaded as record_styles
 
-class Mongo(Database):
+class CDCSDatabase(Database):
     
-    def __init__(self, host='localhost', port=27017, database='iprPy', **kwargs):
+    def __init__(self, host, user=None, pswd=None, cert=None):
         """
-        Initializes a connection to a Mongo database.
+        Initializes a database of style curator.
         
         Parameters
         ----------
         host : str
-            The mongo host to connect to.  Default value is 'localhost'.
-        port : int
-            Then port to use in connecting to the mongo host.  Default value
-            is 27017.
-        database : str
-            The name of the database in the mongo host to interact with.
-            Default value is 'iprPy'
-        **kwargs : dict, optional
-            Any extra keyword arguments needed to initialize a
-            pymongo.MongoClient object.
+            The host name (url) for the database.
+        user : str or tuple of two str
+            The username to use for accessing the database.  Alternatively, a
+            tuple of (user, pswd).
+        pswd : str, optional
+            The password associated with user to use for accessing the database.
+            This can either be the password as a str, or a str path to a file
+            containing only the password. If not given, a prompt will ask for the
+            password.
+        cert : str, optional
+            The path to a certification file if needed for accessing the database.
         """
         
-        # Connect to underlying class
-        self.__mongodb = MongoClient(host=host, port=port, document_class=DM, **kwargs)[database]
-        
-        # Define class host using client's host, port and database name
-        host = self.mongodb.client.address[0]
-        port =self.mongodb.client.address[1]
-        database = self.mongodb.name
-        host = f'{host}:{port}.{database}'
+        # Pass parameters to cdcs object
+        if Path(pswd).is_file():
+            with open(pswd) as f:
+                pswd = f.read().strip()
+        self.cdcs = CDCS(host, username=user, password=pswd, certification=cert)
         
         # Pass host to Database initializer
         Database.__init__(self, host)
-    
-    @property
-    def mongodb(self):
-        """pymongo.Database : The underlying database API object."""
-        return self.__mongodb
     
     def get_records(self, name=None, style=None, query=None, return_df=False,
                     **kwargs):
@@ -71,9 +56,6 @@ class Mongo(Database):
             The record name or id to limit the search by.
         style : str, optional
             The record style to limit the search by.
-        query : str, optional
-            A query str for identifying records.  Not supported by this style.
-        return_df : bool, optional
             
         Returns
         ------
@@ -81,43 +63,32 @@ class Mongo(Database):
             All records from the database matching the given parameters.
         """
         
-        if style is None:
-            style = list(record_styles.keys())
-        else:
-            style = aslist(style)
-
-        # Handle query-based parameters
-        if query is None:
-            query = {}
-            if name is not None:
-                query['name'] = {}
-                query['name']['$in'] = aslist(name)
-        elif name is not None:
-            raise ValueError('name and query cannot both be given')
-        
-        df = []
         records = []
-        for s in style:
-            collection = self.mongodb[s]
-            for entry in collection.find(query):
-                
-                # Load as Record object
-                record = load_record(s, entry['name'], entry['content'])
-                records.append(record)
+
+        def build_records(series):
+            return load_record(style=series.template_title, name=series.title, content=series.xml_content)
+
+        for n in iaslist(name):
+            data = self.cdcs.query(title=n, template=style, mongoquery=query)
+            records.extend(data.apply(build_records, axis=1))
+
+        if return_df or len(kwargs) > 0:
+            df = []
+            for record in records:
                 df.append(record.todict(full=False, flat=True))
-                
-        records = np.array(records)
-        df = pd.DataFrame(df)
-
-        if len(df) > 0:
-            for key in kwargs:
-                df = df[df[key].isin(aslist(kwargs[key]))]
-
-        if return_df:
-            return list(records[df.index.tolist()]), df.reset_index(drop=True)
+            df = pd.DataFrame(df)
+        
+            if len(df) > 0:
+                for key in kwargs:
+                    df = df[df[key].isin(aslist(kwargs[key]))]
+            
+            if return_df:
+                return list(records[df.index.tolist()]), df.reset_index(drop=True)
+            else:
+                return list(records[df.index.tolist()])
         else:
-            return list(records[df.index.tolist()])
-
+            return records
+    
     def get_records_df(self, name=None, style=None, query=None, full=True,
                        flat=False, **kwargs):
         """
@@ -136,29 +107,14 @@ class Mongo(Database):
             All records from the database matching the given parameters.
         """
         
-        if style is None:
-            style = list(record_styles.keys())
-        else:
-            style = aslist(style)
-
-        # Handle query-based parameters
-        if query is None:
-            query = {}
-            if name is not None:
-                query['name'] = {}
-                query['name']['$in'] = aslist(name)
-        elif name is not None:
-            raise ValueError('name and query cannot both be given')
-        
         df = []
-        for s in style:
-            collection = self.mongodb[s]
-            for entry in collection.find(query):
-                    
-                # Load as Record object
-                record = load_record(s, entry['name'], entry['content'])
-                df.append(record.todict(full=full, flat=flat))
-                
+        def build_record_dicts(series, full, flat):
+            return load_record(style=series.template_title, name=series.title,
+                                     content=series.xml_content).todict(full=full, flat=flat)
+        
+        for n in iaslist(name):
+            data = self.cdcs.query(title=n, template=style, mongoquery=query)
+            df.extend(data.apply(build_record_dicts, args=[full, flat], axis=1))
         df = pd.DataFrame(df)
         
         if len(df) > 0:
@@ -190,7 +146,7 @@ class Mongo(Database):
         """
         
         # Get records
-        record = self.get_records(name=name, style=style, query=None, **kwargs)
+        record = self.get_records(name=name, style=style, query=query, **kwargs)
         
         # Verify that there is only one matching record
         if len(record) == 1:
@@ -199,10 +155,11 @@ class Mongo(Database):
             raise ValueError(f'Cannot find matching record {name} ({style})')
         else:
             raise ValueError('Multiple matching records found')
-
+    
     def add_record(self, record=None, style=None, name=None, content=None):
         """
-        Adds a new record to the database.
+        Adds a new record to the database.  Will issue an error if a 
+        matching record already exists in the database.
         
         Parameters
         ----------
@@ -222,7 +179,7 @@ class Mongo(Database):
         Returns
         ------
         iprPy.Record
-            Either the given record or a record composed of the name, style,
+            Either the given record or a record composed of the name, style, 
             and content.
         
         Raises
@@ -231,39 +188,33 @@ class Mongo(Database):
             If style, name and/or content given with record, or a matching record
             already exists.
         """
-
+        
         # Create Record object if not given
         if record is None:
             record = load_record(style, name, content)
-
+        
         # Issue a ValueError for competing kwargs
         elif style is not None or name is not None or content is not None:
             raise ValueError('kwargs style, name, and content cannot be given with kwarg record')
-
-        # Verify that there isn't already a record with a matching name
-        if len(self.get_records(name=record.name, style=record.style)) > 0:
-            raise ValueError(f'Record {record.name} already exists')
-
-        # Create meta mongo entry
-        entry = OrderedDict()
-        entry['name'] = record.name
-        entry['content'] = record.content
+            
+        # Upload record to database
+        self.cdcs.upload_record(template=record.style, content=record.content.xml(), title=record.name)
         
-        # Upload to mongodb
-        self.mongodb[record.style].insert_one(entry)
-
         return record
-
+    
     def update_record(self, record=None, style=None, name=None, content=None):
         """
-        Replaces an existing record with a new record of matching name and
-        style, but new content.
+        Replaces an existing record with a new record of matching name and 
+        style, but new content.  Will issue an error if exactly one 
+        matching record is not found in the databse.
         
         Parameters
         ----------
+        database_info : mdcs.MDCS
+            The MDCS class used for accessing the curator database.
         record : iprPy.Record, optional
-            The record with new content to update in the database.  If not
-            given, content is required along with name and/or style to
+            The record with new content to update in the database.  If not 
+            given, content is required along with name and/or style to 
             uniquely define a record to update.
         name : str, optional
             The name to uniquely identify the record to update.
@@ -272,13 +223,13 @@ class Mongo(Database):
         content : str, optional
             The new xml content to use for the record.  Required if record is
             not given.
-        
+            
         Returns
         ------
         iprPy.Record
-            Either the given record or a record composed of the name, style,
+            Either the given record or a record composed of the name, style, 
             and content.
-        
+            
         Raises
         ------
         TypeError
@@ -294,24 +245,17 @@ class Mongo(Database):
             oldrecord = self.get_record(name=name, style=style)
             record = load_record(oldrecord.style, oldrecord.name, content)
         
-        # Issue a ValueError for competing kwargs
-        elif style is not None or name is not None:
-            raise ValueError('kwargs style and name cannot be given with kwarg record')
-        
-        # Replace content in record object
-        elif content is not None:
-            oldrecord = record
-            record = load_record(oldrecord.style, oldrecord.name, content)
-            
-        # Find oldrecord matching record
+        # Use given record object
         else:
-            oldrecord = self.get_record(name=record.name, style=record.style)
+            if style is not None or name is not None:
+                raise ValueError('kwargs style and name cannot be given with kwarg record')
+            
+            # Replace content in record object
+            if content is not None:
+                record = load_record(record.style, record.name, content)
         
-        # Delete oldrecord
-        self.delete_record(record=oldrecord)
-        
-        # Add new record
-        self.add_record(record=record)
+        # Upload record to database
+        self.cdcs.update_record(template=record.style, content=record.content.xml(), title=record.name)
         
         return record
     
@@ -336,25 +280,16 @@ class Mongo(Database):
             If style and/or name content given with record.
         """
         
-        # Create Record object if not given
-        if record is None:
-            record = self.get_record(name=name, style=style)
-        
-        # Issue a ValueError for competing kwargs
-        elif style is not None or name is not None:
-            raise ValueError('kwargs style and name cannot be given with kwarg record')
-        
-        # Verify that record exists
-        else:
-            record = self.get_record(name=record.name, style=record.style)
-
-        # Build delete query
-        query = {}
-        query['name'] = record.name
-
-        # Delete record 
-        self.mongodb[record.style].delete_one(query)
-
+        # Extract values from Record object if given
+        if record is not None:
+            if style is not None or name is not None:
+                raise ValueError('kwargs style and name cannot be given with kwarg record')
+            name = record.name
+            style = record.style
+         
+        # Delete record
+        self.cdcs.delete(template=style, title=name)
+    
     def add_tar(self, record=None, name=None, style=None, tar=None, root_dir=None):
         """
         Archives and stores a folder associated with a record.  Issues an
@@ -388,61 +323,63 @@ class Mongo(Database):
             If style and/or name content given with record or the record already
             has an archive.
         """
-        # Create Record object if not given
+        
+        # Get Record object if not given
         if record is None:
             record = self.get_record(name=name, style=style)
-
-        # Issue a ValueError for competing kwargs
-        elif style is not None or name is not None:
-            raise ValueError('kwargs style and name cannot be given with kwarg record')
-
-        # Verify that record exists
+        
         else:
+            # Issue a ValueError for competing kwargs
+            if style is not None or name is not None:
+                raise ValueError('kwargs style and name cannot be given with kwarg record')
+
+            # Verify that record exists
             record = self.get_record(name=record.name, style=record.style)
         
-        # Define mongofs
-        mongofs = GridFS(self.mongodb, collection=record.style)
-        
         # Check if an archive already exists
-        if mongofs.exists({"recordname": record.name}):
+        blobs = self.cdcs.get_blobs(filename=record.name)
+        if len(blobs) > 0:
             raise ValueError('Record already has an archive')
         
-        if tar is None:
-        
+        filename = Path(record.name + '.tar.gz')
+
+        # Create directory archive and upload
+        if tar is None: 
+            
             # Make archive
             shutil.make_archive(record.name, 'gztar', root_dir=root_dir,
                                 base_dir=record.name)
-        
-            # Upload archive
-            filename = Path(record.name + '.tar.gz')
-            with open(filename, 'rb') as f:
-                tries = 0
-                while tries < 2:
-                    if True:
-                        mongofs.put(f, recordname=record.name)
-                        break
-                    else:
-                        tries += 1
-                if tries == 2:
-                    raise ValueError('Failed to upload archive 2 times')
-        
-            # Remove local archive copy
-            filename.unlink()
             
-        elif root_dir is None:
             # Upload archive
             tries = 0
             while tries < 2:
                 if True:
-                    mongofs.put(tar, recordname=record.name)
+                    url = self.cdcs.upload_blob(filename.as_posix())
                     break
                 else:
                     tries += 1
             if tries == 2:
                 raise ValueError('Failed to upload archive 2 times')
+            
+            # Remove local archive copy
+            filename.unlink()
+        
+        # Upload pre-existing tar object
+        elif root_dir is None:
+            # Upload archive
+            tries = 0
+            while tries < 2:
+                if True:
+                    url = self.cdcs.upload_blob(filename=filename, blobbytes=BytesIO(tar))
+                    break
+                else:
+                    tries += 1
+            if tries == 2:
+                raise ValueError('Failed to upload archive 2 times')
+        
         else:
             raise ValueError('tar and root_dir cannot both be given')
-        
+
     def get_tar(self, record=None, name=None, style=None, raw=False):
         """
         Retrives the tar archive associated with a record in the database.
@@ -451,6 +388,8 @@ class Mongo(Database):
         
         Parameters
         ----------
+        database_info : mdcs.MDCS
+            The MDCS class used for accessing the curator database.
         record : iprPy.Record, optional
             The record to retrive the associated tar archive for.
         name : str, optional
@@ -460,19 +399,19 @@ class Mongo(Database):
         raw : bool, optional
             If True, return the archive as raw binary content. If 
             False, return as an open tarfile. (Default is False)
-        
+            
         Returns
         -------
         tarfile or str
             The tar archive as an open tarfile if raw=False, or as a binary str if
             raw=True.
-        
+            
         Raises
         ------
         ValueError
             If style and/or name content given with record.
         """
-        
+
         # Create Record object if not given
         if record is None:
             record = self.get_record(name=name, style=style)
@@ -485,92 +424,47 @@ class Mongo(Database):
         else:
             record = self.get_record(name=record.name, style=record.style)
         
-        # Define mongofs
-        mongofs = GridFS(self.mongodb, collection=record.style)
-        
-        # Build query
-        query = {}
-        query['recordname'] = record.name
-        
-        # Get tar
-        matches = list(mongofs.find(query))
-        if len(matches) == 1:
-            tar = matches[0]
-        elif len(matches) == 0:
-            raise ValueError('No tar found for the record')
-        else:
-            raise ValueError('Multiple tars found for the record')
+        filename = Path(record.name + '.tar.gz')
 
-        # Return content
+        # Download tar file
+        tardata = self.cdcs.get_blob_contents(filename=filename)
+        
+        # Return contents
         if raw is True:
-            return tar.read()
+            return tardata
         else:
-            return tarfile.open(fileobj=tar)
-
+            return tarfile.open(fileobj = BytesIO(tardata))
+    
     def delete_tar(self, record=None, name=None, style=None):
-        """
-        Deletes a tar file from the database.  Issues an error if exactly one
-        matching record is not found in the database.
-        
-        Parameters
-        ----------
-        record : iprPy.Record, optional
-            The record associated with the tar archive to delete.  If not
-            given, then name and/or style necessary to uniquely identify
-            the record are needed.
-        name : str, optional
-            .The name to use in uniquely identifying the record.
-        style : str, optional
-            .The style to use in uniquely identifying the record.
-        
-        Raises
-        ------
-        ValueError
-            If style and/or name content given with record.
-        """
-        
         # Create Record object if not given
         if record is None:
             record = self.get_record(name=name, style=style)
         
-        # Issue a ValueError for competing kwargs
+        # Issue a TypeError for competing kwargs
         elif style is not None or name is not None:
-            raise ValueError('kwargs style and name cannot be given with kwarg record')
+            raise TypeError('kwargs style and name cannot be given with kwarg record')
         
         # Verify that record exists
         else:
             record = self.get_record(name=record.name, style=record.style)
         
-        # Define mongofs
-        mongofs = GridFS(self.mongodb, collection=record.style)
-        
-        # Build query
-        query = {}
-        query['recordname'] = record.name
-        
-        # Get tar
-        matches = list(mongofs.find(query))
-        if len(matches) == 1:
-            tar = matches[0]
-        elif len(matches) == 0:
-            raise ValueError('No tar found for the record')
-        else:
-            raise ValueError('Multiple tars found for the record')
-        
-        # Delete tar
-        mongofs.delete(tar._id)
-    
+        filename = Path(record.name + '.tar.gz')
+
+        self.cdcs.delete_blob(filename=filename)
+
     def update_tar(self, record=None, name=None, style=None, tar=None, root_dir=None):
         """
-        Replaces an existing tar archive for a record with a new one.  Issues
-        an error if exactly one matching record is not found in the database.
-        The record's name must match the name of the directory being archived.
+        Archives and stores a folder associated with a record.  Issues an
+        error if exactly one matching record is not found in the database, or
+        the associated record already has a tar archive.
         
         Parameters
         ----------
+        database_info : mdcs.MDCS
+            The MDCS class used for accessing the curator database.
         record : iprPy.Record, optional
-            The record to associate the tar archive with.  If not given, then 
-            name and/or style necessary to uniquely identify the record are 
+            The record to associate the tar archive with.  If not given, then
+            name and/or style necessary to uniquely identify the record are
             needed.
         name : str, optional
             .The name to use in uniquely identifying the record.
@@ -584,10 +478,13 @@ class Mongo(Database):
             The directory to archive is at <root_dir>/<name>.  (Default is to
             set root_dir to the current working directory.)  tar cannot be given
             with root_dir.
+        
+        Raises
+        ------
+        ValueError
+            If style and/or name content given with record or the record already
+            has an archive.
         """
         
-        # Delete the existing tar archive stored in the database
         self.delete_tar(record=record, name=name, style=style)
-        
-        # Add the new tar archive
         self.add_tar(record=record, name=name, style=style, tar=tar, root_dir=root_dir)

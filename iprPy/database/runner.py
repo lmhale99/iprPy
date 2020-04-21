@@ -1,3 +1,4 @@
+# coding: utf-8
 # Standard Python libraries
 import os
 import sys
@@ -13,7 +14,7 @@ import requests
 from DataModelDict import DataModelDict as DM
 
 # iprPy imports
-from .. import rootdir
+from .. import Settings
 
 def runner(dbase, run_directory, orphan_directory=None, hold_directory=None):
     """
@@ -49,8 +50,8 @@ def runner(dbase, run_directory, orphan_directory=None, hold_directory=None):
     # Define runner log file
     d = datetime.datetime.now()
     pid = os.getpid()
-    runner_log_dir = os.path.join(os.path.dirname(rootdir),
-                                  'runner-logs')
+    
+    runner_log_dir = Settings().runner_log_directory
     if not os.path.isdir(runner_log_dir):
         os.makedirs(runner_log_dir)
     log_file = os.path.join(runner_log_dir,

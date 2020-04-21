@@ -1,3 +1,4 @@
+# coding: utf-8
 # Standard Python libraries
 from pathlib import Path
 import shutil
@@ -15,11 +16,11 @@ from .. import Database
 from ... import load_record
 from ...record import loaded as record_styles
 
-class Local(Database):
+class JsonDatabase(Database):
     
     def __init__(self, host):
         """
-        Initializes a connection to a local database.
+        Initializes a connection to a local JSON database.
         
         Parameters
         ----------
@@ -75,7 +76,7 @@ class Local(Database):
             
             # Iterate over all names using glob
             if name is None:
-                for record_file in Path(self.host, record_style).glob('*.xml'):
+                for record_file in Path(self.host, record_style).glob('*.json'):
                     record_name = record_file.stem
                     
                     # Load as an iprPy.Record object
@@ -85,7 +86,7 @@ class Local(Database):
             else:
                 # Iterate over given names
                 for record_name in aslist(name):
-                    record_file = Path(self.host, record_style, record_name+'.xml')
+                    record_file = Path(self.host, record_style, record_name+'.json')
                     if record_file.is_file():
                         
                         # Load as an iprPy.Record object
@@ -140,7 +141,7 @@ class Local(Database):
             
             # Iterate over all names using glob
             if name is None:
-                for record_file in Path(self.host, record_style).glob('*.xml'):
+                for record_file in Path(self.host, record_style).glob('*.json'):
                     record_name = record_file.stem
 
                     # Load as an iprPy.Record object
@@ -149,12 +150,12 @@ class Local(Database):
             else:
                 # Iterate over given names
                 for record_name in aslist(name):
-                    record_file = Path(self.host, record_style, record_name+'.xml')
+                    record_file = Path(self.host, record_style, record_name+'.json')
                     if record_file.is_file():
                         
                         # Load as an iprPy.Record object
                         record = load_record(record_style, record_name, record_file)
-                        df.append(record.todict(full=full, flat=flat))                    
+                        df.append(record.todict(full=full, flat=flat))
                     
         df = pd.DataFrame(df)
         
@@ -193,7 +194,7 @@ class Local(Database):
         if len(record) == 1:
             return record[0]
         elif len(record) == 0:
-            raise ValueError(f'Cannot find matching record {name} ({style})')
+            raise ValueError(f'No matching record found')
         else:
             raise ValueError('Multiple matching records found')
 
@@ -213,7 +214,7 @@ class Local(Database):
             The record style for the new record.  Required if record is not
             given.
         content : str, optional
-            The xml content of the new record.  Required if record is not
+            The json content of the new record.  Required if record is not
             given.
             
         Returns
@@ -246,10 +247,10 @@ class Local(Database):
         if not style_dir.is_dir():
             style_dir.mkdir()
         
-        # Save content to an .xml file
-        xml_file = Path(style_dir, record.name+'.xml')
-        with open(xml_file, 'w') as f:
-            record.content.xml(fp=f)
+        # Save content to an .json file
+        json_file = Path(style_dir, record.name+'.json')
+        with open(json_file, 'w') as f:
+            record.content.json(fp=f)
         
         return record
 
@@ -269,7 +270,7 @@ class Local(Database):
         style : str, optional
             The style of the record to update.
         content : str, optional
-            The new xml content to use for the record.  Required if record is
+            The new json content to use for the record.  Required if record is
             not given.
         
         Returns
@@ -348,10 +349,10 @@ class Local(Database):
             record = self.get_record(name=record.name, style=record.style)
         
         # Build path to record
-        xml_path = Path(self.host, record.style, record.name+'.xml')
+        json_path = Path(self.host, record.style, record.name+'.json')
         
         # Delete record file
-        xml_path.unlink()
+        json_path.unlink()
 
     def add_tar(self, record=None, name=None, style=None, tar=None, root_dir=None):
         """
@@ -361,8 +362,6 @@ class Local(Database):
         
         Parameters
         ----------
-        database_info : mdcs.MDCS
-            The MDCS class used for accessing the curator database.
         record : iprPy.Record, optional
             The record to associate the tar archive with.  If not given, then
             name and/or style necessary to uniquely identify the record are

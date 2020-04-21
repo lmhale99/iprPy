@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 Attributes
 ----------
@@ -10,15 +11,12 @@ databases_dict : dict
 """
 from ..tools import dynamic_import
 
-from .settings import *
-from .settings import __all__ as settings_all
-
 from .Database import Database
 
-ignorelist = ['Database', 'prepare', 'runner', 'settings', 'load_database']
+ignorelist = ['Database', 'prepare', 'runner', 'load_database']
 loaded, failed = dynamic_import(__name__, ignorelist=ignorelist)
 
 from .load_database import load_database
 
-__all__ = settings_all + ['Database', 'load_database', 'failed', 'loaded']
+__all__ = ['Database', 'load_database', 'failed', 'loaded']
 __all__.sort()
