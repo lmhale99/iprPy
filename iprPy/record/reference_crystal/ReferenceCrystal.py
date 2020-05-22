@@ -1,5 +1,11 @@
+# Standard Python libraries
+import uuid
+
 # https://github.com/usnistgov/atomman
 import atomman as am
+
+# https://github.com/usnistgov/DataModelDict
+from DataModelDict import DataModelDict as DM
 
 # iprPy imports
 from .. import Record
@@ -9,8 +15,47 @@ class ReferenceCrystal(Record):
     @property
     def contentroot(self):
         """str: The root element of the content"""
-        return 'reference-crystal'   
+        return 'reference-crystal'
     
+    def buildcontent(self, input_dict):
+        """
+        Builds a data model of the specified record style based on input (and
+        results) parameters.
+        
+        Parameters
+        ----------
+        input_dict : dict
+            Dictionary of all input parameter terms.
+        
+        Returns
+        -------
+        DataModelDict
+            Data model consistent with the record's schema format.
+        
+        Raises
+        ------
+        AttributeError
+            If buildcontent is not defined for record style.
+        """
+        # Create the root of the DataModelDict
+        output = DM()
+        output[self.contentroot] = crystal = DM()
+        
+        # Assign key and id
+        crystal['key'] = input_dict.get('key', str(uuid.uuid4()))
+        crystal['id'] = input_dict['id']
+        
+        # Specify source info
+        crystal['source'] = DM()
+        crystal['source']['name'] = input_dict['sourcename']
+        crystal['source']['link'] = input_dict['sourcelink']
+        
+        system_model = input_dict['ucell'].dump('system_model',
+                                                box_unit=input_dict.get('length_unit', None))
+        crystal['atomic-system'] = system_model['atomic-system']
+        
+        self.content = output
+
     def todict(self, full=True, flat=False):
         """
         Converts the structured content to a simpler dictionary.

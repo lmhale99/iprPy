@@ -1,33 +1,23 @@
 # http://www.numpy.org/
 import numpy as np
 
-from ...analysis import assign_currentIPR
-from .. import boolean
-
 __all__ = ['interatomicpotential']
 
 def interatomicpotential(database, keys, content_dict=None, record='potential_LAMMPS',
-                         currentIPR=None, query=None, **kwargs):
+                         status='active', query=None, **kwargs):
     """
     Builds parameter sets related to interatomic potentials.
     """
     if content_dict is None:
         content_dict = {}
 
-    # Default currentIPR is True for default record, False otherwise
-    if currentIPR is None:
-        currentIPR = record == 'potential_LAMMPS'
-    else:
-        currentIPR = boolean(currentIPR)
-    
+    # Set all status value
+    if status is 'all':
+        status = ['active', 'retracted', 'superseded']
+
     # Fetch potential records and df
     potentials, potential_df = database.get_records(style=record, return_df=True,
-                                                    query=query, **kwargs)
-    
-    # Filter by currentIPR (note that DataFrame index is unchanged)
-    if currentIPR:
-        assign_currentIPR(pot_df=potential_df)
-        potential_df = potential_df[potential_df.currentIPR == True]
+                                                    query=query, status=status, **kwargs)
 
     # Initialize inputs keys
     inputs = {}
@@ -35,7 +25,7 @@ def interatomicpotential(database, keys, content_dict=None, record='potential_LA
         inputs[key] = []
     
     # Loop over all potentials 
-    for i, potential_series in potential_df.iterrows():
+    for i in potential_df.index:
         potential = potentials[i]
         content_dict[potential.name] = potential.content
 

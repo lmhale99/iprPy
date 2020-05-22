@@ -1,10 +1,6 @@
 # https://github.com/usnistgov/atomman
 import atomman.lammps as lmp
 
-# iprPy imports
-from ...analysis import assign_currentIPR
-from .. import boolean
-
 __all__ = ['crystalprototype']
 
 def crystalprototype(database, keys, content_dict=None, 
@@ -40,27 +36,28 @@ def crystalprototype(database, keys, content_dict=None,
         # Pull out potential get_records parameters
         potential_record = potential_kwargs.pop('record', 'potential_LAMMPS')
         potential_query = potential_kwargs.pop('query', None)
-        currentIPR = potential_kwargs.pop('currentIPR', potential_record=='potential_LAMMPS')
-        currentIPR = boolean(currentIPR)
+        status = potential_kwargs.pop('status', 'active')
         
+        # Set all status value
+        if status is 'all':
+            status = ['active', 'retracted', 'superseded']
+
         # Fetch potential records 
         potentials, potential_df = database.get_records(style=potential_record, return_df=True,
-                                                        query=potential_query, **potential_kwargs)
+                                                        query=potential_query, status=status,
+                                                        **potential_kwargs)
         
-        # Filter by currentIPR (note that DataFrame index is unchanged)
-        if currentIPR:
-            assign_currentIPR(pot_df=potential_df)
-            potential_df = potential_df[potential_df.currentIPR == True]
-
         # Loop over prototypes
-        for i, prototype_series in prototype_df.iterrows():
+        for i in prototype_df.index:
             prototype = prototypes[i]
+            prototype_series = prototype_df.loc[i]
             content_dict[prototype.name] = prototype.content
             natypes = prototype_series.natypes
             
             # Loop over potentials
-            for j, potential_series in potential_df.iterrows():
+            for j in potential_df.index:
                 potential = potentials[j]
+                potential_series = potential_df.loc[j]
                 content_dict[potential.name] = potential.content
                 allsymbols = potential_series.symbols
                 
@@ -93,7 +90,7 @@ def crystalprototype(database, keys, content_dict=None,
     # Build without potentials
     else:
         # Loop over prototypes
-        for i, prototype_series in prototype_df.iterrows():
+        for i in prototype_df.index:
             prototype = prototypes[i]
             content_dict[prototype.name] = prototype.content
             

@@ -1,5 +1,4 @@
-# Standard Python libraries
-from pathlib import Path
+# coding: utf-8
 
 # iprPy imports
 from .. import Calculation
@@ -25,6 +24,9 @@ class PointDefectDiffusion(Calculation):
 
     @property
     def files(self):
+        """
+        list: the names of each file required by the calculation.
+        """
         # Fetch universal files from parent
         universalfiles = super().files
 
@@ -32,8 +34,6 @@ class PointDefectDiffusion(Calculation):
         files = [     
             'diffusion.template',
         ]
-        for i in range(len(files)):
-            files[i] = Path(self.directory, files[i])
         
         # Join and return
         return universalfiles + files

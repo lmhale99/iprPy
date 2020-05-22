@@ -1,5 +1,4 @@
-# Standard Python libraries
-from pathlib import Path
+# coding: utf-8
 
 # iprPy imports
 from .. import Calculation

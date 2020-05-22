@@ -1,5 +1,4 @@
-# Standard Python libraries
-from pathlib import Path
+# coding: utf-8
 
 # iprPy imports
 from .. import Calculation
@@ -26,7 +25,7 @@ class ElasticConstantsStatic(Calculation):
     @property
     def files(self):
         """
-        iter of str: Path to each file required by the calculation.
+        list: the names of each file required by the calculation.
         """
         # Fetch universal files from parent
         universalfiles = super().files
@@ -36,9 +35,7 @@ class ElasticConstantsStatic(Calculation):
             'cij.template',
             'potential.template',
         ]
-        for i in range(len(files)):
-            files[i] = Path(self.directory, files[i])
-        
+                
         # Join and return
         return universalfiles + files
     @property

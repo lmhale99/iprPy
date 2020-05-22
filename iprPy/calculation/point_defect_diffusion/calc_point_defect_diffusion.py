@@ -1,5 +1,6 @@
 #!/usr/bin/env python
- 
+# coding: utf-8
+
 # Python script created by Lucas Hale
 
 # Standard library imports
@@ -23,8 +24,11 @@ import atomman.unitconvert as uc
 # https://github.com/usnistgov/iprPy
 import iprPy
 
-# Define record_style
-record_style = 'calculation_point_defect_diffusion'
+# Define calculation metadata
+calculation_style = 'point_defect_diffusion'
+record_style = f'calculation_{calculation_style}'
+script = Path(__file__).stem
+pkg_name = f'iprPy.calculation.{calculation_style}.{script}'
 
 def main(*args):
     """Main function called when script is executed directly."""
@@ -49,12 +53,9 @@ def main(*args):
                                   equilsteps = input_dict['equilsteps'],
                                   randomseed = input_dict['randomseed'])
     
-    # Save data model of results
-    script = Path(__file__).stem
-    
+    # Build and save data model of results
     record = iprPy.load_record(record_style)
-    record.buildcontent(script, input_dict, results_dict)
-    
+    record.buildcontent(input_dict, results_dict)
     with open('results.json', 'w') as f:
         record.content.json(fp=f, indent=4)
 
@@ -134,12 +135,13 @@ def pointdiffusion(lammps_command, system, potential, point_kwargs,
           y-direction.
         - **'d'** (*float*) - The total computed diffusion constant.
     """
+    # Build filedict if function was called from iprPy
     try:
-        # Get script's location if __file__ exists
-        script_dir = Path(__file__).parent
+        assert __name__ == pkg_name
+        calc = iprPy.load_calculation(calculation_style)
+        filedict = calc.filedict
     except:
-        # Use cwd otherwise
-        script_dir = Path.cwd()
+        filedict = {}
 
     # Add defect(s) to the initially perfect system
     if not isinstance(point_kwargs, (list, tuple)):
@@ -201,15 +203,14 @@ def pointdiffusion(lammps_command, system, potential, point_kwargs,
             lammps_variables['dump_modify_format'] = 'float %.13e'
     
     # Write lammps input script
-    template_file = Path(script_dir, 'diffusion.template')
+    template_file = 'diffusion.template'
     lammps_script = 'diffusion.in'
-    with open(template_file) as f:
-        template = f.read()
+    template = iprPy.tools.read_calc_file(template_file, filedict)
     with open(lammps_script, 'w') as f:
         f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
     
     # Run lammps
-    output = lmp.run(lammps_command, 'diffusion.in', mpi_command)
+    output = lmp.run(lammps_command, lammps_script, mpi_command)
     
     # Extract LAMMPS thermo data.
     thermo = output.simulations[1]['thermo']
@@ -293,6 +294,8 @@ def process_input(input_dict, UUID=None, build=True):
         allows for default values to be assigned even if some inputs 
         required by the calculation are incomplete.  (Default is True.)
     """
+    # Set script's name
+    input_dict['script'] = script
     
     # Set calculation UUID
     if UUID is not None:

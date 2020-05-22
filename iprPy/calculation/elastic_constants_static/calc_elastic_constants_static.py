@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf-8
 
 # Python script created by Lucas Hale
 # Built around LAMMPS script by Steve Plimpton
@@ -22,8 +23,11 @@ import atomman.unitconvert as uc
 # https://github.com/usnistgov/iprPy
 import iprPy
 
-# Define record_style
-record_style = 'calculation_elastic_constants_static'
+# Define calculation metadata
+calculation_style = 'elastic_constants_static'
+record_style = f'calculation_{calculation_style}'
+script = Path(__file__).stem
+pkg_name = f'iprPy.calculation.{calculation_style}.{script}'
 
 def main(*args):
     """Main function called when script is executed directly."""
@@ -47,12 +51,9 @@ def main(*args):
                                             maxeval = input_dict['maxevaluations'],
                                             dmax = input_dict['maxatommotion'])
     
-    # Save data model of results
-    script = Path(__file__).stem
-    
+    # Build and save data model of results
     record = iprPy.load_record(record_style)
-    record.buildcontent(script, input_dict, results_dict)
-    
+    record.buildcontent(input_dict, results_dict)
     with open('results.json', 'w') as f:
         record.content.json(fp=f, indent=4)
 
@@ -111,12 +112,13 @@ def elastic_constants_static(lammps_command, system, potential, mpi_command=None
           elastic constants.
         - **'system_relaxed'** (*atomman.System*) - The relaxed system.
     """
+    # Build filedict if function was called from iprPy
     try:
-        # Get script's location if __file__ exists
-        script_dir = Path(__file__).parent
+        assert __name__ == pkg_name
+        calc = iprPy.load_calculation(calculation_style)
+        filedict = calc.filedict
     except:
-        # Use cwd otherwise
-        script_dir = Path.cwd()
+        filedict = {}
 
     # Convert hexagonal cells to orthorhombic to avoid LAMMPS tilt issues
     if am.tools.ishexagonal(system.box):
@@ -143,16 +145,15 @@ def elastic_constants_static(lammps_command, system, potential, mpi_command=None
     lammps_variables['dmax'] = uc.get_in_units(dmax, lammps_units['length'])
     
     # Fill in template files
-    template_file = Path(script_dir, 'cij.template')
+    template_file = 'cij.template'
     lammps_script = 'cij.in'
-    with open(template_file) as f:
-        template = f.read()
+    template = iprPy.tools.read_calc_file(template_file, filedict)
     with open(lammps_script, 'w') as f:
         f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
-    template_file2 = Path(script_dir, 'potential.template')
+
+    template_file2 = 'potential.template'
     lammps_script2 = 'potential.in'
-    with open(template_file2) as f:
-        template = f.read()
+    template = iprPy.tools.read_calc_file(template_file2, filedict)
     with open(lammps_script2, 'w') as f:
         f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
     
@@ -235,6 +236,8 @@ def process_input(input_dict, UUID=None, build=True):
         allows for default values to be assigned even if some inputs 
         required by the calculation are incomplete.  (Default is True.)
     """
+    # Set script's name
+    input_dict['script'] = script
     
     # Set calculation UUID
     if UUID is not None:

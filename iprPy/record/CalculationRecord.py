@@ -1,3 +1,4 @@
+# coding: utf-8
 # Standard Python libraries
 from pathlib import Path
 import sys
@@ -54,15 +55,13 @@ class CalculationRecord(Record):
         """
         return {}
     
-    def buildcontent(self, script, input_dict, results_dict=None):
+    def buildcontent(self, input_dict, results_dict=None):
         """
         Builds a data model of the specified record style based on input (and
         results) parameters.
         
         Parameters
         ----------
-        script : str
-            The name of the calculation script used.
         input_dict : dict
             Dictionary of all input parameter terms.
         results_dict : dict, optional
@@ -94,7 +93,7 @@ class CalculationRecord(Record):
         except:
             pass
         
-        calc['calculation']['script'] = script
+        calc['calculation']['script'] = input_dict['script']
         calc['calculation']['branch'] = input_dict.get('branch', 'main')
 
         self.content = content

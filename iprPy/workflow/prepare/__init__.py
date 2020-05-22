@@ -25,6 +25,7 @@ def prepare(database_name, run_directory_name, calculation_name,
 
 from . import crystal_space_group
 from . import diatom_scan
+from . import isolated_atom
 from . import dislocation_monopole
 from . import dislocation_periodic_array
 from . import dislocation_SDVPN

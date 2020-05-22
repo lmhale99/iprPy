@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf-8
 
 # Python script created by Lucas Hale
 
@@ -24,11 +25,11 @@ import atomman.unitconvert as uc
 # https://github.com/usnistgov/iprPy
 import iprPy
 
-# Define record_style
-record_style = 'calculation_diatom_scan'
-
-# Specify module name if loaded from iprPy
-pkg_name = 'iprPy.calculation.diatom_scan.calc_diatom_scan'
+# Define calculation metadata
+calculation_style = 'diatom_scan'
+record_style = f'calculation_{calculation_style}'
+script = Path(__file__).stem
+pkg_name = f'iprPy.calculation.{calculation_style}.{script}'
 
 def main(*args):
     """Main function called when script is executed directly."""
@@ -40,7 +41,7 @@ def main(*args):
     # Interpret and process input parameters
     process_input(input_dict, *args[1:])
     
-    # Run diatom
+    # Call calculation's function(s)
     results_dict = diatom(input_dict['lammps_command'],
                           input_dict['potential'],
                           input_dict['symbols'],
@@ -49,12 +50,9 @@ def main(*args):
                           rmax = input_dict['maximum_r'],
                           rsteps = input_dict['number_of_steps_r'])
     
-    # Save data model of results
-    script = Path(__file__).stem
-    
+    # Build and save data model of results
     record = iprPy.load_record(record_style)
-    record.buildcontent(script, input_dict, results_dict)
-    
+    record.buildcontent(input_dict, results_dict)
     with open('results.json', 'w') as f:
         record.content.json(fp=f, indent=4)
 
@@ -93,12 +91,12 @@ def diatom(lammps_command, potential, symbols,
         - **'energy_values'** (*numpy.array of float*) - The computed potential
           energies for each r value.
     """
-    
-    # Check if function was called from iprPy
-    if __name__ == pkg_name:
-        calc = iprPy.load_calculation(pkg_name.split('.')[-2])
+    # Build filedict if function was called from iprPy
+    try:
+        assert __name__ == pkg_name
+        calc = iprPy.load_calculation(calculation_style)
         filedict = calc.filedict
-    else:
+    except:
         filedict = {}
  
     # Build lists of values
@@ -187,6 +185,8 @@ def process_input(input_dict, UUID=None, build=True):
         allows for default values to be assigned even if some inputs 
         required by the calculation are incomplete.  (Default is True.)
     """
+    # Set script's name
+    input_dict['script'] = script
     
     # Set calculation UUID
     if UUID is not None:

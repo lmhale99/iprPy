@@ -5,6 +5,11 @@
 *.egg-info/
 *.egg
 
+#PyPI dist and build
+dist/
+build/
+dist-old/
+
 # Local iprPy settings
 iprPy/.iprPy
 
@@ -28,12 +33,8 @@ notebook/*/
 # Generated web content
 analysis/webcontent
 
-# User-defined potentials
-library/potential_users_LAMMPS/
-
-# Downloaded external reference structures
-library/ref/
-library/reference_crystal/
+# Compiled csv results
+IPR workflow/csv
 
 # Virtual Studio Code metadata
 .vscode/

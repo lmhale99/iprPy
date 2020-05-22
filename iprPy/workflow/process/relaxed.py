@@ -207,7 +207,8 @@ def relaxed(database_name, crystal_match_file, all_crystals_file, unique_crystal
     print(f' - {len(newresults)} new results to add')
 
     # Loop over all new records
-    for i, series in newresults.sort_values(['method_int', 'parent_type']).iterrows():
+    for i in newresults.sort_values(['method_int', 'parent_type']).index:
+        series = newresults.sort_values(['method_int', 'parent_type']).loc[i]
         oldresults = results[results.added]
         
         # Create new record
@@ -262,7 +263,7 @@ def relaxed(database_name, crystal_match_file, all_crystals_file, unique_crystal
             input_dict['standing'] = 'bad'
         
         # Build content and upload
-        record.buildcontent('noscript', input_dict)
+        record.buildcontent(input_dict)
         database.add_record(record=record)
 
     relaxed_records = database.get_records_df(style='relaxed_crystal', full=True, flat=False)

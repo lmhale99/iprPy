@@ -1,0 +1,12 @@
+include README.rst iprPy/VERSION
+
+graft bin
+
+graft iprPy/calculation/*
+graft iprPy/database/* 
+graft iprPy/record/* 
+
+graft iprPy/input/buildcombos_functions/* 
+graft iprPy/input/subset_classes/* 
+
+global-exclude *.py[cod]

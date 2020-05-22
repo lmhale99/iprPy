@@ -32,12 +32,13 @@ if __name__ == '__main__':
 
     # Set other generic settings
     #global_kwargs['prototype_id'] = 'A1--Cu--fcc'
-    #global_kwargs['maximum_r'] = '10.0',
-    #global_kwargs['number_of_steps_r'] = '500'
+    global_kwargs['maximum_r'] = '10.0',
+    global_kwargs['number_of_steps_r'] = '500'
 
     # Potential-based modifiers
     pot_kwargs = {}
-    pot_kwargs['id'] = ['1998--Meyer-R--Fe--ipr-1', '2009--Molinero-V--water--ipr-1']
+    pot_kwargs['status'] = 'all'
+    #pot_kwargs['id'] = ['1998--Meyer-R--Fe--ipr-1', '2009--Molinero-V--water--ipr-1']
     #pot_kwargs['pair_style'] = ['eam', 'eam/alloy', 'eam/fs', 'eam/cd']
 
 

@@ -1,3 +1,4 @@
+# coding: utf-8
 # iprPy imports
 from .input.subset_classes import loaded as input_subset_loaded
 from .input.subset_classes import failed as input_subset_failed

@@ -37,6 +37,7 @@ class PotentialLAMMPS(Record):
         params = super().todict(full=full, flat=flat)
 
         pot = self.content[self.contentroot]
+        params['status'] = pot.get('status', 'active')
         params['pot_key'] = pot['potential']['key']
         params['pot_id'] = pot['potential']['id']
         params['units'] = pot['units']

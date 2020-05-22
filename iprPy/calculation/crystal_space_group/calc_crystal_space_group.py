@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf-8
 
 # Python script created by Lucas Hale
 
@@ -27,8 +28,11 @@ import atomman.unitconvert as uc
 # https://github.com/usnistgov/iprPy
 import iprPy
 
-# Define record_style
-record_style = 'calculation_crystal_space_group'
+# Define calculation metadata
+calculation_style = 'crystal_space_group'
+record_style = f'calculation_{calculation_style}'
+script = Path(__file__).stem
+pkg_name = f'iprPy.calculation.{calculation_style}.{script}'
 
 def main(*args):
     """Main function called when script is executed directly."""
@@ -46,12 +50,9 @@ def main(*args):
                                        to_primitive=input_dict['primitivecell'],
                                        no_idealize=not input_dict['idealcell'])
     
-    # Save data model of results
-    script = Path(__file__).stem
-    
+    # Build and save data model of results
     record = iprPy.load_record(record_style)
-    record.buildcontent(script, input_dict, results_dict)
-    
+    record.buildcontent(input_dict, results_dict)
     with open('results.json', 'w') as f:
         record.content.json(fp=f, indent=4)
 
@@ -172,7 +173,9 @@ def process_input(input_dict, UUID=None, build=True):
         allows for default values to be assigned even if some inputs 
         required by the calculation are incomplete.  (Default is True.)
     """
-    
+    # Set script's name
+    input_dict['script'] = script
+
     # Set calculation UUID
     if UUID is not None: 
         input_dict['calc_key'] = UUID

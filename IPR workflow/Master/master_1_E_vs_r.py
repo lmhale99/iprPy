@@ -35,9 +35,8 @@ if __name__ == '__main__':
 
     # Potential-based modifiers
     pot_kwargs = {}
+    pot_kwargs['status'] = 'all'
     #pot_kwargs['id'] = ['2015--Thompson-A-P--Ta--LAMMPS--ipr2']
-    pot_kwargs['id'] = ['1998--Meyer-R--Fe--ipr-1', '2009--Molinero-V--water--ipr-1']
-    pot_kwargs['currentIPR'] = 'False'
     #pot_kwargs['pair_style'] = ['eam', 'eam/alloy', 'eam/fs', 'eam/cd']
 
 

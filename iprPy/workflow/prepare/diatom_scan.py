@@ -28,14 +28,27 @@ def main(database_name, run_directory_name, lammps_command, **kwargs):
     # Set default branch value to match current function's name
     kwargs['branch'] = kwargs.get('branch', sys._getframe().f_code.co_name)
 
-    pot_kwargs = {}
-    for key in kwargs:
-        if 'potential_' in key:
-            pot_kwargs[key[10:]] = kwargs[key]
+    # Extract kwargs starting with "potential"
+    potential_kwargs = {}
+    for key in list(kwargs.keys()):
+        if key[:10] == 'potential_':
+            potential_kwargs[key[10:]] = kwargs.pop(key)
 
     # Fetch potential records and df
     database = load_database(database_name)
-    potentials, potential_df = database.get_records(style='potential_LAMMPS', return_df=True, **pot_kwargs)
+
+    # Pull out potential get_records parameters
+    potential_record = potential_kwargs.pop('record', 'potential_LAMMPS')
+    potential_query = potential_kwargs.pop('query', None)
+    status = potential_kwargs.pop('status', 'active')
+    
+    # Set all status value
+    if status is 'all':
+        status = ['active', 'retracted', 'superseded']
+
+    potentials, potential_df = database.get_records(style=potential_record, return_df=True,
+                                                    query=potential_query, status=status,
+                                                    **potential_kwargs)
 
     kwargs['symbols'] = []
     kwargs['potential_file'] = []
@@ -44,8 +57,9 @@ def main(database_name, run_directory_name, lammps_command, **kwargs):
     kwargs['potential_dir_content'] = []
     
     # Loop over all potentials 
-    for i, potential_series in potential_df.iterrows():
+    for i in potential_df.index:
         potential = potentials[i]
+        potential_series = potential_df.loc[i]
 
         # Loop over symbol sets
         for i in range(0, len(potential_series.symbols)):

@@ -35,3 +35,5 @@ force_unit
 # Run parameters
 displacementdistance            
 symmetryprecision               
+numstrains                      
+strainrange                     

@@ -1,3 +1,4 @@
+# coding: utf-8
 # http://www.numpy.org/
 import numpy as np
 
@@ -63,15 +64,13 @@ class CalculationPointDefectDiffusion(CalculationRecord):
         calc = self.content[self.contentroot]
         return calc['point-defect']['system-family'] == calc['system-info']['family']
     
-    def buildcontent(self, script, input_dict, results_dict=None):
+    def buildcontent(self, input_dict, results_dict=None):
         """
         Builds a data model of the specified record style based on input (and
         results) parameters.
         
         Parameters
         ----------
-        script : str
-            The name of the calculation script used.
         input_dict : dict
             Dictionary of all input parameter terms.
         results_dict : dict, optional
@@ -88,7 +87,7 @@ class CalculationPointDefectDiffusion(CalculationRecord):
             If buildcontent is not defined for record style.
         """
         # Build universal content
-        super().buildcontent(script, input_dict, results_dict=results_dict)
+        super().buildcontent(input_dict, results_dict=results_dict)
 
         # Load content after root
         calc = self.content[self.contentroot]

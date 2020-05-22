@@ -103,9 +103,14 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
                 tar.close()
             
             elif terms[0] == 'tar':
-                tar = database.get_tar(name=terms[1])
-                tar.extractall(calc_directory)
-                tar.close()
+                try:
+                    tar = database.get_tar(name=terms[1])
+                except:
+                    #print(f'No tar for {terms[1]} found')
+                    pass
+                else:
+                    tar.extractall(calc_directory)
+                    tar.close()
         
         # Add record to database
         database.add_record(record=newrecord)

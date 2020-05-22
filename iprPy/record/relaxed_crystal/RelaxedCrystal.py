@@ -49,15 +49,13 @@ class RelaxedCrystal(Record):
                'gamma':1e-2,
                }
     
-    def buildcontent(self, script, input_dict):
+    def buildcontent(self, input_dict):
         """
         Builds a data model of the specified record style based on input (and
         results) parameters.
         
         Parameters
         ----------
-        script : str
-            The name of the calculation script used.
         input_dict : dict
             Dictionary of all input parameter terms.
         
@@ -126,7 +124,7 @@ class RelaxedCrystal(Record):
         
         crystal = self.content[self.contentroot]
         params['method'] = crystal['method']
-        params['standing'] = crystal['standing']
+        params['standing'] = crystal.get('standing', 'good')
         
         # Extract potential info
         subset('lammps_potential').todict(crystal, params, full=full, flat=flat)

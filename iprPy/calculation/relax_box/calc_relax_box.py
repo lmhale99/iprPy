@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf-8
 
 # Python script created by Lucas Hale
 
@@ -24,8 +25,11 @@ import atomman.unitconvert as uc
 # https://github.com/usnistgov/iprPy
 import iprPy
 
-# Define record_style
-record_style = 'calculation_relax_box'
+# Define calculation metadata
+calculation_style = 'relax_box'
+record_style = f'calculation_{calculation_style}'
+script = Path(__file__).stem
+pkg_name = f'iprPy.calculation.{calculation_style}.{script}'
 
 def main(*args):
     """Main function  called when script is executed directly."""
@@ -50,12 +54,9 @@ def main(*args):
                              p_yz = input_dict['pressure_yz'],
                              strainrange = input_dict['strainrange'])
     
-    # Save data model of results
-    script = Path(__file__).stem
-    
+    # Build and save data model of results
     record = iprPy.load_record(record_style)
-    record.buildcontent(script, input_dict, results_dict)
-    
+    record.buildcontent(input_dict, results_dict)
     with open('results.json', 'w') as f:
         record.content.json(fp=f, indent=4)
 
@@ -269,12 +270,13 @@ def calc_cij(lammps_command, system, potential,
     RuntimeError
         If any of the new box dimensions are less than zero.
     """
+    # Build filedict if function was called from iprPy
     try:
-        # Get script's location if __file__ exists
-        script_dir = Path(__file__).parent
+        assert __name__ == pkg_name
+        calc = iprPy.load_calculation(calculation_style)
+        filedict = calc.filedict
     except:
-        # Use cwd otherwise
-        script_dir = Path.cwd()
+        filedict = {}
 
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
@@ -290,10 +292,9 @@ def calc_cij(lammps_command, system, potential,
     lammps_variables['steps'] = 2
     
     # Write lammps input script
-    template_file = Path(script_dir, 'cij.template')
+    template_file = 'cij.template'
     lammps_script = 'cij.in'
-    with open(template_file) as f:
-        template = f.read()
+    template = iprPy.tools.read_calc_file(template_file, filedict)
     with open(lammps_script, 'w') as f:
         f.write(iprPy.tools.filltemplate(template, lammps_variables,
                                          '<', '>'))
@@ -399,6 +400,8 @@ def process_input(input_dict, UUID=None, build=True):
         allows for default values to be assigned even if some inputs 
         required by the calculation are incomplete.  (Default is True.)
     """
+    # Set script's name
+    input_dict['script'] = script
     
     # Set calculation UUID
     if UUID is not None:

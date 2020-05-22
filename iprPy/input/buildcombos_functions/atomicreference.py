@@ -4,10 +4,6 @@ import numpy as np
 # https://github.com/usnistgov/atomman
 import atomman.lammps as lmp
 
-# iprPy imports
-from ...analysis import assign_currentIPR
-from .. import boolean
-
 __all__ = ['atomicreference']
 
 def atomicreference(database, keys, content_dict=None, 
@@ -48,17 +44,16 @@ def atomicreference(database, keys, content_dict=None,
         # Pull out potential get_records parameters
         potential_record = potential_kwargs.pop('record', 'potential_LAMMPS')
         potential_query = potential_kwargs.pop('query', None)
-        currentIPR = potential_kwargs.pop('currentIPR', potential_record=='potential_LAMMPS')
-        currentIPR = boolean(currentIPR)
+        status = potential_kwargs.pop('status', 'active')
+        
+        # Set all status value
+        if status is 'all':
+            status = ['active', 'retracted', 'superseded']
 
         # Fetch potential records 
         potentials, potential_df = database.get_records(style=potential_record, return_df=True,
-                                                        query=potential_query, **potential_kwargs)
-        
-        # Filter by currentIPR (note that DataFrame index is unchanged)
-        if currentIPR:
-            assign_currentIPR(pot_df=potential_df)
-            potential_df = potential_df[potential_df.currentIPR == True]
+                                                        query=potential_query, status=status,
+                                                        **potential_kwargs)
 
         # Loop over all unique reference element sets
         reference_df['elementstr'] = reference_df.symbols.apply(' '.join)
@@ -66,8 +61,9 @@ def atomicreference(database, keys, content_dict=None,
             reference_symbols = elementstr.split()
             
             # Loop over all potentials
-            for j, potential_series in potential_df.iterrows():
+            for j in potential_df.index:
                 potential = potentials[j]
+                potential_series = potential_df.loc[j]
                 content_dict[potential.name] = potential.content
                 potential_symbols = potential_series.symbols
                 potential_elements = potential_series.elements
@@ -76,7 +72,7 @@ def atomicreference(database, keys, content_dict=None,
                 for symbolstr in symbolstrings(reference_symbols, potential_elements, potential_symbols):
                     
                     # Loop over all references with the reference element set
-                    for i, reference_series in reference_df[reference_df.elementstr==elementstr].iterrows():
+                    for i in reference_df[reference_df.elementstr==elementstr].index:
                         reference = references[i]
                         content_dict[reference.name] = reference.content
                 
@@ -109,7 +105,7 @@ def atomicreference(database, keys, content_dict=None,
     # Build without potentials
     else:
         # Loop over all references
-        for i, reference_series in reference_df.iterrows():
+        for i in reference_df.index:
             reference = references[i]
             content_dict[reference.name] = reference.content
             

@@ -1,10 +1,6 @@
 # https://github.com/usnistgov/DataModelDict 
 from DataModelDict import DataModelDict as DM
 
-# iprPy imports
-from ...analysis import assign_currentIPR
-from .. import boolean
-
 __all__ = ['atomicparent']
 
 def atomicparent(database, keys, content_dict=None, record=None,
@@ -12,9 +8,6 @@ def atomicparent(database, keys, content_dict=None, record=None,
     
     if content_dict is None:
         content_dict = {}
-
-    #if 'elasticconstants_file' in keys:
-    #    raise ValueError('Use buildcombos elasticparent instead')
 
     # Check if potential info is in keys
     if 'potential_file' in keys or 'potential_content' in keys or 'potential_dir' in keys:
@@ -29,33 +22,32 @@ def atomicparent(database, keys, content_dict=None, record=None,
         # Pull out potential get_records parameters
         potential_record = potential_kwargs.pop('record', 'potential_LAMMPS')
         potential_query = potential_kwargs.pop('query', None)
-        currentIPR = potential_kwargs.pop('currentIPR', potential_record=='potential_LAMMPS')
-        currentIPR = boolean(currentIPR)
+        status = potential_kwargs.pop('status', 'active')
+        
+        # Set all status value
+        if status is 'all':
+            status = ['active', 'retracted', 'superseded']
         
         # Fetch potential records 
         potentials, potential_df = database.get_records(style=potential_record, return_df=True,
-                                                        query=potential_query, **potential_kwargs)
-
-        # Filter by currentIPR (note that DataFrame index is unchanged)
-        if currentIPR:
-            assign_currentIPR(pot_df=potential_df)
-            potential_df = potential_df[potential_df.currentIPR == True]
-
+                                                        query=potential_query, status=status,
+                                                        **potential_kwargs)
     else:
         include_potentials = False
     
     # Fetch reference records
     parents, parent_df = database.get_records(style=record, return_df=True,
                                               query=query, **kwargs)
-
+                                              
     # Setup
     inputs = {}
     for key in keys:
         inputs[key] = []
 
     # Loop over all parents
-    for i, parent_series in parent_df.iterrows():
+    for i in parent_df.index:
         parent = parents[i]
+        parent_series = parent_df.loc[i]
         content_dict[parent.name] = parent.content
         
         # Find potential

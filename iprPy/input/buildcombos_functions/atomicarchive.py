@@ -1,10 +1,6 @@
 # https://github.com/usnistgov/DataModelDict 
 from DataModelDict import DataModelDict as DM
 
-# iprPy imports
-from ...analysis import assign_currentIPR
-from .. import boolean
-
 __all__ = ['atomicarchive']
 
 def atomicarchive(database, keys, content_dict=None, record=None, load_key='atomic-system',
@@ -26,17 +22,16 @@ def atomicarchive(database, keys, content_dict=None, record=None, load_key='atom
         # Pull out potential get_records parameters
         potential_record = potential_kwargs.pop('record', 'potential_LAMMPS')
         potential_query = potential_kwargs.pop('query', None)
-        currentIPR = potential_kwargs.pop('currentIPR', potential_record=='potential_LAMMPS')
-        currentIPR = boolean(currentIPR)
+        status = potential_kwargs.pop('status', 'active')
+        
+        # Set all status value
+        if status is 'all':
+            status = ['active', 'retracted', 'superseded']
         
         # Fetch potential records 
         potentials, potential_df = database.get_records(style=potential_record, return_df=True,
-                                                        query=potential_query, **potential_kwargs)
-        
-        # Filter by currentIPR (note that DataFrame index is unchanged)
-        if currentIPR:
-            assign_currentIPR(pot_df=potential_df)
-            potential_df = potential_df[potential_df.currentIPR == True]
+                                                        query=potential_query, status=status,
+                                                        **potential_kwargs)
 
     else:
         include_potentials = False
@@ -51,8 +46,9 @@ def atomicarchive(database, keys, content_dict=None, record=None, load_key='atom
         inputs[key] = []   
 
     # Loop over all parents
-    for i, parent_series in parent_df.iterrows():
+    for i in parent_df.index:
         parent = parents[i]
+        parent_series = parent_df.loc[i]
         
         # Find potential
         if include_potentials:

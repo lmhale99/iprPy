@@ -2,9 +2,10 @@ import os
 from setuptools import setup, find_packages
 
 def getversion():
-    """Reads version from VERSION file"""
-    with open(os.path.join(os.path.dirname(__file__), 'iprPy', 'VERSION')) as f:
-        return f.read().strip()
+    """Fetches version information from VERSION file"""
+    with open(os.path.join('iprPy', 'VERSION')) as version_file:
+        version = version_file.read().strip()
+    return version
 
 def getreadme():
     with open('README.rst') as readme_file:
@@ -18,7 +19,8 @@ setup(name = 'iprPy',
         'Development Status :: 4 - Beta',
         'Intended Audience :: Science/Research',
         'Natural Language :: English',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Scientific/Engineering :: Physics'
       ],
       keywords = [
@@ -41,8 +43,10 @@ setup(name = 'iprPy',
         'scipy',
         'pandas',
         'numericalunits',
-        'atomman>=1.2.0',
+        'potentials',
+        'atomman==1.3.2',
         'requests',
       ],
-      package_data={'': ['*']},
+      scripts = ["bin/iprPy"],
+      include_package_data = True,
       zip_safe = False)
