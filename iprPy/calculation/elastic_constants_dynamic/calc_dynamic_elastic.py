@@ -402,7 +402,7 @@ def estimate_elastic_constants(raw_dict):
         
         # Calculate elastic constants
         delta_strain = raw_dict[eps[0]]['strain'][i] - raw_dict[eps[1]]['strain'][i]
-        print delta_strain
+        print(delta_strain)
         delta_stress = - np.array([ raw_dict[eps[0]]['pxx'][0] - raw_dict[eps[1]]['pxx'][0], 
                                     raw_dict[eps[0]]['pyy'][0] - raw_dict[eps[1]]['pyy'][0], 
                                     raw_dict[eps[0]]['pzz'][0] - raw_dict[eps[1]]['pzz'][0], 

@@ -204,7 +204,7 @@ def __initial_setup(inline_terms, global_variables):
         
         #Issue a warning if the keyword is defined in global_variables
         if keyword in global_variables:
-            print 'Warning: high-throughput of', __calc_type__, 'ignores term', keyword
+            print('Warning: high-throughput of', __calc_type__, 'ignores term', keyword)
             
     #Convert 'copy_files' to boolean flag
     if calculation_variables['copy_files'].lower() == 'true':
