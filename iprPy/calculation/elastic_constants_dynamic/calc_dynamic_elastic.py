@@ -409,7 +409,7 @@ def estimate_elastic_constants(raw_dict):
                                     raw_dict[eps[0]]['pyz'][0] - raw_dict[eps[1]]['pyz'][0], 
                                     raw_dict[eps[0]]['pxz'][0] - raw_dict[eps[1]]['pxz'][0], 
                                     raw_dict[eps[0]]['pxy'][0] - raw_dict[eps[1]]['pxy'][0] ])
-        print np.array_str(delta_stress, precision=4, supress_small=True)
+        print(np.array_str(delta_stress, precision=4, supress_small=True))
         cij[i] = delta_stress / delta_strain
         
         # Calculate error
@@ -420,18 +420,18 @@ def estimate_elastic_constants(raw_dict):
                                 raw_dict[eps[0]]['pxz'][1]**2 + raw_dict[eps[1]]['pxz'][1]**2,
                                 raw_dict[eps[0]]['pxy'][1]**2 + raw_dict[eps[1]]['pxy'][1]**2 ])**0.5 / delta_strain
 
-    print
-    print np.array_str(cij, precision=4, suppress_small=True)
-    print np.array_str(cij_std, precision=4, suppress_small=True)
+    print()
+    print(np.array_str(cij, precision=4, suppress_small=True))
+    print(np.array_str(cij_std, precision=4, suppress_small=True))
     
     # Average symmetric terms
     for i in xrange(6):
         for j in xrange(i):
             cij[i,j] = cij[j,i] = (cij[i,j] + cij[j,i]) / 2
             cij_std[i,j] = cij_std[j,i] = (cij_std[i,j] + cij_std[j,i]) / 2
-    print
-    print np.array_str(cij, precision=4, suppress_small=True)
-    print np.array_str(cij_std, precision=4, suppress_small=True)
+    print()
+    print(np.array_str(cij, precision=4, suppress_small=True))
+    print(np.array_str(cij_std, precision=4, suppress_small=True))
             
     results_dict['C'] = am.ElasticConstants(Cij=cij)
     results_dict['cij_std'] = cij_std
