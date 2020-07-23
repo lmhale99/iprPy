@@ -284,7 +284,7 @@ class Library():
                 
         # Load as iprPy record if style exists
         try:
-            return iprPy.load_record(style, name, content)
+            return load_record(style, name, content)
         except:
             return content    
         

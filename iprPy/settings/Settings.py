@@ -62,10 +62,15 @@ class Settings():
         """dict: The pre-defined database settings organized by name"""
         databases = {}
         for database in self.__content.aslist('database'):
-            databases[database['name']] = {}
-            for key in database:
-                if key != 'name':
-                    databases[database['name']][key] = database[key]
+            name = database['name']
+
+            databases[name] = {}
+            databases[name]['style'] = database['style']
+            databases[name]['host'] = database['host']
+            
+            for param in database.aslist('params'):
+                for key, value in param.items():
+                    databases[name][key] = value
         return databases
 
     @property
