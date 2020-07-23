@@ -93,6 +93,11 @@ def crystal_space_group(system, symprec=1e-5, to_primitive=False,
     ucell.atoms.pos -= ucell.atoms.pos[0]
     ucell = ucell.normalize()
     
+    # Throw error if natoms > 2000
+    natoms = ucell.natoms
+    if natoms > 2000:
+        raise RuntimeError('too many positions')
+
     # Average extra per-atom properties by mappings to primitive
     for index in np.unique(sym_data['mapping_to_primitive']):
         for key in system.atoms.prop():
@@ -125,8 +130,7 @@ def crystal_space_group(system, symprec=1e-5, to_primitive=False,
     if latticetype in ['A', 'B']:
         latticetype = 'C'
     
-    natoms = str(ucell.natoms)
-    pearson = crystalclass + latticetype + natoms
+    pearson = crystalclass + latticetype + str(natoms)
     
     # Generate Wyckoff fingerprint
     fingerprint_dict = {} 
