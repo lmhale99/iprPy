@@ -44,7 +44,6 @@ def main(database_name, run_directory_name, lammps_command, **kwargs):
         'maxiterations               5000',
         'maxevaluations              10000',
         'maxatommotion               ',
-        'strainrange                 1e-5',
         'strainrange                 1e-6',
         'strainrange                 1e-7',
         'strainrange                 1e-8',
