@@ -3,9 +3,6 @@ from copy import deepcopy
 from pathlib import Path
 import json
 
-# https://github.com/usnistgov/DataModelDict
-from DataModelDict import DataModelDict as DM
-
 import potentials
 
 # iprPy imports
