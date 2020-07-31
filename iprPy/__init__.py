@@ -9,7 +9,7 @@ __all__ = ['__version__', 'tools', 'Settings', 'input', 'Library',
            'record', 'load_record', 
            'calculation', 'load_calculation',
            'database', 'load_database', 
-           'analysis', 'workflow', 'check_modules']
+           'analysis', 'workflow', 'check_modules', 'command_line']
 __all__.sort()
 
 # iprPy imports
@@ -34,3 +34,5 @@ from .database import load_database
 from . import workflow
 
 from .check_modules import check_modules
+
+from .command_line import command_line

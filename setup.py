@@ -36,17 +36,19 @@ setup(name = 'iprPy',
       author_email = 'lucas.hale@nist.gov',
       packages = find_packages(),
       install_requires = [
-        'xmltodict',
         'DataModelDict',
         'numpy', 
         'matplotlib',
         'scipy',
         'pandas',
-        'numericalunits',
         'potentials',
         'atomman==1.3.3',
         'requests',
       ],
-      scripts = ["bin/iprPy"],
+      entry_points = {
+        'console_scripts': [
+          'iprPy = iprPy.command_line:command_line'
+        ]
+      },
       include_package_data = True,
       zip_safe = False)
