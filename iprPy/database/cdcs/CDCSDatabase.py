@@ -288,7 +288,7 @@ class CDCSDatabase(Database):
             style = record.style
          
         # Delete record
-        self.cdcs.delete(template=style, title=name)
+        self.cdcs.delete_record(template=style, title=name)
     
     def add_tar(self, record=None, name=None, style=None, tar=None, root_dir=None):
         """
