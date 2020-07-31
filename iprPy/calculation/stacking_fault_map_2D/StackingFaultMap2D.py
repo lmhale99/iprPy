@@ -114,3 +114,6 @@ class StackingFaultMap2D(Calculation):
                
         # Join and return
         return universalkeys + keys
+
+# Test module
+StackingFaultMap2D()

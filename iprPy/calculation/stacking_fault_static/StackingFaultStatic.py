@@ -112,3 +112,6 @@ class StackingFaultStatic(Calculation):
                
         # Join and return
         return universalkeys + keys
+
+# Test module
+StackingFaultStatic()

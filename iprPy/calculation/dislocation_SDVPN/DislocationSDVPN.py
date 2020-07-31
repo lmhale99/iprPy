@@ -1,5 +1,4 @@
-# Standard Python libraries
-from pathlib import Path
+# coding: utf-8
 
 from .. import Calculation
 from ...input import subset
@@ -30,8 +29,6 @@ class DislocationSDVPN(Calculation):
 
         # Specify calculation-specific keys 
         files = []
-        for i in range(len(files)):
-            files[i] = Path(self.directory, files[i])
         
         # Join and return
         return universalfiles + files
@@ -149,3 +146,6 @@ class DislocationSDVPN(Calculation):
                    
         # Join and return
         return universalkeys + keys
+
+# Test module
+DislocationSDVPN()

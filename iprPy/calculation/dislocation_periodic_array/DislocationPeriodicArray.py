@@ -1,5 +1,4 @@
-# Standard Python libraries
-from pathlib import Path
+# coding: utf-8
 
 # iprPy imports
 from .. import Calculation
@@ -33,8 +32,6 @@ class DislocationPeriodicArray(Calculation):
         files = [
             'dislarray_relax.template',
         ]
-        for i in range(len(files)):
-            files[i] = Path(self.directory, files[i])
         
         # Join and return
         return universalfiles + files
@@ -124,3 +121,6 @@ class DislocationPeriodicArray(Calculation):
                    
         # Join and return
         return universalkeys + keys
+
+# Test module
+DislocationPeriodicArray()

@@ -105,3 +105,6 @@ class SurfaceEnergyStatic(Calculation):
                
         # Join and return
         return universalkeys + keys
+
+# Test module
+SurfaceEnergyStatic()
