@@ -46,7 +46,6 @@ class DislocationMonopole(Calculation):
             'lammps_commands', 
             'lammps_potential',
             'atomman_systemload',
-            'atomman_systemmanipulate',
             'atomman_elasticconstants',
             'dislocation',
             'units',
@@ -58,8 +57,9 @@ class DislocationMonopole(Calculation):
             'annealtemperature',
             'annealsteps',
             'randomseed',
-            'dislocation_boundarywidth',
             'dislocation_boundaryshape',
+            'dislocation_boundarywidth',
+            'dislocation_boundaryscale',            
         ]
         
         return self._buildtemplate(subsets, runkeys)
@@ -77,8 +77,9 @@ class DislocationMonopole(Calculation):
             subset('lammps_commands').keyset 
             + subset('units').keyset 
             + [
-                'dislocation_boundarywidth',
                 'dislocation_boundaryshape',
+                'dislocation_boundarywidth',
+                'dislocation_boundaryscale',
             ]
         )
 

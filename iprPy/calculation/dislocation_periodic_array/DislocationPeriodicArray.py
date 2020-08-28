@@ -30,7 +30,7 @@ class DislocationPeriodicArray(Calculation):
 
         # Specify calculation-specific keys 
         files = [
-            'dislarray_relax.template',
+            'disl_relax.template',
         ]
         
         # Join and return
@@ -46,7 +46,6 @@ class DislocationPeriodicArray(Calculation):
             'lammps_commands', 
             'lammps_potential',
             'atomman_systemload',
-            'atomman_systemmanipulate',
             'atomman_elasticconstants',
             'dislocation',
             'units',
@@ -58,9 +57,10 @@ class DislocationPeriodicArray(Calculation):
             'annealtemperature',
             'annealsteps',
             'randomseed',
-            'duplicatecutoff',
-            'boundarywidth',
-            'onlyuselinear',   
+            'dislocation_duplicatecutoff',
+            'dislocation_boundarywidth',
+            'dislocation_boundaryscale',
+            'dislocation_onlylinear',   
         ]
         
         return self._buildtemplate(subsets, runkeys)
@@ -78,9 +78,10 @@ class DislocationPeriodicArray(Calculation):
             subset('lammps_commands').keyset 
             + subset('units').keyset 
             + [
-                'duplicatecutoff',
-                'boundarywidth',
-                'onlyuselinear',
+                'dislocation_duplicatecutoff',
+                'dislocation_boundarywidth',
+                'dislocation_boundaryscale',
+                'dislocation_onlylinear',
             ]
         )
 
@@ -114,7 +115,7 @@ class DislocationPeriodicArray(Calculation):
                 + [
                     'randomseed',
                     'annealtemperature',
-                    'annealsteps',                        
+                    'annealsteps',
                     ]
             )
         ]
