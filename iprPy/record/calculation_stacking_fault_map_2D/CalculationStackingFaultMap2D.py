@@ -41,8 +41,8 @@ class CalculationStackingFaultMap2D(CalculationRecord):
             
             'stackingfault_key',
             
-            'numshifts1',
-            'numshifts2'
+            'num_a1',
+            'num_a2'
         ]
     
     @property
@@ -94,14 +94,11 @@ class CalculationStackingFaultMap2D(CalculationRecord):
         calc = self.content[self.contentroot]
         calc['calculation']['run-parameter'] = run_params = DM()
         
-        # Copy over sizemults (rotations and shifts)
-        subset('atomman_systemmanipulate').buildcontent(calc, input_dict, results_dict=results_dict)
-        
         # Copy over minimization parameters
         subset('lammps_minimize').buildcontent(calc, input_dict, results_dict=results_dict)
         
-        run_params['stackingfault_numshifts1'] = input_dict['stackingfault_numshifts1']
-        run_params['stackingfault_numshifts2'] = input_dict['stackingfault_numshifts2']
+        run_params['stackingfault_num_a1'] = input_dict['stackingfault_num_a1']
+        run_params['stackingfault_num_a2'] = input_dict['stackingfault_num_a2']
         
         # Copy over potential data model info
         subset('lammps_potential').buildcontent(calc, input_dict, results_dict=results_dict)
@@ -151,20 +148,16 @@ class CalculationStackingFaultMap2D(CalculationRecord):
         # Extract minimization info
         subset('lammps_minimize').todict(calc, params, full=full, flat=flat)
         
-        params['numshifts1'] = calc['calculation']['run-parameter']['stackingfault_numshifts1']
-        params['numshifts2'] = calc['calculation']['run-parameter']['stackingfault_numshifts2']
+        params['num_a1'] = calc['calculation']['run-parameter']['stackingfault_num_a1']
+        params['num_a2'] = calc['calculation']['run-parameter']['stackingfault_num_a2']
         
         # Extract potential info
         subset('lammps_potential').todict(calc, params, full=full, flat=flat)
         
         # Extract system info
         subset('atomman_systemload').todict(calc, params, full=full, flat=flat)
-        subset('atomman_systemmanipulate').todict(calc, params, full=full, flat=flat)
         
         subset('stackingfault').todict(calc, params, full=full, flat=flat)
-        
-        params['shiftvector1'] = calc['stacking-fault']['calculation-parameter']['shiftvector1']
-        params['shiftvector2'] = calc['stacking-fault']['calculation-parameter']['shiftvector2']
         
         if full is True and params['status'] == 'finished':
         

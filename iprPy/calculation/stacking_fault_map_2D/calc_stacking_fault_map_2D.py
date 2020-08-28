@@ -42,22 +42,26 @@ def main(*args):
     process_input(input_dict, *args[1:])
     
     results_dict = stackingfaultmap(input_dict['lammps_command'],
-                                     input_dict['initialsystem'],
-                                     input_dict['potential'],
-                                     mpi_command = input_dict['mpi_command'],
-                                     a1vect = input_dict['shiftvector1'],
-                                     a2vect = input_dict['shiftvector2'],
-                                     ucell = input_dict['ucell'],
-                                     transform = input_dict['transformationmatrix'],
-                                     cutboxvector = input_dict['stackingfault_cutboxvector'],
-                                     faultposrel = input_dict['faultpos'],
-                                     num_a1 = input_dict['stackingfault_numshifts1'],
-                                     num_a2 = input_dict['stackingfault_numshifts2'],
-                                     etol = input_dict['energytolerance'],
-                                     ftol = input_dict['forcetolerance'],
-                                     maxiter = input_dict['maxiterations'],
-                                     maxeval = input_dict['maxevaluations'],
-                                     dmax = input_dict['maxatommotion'])
+                                    input_dict['ucell'],
+                                    input_dict['potential'],
+                                    input_dict['stackingfault_hkl'],
+                                    mpi_command = input_dict['mpi_command'],
+                                    sizemults = input_dict['sizemults'],
+                                    minwidth = input_dict['stackingfault_minwidth'],
+                                    even = input_dict['stackingfault_even'],
+                                    a1vect_uvw = input_dict['stackingfault_a1vect_uvw'],
+                                    a2vect_uvw = input_dict['stackingfault_a2vect_uvw'],
+                                    conventional_setting = input_dict['stackingfault_cellsetting'],
+                                    cutboxvector = input_dict['stackingfault_cutboxvector'],
+                                    faultpos_rel = input_dict['stackingfault_faultpos_rel'],
+                                    num_a1 = input_dict['stackingfault_num_a1'],
+                                    num_a2 = input_dict['stackingfault_num_a2'],
+                                    shiftindex = input_dict['stackingfault_shiftindex'],
+                                    etol = input_dict['energytolerance'],
+                                    ftol = input_dict['forcetolerance'],
+                                    maxiter = input_dict['maxiterations'],
+                                    maxeval = input_dict['maxevaluations'],
+                                    dmax = input_dict['maxatommotion'])
 
     # Build and save data model of results
     record = iprPy.load_record(record_style)
@@ -169,10 +173,9 @@ def stackingfaultrelax(lammps_command, system, potential,
     lammps_variables = {}
     system_info = system.dump('atom_data',
                               f=Path(sim_directory, 'system.dat').as_posix(),
-                              units=potential.units,
-                              atom_style=potential.atom_style)
-    lammps_variables['atomman_system_info'] = system_info
-    lammps_variables['atomman_pair_info'] = potential.pair_info(system.symbols)
+                              potential=potential,
+                              return_pair_info=True)
+    lammps_variables['atomman_system_pair_info'] = system_info
     lammps_variables['fix_cut_setforce'] = fix_cut_setforce
     lammps_variables['sim_directory'] = sim_directory
     lammps_variables['etol'] = etol
@@ -218,13 +221,13 @@ def stackingfaultrelax(lammps_command, system, potential,
     
     return results_dict
 
-def stackingfaultmap(lammps_command, system, potential, 
-                     mpi_command=None,
-                     a1vect=None, a2vect=None, ucell=None,
-                     transform=None, cutboxvector=None,
-                     faultposrel=0.5, num_a1=10, num_a2=10, 
+def stackingfaultmap(lammps_command, ucell, potential, hkl,
+                     mpi_command=None, sizemults=None, minwidth=None, even=False,
+                     a1vect_uvw=None, a2vect_uvw=None, conventional_setting='p',
+                     cutboxvector='c', faultpos_rel=None, faultpos_cart=None,
+                     num_a1=10, num_a2=10, atomshift=None, shiftindex=None,
                      etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000,
-                     dmax=uc.set_in_units(0.01, 'angstrom')):
+                     dmax=uc.set_in_units(0.01, 'angstrom')): 
     """
     Computes a generalized stacking fault map for shifts along a regular 2D
     grid.
@@ -233,43 +236,69 @@ def stackingfaultmap(lammps_command, system, potential,
     ----------
     lammps_command :str
         Command for running LAMMPS.
-    system : atomman.System
-        The system to perform the calculation on.
+    ucell : atomman.System
+        The crystal unit cell to use as the basis of the stacking fault
+        configurations.
     potential : atomman.lammps.Potential
         The LAMMPS implemented potential to use.
+    hkl : array-like object
+        The Miller(-Bravais) crystal fault plane relative to ucell.
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
         will run serially.
-    a1vect : array-like object, optional
-        A slip vector within the slip plane.  Depending on if ucellbox and
-        transform are given, this can be either a Miller crystal vector or
-        a Cartesian vector relative to the supplied system.  If a1vect is
-        not given and a2vect is, then a1vect is set to [0,0,0].
-    a2vect : array-like object, optional
-        A slip vector within the slip plane.  Depending on if ucellbox and
-        transform are given, this can be either a Miller crystal vector or
-        a Cartesian vector relative to the supplied system.  If a2vect is
-        not given and a1vect is, then a2vect is set to [0,0,0].
-    ucell : atomman.System, optional
-        If ucell is given, then the a1vect and a2vect slip vectors are
-        taken as Miller crystal vectors relative to ucell.box.  If not
-        given, then the slip vectors are taken as Cartesian vectors.
-    transform : array-like object, optional
-        A transformation tensor to apply to the a1vect and a2vect slip
-        vectors.  This is needed if system is oriented differently than
-        ucell, i.e. system is rotated.
+    sizemults : list or tuple, optional
+        The three System.supersize multipliers [a_mult, b_mult, c_mult] to use on the
+        rotated cell to build the final system. Note that the cutboxvector sizemult
+        must be an integer and not a tuple.  Default value is [1, 1, 1].
+    minwidth : float, optional
+        If given, the sizemult along the cutboxvector will be selected such that the
+        width of the resulting final system in that direction will be at least this
+        value. If both sizemults and minwidth are given, then the larger of the two
+        in the cutboxvector direction will be used. 
+    even : bool, optional
+        A True value means that the sizemult for cutboxvector will be made an even
+        number by adding 1 if it is odd.  Default value is False.
+    a1vect_uvw : array-like object, optional
+        The crystal vector to use for one of the two shifting vectors.  If
+        not given, will be set to the shortest in-plane lattice vector.
+    a2vect_uvw : array-like object, optional
+        The crystal vector to use for one of the two shifting vectors.  If
+        not given, will be set to the shortest in-plane lattice vector not
+        parallel to a1vect_uvw.
+    conventional_setting : str, optional
+        Allows for rotations of a primitive unit cell to be determined from
+        (hkl) indices specified relative to a conventional unit cell.  Allowed
+        settings: 'p' for primitive (no conversion), 'f' for face-centered,
+        'i' for body-centered, and 'a', 'b', or 'c' for side-centered.  Default
+        behavior is to perform no conversion, i.e. take (hkl) relative to the
+        given ucell.
     cutboxvector : str, optional
         Indicates which of the three system box vectors, 'a', 'b', or 'c', to
         cut with a non-periodic boundary (default is 'c').
-    faultposrel : float, optional
-        The fractional position along the cutboxvector where the stacking
-        fault plane will be placed (default is 0.5).
+    faultpos_rel : float, optional
+        The position to place the slip plane within the system given as a
+        relative coordinate along the out-of-plane direction.  faultpos_rel
+        and faultpos_cart cannot both be given.  Default value is 0.5 if 
+        faultpos_cart is also not given.
+    faultpos_cart : float, optional
+        The position to place the slip plane within the system given as a
+        Cartesian coordinate along the out-of-plane direction.  faultpos_rel
+        and faultpos_cart cannot both be given.
     num_a1 : int, optional
-        The number of fractional coordinates to evaluate along a1vect.
+        The number of fractional coordinates to evaluate along a1vect_uvw.
         Default value is 10.
     num_a2 : int, optional
-        The number of fractional coordinates to evaluate along a2vect.
-        Default value is 10. 
+        The number of fractional coordinates to evaluate along a2vect_uvw.
+        Default value is 10.
+    atomshift : array-like object, optional
+        A Cartesian vector shift to apply to all atoms.  Can be used to shift
+        atoms perpendicular to the fault plane to allow different termination
+        planes to be cut.  Cannot be given with shiftindex.
+    shiftindex : int, optional
+        Allows for selection of different termination planes based on the
+        preferred shift values determined by the underlying fault generation.
+        Cannot be given with atomshift. If neither atomshift nor shiftindex
+        given, then shiftindex will be set to 0.
     etol : float, optional
         The energy tolerance for the structure minimization. This value is
         unitless. (Default is 0.0).
@@ -297,12 +326,24 @@ def stackingfaultmap(lammps_command, system, potential,
           plotting object.
     """
     # Construct stacking fault configuration generator
-    gsf_gen = am.defect.StackingFault(system, a1vect=a1vect, a2vect=a2vect,
-                                      ucellbox=ucell.box, transform=transform,
-                                      cutboxvector=cutboxvector, faultposrel=faultposrel)
+    gsf_gen = am.defect.StackingFault(hkl, ucell, cutboxvector=cutboxvector,
+                                      a1vect_uvw=a1vect_uvw, a2vect_uvw=a2vect_uvw,
+                                      conventional_setting=conventional_setting)
+    
+    # Check shift parameters
+    if shiftindex is not None:
+        assert atomshift is None, 'shiftindex and atomshift cannot both be given'
+        atomshift = gsf_gen.shifts[shiftindex]
+    elif atomshift is None:
+        atomshift = gsf_gen.shifts[0]
+    
+    # Generate the free surface (zero-shift) configuration
+    gsf_gen.surface(shift=atomshift, minwidth=minwidth, sizemults=sizemults,
+                    even=even, faultpos_rel=faultpos_rel)
+    
     abovefault = gsf_gen.abovefault
     cutindex = gsf_gen.cutindex
-    A_fault = gsf_gen.faultarea
+    A_fault = gsf_gen.surfacearea
 
     # Identify lammps_date version
     lammps_date = lmp.checkversion(lammps_command)['date']
@@ -324,11 +365,8 @@ def stackingfaultmap(lammps_command, system, potential,
                                    mpi_command=mpi_command, 
                                    sim_directory=sim_directory,
                                    cutboxvector=cutboxvector,
-                                   etol=etol,
-                                   ftol=ftol,
-                                   maxiter=maxiter,
-                                   maxeval=maxeval,
-                                   dmax=dmax,
+                                   etol=etol, ftol=ftol, maxiter=maxiter,
+                                   maxeval=maxeval, dmax=dmax,
                                    lammps_date=lammps_date)
         
         # Extract terms
@@ -352,9 +390,9 @@ def stackingfaultmap(lammps_command, system, potential,
     
     results_dict = {}
     results_dict['A_fault'] = A_fault
-    results_dict['gamma'] = am.defect.GammaSurface(a1vect = a1vect,
-                                                   a2vect = a2vect,
-                                                   box = ucell.box,
+    results_dict['gamma'] = am.defect.GammaSurface(a1vect = gsf_gen.a1vect_uvw,
+                                                   a2vect = gsf_gen.a2vect_uvw,
+                                                   box = gsf_gen.ucell.box,
                                                    a1 = a1vals,
                                                    a2 = a2vals,
                                                    E_gsf = E_gsfs,
@@ -402,8 +440,8 @@ def process_input(input_dict, UUID=None, build=True):
     # None for this calculation
     
     # These are calculation-specific default integers
-    input_dict['stackingfault_numshifts1'] = int(input_dict.get('stackingfault_numshifts1', 10))
-    input_dict['stackingfault_numshifts2'] = int(input_dict.get('stackingfault_numshifts2', 10))
+    input_dict['stackingfault_num_a1'] = int(input_dict.get('stackingfault_num_a1', 10))
+    input_dict['stackingfault_num_a2'] = int(input_dict.get('stackingfault_num_a2', 10))
     
     # These are calculation-specific default unitless floats
     # None for this calculation
@@ -425,12 +463,6 @@ def process_input(input_dict, UUID=None, build=True):
     
     # Load stackingfault parameters
     iprPy.input.subset('stackingfault').interpret(input_dict)
-    
-    # Construct initialsystem by manipulating ucell system
-    iprPy.input.subset('atomman_systemmanipulate').interpret(input_dict, build=build)
-    
-    # Convert stackingfault parameters
-    iprPy.input.subset('stackingfault').interpret2(input_dict, build=build)
 
 if __name__ == '__main__':
     main(*sys.argv[1:])
