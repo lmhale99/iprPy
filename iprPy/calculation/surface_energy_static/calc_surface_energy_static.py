@@ -43,15 +43,21 @@ def main(*args):
     
     # Run surface_energy
     results_dict = surface_energy(input_dict['lammps_command'],
-                                  input_dict['initialsystem'],
+                                  input_dict['ucell'],
                                   input_dict['potential'],
+                                  input_dict['surface_hkl'],
                                   mpi_command = input_dict['mpi_command'],
+                                  sizemults = input_dict['sizemults'],
+                                  minwidth = input_dict['surface_minwidth'],
+                                  even = input_dict['surface_even'],
+                                  conventional_setting = input_dict['surface_cellsetting'],
+                                  cutboxvector = input_dict['surface_cutboxvector'],
+                                  shiftindex = input_dict['surface_shiftindex'],
                                   etol = input_dict['energytolerance'],
                                   ftol = input_dict['forcetolerance'],
                                   maxiter = input_dict['maxiterations'],
                                   maxeval = input_dict['maxevaluations'],
-                                  dmax = input_dict['maxatommotion'],
-                                  cutboxvector = input_dict['surface_cutboxvector'])
+                                  dmax = input_dict['maxatommotion'])
     
     # Build and save data model of results
     record = iprPy.load_record(record_style)
@@ -59,10 +65,12 @@ def main(*args):
     with open('results.json', 'w') as f:
         record.content.json(fp=f, indent=4)
 
-def surface_energy(lammps_command, system, potential,
-                   mpi_command=None, etol=0.0, ftol=0.0, maxiter=10000,
-                   maxeval=100000, dmax=uc.set_in_units(0.01, 'angstrom'),
-                   cutboxvector='c'):
+def surface_energy(lammps_command, ucell, potential, hkl,
+                   mpi_command=None, sizemults=None, minwidth=None, even=False,
+                   conventional_setting='p', cutboxvector='c', 
+                   atomshift=None, shiftindex=None,
+                   etol=0.0, ftol=0.0, maxiter=10000,
+                   maxeval=100000, dmax=uc.set_in_units(0.01, 'angstrom')):
     """
     Evaluates surface formation energies by slicing along one periodic
     boundary of a bulk system.
@@ -71,13 +79,47 @@ def surface_energy(lammps_command, system, potential,
     ----------
     lammps_command :str
         Command for running LAMMPS.
-    system : atomman.System
-        The system to perform the calculation on.
+    ucell : atomman.System
+        The crystal unit cell to use as the basis of the stacking fault
+        configurations.
     potential : atomman.lammps.Potential
         The LAMMPS implemented potential to use.
+    hkl : array-like object
+        The Miller(-Bravais) crystal fault plane relative to ucell.
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
         will run serially.
+    sizemults : list or tuple, optional
+        The three System.supersize multipliers [a_mult, b_mult, c_mult] to use on the
+        rotated cell to build the final system. Note that the cutboxvector sizemult
+        must be an integer and not a tuple.  Default value is [1, 1, 1].
+    minwidth : float, optional
+        If given, the sizemult along the cutboxvector will be selected such that the
+        width of the resulting final system in that direction will be at least this
+        value. If both sizemults and minwidth are given, then the larger of the two
+        in the cutboxvector direction will be used. 
+    even : bool, optional
+        A True value means that the sizemult for cutboxvector will be made an even
+        number by adding 1 if it is odd.  Default value is False.
+    conventional_setting : str, optional
+        Allows for rotations of a primitive unit cell to be determined from
+        (hkl) indices specified relative to a conventional unit cell.  Allowed
+        settings: 'p' for primitive (no conversion), 'f' for face-centered,
+        'i' for body-centered, and 'a', 'b', or 'c' for side-centered.  Default
+        behavior is to perform no conversion, i.e. take (hkl) relative to the
+        given ucell.
+    cutboxvector : str, optional
+        Indicates which of the three system box vectors, 'a', 'b', or 'c', to
+        cut with a non-periodic boundary (default is 'c').
+    atomshift : array-like object, optional
+        A Cartesian vector shift to apply to all atoms.  Can be used to shift
+        atoms perpendicular to the fault plane to allow different termination
+        planes to be cut.  Cannot be given with shiftindex.
+    shiftindex : int, optional
+        Allows for selection of different termination planes based on the
+        preferred shift values determined by the underlying fault generation.
+        Cannot be given with atomshift. If neither atomshift nor shiftindex
+        given, then shiftindex will be set to 0.
     etol : float, optional
         The energy tolerance for the structure minimization. This value is
         unitless. (Default is 0.0).
@@ -94,9 +136,6 @@ def surface_energy(lammps_command, system, potential,
         The maximum distance in length units that any atom is allowed to relax
         in any direction during a single minimization iteration (default is
         0.01 Angstroms).
-    cutboxvector : str, optional
-        Indicates which of the three system box vectors, 'a', 'b', or 'c', to
-        cut with a non-periodic boundary (default is 'c').
     
     Returns
     -------
@@ -121,47 +160,49 @@ def surface_energy(lammps_command, system, potential,
     ValueError
         For invalid cutboxvectors
     """
-    
-    # Evaluate perfect system
-    system.pbc = [True, True, True]
-    perfect = relax_system(lammps_command, system, potential,
-                           mpi_command=mpi_command, etol=etol, ftol=ftol,
-                           maxiter=maxiter, maxeval=maxeval, dmax=dmax)
-    
-    # Extract results from perfect system
-    dumpfile_base = 'perfect.dump'
-    shutil.move(perfect['finaldumpfile'], dumpfile_base)
-    shutil.move('log.lammps', 'perfect-log.lammps')
-    E_total_base = perfect['potentialenergy']
-    
-    # Set up defect system
-    # A_surf is area of parallelogram defined by the two box vectors not along
-    # the cutboxvector
-    if   cutboxvector == 'a':
-        system.pbc[0] = False
-        A_surf = np.linalg.norm(np.cross(system.box.bvect, system.box.cvect))
-    
-    elif cutboxvector == 'b':
-        system.pbc[1] = False
-        A_surf = np.linalg.norm(np.cross(system.box.avect, system.box.cvect))
-    
-    elif cutboxvector == 'c':
-        system.pbc[2] = False
-        A_surf = np.linalg.norm(np.cross(system.box.avect, system.box.bvect))
-    
-    else:
-        raise ValueError('Invalid cutboxvector')
-    
+    # Construct free surface configuration generator
+    surf_gen = am.defect.FreeSurface(hkl, ucell, cutboxvector=cutboxvector,
+                                     conventional_setting=conventional_setting)
+
+    # Check shift parameters
+    if shiftindex is not None:
+        assert atomshift is None, 'shiftindex and atomshift cannot both be given'
+        atomshift = surf_gen.shifts[shiftindex]
+    elif atomshift is None:
+        atomshift = surf_gen.shifts[0]
+
+    # Generate the free surface configuration
+    system = surf_gen.surface(shift=atomshift, minwidth=minwidth,
+                                  sizemults=sizemults, even=even)
+    A_surf= surf_gen.surfacearea
+
+    # Identify lammps_date version
+    lammps_date = lmp.checkversion(lammps_command)['date']
+
     # Evaluate system with free surface
-    surface = relax_system(lammps_command, system, potential,
-                           mpi_command=mpi_command, etol=etol, ftol=ftol,
-                           maxiter=maxiter, maxeval=maxeval, dmax=dmax)
+    surf_results = relax_system(lammps_command, system, potential,
+                                mpi_command=mpi_command, etol=etol, ftol=ftol,
+                                maxiter=maxiter, maxeval=maxeval, dmax=dmax,
+                                lammps_date=lammps_date)
     
     # Extract results from system with free surface
     dumpfile_surf = 'surface.dump'
-    shutil.move(surface['finaldumpfile'], dumpfile_surf)
+    shutil.move(surf_results['finaldumpfile'], dumpfile_surf)
     shutil.move('log.lammps', 'surface-log.lammps')
-    E_total_surf = surface['potentialenergy']
+    E_total_surf = surf_results['potentialenergy']
+
+    # Evaluate perfect system (all pbc removes cut)
+    system.pbc = [True, True, True]
+    perf_results = relax_system(lammps_command, system, potential,
+                                mpi_command=mpi_command, etol=etol, ftol=ftol,
+                                maxiter=maxiter, maxeval=maxeval, dmax=dmax,
+                                lammps_date=lammps_date)
+    
+    # Extract results from perfect system
+    dumpfile_base = 'perfect.dump'
+    shutil.move(perf_results['finaldumpfile'], dumpfile_base)
+    shutil.move('log.lammps', 'perfect-log.lammps')
+    E_total_base = perf_results['potentialenergy']
     
     # Compute the free surface formation energy
     E_surf_f = (E_total_surf - E_total_base) / (2 * A_surf)
@@ -181,7 +222,8 @@ def surface_energy(lammps_command, system, potential,
 
 def relax_system(lammps_command, system, potential,
                  mpi_command=None, etol=0.0, ftol=0.0, maxiter=10000,
-                 maxeval=100000, dmax=uc.set_in_units(0.01, 'angstrom')):
+                 maxeval=100000, dmax=uc.set_in_units(0.01, 'angstrom'),
+                 lammps_date=None):
     """
     Sets up and runs the min.in LAMMPS script for performing an energy/force
     minimization to relax a system.
@@ -213,7 +255,10 @@ def relax_system(lammps_command, system, potential,
         The maximum distance in length units that any atom is allowed to relax
         in any direction during a single minimization iteration (default is
         0.01 Angstroms).
-    
+    lammps_date : datetime.date or None, optional
+        The date version of the LAMMPS executable.  If None, will be identified
+        from the lammps_command (default is None).
+
     Returns
     -------
     dict
@@ -244,19 +289,15 @@ def relax_system(lammps_command, system, potential,
     lammps_units = lmp.style.unit(potential.units)
       
     #Get lammps version date
-    lammps_date = lmp.checkversion(lammps_command)['date']
+    if lammps_date is None:
+        lammps_date = lmp.checkversion(lammps_command)['date']
     
     # Define lammps variables
     lammps_variables = {}
-    
-    # Generate system and pair info
     system_info = system.dump('atom_data', f='system.dat',
-                              units=potential.units,
-                              atom_style=potential.atom_style)
-    lammps_variables['atomman_system_info'] = system_info
-    lammps_variables['atomman_pair_info'] = potential.pair_info(system.symbols)
-    
-    # Pass in run parameters
+                              potential=potential,
+                              return_pair_info=True)
+    lammps_variables['atomman_system_pair_info'] = system_info
     lammps_variables['etol'] = etol
     lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])
     lammps_variables['maxiter'] = maxiter
@@ -354,9 +395,6 @@ def process_input(input_dict, UUID=None, build=True):
 
     # Load free surface parameters
     iprPy.input.subset('freesurface').interpret(input_dict)
-    
-    # Construct initialsystem by manipulating ucell system
-    iprPy.input.subset('atomman_systemmanipulate').interpret(input_dict, build=build)
 
 if __name__ == '__main__':
     main(*sys.argv[1:])

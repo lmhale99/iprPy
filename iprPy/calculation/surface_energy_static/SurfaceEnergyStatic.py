@@ -47,7 +47,6 @@ class SurfaceEnergyStatic(Calculation):
             'lammps_commands', 
             'lammps_potential',
             'atomman_systemload',
-            'atomman_systemmanipulate',
             'freesurface',
             'units',
             'lammps_minimize',
