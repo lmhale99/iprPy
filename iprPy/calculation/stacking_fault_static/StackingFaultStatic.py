@@ -47,7 +47,6 @@ class StackingFaultStatic(Calculation):
             'lammps_commands', 
             'lammps_potential',
             'atomman_systemload',
-            'atomman_systemmanipulate',
             'stackingfault',
             'units',
             'lammps_minimize',
@@ -55,8 +54,8 @@ class StackingFaultStatic(Calculation):
         
         # Specify the calculation-specific run parameters
         runkeys = [
-            'stackingfault_shiftfraction1',
-            'stackingfault_shiftfraction2', 
+            'stackingfault_a1',
+            'stackingfault_a2', 
         ]
         
         return self._buildtemplate(subsets, runkeys)
@@ -101,8 +100,8 @@ class StackingFaultStatic(Calculation):
             (
                 subset('stackingfault').keyset
                 + [
-                    'stackingfault_shiftfraction1',
-                    'stackingfault_shiftfraction2',
+                    'stackingfault_a1',
+                    'stackingfault_a2',
                 ]
             ),
             (
@@ -112,3 +111,6 @@ class StackingFaultStatic(Calculation):
                
         # Join and return
         return universalkeys + keys
+
+# Test module
+StackingFaultStatic()

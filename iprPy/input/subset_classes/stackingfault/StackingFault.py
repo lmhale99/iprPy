@@ -9,6 +9,7 @@ import atomman as am
 import atomman.unitconvert as uc
 
 from ..Subset import Subset
+from ... import boolean
 
 class StackingFault(Subset):
     """
@@ -22,10 +23,16 @@ class StackingFault(Subset):
         """
         return [
             'stackingfault_file',
+            'stackingfault_hkl',
+            'stackingfault_a1vect_uvw',
+            'stackingfault_a2vect_uvw',
+            'stackingfault_cellsetting',
             'stackingfault_cutboxvector',
-            'stackingfault_faultpos',
-            'stackingfault_shiftvector1',
-            'stackingfault_shiftvector2',
+            'stackingfault_shiftindex',
+            'stackingfault_faultpos_rel',
+            'sizemults',
+            'stackingfault_minwidth',
+            'stackingfault_even',
         ]
     
     @property
@@ -38,11 +45,8 @@ class StackingFault(Subset):
         return self.templatekeys + [
             'stackingfault_family',
             'stackingfault_content',
-            'a_uvw', 
-            'b_uvw',
-            'c_uvw',
-            'atomshift',
         ]
+    
     @property
     def interpretkeys(self):
         """
@@ -52,12 +56,6 @@ class StackingFault(Subset):
         """
         return self.preparekeys + [
             'stackingfault_model',
-            'ucell',
-            'uvws',
-            'faultpos',
-            'shiftvector1',
-            'shiftvector2',
-            'transformationmatrix',
         ]
 
     def template(self, header=None):
@@ -96,10 +94,13 @@ class StackingFault(Subset):
         if stackingfault_file is not None:
             
             # Verify competing parameters are not defined
-            for key in ('atomshift', 'a_uvw', 'b_uvw', 'c_uvw',
-                        'stackingfault_cutboxvector', 'stackingfault_faultpos',
-                        'stackingfault_shiftvector1',
-                        'stackingfault_shiftvector2'):
+            for key in ('stackingfault_hkl',
+                        'stackingfault_shiftindex',
+                        'stackingfault_a1vect_uvw',
+                        'stackingfault_a2vect_uvw',
+                        'stackingfault_cellsetting',
+                        'stackingfault_cutboxvector',
+                        'stackingfault_faultpos_rel'):
                 assert keymap[key] not in input_dict, (keymap[key] + ' and '
                                                     + keymap['stackingfault_file']
                                                     + ' cannot both be supplied')
@@ -107,79 +108,49 @@ class StackingFault(Subset):
             # Load defect model
             stackingfault_model = DM(stackingfault_file).find('stacking-fault')
             
-            
             # Extract parameter values from defect model
             input_dict[keymap['stackingfault_family']] = stackingfault_model['system-family']
-            input_dict[keymap['a_uvw']] = stackingfault_model['calculation-parameter']['a_uvw']
-            input_dict[keymap['b_uvw']] = stackingfault_model['calculation-parameter']['b_uvw']
-            input_dict[keymap['c_uvw']] = stackingfault_model['calculation-parameter']['c_uvw']
-            input_dict[keymap['atomshift']] = stackingfault_model['calculation-parameter']['atomshift']
+            input_dict[keymap['stackingfault_hkl']] = stackingfault_model['calculation-parameter']['hkl']
+            input_dict[keymap['stackingfault_a1vect_uvw']] = stackingfault_model['calculation-parameter']['a1vect_uvw']
+            input_dict[keymap['stackingfault_a2vect_uvw']] = stackingfault_model['calculation-parameter']['a2vect_uvw']
+            input_dict[keymap['stackingfault_shiftindex']] = int(stackingfault_model['calculation-parameter'].get('shiftindex', 0))
             input_dict[keymap['stackingfault_cutboxvector']] = stackingfault_model['calculation-parameter']['cutboxvector']
-            input_dict[keymap['stackingfault_faultpos']] = float(stackingfault_model['calculation-parameter']['faultpos'])
-            input_dict[keymap['stackingfault_shiftvector1']] = stackingfault_model['calculation-parameter']['shiftvector1']
-            input_dict[keymap['stackingfault_shiftvector2']] = stackingfault_model['calculation-parameter']['shiftvector2']
+            input_dict[keymap['stackingfault_faultpos_rel']] = float(stackingfault_model['calculation-parameter'].get('faultpos_rel', 0.5))
+            input_dict[keymap['stackingfault_cellsetting']] = stackingfault_model['calculation-parameter'].get('cellsetting', 'p')
         
         # Set default parameter values if defect model not given
         else:
             stackingfault_model = None
+            input_dict[keymap['stackingfault_a1vect_uvw']] = input_dict.get(keymap['stackingfault_a1vect_uvw'], None)
+            input_dict[keymap['stackingfault_a2vect_uvw']] = input_dict.get(keymap['stackingfault_a2vect_uvw'], None)
+            input_dict[keymap['stackingfault_shiftindex']] = int(input_dict.get(keymap['stackingfault_shiftindex'], 0))
             input_dict[keymap['stackingfault_cutboxvector']] = input_dict.get(keymap['stackingfault_cutboxvector'], 'c')
-            input_dict[keymap['stackingfault_faultpos']] = float(input_dict.get(keymap['stackingfault_faultpos'], 0.5))
-            assert input_dict[keymap['stackingfault_cutboxvector']] in ['a', 'b', 'c'], 'invalid stackingfault_cutboxvector'
-        
+            input_dict[keymap['stackingfault_faultpos_rel']] = float(input_dict.get(keymap['stackingfault_faultpos_rel'], 0.5))
+            input_dict[keymap['stackingfault_cellsetting']] = input_dict.get(keymap['stackingfault_cellsetting'], 'p')
+            
+        # Process defect parameters values
         input_dict[keymap['stackingfault_model']] = stackingfault_model
-    
-    def interpret2(self, input_dict, build=True):
-        """
-        Interprets calculation parameters.
+        input_dict[keymap['stackingfault_hkl']] = np.array(input_dict[keymap['stackingfault_hkl']].strip().split(), dtype=int)
+        if input_dict[keymap['stackingfault_a1vect_uvw']] is not None:
+            input_dict[keymap['stackingfault_a1vect_uvw']] = np.array(input_dict[keymap['stackingfault_a1vect_uvw']].strip().split(), dtype=float)
+        if input_dict[keymap['stackingfault_a2vect_uvw']] is not None:
+            input_dict[keymap['stackingfault_a2vect_uvw']] = np.array(input_dict[keymap['stackingfault_a2vect_uvw']].strip().split(), dtype=float)
+        assert input_dict[keymap['stackingfault_cutboxvector']] in ['a', 'b', 'c'], 'invalid stackingfault_cutboxvector'
+        assert input_dict[keymap['stackingfault_faultpos_rel']] > 0 and input_dict[keymap['stackingfault_faultpos_rel']] < 1, 'invalid stackingfault_faultpos_rel'
+        assert input_dict[keymap['stackingfault_cellsetting']] in ['p', 'a', 'b', 'c', 'i', 'f'], 'invalid stackingfault_cellsetting'
         
-        Parameters
-        ----------
-        input_dict : dict
-            Dictionary containing input parameter key-value pairs.
-        """
+        # Set default values for fault system manipulations
+        sizemults = input_dict.get(keymap['sizemults'], '1 1 1')
+        input_dict[keymap['stackingfault_minwidth']] = float(input_dict.get(keymap['stackingfault_minwidth'], 0.0))
+        input_dict[keymap['stackingfault_even']] = boolean(input_dict.get(keymap['stackingfault_even'], False))
 
-        # Set default keynames
-        keymap = self.keymap
+        # Convert string values to lists of numbers
+        sizemults = sizemults.strip().split()
+        for i in range(len(sizemults)):
+            sizemults[i] = int(sizemults[i])
+        assert len(sizemults) == 3, 'Invalid sizemults command: only 3 sizemults allowed for this calculation'
         
-        if build is True:
-        
-            # Extract input values and assign default values
-            stackingfault_faultpos = input_dict[keymap['stackingfault_faultpos']]
-            stackingfault_shiftvector1 = input_dict[keymap['stackingfault_shiftvector1']]
-            stackingfault_shiftvector2 = input_dict[keymap['stackingfault_shiftvector2']]
-            stackingfault_cutboxvector = input_dict[keymap['stackingfault_cutboxvector']]
-            sizemults = input_dict['sizemults']
-            
-            # Convert string terms to arrays
-            shiftvector1 = np.array(stackingfault_shiftvector1.strip().split(), dtype=float)
-            shiftvector2 = np.array(stackingfault_shiftvector2.strip().split(), dtype=float)
-            
-            # Identify number of size multiples, m, along cutboxvector
-            if   stackingfault_cutboxvector == 'a': 
-                m = sizemults[0]
-            elif stackingfault_cutboxvector == 'b': 
-                m = sizemults[1]
-            elif stackingfault_cutboxvector == 'c': 
-                m = sizemults[2]
-            if isinstance(m, (list, tuple)):
-                m = m[1] - m[0]
-            
-            # For odd m, initial position of 0.5 goes to 0.5
-            if m % 2 == 1:
-                faultpos = (stackingfault_faultpos + (m-1) * 0.5) / m
-            # For even m, initial position of 0.0 goes to 0.5
-            else:
-                faultpos = (2 * stackingfault_faultpos + m) / (2 * m)
-        
-        else:
-            faultpos = None
-            shiftvector1 = None
-            shiftvector2 = None
-        
-        # Save processed terms
-        input_dict[keymap['faultpos']] = faultpos
-        input_dict[keymap['shiftvector1']] = shiftvector1
-        input_dict[keymap['shiftvector2']] = shiftvector2
+        input_dict[keymap['sizemults']] = sizemults
 
     def buildcontent(self, record_model, input_dict, results_dict=None):
         """
@@ -203,18 +174,34 @@ class StackingFault(Subset):
         stackingfault_model = input_dict[keymap['stackingfault_model']]
         stackingfault_family = input_dict.get(keymap['stackingfault_family'],
                                               input_dict['family'])
-        a_uvw = input_dict[keymap['a_uvw']]
-        b_uvw = input_dict[keymap['b_uvw']]
-        c_uvw = input_dict[keymap['c_uvw']]
-        atomshift = input_dict[keymap['atomshift']]
+        sizemults = input_dict[keymap['sizemults']]
+        stackingfault_hkl = input_dict[keymap['stackingfault_hkl']]
+        stackingfault_a1vect_uvw = input_dict[keymap['stackingfault_a1vect_uvw']]
+        stackingfault_a2vect_uvw = input_dict[keymap['stackingfault_a2vect_uvw']]
+        stackingfault_shiftindex = input_dict[keymap['stackingfault_shiftindex']]
         stackingfault_cutboxvector = input_dict[keymap['stackingfault_cutboxvector']]
-        stackingfault_faultpos = input_dict[keymap['stackingfault_faultpos']]
-        stackingfault_shiftvector1 = input_dict[keymap['stackingfault_shiftvector1']]
-        stackingfault_shiftvector2 = input_dict[keymap['stackingfault_shiftvector2']]
+        stackingfault_faultpos_rel = input_dict[keymap['stackingfault_faultpos_rel']]
+        stackingfault_cellsetting = input_dict[keymap['stackingfault_cellsetting']]
+        stackingfault_minwidth = input_dict[keymap['stackingfault_minwidth']]
 
-        #Save defect model information
+        # Save defect model information
         record_model[f'{modelprefix}stacking-fault'] = sf = DM()
         
+        # Build paths if needed
+        if 'calculation' not in record_model:
+            record_model['calculation'] = DM()
+        if 'run-parameter' not in record_model['calculation']:
+            record_model['calculation']['run-parameter'] = DM()
+
+        run_params = record_model['calculation']['run-parameter']
+        
+        run_params[f'{modelprefix}size-multipliers'] = DM()
+        run_params[f'{modelprefix}size-multipliers']['a'] = sorted([0, sizemults[0]])
+        run_params[f'{modelprefix}size-multipliers']['b'] = sorted([0, sizemults[1]])
+        run_params[f'{modelprefix}size-multipliers']['c'] = sorted([0, sizemults[2]])
+        run_params[f'{modelprefix}minimum-width'] = uc.model(stackingfault_minwidth,
+                                                             units=input_dict['length_unit'])
+
         if stackingfault_model is not None:
             sf['key'] = stackingfault_model['key']
             sf['id'] =  stackingfault_model['id']
@@ -223,14 +210,16 @@ class StackingFault(Subset):
             sf['id'] =  None
         sf['system-family'] = stackingfault_family
         sf['calculation-parameter'] = cp = DM()
-        cp['a_uvw'] = a_uvw
-        cp['b_uvw'] = b_uvw
-        cp['c_uvw'] = c_uvw
-        cp['atomshift'] = atomshift
+        if len(stackingfault_hkl) == 3:
+            cp['hkl'] = f'{stackingfault_hkl[0]} {stackingfault_hkl[1]} {stackingfault_hkl[2]}'
+        else:
+            cp['hkl'] = f'{stackingfault_hkl[0]} {stackingfault_hkl[1]} {stackingfault_hkl[2]} {stackingfault_hkl[3]}'
+        cp['a1vect_uvw'] = f'{stackingfault_a1vect_uvw[0]} {stackingfault_a1vect_uvw[1]} {stackingfault_a1vect_uvw[2]}'
+        cp['a2vect_uvw'] = f'{stackingfault_a2vect_uvw[0]} {stackingfault_a2vect_uvw[1]} {stackingfault_a2vect_uvw[2]}'
+        cp['shiftindex'] = str(stackingfault_shiftindex)
         cp['cutboxvector'] = stackingfault_cutboxvector
-        cp['faultpos'] = stackingfault_faultpos
-        cp['shiftvector1'] = stackingfault_shiftvector1
-        cp['shiftvector2'] = stackingfault_shiftvector2
+        cp['faultpos_rel'] = str(stackingfault_faultpos_rel)
+        cp['cellsetting'] = stackingfault_cellsetting
         
     def todict(self, record_model, params, full=True, flat=False):
         """
@@ -257,5 +246,21 @@ class StackingFault(Subset):
         modelprefix = prefix.replace('_', '-')
 
         sf = record_model[f'{modelprefix}stacking-fault']
-        params['stackingfault_key'] = sf['key']
-        params['stackingfault_id'] = sf['id']
+        params[f'{prefix}stackingfault_key'] = sf['key']
+        params[f'{prefix}stackingfault_id'] = sf['id']
+        params[f'{prefix}stackingfault_hkl'] = sf['calculation-parameter']['hkl']
+        params[f'{prefix}stackingfault_a1vect_uvw'] = sf['calculation-parameter']['a1vect_uvw']
+        params[f'{prefix}stackingfault_a2vect_uvw'] = sf['calculation-parameter']['a2vect_uvw']
+        params[f'{prefix}stackingfault_shiftindex'] = sf['calculation-parameter']['shiftindex']
+
+        sizemults = record_model['calculation']['run-parameter'][f'{modelprefix}size-multipliers']
+
+        if flat is True:
+            params[f'{prefix}a_mult1'] = sizemults['a'][0]
+            params[f'{prefix}a_mult2'] = sizemults['a'][1]
+            params[f'{prefix}b_mult1'] = sizemults['b'][0]
+            params[f'{prefix}b_mult2'] = sizemults['b'][1]
+            params[f'{prefix}c_mult1'] = sizemults['c'][0]
+            params[f'{prefix}c_mult2'] = sizemults['c'][1]
+        else:
+            params[f'{prefix}sizemults'] = np.array([sizemults['a'], sizemults['b'], sizemults['c']])

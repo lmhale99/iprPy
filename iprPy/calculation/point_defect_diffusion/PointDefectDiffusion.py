@@ -117,3 +117,6 @@ class PointDefectDiffusion(Calculation):
                      
         # Join and return
         return universalkeys + keys
+
+# Test module
+PointDefectDiffusion()

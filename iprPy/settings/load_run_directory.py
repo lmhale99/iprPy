@@ -17,9 +17,9 @@ def load_run_directory(name=None):
     str
         The path to the identified run_directory.
     """
-    # Get information from settings file
-    run_directories = Settings().run_directories
-    run_directory_names = list(run_directories)
+    # Get information from settings file'
+    settings = Settings()
+    run_directory_names = settings.list_run_directories
 
     # Ask for name if not given
     if name is None:
@@ -38,6 +38,6 @@ def load_run_directory(name=None):
             raise KeyError('No run_directories currently set')
 
     try:
-        return Path(run_directories[name])
+        return Path(settings.run_directories[name])
     except:
         raise ValueError(f'run_directory {name} not found')

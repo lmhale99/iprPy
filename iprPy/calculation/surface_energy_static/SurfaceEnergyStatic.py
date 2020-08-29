@@ -47,7 +47,6 @@ class SurfaceEnergyStatic(Calculation):
             'lammps_commands', 
             'lammps_potential',
             'atomman_systemload',
-            'atomman_systemmanipulate',
             'freesurface',
             'units',
             'lammps_minimize',
@@ -105,3 +104,6 @@ class SurfaceEnergyStatic(Calculation):
                
         # Join and return
         return universalkeys + keys
+
+# Test module
+SurfaceEnergyStatic()

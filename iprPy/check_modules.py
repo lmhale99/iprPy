@@ -18,6 +18,30 @@ def check_modules():
     Prints lists of the calculation, record, and database styles that were
     successfully and unsuccessfully loaded when iprPy was initialized.
     """
+    print('database styles that passed import:')
+    for style in database_loaded.keys():
+        print(f'- {style}')
+    print('database styles that failed import:')
+    for style in database_failed.keys():
+        print(f'- {style}: {database_failed[style]}')
+    print()
+    
+    print('calculation styles that passed import:')
+    for style in calculation_loaded.keys():
+        print(f'- {style}')
+    print('calculation styles that failed import:')
+    for style in calculation_failed.keys():
+        print(f'- {style}: {calculation_failed[style]}')
+    print()
+    
+    print('record styles that passed import:')
+    for style in record_loaded.keys():
+        print(f'- {style}')
+    print('record styles that failed import:')
+    for style in record_failed.keys():
+        print(f'- {style}: {record_failed[style]}')
+    print()
+
     print('input.subset styles that passed import:')
     for style in input_subset_loaded.keys():
         print(f'- {style}')
@@ -32,28 +56,4 @@ def check_modules():
     print('input.buildcombos styles that failed import:')
     for style in input_buildcombos_failed.keys():
         print(f'- {style}: {input_buildcombos_failed[style]}')
-    print()
-
-    print('record styles that passed import:')
-    for style in record_loaded.keys():
-        print(f'- {style}')
-    print('record styles that failed import:')
-    for style in record_failed.keys():
-        print(f'- {style}: {record_failed[style]}')
-    print()
-    
-    print('calculation styles that passed import:')
-    for style in calculation_loaded.keys():
-        print(f'- {style}')
-    print('calculation styles that failed import:')
-    for style in calculation_failed.keys():
-        print(f'- {style}: {calculation_failed[style]}')
-    print()
-    
-    print('database styles that passed import:')
-    for style in database_loaded.keys():
-        print(f'- {style}')
-    print('database styles that failed import:')
-    for style in database_failed.keys():
-        print(f'- {style}: {database_failed[style]}')
     print()

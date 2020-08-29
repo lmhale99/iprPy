@@ -9,6 +9,7 @@ import atomman as am
 import atomman.unitconvert as uc
 
 from ..Subset import Subset
+from ... import boolean
 
 class FreeSurface(Subset):
     """
@@ -22,7 +23,13 @@ class FreeSurface(Subset):
         """
         return [
             'surface_file',
+            'surface_hkl',
+            'surface_cellsetting',
             'surface_cutboxvector',
+            'surface_shiftindex',
+            'sizemults',
+            'surface_minwidth',
+            'surface_even',
         ]
     
     @property
@@ -34,11 +41,7 @@ class FreeSurface(Subset):
         """
         return self.templatekeys + [
             'surface_family',
-            'surface_content',
-            'a_uvw',
-            'b_uvw',
-            'c_uvw',
-            'atomshift',
+            'surface_content'
         ]
     @property
     def interpretkeys(self):
@@ -86,7 +89,9 @@ class FreeSurface(Subset):
         if surface_file is not None:
             
             # Verify competing parameters are not defined
-            for key in ('atomshift', 'a_uvw', 'b_uvw', 'c_uvw', 
+            for key in ('surface_hkl',
+                        'surface_shiftindex',
+                        'surface_cellsetting',
                         'surface_cutboxvector'):
                 assert keymap[key] not in input_dict, (keymap[key] + ' and '
                                                     + keymap['surface_model']
@@ -97,20 +102,36 @@ class FreeSurface(Subset):
                 
             # Extract parameter values from defect model
             input_dict[keymap['surface_family']] = surface_model['system-family']
-            input_dict[keymap['a_uvw']] = surface_model['calculation-parameter']['a_uvw']
-            input_dict[keymap['b_uvw']] = surface_model['calculation-parameter']['b_uvw']
-            input_dict[keymap['c_uvw']] = surface_model['calculation-parameter']['c_uvw']
-            input_dict[keymap['atomshift']] = surface_model['calculation-parameter']['atomshift']
+            input_dict[keymap['surface_hkl']] = surface_model['calculation-parameter']['hkl']
+            input_dict[keymap['surface_shiftindex']] = int(surface_model['calculation-parameter'].get('shiftindex', 0))
             input_dict[keymap['surface_cutboxvector']] = surface_model['calculation-parameter']['cutboxvector']
+            input_dict[keymap['surface_cellsetting']] = surface_model['calculation-parameter'].get('cellsetting', 'p')
         
         # Set default parameter values if defect model not given
         else:
             surface_model = None
+            input_dict[keymap['surface_shiftindex']] = int(input_dict.get(keymap['surface_shiftindex'], 0))
             input_dict[keymap['surface_cutboxvector']] = input_dict.get(keymap['surface_cutboxvector'], 'c')
-            assert input_dict[keymap['surface_cutboxvector']] in ['a', 'b', 'c'], 'invalid surface_cutboxvector'
+            input_dict[keymap['surface_cellsetting']] = input_dict.get(keymap['surface_cellsetting'], 'p')
             
-        # Save processed terms
+        # Process defect parameters values
         input_dict[keymap['surface_model']] = surface_model
+        input_dict[keymap['surface_hkl']] = np.array(input_dict[keymap['surface_hkl']].strip().split(), dtype=int)
+        assert input_dict[keymap['surface_cutboxvector']] in ['a', 'b', 'c'], 'invalid surface_cutboxvector'
+        assert input_dict[keymap['surface_cellsetting']] in ['p', 'a', 'b', 'c', 'i', 'f'], 'invalid surface_cellsetting'
+        
+        # Set default values for fault system manipulations
+        sizemults = input_dict.get(keymap['sizemults'], '1 1 1')
+        input_dict[keymap['surface_minwidth']] = float(input_dict.get(keymap['surface_minwidth'], 0.0))
+        input_dict[keymap['surface_even']] = boolean(input_dict.get(keymap['surface_even'], False))
+
+        # Convert string values to lists of numbers
+        sizemults = sizemults.strip().split()
+        for i in range(len(sizemults)):
+            sizemults[i] = int(sizemults[i])
+        assert len(sizemults) == 3, 'Invalid sizemults command: only 3 sizemults allowed for this calculation'
+        
+        input_dict[keymap['sizemults']] = sizemults
 
     def buildcontent(self, record_model, input_dict, results_dict=None):
         """
@@ -134,14 +155,31 @@ class FreeSurface(Subset):
         surface_model = input_dict[keymap['surface_model']]
         surface_family = input_dict.get(keymap['surface_family'],
                                         input_dict['family'])
-        a_uvw = input_dict[keymap['a_uvw']]
-        b_uvw = input_dict[keymap['b_uvw']]
-        c_uvw = input_dict[keymap['c_uvw']]
-        atomshift = input_dict[keymap['atomshift']]
+        sizemults = input_dict[keymap['sizemults']]
+        surface_hkl = input_dict[keymap['surface_hkl']]
+        surface_shiftindex = input_dict[keymap['surface_shiftindex']]
         surface_cutboxvector = input_dict[keymap['surface_cutboxvector']]
+        surface_cellsetting = input_dict[keymap['surface_cellsetting']]
+        surface_minwidth = input_dict[keymap['surface_minwidth']]
 
         #Save defect parameters
         record_model[f'{modelprefix}free-surface'] = surf = DM()
+
+        # Build paths if needed
+        if 'calculation' not in record_model:
+            record_model['calculation'] = DM()
+        if 'run-parameter' not in record_model['calculation']:
+            record_model['calculation']['run-parameter'] = DM()
+
+        run_params = record_model['calculation']['run-parameter']
+        
+        run_params[f'{modelprefix}size-multipliers'] = DM()
+        run_params[f'{modelprefix}size-multipliers']['a'] = sorted([0, sizemults[0]])
+        run_params[f'{modelprefix}size-multipliers']['b'] = sorted([0, sizemults[1]])
+        run_params[f'{modelprefix}size-multipliers']['c'] = sorted([0, sizemults[2]])
+        run_params[f'{modelprefix}minimum-width'] = uc.model(surface_minwidth,
+                                                             units=input_dict['length_unit'])
+
         if surface_model is not None:
             surf['key'] = surface_model['key']
             surf['id'] = surface_model['id']
@@ -150,11 +188,13 @@ class FreeSurface(Subset):
             surf['id'] = None
         surf['system-family'] = surface_family
         surf['calculation-parameter'] = cp = DM()
-        cp['a_uvw'] = a_uvw
-        cp['b_uvw'] = b_uvw
-        cp['c_uvw'] = c_uvw
-        cp['atomshift'] = atomshift
+        if len(surface_hkl) == 3:
+            cp['hkl'] = f'{surface_hkl[0]} {surface_hkl[1]} {surface_hkl[2]}'
+        else:
+            cp['hkl'] = f'{surface_hkl[0]} {surface_hkl[1]} {surface_hkl[2]} {surface_hkl[3]}'
+        cp['shiftindex'] = str(surface_shiftindex)
         cp['cutboxvector'] = surface_cutboxvector
+        cp['cellsetting'] = surface_cellsetting
         
     def todict(self, record_model, params, full=True, flat=False):
         """
@@ -183,3 +223,17 @@ class FreeSurface(Subset):
         fs = record_model[f'{modelprefix}free-surface']
         params[f'{prefix}surface_key'] = fs['key']
         params[f'{prefix}surface_id'] = fs['id']
+        params[f'{prefix}surface_hkl'] = fs['calculation-parameter']['hkl']
+        params[f'{prefix}surface_shiftindex'] = fs['calculation-parameter']['shiftindex']
+
+        sizemults = record_model['calculation']['run-parameter'][f'{modelprefix}size-multipliers']
+
+        if flat is True:
+            params[f'{prefix}a_mult1'] = sizemults['a'][0]
+            params[f'{prefix}a_mult2'] = sizemults['a'][1]
+            params[f'{prefix}b_mult1'] = sizemults['b'][0]
+            params[f'{prefix}b_mult2'] = sizemults['b'][1]
+            params[f'{prefix}c_mult1'] = sizemults['c'][0]
+            params[f'{prefix}c_mult2'] = sizemults['c'][1]
+        else:
+            params[f'{prefix}sizemults'] = np.array([sizemults['a'], sizemults['b'], sizemults['c']])

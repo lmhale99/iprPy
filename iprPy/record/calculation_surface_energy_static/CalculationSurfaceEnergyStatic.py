@@ -90,9 +90,6 @@ class CalculationSurfaceEnergyStatic(CalculationRecord):
         # Load content after root
         calc = self.content[self.contentroot]
         
-        # Copy over sizemults (rotations and shifts)
-        subset('atomman_systemmanipulate').buildcontent(calc, input_dict, results_dict=results_dict)
-        
         # Copy over minimization parameters
         subset('lammps_minimize').buildcontent(calc, input_dict, results_dict=results_dict)
         
@@ -167,7 +164,6 @@ class CalculationSurfaceEnergyStatic(CalculationRecord):
         
         # Extract system info
         subset('atomman_systemload').todict(calc, params, full=full, flat=flat)
-        subset('atomman_systemmanipulate').todict(calc, params, full=full, flat=flat)
         
         subset('freesurface').todict(calc, params, full=full, flat=flat)
         

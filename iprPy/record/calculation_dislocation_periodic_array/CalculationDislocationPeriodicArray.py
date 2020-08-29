@@ -1,3 +1,4 @@
+# coding: utf-8
 # http://www.numpy.org/
 import numpy as np
 
@@ -68,15 +69,13 @@ class CalculationDislocationPeriodicArray(CalculationRecord):
         calc = self.content[self.contentroot]
         return calc['dislocation']['system-family'] == calc['system-info']['family']
     
-    def buildcontent(self, script, input_dict, results_dict=None):
+    def buildcontent(self, input_dict, results_dict=None):
         """
         Builds a data model of the specified record style based on input (and
         results) parameters.
         
         Parameters
         ----------
-        script : str
-            The name of the calculation script used.
         input_dict : dict
             Dictionary of all input parameter terms.
         results_dict : dict, optional
@@ -93,20 +92,18 @@ class CalculationDislocationPeriodicArray(CalculationRecord):
             If buildcontent is not defined for record style.
         """
         # Build universal content
-        super().buildcontent(script, input_dict, results_dict=results_dict)
+        super().buildcontent(input_dict, results_dict=results_dict)
 
         # Load content after root
         calc = self.content[self.contentroot]
         calc['calculation']['run-parameter'] = run_params = DM()
         
-        run_params['size-multipliers'] = DM()
-        # Copy over sizemults (rotations and shifts)
-        subset('atomman_systemmanipulate').buildcontent(calc, input_dict, results_dict=results_dict)
-        
         # Copy over minimization parameters
         subset('lammps_minimize').buildcontent(calc, input_dict, results_dict=results_dict)
         
-        run_params['dislocation_boundarywidth'] = input_dict['boundarywidth']
+        run_params['dislocation_boundarywidth'] = input_dict['dislocation_boundarywidth']
+        run_params['dislocation_boundaryscale'] = input_dict['dislocation_boundaryscale']
+        run_params['dislocation_onlylinear'] = input_dict['dislocation_onlylinear']
         
         run_params['annealtemperature'] = input_dict['annealtemperature']
         run_params['annealsteps'] = input_dict['annealsteps']
@@ -141,7 +138,14 @@ class CalculationDislocationPeriodicArray(CalculationRecord):
             calc['defect-system']['artifact']['file'] = results_dict['dumpfile_disl']
             calc['defect-system']['artifact']['format'] = 'atom_dump'
             calc['defect-system']['symbols'] = results_dict['symbols_disl']
-    
+
+            calc['elastic-solution'] = elsol = DM()
+            elsol['pre-ln-factor'] = uc.model(results_dict['dislocation'].dislsol.preln,
+                                            f"{input_dict['energy_unit']}/{input_dict['length_unit']}")
+            
+            elsol['K-tensor'] = uc.model(results_dict['dislocation'].dislsol.K_tensor,
+                                        input_dict['pressure_unit'])
+
     def todict(self, full=True, flat=False):
         """
         Converts the structured content to a simpler dictionary.
@@ -180,15 +184,28 @@ class CalculationDislocationPeriodicArray(CalculationRecord):
         
         # Extract system info
         subset('atomman_systemload').todict(calc, params, full=full, flat=flat)
-        subset('atomman_systemmanipulate').todict(calc, params, full=full, flat=flat)
-
+        
         subset('dislocation').todict(calc, params, full=full, flat=flat)
         
         if full is True and params['status'] == 'finished':
-            
+            params['preln'] = uc.value_unit(calc['elastic-solution']['pre-ln-factor'])
+            K_tensor = uc.value_unit(calc['elastic-solution']['K-tensor'])
+
             if flat is True:
-                pass
+                if calc['elastic-constants'] is not None:
+                    for C in calc['elastic-constants'].aslist('C'):
+                        params['C'+str(C['ij'][0])+str(C['ij'][2])] = uc.value_unit(C['stiffness'])
+                params['K11'] = K_tensor[0,0]
+                params['K12'] = K_tensor[0,1]
+                params['K13'] = K_tensor[0,2]
+                params['K22'] = K_tensor[1,1]
+                params['K23'] = K_tensor[1,2]
+                params['K33'] = K_tensor[2,2]
             else:
-                pass
+                try:
+                    params['C'] = am.ElasticConstants(model=calc)
+                except:
+                    params['C'] = 'Invalid'
+                params['K_tensor'] = K_tensor
         
         return params

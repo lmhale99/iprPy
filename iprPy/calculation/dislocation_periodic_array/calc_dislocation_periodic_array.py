@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf-8
 
 # Python script created by Lucas Hale
 
@@ -26,8 +27,11 @@ import atomman.unitconvert as uc
 # https://github.com/usnistgov/iprPy
 import iprPy
 
-# Define record_style
-record_style = 'calculation_dislocation_periodic_array'
+# Define calculation metadata
+calculation_style = 'dislocation_periodic_array'
+record_style = f'calculation_{calculation_style}'
+script = Path(__file__).stem
+pkg_name = f'iprPy.calculation.{calculation_style}.{script}'
 
 def main(*args):
     """Main function called when script is executed directly."""
@@ -40,14 +44,22 @@ def main(*args):
     process_input(input_dict, *args[1:])
    
     results_dict = dislocationarray(input_dict['lammps_command'],
-                                    input_dict['initialsystem'],
+                                    input_dict['ucell'],
                                     input_dict['potential'],
-                                    input_dict['burgersvector'],
                                     input_dict['C'],
+                                    input_dict['dislocation_burgers'],
+                                    input_dict['dislocation_ξ_uvw'],
+                                    input_dict['dislocation_slip_hkl'],
                                     mpi_command = input_dict['mpi_command'],
-                                    axes = input_dict['transformationmatrix'],
-                                    m = input_dict['stroh_m'],
-                                    n = input_dict['stroh_n'],
+                                    m = input_dict['dislocation_m'],
+                                    n = input_dict['dislocation_n'],
+                                    sizemults = input_dict['sizemults'],
+                                    amin = input_dict['amin'],
+                                    bmin = input_dict['bmin'],
+                                    cmin = input_dict['cmin'],
+                                    shift = input_dict['dislocation_shift'],
+                                    shiftscale = input_dict['dislocation_shiftscale'],
+                                    shiftindex = input_dict['dislocation_shiftindex'],
                                     etol = input_dict['energytolerance'],
                                     ftol = input_dict['forcetolerance'],
                                     maxiter = input_dict['maxiterations'],
@@ -56,24 +68,26 @@ def main(*args):
                                     annealtemp =  input_dict['annealtemperature'],
                                     annealsteps =  input_dict['annealsteps'],
                                     randomseed = input_dict['randomseed'],
-                                    bwidth = input_dict['boundarywidth'],
-                                    cutoff = input_dict['duplicatecutoff'],
-                                    onlyuselinear = input_dict['onlyuselinear'])
+                                    boundarywidth = input_dict['dislocation_boundarywidth'],
+                                    boundaryscale = input_dict['dislocation_boundaryscale'],
+                                    linear = input_dict['dislocation_onlylinear'],
+                                    cutoff = input_dict['dislocation_duplicatecutoff'])
     
-    # Save data model of results
-    script = Path(__file__).stem
-    
+    # Build and save data model of results
     record = iprPy.load_record(record_style)
-    record.buildcontent(script, input_dict, results_dict)
-    
+    record.buildcontent(input_dict, results_dict)
     with open('results.json', 'w') as f:
         record.content.json(fp=f, indent=4)
 
-def dislocationarray(lammps_command, system, potential, burgers,
-                     C, mpi_command=None, axes=None, m=[0,1,0], n=[0,0,1],
-                     etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000, dmax=None,
+def dislocationarray(lammps_command, ucell, potential, C, burgers, ξ_uvw,
+                     slip_hkl, mpi_command=None, m=[0,1,0], n=[0,0,1],
+                     sizemults=None, amin=None, bmin=None, cmin=None,
+                     shift=None, shiftscale=False, shiftindex=None, tol=1e-8,
+                     etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000,
+                     dmax=uc.set_in_units(0.01, 'angstrom'),
                      annealtemp=0.0, annealsteps=None, randomseed=None,
-                     bwidth=None, cutoff=None, onlyuselinear=False):
+                     boundaryshape='cylinder', boundarywidth=0.0, boundaryscale=False,
+                     cutoff=None, linear=False):
     """
     Creates and relaxes a dislocation monopole system.
     
@@ -81,61 +95,128 @@ def dislocationarray(lammps_command, system, potential, burgers,
     ----------
     lammps_command :str
         Command for running LAMMPS.
-    system : atomman.System
-        The bulk system to add the defect to.
+    ucell : atomman.System
+        The unit cell to use as the seed for generating the dislocation
+        monopole system.
     potential : atomman.lammps.Potential
         The LAMMPS implemented potential to use.
-    burgers : list or numpy.array of float
-        The burgers vector for the dislocation being added.
     C : atomman.ElasticConstants
-        The system's elastic constants.
+        The elastic constants associated with the bulk crystal structure
+        for ucell.
+    burgers : array-like object
+        The dislocation's Burgers vector given as a Miller or
+        Miller-Bravais vector relative to ucell.
+    ξ_uvw : array-like object
+        The dislocation's line direction given as a Miller or
+        Miller-Bravais vector relative to ucell.
+    slip_hkl : array-like object
+        The dislocation's slip plane given as a Miller or Miller-Bravais
+        plane relative to ucell.
     mpi_command : str or None, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
         will run serially.
-    axes : numpy.array of float or None, optional
-        The 3x3 axes used to rotate the system by during creation.  If given,
-        will be used to transform burgers and C from the standard
-        crystallographic orientations to the system's Cartesian units.
-    randomseed : int or None, optional
-        Random number seed used by LAMMPS in creating velocities and with
-        the Langevin thermostat.  Default is None which will select a
-        random int between 1 and 900000000.
+    m : array-like object, optional
+        The m unit vector for the dislocation solution.  m, n, and ξ
+        (dislocation line) should be right-hand orthogonal.  Default value
+        is [0,1,0] (y-axis).
+    n : array-like object, optional
+        The n unit vector for the dislocation solution.  m, n, and ξ
+        (dislocation line) should be right-hand orthogonal.  Default value
+        is [0,0,1] (z-axis). n is normal to the dislocation slip plane.
+    sizemults : tuple, optional
+        The size multipliers to use when generating the system.  Values are
+        limited to being positive integers.  The multipliers for the two
+        non-periodic directions must be even.  If not given, the default
+        multipliers will be 2 for the non-periodic directions and 1 for the
+        periodic direction.
+    amin : float, optional
+        A minimum thickness to use for the a box vector direction of the
+        final system.  Default value is 0.0.  For the non-periodic
+        directions, the resulting vector multiplier will be even.  If both
+        amin and sizemults is given, then the larger multiplier for the two
+        will be used.
+    bmin : float, optional
+        A minimum thickness to use for the b box vector direction of the
+        final system.  Default value is 0.0.  For the non-periodic
+        directions, the resulting vector multiplier will be even.  If both
+        bmin and sizemults is given, then the larger multiplier for the two
+        will be used.
+    cmin : float, optional
+        A minimum thickness to use for the c box vector direction of the
+        final system.  Default value is 0.0.  For the non-periodic
+        directions, the resulting vector multiplier will be even.  If both
+        cmin and sizemults is given, then the larger multiplier for the two
+        will be used.
+    shift : float, optional
+        A rigid body shift to apply to the rotated cell prior to inserting
+        the dislocation.  Should be selected such that the ideal slip plane
+        does not correspond to any atomic planes.  Is taken as absolute if
+        shiftscale is False, or relative to the rotated cell's box vectors
+        if shiftscale is True.  Cannot be given with shiftindex.  If
+        neither shift nor shiftindex is given then shiftindex = 0 is used.
+    shiftindex : float, optional
+        The index of the identified optimum shifts based on the rotated
+        cell to use.  Different values allow for the selection of different
+        atomic planes neighboring the slip plane.  Note that shiftindex
+        values only apply shifts normal to the slip plane; best shifts for
+        non-planar dislocations (like bcc screw) may also need a shift in
+        the slip plane.  Cannot be given with shiftindex.  If neither shift
+        nor shiftindex is given then shiftindex = 0 is used.
+    shiftscale : bool, optional
+        If False (default), a given shift value will be taken as absolute
+        Cartesian.  If True, a given shift will be taken relative to the
+        rotated cell's box vectors.
+    tol : float
+        A cutoff tolerance used with obtaining the dislocation solution.
+        Only needs to be changed if there are issues with obtaining a
+        solution.
     etol : float, optional
         The energy tolerance for the structure minimization. This value is
-        unitless. (Default is 0.0).
+        unitless. Default is 0.0.
     ftol : float, optional
         The force tolerance for the structure minimization. This value is in
-        units of force. (Default is 0.0).
+        units of force. Default is 0.0.
     maxiter : int, optional
-        The maximum number of minimization iterations to use (default is 
-        10000).
+        The maximum number of minimization iterations to use. Default is 
+        10000.
     maxeval : int, optional
-        The maximum number of minimization evaluations to use (default is 
-        100000).
+        The maximum number of minimization evaluations to use. Default is 
+        100000.
     dmax : float, optional
         The maximum distance in length units that any atom is allowed to relax
-        in any direction during a single minimization iteration (default is
-        0.01 Angstroms).
+        in any direction during a single minimization iteration. Default is
+        0.01 Angstroms.
     annealtemp : float, optional
         The temperature to perform a dynamic relaxation at. Default is 0.0,
         which will skip the dynamic relaxation.
     annealsteps : int, optional
         The number of time steps to run the dynamic relaxation for.  Default
-        is None, which will run for 10000 steps if annealtemp is not 0.0. 
-    bshape : str, optional
-        The shape to make the boundary region.  Options are 'circle' and
-        'rect' (default is 'circle').
+        is None, which will run for 10000 steps if annealtemp is not 0.0.  
+    randomseed : int or None, optional
+        Random number seed used by LAMMPS in creating velocities and with
+        the Langevin thermostat.  Default is None which will select a
+        random int between 1 and 900000000.
+    boundarywidth : float, optional
+        The width of the boundary region to apply.  Default value is 0.0,
+        i.e. no boundary region.  All atoms in the boundary region will
+        have their atype values changed.
+    boundaryscale : bool, optional
+        If False (Default), the boundarywidth will be taken as absolute.
+        If True, the boundarywidth will be taken relative to the magnitude
+        of the unit cell's a box vector.
+    linear : bool, optional
+        If True, then only linear displacements will be used and not the
+        dislocation solution.  Using only linear displacements is useful
+        for screw dislocations and dislocations with large stacking fault
+        distances.  If False (default) then the dislocation solution will
+        be used for the middle displacements and linear displacements only
+        in the boundary region.
     cutoff : float, optional
         Cutoff distance to use for identifying duplicate atoms to remove.
         For dislocations with an edge component, applying the displacements
-        creates an extra half-plane of atoms that will have (nearly) identical
-        positions with other atoms after altering the boundary conditions.
-        Default cutoff value is 0.5 Angstrom.
-    useonlylinear : bool, optional
-        If False (default) the atoms in the middle of the system will be
-        displaced according to an elasticity solution for a dislocation core
-        and boundary atoms displaced by a linear gradient.  If True, all 
-        atoms are displaced by the linear gradient.
+        creates an extra half-plane of atoms that will have (nearly)
+        identical positions with other atoms after altering the boundary
+        conditions.  Default value is 0.5 Angstrom.
     
     Returns
     -------
@@ -147,42 +228,134 @@ def dislocationarray(lammps_command, system, potential, burgers,
         - **'symbols_base'** (*list of str*) - The list of element-model
           symbols for the Potential that correspond to the base system's
           atypes.
-        - **'Stroh_preln'** (*float*) - The pre-logarithmic factor in the 
-          dislocation's self-energy expression.
-        - **'Stroh_K_tensor'** (*numpy.array of float*) - The energy
-          coefficient tensor based on the dislocation's Stroh solution.
         - **'dumpfile_disl'** (*str*) - The filename of the LAMMPS dump file
           for the relaxed dislocation monopole system.
         - **'symbols_disl'** (*list of str*) - The list of element-model
           symbols for the Potential that correspond to the dislocation
           monopole system's atypes.
+        - **'dislocation'** (*atomman.defect.Dislocation*) - The Dislocation
+          object used to generate the monopole system.
         - **'E_total_disl'** (*float*) - The total potential energy of the
           dislocation monopole system.
     """
+    # Construct dislocation configuration generator
+    dislocation = am.defect.Dislocation(ucell, C, burgers, ξ_uvw, slip_hkl,
+                                        m=m, n=n, shift=shift, shiftindex=shiftindex,
+                                        shiftscale=shiftscale, tol=tol)
+    
+    # Generate the base and dislocation systems
+    base_system, disl_system = dislocation.periodicarray(sizemults=sizemults,
+                                                         amin=amin, bmin=bmin, cmin=cmin,
+                                                         shift=shift,
+                                                         shiftindex=shiftindex,
+                                                         shiftscale=shiftscale,
+                                                         boundarywidth=boundarywidth,
+                                                         boundaryscale=boundaryscale,
+                                                         linear=linear,
+                                                         cutoff=cutoff,
+                                                         return_base_system=True)
+    
+    # Initialize results dict
+    results_dict = {}
+    
+    # Save initial perfect system
+    base_system.dump('atom_dump', f='base.dump')
+    results_dict['dumpfile_base'] = 'base.dump'
+    results_dict['symbols_base'] = base_system.symbols
+    
+    # Save dislocation generator
+    results_dict['dislocation'] = dislocation
+
+    # Relax system
+    relaxed = disl_relax(lammps_command, disl_system, potential,
+                         mpi_command=mpi_command, annealtemp=annealtemp,
+                         annealsteps=annealsteps, randomseed=randomseed,
+                         etol=etol, ftol=ftol, maxiter=maxiter, 
+                         maxeval=maxeval, dmax=dmax)
+    
+    # Save relaxed dislocation system with original box vects
+    system_disl = am.load('atom_dump', relaxed['dumpfile'], symbols=disl_system.symbols)
+    
+    system_disl.box_set(vects=disl_system.box.vects, origin=disl_system.box.origin)
+    system_disl.dump('atom_dump', f='disl.dump')
+    results_dict['dumpfile_disl'] = 'disl.dump'
+    results_dict['symbols_disl'] = system_disl.symbols
+    
+    results_dict['E_total_disl'] = relaxed['E_total']
+    
+    # Cleanup files
+    Path('0.dump').unlink()
+    Path(relaxed['dumpfile']).unlink()
+    for dumpjsonfile in Path('.').glob('*.dump.json'):
+        dumpjsonfile.unlink()
+    
+    return results_dict
+
+def disl_relax(lammps_command, system, potential,
+               mpi_command=None, 
+               annealtemp=0.0, annealsteps=None, randomseed=None,
+               etol=0.0, ftol=1e-6, maxiter=10000, maxeval=100000,
+               dmax=uc.set_in_units(0.01, 'angstrom')):
+    """
+    Sets up and runs the disl_relax.in LAMMPS script for relaxing a
+    dislocation monopole system.
+    
+    Parameters
+    ----------
+    lammps_command :str
+        Command for running LAMMPS.
+    system : atomman.System
+        The system to perform the calculation on.
+    potential : atomman.lammps.Potential
+        The LAMMPS implemented potential to use.
+    mpi_command : str, optional
+        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+        will run serially.
+    annealtemp : float, optional
+        The temperature to perform a dynamic relaxation at. Default is 0.0,
+        which will skip the dynamic relaxation.
+    annealsteps : int, optional
+        The number of time steps to run the dynamic relaxation for.  Default
+        is None, which will run for 10000 steps if annealtemp is not 0.0.        
+    randomseed : int or None, optional
+        Random number seed used by LAMMPS in creating velocities and with
+        the Langevin thermostat.  Default is None which will select a
+        random int between 1 and 900000000.
+    etol : float, optional
+        The energy tolerance for the structure minimization. This value is
+        unitless. Default is 0.0.
+    ftol : float, optional
+        The force tolerance for the structure minimization. This value is in
+        units of force. Default is 0.0.
+    maxiter : int, optional
+        The maximum number of minimization iterations to use default is 
+        10000.
+    maxeval : int, optional
+        The maximum number of minimization evaluations to use default is 
+        100000.
+    dmax : float, optional
+        The maximum distance in length units that any atom is allowed to relax
+        in any direction during a single minimization iteration default is
+        0.01 Angstroms.
+        
+    Returns
+    -------
+    dict
+        Dictionary of results consisting of keys:
+        
+        - **'logfile'** (*str*) - The name of the LAMMPS log file.
+        - **'dumpfile'** (*str*) - The name of the LAMMPS dump file
+          for the relaxed system.
+        - **'E_total'** (*float*) - The total potential energy for the
+          relaxed system.
+    """
+    # Build filedict if function was called from iprPy
     try:
-        # Get script's location if __file__ exists
-        script_dir = Path(__file__).parent
+        assert __name__ == pkg_name
+        calc = iprPy.load_calculation(calculation_style)
+        filedict = calc.filedict
     except:
-        # Use cwd otherwise
-        script_dir = Path.cwd()
-
-    # Set default values
-    if dmax is None:
-        dmax = uc.set_in_units(0.01, 'angstrom')
-
-    # Save base system
-    system.dump('atom_dump', f='base.dump')
-
-    # Generate periodic array of dislocations
-    if onlyuselinear is False:
-        dislsol = am.defect.solve_volterra_dislocation(C, burgers, axes=axes, m=m, n=n)
-        dislsystem = am.defect.dislocation_array(system, dislsol=dislsol, bwidth=bwidth,
-                                                 cutoff=cutoff)
-    else:
-        if axes is not None:
-            T = am.tools.axes_check(axes)
-            burgers = T.dot(burgers)
-        dislsystem = am.defect.dislocation_array(system, burgers=burgers, m=m, n=n, cutoff=cutoff)
+        filedict = {}
 
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
@@ -192,11 +365,10 @@ def dislocationarray(lammps_command, system, potential, burgers,
     
     # Define lammps variables
     lammps_variables = {}
-    system_info = dislsystem.dump('atom_data', f='initial.dat',
-                                  units=potential.units,
-                                  atom_style=potential.atom_style)
-    lammps_variables['atomman_system_info'] = system_info
-    lammps_variables['atomman_pair_info'] = potential.pair_info(dislsystem.symbols)
+    system_info = system.dump('atom_data', f='system.dat',
+                              potential=potential,
+                              return_pair_info=True)
+    lammps_variables['atomman_system_pair_info'] = system_info
     lammps_variables['anneal_info'] = anneal_info(annealtemp, annealsteps, 
                                                   randomseed, potential.units)
     lammps_variables['etol'] = etol
@@ -204,7 +376,7 @@ def dislocationarray(lammps_command, system, potential, burgers,
     lammps_variables['maxiter'] = maxiter
     lammps_variables['maxeval'] = maxeval
     lammps_variables['dmax'] = dmax
-    lammps_variables['bwidth'] = uc.get_in_units(bwidth, lammps_units['length'])
+    lammps_variables['group_move'] = ' '.join(np.array(range(1, system.natypes // 2 + 1), dtype=str))
     
     # Set dump_modify format based on dump_modify_version
     if lammps_date < datetime.date(2016, 8, 3):
@@ -213,10 +385,9 @@ def dislocationarray(lammps_command, system, potential, burgers,
         lammps_variables['dump_modify_format'] = 'float %.13e'
     
     # Write lammps input script
-    template_file = Path(script_dir, 'dislarray_relax.template')
-    lammps_script = 'dislarray_relax.in'
-    with open(template_file) as f:
-        template = f.read()
+    template_file = 'disl_relax.template'
+    lammps_script = 'disl_relax.in'
+    template = iprPy.tools.read_calc_file(template_file, filedict)
     with open(lammps_script, 'w') as f:
         f.write(iprPy.tools.filltemplate(template, lammps_variables,
                                          '<', '>'))
@@ -226,14 +397,13 @@ def dislocationarray(lammps_command, system, potential, burgers,
     thermo = output.simulations[-1]['thermo']
     
     # Extract output values
-    results_dict = {}
-    results_dict['logfile'] = 'log.lammps'
-    results_dict['dumpfile_base'] = 'base.dump'
-    results_dict['symbols_base'] = system.symbols
-    results_dict['dumpfile_disl'] = '%i.dump' % thermo.Step.values[-1]
-    results_dict['symbols_disl'] = dislsystem.symbols
-
-    return results_dict
+    results = {}
+    results['logfile'] = 'log.lammps'
+    results['dumpfile'] = '%i.dump' % thermo.Step.values[-1] 
+    results['E_total'] = uc.set_in_units(thermo.PotEng.values[-1],
+                                         lammps_units['energy'])
+    
+    return results
 
 def anneal_info(temperature=0.0, runsteps=None, randomseed=None, units='metal'):
     """
@@ -271,7 +441,7 @@ def anneal_info(temperature=0.0, runsteps=None, randomseed=None, units='metal'):
         tdamp = 100 * lmp.style.timestep(units)
         timestep = lmp.style.timestep(units)
         info = '\n'.join([
-            'velocity mid create %f %i mom yes rot yes dist gaussian' % (start_temp, randomseed),
+            'velocity move create %f %i mom yes rot yes dist gaussian' % (start_temp, randomseed),
             'fix nvt all nvt temp %f %f %f' % (temperature, temperature,
                                                tdamp),
             'timestep %f' % (timestep),
@@ -300,7 +470,9 @@ def process_input(input_dict, UUID=None, build=True):
         allows for default values to be assigned even if some inputs 
         required by the calculation are incomplete.  (Default is True.)
     """
-    
+    # Set script's name
+    input_dict['script'] = script
+
     # Set calculation UUID
     if UUID is not None: 
         input_dict['calc_key'] = UUID
@@ -311,30 +483,27 @@ def process_input(input_dict, UUID=None, build=True):
     iprPy.input.subset('units').interpret(input_dict)
     
     # These are calculation-specific default strings
-    input_dict['sizemults'] = input_dict.get('sizemults', '0 3 -20 20 -20 20')
-    input_dict['boundaryshape'] = input_dict.get('dislocation_boundaryshape',
-                                                  'circle')
     input_dict['forcetolerance'] = input_dict.get('forcetolerance',
                                                   '1.0e-6 eV/angstrom')
     
     # These are calculation-specific default booleans
-    input_dict['onlyuselinear'] = iprPy.input.boolean(input_dict.get('onlyuselinear', False))
+    input_dict['dislocation_onlylinear'] = iprPy.input.boolean(input_dict.get('dislocation_onlylinear', False))
+    input_dict['dislocation_boundaryscale'] = iprPy.input.boolean(input_dict.get('dislocation_boundaryscale', False))
     
     # These are calculation-specific default integers
     input_dict['randomseed'] = int(input_dict.get('randomseed',
                                    random.randint(1, 900000000)))
     
     # These are calculation-specific default unitless floats
-    input_dict['annealtemperature'] = float(input_dict.get('annealtemperature',
-                                                           0.0))
+    input_dict['annealtemperature'] = float(input_dict.get('annealtemperature', 0.0))
     
     # These are calculation-specific default floats with units
-    input_dict['duplicatecutoff'] = iprPy.input.value(input_dict, 'duplicatecutoff',
+    input_dict['dislocation_duplicatecutoff'] = iprPy.input.value(input_dict, 'dislocation_duplicatecutoff',
                                             default_unit=input_dict['length_unit'],
                                             default_term='0.5 angstrom')
-    input_dict['boundarywidth'] = iprPy.input.value(input_dict, 'boundarywidth',
+    input_dict['dislocation_boundarywidth'] = iprPy.input.value(input_dict, 'dislocation_boundarywidth',
                                             default_unit=input_dict['length_unit'],
-                                            default_term='10 angstrom')
+                                            default_term='0 angstrom')
     
     # These are calculation-specific dependent parameters
     if input_dict['annealtemperature'] == 0.0:
@@ -358,13 +527,7 @@ def process_input(input_dict, UUID=None, build=True):
     iprPy.input.subset('dislocation').interpret(input_dict)
     
     # Load elastic constants
-    if input_dict['onlyuselinear'] is False:
-        iprPy.input.subset('atomman_elasticconstants').interpret(input_dict, build=build)
-    else:
-        input_dict['C'] = None
-
-    # Construct initialsystem by manipulating ucell system
-    iprPy.input.subset('atomman_systemmanipulate').interpret(input_dict, build=build)
+    iprPy.input.subset('atomman_elasticconstants').interpret(input_dict, build=build)
 
 if __name__ == '__main__':
     main(*sys.argv[1:])

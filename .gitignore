@@ -38,3 +38,5 @@ IPR workflow/csv
 
 # Virtual Studio Code metadata
 .vscode/
+
+upload_package.bash

@@ -48,8 +48,8 @@ class CalculationStackingFaultStatic(CalculationRecord):
         dict: The terms to compare values using a tolerance.
         """
         return {
-            'shiftfraction1':1e-5,
-            'shiftfraction2':1e-5,
+            'a1':1e-5,
+            'a2':1e-5,
         }
     
     def isvalid(self):
@@ -94,14 +94,11 @@ class CalculationStackingFaultStatic(CalculationRecord):
         calc = self.content[self.contentroot]
         calc['calculation']['run-parameter'] = run_params = DM()
         
-        # Copy over sizemults (rotations and shifts)
-        subset('atomman_systemmanipulate').buildcontent(calc, input_dict, results_dict=results_dict)
-        
         # Copy over minimization parameters
         subset('lammps_minimize').buildcontent(calc, input_dict, results_dict=results_dict)
         
-        run_params['stackingfault_shiftfraction1'] = input_dict['stackingfault_shiftfraction1']
-        run_params['stackingfault_shiftfraction2'] = input_dict['stackingfault_shiftfraction2']
+        run_params['stackingfault_a1'] = input_dict['stackingfault_a1']
+        run_params['stackingfault_a2'] = input_dict['stackingfault_a2']
         
         # Copy over potential data model info
         subset('lammps_potential').buildcontent(calc, input_dict, results_dict=results_dict)
@@ -170,20 +167,16 @@ class CalculationStackingFaultStatic(CalculationRecord):
         # Extract minimization info
         subset('lammps_minimize').todict(calc, params, full=full, flat=flat)
         
-        params['shiftfraction1'] = calc['calculation']['run-parameter']['stackingfault_shiftfraction1']
-        params['shiftfraction2'] = calc['calculation']['run-parameter']['stackingfault_shiftfraction2']
+        params['a1'] = calc['calculation']['run-parameter']['stackingfault_a1']
+        params['a2'] = calc['calculation']['run-parameter']['stackingfault_a2']
         
         # Extract potential info
         subset('lammps_potential').todict(calc, params, full=full, flat=flat)
         
         # Extract system info
         subset('atomman_systemload').todict(calc, params, full=full, flat=flat)
-        subset('atomman_systemmanipulate').todict(calc, params, full=full, flat=flat)
         
         subset('stackingfault').todict(calc, params, full=full, flat=flat)
-        
-        params['shiftvector1'] = calc['stacking-fault']['calculation-parameter']['shiftvector1']
-        params['shiftvector2'] = calc['stacking-fault']['calculation-parameter']['shiftvector2']
         
         if full is True and params['status'] == 'finished':
             params['gamma_sf'] = uc.value_unit(calc['stacking-fault-energy'])

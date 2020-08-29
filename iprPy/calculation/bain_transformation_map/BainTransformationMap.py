@@ -20,7 +20,7 @@ class BainTransformationMap(Calculation):
         super().__init__()
 
         # Define calc shortcut
-        self.calc = self.script.crystal_space_group
+        self.calc = self.script.baintransformation
     
     @property
     def files(self):
@@ -114,3 +114,6 @@ class BainTransformationMap(Calculation):
         
         # Join and return
         return universalkeys + keys
+
+# Test module
+BainTransformationMap()

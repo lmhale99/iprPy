@@ -98,14 +98,12 @@ class CalculationDislocationMonopole(CalculationRecord):
         calc = self.content[self.contentroot]
         calc['calculation']['run-parameter'] = run_params = DM()
         
-        # Copy over sizemults (rotations and shifts)
-        subset('atomman_systemmanipulate').buildcontent(calc, input_dict, results_dict=results_dict)
-        
         # Copy over minimization parameters
         subset('lammps_minimize').buildcontent(calc, input_dict, results_dict=results_dict)
         
         run_params['dislocation_boundarywidth'] = input_dict['dislocation_boundarywidth']
         run_params['dislocation_boundaryshape'] = input_dict['dislocation_boundaryshape']
+        run_params['dislocation_boundaryscale'] = input_dict['dislocation_boundaryscale']
         
         run_params['annealtemperature'] = input_dict['annealtemperature']
         run_params['annealsteps'] = input_dict['annealsteps']
@@ -139,12 +137,12 @@ class CalculationDislocationMonopole(CalculationRecord):
             calc['defect-system']['potential-energy'] = uc.model(results_dict['E_total_disl'], 
                                                                  input_dict['energy_unit'])
             
-            calc['Stroh-pre-ln-factor'] = uc.model(results_dict['Stroh_preln'],
-                                                   input_dict['energy_unit'] + '/'
-                                                   + input_dict['length_unit'])
+            calc['elastic-solution'] = elsol = DM()
+            elsol['pre-ln-factor'] = uc.model(results_dict['dislocation'].dislsol.preln,
+                                             f"{input_dict['energy_unit']}/{input_dict['length_unit']}")
             
-            calc['Stroh-K-tensor'] = uc.model(results_dict['Stroh_K_tensor'],
-                                              input_dict['pressure_unit'])
+            elsol['K-tensor'] = uc.model(results_dict['dislocation'].dislsol.K_tensor,
+                                         input_dict['pressure_unit'])
     
     def todict(self, full=True, flat=False):
         """
@@ -184,13 +182,12 @@ class CalculationDislocationMonopole(CalculationRecord):
         
         # Extract system info
         subset('atomman_systemload').todict(calc, params, full=full, flat=flat)
-        subset('atomman_systemmanipulate').todict(calc, params, full=full, flat=flat)
-
+        
         subset('dislocation').todict(calc, params, full=full, flat=flat)
         
         if full is True and params['status'] == 'finished':
-            params['preln'] = uc.value_unit(calc['Stroh-pre-ln-factor'])
-            K_tensor = uc.value_unit(calc['Stroh-K-tensor'])
+            params['preln'] = uc.value_unit(calc['elastic-solution']['pre-ln-factor'])
+            K_tensor = uc.value_unit(calc['elastic-solution']['K-tensor'])
 
             if flat is True:
                 for C in calc['elastic-constants'].aslist('C'):

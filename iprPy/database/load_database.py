@@ -1,4 +1,5 @@
 # coding: utf-8
+
 from ..tools import screen_input
 from . import loaded
 from .. import Settings
@@ -43,8 +44,8 @@ def load_database(name=None, style=None, host=None, **kwargs):
         assert host is None and len(kwargs) == 0, 'style must be given with host, kwargs'
 
         # Get information from settings file
-        databases = Settings().databases
-        database_names = list(databases.keys())
+        settings = Settings()
+        database_names = settings.list_databases
         
         # Ask for name if not given
         if name is None:
@@ -63,7 +64,7 @@ def load_database(name=None, style=None, host=None, **kwargs):
                 raise KeyError('No databases currently set')
         
         try:
-            database = databases[name]
+            database = settings.databases[name]
         except:
             raise ValueError(f'database {name} not found')
 

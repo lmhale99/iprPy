@@ -9,50 +9,17 @@ from DataModelDict import DataModelDict as DM
 # https://github.com/usnistgov/atomman
 import atomman as am
 
-import potentials
-
 import requests
 
-from .. import Settings, load_record
+from .. import load_record
 from ..tools import aslist
 
-class Library():
+class Library(am.library.Database):
     """
-    Class for interacting with the iprPy library directory.
+    Class for interacting with potential records hosted from potentials.nist.gov
     """
-    def __init__(self, directory=None, load=False, local=True, remote=True):
-        """
-        Class initializer
 
-        Parameters
-        ----------
-        directory : str or Path, optional
-            The path to the library directory to interact with.  If not given,
-            will use the library directory that has been set for iprPy.
-        """
-        if directory is None:
-            self.__directory = Settings().library_directory
-        else:
-            self.__directory = Path(directory).resolve()
-
-        self.__potdb = potentials.Database(localpath=self.directory,
-                                           local=local, remote=remote,
-                                           load=load)
-
-    @property
-    def directory(self):
-        return self.__directory
-
-    @property
-    def potdb(self):
-        return self.__potdb
-
-    @property
-    def all_ref_styles(self):
-        """list : all reference record styles hosted at potentials.nist.gov"""
-        return ['crystal_prototype', 'dislocation', 'free_surface', 'point_defect', 'stacking_fault', 'potential_LAMMPS']
-
-    def download_refs(self, style=None, status='active'):
+    def download_refs(self, style=None, status='active', format='json', indent=4, verbose=False):
         """
         Downloads reference records from potentials.nist.gov to the library.
         Note: this will overwrite any local copies of records with matching
@@ -69,19 +36,25 @@ class Library():
             be downloaded.  Allowed values are 'active' (default),
             'superseded', and 'retracted'.  If set to None, all hosted
             potential_LAMMPS will be downloaded.
-        """          
-        # Get all_ref_styles if none are specified
+        """
+        assert format in ['json', 'xml']
+        
+        # use all_ref_styles if none are specified
+        all_ref_styles = ['crystal_prototype', 'dislocation', 'free_surface',
+                          'point_defect', 'stacking_fault', 'potential_LAMMPS']
+        
         if style is None:
-            style = self.all_ref_styles
+            style = all_ref_styles
         style = aslist(style)
         
         for s in style:
             if s == 'potential_LAMMPS':
-                self.potdb.download_lammps_potentials(format='json', indent=4, status=status, verbose=True)
+                self.download_lammps_potentials(format=format, indent=indent,
+                                                      status=status, verbose=verbose)
             else:
-                self.potdb.download_records(s, format='json', indent=4, verbose=True)
+                self.download_records(s, format=format, indent=indent, verbose=verbose)
 
-    def download_oqmd_crystals(self, elements):
+    def download_oqmd_crystals(self, elements, localpath=None, format='json', indent=4):
         """
         Accesses OQMD and downloads crystal structures containing the given
         elements.  The structures are saved to the iprPy library as
@@ -92,6 +65,8 @@ class Library():
         elements : list
             A list of element symbols.
         """
+        assert format in ['json', 'xml']
+
         # Load record style and set universal values
         style = 'reference_crystal'
         record = load_record(style)
@@ -101,7 +76,9 @@ class Library():
         input_dict['length_unit'] = "angstrom"
         
         # Set library subdirectory
-        style_directory = Path(self.directory, style)
+        if localpath is None:
+            localpath = self.localpath
+        style_directory = Path(localpath, style)
         if not style_directory.is_dir():
             style_directory.mkdir(parents=True)
         
@@ -110,7 +87,7 @@ class Library():
 
         # Build list of downloaded entries
         have = []
-        for fname in style_directory.glob('*.json'):
+        for fname in style_directory.glob('oqmd-*.*'):
             have.append(fname.stem)
         
         # Build list of missing OQMD entries
@@ -165,11 +142,14 @@ class Library():
             record.buildcontent(input_dict)
 
             # Save
-            with open(Path(style_directory, entry_id+'.json'), 'w') as f:
-                record.content.json(fp=f, indent=4)
+            with open(Path(style_directory, f'{entry_id}.{format}'), 'w') as f:
+                if format == 'json':
+                    record.content.json(fp=f, indent=indent)
+                else:
+                    record.content.xml(fp=f, indent=indent)
             print('Added', entry_id)
 
-    def download_mp_crystals(self, elements, api_key=None):
+    def download_mp_crystals(self, elements, api_key=None, localpath=None, format='json', indent=4):
         """
         Accesses Materials Project and downloads crystal structures containing the given
         elements.  The structures are saved to the iprPy library as
@@ -183,6 +163,9 @@ class Library():
             The user's Materials Project API key. If not given, will use "MAPI_KEY"
             environment variable
         """
+
+        assert format in ['json', 'xml']
+
         # Function-specific imports
         import pymatgen as pmg
         from pymatgen.ext.matproj import MPRester
@@ -205,7 +188,9 @@ class Library():
         input_dict['length_unit'] = "angstrom"
 
         # Set library subdirectory
-        style_directory = Path(self.directory, style)
+        if localpath is None:
+            localpath = self.localpath
+        style_directory = Path(localpath, style)
         if not style_directory.is_dir():
             style_directory.mkdir(parents=True)
         
@@ -214,7 +199,7 @@ class Library():
 
         # Build list of downloaded entries
         have = []
-        for fname in style_directory.glob('*.json'):
+        for fname in style_directory.glob('mp-*.*'):
             have.append(fname.stem)
         
         # Open connection to Materials Project
@@ -250,8 +235,11 @@ class Library():
                         record.buildcontent(input_dict)
 
                         # Save
-                        with open(Path(style_directory, entry_id+'.json'), 'w') as f:
-                            record.content.json(fp=f, indent=4)
+                        with open(Path(style_directory, f'{entry_id}.{format}'), 'w') as f:
+                            if format == 'json':
+                                record.content.json(fp=f, indent=indent)
+                            else:
+                                record.content.xml(fp=f, indent=indent)
                         print('Added', entry_id)
 
     def get_ref(self, style, name, verbose=False, asrecord=True):
@@ -280,99 +268,11 @@ class Library():
             The content as a DataModelDict.  Returned if asrecord is False or
             iprPy does not have a subclass for the record's style.
         """
-        content = self.potdb.get_record(template=style, title=name, verbose=verbose)
+        content = self.get_record(template=style, title=name, verbose=verbose)
                 
         # Load as iprPy record if style exists
         try:
+            assert asrecord
             return load_record(style, name, content)
         except:
-            return content    
-        
-    def get_potentials(self, id=None, key=None, potid=None, potkey=None,
-                    status='active', pair_style=None, element=None,
-                    symbol=None, verbose=False, get_files=False):
-        """
-        Gets LAMMPS potentials from the iprPy library or by downloading from
-        potentials.nist.gov if local copies are not found.
-        
-        Parameters
-        ----------
-        id : str or list, optional
-            The id value(s) to limit the search by.
-        key : str or list, optional
-            The key value(s) to limit the search by.
-        potid : str or list, optional
-            The potid value(s) to limit the search by.
-        potkey : str or list, optional
-            The potkey value(s) to limit the search by.
-        status : str or list, optional
-            The status value(s) to limit the search by.
-        pair_style : str or list, optional
-            The pair_style value(s) to limit the search by.
-        element : str or list, optional
-            The included elemental model(s) to limit the search by.
-        symbol : str or list, optional
-            The included symbol model(s) to limit the search by.
-        verbose: bool, optional
-            If True, informative print statements will be used.
-        get_files : bool, optional
-            If True, then the parameter files for the matching potentials
-            will also be retrieved and copied to the working directory.
-            If False (default) and the parameter files are in the library,
-            then the returned objects' pot_dir path will be set appropriately.
-            
-        Returns
-        -------
-        Potential.LAMMPSPotential
-            The potential object to use.
-        """
-        if self.potdb.lammps_potentials is None:
-            self.potdb.load_lammps_potentials()
-            
-        return self.potdb.get_lammps_potentials(id=id, key=key, potid=potid, potkey=potkey,
-                                                status=status, pair_style=pair_style, element=element,
-                                                symbol=symbol, verbose=verbose, get_files=get_files)
-
-    def get_potential(self, id=None, key=None, potid=None, potkey=None,
-                    status='active', pair_style=None, element=None,
-                    symbol=None, verbose=False, get_files=False):
-        """
-        Gets a LAMMPS potential from the iprPy library or by downloading from
-        potentials.nist.gov if a local copy is not found.  Will raise an error
-        if none or multiple matching potentials are found.
-        
-        Parameters
-        ----------
-        id : str or list, optional
-            The id value(s) to limit the search by.
-        key : str or list, optional
-            The key value(s) to limit the search by.
-        potid : str or list, optional
-            The potid value(s) to limit the search by.
-        potkey : str or list, optional
-            The potkey value(s) to limit the search by.
-        status : str or list, optional
-            The status value(s) to limit the search by.
-        pair_style : str or list, optional
-            The pair_style value(s) to limit the search by.
-        element : str or list, optional
-            The included elemental model(s) to limit the search by.
-        symbol : str or list, optional
-            The included symbol model(s) to limit the search by.
-        verbose: bool, optional
-            If True, informative print statements will be used.
-        get_files : bool, optional
-            If True, then the parameter files for the matching potentials
-            will also be retrieved and copied to the working directory.
-            If False (default) and the parameter files are in the library,
-            then the returned objects' pot_dir path will be set appropriately.
-            
-        Returns
-        -------
-        Potential.LAMMPSPotential
-            The potential object to use.
-        """
-        
-        return self.potdb.get_lammps_potential(id=id, key=key, potid=potid, potkey=potkey,
-                                               status=status, pair_style=pair_style, element=element,
-                                               symbol=symbol, verbose=verbose, get_files=get_files)
+            return content
