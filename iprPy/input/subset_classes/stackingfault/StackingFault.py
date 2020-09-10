@@ -58,6 +58,16 @@ class StackingFault(Subset):
             'stackingfault_model',
         ]
 
+    @property
+    def keyset(self):
+        """
+        list : The input keyset for preparing.
+        """
+        keys = self.preparekeys
+        keys.pop(keys.index('sizemults'))
+        keys.pop(keys.index('stackingfault_minwidth'))
+        return self._pre(keys)
+
     def template(self, header=None):
         """
         str : The input file template lines.

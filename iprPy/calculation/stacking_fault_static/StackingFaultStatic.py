@@ -95,11 +95,14 @@ class StackingFaultStatic(Calculation):
             (
                 [
                     'sizemults',
+                    'stackingfault_minwidth',
                 ]
             ),
             (
                 subset('stackingfault').keyset
-                + [
+            ),
+            (
+                [
                     'stackingfault_a1',
                     'stackingfault_a2',
                 ]

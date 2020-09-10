@@ -77,13 +77,13 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
             calc_directory.mkdir(parents=True)
 
         # Save inputfile to calculation folder
-        with open(Path(calc_directory, f'calc_{calculation.style}.in'), 'w') as f:
+        with open(Path(calc_directory, f'calc_{calculation.style}.in'), 'w', encoding='UTF-8') as f:
             f.write(inputfile)
 
         # Copy calculation files to calculation folder
         for filename in filedict:
             calc_file = Path(calc_directory, filename)
-            with open(calc_file, 'w') as f:
+            with open(calc_file, 'w', encoding='UTF-8') as f:
                 f.write(filedict[filename])
 
         # Copy/generate content files keys

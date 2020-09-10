@@ -35,12 +35,9 @@ class CalculationDislocationMonopole(CalculationRecord):
             
             'potential_LAMMPS_key',
             
-            'a_mult1',
-            'a_mult2',
-            'b_mult1',
-            'b_mult2',
-            'c_mult1',
-            'c_mult2',
+            'a_mult',
+            'b_mult',
+            'c_mult',
             
             'dislocation_key',
 

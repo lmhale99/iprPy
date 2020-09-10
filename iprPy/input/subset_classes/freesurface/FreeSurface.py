@@ -53,6 +53,15 @@ class FreeSurface(Subset):
         return self.preparekeys + [
             'surface_model',
         ]
+    
+    @property
+    def keyset(self):
+        """
+        list : The input keyset for preparing.
+        """
+        keys = self.preparekeys
+        keys.pop(keys.index('sizemults'))
+        return self._pre(keys)
 
     def template(self, header=None):
         """
@@ -84,7 +93,7 @@ class FreeSurface(Subset):
         # Replace defect model with defect content if given
         if surface_content is not None:
             surface_file = surface_content
-        
+
         # If defect model is given
         if surface_file is not None:
             

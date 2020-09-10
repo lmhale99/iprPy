@@ -35,19 +35,19 @@ class Dislocation(Record):
 
         disl = self.content[self.contentroot]
         params['character'] = disl['character']
-        params['burgersstring'] = disl['Burgers-vector']
+        params['burgersvector'] = disl['Burgers-vector']
         params['slipplane'] = disl['slip-plane']
         params['linedirection'] = disl['line-direction']
         params['family'] = disl['system-family']
         
         calcparam = disl['calculation-parameter']
-        params['stroh_m'] = calcparam['stroh_m']
-        params['stroh_n'] = calcparam['stroh_n']
-        params['lineboxvector'] = calcparam['lineboxvector']
-        params['a_uvw'] = calcparam['a_uvw']
-        params['b_uvw'] = calcparam['b_uvw']
-        params['c_uvw'] = calcparam['c_uvw']
-        params['atomshift'] = calcparam['atomshift']
-        params['burgersvector'] = calcparam['burgersvector']
+        params['slip_hkl'] = calcparam['slip_hkl']
+        params['ξ_uvw'] = calcparam['ξ_uvw']
+        params['burgers'] = calcparam['burgers']
+        params['m'] = calcparam['m']
+        params['n'] = calcparam['n']
+        params['shift'] = calcparam.get('shift', None)
+        params['shiftscale'] = calcparam.get('shiftscale', False)
+        params['shiftindex'] = calcparam.get('shiftindex', None)
         
         return params

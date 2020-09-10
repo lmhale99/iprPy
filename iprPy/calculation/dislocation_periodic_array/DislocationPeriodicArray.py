@@ -106,6 +106,9 @@ class DislocationPeriodicArray(Calculation):
             (
                 [
                     'sizemults',
+                    'amin',
+                    'bmin',
+                    'cmin',
                 ]
             ),
             (

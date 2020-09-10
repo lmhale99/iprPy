@@ -37,10 +37,8 @@ class FreeSurface(Record):
         params['family'] = surf['system-family']
         
         calcparam = surf['calculation-parameter']
-        params['a_uvw'] = calcparam['a_uvw']
-        params['b_uvw'] = calcparam['b_uvw']
-        params['c_uvw'] = calcparam['c_uvw']
-        params['atomshift'] = calcparam['atomshift']
+        params['hkl'] = calcparam['hkl']
+        params['shiftindex'] = calcparam['shiftindex']
         params['cutboxvector'] = calcparam['cutboxvector']
         
         return params

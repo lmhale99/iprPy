@@ -95,6 +95,7 @@ class StackingFaultMap2D(Calculation):
             (
                 [
                     'sizemults',
+                    'stackingfault_minwidth',
                 ]
             ),
             (

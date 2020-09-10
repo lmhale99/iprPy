@@ -60,6 +60,18 @@ class Dislocation(Subset):
             'dislocation_model', 
         ]
 
+    @property
+    def keyset(self):
+        """
+        list : The input keyset for preparing.
+        """
+        keys = self.preparekeys
+        keys.pop(keys.index('sizemults'))
+        keys.pop(keys.index('amin'))
+        keys.pop(keys.index('bmin'))
+        keys.pop(keys.index('cmin'))
+        return self._pre(keys)
+
     def template(self, header=None):
         """
         str : The input file template lines.
@@ -224,9 +236,18 @@ class Dislocation(Subset):
         run_params = record_model['calculation']['run-parameter']
         
         run_params[f'{modelprefix}size-multipliers'] = DM()
-        run_params[f'{modelprefix}size-multipliers']['a'] = list(sizemults[0])
-        run_params[f'{modelprefix}size-multipliers']['b'] = list(sizemults[1])
-        run_params[f'{modelprefix}size-multipliers']['c'] = list(sizemults[2])
+        if isinstance(sizemults[0], int):
+            run_params[f'{modelprefix}size-multipliers']['a'] = [0, sizemults[0]]
+        else:
+            run_params[f'{modelprefix}size-multipliers']['a'] = list(sizemults[0])
+        if isinstance(sizemults[1], int):
+            run_params[f'{modelprefix}size-multipliers']['b'] = [0, sizemults[1]]
+        else:
+            run_params[f'{modelprefix}size-multipliers']['b'] = list(sizemults[1])
+        if isinstance(sizemults[2], int):
+            run_params[f'{modelprefix}size-multipliers']['c'] = [0, sizemults[2]]
+        else:
+            run_params[f'{modelprefix}size-multipliers']['c'] = list(sizemults[2])
         
         if dislocation_model is not None:
             disl['key'] = dislocation_model['key']
@@ -288,3 +309,15 @@ class Dislocation(Subset):
         params[f'{prefix}dislocation_shift'] = cp.get('shift', None)
         params[f'{prefix}dislocation_shiftscale'] = cp['shiftscale']
         params[f'{prefix}dislocation_shiftindex'] = cp.get('shiftindex', None)
+
+        sizemults = record_model['calculation']['run-parameter'][f'{modelprefix}size-multipliers']
+
+        if flat is True:
+            params[f'{prefix}a_mult1'] = sizemults['a'][0]
+            params[f'{prefix}a_mult2'] = sizemults['a'][1]
+            params[f'{prefix}b_mult1'] = sizemults['b'][0]
+            params[f'{prefix}b_mult2'] = sizemults['b'][1]
+            params[f'{prefix}c_mult1'] = sizemults['c'][0]
+            params[f'{prefix}c_mult2'] = sizemults['c'][1]
+        else:
+            params[f'{prefix}sizemults'] = np.array([sizemults['a'], sizemults['b'], sizemults['c']])

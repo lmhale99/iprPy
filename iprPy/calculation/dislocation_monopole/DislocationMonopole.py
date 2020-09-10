@@ -104,6 +104,9 @@ class DislocationMonopole(Calculation):
             (
                 [
                     'sizemults',
+                    'amin',
+                    'bmin',
+                    'cmin',
                 ]
             ),     
             (
