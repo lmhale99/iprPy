@@ -32,13 +32,18 @@ def atomicarchive(database, keys, content_dict=None, record=None, load_key='atom
         potentials, potential_df = database.get_records(style=potential_record, return_df=True,
                                                         query=potential_query, status=status,
                                                         **potential_kwargs)
-
+        print(len(potential_df), 'matching interatomic potentials found')
+        if len(potential_df) == 0:
+            raise ValueError('No matching interatomic potentials found') 
     else:
         include_potentials = False
 
     # Fetch reference records
     parents, parent_df = database.get_records(style=record, return_df=True,
                                               query=query, **kwargs)
+    print(len(parent_df), 'matching atomic archives found')
+    if len(parent_df) == 0:
+        raise ValueError('No matching atomic archives found')
 
     # Setup
     inputs = {}

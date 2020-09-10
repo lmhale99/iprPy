@@ -18,6 +18,9 @@ def interatomicpotential(database, keys, content_dict=None, record='potential_LA
     # Fetch potential records and df
     potentials, potential_df = database.get_records(style=record, return_df=True,
                                                     query=query, status=status, **kwargs)
+    print(len(potential_df), 'matching interatomic potentials found')
+    if len(potential_df) == 0:
+        raise ValueError('No matching interatomic potentials found')
 
     # Initialize inputs keys
     inputs = {}

@@ -28,6 +28,9 @@ def atomicreference(database, keys, content_dict=None,
     # Fetch reference records
     references, reference_df = database.get_records(style=record, return_df=True,
                                                     query=query, **kwargs)
+    print(len(reference_df), 'matching atomic references found')
+    if len(reference_df) == 0:
+        raise ValueError('No matching atomic references found')
 
     # Initialize inputs keys
     inputs = {}
@@ -54,7 +57,10 @@ def atomicreference(database, keys, content_dict=None,
         potentials, potential_df = database.get_records(style=potential_record, return_df=True,
                                                         query=potential_query, status=status,
                                                         **potential_kwargs)
-
+        print(len(potential_df), 'matching interatomic potentials found')
+        if len(potential_df) == 0:
+            raise ValueError('No matching interatomic potentials found')
+        
         # Loop over all unique reference element sets
         reference_df['elementstr'] = reference_df.symbols.apply(' '.join)
         for elementstr in np.unique(reference_df.elementstr):

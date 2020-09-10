@@ -24,12 +24,14 @@ def crystalprototype(database, keys, content_dict=None,
     # Fetch prototype records
     prototypes, prototype_df = database.get_records(style=record, return_df=True,
                                                  query=query, **kwargs)
-    
+    print(len(prototype_df), 'matching crystal prototypes found')
+    if len(prototype_df) == 0:
+        raise ValueError('No matching crystal prototypes found')
     # Initialize inputs keys
     inputs = {}
     for key in keys:
         inputs[key] = []
-    
+        
     # Build with potentials
     if include_potentials:
 
@@ -46,7 +48,10 @@ def crystalprototype(database, keys, content_dict=None,
         potentials, potential_df = database.get_records(style=potential_record, return_df=True,
                                                         query=potential_query, status=status,
                                                         **potential_kwargs)
-        
+        print(len(potential_df), 'matching interatomic potentials found')
+        if len(potential_df) == 0:
+            raise ValueError('No matching interatomic potentials found')
+
         # Loop over prototypes
         for i in prototype_df.index:
             prototype = prototypes[i]

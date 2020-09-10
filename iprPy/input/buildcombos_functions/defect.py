@@ -9,8 +9,11 @@ def defect(database, keys, content_dict=None, record=None, query=None, **kwargs)
         content_dict = {}
 
     defects, defect_df = database.get_records(style=record, return_df=True,
-                                           query=query, **kwargs)
-    
+                                              query=query, **kwargs)
+    print(len(defect_df), 'matching defects')
+    if len(defect_df) == 0:
+        raise ValueError('No matching defects found')
+        
     # Search for defect keys
     file_key = None
     content_key = None
@@ -42,8 +45,11 @@ def defect(database, keys, content_dict=None, record=None, query=None, **kwargs)
     if family_key is None:
         raise KeyError('No <defect>_family key found')
     
+
+
     # Generate 
-    for i, defect_series in defect_df.iterrows():
+    for i in defect_df.index:
+        defect_series = defect_df.loc[i]
         defect = defects[i]
         content_dict[defect.name] = defect.content
 
