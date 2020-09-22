@@ -2,17 +2,20 @@
 
 **Lucas M. Hale**, [lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), *Materials Science and Engineering Division, NIST*.
 
-Description updated: 2019-07-26
 
 ## Introduction
 
-The dislocation_periodic_array calculation constructs an atomic system with a periodic array of dislocations configuration.  A single dislocation is inserted into an otherwise perfect crystal, and the system is kept periodic in the two system box directions that are within the dislocation's slip plane.  The system is then statically relaxed with the atoms at the boundary perpendicular to the slip plane held fixed.  The generated system can then be used by the other "dislocation_periodic_array_*" calculations for examining the slip response of a dislocation to applied stresses or strain rates.
+The dislocation_periodic_array calculation constructs an atomic system with a periodic array of dislocations configuration.  A single dislocation is inserted into an otherwise perfect crystal, and the system is kept periodic in the two system box directions that are within the dislocation's slip plane.  The system is then statically relaxed with the atoms at the boundary perpendicular to the slip plane held fixed.  
 
 ### Version notes
+
+- 2019-07-30: Notebook added.
+- 2020-05-22: Notebook updated for iprPy version 0.10 and tested for hcp
+- 2020-09-22: Notebook updated to reflect that calculation method has changed to now use atomman.defect.Dislocation. Setup and parameter definition cleaned up and streamlined. 
 
 ### Additional dependencies
 
 ### Disclaimers
 
 - [NIST disclaimers](http://www.nist.gov/public_affairs/disclaimer.cfm)
-- This calculation was designed to be general enough to properly generate a dislocation for any crystal system, but has so far only been tested with cubic systems.  The resulting system should be carefully examined if the base system in which the dislocation is inserted is not orthorhombic.  In particular, the method may need adjusting if the $\vec{c}$ box vector has a large $y$ component.
+- This calculation was designed to be general enough to properly generate a dislocation for any crystal system but has not been fully tested yet for extreme cases. 

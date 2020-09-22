@@ -2,15 +2,16 @@
 
 **Lucas M. Hale**, [lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), *Materials Science and Engineering Division, NIST*.
 
-Description updated: 2019-07-26
-
 ## Introduction
 
 The relax_dynamic calculation style dynamically relaxes an atomic configuration for a specified number of timesteps.  Upon completion, the mean, $\langle X \rangle$, and standard deviation, $\sigma_X$, of all thermo properties, $X$, are computed for a specified range of times.  This method is meant to measure equilibrium properties of bulk materials, both at zero K and at various temperatures.
 
 ### Version notes
 
-- This style was previously called dynamic_relax and was renamed for consistency with other calculations.
+- 2018-07-09: Notebook added.
+- 2019-07-30: Description updated and small changes due to iprPy version.
+- 2020-05-22: Version 0.10 update - potentials now loaded from database.
+- 2020-09-22: Setup and parameter definition streamlined.
 
 ### Additional dependencies
 

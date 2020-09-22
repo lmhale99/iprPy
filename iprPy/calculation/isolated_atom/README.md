@@ -2,16 +2,18 @@
 
 **Lucas M. Hale**, [lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), *Materials Science and Engineering Division, NIST*.
 
-Description updated: 2019-12-05
-
 ## Introduction
 
-The isolated_atom calculation style evaluates the energy of a single isolated atom of each element type associated with an iteratomic potential.  This value is important for correctly computing the cohesive energy of a crystal with some interatomic potentials, and can serve as a simple test if a potential implementation works with a given version of LAMMPS.
+The isolated_atom calculation style evaluates the base energies of all atomic models associated with an interatomic potential. 
+For some potentials, the isolated energy values are necessary to properly compute the cohesive energy of crystal structures.  This also provides a simple test whether a potential implementation is compatible with a version of LAMMPS. 
 
 ### Version notes
+
+- 2020-09-22: Notebook first added.
 
 ### Additional dependencies
 
 ### Disclaimers
 
 - [NIST disclaimers](http://www.nist.gov/public_affairs/disclaimer.cfm)
+- Some potentials have two cutoffs with atomic energies outside the first being the "isolated" energy while outside the second have zero energy.  The first isolated energy values for those potentials can be found using the diatom_scan calculation instead.

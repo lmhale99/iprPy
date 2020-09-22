@@ -2,15 +2,16 @@
 
 **Lucas M. Hale**, [lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), *Materials Science and Engineering Division, NIST*.
 
-Description updated: 2019-07-26
-
 ## Introduction
 
 The elastic_constants_static calculation style computes the elastic constants, $C_{ij}$, for a system by applying small strains and performing static energy minimizations of the initial and strained configurations.  Three estimates of the elastic constants are returned: one for applying positive strains, one for applying negative strains, and a normalized estimate that averages the &pm; strains and the symmetric components of the $C_{ij}$ tensor.
 
 ### Version notes
 
-- This calculation style and relax_static replace the previous LAMMPS_ELASTIC calculation style.
+- 2018-07-09: Notebook added.
+- 2019-07-30: Description updated and small changes due to iprPy version.
+- 2020-05-22: Version 0.10 update - potentials now loaded from database.
+- 2020-09-22: Setup and parameter definition streamlined.
 
 ### Additional dependencies
 

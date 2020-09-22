@@ -2,8 +2,6 @@
 
 **Lucas M. Hale**, [lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), *Materials Science and Engineering Division, NIST*.
 
-Description updated: 2019-07-26
-
 ## Introduction
 
 The E_vs_r_scan calculation style calculation creates a plot of the cohesive energy vs interatomic spacing, $r$, for a given atomic system. The system size is uniformly scaled ($b/a$ and $c/a$ ratios held fixed) and the energy is calculated at a number of sizes without relaxing the system. All box sizes corresponding to energy minima are identified.
@@ -11,6 +9,11 @@ The E_vs_r_scan calculation style calculation creates a plot of the cohesive ene
 This calculation was created as a quick method for scanning the phase space of a crystal structure with a given potential in order to identify starting guesses for further structure refinement calculations.
 
 ### Version notes
+
+- 2018-07-09: Notebook added.
+- 2019-07-30: Description updated and small changes due to iprPy version.
+- 2020-05-22: Version 0.10 update - potentials now loaded from database.
+- 2020-09-22: Setup and parameter definitions streamlined.
 
 ### Additional dependencies
 

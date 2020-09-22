@@ -2,13 +2,15 @@
 
 **Lucas M. Hale**, [lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), *Materials Science and Engineering Division, NIST*.
 
-Description updated: 2019-07-26
-
 ## Introduction
 
 The dislocation_monopole calculation style calculation inserts a dislocation monopole into an atomic system using the anisotropic elasticity solution for a perfectly straight dislocation. The system is divided into two regions: a boundary region at the system's edges perpendicular to the dislocation line, and an active region around the dislocation. After inserting the dislocation, the atoms within the active region of the system are relaxed while the positions of the atoms in the boundary region are held fixed at the elasticity solution. The relaxed dislocation system and corresponding dislocation-free base systems are retained in the calculation's archived record. Various properties associated with the dislocation's elasticity solution are recorded in the calculation's results record.
 
 ### Version notes
+
+- 2018-09-25: Notebook added
+- 2019-07-30: Method and Notebook updated for iprPy version 0.9.
+- 2020-09-22: Notebook updated to reflect that calculation method has changed to now use atomman.defect.Dislocation.  
 
 ### Additional dependencies
 

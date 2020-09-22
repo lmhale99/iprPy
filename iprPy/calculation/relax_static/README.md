@@ -2,15 +2,16 @@
 
 **Lucas M. Hale**, [lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), *Materials Science and Engineering Division, NIST*.
 
-Description updated: 2019-07-26
-
 ## Introduction
 
 The relax_static calculation style uses static energy/force minimizations to relax the atomic positions and box dimensions of a system to a specified pressure.
 
 ### Version notes
 
-- This calculation style and elastic_constants_static replace the previous LAMMPS_ELASTIC calculation style.
+- 2018-07-09: Notebook added.
+- 2019-07-30: Description updated and small changes due to iprPy version.
+- 2020-05-22: Version 0.10 update - potentials now loaded from database.
+- 2020-09-22: Setup and parameter definition streamlined.
 
 ### Additional dependencies
 

@@ -38,13 +38,11 @@ class ElasticConstantsStatic(Calculation):
                 
         # Join and return
         return universalfiles + files
+    
     @property
-    def template(self):
-        """
-        str: The template to use for generating calc.in files.
-        """
-        # Specify the subsets to include in the template
-        subsets = [
+    def inputsubsets(self):
+        """list: The subsets whose input key sets are used for the calculation"""
+        return  [
             'lammps_commands', 
             'lammps_potential',
             'atomman_systemload',
@@ -52,14 +50,14 @@ class ElasticConstantsStatic(Calculation):
             'units',
             'lammps_minimize',
         ]
-        
-        # Specify the calculation-specific run parameters
-        runkeys = [
+    
+    @property
+    def inputkeys(self):
+        """list: the calculation-specific input keys"""
+        return  [
             'strainrange',
         ]
         
-        return self._buildtemplate(subsets, runkeys)
-
     @property
     def singularkeys(self):
         """

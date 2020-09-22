@@ -68,18 +68,94 @@ class Calculation(object):
         return self.script.record_style
     
     @property
+    def inputsubsets(self):
+        """list: the subsets whose input key sets are used for the calculation"""
+        return []
+
+    @property
+    def inputkeys(self):
+        """list: the calculation-specific input keys"""
+        return []
+
+    @property
+    def inputdoc(self):
+        """str: the documentation for the calculation-specific input keys"""
+        try:
+            return resources.read_text(self.parent_module, 'runparameters.md')
+        except:
+            return ""
+
+    @property
+    def maindoc(self):
+        """str: the overview documentation for the calculation"""
+        try:
+            return resources.read_text(self.parent_module, 'README.md')
+        except:
+            return ""
+
+    @property
+    def theorydoc(self):
+        """str: the methods and theory documentation for the calculation"""
+        try:
+            return resources.read_text(self.parent_module, 'theory.md')
+        except:
+            return ""
+
+    @property
     def template(self):
         """
         str: The template to use for generating calc.in files.
         """
-        # Specify the subsets to include in the template
-        subsets = []
+        # Set the template header
+        template = f'# Input script for calc_{self.style}.py\n'
         
-        # Specify the calculation-specific run parameters
-        runkeys = []
+        # Add metadata fields
+        template += '\n# Calculation metadata\n'
+        metakeys = ['branch']
+        for key in metakeys:
+            spacelen = 32 - len(key)
+            if spacelen < 1:
+                spacelen = 1
+            space = ' ' * spacelen
+            template += f'{key}{space}<{key}>\n'
+
+        # Add subset components
+        for key in self.inputsubsets:
+            template += subset(key).template() + '\n'
+                
+        # Add calculation-specific components
+        if len(self.inputkeys) > 0:
+            template += '\n# Run parameters\n'
+            for key in self.inputkeys:
+                spacelen = 32 - len(key)
+                if spacelen < 1:
+                    spacelen = 1
+                space = ' ' * spacelen
+                template += f'{key}{space}<{key}>\n'
         
-        return self._buildtemplate(subsets, runkeys)
+        return template
     
+    @property
+    def templatedoc(self):
+        """str: The markdown doc describing the calculation's input parameters"""
+        
+        # Set the documentation header
+        doc = "## Input script parameters\n\n"
+        doc += f"This is a list of the input parameter names recognized by calc_{self.style}.py.\n\n"
+
+        # Describe metadata parameters
+        doc += "### Global metadata parameters\n\n"
+        doc += "- __branch__: assigns a group/branch descriptor to the calculation which can help with parsing results later.  Default value is 'main'.\n\n"
+
+        # Append the subsets documentation
+        for key in self.inputsubsets:
+            doc += subset(key).templatedoc + '\n'
+
+        # Append the run parameters documentation
+        doc += self.inputdoc
+        
+        return doc
+
     def calc(self, *args, **kwargs):
         """
         Calls the calculation's primary function(s)
@@ -136,33 +212,3 @@ class Calculation(object):
             allkeys.extend(keyset)
         
         return allkeys
-
-    def _buildtemplate(self, subsets, runkeys):
-        # Set the template header
-        template = f'# Input script for calc_{self.style}.py\n'
-        
-        # Add metadata fields
-        template += '\n# Calculation metadata\n'
-        metakeys = ['branch']
-        for key in metakeys:
-            spacelen = 32 - len(key)
-            if spacelen < 1:
-                spacelen = 1
-            space = ' ' * spacelen
-            template += f'{key}{space}<{key}>\n'       
-
-        # Add subset components
-        for key in subsets:
-            template += subset(key).template() + '\n'
-                
-        # Add calculation-specific components
-        if len(runkeys) > 0:
-            template += '\n# Run parameters\n'
-            for key in runkeys:
-                spacelen = 32 - len(key)
-                if spacelen < 1:
-                    spacelen = 1
-                space = ' ' * spacelen
-                template += f'{key}{space}<{key}>\n'
-        
-        return template

@@ -2,15 +2,16 @@
 
 **Lucas M. Hale**, [lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), *Materials Science and Engineering Division, NIST*.
 
-Description updated: 2019-07-26
-
 ## Introduction
 
 The surface_energy_static calculation style evaluates the formation energy for a free surface by slicing an atomic system along a specific plane.
 
 ### Version notes
 
-- This was previously called the surface_energy calculation style and was renamed for consistency.
+- 2018-07-09: Notebook added.
+- 2019-07-30: Description updated and small changes due to iprPy version.
+- 2020-05-22: Version 0.10 update - potentials now loaded from database.
+- 2020-09-22: Calculation updated to use atomman.defect.FreeSurface class. Setup and parameter definition streamlined.
 
 ### Additional dependencies
 

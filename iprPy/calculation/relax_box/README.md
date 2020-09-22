@@ -2,8 +2,6 @@
 
 **Lucas M. Hale**, [lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), *Materials Science and Engineering Division, NIST*.
 
-Description updated: 2019-07-26
-
 ## Introduction
 
 The relax_box calculation style refines the lattice parameters of an orthogonal system (crystal structure) by relaxing the box dimensions towards a given pressure.  In refining the lattice parameter values, the box dimensions are allowed to relax, but the relative positions of the atoms within the box are held fixed.
@@ -12,7 +10,10 @@ This calculations provides a quick tool for obtaining lattice parameters for ide
 
 ### Version notes
 
-- This style was previously called refine_structure and was renamed for consistency with other calculations.  Additionally, reporting of the elastic constants has been removed in favor of the separate elastic_constants_static style.
+- 2018-07-09: Notebook added.
+- 2019-07-30: Description updated and small changes due to iprPy version.
+- 2020-05-22: Version 0.10 update - potentials now loaded from database.
+- 2020-09-22: Setup and parameter definition streamlined.
 
 ### Additional dependencies
 
