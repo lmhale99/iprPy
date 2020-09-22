@@ -38,12 +38,6 @@ class Subset():
         return Path(self._mod_file).resolve().parent
 
     @property
-    def parameters_doc(self):
-        """str: The markdown doc describing the associated input parameters"""
-        with open(Path(self.directory, 'parameters.md')) as f:
-            return f.read()
-
-    @property
     def prefix(self):
         """
         str: The calculation style
@@ -57,6 +51,12 @@ class Subset():
         """
         return []
     
+    @property
+    def templatedoc(self):
+        """str: The markdown doc describing the associated input parameters"""
+        with open(Path(self.directory, 'parameters.md')) as f:
+            return f.read()
+
     @property
     def preparekeys(self):
         """
