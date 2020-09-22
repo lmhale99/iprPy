@@ -10,9 +10,11 @@
 
 ## [dislocation_SDVPN](dislocation_SDVPN.ipynb)
 
+## [E_vs_r_scan](E_vs_r_scan.ipynb)
+
 ## [elastic_constants_static](elastic_constants_static.ipynb)
 
-## [E_vs_r_scan](E_vs_r_scan.ipynb)
+## [isolated_atom](isolated_atom.ipynb)
 
 ## [phonon](phonon.ipynb)
 
