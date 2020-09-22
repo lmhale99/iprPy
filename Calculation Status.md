@@ -19,7 +19,7 @@ This is a list of the implemented calculations and the status of the associated 
 ## diatom_scan
 
 - script: Current
-- workflow: Not implemented (easy to add)
+- workflow: Current
 - docs: Current
 - Notebook: Current
 
@@ -107,26 +107,33 @@ This is a list of the implemented calculations and the status of the associated 
 - docs: Missing
 - Notebook: Missing
 
-## phonon
+## isolated_atom
 
 - script: Current
 - workflow: Current
 - docs: Current
 - Notebook: Current
+
+## phonon
+
+- script: Needs updating
+- workflow: Needs updating
+- docs: Needs updating
+- Notebook: Needs updating
 
 ## point_defect_diffusion
 
-- script: Current
+- script: Needs updating
 - workflow: Not implemented (needs temperature relaxations)
-- docs: Current
-- Notebook: Current
+- docs: Needs updating
+- Notebook: Needs updating
 
 ## point_defect_static
 
-- script: Current
-- workflow: Current
-- docs: Current
-- Notebook: Current
+- script: Needs updating
+- workflow: Needs updating
+- docs: Needs updating
+- Notebook: Needs updating
 
 ## relax_box
 
