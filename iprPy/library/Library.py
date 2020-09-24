@@ -36,6 +36,15 @@ class Library(am.library.Database):
             be downloaded.  Allowed values are 'active' (default),
             'superseded', and 'retracted'.  If set to None, all hosted
             potential_LAMMPS will be downloaded.
+        format : str, optional
+            Indicates the file format to save the refs as: 'json' or 'xml'.
+            Default is 'json'.
+        indent : int or None, optional
+            If a number, then the saved content will be indented making it
+            easier to read but larger files.  If None, the files will be
+            compact.  Default value is 4.
+        verbose : bool, optional
+            If True, informative messages will be printed.
         """
         assert format in ['json', 'xml']
         
@@ -83,6 +92,7 @@ class Library(am.library.Database):
             style_directory.mkdir(parents=True)
         
         # Sort elements
+        elements = aslist(elements)
         elements.sort()
 
         # Build list of downloaded entries
@@ -195,6 +205,7 @@ class Library(am.library.Database):
             style_directory.mkdir(parents=True)
         
         # Sort elements
+        elements = aslist(elements)
         elements.sort()
 
         # Build list of downloaded entries
