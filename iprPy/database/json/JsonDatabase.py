@@ -250,7 +250,7 @@ class JsonDatabase(Database):
         # Save content to an .json file
         json_file = Path(style_dir, record.name+'.json')
         with open(json_file, 'w') as f:
-            record.content.json(fp=f)
+            record.content.json(fp=f, indent=4)
         
         return record
 
