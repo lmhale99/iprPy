@@ -11,6 +11,12 @@ computational smoothness of the potential’s functional form.
 Version notes
 ~~~~~~~~~~~~~
 
+-  2019-07-30: Notebook added.
+-  2020-05-22: Version 0.10 update - potentials now loaded from
+   database.
+-  2020-09-22: Setup and parameter definition streamlined. Method and
+   theory expanded.
+
 Additional dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~
 

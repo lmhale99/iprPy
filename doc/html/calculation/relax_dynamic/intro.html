@@ -1,12 +1,10 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Introduction &#8212; iprPy 0.9.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>Introduction &#8212; iprPy 0.10.2 documentation</title>
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -14,6 +12,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -36,7 +35,7 @@
         <li class="right" >
           <a href="index.html" title="relax_dynamic"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">relax_dynamic</a> &#187;</li> 
       </ul>
@@ -59,8 +58,12 @@ temperatures.</p>
 <div class="section" id="version-notes">
 <h2>Version notes<a class="headerlink" href="#version-notes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>This style was previously called dynamic_relax and was renamed for
-consistency with other calculations.</li>
+<li><p>2018-07-09: Notebook added.</p></li>
+<li><p>2019-07-30: Description updated and small changes due to iprPy
+version.</p></li>
+<li><p>2020-05-22: Version 0.10 update - potentials now loaded from
+database.</p></li>
+<li><p>2020-09-22: Setup and parameter definition streamlined.</p></li>
 </ul>
 </div>
 <div class="section" id="additional-dependencies">
@@ -69,9 +72,9 @@ consistency with other calculations.</li>
 <div class="section" id="disclaimers">
 <h2>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST
-disclaimers</a></li>
-<li>The calculation reports the standard deviation, <span class="math notranslate nohighlight">\(\sigma_X\)</span> of
+<li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST
+disclaimers</a></p></li>
+<li><p>The calculation reports the standard deviation, <span class="math notranslate nohighlight">\(\sigma_X\)</span> of
 the measured properties not the standard error of the mean,
 <span class="math notranslate nohighlight">\(\sigma_{\langle X \rangle}\)</span>. The two are related to each other
 according to
@@ -81,19 +84,20 @@ where <span class="math notranslate nohighlight">\(N\)</span> is the number of s
 the measurements with time. Obtaining a proper estimate of
 <span class="math notranslate nohighlight">\(\sigma_{\langle X \rangle}\)</span> requires either estimating
 <span class="math notranslate nohighlight">\(C\)</span> from the raw thermo data (not done here), or only taking
-measurements sporadically to ensure the samples are independent.</li>
-<li>Good (low error) results requires running large simulations for a
-long time. The reasons for this are:<ul>
-<li>Systems have to be large enough to avoid issues with fluctuations
-across the periodic boundaries.</li>
-<li>Runs must first let the systems equilibrate before meaningful
-measurements can be taken.</li>
-<li>The standard deviation, <span class="math notranslate nohighlight">\(\sigma\)</span>, of thermo properties is
+measurements sporadically to ensure the samples are independent.</p></li>
+<li><p>Good (low error) results requires running large simulations for a
+long time. The reasons for this are:</p>
+<ul>
+<li><p>Systems have to be large enough to avoid issues with fluctuations
+across the periodic boundaries.</p></li>
+<li><p>Runs must first let the systems equilibrate before meaningful
+measurements can be taken.</p></li>
+<li><p>The standard deviation, <span class="math notranslate nohighlight">\(\sigma\)</span>, of thermo properties is
 proportional to the number of atoms, <span class="math notranslate nohighlight">\(N_a\)</span> as
-<span class="math notranslate nohighlight">\(\sigma \propto \frac{1}{\sqrt{N_a}}\)</span>.</li>
-<li>The standard error, <span class="math notranslate nohighlight">\(\sigma_x\)</span> of thermo properties is
+<span class="math notranslate nohighlight">\(\sigma \propto \frac{1}{\sqrt{N_a}}\)</span>.</p></li>
+<li><p>The standard error, <span class="math notranslate nohighlight">\(\sigma_x\)</span> of thermo properties is
 proportional to the number of samples taken, <span class="math notranslate nohighlight">\(N\)</span> as
-<span class="math notranslate nohighlight">\(\sigma_x \propto \frac{1}{\sqrt{N}}\)</span>.</li>
+<span class="math notranslate nohighlight">\(\sigma_x \propto \frac{1}{\sqrt{N}}\)</span>.</p></li>
 </ul>
 </li>
 </ul>
@@ -141,13 +145,13 @@ proportional to the number of samples taken, <span class="math notranslate nohig
         <li class="right" >
           <a href="index.html" title="relax_dynamic"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >relax_dynamic</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>
 </html>

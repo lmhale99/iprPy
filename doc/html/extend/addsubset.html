@@ -1,12 +1,10 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Adding new subset styles &#8212; iprPy 0.9.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>Adding new subset styles &#8212; iprPy 0.10.2 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -14,6 +12,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -36,7 +35,7 @@
         <li class="right" >
           <a href="addrecord.html" title="Adding new record styles"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Extending iprPy</a> &#187;</li> 
       </ul>
     </div>  
@@ -50,24 +49,24 @@
 <h1>Adding new subset styles<a class="headerlink" href="#adding-new-subset-styles" title="Permalink to this headline">¶</a></h1>
 <p>The basic steps associated with implementing a new subset style in iprPy are</p>
 <ol class="arabic simple">
-<li>Create a new subdirectory in iprPy/input/subset_classes named for the new
-subset style.</li>
-<li>Create a file that defines the Subset subclass.  Name the file
+<li><p>Create a new subdirectory in iprPy/input/subset_classes named for the new
+subset style.</p></li>
+<li><p>Create a file that defines the Subset subclass.  Name the file
 after the subclass name, typically by converting the style name to upper
-camel case (each word capitalized with no separators).</li>
-<li>Define the Subset subclass templatekeys, preparekeys and interpretkeys
-attributes and template, interpret, buildcontent and todict methods.</li>
-<li>Create an “__init__.py” file that imports the subclass.</li>
-<li>Create a parameters.md file that describes the templatekeys.</li>
+camel case (each word capitalized with no separators).</p></li>
+<li><p>Define the Subset subclass templatekeys, preparekeys and interpretkeys
+attributes and template, interpret, buildcontent and todict methods.</p></li>
+<li><p>Create an “__init__.py” file that imports the subclass.</p></li>
+<li><p>Create a parameters.md file that describes the templatekeys.</p></li>
 </ol>
 <div class="section" id="files-in-the-subset-style-directories">
 <h2>Files in the subset style directories<a class="headerlink" href="#files-in-the-subset-style-directories" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>[Style].py</strong>: Defines the Subset subclass for the subset style.
-This defines how the iprPy codebase interacts with the subset.</li>
-<li><strong>__init__.py</strong>: Allows Python to identify the subset directory as
-a sub-package and be able to import the Subset subclass into iprPy.</li>
-<li><strong>parameters.md</strong>: Descriptions of the keys in templatekeys.</li>
+<li><p><strong>[Style].py</strong>: Defines the Subset subclass for the subset style.
+This defines how the iprPy codebase interacts with the subset.</p></li>
+<li><p><strong>__init__.py</strong>: Allows Python to identify the subset directory as
+a sub-package and be able to import the Subset subclass into iprPy.</p></li>
+<li><p><strong>parameters.md</strong>: Descriptions of the keys in templatekeys.</p></li>
 </ul>
 <div class="section" id="style-py">
 <h3>[Style].py<a class="headerlink" href="#style-py" title="Permalink to this headline">¶</a></h3>
@@ -117,29 +116,27 @@ input lines.</p>
 <p>The interpret() method interprets the calculation input parameter terms
 associated with the subset.</p>
 <ul>
-<li><p class="first">The function takes the input_dict dictionary of input parameters as the
-first argument.</p>
-</li>
-<li><p class="first">The function only operates on the parameters contained within input_dict.
+<li><p>The function takes the input_dict dictionary of input parameters as the
+first argument.</p></li>
+<li><p>The function only operates on the parameters contained within input_dict.
 Each function reads input parameters from pre-defined keys of input_dict and
 saves the processed values to input_dict.  No calculation parameters are
 returned by the function.</p>
 <blockquote>
 <div><ul class="simple">
-<li>Basic input parameters can be modified by the function by assigning
+<li><p>Basic input parameters can be modified by the function by assigning
 default values if needed, and simple conversion of string inputs to
-numerical values.</li>
-<li>Terms generated by the functions should be saved to new input_dict keys
+numerical values.</p></li>
+<li><p>Terms generated by the functions should be saved to new input_dict keys
 as opposed to overwriting the keys the function uses as inputs.  This is
-so that the original format can be retained whenever possible.</li>
+so that the original format can be retained whenever possible.</p></li>
 </ul>
 </div></blockquote>
 </li>
-<li><p class="first">The class’ keymap attribute maps the default key names without prefix to the
+<li><p>The class’ keymap attribute maps the default key names without prefix to the
 key names with the prefix added.  So, input_dict[self.keymap[‘keyname1’]]
-will access the input_dict value for ‘prefix + keyname1’.</p>
-</li>
-<li><p class="first">The function may have an optional <em>build</em> keyword parameter that takes a
+will access the input_dict value for ‘prefix + keyname1’.</p></li>
+<li><p>The function may have an optional <em>build</em> keyword parameter that takes a
 boolean value.  Giving <em>build</em> a value of False keeps the function from
 generating complex data structures and objects based on the inputs and only
 processes the simple terms.  This is useful in preparing calculations where
@@ -148,8 +145,7 @@ other complex input terms are not needed.  For instance, parameters defining
 a system (e.g. size multipliers and axis orientations) are important for
 defining the calculation and therefore need to appear in the calculation’s
 record when it is prepared, but the actual generated atomic system is not
-needed until the calculation is later performed.</p>
-</li>
+needed until the calculation is later performed.</p></li>
 </ul>
 </div>
 <div class="section" id="buildcontent">
@@ -226,12 +222,12 @@ the method adds terms to the params dictionary, no values are returned.</p>
         <li class="right" >
           <a href="addrecord.html" title="Adding new record styles"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Extending iprPy</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>
 </html>

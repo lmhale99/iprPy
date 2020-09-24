@@ -1,12 +1,10 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>iprPy package &#8212; iprPy 0.9.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>iprPy package &#8212; iprPy 0.10.2 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -14,6 +12,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -36,7 +35,7 @@
         <li class="right" >
           <a href="../database/mongo/intro.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -61,235 +60,313 @@
 </div>
 <div class="section" id="module-iprPy">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-iprPy" title="Permalink to this headline">¶</a></h2>
-<dl class="attribute">
-<dt id="iprPy.rootdir">
-<code class="descname">rootdir</code><a class="headerlink" href="#iprPy.rootdir" title="Permalink to this definition">¶</a></dt>
-<dd><p>The absolute path to the iprPy package’s root directory used to locate
-contained data files.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="class">
+<dt id="iprPy.Library">
+<em class="property">class </em><code class="sig-name descname">Library</code><span class="sig-paren">(</span><em class="sig-param">host=None</em>, <em class="sig-param">username=None</em>, <em class="sig-param">password=None</em>, <em class="sig-param">certification=None</em>, <em class="sig-param">localpath=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">local=True</em>, <em class="sig-param">remote=True</em>, <em class="sig-param">load=False</em>, <em class="sig-param">status='active'</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.Library" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">atomman.library.Database.Database</span></code></p>
+<p>Class for interacting with potential records hosted from potentials.nist.gov</p>
+<dl class="method">
+<dt id="iprPy.Library.download_mp_crystals">
+<code class="sig-name descname">download_mp_crystals</code><span class="sig-paren">(</span><em class="sig-param">elements</em>, <em class="sig-param">api_key=None</em>, <em class="sig-param">localpath=None</em>, <em class="sig-param">format='json'</em>, <em class="sig-param">indent=4</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.Library.download_mp_crystals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accesses Materials Project and downloads crystal structures containing the given
+elements.  The structures are saved to the iprPy library as
+reference_crystal records.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>elements</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – A list of element symbols.</p></li>
+<li><p><strong>api_key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The user’s Materials Project API key. If not given, will use “MAPI_KEY”
+environment variable</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="iprPy.libdir">
-<code class="descname">libdir</code><a class="headerlink" href="#iprPy.libdir" title="Permalink to this definition">¶</a></dt>
-<dd><p>The absolute path to the iprPy package’s library directory.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="method">
+<dt id="iprPy.Library.download_oqmd_crystals">
+<code class="sig-name descname">download_oqmd_crystals</code><span class="sig-paren">(</span><em class="sig-param">elements</em>, <em class="sig-param">localpath=None</em>, <em class="sig-param">format='json'</em>, <em class="sig-param">indent=4</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.Library.download_oqmd_crystals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accesses OQMD and downloads crystal structures containing the given
+elements.  The structures are saved to the iprPy library as
+reference_crystal records.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>elements</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – A list of element symbols.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="iprPy.Library.download_refs">
+<code class="sig-name descname">download_refs</code><span class="sig-paren">(</span><em class="sig-param">style=None</em>, <em class="sig-param">status='active'</em>, <em class="sig-param">format='json'</em>, <em class="sig-param">indent=4</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.Library.download_refs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Downloads reference records from potentials.nist.gov to the library.
+Note: this will overwrite any local copies of records with matching
+names.  If you made changes to library files, be sure to save them
+with a different name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>optional</em>) – The reference style(s) to download.  If not given, all reference
+style will be downloaded.</p></li>
+<li><p><strong>status</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – Only the potential_LAMMPS records with the given status(es) will
+be downloaded.  Allowed values are ‘active’ (default),
+‘superseded’, and ‘retracted’.  If set to None, all hosted
+potential_LAMMPS will be downloaded.</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Indicates the file format to save the refs as: ‘json’ or ‘xml’.
+Default is ‘json’.</p></li>
+<li><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – If a number, then the saved content will be indented making it
+easier to read but larger files.  If None, the files will be
+compact.  Default value is 4.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, informative messages will be printed.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="iprPy.Library.get_ref">
+<code class="sig-name descname">get_ref</code><span class="sig-paren">(</span><em class="sig-param">style</em>, <em class="sig-param">name</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">asrecord=True</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.Library.get_ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a reference file from the iprPy library or by downloading from
+potentials.nist.gov if a local copy is not found.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The reference record’s style.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the record.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, informative print statements will be used.</p></li>
+<li><p><strong>asrecord</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True (default) then the content will be returned as an iprPy
+Record if a subclass has been defined for the style.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>iprPy.Record</em> – The content as an iprPy Record object. Returned if asrecord is True
+and iprPy has a subclass for the record’s style.</p></li>
+<li><p><em>DataModelDict.DataModelDict</em> – The content as a DataModelDict.  Returned if asrecord is False or
+iprPy does not have a subclass for the record’s style.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="iprPy.Settings">
+<em class="property">class </em><code class="sig-name descname">Settings</code><a class="headerlink" href="#iprPy.Settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">potentials.Settings.Settings</span></code></p>
+<p>Class for handling saved settings.</p>
+<dl class="method">
+<dt id="iprPy.Settings.databases">
+<em class="property">property </em><code class="sig-name descname">databases</code><a class="headerlink" href="#iprPy.Settings.databases" title="Permalink to this definition">¶</a></dt>
+<dd><p>The pre-defined database settings organized by name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="iprPy.Settings.list_databases">
+<em class="property">property </em><code class="sig-name descname">list_databases</code><a class="headerlink" href="#iprPy.Settings.list_databases" title="Permalink to this definition">¶</a></dt>
+<dd><p>The names of the pre-defined database names</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="iprPy.Settings.list_run_directories">
+<em class="property">property </em><code class="sig-name descname">list_run_directories</code><a class="headerlink" href="#iprPy.Settings.list_run_directories" title="Permalink to this definition">¶</a></dt>
+<dd><p>The names of the pre-defined database names</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="iprPy.Settings.run_directories">
+<em class="property">property </em><code class="sig-name descname">run_directories</code><a class="headerlink" href="#iprPy.Settings.run_directories" title="Permalink to this definition">¶</a></dt>
+<dd><p>The pre-defined run_directory paths organized by name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="iprPy.Settings.runner_log_directory">
+<em class="property">property </em><code class="sig-name descname">runner_log_directory</code><a class="headerlink" href="#iprPy.Settings.runner_log_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path to the directory where runner logs are saved to.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.8)">pathlib.Path</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="iprPy.Settings.set_database">
+<code class="sig-name descname">set_database</code><span class="sig-paren">(</span><em class="sig-param">name=None</em>, <em class="sig-param">style=None</em>, <em class="sig-param">host=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.Settings.set_database" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows for database information to be defined in the settings file. Screen
+prompts will be given to allow any necessary database parameters to be
+entered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the database. If not given, the user will be
+prompted to enter one.</p></li>
+<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The database style associated with the database. If not given, the
+user will be prompted to enter one.</p></li>
+<li><p><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The database host (directory path or url) where the database is
+located. If not given, the user will be prompted to enter one.</p></li>
+<li><p><strong>**kwargs</strong> (<em>any</em><em>, </em><em>optional</em>) – Any other database style-specific parameter settings required to
+properly access the database.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="iprPy.Settings.set_run_directory">
+<code class="sig-name descname">set_run_directory</code><span class="sig-paren">(</span><em class="sig-param">name=None</em>, <em class="sig-param">path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.Settings.set_run_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows for run_directory information to be defined in the settings file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the run_directory.  If not given, the user will
+be prompted to enter one.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The directory path for the run_directory.  If not given, the user will
+be prompted to enter one.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="iprPy.Settings.set_runner_log_directory">
+<code class="sig-name descname">set_runner_log_directory</code><span class="sig-paren">(</span><em class="sig-param">path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.Settings.set_runner_log_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the runner log directory to a different location.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>Path</em>) – The path to the new runner log directory where log files generated
+by runners are saved to.  If not given, will be asked for in a
+prompt.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="iprPy.Settings.unset_database">
+<code class="sig-name descname">unset_database</code><span class="sig-paren">(</span><em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.Settings.unset_database" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes the settings for a pre-defined database from the settings file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name assigned to a pre-defined database.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="iprPy.Settings.unset_run_directory">
+<code class="sig-name descname">unset_run_directory</code><span class="sig-paren">(</span><em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.Settings.unset_run_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes the settings for a pre-defined run_directory from the settings
+file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name assigned to a pre-defined run_directory.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="iprPy.Settings.unset_runner_log_directory">
+<code class="sig-name descname">unset_runner_log_directory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.Settings.unset_runner_log_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the saved runner log directory information back to the default
+&lt;Settings.directory&gt;/runner-logs/ location.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="function">
 <dt id="iprPy.check_modules">
-<code class="descname">check_modules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.check_modules" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">check_modules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.check_modules" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prints lists of the calculation, record, and database styles that were
 successfully and unsuccessfully loaded when iprPy was initialized.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="iprPy.list_databases">
-<code class="descname">list_databases</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.list_databases" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gives a list of the pre-defined database names</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>list</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">The names associated with the pre-defined databases.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="iprPy.list_run_directories">
-<code class="descname">list_run_directories</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.list_run_directories" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gives a list of the pre-defined run_directory names</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>list</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">The names associated with the pre-defined run_directories.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
+<dt id="iprPy.command_line">
+<code class="sig-name descname">command_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.command_line" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="iprPy.load_calculation">
-<code class="descname">load_calculation</code><span class="sig-paren">(</span><em>style</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.load_calculation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">load_calculation</code><span class="sig-paren">(</span><em class="sig-param">style</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.load_calculation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads a Calculation subclass associated with a given calculation style</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The calculation style</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A Calculation object for the style</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">subclass of iprPy.calculation.Calculation</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The calculation style</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Calculation object for the style</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>subclass of iprPy.calculation.Calculation</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="iprPy.load_database">
-<code class="descname">load_database</code><span class="sig-paren">(</span><em>name=None</em>, <em>style=None</em>, <em>host=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.load_database" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">load_database</code><span class="sig-paren">(</span><em class="sig-param">name=None</em>, <em class="sig-param">style=None</em>, <em class="sig-param">host=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.load_database" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads a database object.  Can be either loaded from stored settings or
 by defining all needed access information.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The name assigned to a pre-defined database.  If given, can be the only
-parameter.</li>
-<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The database style to use.</li>
-<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The URL/file path where the database is hosted.</li>
-<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) – Any other keyword parameters defining necessary access information.
-Allowed keywords are database style-specific.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The name assigned to a pre-defined database.  If given, can be the only
+parameter.</p></li>
+<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The database style to use.</p></li>
+<li><p><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The URL/file path where the database is hosted.</p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>, </em><em>optional</em>) – Any other keyword parameters defining necessary access information.
+Allowed keywords are database style-specific.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The database object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Subclass of iprPy.Database</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The database object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Subclass of iprPy.Database</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="iprPy.load_record">
-<code class="descname">load_record</code><span class="sig-paren">(</span><em>style</em>, <em>name=None</em>, <em>content=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.load_record" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">load_record</code><span class="sig-paren">(</span><em class="sig-param">style</em>, <em class="sig-param">name=None</em>, <em class="sig-param">content=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.load_record" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads a Record subclass associated with a given record style</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The record style</li>
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name to give to the specific record</li>
-<li><strong>content</strong> – The record’s data model content</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The record style</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name to give to the specific record</p></li>
+<li><p><strong>content</strong> – The record’s data model content</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A Record object for the style</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">subclass of iprPy.record.Record</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="iprPy.load_run_directory">
-<code class="descname">load_run_directory</code><span class="sig-paren">(</span><em>name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.load_run_directory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loads a pre-defined run_directory from the settings file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name assigned to a pre-defined run_directory.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The path to the identified run_directory.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="iprPy.set_database">
-<code class="descname">set_database</code><span class="sig-paren">(</span><em>name=None</em>, <em>style=None</em>, <em>host=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.set_database" title="Permalink to this definition">¶</a></dt>
-<dd><p>Allows for database information to be defined in the settings file. Screen
-prompts will be given to allow any necessary database parameters to be
-entered.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the database. If not given, the user will be
-prompted to enter one.</li>
-<li><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The database style associated with the database. If not given, the
-user will be prompted to enter one.</li>
-<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The database host (directory path or url) where the database is
-located. If not given, the user will be prompted to enter one.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="iprPy.set_run_directory">
-<code class="descname">set_run_directory</code><span class="sig-paren">(</span><em>name=None</em>, <em>path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.set_run_directory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Allows for run_directory information to be defined in the settings file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the run_directory.  If not given, the user will
-be prompted to enter one.</li>
-<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The directory path for the run_directory.  If not given, the user will
-be prompted to enter one.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="iprPy.unset_database">
-<code class="descname">unset_database</code><span class="sig-paren">(</span><em>name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.unset_database" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes the settings for a pre-defined database from the settings file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name assigned to a pre-defined database.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="iprPy.unset_run_directory">
-<code class="descname">unset_run_directory</code><span class="sig-paren">(</span><em>name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.unset_run_directory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes the settings for a pre-defined run_directory from the settings
-file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name assigned to a pre-defined run_directory.</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Record object for the style</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>subclass of iprPy.record.Record</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -335,11 +412,11 @@ file.</p>
         <li class="right" >
           <a href="../database/mongo/intro.html" title="Introduction"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>
 </html>

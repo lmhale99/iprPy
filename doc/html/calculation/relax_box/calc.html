@@ -1,12 +1,10 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>calc_relax_box.py &#8212; iprPy 0.9.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>calc_relax_box.py &#8212; iprPy 0.10.2 documentation</title>
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -14,6 +12,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -36,7 +35,7 @@
         <li class="right" >
           <a href="parameters.html" title="Input script parameters"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">relax_box</a> &#187;</li> 
       </ul>
@@ -53,145 +52,133 @@
 <span id="calculation-script-functions"></span><h2>Calculation script functions<a class="headerlink" href="#module-iprPy.calculation.relax_box.calc_relax_box" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="iprPy.calculation.relax_box.calc_relax_box.calc_cij">
-<code class="descname">calc_cij</code><span class="sig-paren">(</span><em>lammps_command</em>, <em>system</em>, <em>potential</em>, <em>mpi_command=None</em>, <em>p_xx=0.0</em>, <em>p_yy=0.0</em>, <em>p_zz=0.0</em>, <em>strainrange=1e-06</em>, <em>cycle=0</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_box.calc_relax_box.calc_cij" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">calc_cij</code><span class="sig-paren">(</span><em class="sig-param">lammps_command</em>, <em class="sig-param">system</em>, <em class="sig-param">potential</em>, <em class="sig-param">mpi_command=None</em>, <em class="sig-param">p_xx=0.0</em>, <em class="sig-param">p_yy=0.0</em>, <em class="sig-param">p_zz=0.0</em>, <em class="sig-param">strainrange=1e-06</em>, <em class="sig-param">cycle=0</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_box.calc_relax_box.calc_cij" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs cij.in LAMMPS script to evaluate Cij, and E_coh of the current system,
 and define a new system with updated box dimensions to test.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lammps_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Command for running LAMMPS.</li>
-<li><strong>system</strong> (<em>atomman.System</em>) – The system to perform the calculation on.</li>
-<li><strong>potential</strong> (<em>atomman.lammps.Potential</em>) – The LAMMPS implemented potential to use.</li>
-<li><strong>mpi_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
-will run serially.</li>
-<li><strong>strainrange</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The small strain value to apply when calculating the elastic
-constants (default is 1e-6).</li>
-<li><strong>p_xx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the x tensile pressure component to (default is
-0.0).</li>
-<li><strong>p_yy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the y tensile pressure component to (default is
-0.0).</li>
-<li><strong>p_zz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the z tensile pressure component to (default is
-0.0).</li>
-<li><strong>cycle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Indicates the iteration cycle of quick_a_Cij().  This is used to
-uniquely save the LAMMPS input and output files.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lammps_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Command for running LAMMPS.</p></li>
+<li><p><strong>system</strong> (<em>atomman.System</em>) – The system to perform the calculation on.</p></li>
+<li><p><strong>potential</strong> (<em>atomman.lammps.Potential</em>) – The LAMMPS implemented potential to use.</p></li>
+<li><p><strong>mpi_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+will run serially.</p></li>
+<li><p><strong>strainrange</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The small strain value to apply when calculating the elastic
+constants (default is 1e-6).</p></li>
+<li><p><strong>p_xx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the x tensile pressure component to (default is
+0.0).</p></li>
+<li><p><strong>p_yy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the y tensile pressure component to (default is
+0.0).</p></li>
+<li><p><strong>p_zz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the z tensile pressure component to (default is
+0.0).</p></li>
+<li><p><strong>cycle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Indicates the iteration cycle of quick_a_Cij().  This is used to
+uniquely save the LAMMPS input and output files.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>Dictionary of results consisting of keys:</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>Dictionary of results consisting of keys:</p>
 <ul class="simple">
-<li><strong>’E_coh’</strong> (<em>float</em>) - The cohesive energy of the supplied system.</li>
-<li><strong>’stress’</strong> (<em>numpy.array</em>) - The measured stress state of the
-supplied system.</li>
-<li><strong>’C_elastic’</strong> (<em>atomman.ElasticConstants</em>) - The supplied system’s
-elastic constants.</li>
-<li><strong>’system_new’</strong> (<em>atomman.System</em>) - System with updated box
-dimensions.</li>
+<li><p><strong>’E_coh’</strong> (<em>float</em>) - The cohesive energy of the supplied system.</p></li>
+<li><p><strong>’stress’</strong> (<em>numpy.array</em>) - The measured stress state of the
+supplied system.</p></li>
+<li><p><strong>’C_elastic’</strong> (<em>atomman.ElasticConstants</em>) - The supplied system’s
+elastic constants.</p></li>
+<li><p><strong>’system_new’</strong> (<em>atomman.System</em>) - System with updated box
+dimensions.</p></li>
 </ul>
 </p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If any of the new box dimensions are less than zero.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.8)"><strong>RuntimeError</strong></a> – If any of the new box dimensions are less than zero.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="iprPy.calculation.relax_box.calc_relax_box.main">
-<code class="descname">main</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_box.calc_relax_box.main" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_box.calc_relax_box.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Main function  called when script is executed directly.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="iprPy.calculation.relax_box.calc_relax_box.process_input">
-<code class="descname">process_input</code><span class="sig-paren">(</span><em>input_dict</em>, <em>UUID=None</em>, <em>build=True</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_box.calc_relax_box.process_input" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">process_input</code><span class="sig-paren">(</span><em class="sig-param">input_dict</em>, <em class="sig-param">UUID=None</em>, <em class="sig-param">build=True</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_box.calc_relax_box.process_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processes str input parameters, assigns default values if needed, and
 generates new, more complex terms as used by the calculation.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary containing the calculation input parameters with string
-values.  The allowed keys depends on the calculation style.</li>
-<li><strong>UUID</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Unique identifier to use for the calculation instance.  If not
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Dictionary containing the calculation input parameters with string
+values.  The allowed keys depends on the calculation style.</p></li>
+<li><p><strong>UUID</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Unique identifier to use for the calculation instance.  If not
 given and a ‘UUID’ key is not in input_dict, then a random UUID4
-hash tag will be assigned.</li>
-<li><strong>build</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if all complex terms are to be built.  A value of False
+hash tag will be assigned.</p></li>
+<li><p><strong>build</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if all complex terms are to be built.  A value of False
 allows for default values to be assigned even if some inputs
-required by the calculation are incomplete.  (Default is True.)</li>
+required by the calculation are incomplete.  (Default is True.)</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="iprPy.calculation.relax_box.calc_relax_box.relax_box">
-<code class="descname">relax_box</code><span class="sig-paren">(</span><em>lammps_command</em>, <em>system</em>, <em>potential</em>, <em>mpi_command=None</em>, <em>strainrange=1e-06</em>, <em>p_xx=0.0</em>, <em>p_yy=0.0</em>, <em>p_zz=0.0</em>, <em>p_xy=0.0</em>, <em>p_xz=0.0</em>, <em>p_yz=0.0</em>, <em>tol=1e-10</em>, <em>diverge_scale=3.0</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_box.calc_relax_box.relax_box" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">relax_box</code><span class="sig-paren">(</span><em class="sig-param">lammps_command</em>, <em class="sig-param">system</em>, <em class="sig-param">potential</em>, <em class="sig-param">mpi_command=None</em>, <em class="sig-param">strainrange=1e-06</em>, <em class="sig-param">p_xx=0.0</em>, <em class="sig-param">p_yy=0.0</em>, <em class="sig-param">p_zz=0.0</em>, <em class="sig-param">p_xy=0.0</em>, <em class="sig-param">p_xz=0.0</em>, <em class="sig-param">p_yz=0.0</em>, <em class="sig-param">tol=1e-10</em>, <em class="sig-param">diverge_scale=3.0</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_box.calc_relax_box.relax_box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Quickly refines static orthorhombic system by evaluating the elastic
 constants and the virial pressure.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lammps_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Command for running LAMMPS.</li>
-<li><strong>system</strong> (<em>atomman.System</em>) – The system to perform the calculation on.</li>
-<li><strong>potential</strong> (<em>atomman.lammps.Potential</em>) – The LAMMPS implemented potential to use.</li>
-<li><strong>mpi_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
-will run serially.</li>
-<li><strong>strainrange</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The small strain value to apply when calculating the elastic
-constants (default is 1e-6).</li>
-<li><strong>p_xx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the x tensile pressure component to (default is
-0.0).</li>
-<li><strong>p_yy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the y tensile pressure component to (default is
-0.0).</li>
-<li><strong>p_zz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the z tensile pressure component to (default is
-0.0).</li>
-<li><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The relative tolerance used to determine if the lattice constants have
-converged (default is 1e-10).</li>
-<li><strong>diverge_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Factor to identify if the system’s dimensions have diverged.  Divergence
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lammps_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Command for running LAMMPS.</p></li>
+<li><p><strong>system</strong> (<em>atomman.System</em>) – The system to perform the calculation on.</p></li>
+<li><p><strong>potential</strong> (<em>atomman.lammps.Potential</em>) – The LAMMPS implemented potential to use.</p></li>
+<li><p><strong>mpi_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+will run serially.</p></li>
+<li><p><strong>strainrange</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The small strain value to apply when calculating the elastic
+constants (default is 1e-6).</p></li>
+<li><p><strong>p_xx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the x tensile pressure component to (default is
+0.0).</p></li>
+<li><p><strong>p_yy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the y tensile pressure component to (default is
+0.0).</p></li>
+<li><p><strong>p_zz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The value to relax the z tensile pressure component to (default is
+0.0).</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The relative tolerance used to determine if the lattice constants have
+converged (default is 1e-10).</p></li>
+<li><p><strong>diverge_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Factor to identify if the system’s dimensions have diverged.  Divergence
 is identified if either any current box dimension is greater than the
 original dimension multiplied by diverge_scale, or if any current box
 dimension is less than the original dimension divided by diverge_scale.
-(Default is 3.0).</li>
+(Default is 3.0).</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>Dictionary of results consisting of keys:</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>Dictionary of results consisting of keys:</p>
 <ul class="simple">
-<li><strong>’a_lat’</strong> (<em>float</em>) - The relaxed a lattice constant.</li>
-<li><strong>’b_lat’</strong> (<em>float</em>) - The relaxed b lattice constant.</li>
-<li><strong>’c_lat’</strong> (<em>float</em>) - The relaxed c lattice constant.</li>
-<li><strong>’alpha_lat’</strong> (<em>float</em>) - The alpha lattice angle.</li>
-<li><strong>’beta_lat’</strong> (<em>float</em>) - The beta lattice angle.</li>
-<li><strong>’gamma_lat’</strong> (<em>float</em>) - The gamma lattice angle.</li>
-<li><strong>’E_coh’</strong> (<em>float</em>) - The cohesive energy of the relaxed system.</li>
-<li><strong>’stress’</strong> (<em>numpy.array</em>) - The measured stress state of the
-relaxed system.</li>
-<li><strong>’C_elastic’</strong> (<em>atomman.ElasticConstants</em>) - The relaxed system’s
-elastic constants.</li>
-<li><strong>’system_relaxed’</strong> (<em>atomman.System</em>) - The relaxed system.</li>
+<li><p><strong>’a_lat’</strong> (<em>float</em>) - The relaxed a lattice constant.</p></li>
+<li><p><strong>’b_lat’</strong> (<em>float</em>) - The relaxed b lattice constant.</p></li>
+<li><p><strong>’c_lat’</strong> (<em>float</em>) - The relaxed c lattice constant.</p></li>
+<li><p><strong>’alpha_lat’</strong> (<em>float</em>) - The alpha lattice angle.</p></li>
+<li><p><strong>’beta_lat’</strong> (<em>float</em>) - The beta lattice angle.</p></li>
+<li><p><strong>’gamma_lat’</strong> (<em>float</em>) - The gamma lattice angle.</p></li>
+<li><p><strong>’E_coh’</strong> (<em>float</em>) - The cohesive energy of the relaxed system.</p></li>
+<li><p><strong>’stress’</strong> (<em>numpy.array</em>) - The measured stress state of the
+relaxed system.</p></li>
+<li><p><strong>’C_elastic’</strong> (<em>atomman.ElasticConstants</em>) - The relaxed system’s
+elastic constants.</p></li>
+<li><p><strong>’system_relaxed’</strong> (<em>atomman.System</em>) - The relaxed system.</p></li>
 </ul>
 </p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If system diverges or no convergence reached after 100 cycles.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.8)"><strong>RuntimeError</strong></a> – If system diverges or no convergence reached after 100 cycles.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -236,13 +223,13 @@ elastic constants.</li>
         <li class="right" >
           <a href="parameters.html" title="Input script parameters"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >relax_box</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>
 </html>

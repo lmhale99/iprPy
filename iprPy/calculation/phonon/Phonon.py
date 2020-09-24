@@ -1,5 +1,5 @@
 # coding: utf-8
-
+raise NotImplementedError('Needs updating to iprPy 0.10')
 # iprPy imports
 from .. import Calculation
 from ...input import subset

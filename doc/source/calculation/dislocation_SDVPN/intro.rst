@@ -13,6 +13,12 @@ dislocation’s spreading.
 Version notes
 ~~~~~~~~~~~~~
 
+-  2018-09-25: Notebook added
+-  2019-07-30: Notebook setup and parameters changed.
+-  2020-09-22: Notebook updated to reflect changes in the calculation
+   method due to updates in atomman’s Volterra class solution
+   generators. Setup and parameter definitiions streamlined.
+
 Additional dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~
 

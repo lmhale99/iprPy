@@ -1,4 +1,6 @@
 # coding: utf-8
+raise NotImplementedError('Testing not finished')
+
 # http://www.numpy.org/
 import numpy as np
 

@@ -17,6 +17,11 @@ recorded in the calculation’s results record.
 Version notes
 ~~~~~~~~~~~~~
 
+-  2018-09-25: Notebook added
+-  2019-07-30: Method and Notebook updated for iprPy version 0.9.
+-  2020-09-22: Notebook updated to reflect that calculation method has
+   changed to now use atomman.defect.Dislocation.
+
 Additional dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~
 

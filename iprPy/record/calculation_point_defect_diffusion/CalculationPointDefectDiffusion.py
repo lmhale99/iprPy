@@ -1,7 +1,7 @@
 # coding: utf-8
 # http://www.numpy.org/
 import numpy as np
-
+raise NotImplementedError('Needs updating to iprPy 0.10')
 # https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 

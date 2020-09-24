@@ -56,10 +56,6 @@ templates_path = ['_templates']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
-source_parsers = {
-   '.md': CommonMarkParser,
-}
-
 source_suffix = ['.rst', '.md']
 
 # The master toctree document.
@@ -203,9 +199,9 @@ intersphinx_mapping = {'https://docs.python.org/': None}
 todo_include_todos = True
 
 # At the bottom of conf.py
-def setup(app):
-    app.add_config_value('recommonmark_config', {
-            'url_resolver': lambda url: github_doc_root + url,
-            'auto_toc_tree_section': 'Contents',
-            }, True)
-    app.add_transform(AutoStructify)
+#def setup(app):
+#    app.add_config_value('recommonmark_config', {
+#            'url_resolver': lambda url: github_doc_root + url,
+#            'auto_toc_tree_section': 'Contents',
+#            }, True)
+#    app.add_transform(AutoStructify)

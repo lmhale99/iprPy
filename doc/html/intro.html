@@ -1,12 +1,10 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Introduction to iprPy &#8212; iprPy 0.9.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>Introduction to iprPy &#8212; iprPy 0.10.2 documentation</title>
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -14,6 +12,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -36,7 +35,7 @@
         <li class="right" >
           <a href="index.html" title="iprPy High-Throughput Computational Framework"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.9.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.10.2 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -55,15 +54,15 @@ effort will it cost you?  Read on!</p>
 investigation involving LAMMPS molecular dynamics simulations.  Here’s a
 simplified description of the research process for that scientist:</p>
 <ol class="arabic simple">
-<li>Do a literature search for similar and relevant works.</li>
-<li>Select an interatomic potential based on availability and behavior.</li>
-<li>Construct atomic configurations for the investigation.</li>
-<li>Perform simulations using LAMMPS.</li>
-<li>Extract simulation results from the produced data.</li>
-<li>Perform analysis on the extracted data.</li>
-<li>Write up a publication describing the calculation methods and the processed
-results.</li>
-<li>Move on to a new project.</li>
+<li><p>Do a literature search for similar and relevant works.</p></li>
+<li><p>Select an interatomic potential based on availability and behavior.</p></li>
+<li><p>Construct atomic configurations for the investigation.</p></li>
+<li><p>Perform simulations using LAMMPS.</p></li>
+<li><p>Extract simulation results from the produced data.</p></li>
+<li><p>Perform analysis on the extracted data.</p></li>
+<li><p>Write up a publication describing the calculation methods and the processed
+results.</p></li>
+<li><p>Move on to a new project.</p></li>
 </ol>
 </div>
 <div class="section" id="complications">
@@ -73,21 +72,21 @@ scientist’s work.  It could be the original scientist, their advisor or
 boss, the next grad student or postdoc in the group, or someone from a
 completely different organization.</p>
 <ul class="simple">
-<li>Can the original scientist locate all LAMMPS scripts, setup and analysis
-tools, and plotting files (Excel, Matlab, etc.) that were used?</li>
-<li>Are the located resources in a format that can easily be shared with other
-researchers?</li>
-<li>Are the resources clearly documented so that the methodology can be
-learned (or relearned)?</li>
-<li>How much content is missing and how long will it take to replace?</li>
-<li>Does the associated publication have enough detail that any missing
-content can be reimplemented?</li>
-<li>Can the results of the original work be reproduced?</li>
-<li>If not, can the source of the discrepancy be identified (implementation
-error, statistical error, parameter sensitivity, invalid model, etc.)?</li>
-<li>Is the original data available for validation and verification of the
-original work?</li>
-<li>How easily can the original process be adapted for the new study?</li>
+<li><p>Can the original scientist locate all LAMMPS scripts, setup and analysis
+tools, and plotting files (Excel, Matlab, etc.) that were used?</p></li>
+<li><p>Are the located resources in a format that can easily be shared with other
+researchers?</p></li>
+<li><p>Are the resources clearly documented so that the methodology can be
+learned (or relearned)?</p></li>
+<li><p>How much content is missing and how long will it take to replace?</p></li>
+<li><p>Does the associated publication have enough detail that any missing
+content can be reimplemented?</p></li>
+<li><p>Can the results of the original work be reproduced?</p></li>
+<li><p>If not, can the source of the discrepancy be identified (implementation
+error, statistical error, parameter sensitivity, invalid model, etc.)?</p></li>
+<li><p>Is the original data available for validation and verification of the
+original work?</p></li>
+<li><p>How easily can the original process be adapted for the new study?</p></li>
 </ul>
 <p>All these complications lead to wasted time and money. If you develop a new
 capability, you should be able to reuse that capability at any time without
@@ -98,24 +97,24 @@ having to develop it again!</p>
 <p>With iprPy, the idea is to avoid these complications beforehand through
 proper calculation design.</p>
 <ul class="simple">
-<li>Python calculation scripts are used to collect
+<li><p>Python calculation scripts are used to collect
 specific calculation processes (steps 2-5 of the research workflow above)
 into independent, self-contained units of work. Each self-contained
 calculation allows for the entire calculation technique and knowledge behind
 the technique to be contained within a single file or folder that can easily
-be archived and/or shared.</li>
-<li>All of a calculation script’s variable parameters are read in through a
+be archived and/or shared.</p></li>
+<li><p>All of a calculation script’s variable parameters are read in through a
 simple input parameter file. This highlights the
 important parameters of the calculation allowing parameter sensitivity
 studies. The simple standard input also opens the calculations to being
-implemented into high-throughput workflow managers.</li>
-<li>Upon successful completion, the calculation scripts produce XML- or
+implemented into high-throughput workflow managers.</p></li>
+<li><p>Upon successful completion, the calculation scripts produce XML- or
 JSON-formatted results records. Records in these
 formats can automatically be uploaded to databases for storing, processing,
 and sharing of the information. Additionally, with properly named and
 structured elements, the contents of a record should be able to be
 visually interpreted by someone in the same field even if they are
-unfamiliar with the calculation.</li>
+unfamiliar with the calculation.</p></li>
 </ul>
 </div>
 <div class="section" id="how-much-extra-work">
@@ -128,15 +127,15 @@ on.</p>
 barriers for usage.  We want that initial cost as low as possible to reap
 the rewards.</p>
 <ul class="simple">
-<li><a class="reference internal" href="setup.html"><span class="doc">Setup</span></a> requirements are minimal. The basic framework only
-requires Python 3.6+ and a few extra packages.</li>
-<li>All calculation scripts can be directly executed.</li>
-<li>Demonstration Jupyter Notebooks are provided for each calculation.</li>
-<li>The high-throughput tools can be directly executed from stand-alone
+<li><p><a class="reference internal" href="setup.html"><span class="doc">Setup</span></a> requirements are minimal. The basic framework only
+requires Python 3.6+ and a few extra packages.</p></li>
+<li><p>All calculation scripts can be directly executed.</p></li>
+<li><p>Demonstration Jupyter Notebooks are provided for each calculation.</p></li>
+<li><p>The high-throughput tools can be directly executed from stand-alone
 scripts, called as Python functions, or accessed with inline console
-commands.</li>
-<li>New content can be easily added in a modular fashion.</li>
-<li>Where possible, common codebase is developed for similar calculations.</li>
+commands.</p></li>
+<li><p>New content can be easily added in a modular fashion.</p></li>
+<li><p>Where possible, common codebase is developed for similar calculations.</p></li>
 </ul>
 </div>
 </div>
@@ -183,11 +182,11 @@ commands.</li>
         <li class="right" >
           <a href="index.html" title="iprPy High-Throughput Computational Framework"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.9.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.10.2 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>
 </html>

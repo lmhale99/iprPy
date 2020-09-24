@@ -8,6 +8,14 @@ crystallographic plane.
 Version notes
 ~~~~~~~~~~~~~
 
+-  2018-07-09: Notebook added.
+-  2019-07-30: Description updated and small changes due to iprPy
+   version.
+-  2020-05-22: Version 0.10 update - potentials now loaded from
+   database.
+-  2020-09-22: Calculation updated to use atomman.defect.StackingFault
+   class. Setup and parameter definition streamlined.
+
 Additional dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -1,12 +1,10 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>calc_E_vs_r_scan.py &#8212; iprPy 0.9.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>calc_E_vs_r_scan.py &#8212; iprPy 0.10.2 documentation</title>
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -14,6 +12,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -36,7 +35,7 @@
         <li class="right" >
           <a href="parameters.html" title="Input script parameters"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">E_vs_r_scan</a> &#187;</li> 
       </ul>
@@ -53,97 +52,88 @@
 <span id="calculation-script-functions"></span><h2>Calculation script functions<a class="headerlink" href="#module-iprPy.calculation.E_vs_r_scan.calc_E_vs_r_scan" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="iprPy.calculation.E_vs_r_scan.calc_E_vs_r_scan.e_vs_r">
-<code class="descname">e_vs_r</code><span class="sig-paren">(</span><em>lammps_command</em>, <em>system</em>, <em>potential</em>, <em>mpi_command=None</em>, <em>ucell=None</em>, <em>rmin=2.0</em>, <em>rmax=6.0</em>, <em>rsteps=200</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.E_vs_r_scan.calc_E_vs_r_scan.e_vs_r" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">e_vs_r</code><span class="sig-paren">(</span><em class="sig-param">lammps_command</em>, <em class="sig-param">system</em>, <em class="sig-param">potential</em>, <em class="sig-param">mpi_command=None</em>, <em class="sig-param">ucell=None</em>, <em class="sig-param">rmin=2.0</em>, <em class="sig-param">rmax=6.0</em>, <em class="sig-param">rsteps=200</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.E_vs_r_scan.calc_E_vs_r_scan.e_vs_r" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs a cohesive energy scan over a range of interatomic spaces, r.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lammps_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Command for running LAMMPS.</li>
-<li><strong>system</strong> (<em>atomman.System</em>) – The system to perform the calculation on.</li>
-<li><strong>potential</strong> (<em>atomman.lammps.Potential</em>) – The LAMMPS implemented potential to use.</li>
-<li><strong>mpi_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
-will run serially.</li>
-<li><strong>ucell</strong> (<em>atomman.System</em><em>, </em><em>optional</em>) – The fundamental unit cell correspodning to system.  This is used to
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lammps_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Command for running LAMMPS.</p></li>
+<li><p><strong>system</strong> (<em>atomman.System</em>) – The system to perform the calculation on.</p></li>
+<li><p><strong>potential</strong> (<em>atomman.lammps.Potential</em>) – The LAMMPS implemented potential to use.</p></li>
+<li><p><strong>mpi_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+will run serially.</p></li>
+<li><p><strong>ucell</strong> (<em>atomman.System</em><em>, </em><em>optional</em>) – The fundamental unit cell correspodning to system.  This is used to
 convert system dimensions to cell dimensions. If not given, ucell will
-be taken as system.</li>
-<li><strong>rmin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The minimum r spacing to use (default value is 2.0 angstroms).</li>
-<li><strong>rmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – The maximum r spacing to use (default value is 6.0 angstroms).</li>
-<li><strong>rsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – The number of r spacing steps to evaluate (default value is 200).</li>
+be taken as system.</p></li>
+<li><p><strong>rmin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The minimum r spacing to use (default value is 2.0 angstroms).</p></li>
+<li><p><strong>rmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The maximum r spacing to use (default value is 6.0 angstroms).</p></li>
+<li><p><strong>rsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – The number of r spacing steps to evaluate (default value is 200).</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>Dictionary of results consisting of keys:</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>Dictionary of results consisting of keys:</p>
 <ul class="simple">
-<li><strong>’r_values’</strong> (<em>numpy.array of float</em>) - All interatomic spacings,
-r, explored.</li>
-<li><strong>’a_values’</strong> (<em>numpy.array of float</em>) - All unit cell a lattice
-constants corresponding to the values explored.</li>
-<li><strong>’Ecoh_values’</strong> (<em>numpy.array of float</em>) - The computed cohesive
-energies for each r value.</li>
-<li><strong>’min_cell’</strong> (<em>list of atomman.System</em>) - Systems corresponding to
-the minima identified in the Ecoh_values.</li>
+<li><p><strong>’r_values’</strong> (<em>numpy.array of float</em>) - All interatomic spacings,
+r, explored.</p></li>
+<li><p><strong>’a_values’</strong> (<em>numpy.array of float</em>) - All unit cell a lattice
+constants corresponding to the values explored.</p></li>
+<li><p><strong>’Ecoh_values’</strong> (<em>numpy.array of float</em>) - The computed cohesive
+energies for each r value.</p></li>
+<li><p><strong>’min_cell’</strong> (<em>list of atomman.System</em>) - Systems corresponding to
+the minima identified in the Ecoh_values.</p></li>
 </ul>
 </p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="iprPy.calculation.E_vs_r_scan.calc_E_vs_r_scan.main">
-<code class="descname">main</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.E_vs_r_scan.calc_E_vs_r_scan.main" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.E_vs_r_scan.calc_E_vs_r_scan.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Main function called when script is executed directly.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="iprPy.calculation.E_vs_r_scan.calc_E_vs_r_scan.process_input">
-<code class="descname">process_input</code><span class="sig-paren">(</span><em>input_dict</em>, <em>UUID=None</em>, <em>build=True</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.E_vs_r_scan.calc_E_vs_r_scan.process_input" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">process_input</code><span class="sig-paren">(</span><em class="sig-param">input_dict</em>, <em class="sig-param">UUID=None</em>, <em class="sig-param">build=True</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.E_vs_r_scan.calc_E_vs_r_scan.process_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processes str input parameters, assigns default values if needed, and
 generates new, more complex terms as used by the calculation.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary containing the calculation input parameters with string
-values.  The allowed keys depends on the calculation style.</li>
-<li><strong>UUID</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Unique identifier to use for the calculation instance.  If not
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Dictionary containing the calculation input parameters with string
+values.  The allowed keys depends on the calculation style.</p></li>
+<li><p><strong>UUID</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Unique identifier to use for the calculation instance.  If not
 given and a ‘UUID’ key is not in input_dict, then a random UUID4
-hash tag will be assigned.</li>
-<li><strong>build</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if all complex terms are to be built.  A value of False
+hash tag will be assigned.</p></li>
+<li><p><strong>build</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if all complex terms are to be built.  A value of False
 allows for default values to be assigned even if some inputs
-required by the calculation are incomplete.  (Default is True.)</li>
+required by the calculation are incomplete.  (Default is True.)</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="iprPy.calculation.E_vs_r_scan.calc_E_vs_r_scan.r_a_ratio">
-<code class="descname">r_a_ratio</code><span class="sig-paren">(</span><em>ucell</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.E_vs_r_scan.calc_E_vs_r_scan.r_a_ratio" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">r_a_ratio</code><span class="sig-paren">(</span><em class="sig-param">ucell</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.E_vs_r_scan.calc_E_vs_r_scan.r_a_ratio" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the r/a ratio by identifying the shortest interatomic spacing, r,
 for a unit cell.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ucell</strong> (<em>atomman.System</em>) – The unit cell system to evaluate.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The shortest interatomic spacing, r, divided by the unit cell’s a
-lattice parameter.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ucell</strong> (<em>atomman.System</em>) – The unit cell system to evaluate.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The shortest interatomic spacing, r, divided by the unit cell’s a
+lattice parameter.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -188,13 +178,13 @@ lattice parameter.</td>
         <li class="right" >
           <a href="parameters.html" title="Input script parameters"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >E_vs_r_scan</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>
 </html>

@@ -1,12 +1,10 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Method and Theory &#8212; iprPy 0.9.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>Method and Theory &#8212; iprPy 0.10.2 documentation</title>
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -14,6 +12,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -36,7 +35,7 @@
         <li class="right" >
           <a href="intro.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">dislocation_monopole</a> &#187;</li> 
       </ul>
@@ -52,8 +51,8 @@
 <div class="section" id="stroh-theory">
 <h2>Stroh theory<a class="headerlink" href="#stroh-theory" title="Permalink to this headline">¶</a></h2>
 <p>A detailed description of the Stroh method to solve the Eshelby solution
-for an anisotropic straight dislocation can be found in the atomman
-documentation.</p>
+for an anisotropic straight dislocation can be found in the <a class="reference external" href="https://www.ctcms.nist.gov/potentials/atomman/">atomman
+documentation</a>.</p>
 </div>
 <div class="section" id="orientation">
 <h2>Orientation<a class="headerlink" href="#orientation" title="Permalink to this headline">¶</a></h2>
@@ -63,32 +62,33 @@ particular, care is needed to properly align the system’s Cartesian
 axes, <span class="math notranslate nohighlight">\(x, y, z\)</span>, the system’s box vectors, <span class="math notranslate nohighlight">\(a, b, c\)</span>, and
 the Stroh solution’s axes, <span class="math notranslate nohighlight">\(u, m, n\)</span>.</p>
 <ul class="simple">
-<li>In order for the dislocation to remain perfectly straight in the
+<li><p>In order for the dislocation to remain perfectly straight in the
 atomic system, the dislocation line, <span class="math notranslate nohighlight">\(u\)</span>, must correspond to
 one of the system’s box vectors. The resulting dislocation monopole
 system will be periodic along the box direction corresponding to
-<span class="math notranslate nohighlight">\(u\)</span>, and non-periodic in the other two box directions.</li>
-<li>The Stroh solution is invariant along the dislocation line direction,
+<span class="math notranslate nohighlight">\(u\)</span>, and non-periodic in the other two box directions.</p></li>
+<li><p>The Stroh solution is invariant along the dislocation line direction,
 <span class="math notranslate nohighlight">\(u\)</span>, thereby the solution is 2 dimensional. <span class="math notranslate nohighlight">\(m\)</span> and
 <span class="math notranslate nohighlight">\(n\)</span> are the unit vectors for the 2D axis system used by the
 Stroh solution. As such, <span class="math notranslate nohighlight">\(u, m\)</span> and <span class="math notranslate nohighlight">\(n\)</span> are all normal to
 each other. The plane defined by the <span class="math notranslate nohighlight">\(um\)</span> vectors is the
-dislocation’s slip plane, i.e. <span class="math notranslate nohighlight">\(n\)</span> is normal to the slip plane.</li>
-<li>For LAMMPS simulations, the system’s box vectors are limited such
+dislocation’s slip plane, i.e. <span class="math notranslate nohighlight">\(n\)</span> is normal to the slip plane.</p></li>
+<li><p>For LAMMPS simulations, the system’s box vectors are limited such
 that <span class="math notranslate nohighlight">\(a\)</span> is parallel to the <span class="math notranslate nohighlight">\(x\)</span>-axis, and <span class="math notranslate nohighlight">\(b\)</span> is in
-the <span class="math notranslate nohighlight">\(xy\)</span>-plane (i.e.&nbsp;has no <span class="math notranslate nohighlight">\(z\)</span> component). Based on this
+the <span class="math notranslate nohighlight">\(xy\)</span>-plane (i.e. has no <span class="math notranslate nohighlight">\(z\)</span> component). Based on this
 and the previous two points, the most convenient, and therefore the
-default, orientation for a generic dislocation is to<ul>
-<li>Make <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(a\)</span> parallel, which also places <span class="math notranslate nohighlight">\(u\)</span>
-parallel to the <span class="math notranslate nohighlight">\(x\)</span>-axis.</li>
-<li>Select <span class="math notranslate nohighlight">\(b\)</span> such that it is within the slip plane. As
+default, orientation for a generic dislocation is to</p>
+<ul>
+<li><p>Make <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(a\)</span> parallel, which also places <span class="math notranslate nohighlight">\(u\)</span>
+parallel to the <span class="math notranslate nohighlight">\(x\)</span>-axis.</p></li>
+<li><p>Select <span class="math notranslate nohighlight">\(b\)</span> such that it is within the slip plane. As
 <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(a\)</span> must also be in the slip plane, the plane
-itself is defined by <span class="math notranslate nohighlight">\(a \times b\)</span>.</li>
-<li>Given that neither <span class="math notranslate nohighlight">\(a\)</span> nor <span class="math notranslate nohighlight">\(b\)</span> have <span class="math notranslate nohighlight">\(z\)</span>
+itself is defined by <span class="math notranslate nohighlight">\(a \times b\)</span>.</p></li>
+<li><p>Given that neither <span class="math notranslate nohighlight">\(a\)</span> nor <span class="math notranslate nohighlight">\(b\)</span> have <span class="math notranslate nohighlight">\(z\)</span>
 components, the normal to the slip plane will be perpendicular to
 <span class="math notranslate nohighlight">\(z\)</span>. From this, it naturally follows that <span class="math notranslate nohighlight">\(m\)</span> can be
 taken as parallel to the <span class="math notranslate nohighlight">\(y\)</span>-axis, and <span class="math notranslate nohighlight">\(n\)</span> parallel to
-the <span class="math notranslate nohighlight">\(z\)</span>-axis.</li>
+the <span class="math notranslate nohighlight">\(z\)</span>-axis.</p></li>
 </ul>
 </li>
 </ul>
@@ -96,30 +96,30 @@ the <span class="math notranslate nohighlight">\(z\)</span>-axis.</li>
 <div class="section" id="calculation-methodology">
 <h2>Calculation methodology<a class="headerlink" href="#calculation-methodology" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
-<li>An initial system is generated based on the loaded system and <em>uvw</em>,
+<li><p>An initial system is generated based on the loaded system and <em>uvw</em>,
 <em>atomshift</em>, and <em>sizemults</em> input parameters. This initial system is
-saved as base.dump.</li>
-<li>The atomman.defect.Stroh class is used to obtain the dislocation
+saved as base.dump.</p></li>
+<li><p>The atomman.defect.Stroh class is used to obtain the dislocation
 solution based on the defined <span class="math notranslate nohighlight">\(m\)</span> and <span class="math notranslate nohighlight">\(n\)</span> vectors,
-<span class="math notranslate nohighlight">\(C_{ij}\)</span>, and the dislocation’s Burgers vector, <span class="math notranslate nohighlight">\(b_i\)</span>.</li>
-<li>The dislocation is inserted into the system by displacing all atoms
+<span class="math notranslate nohighlight">\(C_{ij}\)</span>, and the dislocation’s Burgers vector, <span class="math notranslate nohighlight">\(b_i\)</span>.</p></li>
+<li><p>The dislocation is inserted into the system by displacing all atoms
 according to the Stroh solution’s displacements. The dislocation line
 is placed parallel to the specified <em>dislocation_lineboxvector</em> and
-includes the Cartesian point (0, 0, 0).</li>
-<li>The box dimension parallel to the dislocation line is kept periodic,
+includes the Cartesian point (0, 0, 0).</p></li>
+<li><p>The box dimension parallel to the dislocation line is kept periodic,
 and the other two box directions are made non-periodic. A boundary
 region is defined that is at least <em>bwidth</em> thick at the edges of the
 two non-periodic directions, such that the shape of the active region
 corresponds to the <em>bshape</em> parameter. Atoms in the boundary region
-are identified by altering their integer atomic types.</li>
-<li>The dislocation is relaxed by performing a LAMMPS simulation. The
+are identified by altering their integer atomic types.</p></li>
+<li><p>The dislocation is relaxed by performing a LAMMPS simulation. The
 atoms in the active region are allowed to relax either with nvt
 integration followed by an energy/force minimization, or with just an
 energy/force minimization. The atoms in the boundary region are held
 fixed at the elastic solution. The resulting relaxed system is saved
-as disl.dump.</li>
-<li>Parameters associated with the Stroh solution are saved to the
-results record.</li>
+as disl.dump.</p></li>
+<li><p>Parameters associated with the Stroh solution are saved to the
+results record.</p></li>
 </ol>
 </div>
 </div>
@@ -165,13 +165,13 @@ results record.</li>
         <li class="right" >
           <a href="intro.html" title="Introduction"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >dislocation_monopole</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>
 </html>

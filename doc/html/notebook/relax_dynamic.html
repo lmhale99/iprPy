@@ -1,12 +1,10 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>relax_dynamic calculation style &#8212; iprPy 0.9.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>relax_dynamic calculation style &#8212; iprPy 0.10.2 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -14,6 +12,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -36,7 +35,7 @@
         <li class="right" >
           <a href="relax_box.html" title="relax_box calculation style"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>  
@@ -51,16 +50,16 @@
 /* CSS for nbsphinx extension */
 
 /* remove conflicting styling from Sphinx themes */
-div.nbinput,
-div.nbinput div.prompt,
-div.nbinput div.input_area,
-div.nbinput div[class*=highlight],
-div.nbinput div[class*=highlight] pre,
-div.nboutput,
-div.nbinput div.prompt,
-div.nbinput div.output_area,
-div.nboutput div[class*=highlight],
-div.nboutput div[class*=highlight] pre {
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
     background: none;
     border: none;
     padding: 0 0;
@@ -69,13 +68,13 @@ div.nboutput div[class*=highlight] pre {
 }
 
 /* avoid gaps between output lines */
-div.nboutput div[class*=highlight] pre {
+div.nboutput.container div[class*=highlight] pre {
     line-height: normal;
 }
 
 /* input/output containers */
-div.nbinput,
-div.nboutput {
+div.nbinput.container,
+div.nboutput.container {
     display: -webkit-flex;
     display: flex;
     align-items: flex-start;
@@ -83,92 +82,104 @@ div.nboutput {
     width: 100%;
 }
 @media (max-width: 540px) {
-    div.nbinput,
-    div.nboutput {
+    div.nbinput.container,
+    div.nboutput.container {
         flex-direction: column;
     }
 }
 
 /* input container */
-div.nbinput {
+div.nbinput.container {
     padding-top: 5px;
 }
 
 /* last container */
-div.nblast {
+div.nblast.container {
     padding-bottom: 5px;
 }
 
 /* input prompt */
-div.nbinput div.prompt pre {
+div.nbinput.container div.prompt pre {
     color: #307FC1;
 }
 
 /* output prompt */
-div.nboutput div.prompt pre {
+div.nboutput.container div.prompt pre {
     color: #BF5B3D;
 }
 
 /* all prompts */
-div.nbinput div.prompt,
-div.nboutput div.prompt {
-    min-width: 7ex;
-    padding-top: 0.4em;
-    padding-right: 0.4em;
-    text-align: right;
-    flex: 0;
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
 }
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
 @media (max-width: 540px) {
-    div.nbinput div.prompt,
-    div.nboutput div.prompt {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
         text-align: left;
         padding: 0.4em;
     }
-    div.nboutput div.prompt.empty {
+    div.nboutput.container div.prompt.empty {
         padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
     }
 }
 
 /* disable scrollbars on prompts */
-div.nbinput div.prompt pre,
-div.nboutput div.prompt pre {
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
     overflow: hidden;
 }
 
 /* input/output area */
-div.nbinput div.input_area,
-div.nboutput div.output_area {
-    padding: 0.4em;
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
     -webkit-flex: 1;
     flex: 1;
     overflow: auto;
 }
 @media (max-width: 540px) {
-    div.nbinput div.input_area,
-    div.nboutput div.output_area {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
         width: 100%;
     }
 }
 
 /* input area */
-div.nbinput div.input_area {
+div.nbinput.container div.input_area {
     border: 1px solid #e0e0e0;
     border-radius: 2px;
     background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
-div.nboutput div[class*=MathJax] {
+div.nboutput.container div[class*=MathJax] {
     text-align: left !important;
 }
 
 /* override sphinx.ext.imgmath center alignment in output cells */
-div.nboutput div.math p {
+div.nboutput.container div.math p {
     text-align: left;
 }
 
 /* standard error */
-div.nboutput div.output_area.stderr {
+div.nboutput.container div.output_area.stderr {
     background: #fdd;
 }
 
@@ -212,6 +223,27 @@ div.nboutput div.output_area.stderr {
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
 
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
 /* Some additional styling taken form the Jupyter notebook CSS */
 div.rendered_html table {
   border: none;
@@ -249,14 +281,16 @@ div.rendered_html tbody tr:hover {
 <div class="section" id="relax_dynamic-calculation-style">
 <h1>relax_dynamic calculation style<a class="headerlink" href="#relax_dynamic-calculation-style" title="Permalink to this headline">¶</a></h1>
 <p><strong>Lucas M. Hale</strong>, <a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>, <em>Materials Science and Engineering Division, NIST</em>.</p>
-<p>Description updated: 2019-07-26</p>
 <div class="section" id="Introduction">
 <h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
 <p>The relax_dynamic calculation style dynamically relaxes an atomic configuration for a specified number of timesteps. Upon completion, the mean, <span class="math notranslate nohighlight">\(\langle X \rangle\)</span>, and standard deviation, <span class="math notranslate nohighlight">\(\sigma_X\)</span>, of all thermo properties, <span class="math notranslate nohighlight">\(X\)</span>, are computed for a specified range of times. This method is meant to measure equilibrium properties of bulk materials, both at zero K and at various temperatures.</p>
 <div class="section" id="Version-notes">
 <h3>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>This style was previously called dynamic_relax and was renamed for consistency with other calculations.</li>
+<li><p>2018-07-09: Notebook added.</p></li>
+<li><p>2019-07-30: Description updated and small changes due to iprPy version.</p></li>
+<li><p>2020-05-22: Version 0.10 update - potentials now loaded from database.</p></li>
+<li><p>2020-09-22: Setup and parameter definition streamlined.</p></li>
 </ul>
 </div>
 <div class="section" id="Additional-dependencies">
@@ -265,14 +299,15 @@ div.rendered_html tbody tr:hover {
 <div class="section" id="Disclaimers">
 <h3>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST disclaimers</a></li>
-<li>The calculation reports the standard deviation, <span class="math notranslate nohighlight">\(\sigma_X\)</span> of the measured properties not the standard error of the mean, <span class="math notranslate nohighlight">\(\sigma_{\langle X \rangle}\)</span>. The two are related to each other according to <span class="math notranslate nohighlight">\(\sigma_{\langle X \rangle} = \sigma_X \sqrt{\frac{C}{N}}\)</span>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of samples taken of <span class="math notranslate nohighlight">\(X\)</span>, and <span class="math notranslate nohighlight">\(C\)</span> is a statistical inefficiency due to the autocorrelation of the measurements with time. Obtaining a proper estimate of
-<span class="math notranslate nohighlight">\(\sigma_{\langle X \rangle}\)</span> requires either estimating <span class="math notranslate nohighlight">\(C\)</span> from the raw thermo data (not done here), or only taking measurements sporadically to ensure the samples are independent.</li>
-<li>Good (low error) results requires running large simulations for a long time. The reasons for this are:<ul>
-<li>Systems have to be large enough to avoid issues with fluctuations across the periodic boundaries.</li>
-<li>Runs must first let the systems equilibrate before meaningful measurements can be taken.</li>
-<li>The standard deviation, <span class="math notranslate nohighlight">\(\sigma\)</span>, of thermo properties is proportional to the number of atoms, <span class="math notranslate nohighlight">\(N_a\)</span> as <span class="math notranslate nohighlight">\(\sigma \propto \frac{1}{\sqrt{N_a}}\)</span>.</li>
-<li>The standard error, <span class="math notranslate nohighlight">\(\sigma_x\)</span> of thermo properties is proportional to the number of samples taken, <span class="math notranslate nohighlight">\(N\)</span> as <span class="math notranslate nohighlight">\(\sigma_x \propto \frac{1}{\sqrt{N}}\)</span>.</li>
+<li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST disclaimers</a></p></li>
+<li><p>The calculation reports the standard deviation, <span class="math notranslate nohighlight">\(\sigma_X\)</span> of the measured properties not the standard error of the mean, <span class="math notranslate nohighlight">\(\sigma_{\langle X \rangle}\)</span>. The two are related to each other according to <span class="math notranslate nohighlight">\(\sigma_{\langle X \rangle} = \sigma_X \sqrt{\frac{C}{N}}\)</span>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of samples taken of <span class="math notranslate nohighlight">\(X\)</span>, and <span class="math notranslate nohighlight">\(C\)</span> is a statistical inefficiency due to the autocorrelation of the measurements with time. Obtaining a proper estimate of
+<span class="math notranslate nohighlight">\(\sigma_{\langle X \rangle}\)</span> requires either estimating <span class="math notranslate nohighlight">\(C\)</span> from the raw thermo data (not done here), or only taking measurements sporadically to ensure the samples are independent.</p></li>
+<li><p>Good (low error) results requires running large simulations for a long time. The reasons for this are:</p>
+<ul>
+<li><p>Systems have to be large enough to avoid issues with fluctuations across the periodic boundaries.</p></li>
+<li><p>Runs must first let the systems equilibrate before meaningful measurements can be taken.</p></li>
+<li><p>The standard deviation, <span class="math notranslate nohighlight">\(\sigma\)</span>, of thermo properties is proportional to the number of atoms, <span class="math notranslate nohighlight">\(N_a\)</span> as <span class="math notranslate nohighlight">\(\sigma \propto \frac{1}{\sqrt{N_a}}\)</span>.</p></li>
+<li><p>The standard error, <span class="math notranslate nohighlight">\(\sigma_x\)</span> of thermo properties is proportional to the number of samples taken, <span class="math notranslate nohighlight">\(N\)</span> as <span class="math notranslate nohighlight">\(\sigma_x \propto \frac{1}{\sqrt{N}}\)</span>.</p></li>
 </ul>
 </li>
 </ul>
@@ -283,18 +318,18 @@ div.rendered_html tbody tr:hover {
 <p>An initial system (and corresponding unit cell system) is supplied with box dimensions, <span class="math notranslate nohighlight">\(a_i^0\)</span>, close to the equilibrium values. A LAMMPS simulation then integrates the atomic positions and velocities for a specified number of timesteps.</p>
 <p>The calculation script allows for the use of different integration methods:</p>
 <ul class="simple">
-<li>nve integrates atomic positions without changing box dimensions or the system’s total energy.</li>
-<li>npt integrates atomic positions and applies Nose-Hoover style thermostat and barostat (equilibriate to specified T and P).</li>
-<li>nvt integrates atomic positions and applies Nose-Hoover style thermostat (equilibriate to specified T).</li>
-<li>nph integrates atomic positions and applies Nose-Hoover style barostat (equilibriate to specified P).</li>
-<li>nve+l integrates atomic positions and applies Langevin style thermostat (equilibriate to specified T).</li>
-<li>nph+l integrates atomic positions and applies Nose-Hoover style barostat and Langevin style thermostat (equilibriate to specified T and P).</li>
+<li><p>nve integrates atomic positions without changing box dimensions or the system’s total energy.</p></li>
+<li><p>npt integrates atomic positions and applies Nose-Hoover style thermostat and barostat (equilibriate to specified T and P).</p></li>
+<li><p>nvt integrates atomic positions and applies Nose-Hoover style thermostat (equilibriate to specified T).</p></li>
+<li><p>nph integrates atomic positions and applies Nose-Hoover style barostat (equilibriate to specified P).</p></li>
+<li><p>nve+l integrates atomic positions and applies Langevin style thermostat (equilibriate to specified T).</p></li>
+<li><p>nph+l integrates atomic positions and applies Nose-Hoover style barostat and Langevin style thermostat (equilibriate to specified T and P).</p></li>
 </ul>
 <p><strong>Notes</strong> on the different control schemes:</p>
 <ul class="simple">
-<li>The Nose-Hoover barostat works by rescaling the box dimensions according to the measured system pressures.</li>
-<li>The Nose-Hoover thermostat works by rescaling the atomic velocities according to the measured system temperature (kinetic energy). Cannot be used with a temperature of 0 K.</li>
-<li>The Langevin thermostat works by modifying the forces on all atoms with both a dampener and a random temperature dependent fluctuation. Used at 0 K, only the force dampener is applied.</li>
+<li><p>The Nose-Hoover barostat works by rescaling the box dimensions according to the measured system pressures.</p></li>
+<li><p>The Nose-Hoover thermostat works by rescaling the atomic velocities according to the measured system temperature (kinetic energy). Cannot be used with a temperature of 0 K.</p></li>
+<li><p>The Langevin thermostat works by modifying the forces on all atoms with both a dampener and a random temperature dependent fluctuation. Used at 0 K, only the force dampener is applied.</p></li>
 </ul>
 <p><strong>Notes</strong> on run parameter values. The proper time to reach equilibrium (equilsteps), and sample frequency to ensure uncorrelated measurements (thermosteps) is simulation dependent. They can be influenced by the potential, timestep size, crystal structure, integration method, presence of defects, etc. The default values of equilsteps = 20,000 and thermosteps = 100 are based on general rule-of-thumb estimates for bulk crystals and EAM potentials, and may or may not be adequate.</p>
 </div>
@@ -306,10 +341,9 @@ div.rendered_html tbody tr:hover {
 <h4>1.1. Library imports<a class="headerlink" href="#1.1.-Library-imports" title="Permalink to this headline">¶</a></h4>
 <p>Import libraries needed by the calculation. The external libraries used are:</p>
 <ul class="simple">
-<li><a class="reference external" href="http://www.numpy.org/">numpy</a></li>
-<li><a class="reference external" href="https://github.com/usnistgov/DataModelDict">DataModelDict</a></li>
-<li><a class="reference external" href="https://github.com/usnistgov/atomman">atomman</a></li>
-<li><a class="reference external" href="https://github.com/usnistgov/iprPy">iprPy</a></li>
+<li><p><a class="reference external" href="http://www.numpy.org/">numpy</a></p></li>
+<li><p><a class="reference external" href="https://github.com/usnistgov/atomman">atomman</a></p></li>
+<li><p><a class="reference external" href="https://github.com/usnistgov/iprPy">iprPy</a></p></li>
 </ul>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -319,18 +353,12 @@ div.rendered_html tbody tr:hover {
 <span></span><span class="c1"># Standard library imports</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
 
 <span class="c1"># http://www.numpy.org/</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-<span class="c1"># https://github.com/usnistgov/DataModelDict</span>
-<span class="kn">from</span> <span class="nn">DataModelDict</span> <span class="k">import</span> <span class="n">DataModelDict</span> <span class="k">as</span> <span class="n">DM</span>
 
 <span class="c1"># https://github.com/usnistgov/atomman</span>
 <span class="kn">import</span> <span class="nn">atomman</span> <span class="k">as</span> <span class="nn">am</span>
@@ -349,7 +377,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Notebook last executed on 2019-07-29 using iprPy version 0.9.0
+Notebook last executed on 2020-09-22 using iprPy version 0.10.2
 </pre></div></div>
 </div>
 </div>
@@ -373,6 +401,9 @@ Notebook last executed on 2019-07-29 using iprPy version 0.9.0
     <span class="k">if</span> <span class="ow">not</span> <span class="n">workingdir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
         <span class="n">workingdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">)</span>
+
+<span class="c1"># Initialize connection to library</span>
+<span class="n">library</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">Library</span><span class="p">(</span><span class="n">load</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lammps_potentials&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -383,16 +414,17 @@ Notebook last executed on 2019-07-29 using iprPy version 0.9.0
 <div class="section" id="2.1.-Specify-system-specific-paths">
 <h4>2.1. Specify system-specific paths<a class="headerlink" href="#2.1.-Specify-system-specific-paths" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>lammps_command</strong> is the LAMMPS command to use (required).</li>
-<li><strong>mpi_command</strong> MPI command for running LAMMPS in parallel. A value of None will run simulations serially.</li>
+<li><p><strong>lammps_command</strong> is the LAMMPS command to use (required).</p></li>
+<li><p><strong>mpi_command</strong> MPI command for running LAMMPS in parallel. A value of None will run simulations serially.</p></li>
 </ul>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lammps_command</span> <span class="o">=</span> <span class="s1">&#39;lmp_serial&#39;</span>
-<span class="n">mpi_command</span> <span class="o">=</span> <span class="kc">None</span>
+<span></span><span class="n">lammps_command</span> <span class="o">=</span> <span class="s1">&#39;lmp_mpi&#39;</span>
+<span class="c1">#mpi_command = None</span>
+<span class="n">mpi_command</span> <span class="o">=</span> <span class="s1">&#39;C:/Program Files/MPICH2/bin/mpiexec.exe -localonly 6&#39;</span>
 </pre></div>
 </div>
 </div>
@@ -400,69 +432,34 @@ Notebook last executed on 2019-07-29 using iprPy version 0.9.0
 <div class="section" id="2.2.-Load-interatomic-potential">
 <h4>2.2. Load interatomic potential<a class="headerlink" href="#2.2.-Load-interatomic-potential" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>potential_name</strong> gives the name of the potential_LAMMPS reference record in the iprPy library to use for the calculation.</li>
-<li><strong>potential_file</strong> gives the path to the potential_LAMMPS reference record to use. Here, this parameter is automatically generated using potential_name and librarydir.</li>
-<li><strong>potential_dir</strong> gives the path for the folder containing the artifacts associated with the potential (i.e.&nbsp;eam.alloy file). Here, this parameter is automatically generated using potential_name and librarydir.</li>
-<li><strong>potential</strong> is an atomman.lammps.Potential object (required). Here, this parameter is automatically generated from potential_file and potential_dir.</li>
+<li><p><strong>potential_name</strong> gives the name of the potential_LAMMPS reference record in the iprPy library to use for the calculation.</p></li>
+<li><p><strong>potential</strong> is an atomman.lammps.Potential object (required).</p></li>
 </ul>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">potential_name</span> <span class="o">=</span> <span class="s1">&#39;1999--Mishin-Y--Ni--LAMMPS--ipr1&#39;</span>
 
-<span class="c1"># Define potential_file and potential_dir using librarydir and potential_name</span>
-<span class="n">potential_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;potential_LAMMPS&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{potential_name}</span><span class="s1">.json&#39;</span><span class="p">)</span>
-<span class="n">potential_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;potential_LAMMPS&#39;</span><span class="p">,</span> <span class="n">potential_name</span><span class="p">)</span>
-
-<span class="c1"># Initialize Potential object using potential_file and potential_dir.</span>
-<span class="n">potential</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">Potential</span><span class="p">(</span><span class="n">potential_file</span><span class="p">,</span> <span class="n">potential_dir</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Successfully loaded potential&#39;</span><span class="p">,</span> <span class="n">potential</span><span class="p">)</span>
+<span class="c1"># Retrieve potential and parameter file(s)</span>
+<span class="n">potential</span> <span class="o">=</span> <span class="n">library</span><span class="o">.</span><span class="n">get_lammps_potential</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">potential_name</span><span class="p">,</span> <span class="n">getfiles</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Successfully loaded potential 1999--Mishin-Y--Ni--LAMMPS--ipr1
-</pre></div></div>
 </div>
 </div>
 <div class="section" id="2.3.-Load-initial-unit-cell-system">
 <h4>2.3. Load initial unit cell system<a class="headerlink" href="#2.3.-Load-initial-unit-cell-system" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>prototype_name</strong> gives the name of the crystal_prototype reference record in the iprPy library to load.</li>
-<li><strong>symbols</strong> is a list of the potential’s elemental model symbols to associate with the unique atom types of the loaded system.</li>
-<li><strong>box_parameters</strong> is a list of the a, b, c lattice constants to assign to the loaded file.</li>
-<li><strong>load_file</strong> gives the path to the atomic configuration file to load for the ucell system. Here, this is generated automatically using prototype_name and librarydir.</li>
-<li><strong>load_style</strong> specifies the format of load_file. Here, this is automatically set for crystal_prototype records.</li>
-<li><strong>load_options</strong> specifies any other keyword options for properly loading the load_file. Here, this is automatically set for crystal_prototype records.</li>
-<li><strong>ucell</strong> is an atomman.System representing a fundamental unit cell of the system (required). Here, this is generated using the load parameters and symbols.</li>
+<li><p><strong>ucell</strong> is an atomman.System representing a fundamental unit cell of the system (required). Here, this is generated using the load parameters and symbols.</p></li>
 </ul>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">prototype_name</span> <span class="o">=</span> <span class="s1">&#39;A1--Cu--fcc&#39;</span>
-<span class="n">symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ni&#39;</span><span class="p">]</span>
-<span class="n">box_parameters</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">([</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">],</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
-
-<span class="c1"># Define load_file using librarydir and prototype_name</span>
-<span class="n">load_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;crystal_prototype&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{prototype_name}</span><span class="s1">.json&#39;</span><span class="p">)</span>
-
-<span class="c1"># Define load_style and load_options for crystal_prototype records</span>
-<span class="n">load_style</span> <span class="o">=</span> <span class="s1">&#39;system_model&#39;</span>
-<span class="n">load_options</span> <span class="o">=</span> <span class="p">{}</span>
-
-<span class="c1"># Create ucell by loading prototype record</span>
-<span class="n">ucell</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">load_style</span><span class="p">,</span> <span class="n">load_file</span><span class="p">,</span> <span class="n">symbols</span><span class="o">=</span><span class="n">symbols</span><span class="p">,</span> <span class="o">**</span><span class="n">load_options</span><span class="p">)</span>
-
-<span class="c1"># Rescale ucell using box_parameters</span>
-<span class="n">ucell</span><span class="o">.</span><span class="n">box_set</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">b</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span></span><span class="c1"># Create ucell by loading prototype record</span>
+<span class="n">ucell</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;prototype&#39;</span><span class="p">,</span> <span class="s1">&#39;A1--Cu--fcc&#39;</span><span class="p">,</span> <span class="n">symbols</span><span class="o">=</span><span class="s1">&#39;Ni&#39;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mf">3.5</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">ucell</span><span class="p">)</span>
 </pre></div>
@@ -493,8 +490,8 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 <div class="section" id="2.4.-Modify-system">
 <h4>2.4. Modify system<a class="headerlink" href="#2.4.-Modify-system" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>sizemults</strong> list of three integers specifying how many times the ucell vectors of <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span> and <span class="math notranslate nohighlight">\(c\)</span> are replicated in creating system.</li>
-<li><strong>system</strong> is an atomman.System to perform the scan on (required).</li>
+<li><p><strong>sizemults</strong> list of three integers specifying how many times the ucell vectors of <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span> and <span class="math notranslate nohighlight">\(c\)</span> are replicated in creating system.</p></li>
+<li><p><strong>system</strong> is an atomman.System to perform the scan on (required).</p></li>
 </ul>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -521,19 +518,19 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 <div class="section" id="2.5.-Specify-calculation-specific-run-parameters">
 <h4>2.5. Specify calculation-specific run parameters<a class="headerlink" href="#2.5.-Specify-calculation-specific-run-parameters" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>pressure_xx</strong> gives the xx component of the pressure to equilibriate the system to (npt, nph, and nph+l styles).</li>
-<li><strong>pressure_yy</strong> gives the yy component of the pressure to equilibriate the system to (npt, nph, and nph+l styles).</li>
-<li><strong>pressure_zz</strong> gives the zz component of the pressure to equilibriate the system to (npt, nph, and nph+l styles).</li>
-<li><strong>pressure_xy</strong> gives the xy component of the pressure to equilibriate the system to (npt, nph, and nph+l styles).</li>
-<li><strong>pressure_xz</strong> gives the xz component of the pressure to equilibriate the system to (npt, nph, and nph+l styles).</li>
-<li><strong>pressure_yz</strong> gives the yz component of the pressure to equilibriate the system to (npt, nph, and nph+l styles).</li>
-<li><strong>temperature</strong> gives the temperature to equilibriate the system to (nvt, npt, nve+l, and nph+l styles).</li>
-<li><strong>integrator</strong> specifies the integrator style to use. Default value is ‘nph+l’ for temperature = 0, and ‘npt’ otherwise.</li>
-<li><strong>runsteps</strong> is the total number of integration timesteps to perform. Default value is 220000.</li>
-<li><strong>thermosteps</strong> specifies to output thermo values every this many timesteps. Default value is 100.</li>
-<li><strong>dumpsteps</strong> specifies to output dump files every this many timesteps. Default value is runsteps (only first and last steps are outputted as dump files).</li>
-<li><strong>equilsteps</strong> is the number of timesteps to equilibriate the system for. Only thermo values associated with timesteps greater than equilsteps will be included in the mean and standard deviation calculations. Default value is 20000.</li>
-<li><strong>randomseed</strong> specifies a random number seed used to generate the initial atomic velocities and the Langevin thermostat fluctuations. Default value generates a new random integer every time.</li>
+<li><p><strong>pressure_xx</strong> gives the xx component of the pressure to equilibriate the system to (npt, nph, and nph+l styles).</p></li>
+<li><p><strong>pressure_yy</strong> gives the yy component of the pressure to equilibriate the system to (npt, nph, and nph+l styles).</p></li>
+<li><p><strong>pressure_zz</strong> gives the zz component of the pressure to equilibriate the system to (npt, nph, and nph+l styles).</p></li>
+<li><p><strong>pressure_xy</strong> gives the xy component of the pressure to equilibriate the system to (npt, nph, and nph+l styles).</p></li>
+<li><p><strong>pressure_xz</strong> gives the xz component of the pressure to equilibriate the system to (npt, nph, and nph+l styles).</p></li>
+<li><p><strong>pressure_yz</strong> gives the yz component of the pressure to equilibriate the system to (npt, nph, and nph+l styles).</p></li>
+<li><p><strong>temperature</strong> gives the temperature to equilibriate the system to (nvt, npt, nve+l, and nph+l styles).</p></li>
+<li><p><strong>integrator</strong> specifies the integrator style to use. Default value is ‘nph+l’ for temperature = 0, and ‘npt’ otherwise.</p></li>
+<li><p><strong>runsteps</strong> is the total number of integration timesteps to perform. Default value is 220000.</p></li>
+<li><p><strong>thermosteps</strong> specifies to output thermo values every this many timesteps. Default value is 100.</p></li>
+<li><p><strong>dumpsteps</strong> specifies to output dump files every this many timesteps. Default value is runsteps (only first and last steps are outputted as dump files).</p></li>
+<li><p><strong>equilsteps</strong> is the number of timesteps to equilibriate the system for. Only thermo values associated with timesteps greater than equilsteps will be included in the mean and standard deviation calculations. Default value is 20000.</p></li>
+<li><p><strong>randomseed</strong> specifies a random number seed used to generate the initial atomic velocities and the Langevin thermostat fluctuations. Default value generates a new random integer every time.</p></li>
 </ul>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
@@ -572,11 +569,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 
 <span class="s2">box tilt large</span>
 
-<span class="s2">&lt;atomman_system_info&gt;</span>
+<span class="s2">&lt;atomman_system_pair_info&gt;</span>
 
 <span class="s2">change_box all triclinic</span>
-
-<span class="s2">&lt;atomman_pair_info&gt;</span>
 
 <span class="s2">compute pe all pe/atom</span>
 <span class="s2">compute ke all ke/atom</span>
@@ -591,6 +586,7 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 
 <span class="s2">dump dumpit all custom &lt;dumpsteps&gt; *.dump &lt;dump_keys&gt;</span>
 <span class="s2">dump_modify dumpit format &lt;dump_modify_format&gt;</span>
+<span class="s2">restart &lt;runsteps&gt; *.restart</span>
 
 <span class="s2">run &lt;runsteps&gt; upto&quot;&quot;&quot;</span><span class="p">)</span>
 </pre></div>
@@ -738,8 +734,6 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid integrator style&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">int_info</span>
-
-
 </pre></div>
 </div>
 </div>
@@ -843,12 +837,13 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 <span class="sd">        - **&#39;temp_std&#39;** (*float*) - The standard deviation in the measured</span>
 <span class="sd">          temperature values.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Build filedict if function was called from iprPy</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="c1"># Get script&#39;s location if __file__ exists</span>
-        <span class="n">script_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+        <span class="k">assert</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="n">pkg_name</span>
+        <span class="n">calc</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">load_calculation</span><span class="p">(</span><span class="n">calculation_style</span><span class="p">)</span>
+        <span class="n">filedict</span> <span class="o">=</span> <span class="n">calc</span><span class="o">.</span><span class="n">filedict</span>
     <span class="k">except</span><span class="p">:</span>
-        <span class="c1"># Use cwd otherwise</span>
-        <span class="n">script_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+        <span class="n">filedict</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="c1"># Get lammps units</span>
     <span class="n">lammps_units</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
@@ -863,10 +858,10 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
     <span class="c1"># Define lammps variables</span>
     <span class="n">lammps_variables</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">system_info</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;atom_data&#39;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="s1">&#39;init.dat&#39;</span><span class="p">,</span>
-                              <span class="n">units</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">,</span>
-                              <span class="n">atom_style</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">atom_style</span><span class="p">)</span>
-    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_system_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_info</span>
-    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_pair_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">potential</span><span class="o">.</span><span class="n">pair_info</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">symbols</span><span class="p">)</span>
+                              <span class="n">potential</span><span class="o">=</span><span class="n">potential</span><span class="p">,</span>
+                              <span class="n">return_pair_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_system_pair_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_info</span>
+
     <span class="n">integ_info</span> <span class="o">=</span> <span class="n">integrator_info</span><span class="p">(</span><span class="n">integrator</span><span class="o">=</span><span class="n">integrator</span><span class="p">,</span>
                                  <span class="n">p_xx</span><span class="o">=</span><span class="n">p_xx</span><span class="p">,</span> <span class="n">p_yy</span><span class="o">=</span><span class="n">p_yy</span><span class="p">,</span> <span class="n">p_zz</span><span class="o">=</span><span class="n">p_zz</span><span class="p">,</span>
                                  <span class="n">p_xy</span><span class="o">=</span><span class="n">p_xy</span><span class="p">,</span> <span class="n">p_xz</span><span class="o">=</span><span class="n">p_xz</span><span class="p">,</span> <span class="n">p_yz</span><span class="o">=</span><span class="n">p_yz</span><span class="p">,</span>
@@ -903,10 +898,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
         <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;float </span><span class="si">%.13e</span><span class="s1">&#39;</span>
 
     <span class="c1"># Write lammps input script</span>
-    <span class="n">template_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span> <span class="s1">&#39;full_relax.template&#39;</span><span class="p">)</span>
+    <span class="n">template_file</span> <span class="o">=</span> <span class="s1">&#39;full_relax.template&#39;</span>
     <span class="n">lammps_script</span> <span class="o">=</span> <span class="s1">&#39;full_relax.in&#39;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">template_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">template</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">read_calc_file</span><span class="p">(</span><span class="n">template_file</span><span class="p">,</span> <span class="n">filedict</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lammps_script</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">filltemplate</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">lammps_variables</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
 
@@ -934,6 +928,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
     <span class="n">natoms</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">natoms</span>
     <span class="n">results</span><span class="p">[</span><span class="s1">&#39;E_coh&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">PotEng</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">/</span> <span class="n">natoms</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;energy&#39;</span><span class="p">])</span>
     <span class="n">results</span><span class="p">[</span><span class="s1">&#39;E_coh_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">PotEng</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">/</span> <span class="n">natoms</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;energy&#39;</span><span class="p">])</span>
+
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;E_total&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">TotEng</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">/</span> <span class="n">natoms</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;energy&#39;</span><span class="p">])</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;E_total_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">TotEng</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">/</span> <span class="n">natoms</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;energy&#39;</span><span class="p">])</span>
 
     <span class="n">results</span><span class="p">[</span><span class="s1">&#39;lx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">Lx</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">])</span>
     <span class="n">results</span><span class="p">[</span><span class="s1">&#39;lx_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">Lx</span><span class="o">.</span><span class="n">std</span><span class="p">(),</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">])</span>
@@ -964,8 +961,6 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
     <span class="n">results</span><span class="p">[</span><span class="s1">&#39;temp_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">thermo</span><span class="o">.</span><span class="n">Temp</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">results</span>
-
-
 </pre></div>
 </div>
 </div>
@@ -1009,10 +1004,10 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>dict_keys([&#39;dumpfile_initial&#39;, &#39;symbols_initial&#39;, &#39;dumpfile_final&#39;, &#39;symbols_final&#39;, &#39;nsamples&#39;, &#39;E_coh&#39;, &#39;E_coh_std&#39;, &#39;lx&#39;, &#39;lx_std&#39;, &#39;ly&#39;, &#39;ly_std&#39;, &#39;lz&#39;, &#39;lz_std&#39;, &#39;xy&#39;, &#39;xy_std&#39;, &#39;xz&#39;, &#39;xz_std&#39;, &#39;yz&#39;, &#39;yz_std&#39;, &#39;measured_pxx&#39;, &#39;measured_pxx_std&#39;, &#39;measured_pyy&#39;, &#39;measured_pyy_std&#39;, &#39;measured_pzz&#39;, &#39;measured_pzz_std&#39;, &#39;measured_pxy&#39;, &#39;measured_pxy_std&#39;, &#39;measured_pxz&#39;, &#39;measured_pxz_std&#39;, &#39;measured_pyz&#39;, &#39;measured_pyz_std&#39;, &#39;temp&#39;, &#39;temp_std&#39;])
-</pre></div>
-</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+dict_keys([&#39;dumpfile_initial&#39;, &#39;symbols_initial&#39;, &#39;dumpfile_final&#39;, &#39;symbols_final&#39;, &#39;nsamples&#39;, &#39;E_coh&#39;, &#39;E_coh_std&#39;, &#39;E_total&#39;, &#39;E_total_std&#39;, &#39;lx&#39;, &#39;lx_std&#39;, &#39;ly&#39;, &#39;ly_std&#39;, &#39;lz&#39;, &#39;lz_std&#39;, &#39;xy&#39;, &#39;xy_std&#39;, &#39;xz&#39;, &#39;xz_std&#39;, &#39;yz&#39;, &#39;yz_std&#39;, &#39;measured_pxx&#39;, &#39;measured_pxx_std&#39;, &#39;measured_pyy&#39;, &#39;measured_pyy_std&#39;, &#39;measured_pzz&#39;, &#39;measured_pzz_std&#39;, &#39;measured_pxy&#39;, &#39;measured_pxy_std&#39;, &#39;measured_pxz&#39;, &#39;measured_pxz_std&#39;, &#39;measured_pyz&#39;, &#39;measured_pyz_std&#39;, &#39;temp&#39;, &#39;temp_std&#39;])
+</pre></div></div>
 </div>
 </div>
 <div class="section" id="5.-Report-results">
@@ -1020,9 +1015,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 <div class="section" id="5.1.-Define-units-for-outputting-values">
 <h4>5.1. Define units for outputting values<a class="headerlink" href="#5.1.-Define-units-for-outputting-values" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>length_unit</strong> is the unit of length to display values in.</li>
-<li><strong>energy_unit</strong> is the unit of energy to display values in.</li>
-<li><strong>pressure_unit</strong> is the unit of pressure to display values in.</li>
+<li><p><strong>length_unit</strong> is the unit of length to display values in.</p></li>
+<li><p><strong>energy_unit</strong> is the unit of energy to display values in.</p></li>
+<li><p><strong>pressure_unit</strong> is the unit of pressure to display values in.</p></li>
 </ul>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
@@ -1113,20 +1108,20 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Measured thermo data with standard deviation:
-Ecoh = -4.413027 +-  0.000500 eV
-lx   = 35.330213 +-  0.025658 angstrom
-ly   = 35.330645 +-  0.025557 angstrom
-lz   = 35.329775 +-  0.027941 angstrom
-xy   =  0.000272 +-  0.029357 angstrom
-xz   =  0.000290 +-  0.029066 angstrom
-yz   =  0.000300 +-  0.025287 angstrom
-T    = 300.080847 +-  3.975875 K
-Pxx  = -0.000088 +-  0.171194 GPa
-Pyy  =  0.000286 +-  0.172926 GPa
-Pzz  = -0.000474 +-  0.177632 GPa
-Pxy  =  0.000077 +-  0.125134 GPa
-Pxz  =  0.000136 +-  0.123489 GPa
-Pyz  =  0.000402 +-  0.108128 GPa
+Ecoh = -4.413022 +-  0.000507 eV
+lx   = 35.330025 +-  0.025861 angstrom
+ly   = 35.329559 +-  0.026324 angstrom
+lz   = 35.330773 +-  0.026982 angstrom
+xy   = -0.000836 +-  0.029263 angstrom
+xz   = -0.000028 +-  0.027548 angstrom
+yz   =  0.000586 +-  0.024387 angstrom
+T    = 299.963948 +-  3.788839 K
+Pxx  =  0.000186 +-  0.190085 GPa
+Pyy  =  0.000212 +-  0.188994 GPa
+Pzz  =  0.000974 +-  0.190964 GPa
+Pxy  =  0.000299 +-  0.125513 GPa
+Pxz  =  0.000353 +-  0.118209 GPa
+Pyz  =  0.000150 +-  0.103573 GPa
 </pre></div></div>
 </div>
 </div>
@@ -1134,8 +1129,8 @@ Pyz  =  0.000402 +-  0.108128 GPa
 <h4>5.4. Compute lattice constant with standard error<a class="headerlink" href="#5.4.-Compute-lattice-constant-with-standard-error" title="Permalink to this headline">¶</a></h4>
 <p><strong>NOTE</strong>: This step makes two assumptions</p>
 <ol class="arabic simple">
-<li>The crystal structure is cubic and remains cubic after relaxation. Check values above to verify this.</li>
-<li>The thermosteps parameter is large enough that the measurements are not correlated. If thermosteps ≥ 100 this is likely a sound assumption.</li>
+<li><p>The crystal structure is cubic and remains cubic after relaxation. Check values above to verify this.</p></li>
+<li><p>The thermosteps parameter is large enough that the measurements are not correlated. If thermosteps ≥ 100 this is likely a sound assumption.</p></li>
 </ol>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
@@ -1168,7 +1163,7 @@ Pyz  =  0.000402 +-  0.108128 GPa
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Cubic lattice constant with standard error:
-a =  3.533021 +-  0.000034 angstrom
+a =  3.533012 +-  0.000034 angstrom
 </pre></div></div>
 </div>
 </div>
@@ -1190,10 +1185,10 @@ a =  3.533021 +-  0.000034 angstrom
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-avect =  [35.302,  0.000,  0.000]
-bvect =  [-0.002, 35.366,  0.000]
-cvect =  [ 0.026, -0.027, 35.348]
-origin = [-0.151, -0.183, -0.174]
+avect =  [35.319,  0.000,  0.000]
+bvect =  [-0.027, 35.360,  0.000]
+cvect =  [ 0.026, -0.004, 35.285]
+origin = [-0.159, -0.180, -0.143]
 </pre></div></div>
 </div>
 </div>
@@ -1277,12 +1272,12 @@ origin = [-0.151, -0.183, -0.174]
         <li class="right" >
           <a href="relax_box.html" title="relax_box calculation style"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>
 </html>

@@ -1,12 +1,10 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Method and Theory &#8212; iprPy 0.9.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>Method and Theory &#8212; iprPy 0.10.2 documentation</title>
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -14,6 +12,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -36,7 +35,7 @@
         <li class="right" >
           <a href="intro.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">relax_dynamic</a> &#187;</li> 
       </ul>
@@ -56,30 +55,30 @@ specified number of timesteps.</p>
 <p>The calculation script allows for the use of different integration
 methods:</p>
 <ul class="simple">
-<li>nve integrates atomic positions without changing box dimensions or
-the system’s total energy.</li>
-<li>npt integrates atomic positions and applies Nose-Hoover style
-thermostat and barostat (equilibriate to specified T and P).</li>
-<li>nvt integrates atomic positions and applies Nose-Hoover style
-thermostat (equilibriate to specified T).</li>
-<li>nph integrates atomic positions and applies Nose-Hoover style
-barostat (equilibriate to specified P).</li>
-<li>nve+l integrates atomic positions and applies Langevin style
-thermostat (equilibriate to specified T).</li>
-<li>nph+l integrates atomic positions and applies Nose-Hoover style
+<li><p>nve integrates atomic positions without changing box dimensions or
+the system’s total energy.</p></li>
+<li><p>npt integrates atomic positions and applies Nose-Hoover style
+thermostat and barostat (equilibriate to specified T and P).</p></li>
+<li><p>nvt integrates atomic positions and applies Nose-Hoover style
+thermostat (equilibriate to specified T).</p></li>
+<li><p>nph integrates atomic positions and applies Nose-Hoover style
+barostat (equilibriate to specified P).</p></li>
+<li><p>nve+l integrates atomic positions and applies Langevin style
+thermostat (equilibriate to specified T).</p></li>
+<li><p>nph+l integrates atomic positions and applies Nose-Hoover style
 barostat and Langevin style thermostat (equilibriate to specified T
-and P).</li>
+and P).</p></li>
 </ul>
 <p><strong>Notes</strong> on the different control schemes:</p>
 <ul class="simple">
-<li>The Nose-Hoover barostat works by rescaling the box dimensions
-according to the measured system pressures.</li>
-<li>The Nose-Hoover thermostat works by rescaling the atomic velocities
+<li><p>The Nose-Hoover barostat works by rescaling the box dimensions
+according to the measured system pressures.</p></li>
+<li><p>The Nose-Hoover thermostat works by rescaling the atomic velocities
 according to the measured system temperature (kinetic energy). Cannot
-be used with a temperature of 0 K.</li>
-<li>The Langevin thermostat works by modifying the forces on all atoms
+be used with a temperature of 0 K.</p></li>
+<li><p>The Langevin thermostat works by modifying the forces on all atoms
 with both a dampener and a random temperature dependent fluctuation.
-Used at 0 K, only the force dampener is applied.</li>
+Used at 0 K, only the force dampener is applied.</p></li>
 </ul>
 <p><strong>Notes</strong> on run parameter values. The proper time to reach equilibrium
 (equilsteps), and sample frequency to ensure uncorrelated measurements
@@ -121,13 +120,13 @@ crystals and EAM potentials, and may or may not be adequate.</p>
         <li class="right" >
           <a href="intro.html" title="Introduction"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >relax_dynamic</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>
 </html>

@@ -19,19 +19,18 @@ family
 symbols                         
 box_parameters                  
 
-# System manipulations
-a_uvw                           
-b_uvw                           
-c_uvw                           
-atomshift                       
-sizemults                       
-
 # Stacking fault defect parameters
 stackingfault_file              
+stackingfault_hkl               
+stackingfault_a1vect_uvw        
+stackingfault_a2vect_uvw        
+stackingfault_cellsetting       
 stackingfault_cutboxvector      
-stackingfault_faultpos          
-stackingfault_shiftvector1      
-stackingfault_shiftvector2      
+stackingfault_shiftindex        
+stackingfault_faultpos_rel      
+sizemults                       
+stackingfault_minwidth          
+stackingfault_even              
 
 # Units for input/output values
 length_unit                     
@@ -47,5 +46,5 @@ maxevaluations
 maxatommotion                   
 
 # Run parameters
-stackingfault_numshifts1        
-stackingfault_numshifts2        
+stackingfault_num_a1            
+stackingfault_num_a2            

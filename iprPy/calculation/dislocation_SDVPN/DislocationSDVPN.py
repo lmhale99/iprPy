@@ -85,7 +85,12 @@ class DislocationSDVPN(Calculation):
         keys = (
             subset('lammps_commands').keyset 
             + subset('units').keyset 
-            + []
+            + [
+                'sizemults',
+                'amin',
+                'bmin',
+                'cmin',
+            ]
         )
 
         # Join and return

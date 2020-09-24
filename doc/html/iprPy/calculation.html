@@ -1,12 +1,10 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>iprPy.calculation package &#8212; iprPy 0.9.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>iprPy.calculation package &#8212; iprPy 0.10.2 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -14,6 +12,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -36,7 +35,7 @@
         <li class="right" >
           <a href="index.html" title="iprPy package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">iprPy package</a> &#187;</li> 
       </ul>
     </div>  
@@ -52,220 +51,229 @@
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-iprPy.calculation" title="Permalink to this headline">¶</a></h2>
 <dl class="attribute">
 <dt id="iprPy.calculation.loaded">
-<code class="descname">loaded</code><a class="headerlink" href="#iprPy.calculation.loaded" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">loaded</code><a class="headerlink" href="#iprPy.calculation.loaded" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dictionary of the derived classes</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="iprPy.calculation.databases_dict">
-<code class="descname">databases_dict</code><a class="headerlink" href="#iprPy.calculation.databases_dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">databases_dict</code><a class="headerlink" href="#iprPy.calculation.databases_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dictionary of the database styles that successfully loaded. The
 dictionary keys are the database style names, and the values are the
 loaded modules.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="class">
 <dt id="iprPy.calculation.Calculation">
-<em class="property">class </em><code class="descname">Calculation</code><a class="headerlink" href="#iprPy.calculation.Calculation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property">class </em><code class="sig-name descname">Calculation</code><a class="headerlink" href="#iprPy.calculation.Calculation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class for handling different calculation styles in the same fashion.  The
 class defines the common methods and attributes, which are then uniquely
 implemented for each style.  The available styles are loaded from the
 iprPy.calculations submodule.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="iprPy.calculation.Calculation.allkeys">
-<code class="descname">allkeys</code><a class="headerlink" href="#iprPy.calculation.Calculation.allkeys" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">allkeys</code><a class="headerlink" href="#iprPy.calculation.Calculation.allkeys" title="Permalink to this definition">¶</a></dt>
 <dd><p>All keys used by the calculation.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="iprPy.calculation.Calculation.calc">
-<code class="descname">calc</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.calc" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">calc</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.calc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the calculation’s primary function(s)</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="iprPy.calculation.Calculation.directory">
-<code class="descname">directory</code><a class="headerlink" href="#iprPy.calculation.Calculation.directory" title="Permalink to this definition">¶</a></dt>
-<dd><p>The path to the calculation’s directory</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="method">
+<dt id="iprPy.calculation.Calculation.filedict">
+<em class="property">property </em><code class="sig-name descname">filedict</code><a class="headerlink" href="#iprPy.calculation.Calculation.filedict" title="Permalink to this definition">¶</a></dt>
+<dd><p>the names and contents of all required files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="iprPy.calculation.Calculation.files">
-<code class="descname">files</code><a class="headerlink" href="#iprPy.calculation.Calculation.files" title="Permalink to this definition">¶</a></dt>
-<dd><p>Path to each file required by the calculation.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
-</tr>
-</tbody>
-</table>
+<em class="property">property </em><code class="sig-name descname">files</code><a class="headerlink" href="#iprPy.calculation.Calculation.files" title="Permalink to this definition">¶</a></dt>
+<dd><p>the names of each file required by the calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="iprPy.calculation.Calculation.module_file">
-<code class="descname">module_file</code><a class="headerlink" href="#iprPy.calculation.Calculation.module_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>The path to the Calculation class file</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.7)">pathlib.Path</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="method">
+<dt id="iprPy.calculation.Calculation.inputdoc">
+<em class="property">property </em><code class="sig-name descname">inputdoc</code><a class="headerlink" href="#iprPy.calculation.Calculation.inputdoc" title="Permalink to this definition">¶</a></dt>
+<dd><p>the documentation for the calculation-specific input keys</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="iprPy.calculation.Calculation.module_name">
-<code class="descname">module_name</code><a class="headerlink" href="#iprPy.calculation.Calculation.module_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>The calculation style</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="method">
+<dt id="iprPy.calculation.Calculation.inputkeys">
+<em class="property">property </em><code class="sig-name descname">inputkeys</code><a class="headerlink" href="#iprPy.calculation.Calculation.inputkeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>the calculation-specific input keys</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
+<dt id="iprPy.calculation.Calculation.inputsubsets">
+<em class="property">property </em><code class="sig-name descname">inputsubsets</code><a class="headerlink" href="#iprPy.calculation.Calculation.inputsubsets" title="Permalink to this definition">¶</a></dt>
+<dd><p>the subsets whose input key sets are used for the calculation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="iprPy.calculation.Calculation.maindoc">
+<em class="property">property </em><code class="sig-name descname">maindoc</code><a class="headerlink" href="#iprPy.calculation.Calculation.maindoc" title="Permalink to this definition">¶</a></dt>
+<dd><p>the overview documentation for the calculation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="iprPy.calculation.Calculation.multikeys">
-<code class="descname">multikeys</code><a class="headerlink" href="#iprPy.calculation.Calculation.multikeys" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">multikeys</code><a class="headerlink" href="#iprPy.calculation.Calculation.multikeys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculation key sets that can have multiple values during prepare.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
+<dt id="iprPy.calculation.Calculation.parent_module">
+<em class="property">property </em><code class="sig-name descname">parent_module</code><a class="headerlink" href="#iprPy.calculation.Calculation.parent_module" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="iprPy.calculation.Calculation.record_style">
-<code class="descname">record_style</code><a class="headerlink" href="#iprPy.calculation.Calculation.record_style" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">record_style</code><a class="headerlink" href="#iprPy.calculation.Calculation.record_style" title="Permalink to this definition">¶</a></dt>
 <dd><p>The record style associated with the calculation.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="iprPy.calculation.Calculation.script">
-<code class="descname">script</code><a class="headerlink" href="#iprPy.calculation.Calculation.script" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">script</code><a class="headerlink" href="#iprPy.calculation.Calculation.script" title="Permalink to this definition">¶</a></dt>
 <dd><p>shortcut to the imported calc_*.py module</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">module</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>module</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="iprPy.calculation.Calculation.singularkeys">
-<code class="descname">singularkeys</code><a class="headerlink" href="#iprPy.calculation.Calculation.singularkeys" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">singularkeys</code><a class="headerlink" href="#iprPy.calculation.Calculation.singularkeys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculation keys that can have single values during prepare.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="iprPy.calculation.Calculation.style">
-<code class="descname">style</code><a class="headerlink" href="#iprPy.calculation.Calculation.style" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">style</code><a class="headerlink" href="#iprPy.calculation.Calculation.style" title="Permalink to this definition">¶</a></dt>
 <dd><p>The calculation style</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="iprPy.calculation.Calculation.template">
-<code class="descname">template</code><a class="headerlink" href="#iprPy.calculation.Calculation.template" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">template</code><a class="headerlink" href="#iprPy.calculation.Calculation.template" title="Permalink to this definition">¶</a></dt>
 <dd><p>The template to use for generating calc.in files.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="iprPy.calculation.Calculation.templatedoc">
+<em class="property">property </em><code class="sig-name descname">templatedoc</code><a class="headerlink" href="#iprPy.calculation.Calculation.templatedoc" title="Permalink to this definition">¶</a></dt>
+<dd><p>The markdown doc describing the calculation’s input parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="iprPy.calculation.Calculation.theorydoc">
+<em class="property">property </em><code class="sig-name descname">theorydoc</code><a class="headerlink" href="#iprPy.calculation.Calculation.theorydoc" title="Permalink to this definition">¶</a></dt>
+<dd><p>the methods and theory documentation for the calculation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="iprPy.calculation.load_calculation">
-<code class="descname">load_calculation</code><span class="sig-paren">(</span><em>style</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.load_calculation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">load_calculation</code><span class="sig-paren">(</span><em class="sig-param">style</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.load_calculation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads a Calculation subclass associated with a given calculation style</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The calculation style</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A Calculation object for the style</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">subclass of iprPy.calculation.Calculation</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The calculation style</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Calculation object for the style</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>subclass of iprPy.calculation.Calculation</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -310,12 +318,12 @@ iprPy.calculations submodule.</p>
         <li class="right" >
           <a href="index.html" title="iprPy package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >iprPy package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>
 </html>

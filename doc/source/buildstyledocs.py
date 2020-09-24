@@ -1,10 +1,12 @@
-from __future__ import print_function, division, absolute_import
+from pathlib import Path
 import os
 import sys
 import glob
 import iprPy
 import shutil
 import pypandoc
+
+rootdir = 'E:/Python-packages/iprPy/iprPy'
 
 def main():
     
@@ -17,10 +19,10 @@ def buildcalculations():
     """Builds doc/source pages for all calculation styles implemented in iprPy"""
     
     # Specify path to Python code for the iprPy.calculations submodule
-    pypath = os.path.join(iprPy.rootdir, 'calculation')
+    pypath = Path(rootdir, 'calculation')
     
     # Specify relative path to doc/source folder for calculations
-    docpath = os.path.join(iprPy.rootdir, '..', 'doc', 'source', 'calculation')
+    docpath = Path(rootdir, '..', 'doc', 'source', 'calculation')
     
     # Define template index
     indextemplate = """<nameheader>
@@ -43,24 +45,25 @@ Calculation script functions
     :show-inheritance:"""
     
     # Remove existing doc source
-    if os.path.isdir(docpath):
+    if docpath.is_dir():
         cleantree(docpath)
     
     # Loop over all implemented calculation styles
     for name in iprPy.calculation.loaded.keys():
-        print(name)
-        sys.stdout.flush()
-        pydir = os.path.join(pypath, name)
-        docdir = os.path.join(docpath, name)
-        os.makedirs(docdir)
+        print(name, flush=True)
+        calc = iprPy.load_calculation(name)
+        
+        pydir = Path(pypath, name)
+        docdir = Path(docpath, name)
+        docdir.mkdir(parents=True)
         
         # Verify calculation is a submodule
-        if os.path.isdir(pydir):
+        if pydir.is_dir():
             
             # Create index.rst
             d = {}
             d['nameheader'] = '\n'.join(['=' * len(name), name, '='*len(name)])
-            with open(os.path.join(docdir, 'index.rst'), 'w', encoding='UTF-8', newline='\n') as f:
+            with open(Path(docdir, 'index.rst'), 'w', encoding='UTF-8', newline='\n') as f:
                 f.write(iprPy.tools.filltemplate(indextemplate, d,'<', '>'))
             
             # Create calc.rst
@@ -68,29 +71,41 @@ Calculation script functions
             pyname = 'calc_' + name + '.py'
             d['scriptheader'] = '\n'.join(['=' * len(pyname), pyname, '='*len(pyname)])
             d['name'] = name
-            with open(os.path.join(docdir, 'calc.rst'), 'w', encoding='UTF-8', newline='\n') as f:
+            with open(Path(docdir, 'calc.rst'), 'w', encoding='UTF-8', newline='\n') as f:
                 f.write(iprPy.tools.filltemplate(scripttemplate, d, '<', '>'))
+
+            # Copy README.md to intro.rst
+            copy_md2rst(Path(pydir, 'README.md'),
+                        Path(docdir, 'intro.rst'))
             
-            # copy README.md to intro.rst
-            copy_md2rst(os.path.join(pydir, 'README.md'),
-                        os.path.join(docdir, 'intro.rst'))
+            # Copy theory.md to theory.rst
+            copy_md2rst(Path(pydir, 'theory.md'),
+                        Path(docdir, 'theory.rst'))
             
-            # copy theory.md to theory.rst
-            copy_md2rst(os.path.join(pydir, 'theory.md'),
-                        os.path.join(docdir, 'theory.rst'))
-            
-            # copy parameters.md to parameters.rst
-            copy_md2rst(os.path.join(pydir, 'parameters.md'),
-                        os.path.join(docdir, 'parameters.rst'))
+            # Create parameters.md
+            with open(Path(pydir, 'parameters.md'), 'w', encoding='utf-8') as f:
+                f.write(calc.templatedoc)
+
+            # Copy parameters.md to parameters.rst
+            copy_md2rst(Path(pydir, 'parameters.md'),
+                        Path(docdir, 'parameters.rst'))
+
+            # Create empty calc_.in file from template
+            t = {}
+            for key in calc.allkeys:
+                t[key] = ''
+            infile = iprPy.tools.filltemplate(calc.template, t, '<', '>')
+            with open(Path(pydir, f'calc_{calc.style}.in'), 'w', encoding='utf-8') as f:
+                f.write(infile)
 
 def buildrecords():
     """Builds doc/source pages for all record styles implemented in iprPy"""
     
     # Specify path to Python code for the iprPy.record submodule
-    pypath = os.path.join(iprPy.rootdir, 'record')
+    pypath = Path(rootdir, 'record')
     
     # Specify relative path to doc/source folder for record
-    docpath = os.path.join(iprPy.rootdir, '..', 'doc', 'source', 'record')
+    docpath = Path(rootdir, '..', 'doc', 'source', 'record')
     
     indextemplate = """<nameheader>
 
@@ -100,38 +115,37 @@ def buildrecords():
     intro"""
     
     # Remove existing doc source
-    if os.path.isdir(docpath):
+    if docpath.is_dir():
         cleantree(docpath)
     
    # Loop over all implemented record styles
     for name in iprPy.record.loaded.keys():
-        print(name)
-        sys.stdout.flush()
-        pydir = os.path.join(pypath, name)
-        docdir = os.path.join(docpath, name)
-        os.makedirs(docdir)
+        print(name, flush=True)
+        pydir = Path(pypath, name)
+        docdir = Path(docpath, name)
+        docdir.mkdir(parents=True)
         
          # Verify record is a submodule
-        if os.path.isdir(pydir):
+        if pydir.is_dir():
             
             # Create index.rst
             d = {}
             d['nameheader'] = '\n'.join(['=' * len(name), name, '='*len(name)])
-            with open(os.path.join(docdir, 'index.rst'), 'w', encoding='UTF-8', newline='\n') as f:
+            with open(Path(docdir, 'index.rst'), 'w', encoding='UTF-8', newline='\n') as f:
                 f.write(iprPy.tools.filltemplate(indextemplate, d,'<', '>'))
             
             # copy README.md to intro.rst
-            copy_md2rst(os.path.join(pydir, 'README.md'),
-                        os.path.join(docdir, 'intro.rst'))
+            copy_md2rst(Path(pydir, 'README.md'),
+                        Path(docdir, 'intro.rst'))
 
 def builddatabases():
     """Builds doc/source pages for all database styles implemented in iprPy"""
     
     # Specify path to Python code for the iprPy.database submodule
-    pypath = os.path.join(iprPy.rootdir, 'database')
+    pypath = Path(rootdir, 'database')
     
     # Specify relative path to doc/source folder for database
-    docpath = os.path.join(iprPy.rootdir, '..', 'doc', 'source', 'database')
+    docpath = Path(rootdir, '..', 'doc', 'source', 'database')
     
     indextemplate = """<nameheader>
 
@@ -141,50 +155,49 @@ def builddatabases():
     intro"""
     
     # Remove existing doc source
-    if os.path.isdir(docpath):
+    if docpath.is_dir():
         cleantree(docpath)
     
    # Loop over all implemented database styles
     for name in iprPy.database.loaded.keys():
-        print(name)
-        sys.stdout.flush()
-        pydir = os.path.join(pypath, name)
-        docdir = os.path.join(docpath, name)
-        os.makedirs(docdir)
+        print(name, flush=True)
+        pydir = Path(pypath, name)
+        docdir = Path(docpath, name)
+        docdir.mkdir(parents=True)
         
          # Verify database is a submodule
-        if os.path.isdir(pydir):
+        if pydir.is_dir():
             
             # Create index.rst
             d = {}
             d['nameheader'] = '\n'.join(['=' * len(name), name, '='*len(name)])
-            with open(os.path.join(docdir, 'index.rst'), 'w', encoding='UTF-8', newline='\n') as f:
+            with open(Path(docdir, 'index.rst'), 'w', encoding='UTF-8', newline='\n') as f:
                 f.write(iprPy.tools.filltemplate(indextemplate, d,'<', '>'))
             
             # copy README.md to intro.rst
-            copy_md2rst(os.path.join(pydir, 'README.md'),
-                        os.path.join(docdir, 'intro.rst'))
+            copy_md2rst(Path(pydir, 'README.md'),
+                        Path(docdir, 'intro.rst'))
 
 def copynotebooks():
     
     # Specify path to Jupyter Notebooks
-    pypath = os.path.join(iprPy.rootdir, '..', 'notebook')
+    pypath = Path(rootdir, '..', 'notebook')
     
     # Specify relative path to doc/source folder for database
-    docpath = os.path.join(iprPy.rootdir, '..', 'doc', 'source', 'notebook')
+    docpath = Path(rootdir, '..', 'doc', 'source', 'notebook')
     
     # Remove existing doc source
-    if os.path.isdir(docpath):
+    if docpath.is_dir():
         cleantree(docpath)
     
     # Make calculationfiles folder
-    os.makedirs(os.path.join(docpath, 'calculationfiles'))
+    Path(docpath, 'calculationfiles').mkdir(parents=True)
     
-    for oldpath in glob.iglob(os.path.join(pypath, '*.ipynb')):
-        oldname = os.path.basename(oldpath)
+    for oldpath in pypath.glob('*.ipynb'):
+        oldname = oldpath.name
         newname = oldname.replace(' ', '_')
         print(newname)
-        newpath = os.path.join(docpath, newname)
+        newpath = Path(docpath, newname)
         shutil.copy(oldpath, newpath)
 
 def cleantree(path):

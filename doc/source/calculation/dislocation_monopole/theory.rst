@@ -5,8 +5,8 @@ Stroh theory
 ~~~~~~~~~~~~
 
 A detailed description of the Stroh method to solve the Eshelby solution
-for an anisotropic straight dislocation can be found in the atomman
-documentation.
+for an anisotropic straight dislocation can be found in the `atomman
+documentation <https://www.ctcms.nist.gov/potentials/atomman/>`__.
 
 Orientation
 ~~~~~~~~~~~

@@ -46,10 +46,18 @@ C_K
 
 # Dislocation defect parameters
 dislocation_file                
-dislocation_stroh_m             
-dislocation_stroh_n             
-dislocation_lineboxvector       
-dislocation_burgersvector       
+dislocation_slip_hkl            
+dislocation_ξ_uvw               
+dislocation_burgers             
+dislocation_m                   
+dislocation_n                   
+dislocation_shift               
+dislocation_shiftscale          
+dislocation_shiftindex          
+sizemults                       
+amin                            
+bmin                            
+cmin                            
 
 # Units for input/output values
 length_unit                     
@@ -58,9 +66,6 @@ energy_unit
 force_unit                      
 
 # Run parameters
-a_uvw                           
-b_uvw                           
-c_uvw                           
 xmax                            
 xstep                           
 xnum                            

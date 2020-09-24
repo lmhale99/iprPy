@@ -1,12 +1,10 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>High-Throughput Calculation Execution &#8212; iprPy 0.9.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>High-Throughput Calculation Execution &#8212; iprPy 0.10.2 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -14,6 +12,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -36,7 +35,7 @@
         <li class="right" >
           <a href="notebook.html" title="Run a Jupyter Calculation Notebook"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Calculations</a> &#187;</li> 
       </ul>
     </div>  
@@ -51,20 +50,20 @@
 <p>There are five primary steps for performing high-throughput calculations using
 iprPy</p>
 <ol class="arabic simple">
-<li>Define one or more databases and run directories.  A database stores
+<li><p>Define one or more databases and run directories.  A database stores
 records, while a run directory is a path to a local directory where
-calculation files are placed for execution.</li>
-<li>Upload reference records from the iprPy/library to the databases that you
-want to use.</li>
-<li>Prepare calculations for high-throughput execution.  For every instance of
+calculation files are placed for execution.</p></li>
+<li><p>Upload reference records from the iprPy/library to the databases that you
+want to use.</p></li>
+<li><p>Prepare calculations for high-throughput execution.  For every instance of
 a calculation style being prepared, a calculation folder is created in a
 run directory that contains all necessary files for execution, and a
-corresponding incomplete record is added to a database.</li>
-<li>Start one or more runners to systematically execute the prepared
+corresponding incomplete record is added to a database.</p></li>
+<li><p>Start one or more runners to systematically execute the prepared
 calculations in a run directory and update the associated calculation
-records in the database upon completion.</li>
-<li>Access records from the database to check on the status of the calculations
-and to analyze results.</li>
+records in the database upon completion.</p></li>
+<li><p>Access records from the database to check on the status of the calculations
+and to analyze results.</p></li>
 </ol>
 <p>These actions can be performed either in Python or by using the iprPy inline
 commands.  The basic Python functions are described below, while the inline
@@ -152,13 +151,13 @@ arguments.</p>
 input file format used to run calculation scripts.  The only real difference is
 that keys can be assigned multiple values.</p>
 <ul class="simple">
-<li>The parameters are given in key-value format, with each line listing a
-parameter followed by its assigned value.</li>
-<li>Any parameters that are not listed or not given values will be ignored and be
-given default values, if allowed by the calculation.</li>
-<li>Any terms listed after a # will be treated as comments and ignored.</li>
-<li>Keys can be assigned multiple values by listing more than one complete
-non-comment key-value line for that key.</li>
+<li><p>The parameters are given in key-value format, with each line listing a
+parameter followed by its assigned value.</p></li>
+<li><p>Any parameters that are not listed or not given values will be ignored and be
+given default values, if allowed by the calculation.</p></li>
+<li><p>Any terms listed after a # will be treated as comments and ignored.</p></li>
+<li><p>Keys can be assigned multiple values by listing more than one complete
+non-comment key-value line for that key.</p></li>
 </ul>
 </div>
 <div class="section" id="passing-inputs-as-keyword-arguments">
@@ -166,12 +165,12 @@ non-comment key-value line for that key.</li>
 <p>Alternatively, input values can be defined as keyword arguments of prepare.
 This option is convenient for dynamically generating input values.</p>
 <ul class="simple">
-<li>The keyword name corresponds to the input key.</li>
-<li>Each input value is given as a string matching how it would appear in the
+<li><p>The keyword name corresponds to the input key.</p></li>
+<li><p>Each input value is given as a string matching how it would appear in the
 input file.  For example, myinput=‘1 angstrom’ corresponds to the input file
-line ‘myinput   1 angstrom’.</li>
-<li>Multiple values can be given for an input key by simply assigning it a list
-of string values.</li>
+line ‘myinput   1 angstrom’.</p></li>
+<li><p>Multiple values can be given for an input key by simply assigning it a list
+of string values.</p></li>
 </ul>
 </div>
 <div class="section" id="recognized-input-keys">
@@ -244,33 +243,29 @@ use.</p>
 <h3>Runner process<a class="headerlink" href="#runner-process" title="Permalink to this headline">¶</a></h3>
 <p>This details the specific steps that a runner performs</p>
 <ol class="arabic">
-<li><p class="first">A calculation folder in the run directory is selected at random.</p>
-</li>
-<li><p class="first">The runner checks the calculation folder for the following files</p>
+<li><p>A calculation folder in the run directory is selected at random.</p></li>
+<li><p>The runner checks the calculation folder for the following files</p>
 <blockquote>
 <div><ol class="upperalpha simple">
-<li>A .bid file indicates that another runner is already operating on the
-calculation, and therefore should be left alone.</li>
-<li>Any included .xml and .json files may be results records from a parent
+<li><p>A .bid file indicates that another runner is already operating on the
+calculation, and therefore should be left alone.</p></li>
+<li><p>Any included .xml and .json files may be results records from a parent
 calculation.  Their status is checked and updated from the database if
 needed.  If a parent record is found to be incomplete, the runner will
-try running the parent calculation.</li>
-<li>If the folder is missing either calc_[style].py or calc_[style].in, or
+try running the parent calculation.</p></li>
+<li><p>If the folder is missing either calc_[style].py or calc_[style].in, or
 there is no corresponding record in the database, then the calculation
-folder is archived to an orphan directory.</li>
+folder is archived to an orphan directory.</p></li>
 </ol>
 </div></blockquote>
 </li>
-<li><p class="first">If the calculation is free and ready, then the runner will create a .bid
-file and run the calculation.</p>
-</li>
-<li><p class="first">Upon completion, the calculation’s record is updated, and the calculation
-folder is zipped and archived to the database.</p>
-</li>
-<li><p class="first">Steps 1-4 are repeated until either there are no more calculation folders
+<li><p>If the calculation is free and ready, then the runner will create a .bid
+file and run the calculation.</p></li>
+<li><p>Upon completion, the calculation’s record is updated, and the calculation
+folder is zipped and archived to the database.</p></li>
+<li><p>Steps 1-4 are repeated until either there are no more calculation folders
 or the runner fails to find an open calculation after a set number of
-attempts.</p>
-</li>
+attempts.</p></li>
 </ol>
 </div>
 </div>
@@ -279,20 +274,20 @@ attempts.</p>
 <p>The database object also has additional methods for accessing and manipulating
 records</p>
 <ul class="simple">
-<li>get_records() retrieves all records matching given criterion.</li>
-<li>get_record() retrieves one record that uniquely matches the given criterion.
-Raises an error if no or multiple matching calculations are found.</li>
-<li>get_records_df() returns record information as a pandas DataFrame.</li>
-<li>get_tar() retrieves the archived calculation folder for a record as a tarfile
-object.</li>
-<li>check_records() will display the number of records in the database for a
+<li><p>get_records() retrieves all records matching given criterion.</p></li>
+<li><p>get_record() retrieves one record that uniquely matches the given criterion.
+Raises an error if no or multiple matching calculations are found.</p></li>
+<li><p>get_records_df() returns record information as a pandas DataFrame.</p></li>
+<li><p>get_tar() retrieves the archived calculation folder for a record as a tarfile
+object.</p></li>
+<li><p>check_records() will display the number of records in the database for a
 given record style, and for calculation records will count how many are
-finished, still to run, or issued errors.</li>
-<li>copy_records() allows records to be copied from one database to another.</li>
-<li>clean_records() resets any calculations that issued errors back to a
-run_directory and removes .bid files.  This is useful for debugging.</li>
-<li>destroy_records() permanently deletes all stored calculations of a given
-style.</li>
+finished, still to run, or issued errors.</p></li>
+<li><p>copy_records() allows records to be copied from one database to another.</p></li>
+<li><p>clean_records() resets any calculations that issued errors back to a
+run_directory and removes .bid files.  This is useful for debugging.</p></li>
+<li><p>destroy_records() permanently deletes all stored calculations of a given
+style.</p></li>
 </ul>
 </div>
 </div>
@@ -349,12 +344,12 @@ style.</li>
         <li class="right" >
           <a href="notebook.html" title="Run a Jupyter Calculation Notebook"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Calculations</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>
 </html>

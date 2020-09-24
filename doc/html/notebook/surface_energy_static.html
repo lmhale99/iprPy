@@ -1,12 +1,10 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>surface_energy_static calculation style &#8212; iprPy 0.9.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>surface_energy_static calculation style &#8212; iprPy 0.10.2 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -14,6 +12,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -36,7 +35,7 @@
         <li class="right" >
           <a href="stacking_fault_static.html" title="stacking_fault_static calculation style"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>  
@@ -51,16 +50,16 @@
 /* CSS for nbsphinx extension */
 
 /* remove conflicting styling from Sphinx themes */
-div.nbinput,
-div.nbinput div.prompt,
-div.nbinput div.input_area,
-div.nbinput div[class*=highlight],
-div.nbinput div[class*=highlight] pre,
-div.nboutput,
-div.nbinput div.prompt,
-div.nbinput div.output_area,
-div.nboutput div[class*=highlight],
-div.nboutput div[class*=highlight] pre {
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
     background: none;
     border: none;
     padding: 0 0;
@@ -69,13 +68,13 @@ div.nboutput div[class*=highlight] pre {
 }
 
 /* avoid gaps between output lines */
-div.nboutput div[class*=highlight] pre {
+div.nboutput.container div[class*=highlight] pre {
     line-height: normal;
 }
 
 /* input/output containers */
-div.nbinput,
-div.nboutput {
+div.nbinput.container,
+div.nboutput.container {
     display: -webkit-flex;
     display: flex;
     align-items: flex-start;
@@ -83,92 +82,104 @@ div.nboutput {
     width: 100%;
 }
 @media (max-width: 540px) {
-    div.nbinput,
-    div.nboutput {
+    div.nbinput.container,
+    div.nboutput.container {
         flex-direction: column;
     }
 }
 
 /* input container */
-div.nbinput {
+div.nbinput.container {
     padding-top: 5px;
 }
 
 /* last container */
-div.nblast {
+div.nblast.container {
     padding-bottom: 5px;
 }
 
 /* input prompt */
-div.nbinput div.prompt pre {
+div.nbinput.container div.prompt pre {
     color: #307FC1;
 }
 
 /* output prompt */
-div.nboutput div.prompt pre {
+div.nboutput.container div.prompt pre {
     color: #BF5B3D;
 }
 
 /* all prompts */
-div.nbinput div.prompt,
-div.nboutput div.prompt {
-    min-width: 7ex;
-    padding-top: 0.4em;
-    padding-right: 0.4em;
-    text-align: right;
-    flex: 0;
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
 }
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
 @media (max-width: 540px) {
-    div.nbinput div.prompt,
-    div.nboutput div.prompt {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
         text-align: left;
         padding: 0.4em;
     }
-    div.nboutput div.prompt.empty {
+    div.nboutput.container div.prompt.empty {
         padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
     }
 }
 
 /* disable scrollbars on prompts */
-div.nbinput div.prompt pre,
-div.nboutput div.prompt pre {
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
     overflow: hidden;
 }
 
 /* input/output area */
-div.nbinput div.input_area,
-div.nboutput div.output_area {
-    padding: 0.4em;
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
     -webkit-flex: 1;
     flex: 1;
     overflow: auto;
 }
 @media (max-width: 540px) {
-    div.nbinput div.input_area,
-    div.nboutput div.output_area {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
         width: 100%;
     }
 }
 
 /* input area */
-div.nbinput div.input_area {
+div.nbinput.container div.input_area {
     border: 1px solid #e0e0e0;
     border-radius: 2px;
     background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
-div.nboutput div[class*=MathJax] {
+div.nboutput.container div[class*=MathJax] {
     text-align: left !important;
 }
 
 /* override sphinx.ext.imgmath center alignment in output cells */
-div.nboutput div.math p {
+div.nboutput.container div.math p {
     text-align: left;
 }
 
 /* standard error */
-div.nboutput div.output_area.stderr {
+div.nboutput.container div.output_area.stderr {
     background: #fdd;
 }
 
@@ -212,6 +223,27 @@ div.nboutput div.output_area.stderr {
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
 
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
 /* Some additional styling taken form the Jupyter notebook CSS */
 div.rendered_html table {
   border: none;
@@ -249,14 +281,16 @@ div.rendered_html tbody tr:hover {
 <div class="section" id="surface_energy_static-calculation-style">
 <h1>surface_energy_static calculation style<a class="headerlink" href="#surface_energy_static-calculation-style" title="Permalink to this headline">¶</a></h1>
 <p><strong>Lucas M. Hale</strong>, <a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>, <em>Materials Science and Engineering Division, NIST</em>.</p>
-<p>Description updated: 2019-07-26</p>
 <div class="section" id="Introduction">
 <h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
 <p>The surface_energy_static calculation style evaluates the formation energy for a free surface by slicing an atomic system along a specific plane.</p>
 <div class="section" id="Version-notes">
 <h3>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>This was previously called the surface_energy calculation style and was renamed for consistency.</li>
+<li><p>2018-07-09: Notebook added.</p></li>
+<li><p>2019-07-30: Description updated and small changes due to iprPy version.</p></li>
+<li><p>2020-05-22: Version 0.10 update - potentials now loaded from database.</p></li>
+<li><p>2020-09-22: Calculation updated to use atomman.defect.FreeSurface class. Setup and parameter definition streamlined.</p></li>
 </ul>
 </div>
 <div class="section" id="Additional-dependencies">
@@ -265,8 +299,8 @@ div.rendered_html tbody tr:hover {
 <div class="section" id="Disclaimers">
 <h3>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST disclaimers</a></li>
-<li>Other atomic configurations at the free surface for certain planar cuts may have lower energies. The atomic relaxation will find a local minimum, which may not be the global minimum. Additionally, the material cut is planar perfect and therefore does not explore the effects of atomic roughness.</li>
+<li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST disclaimers</a></p></li>
+<li><p>Other atomic configurations at the free surface for certain planar cuts may have lower energies. The atomic relaxation will find a local minimum, which may not be the global minimum. Additionally, the material cut is planar perfect and therefore does not explore the effects of atomic roughness.</p></li>
 </ul>
 </div>
 </div>
@@ -274,10 +308,10 @@ div.rendered_html tbody tr:hover {
 <h2>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this headline">¶</a></h2>
 <p>First, an initial system is generated. This is accomplished by</p>
 <ol class="arabic simple">
-<li>Starting with a unit cell system.</li>
-<li>Generating a transformed system by rotating the unit cell such that the new system’s box vectors correspond to crystallographic directions, and filled in with atoms to remain a perfect bulk cell when the three boundaries are periodic.</li>
-<li>All atoms are shifted by a fractional amount of the box vectors if needed.</li>
-<li>A supercell system is constructed by combining multiple replicas of the transformed system.</li>
+<li><p>Starting with a unit cell system.</p></li>
+<li><p>Generating a transformed system by rotating the unit cell such that the new system’s box vectors correspond to crystallographic directions, and filled in with atoms to remain a perfect bulk cell when the three boundaries are periodic.</p></li>
+<li><p>All atoms are shifted by a fractional amount of the box vectors if needed.</p></li>
+<li><p>A supercell system is constructed by combining multiple replicas of the transformed system.</p></li>
 </ol>
 <p>Two LAMMPS simulations are then performed that apply an energy/force minimization on the system, and the total energy of the system after relaxing is measured, <span class="math notranslate nohighlight">\(E_{total}\)</span>. In the first simulation, all of the box’s directions are kept periodic (ppp), while in the second simulation two are periodic and one is non-periodic (ppm). This effectively slices the system along the boundary plane creating two free surfaces, each with surface area</p>
 <div class="math notranslate nohighlight">
@@ -298,10 +332,9 @@ cut plane.</p>
 <h3>1.1. Library imports<a class="headerlink" href="#1.1.-Library-imports" title="Permalink to this headline">¶</a></h3>
 <p>Import libraries needed by the calculation. The external libraries used are:</p>
 <ul class="simple">
-<li><a class="reference external" href="http://www.numpy.org/">numpy</a></li>
-<li><a class="reference external" href="https://github.com/usnistgov/DataModelDict">DataModelDict</a></li>
-<li><a class="reference external" href="https://github.com/usnistgov/atomman">atomman</a></li>
-<li><a class="reference external" href="https://github.com/usnistgov/iprPy">iprPy</a></li>
+<li><p><a class="reference external" href="http://www.numpy.org/">numpy</a></p></li>
+<li><p><a class="reference external" href="https://github.com/usnistgov/atomman">atomman</a></p></li>
+<li><p><a class="reference external" href="https://github.com/usnistgov/iprPy">iprPy</a></p></li>
 </ul>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -311,17 +344,11 @@ cut plane.</p>
 <span></span><span class="c1"># Standard library imports</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
 
 <span class="c1"># http://www.numpy.org/</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-<span class="c1"># https://github.com/usnistgov/DataModelDict</span>
-<span class="kn">from</span> <span class="nn">DataModelDict</span> <span class="k">import</span> <span class="n">DataModelDict</span> <span class="k">as</span> <span class="n">DM</span>
 
 <span class="c1"># https://github.com/usnistgov/atomman</span>
 <span class="kn">import</span> <span class="nn">atomman</span> <span class="k">as</span> <span class="nn">am</span>
@@ -340,7 +367,7 @@ cut plane.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Notebook last executed on 2019-07-29 using iprPy version 0.9.0
+Notebook last executed on 2020-09-22 using iprPy version 0.10.2
 </pre></div></div>
 </div>
 <div class="section" id="1.2.-Default-calculation-setup">
@@ -363,6 +390,11 @@ Notebook last executed on 2019-07-29 using iprPy version 0.9.0
     <span class="k">if</span> <span class="ow">not</span> <span class="n">workingdir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
         <span class="n">workingdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">)</span>
+
+<span class="c1"># Initialize connection to library</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;C:/Users/lmh1/Documents/potentials_nist_gov/password.txt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">user</span><span class="p">,</span> <span class="n">pswd</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+<span class="n">library</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">Library</span><span class="p">(</span><span class="n">load</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lammps_potentials&#39;</span><span class="p">],</span> <span class="n">username</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">pswd</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -373,8 +405,8 @@ Notebook last executed on 2019-07-29 using iprPy version 0.9.0
 <div class="section" id="2.1.-Specify-system-specific-paths">
 <h4>2.1. Specify system-specific paths<a class="headerlink" href="#2.1.-Specify-system-specific-paths" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>lammps_command</strong> is the LAMMPS command to use (required).</li>
-<li><strong>mpi_command</strong> MPI command for running LAMMPS in parallel. A value of None will run simulations serially.</li>
+<li><p><strong>lammps_command</strong> is the LAMMPS command to use (required).</p></li>
+<li><p><strong>mpi_command</strong> MPI command for running LAMMPS in parallel. A value of None will run simulations serially.</p></li>
 </ul>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -390,69 +422,34 @@ Notebook last executed on 2019-07-29 using iprPy version 0.9.0
 <div class="section" id="2.2.-Load-interatomic-potential">
 <h4>2.2. Load interatomic potential<a class="headerlink" href="#2.2.-Load-interatomic-potential" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>potential_name</strong> gives the name of the potential_LAMMPS reference record in the iprPy library to use for the calculation.</li>
-<li><strong>potential_file</strong> gives the path to the potential_LAMMPS reference record to use. Here, this parameter is automatically generated using potential_name and librarydir.</li>
-<li><strong>potential_dir</strong> gives the path for the folder containing the artifacts associated with the potential (i.e.&nbsp;eam.alloy file). Here, this parameter is automatically generated using potential_name and librarydir.</li>
-<li><strong>potential</strong> is an atomman.lammps.Potential object (required). Here, this parameter is automatically generated from potential_file and potential_dir.</li>
+<li><p><strong>potential_name</strong> gives the name of the potential_LAMMPS reference record in the iprPy library to use for the calculation.</p></li>
+<li><p><strong>potential</strong> is an atomman.lammps.Potential object (required).</p></li>
 </ul>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">potential_name</span> <span class="o">=</span> <span class="s1">&#39;1999--Mishin-Y--Ni--LAMMPS--ipr1&#39;</span>
 
-<span class="c1"># Define potential_file and potential_dir using librarydir and potential_name</span>
-<span class="n">potential_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;potential_LAMMPS&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{potential_name}</span><span class="s1">.json&#39;</span><span class="p">)</span>
-<span class="n">potential_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;potential_LAMMPS&#39;</span><span class="p">,</span> <span class="n">potential_name</span><span class="p">)</span>
-
-<span class="c1"># Initialize Potential object using potential_file and potential_dir.</span>
-<span class="n">potential</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">Potential</span><span class="p">(</span><span class="n">potential_file</span><span class="p">,</span> <span class="n">potential_dir</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Successfully loaded potential&#39;</span><span class="p">,</span> <span class="n">potential</span><span class="p">)</span>
+<span class="c1"># Retrieve potential and parameter file(s)</span>
+<span class="n">potential</span> <span class="o">=</span> <span class="n">library</span><span class="o">.</span><span class="n">get_lammps_potential</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">potential_name</span><span class="p">,</span> <span class="n">getfiles</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Successfully loaded potential 1999--Mishin-Y--Ni--LAMMPS--ipr1
-</pre></div></div>
 </div>
 </div>
 <div class="section" id="2.3.-Load-initial-unit-cell-system">
 <h4>2.3. Load initial unit cell system<a class="headerlink" href="#2.3.-Load-initial-unit-cell-system" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>prototype_name</strong> gives the name of the crystal_prototype reference record in the iprPy library to load.</li>
-<li><strong>symbols</strong> is a list of the potential’s elemental model symbols to associate with the unique atom types of the loaded system.</li>
-<li><strong>box_parameters</strong> is a list of the a, b, c lattice constants to assign to the loaded file.</li>
-<li><strong>load_file</strong> gives the path to the atomic configuration file to load for the ucell system. Here, this is generated automatically using prototype_name and librarydir.</li>
-<li><strong>load_style</strong> specifies the format of load_file. Here, this is automatically set for crystal_prototype records.</li>
-<li><strong>load_options</strong> specifies any other keyword options for properly loading the load_file. Here, this is automatically set for crystal_prototype records.</li>
-<li><strong>ucell</strong> is an atomman.System representing a fundamental unit cell of the system (required). Here, this is generated using the load parameters and symbols.</li>
+<li><p><strong>ucell</strong> is an atomman.System representing a fundamental unit cell of the system (required). Here, this is loaded from the database for the prototype.</p></li>
 </ul>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">prototype_name</span> <span class="o">=</span> <span class="s1">&#39;A1--Cu--fcc&#39;</span>
-<span class="n">symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ni&#39;</span><span class="p">]</span>
-<span class="n">box_parameters</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">([</span><span class="mf">3.52</span><span class="p">,</span> <span class="mf">3.52</span><span class="p">,</span> <span class="mf">3.52</span><span class="p">],</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
-
-<span class="c1"># Define load_file using librarydir and prototype_name</span>
-<span class="n">load_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;crystal_prototype&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{prototype_name}</span><span class="s1">.json&#39;</span><span class="p">)</span>
-
-<span class="c1"># Define load_style and load_options for crystal_prototype records</span>
-<span class="n">load_style</span> <span class="o">=</span> <span class="s1">&#39;system_model&#39;</span>
-<span class="n">load_options</span> <span class="o">=</span> <span class="p">{}</span>
-
-<span class="c1"># Create ucell by loading prototype record</span>
-<span class="n">ucell</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">load_style</span><span class="p">,</span> <span class="n">load_file</span><span class="p">,</span> <span class="n">symbols</span><span class="o">=</span><span class="n">symbols</span><span class="p">,</span> <span class="o">**</span><span class="n">load_options</span><span class="p">)</span>
-
-<span class="c1"># Rescale ucell using box_parameters</span>
-<span class="n">ucell</span><span class="o">.</span><span class="n">box_set</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">b</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span></span><span class="c1"># Create ucell by loading prototype record</span>
+<span class="n">ucell</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;crystal&#39;</span><span class="p">,</span> <span class="n">potential</span><span class="o">=</span><span class="n">potential</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;A1--Cu--fcc&#39;</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="n">library</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">ucell</span><span class="p">)</span>
 </pre></div>
@@ -483,104 +480,47 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 <div class="section" id="2.4.-Specify-the-defect-parameters">
 <h4>2.4. Specify the defect parameters<a class="headerlink" href="#2.4.-Specify-the-defect-parameters" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>freesurface_name</strong> gives the name of a free-surface reference record in the iprPy library containing point defect input parameters.</li>
-<li><strong>freesurface_file</strong> gives the path to a point-defect reference containing point defect input parameters. Here, this is built automatically using pointdefect_name and librarydir.</li>
-<li><strong>cutboxvector</strong> specifies which of the three box vectors (‘a’, ‘b’, or ‘c’) is to be made non-periodic to create the free surface. Here, this is extracted from the defect model.</li>
+<li><p><strong>hkl</strong> gives the Miller (hkl) or Miller-Bravais (hkil) plane to create the free surface on.</p></li>
+<li><p><strong>cutboxvector</strong> specifies which of the three box vectors (‘a’, ‘b’, or ‘c’) is to be made non-periodic to create the free surface.</p></li>
+<li><p><strong>shiftindex</strong> can be used for complex crystals to specify different termination planes.</p></li>
 </ul>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">surface_name</span> <span class="o">=</span> <span class="s1">&#39;A1--Cu--fcc--100&#39;</span>
-<span class="c1">#surface_name = &#39;A1--Cu--fcc--110&#39;</span>
-<span class="c1">#surface_name = &#39;A1--Cu--fcc--111&#39;</span>
-
-<span class="c1"># Define surface_file using librarydir and surface_name</span>
-<span class="n">surface_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;free_surface&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{surface_name}</span><span class="s1">.json&#39;</span><span class="p">)</span>
-
-<span class="c1"># Parse freesurface_file using iprPy.input.interpret()</span>
-<span class="n">defectinputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;surface_file&#39;</span><span class="p">:</span><span class="n">surface_file</span><span class="p">}</span>
-<span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">subset</span><span class="p">(</span><span class="s1">&#39;freesurface&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">interpret</span><span class="p">(</span><span class="n">defectinputs</span><span class="p">)</span>
-
-<span class="c1"># Extract parameters from defect model</span>
-<span class="n">cutboxvector</span> <span class="o">=</span> <span class="n">defectinputs</span><span class="p">[</span><span class="s1">&#39;surface_cutboxvector&#39;</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;cutboxvector =&#39;</span><span class="p">,</span> <span class="n">cutboxvector</span><span class="p">)</span>
+<span></span><span class="n">hkl</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">cutboxvector</span> <span class="o">=</span> <span class="s1">&#39;c&#39;</span>
+<span class="n">shiftindex</span> <span class="o">=</span> <span class="mi">0</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-cutboxvector = c
-</pre></div></div>
 </div>
 </div>
 <div class="section" id="2.5.-Modify-system">
 <h4>2.5. Modify system<a class="headerlink" href="#2.5.-Modify-system" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>a_uvw</strong> Miller crystal vector used to generate a rotated system from ucell. The a box vector of the rotated system will correspond to the crystal vector relative to ucell. Here, this is extracted from the defect model.</li>
-<li><strong>b_uvw</strong> Miller crystal vector used to generate a rotated system from ucell. The a box vector of the rotated system will correspond to the crystal vector relative to ucell. Here, this is extracted from the defect model.</li>
-<li><strong>c_uvw</strong> Miller crystal vector used to generate a rotated system from ucell. The a box vector of the rotated system will correspond to the crystal vector relative to ucell. Here, this is extracted from the defect model.</li>
-<li><strong>atomshift</strong> fractional rigid body shift to apply to the rotated system. Here, this is extracted from the defect model.</li>
-<li><strong>sizemults</strong> list of three integers specifying how many times the ucell vectors of <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span> and <span class="math notranslate nohighlight">\(c\)</span> are replicated in creating system.</li>
-<li><strong>system</strong> is an atomman.System to use as the input system for the calculation (required).</li>
+<li><p><strong>sizemults</strong> list of three integers specifying how many times the ucell vectors of <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span> and <span class="math notranslate nohighlight">\(c\)</span> are replicated in creating system.</p></li>
+<li><p><strong>minwidth</strong> specifies a minimum width that the system should be along the cutboxvector direction. The given sizemult in that direction will be increased if needed to ensure that the system is at least this wide.</p></li>
 </ul>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">sizemults</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
-
-<span class="c1"># Extract parameters from defect model</span>
-<span class="n">a_uvw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">defectinputs</span><span class="p">[</span><span class="s1">&#39;a_uvw&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-<span class="n">b_uvw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">defectinputs</span><span class="p">[</span><span class="s1">&#39;b_uvw&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-<span class="n">c_uvw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">defectinputs</span><span class="p">[</span><span class="s1">&#39;c_uvw&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-<span class="n">atomshift</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">defectinputs</span><span class="p">[</span><span class="s1">&#39;atomshift&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;a_uvw =&#39;</span><span class="p">,</span> <span class="n">a_uvw</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;b_uvw =&#39;</span><span class="p">,</span> <span class="n">b_uvw</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;c_uvw =&#39;</span><span class="p">,</span> <span class="n">c_uvw</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;atomshift =&#39;</span><span class="p">,</span> <span class="n">atomshift</span><span class="p">)</span>
-
-<span class="c1"># Rotate to specified uvws</span>
-<span class="n">system</span> <span class="o">=</span> <span class="n">ucell</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">a_uvw</span><span class="p">,</span> <span class="n">b_uvw</span><span class="p">,</span> <span class="n">c_uvw</span><span class="p">]))</span>
-
-<span class="c1"># Scale atomshift by rotated system&#39;s box vectors</span>
-<span class="n">shift</span> <span class="o">=</span> <span class="p">(</span><span class="n">atomshift</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">avect</span> <span class="o">+</span>
-         <span class="n">atomshift</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">bvect</span> <span class="o">+</span>
-         <span class="n">atomshift</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">cvect</span><span class="p">)</span>
-<span class="n">system</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">pos</span> <span class="o">+=</span> <span class="n">shift</span>
-
-<span class="c1"># Generate system by supersizing ucell</span>
-<span class="n">system</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">supersize</span><span class="p">(</span><span class="o">*</span><span class="n">sizemults</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;# of atoms in system =&#39;</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">natoms</span><span class="p">)</span>
+<span class="n">minwidth</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-a_uvw = [0. 1. 0.]
-b_uvw = [0. 0. 1.]
-c_uvw = [1. 0. 0.]
-atomshift = [ 0.    0.   -0.25]
-# of atoms in system = 1000
-</pre></div></div>
 </div>
 </div>
 <div class="section" id="2.6.-Specify-calculation-specific-run-parameters">
 <h4>2.6. Specify calculation-specific run parameters<a class="headerlink" href="#2.6.-Specify-calculation-specific-run-parameters" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>energytolerance</strong> is the energy tolerance to use during the minimizations. This is unitless.</li>
-<li><strong>forcetolerance</strong> is the force tolerance to use during the minimizations. This is in energy/length units.</li>
-<li><strong>maxiterations</strong> is the maximum number of minimization iterations to use.</li>
-<li><strong>maxevaluations</strong> is the maximum number of minimization evaluations to use.</li>
-<li><strong>maxatommotion</strong> is the largest distance that an atom is allowed to move during a minimization iteration. This is in length units.</li>
+<li><p><strong>energytolerance</strong> is the energy tolerance to use during the minimizations. This is unitless.</p></li>
+<li><p><strong>forcetolerance</strong> is the force tolerance to use during the minimizations. This is in energy/length units.</p></li>
+<li><p><strong>maxiterations</strong> is the maximum number of minimization iterations to use.</p></li>
+<li><p><strong>maxevaluations</strong> is the maximum number of minimization evaluations to use.</p></li>
+<li><p><strong>maxatommotion</strong> is the largest distance that an atom is allowed to move during a minimization iteration. This is in length units.</p></li>
 </ul>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
@@ -611,9 +551,7 @@ atomshift = [ 0.    0.   -0.25]
 
 <span class="s2">box tilt large</span>
 
-<span class="s2">&lt;atomman_system_info&gt;</span>
-
-<span class="s2">&lt;atomman_pair_info&gt;</span>
+<span class="s2">&lt;atomman_system_pair_info&gt;</span>
 
 <span class="s2">thermo_style custom step lx ly lz pxx pyy pzz pe</span>
 <span class="s2">thermo_modify format float </span><span class="si">%.13e</span><span class="s2"></span>
@@ -637,10 +575,12 @@ atomshift = [ 0.    0.   -0.25]
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="k">def</span> <span class="nf">surface_energy</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span>
-                   <span class="n">mpi_command</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">etol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
-                   <span class="n">maxeval</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">dmax</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">),</span>
-                   <span class="n">cutboxvector</span><span class="o">=</span><span class="s1">&#39;c&#39;</span><span class="p">):</span>
+<span></span><span class="k">def</span> <span class="nf">surface_energy</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">ucell</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">hkl</span><span class="p">,</span>
+                   <span class="n">mpi_command</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sizemults</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">minwidth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">even</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                   <span class="n">conventional_setting</span><span class="o">=</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">cutboxvector</span><span class="o">=</span><span class="s1">&#39;c&#39;</span><span class="p">,</span>
+                   <span class="n">atomshift</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">shiftindex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">etol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+                   <span class="n">maxeval</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">dmax</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluates surface formation energies by slicing along one periodic</span>
 <span class="sd">    boundary of a bulk system.</span>
@@ -649,13 +589,47 @@ atomshift = [ 0.    0.   -0.25]
 <span class="sd">    ----------</span>
 <span class="sd">    lammps_command :str</span>
 <span class="sd">        Command for running LAMMPS.</span>
-<span class="sd">    system : atomman.System</span>
-<span class="sd">        The system to perform the calculation on.</span>
+<span class="sd">    ucell : atomman.System</span>
+<span class="sd">        The crystal unit cell to use as the basis of the stacking fault</span>
+<span class="sd">        configurations.</span>
 <span class="sd">    potential : atomman.lammps.Potential</span>
 <span class="sd">        The LAMMPS implemented potential to use.</span>
+<span class="sd">    hkl : array-like object</span>
+<span class="sd">        The Miller(-Bravais) crystal fault plane relative to ucell.</span>
 <span class="sd">    mpi_command : str, optional</span>
 <span class="sd">        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS</span>
 <span class="sd">        will run serially.</span>
+<span class="sd">    sizemults : list or tuple, optional</span>
+<span class="sd">        The three System.supersize multipliers [a_mult, b_mult, c_mult] to use on the</span>
+<span class="sd">        rotated cell to build the final system. Note that the cutboxvector sizemult</span>
+<span class="sd">        must be an integer and not a tuple.  Default value is [1, 1, 1].</span>
+<span class="sd">    minwidth : float, optional</span>
+<span class="sd">        If given, the sizemult along the cutboxvector will be selected such that the</span>
+<span class="sd">        width of the resulting final system in that direction will be at least this</span>
+<span class="sd">        value. If both sizemults and minwidth are given, then the larger of the two</span>
+<span class="sd">        in the cutboxvector direction will be used.</span>
+<span class="sd">    even : bool, optional</span>
+<span class="sd">        A True value means that the sizemult for cutboxvector will be made an even</span>
+<span class="sd">        number by adding 1 if it is odd.  Default value is False.</span>
+<span class="sd">    conventional_setting : str, optional</span>
+<span class="sd">        Allows for rotations of a primitive unit cell to be determined from</span>
+<span class="sd">        (hkl) indices specified relative to a conventional unit cell.  Allowed</span>
+<span class="sd">        settings: &#39;p&#39; for primitive (no conversion), &#39;f&#39; for face-centered,</span>
+<span class="sd">        &#39;i&#39; for body-centered, and &#39;a&#39;, &#39;b&#39;, or &#39;c&#39; for side-centered.  Default</span>
+<span class="sd">        behavior is to perform no conversion, i.e. take (hkl) relative to the</span>
+<span class="sd">        given ucell.</span>
+<span class="sd">    cutboxvector : str, optional</span>
+<span class="sd">        Indicates which of the three system box vectors, &#39;a&#39;, &#39;b&#39;, or &#39;c&#39;, to</span>
+<span class="sd">        cut with a non-periodic boundary (default is &#39;c&#39;).</span>
+<span class="sd">    atomshift : array-like object, optional</span>
+<span class="sd">        A Cartesian vector shift to apply to all atoms.  Can be used to shift</span>
+<span class="sd">        atoms perpendicular to the fault plane to allow different termination</span>
+<span class="sd">        planes to be cut.  Cannot be given with shiftindex.</span>
+<span class="sd">    shiftindex : int, optional</span>
+<span class="sd">        Allows for selection of different termination planes based on the</span>
+<span class="sd">        preferred shift values determined by the underlying fault generation.</span>
+<span class="sd">        Cannot be given with atomshift. If neither atomshift nor shiftindex</span>
+<span class="sd">        given, then shiftindex will be set to 0.</span>
 <span class="sd">    etol : float, optional</span>
 <span class="sd">        The energy tolerance for the structure minimization. This value is</span>
 <span class="sd">        unitless. (Default is 0.0).</span>
@@ -672,9 +646,6 @@ atomshift = [ 0.    0.   -0.25]
 <span class="sd">        The maximum distance in length units that any atom is allowed to relax</span>
 <span class="sd">        in any direction during a single minimization iteration (default is</span>
 <span class="sd">        0.01 Angstroms).</span>
-<span class="sd">    cutboxvector : str, optional</span>
-<span class="sd">        Indicates which of the three system box vectors, &#39;a&#39;, &#39;b&#39;, or &#39;c&#39;, to</span>
-<span class="sd">        cut with a non-periodic boundary (default is &#39;c&#39;).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -699,47 +670,49 @@ atomshift = [ 0.    0.   -0.25]
 <span class="sd">    ValueError</span>
 <span class="sd">        For invalid cutboxvectors</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Construct free surface configuration generator</span>
+    <span class="n">surf_gen</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">defect</span><span class="o">.</span><span class="n">FreeSurface</span><span class="p">(</span><span class="n">hkl</span><span class="p">,</span> <span class="n">ucell</span><span class="p">,</span> <span class="n">cutboxvector</span><span class="o">=</span><span class="n">cutboxvector</span><span class="p">,</span>
+                                     <span class="n">conventional_setting</span><span class="o">=</span><span class="n">conventional_setting</span><span class="p">)</span>
 
-    <span class="c1"># Evaluate perfect system</span>
-    <span class="n">system</span><span class="o">.</span><span class="n">pbc</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]</span>
-    <span class="n">perfect</span> <span class="o">=</span> <span class="n">relax_system</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span>
-                           <span class="n">mpi_command</span><span class="o">=</span><span class="n">mpi_command</span><span class="p">,</span> <span class="n">etol</span><span class="o">=</span><span class="n">etol</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="n">ftol</span><span class="p">,</span>
-                           <span class="n">maxiter</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span> <span class="n">maxeval</span><span class="o">=</span><span class="n">maxeval</span><span class="p">,</span> <span class="n">dmax</span><span class="o">=</span><span class="n">dmax</span><span class="p">)</span>
+    <span class="c1"># Check shift parameters</span>
+    <span class="k">if</span> <span class="n">shiftindex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">atomshift</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;shiftindex and atomshift cannot both be given&#39;</span>
+        <span class="n">atomshift</span> <span class="o">=</span> <span class="n">surf_gen</span><span class="o">.</span><span class="n">shifts</span><span class="p">[</span><span class="n">shiftindex</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">atomshift</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">atomshift</span> <span class="o">=</span> <span class="n">surf_gen</span><span class="o">.</span><span class="n">shifts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="c1"># Extract results from perfect system</span>
-    <span class="n">dumpfile_base</span> <span class="o">=</span> <span class="s1">&#39;perfect.dump&#39;</span>
-    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">perfect</span><span class="p">[</span><span class="s1">&#39;finaldumpfile&#39;</span><span class="p">],</span> <span class="n">dumpfile_base</span><span class="p">)</span>
-    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="s1">&#39;log.lammps&#39;</span><span class="p">,</span> <span class="s1">&#39;perfect-log.lammps&#39;</span><span class="p">)</span>
-    <span class="n">E_total_base</span> <span class="o">=</span> <span class="n">perfect</span><span class="p">[</span><span class="s1">&#39;potentialenergy&#39;</span><span class="p">]</span>
+    <span class="c1"># Generate the free surface configuration</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">surf_gen</span><span class="o">.</span><span class="n">surface</span><span class="p">(</span><span class="n">shift</span><span class="o">=</span><span class="n">atomshift</span><span class="p">,</span> <span class="n">minwidth</span><span class="o">=</span><span class="n">minwidth</span><span class="p">,</span>
+                                  <span class="n">sizemults</span><span class="o">=</span><span class="n">sizemults</span><span class="p">,</span> <span class="n">even</span><span class="o">=</span><span class="n">even</span><span class="p">)</span>
+    <span class="n">A_surf</span><span class="o">=</span> <span class="n">surf_gen</span><span class="o">.</span><span class="n">surfacearea</span>
 
-    <span class="c1"># Set up defect system</span>
-    <span class="c1"># A_surf is area of parallelogram defined by the two box vectors not along</span>
-    <span class="c1"># the cutboxvector</span>
-    <span class="k">if</span>   <span class="n">cutboxvector</span> <span class="o">==</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span>
-        <span class="n">system</span><span class="o">.</span><span class="n">pbc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">A_surf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">bvect</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">cvect</span><span class="p">))</span>
-
-    <span class="k">elif</span> <span class="n">cutboxvector</span> <span class="o">==</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span>
-        <span class="n">system</span><span class="o">.</span><span class="n">pbc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">A_surf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">avect</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">cvect</span><span class="p">))</span>
-
-    <span class="k">elif</span> <span class="n">cutboxvector</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>
-        <span class="n">system</span><span class="o">.</span><span class="n">pbc</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">A_surf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">avect</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">bvect</span><span class="p">))</span>
-
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid cutboxvector&#39;</span><span class="p">)</span>
+    <span class="c1"># Identify lammps_date version</span>
+    <span class="n">lammps_date</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">checkversion</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">)[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span>
 
     <span class="c1"># Evaluate system with free surface</span>
-    <span class="n">surface</span> <span class="o">=</span> <span class="n">relax_system</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span>
-                           <span class="n">mpi_command</span><span class="o">=</span><span class="n">mpi_command</span><span class="p">,</span> <span class="n">etol</span><span class="o">=</span><span class="n">etol</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="n">ftol</span><span class="p">,</span>
-                           <span class="n">maxiter</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span> <span class="n">maxeval</span><span class="o">=</span><span class="n">maxeval</span><span class="p">,</span> <span class="n">dmax</span><span class="o">=</span><span class="n">dmax</span><span class="p">)</span>
+    <span class="n">surf_results</span> <span class="o">=</span> <span class="n">relax_system</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span>
+                                <span class="n">mpi_command</span><span class="o">=</span><span class="n">mpi_command</span><span class="p">,</span> <span class="n">etol</span><span class="o">=</span><span class="n">etol</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="n">ftol</span><span class="p">,</span>
+                                <span class="n">maxiter</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span> <span class="n">maxeval</span><span class="o">=</span><span class="n">maxeval</span><span class="p">,</span> <span class="n">dmax</span><span class="o">=</span><span class="n">dmax</span><span class="p">,</span>
+                                <span class="n">lammps_date</span><span class="o">=</span><span class="n">lammps_date</span><span class="p">)</span>
 
     <span class="c1"># Extract results from system with free surface</span>
     <span class="n">dumpfile_surf</span> <span class="o">=</span> <span class="s1">&#39;surface.dump&#39;</span>
-    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">surface</span><span class="p">[</span><span class="s1">&#39;finaldumpfile&#39;</span><span class="p">],</span> <span class="n">dumpfile_surf</span><span class="p">)</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">surf_results</span><span class="p">[</span><span class="s1">&#39;finaldumpfile&#39;</span><span class="p">],</span> <span class="n">dumpfile_surf</span><span class="p">)</span>
     <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="s1">&#39;log.lammps&#39;</span><span class="p">,</span> <span class="s1">&#39;surface-log.lammps&#39;</span><span class="p">)</span>
-    <span class="n">E_total_surf</span> <span class="o">=</span> <span class="n">surface</span><span class="p">[</span><span class="s1">&#39;potentialenergy&#39;</span><span class="p">]</span>
+    <span class="n">E_total_surf</span> <span class="o">=</span> <span class="n">surf_results</span><span class="p">[</span><span class="s1">&#39;potentialenergy&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Evaluate perfect system (all pbc removes cut)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">pbc</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]</span>
+    <span class="n">perf_results</span> <span class="o">=</span> <span class="n">relax_system</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span>
+                                <span class="n">mpi_command</span><span class="o">=</span><span class="n">mpi_command</span><span class="p">,</span> <span class="n">etol</span><span class="o">=</span><span class="n">etol</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="n">ftol</span><span class="p">,</span>
+                                <span class="n">maxiter</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span> <span class="n">maxeval</span><span class="o">=</span><span class="n">maxeval</span><span class="p">,</span> <span class="n">dmax</span><span class="o">=</span><span class="n">dmax</span><span class="p">,</span>
+                                <span class="n">lammps_date</span><span class="o">=</span><span class="n">lammps_date</span><span class="p">)</span>
+
+    <span class="c1"># Extract results from perfect system</span>
+    <span class="n">dumpfile_base</span> <span class="o">=</span> <span class="s1">&#39;perfect.dump&#39;</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">perf_results</span><span class="p">[</span><span class="s1">&#39;finaldumpfile&#39;</span><span class="p">],</span> <span class="n">dumpfile_base</span><span class="p">)</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="s1">&#39;log.lammps&#39;</span><span class="p">,</span> <span class="s1">&#39;perfect-log.lammps&#39;</span><span class="p">)</span>
+    <span class="n">E_total_base</span> <span class="o">=</span> <span class="n">perf_results</span><span class="p">[</span><span class="s1">&#39;potentialenergy&#39;</span><span class="p">]</span>
 
     <span class="c1"># Compute the free surface formation energy</span>
     <span class="n">E_surf_f</span> <span class="o">=</span> <span class="p">(</span><span class="n">E_total_surf</span> <span class="o">-</span> <span class="n">E_total_base</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">A_surf</span><span class="p">)</span>
@@ -756,8 +729,6 @@ atomshift = [ 0.    0.   -0.25]
     <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_surf_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_surf_f</span>
 
     <span class="k">return</span> <span class="n">results_dict</span>
-
-
 </pre></div>
 </div>
 </div>
@@ -771,7 +742,8 @@ atomshift = [ 0.    0.   -0.25]
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="k">def</span> <span class="nf">relax_system</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span>
                  <span class="n">mpi_command</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">etol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
-                 <span class="n">maxeval</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">dmax</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)):</span>
+                 <span class="n">maxeval</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">dmax</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">),</span>
+                 <span class="n">lammps_date</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sets up and runs the min.in LAMMPS script for performing an energy/force</span>
 <span class="sd">    minimization to relax a system.</span>
@@ -803,6 +775,9 @@ atomshift = [ 0.    0.   -0.25]
 <span class="sd">        The maximum distance in length units that any atom is allowed to relax</span>
 <span class="sd">        in any direction during a single minimization iteration (default is</span>
 <span class="sd">        0.01 Angstroms).</span>
+<span class="sd">    lammps_date : datetime.date or None, optional</span>
+<span class="sd">        The date version of the LAMMPS executable.  If None, will be identified</span>
+<span class="sd">        from the lammps_command (default is None).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -819,12 +794,13 @@ atomshift = [ 0.    0.   -0.25]
 <span class="sd">        - **&#39;potentialenergy&#39;** (*float*) - The total potential energy of</span>
 <span class="sd">          the relaxed system.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Build filedict if function was called from iprPy</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="c1"># Get script&#39;s location if __file__ exists</span>
-        <span class="n">script_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+        <span class="k">assert</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="n">pkg_name</span>
+        <span class="n">calc</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">load_calculation</span><span class="p">(</span><span class="n">calculation_style</span><span class="p">)</span>
+        <span class="n">filedict</span> <span class="o">=</span> <span class="n">calc</span><span class="o">.</span><span class="n">filedict</span>
     <span class="k">except</span><span class="p">:</span>
-        <span class="c1"># Use cwd otherwise</span>
-        <span class="n">script_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+        <span class="n">filedict</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="c1"># Ensure all atoms are within the system&#39;s box</span>
     <span class="n">system</span><span class="o">.</span><span class="n">wrap</span><span class="p">()</span>
@@ -833,19 +809,15 @@ atomshift = [ 0.    0.   -0.25]
     <span class="n">lammps_units</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
 
     <span class="c1">#Get lammps version date</span>
-    <span class="n">lammps_date</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">checkversion</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">)[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">lammps_date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">lammps_date</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">checkversion</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">)[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span>
 
     <span class="c1"># Define lammps variables</span>
     <span class="n">lammps_variables</span> <span class="o">=</span> <span class="p">{}</span>
-
-    <span class="c1"># Generate system and pair info</span>
     <span class="n">system_info</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;atom_data&#39;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="s1">&#39;system.dat&#39;</span><span class="p">,</span>
-                              <span class="n">units</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">,</span>
-                              <span class="n">atom_style</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">atom_style</span><span class="p">)</span>
-    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_system_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_info</span>
-    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_pair_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">potential</span><span class="o">.</span><span class="n">pair_info</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">symbols</span><span class="p">)</span>
-
-    <span class="c1"># Pass in run parameters</span>
+                              <span class="n">potential</span><span class="o">=</span><span class="n">potential</span><span class="p">,</span>
+                              <span class="n">return_pair_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_system_pair_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_info</span>
     <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;etol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">etol</span>
     <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;ftol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">ftol</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;force&#39;</span><span class="p">])</span>
     <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxiter</span>
@@ -859,10 +831,9 @@ atomshift = [ 0.    0.   -0.25]
         <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;float </span><span class="si">%.13e</span><span class="s1">&#39;</span>
 
     <span class="c1"># Write lammps input script</span>
-    <span class="n">template_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span> <span class="s1">&#39;min.template&#39;</span><span class="p">)</span>
+    <span class="n">template_file</span> <span class="o">=</span> <span class="s1">&#39;min.template&#39;</span>
     <span class="n">lammps_script</span> <span class="o">=</span> <span class="s1">&#39;min.in&#39;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">template_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">template</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">read_calc_file</span><span class="p">(</span><span class="n">template_file</span><span class="p">,</span> <span class="n">filedict</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lammps_script</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">filltemplate</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">lammps_variables</span><span class="p">,</span>
                                          <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
@@ -881,8 +852,6 @@ atomshift = [ 0.    0.   -0.25]
                                                  <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;energy&#39;</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">results</span>
-
-
 </pre></div>
 </div>
 </div>
@@ -895,9 +864,12 @@ atomshift = [ 0.    0.   -0.25]
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">results_dict</span> <span class="o">=</span> <span class="n">surface_energy</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span>
+<span></span><span class="n">results_dict</span> <span class="o">=</span> <span class="n">surface_energy</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">ucell</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">hkl</span><span class="p">,</span>
                               <span class="n">mpi_command</span> <span class="o">=</span> <span class="n">mpi_command</span><span class="p">,</span>
+                              <span class="n">sizemults</span> <span class="o">=</span> <span class="n">sizemults</span><span class="p">,</span>
+                              <span class="n">minwidth</span> <span class="o">=</span> <span class="n">minwidth</span><span class="p">,</span>
                               <span class="n">cutboxvector</span> <span class="o">=</span> <span class="n">cutboxvector</span><span class="p">,</span>
+                              <span class="n">shiftindex</span> <span class="o">=</span> <span class="n">shiftindex</span><span class="p">,</span>
                               <span class="n">etol</span> <span class="o">=</span> <span class="n">energytolerance</span><span class="p">,</span>
                               <span class="n">ftol</span> <span class="o">=</span> <span class="n">forcetolerance</span><span class="p">,</span>
                               <span class="n">maxiter</span> <span class="o">=</span> <span class="n">maxiterations</span><span class="p">,</span>
@@ -919,10 +891,10 @@ atomshift = [ 0.    0.   -0.25]
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>dict_keys([&#39;dumpfile_base&#39;, &#39;dumpfile_surf&#39;, &#39;E_total_base&#39;, &#39;E_total_surf&#39;, &#39;A_surf&#39;, &#39;E_coh&#39;, &#39;E_surf_f&#39;])
-</pre></div>
-</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+dict_keys([&#39;dumpfile_base&#39;, &#39;dumpfile_surf&#39;, &#39;E_total_base&#39;, &#39;E_total_surf&#39;, &#39;A_surf&#39;, &#39;E_coh&#39;, &#39;E_surf_f&#39;])
+</pre></div></div>
 </div>
 </div>
 <div class="section" id="5.-Report-results">
@@ -930,9 +902,9 @@ atomshift = [ 0.    0.   -0.25]
 <div class="section" id="5.1.-Define-units-for-outputting-values">
 <h4>5.1. Define units for outputting values<a class="headerlink" href="#5.1.-Define-units-for-outputting-values" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>area_unit</strong> is the unit of area to display surface area in.</li>
-<li><strong>energy_unit</strong> is the unit of energy to display cohesive energies in.</li>
-<li><strong>energy_area_unit</strong> is the energy per area to report the surface energy in.</li>
+<li><p><strong>area_unit</strong> is the unit of area to display surface area in.</p></li>
+<li><p><strong>energy_unit</strong> is the unit of energy to display cohesive energies in.</p></li>
+<li><p><strong>energy_area_unit</strong> is the energy per area to report the surface energy in.</p></li>
 </ul>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
@@ -965,9 +937,9 @@ atomshift = [ 0.    0.   -0.25]
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-E_coh =   -4.4499999983493 eV
-A_surface = 3.0976000000000004 nm^2
-E_surface_f = 1877.94811766384 mJ/m^2
+E_coh =   -4.4499999983449 eV
+A_surface = 3.0975990100882553 nm^2
+E_surface_f = 1877.9483735323636 mJ/m^2
 </pre></div></div>
 </div>
 </div>
@@ -1049,12 +1021,12 @@ E_surface_f = 1877.94811766384 mJ/m^2
         <li class="right" >
           <a href="stacking_fault_static.html" title="stacking_fault_static calculation style"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>
 </html>

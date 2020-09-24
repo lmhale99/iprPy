@@ -1,12 +1,10 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Setup &#8212; iprPy 0.9.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>Setup &#8212; iprPy 0.10.2 documentation</title>
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -14,6 +12,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -36,7 +35,7 @@
         <li class="right" >
           <a href="intro.html" title="Introduction to iprPy"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.9.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.10.2 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -54,23 +53,21 @@ with any operating system that Python runs on.</p>
 <div class="section" id="installing-iprpy">
 <h2>Installing iprPy<a class="headerlink" href="#installing-iprpy" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
-<li><p class="first">Install Python 3.6+ and the <a class="reference external" href="https://www.scipy.org/">scipy</a> family of Python packages.  If you
+<li><p>Install Python 3.6+ and the <a class="reference external" href="https://www.scipy.org/">scipy</a> family of Python packages.  If you
 don’t already have Python, the easiest way to do this is to install
 <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a>.  The standard Anaconda distribution automatically adds the
 scipy packages.  For miniconda or a new environment of an existing anaconda
-installation, use the conda command to install the scipy packages.</p>
-</li>
-<li><p class="first">Fork and clone, or download iprPy from GitHub.  The repository for the
-stable versions is available at <a class="reference external" href="https://github.com/usnistgov/iprPy">https://github.com/usnistgov/iprPy</a>.</p>
-</li>
-<li><p class="first">In a terminal, go into the local iprPy root directory and install the iprPy
+installation, use the conda command to install the scipy packages.</p></li>
+<li><p>Fork and clone, or download iprPy from GitHub.  The repository for the
+stable versions is available at <a class="reference external" href="https://github.com/usnistgov/iprPy">https://github.com/usnistgov/iprPy</a>.</p></li>
+<li><p>In a terminal, go into the local iprPy root directory and install the iprPy
 package to Python with the command</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python setup.py develop</span>
 </pre></div>
 </div>
 <p>This should automatically install any other required Python packages.</p>
 </li>
-<li><p class="first">To test if the framework is working, in a terminal go into the iprPy/bin
+<li><p>To test if the framework is working, in a terminal go into the iprPy/bin
 directory and enter the command</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python iprPy check_modules</span>
 </pre></div>
@@ -78,11 +75,10 @@ directory and enter the command</p>
 <p>If you see a list of included calculation, record, and database styles,
 then it is working!</p>
 </li>
-<li><p class="first">The list printed in the last step indicates the iprPy modules that were
+<li><p>The list printed in the last step indicates the iprPy modules that were
 successfully and unsuccessfully loaded.  If a module did not load, then
 either the module has additional package requirements or has not yet been
-fully implemented into iprPy.</p>
-</li>
+fully implemented into iprPy.</p></li>
 </ol>
 </div>
 <div class="section" id="updating-iprpy">
@@ -92,20 +88,18 @@ recompiled every time the package is imported.  This makes it possible for
 users to easily make their own changes and modifications as needed.  However,
 it makes updating slightly more complicated.</p>
 <ol class="arabic">
-<li><p class="first">Development of the <a class="reference external" href="https://github.com/usnistgov/atomman/">atomman</a> Python package is closely aligned to iprPy.
+<li><p>Development of the <a class="reference external" href="https://github.com/usnistgov/atomman/">atomman</a> Python package is closely aligned to iprPy.
 As such, atomman should be updated using pip whenever iprPy is updated</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install -U atomman</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">If you forked iprPy from github, you can pull any changes.  Note that any
+<li><p>If you forked iprPy from github, you can pull any changes.  Note that any
 changes you personally made would have to be committed and may lead to
-conflicts that need to be resolved.</p>
-</li>
-<li><p class="first">If you downloaded iprPy, you can download a new version.  Then, either
+conflicts that need to be resolved.</p></li>
+<li><p>If you downloaded iprPy, you can download a new version.  Then, either
 uninstall the old version and install the new version, or overwrite the
-files in the old version with the new.</p>
-</li>
+files in the old version with the new.</p></li>
 </ol>
 </div>
 <div class="section" id="uninstalling-iprpy">
@@ -157,11 +151,11 @@ Python, move iprPy to a new directory.</p>
         <li class="right" >
           <a href="intro.html" title="Introduction to iprPy"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.9.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.10.2 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>
 </html>

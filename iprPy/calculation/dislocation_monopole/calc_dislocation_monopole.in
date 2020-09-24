@@ -19,13 +19,6 @@ family
 symbols                         
 box_parameters                  
 
-# System manipulations
-a_uvw                           
-b_uvw                           
-c_uvw                           
-atomshift                       
-sizemults                       
-
 # Elastic constants
 elasticconstants_file           
 C11                             
@@ -58,10 +51,18 @@ C_K
 
 # Dislocation defect parameters
 dislocation_file                
-dislocation_stroh_m             
-dislocation_stroh_n             
-dislocation_lineboxvector       
-dislocation_burgersvector       
+dislocation_slip_hkl            
+dislocation_ξ_uvw               
+dislocation_burgers             
+dislocation_m                   
+dislocation_n                   
+dislocation_shift               
+dislocation_shiftscale          
+dislocation_shiftindex          
+sizemults                       
+amin                            
+bmin                            
+cmin                            
 
 # Units for input/output values
 length_unit                     
@@ -80,5 +81,6 @@ maxatommotion
 annealtemperature               
 annealsteps                     
 randomseed                      
-dislocation_boundarywidth       
 dislocation_boundaryshape       
+dislocation_boundarywidth       
+dislocation_boundaryscale       

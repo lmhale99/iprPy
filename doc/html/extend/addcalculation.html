@@ -1,12 +1,10 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Adding new calculation styles &#8212; iprPy 0.9.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>Adding new calculation styles &#8212; iprPy 0.10.2 documentation</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -14,6 +12,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -36,7 +35,7 @@
         <li class="right" >
           <a href="addreference.html" title="Reference Library"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Extending iprPy</a> &#187;</li> 
       </ul>
     </div>  
@@ -51,60 +50,60 @@
 <p>The basic steps associated with implementing a new calculation style in iprPy
 are</p>
 <ol class="arabic simple">
-<li>Create a new subdirectory in iprPy/calculation named for the new calculation
+<li><p>Create a new subdirectory in iprPy/calculation named for the new calculation
 style.  For the style name, use lowercase letters except where important and
 separate words with underscores.  The name should be clear and distinct as
-to what the calculation does.</li>
-<li>Create the calculation script calc_[style].py within the calculation
-style directory.</li>
-<li>Add the Python function(s) that perform the calculation to the calculation
-script.</li>
-<li>Define a process_input() function within the script that generates the
-inputs for the calculation function(s) based on a text input file.</li>
-<li>If any sets of input keys can or are used by multiple calculation styles and
-are not already collected in a subset style, think about creating one.</li>
-<li>Add a main() function that calls process_input followed by the calculation
+to what the calculation does.</p></li>
+<li><p>Create the calculation script calc_[style].py within the calculation
+style directory.</p></li>
+<li><p>Add the Python function(s) that perform the calculation to the calculation
+script.</p></li>
+<li><p>Define a process_input() function within the script that generates the
+inputs for the calculation function(s) based on a text input file.</p></li>
+<li><p>If any sets of input keys can or are used by multiple calculation styles and
+are not already collected in a subset style, think about creating one.</p></li>
+<li><p>Add a main() function that calls process_input followed by the calculation
 function(s).  Add the “if __name__ == ‘__main__’:” check that calls
-main() and passes it any command line arguments.</li>
-<li>Place copies of any other files that the calculation needs (excluding input
-files) in the calculation folder.</li>
-<li>Create a separate file that defines the Calculation subclass.  Name the file
+main() and passes it any command line arguments.</p></li>
+<li><p>Place copies of any other files that the calculation needs (excluding input
+files) in the calculation folder.</p></li>
+<li><p>Create a separate file that defines the Calculation subclass.  Name the file
 after the subclass name, typically by converting the style name to upper
-camel case (each word capitalized with no separators).</li>
-<li>Define the subclass methods and attributes specific to the calculation
-style.</li>
-<li>Create an “__init__.py” file that imports the subclass.</li>
-<li>Create a record style for collecting the calculation results (see
-addrecord documentation).</li>
-<li>Test single runs of the calculation using Calculation.calc(), and
-Calculation.main() or by running the calculation script.</li>
-<li>Test preparing the new calculation style for a limited number of conditions.</li>
-<li>In a terminal, go into one of the prepared calculations in the run directory
+camel case (each word capitalized with no separators).</p></li>
+<li><p>Define the subclass methods and attributes specific to the calculation
+style.</p></li>
+<li><p>Create an “__init__.py” file that imports the subclass.</p></li>
+<li><p>Create a record style for collecting the calculation results (see
+addrecord documentation).</p></li>
+<li><p>Test single runs of the calculation using Calculation.calc(), and
+Calculation.main() or by running the calculation script.</p></li>
+<li><p>Test preparing the new calculation style for a limited number of conditions.</p></li>
+<li><p>In a terminal, go into one of the prepared calculations in the run directory
 and run the calculation script directly.  Doing this helps check that all
-components of the calculation were properly copied during prepare.</li>
-<li>Run all of the prepared calculations with runners and check the results.</li>
-<li>Write documentation for the calculation style in the README.md, theory.md,
-and parameters.md files.  Create an empty calc_[style].in input file.</li>
+components of the calculation were properly copied during prepare.</p></li>
+<li><p>Run all of the prepared calculations with runners and check the results.</p></li>
+<li><p>Write documentation for the calculation style in the README.md, theory.md,
+and parameters.md files.  Create an empty calc_[style].in input file.</p></li>
 </ol>
 <div class="section" id="files-in-the-calculation-style-directories">
 <h2>Files in the calculation style directories<a class="headerlink" href="#files-in-the-calculation-style-directories" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>calc_[style].py</strong>: The Python calculation script.</li>
-<li><strong>calc_[style].in</strong>: The input file for the calculation with all input keys
-and no values.</li>
-<li><strong>[Style].py</strong>: Defines the Calculation subclass for the calculation style.
-This defines how the iprPy codebase interacts with the calculation.</li>
-<li><strong>__init__.py</strong>: Allows Python to identify the calculation directory as
-a sub-package and be able to import the calculation subclass into iprPy.</li>
-<li><strong>README.md</strong>: A general overview description of the calculation.</li>
-<li><dl class="first docutils">
-<dt><strong>theory.md</strong>: A detailed description of the calculation theory and</dt>
-<dd>methodology.</dd>
+<li><p><strong>calc_[style].py</strong>: The Python calculation script.</p></li>
+<li><p><strong>calc_[style].in</strong>: The input file for the calculation with all input keys
+and no values.</p></li>
+<li><p><strong>[Style].py</strong>: Defines the Calculation subclass for the calculation style.
+This defines how the iprPy codebase interacts with the calculation.</p></li>
+<li><p><strong>__init__.py</strong>: Allows Python to identify the calculation directory as
+a sub-package and be able to import the calculation subclass into iprPy.</p></li>
+<li><p><strong>README.md</strong>: A general overview description of the calculation.</p></li>
+<li><dl class="simple">
+<dt><strong>theory.md</strong>: A detailed description of the calculation theory and</dt><dd><p>methodology.</p>
+</dd>
 </dl>
 </li>
-<li><strong>parameters.md</strong>: Lists and describes the input parameters recognized by the
-calculation style.</li>
-<li>Copies of any other files required by the calculation.</li>
+<li><p><strong>parameters.md</strong>: Lists and describes the input parameters recognized by the
+calculation style.</p></li>
+<li><p>Copies of any other files required by the calculation.</p></li>
 </ul>
 <div class="section" id="calc-style-py">
 <h3>calc_[style].py<a class="headerlink" href="#calc-style-py" title="Permalink to this headline">¶</a></h3>
@@ -122,18 +121,18 @@ it here for clarity.</p>
 <h4>main()<a class="headerlink" href="#main" title="Permalink to this headline">¶</a></h4>
 <p>The calculation script’s main() function</p>
 <ol class="arabic simple">
-<li>Opens and parses an input parameter file with the iprPy.input.parse()
+<li><p>Opens and parses an input parameter file with the iprPy.input.parse()
 function.  This returns a dictionary of the key-value terms, with the values
-as strings.</li>
-<li>Calls process_input() to interpret the string values of the input dictionary
+as strings.</p></li>
+<li><p>Calls process_input() to interpret the string values of the input dictionary
 as Python values and objects.  The interpreted values are added to the input
-dictionary.</li>
-<li>Calls the calculation function(s) using the processed terms in the input
-dictionary as input parameters.</li>
-<li>The formatted results content is generated by passing the input dict and any
+dictionary.</p></li>
+<li><p>Calls the calculation function(s) using the processed terms in the input
+dictionary as input parameters.</p></li>
+<li><p>The formatted results content is generated by passing the input dict and any
 results produced by the calculation function(s) to the record style’s
-buildcontent() method.</li>
-<li>The formatted results content is saved to “results.json”.</li>
+buildcontent() method.</p></li>
+<li><p>The formatted results content is saved to “results.json”.</p></li>
 </ol>
 </div>
 <div class="section" id="calculation-function-s">
@@ -151,26 +150,26 @@ update the values already in the input dictionary, or are added to the
 dictionary as new keys.</p>
 <p>The function takes the parameters</p>
 <ul class="simple">
-<li>input_dict: The dictionary of input values to interpret.</li>
-<li>UUID: The UUID4 calculation key to use.  If not given, a new one will be
-generated.</li>
-<li>build: A boolean flag, which indicates if the function should build all
+<li><p>input_dict: The dictionary of input values to interpret.</p></li>
+<li><p>UUID: The UUID4 calculation key to use.  If not given, a new one will be
+generated.</p></li>
+<li><p>build: A boolean flag, which indicates if the function should build all
 objects interpreted from the inputs (True, default), or only those necessary
 to define the calculation (False).  Setting build=False allows for
 process_input() to be used during high-throughput prepare without the
 overhead of creating complex objects that are not used until the calculation
-is executed.</li>
+is executed.</p></li>
 </ul>
 <p>To interpret subset keys similarly across different calculations, use the
 Subset.interpret() method for the subset styles you want to include.</p>
 <p>For calculation-specific keys, the iprPy.input submodule contains a few
 useful functions for interpreting the input files in a common manner.</p>
 <ul class="simple">
-<li>iprPy.input.boolean() will interpret (ignoring case sensitivity) ‘true’,
+<li><p>iprPy.input.boolean() will interpret (ignoring case sensitivity) ‘true’,
 ‘t’, ‘false’, and ‘f’ strings as Python bool values, and will pass
-through values that are already bool.</li>
-<li>iprPy.input.value() can be used to interpret and set default values and
-units for parameters that may include units information, e.g. “5 nm”.</li>
+through values that are already bool.</p></li>
+<li><p>iprPy.input.value() can be used to interpret and set default values and
+units for parameters that may include units information, e.g. “5 nm”.</p></li>
 </ul>
 </div>
 <div class="section" id="main-script-option">
@@ -311,12 +310,12 @@ __init__.py contains</p>
         <li class="right" >
           <a href="addreference.html" title="Reference Library"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.9.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Extending iprPy</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>
 </html>
