@@ -1,27 +1,36 @@
-# Workflow Manager Scripts
+# Workflow Manager Notebooks
 
-This folder contains scripts and functions associated with preparing and running iprPy calculations in a manner consistent with the workflows used by the NIST Interatomic Potentials Repository (IPR).  
+This folder contains Jupyter Notebooks to setup and manage workflows of iprPy calculations. See the associated section below for more details about the included workflow Notebooks and what they do.
 
-## Prepare functions
+## 1. Check Modules.ipynb
 
-The workflow_prepare package contains pre-defined prepare functions that
+The Check Modules Notebook loads iprPy and calls the check_modules() function to test the current status of all included modules.  The output provides details about which modules are currently available.  In particular, the modules that fail import likely raise either
 
-1. Are associated with a specific iprPy calculation.
-2. Take names for a pre-set database and run_directory as arguments. 
-3. Have a built-in default prepare script that specifies the default parameter values used by IPR.
-4. Allow keyword arguments to be passed in that add to or replace parameters in the prepare scripts
-5. Calls Database.prepare() with the information in 1-4.
+- __ModuleNotFoundError__ if the module has additional Python library requirements that need to be installed.
+- __NotImplementedError__ if the module is in development or needs to be updated to current iprPy versions.
 
-In short, these are useful if you want to run the calculations in exactly the same way (workflow order and calculation parameters) as what is done for the IPR website.  
+## 2. Library Manager.ipynb
+ 
+The Library Manager Notebook collects the commands for managing the reference library.  The library is a local copy of records from https://potentials.nist.gov/. iprPy uses the [potentials](https://github.com/usnistgov/potentials) Python package to interact with these records, and as such, all settings and downloaded reference files are common for iprPy, potentials and atomman.
 
-## multi_runners
+The included tools in this Notebook allow for
 
-This is simply a convenience function that uses the Python multiprocessing module to call for multiple runners to execute on a given database + run_directory. In other words, this function allows for the workflow scripts mentioned below to both prepare and run calculations in a specific order.
+- Defining the library settings,
+- Downloading reference files from https://potentials.nist.gov/, and
+- Downloading additional reference records from [Materials Project](https://materialsproject.org/) and [OQMD](http://oqmd.org/).
 
-## Workflow scripts
 
-The other scripts in this folder are workflows, or portions of workflows, associated with running the calculations in high-throughput.  The scripts are divided up into different branches, but the steps involved in each branch are the same and they access the same prepare functions.
+## 3. Database Manager.ipynb
 
-- The __demo__ branch provides a demonstration of the workflow for a small subset of potentials/settings.
-- The __single__ branch is designed specifically to streamline the workflow for investigating a single potential.
-- The __master__ branch removes the limiters to run across all potentials/settings. Due to the massive number of calculations involved, the master scripts are greatly subdivided and it is assumed that runners will be submitted to queuing systems rather than executed directly.
+The Database Manager Notebook oversees commands related to defining database settings for setting up and performing calculation workflows.  At least one database needs to be defined in order to perform the calculation workflows.  In particular, this Notebook allows for 
+
+- Defining databases,
+- Specifying the local run_directories where calculations will be placed/performed,
+- Copying/uploading reference records from the library to the databases,
+- Checking the number and status of records within a database,
+- Cleaning records in a database by resetting any that issued errors, and
+- Copying/removing database records.
+
+## 4. Workflow Manager.ipynb
+
+The Workflow Manager Notebook provides a centralized location for preparing and running calculations according to the high-throughput workflow used by the NIST Interatomic Potentials Repository.
