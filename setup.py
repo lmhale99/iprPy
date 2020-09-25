@@ -42,7 +42,7 @@ setup(name = 'iprPy',
         'scipy',
         'pandas',
         'potentials',
-        'atomman==1.3.3',
+        'atomman==1.3.4',
         'requests',
       ],
       entry_points = {
