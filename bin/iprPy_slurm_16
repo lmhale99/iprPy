@@ -6,4 +6,5 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=16
 
+export LD_LIBRARY_PATH=/cluster/deb9/lib:$LD_LIBRARY_PATH
 python iprPy $@
