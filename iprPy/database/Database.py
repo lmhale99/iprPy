@@ -17,7 +17,7 @@ from .. import Settings, load_run_directory
 from ..record import loaded as record_loaded
 from ..tools import screen_input, aslist
 from .prepare import prepare
-from .runner import runner
+from .runner import runner, RunManager
 
 
 class Database(object):
@@ -742,13 +742,81 @@ class Database(object):
         
         prepare(self, run_directory, calculation, **kwargs)
     
-    def runner(self, run_directory, orphan_directory=None, hold_directory=None):
-        # Check for run_directory first by name then by path
-        try:
-            run_directory = load_run_directory(run_directory)
-        except:
-            run_directory = Path(run_directory).resolve()
-            if not run_directory.is_dir():
-                raise ValueError('run_directory not found/set')
+    def runner(self, run_directory, calc_name=None, orphan_directory=None,
+               hold_directory=None, python_exe=None, log=True,
+               bidtries=10, temp=False, temp_directory=None):
+        """
+        High-throughput calculation runner.
         
-        runner(self, run_directory, orphan_directory=None, hold_directory=None)
+        Parameters
+        ----------
+        run_directory : path-like object or str
+            The run_directory name or path to the directory where the calculations
+            to run are located.
+        calc_name : str, optional
+            The name of a specific calculation to run.  If not given, all
+            calculations in run_directory will be performed one at a time.
+        orphan_directory : path-like object, optional
+            The path for the orphan directory where incomplete calculations are
+            moved.  If None (default) then will use 'orphan' at the same level as
+            the run_directory.
+        hold_directory : str, optional
+            The path for the hold directory where tar archives that failed to be
+            uploaded are moved to.  If None (default) then will use 'hold' at the
+            same level as the run_directory.
+        python_exe : str, optional
+            The Python executable to use when running the calculations.  If not given,
+            will try to use the current Python executable, and if not available will use
+            'python'.
+        log : bool, optional
+            If True (default), the runner will create and save a log file detailing the
+            status of each calculation that it runs.
+        temp : bool, optional
+            If True, a temporary directory will be automatically created and used
+            for this run.
+        bidtries : int, optional
+            The runner will stop if it fails on bidding this many times in a
+            row.  This allows for the cleanup of excess competing runners.
+            Default value is 10.
+        temp_directory : path-like object, optional
+            The path to an existing temporary directory where the calculations
+            are to be copied to and executed there instead of in the run_directory.
+        """
+        runner(self, run_directory, calc_name=calc_name, orphan_directory=orphan_directory,
+               hold_directory=hold_directory, python_exe=python_exe, log=log,
+               bidtries=bidtries, temp=temp, temp_directory=temp_directory)
+        
+    def runmanager(self, run_directory, orphan_directory=None, hold_directory=None,
+                   python_exe=None, log=True):
+        """
+        Creates a RunManager object for the database and the given run_directory
+        allowing for more direct control over calculation runs.
+        
+        Parameters
+        ----------
+        run_directory : path-like object or str
+            The run_directory name or path to the directory where the calculations
+            to run are located.
+        orphan_directory : path-like object, optional
+            The path for the orphan directory where incomplete calculations are
+            moved.  If None (default) then will use 'orphan' at the same level as
+            the run_directory.
+        hold_directory : str, optional
+            The path for the hold directory where tar archives that failed to be
+            uploaded are moved to.  If None (default) then will use 'hold' at the
+            same level as the run_directory.
+        python_exe : str, optional
+            The Python executable to use when running the calculations.  If not given,
+            will try to use the current Python executable, and if not available will use
+            'python'.
+        log : bool, optional
+            If True (default), the runner will create and save a log file detailing the
+            status of each calculation that it runs.
+        
+        Returns
+        -------
+        iprPy.database.RunManager
+            The manager for running calculations associated with the database.
+        """
+        return RunManager(self, run_directory, orphan_directory=orphan_directory,
+                          hold_directory=hold_directory, python_exe=python_exe, log=log)
