@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 #SBATCH --job-name="iprPy_8"
+#SBATCH --time=30-00:00:00
 #SBATCH --output=runner_%j.txt
 #SBATCH --partition=rack1,rack2,rack3,rack4,rack5,rack6
 #SBATCH --nodes=1
