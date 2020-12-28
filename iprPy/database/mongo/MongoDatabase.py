@@ -409,13 +409,16 @@ class MongoDatabase(Database):
             raise ValueError('Record already has an archive')
         
         if tar is None:
-        
+            if root_dir is None:
+                root_dir = Path.cwd()
+                
             # Make archive
-            shutil.make_archive(record.name, 'gztar', root_dir=root_dir,
+            basename = Path(root_dir, record.name)
+            filename = Path(root_dir, record.name + '.tar.gz')
+            shutil.make_archive(basename, 'gztar', root_dir=root_dir,
                                 base_dir=record.name)
         
             # Upload archive
-            filename = Path(record.name + '.tar.gz')
             with open(filename, 'rb') as f:
                 tries = 0
                 while tries < 2:

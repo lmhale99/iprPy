@@ -341,13 +341,15 @@ class CDCSDatabase(Database):
         if len(blobs) > 0:
             raise ValueError('Record already has an archive')
         
-        filename = Path(record.name + '.tar.gz')
-
         # Create directory archive and upload
         if tar is None: 
-            
+            if root_dir is None:
+                root_dir = Path.cwd()
+                
             # Make archive
-            shutil.make_archive(record.name, 'gztar', root_dir=root_dir,
+            basename = Path(root_dir, record.name)
+            filename = Path(root_dir, record.name + '.tar.gz')
+            shutil.make_archive(basename, 'gztar', root_dir=root_dir,
                                 base_dir=record.name)
             
             # Upload archive
@@ -366,6 +368,8 @@ class CDCSDatabase(Database):
         
         # Upload pre-existing tar object
         elif root_dir is None:
+            filename = Path(record.name + '.tar.gz')
+
             # Upload archive
             tries = 0
             while tries < 2:

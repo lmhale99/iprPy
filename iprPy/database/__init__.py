@@ -11,6 +11,7 @@ databases_dict : dict
 """
 from ..tools import dynamic_import
 
+from .runner import runner, RunManager
 from .Database import Database
 
 ignorelist = ['Database', 'prepare', 'runner', 'load_database']
@@ -18,5 +19,5 @@ loaded, failed = dynamic_import(__name__, ignorelist=ignorelist)
 
 from .load_database import load_database
 
-__all__ = ['Database', 'load_database', 'failed', 'loaded']
+__all__ = ['Database', 'load_database', 'failed', 'loaded', 'runner', 'RunManager']
 __all__.sort()
