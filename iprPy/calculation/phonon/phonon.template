@@ -2,9 +2,7 @@
 
 box tilt large
 
-<atomman_system_info>
-
-<atomman_pair_info>
+<atomman_system_pair_info>
 
 thermo_style custom step pe
 thermo_modify format float %.13e

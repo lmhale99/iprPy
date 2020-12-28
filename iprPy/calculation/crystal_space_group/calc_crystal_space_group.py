@@ -65,13 +65,13 @@ def crystal_space_group(system, symprec=1e-5, to_primitive=False,
     ----------
     system : atomman.System
         The system to analyze.
-    symprec : float
+    symprec : float, optional
         Absolute length tolerance to use in identifying symmetry of atomic
-        sites and system boundaries.
-    to_primitive : bool
+        sites and system boundaries. Default value is 1e-5
+    to_primitive : bool, optional
         Indicates if the returned unit cell is conventional (False) or
         primitive (True). Default value is False.
-    no_idealize : bool
+    no_idealize : bool, optional
         Indicates if the atom positions in the returned unit cell are averaged
         (True) or idealized based on the structure (False).  Default value is
         False.

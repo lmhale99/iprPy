@@ -50,7 +50,7 @@ def main(*args):
     process_input(input_dict, *args[1:])
     
     # Run phonon
-    results_dict = phonon(input_dict['lammps_command'],
+    results_dict = phonon_quasiharmonic(input_dict['lammps_command'],
                           input_dict['ucell'],
                           input_dict['potential'],
                           mpi_command = input_dict['mpi_command'],
@@ -58,7 +58,9 @@ def main(*args):
                           b_mult = input_dict['sizemults'][1][1] - input_dict['sizemults'][1][0],
                           c_mult = input_dict['sizemults'][2][1] - input_dict['sizemults'][2][0],
                           distance = input_dict['displacementdistance'],
-                          symprec = input_dict['symmetryprecision'])
+                          symprec = input_dict['symmetryprecision'],
+                          strainrange = input_dict['strainrange'],
+                          numstrains = input_dict['numstrains'])
     
     # Build and save data model of results
     record = iprPy.load_record(record_style)
@@ -66,9 +68,46 @@ def main(*args):
     with open('results.json', 'w') as f:
         record.content.json(fp=f, indent=4)
 
-def phonon(lammps_command, ucell, potential, mpi_command=None, a_mult=3, b_mult=3, c_mult=3,
-           distance=0.01, symprec=1e-5):
-    
+def phonon_quasiharmonic(lammps_command, ucell, potential, mpi_command=None, a_mult=3, b_mult=3, c_mult=3,
+           distance=0.01, symprec=1e-5, strainrange=0.01, numstrains=5):
+    """
+    Function that performs phonon and quasiharmonic approximation calculations
+    using phonopy and LAMMPS.
+
+    Parameters
+    ----------
+    lammps_command :str
+        Command for running LAMMPS.
+    ucell : atomman.System
+        The unit cell system to perform the calculation on.
+    potential : atomman.lammps.Potential
+        The LAMMPS implemented potential to use.
+    mpi_command : str, optional
+        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+        will run serially.
+    a_mult : int, optional
+        The a size multiplier to use on ucell before running the phonon
+        calculation.  Must be an int and not a tuple.  Default value is 3.
+    b_mult : int, optional
+        The b size multiplier to use on ucell before running the phonon
+        calculation.  Must be an int and not a tuple.  Default value is 3.
+    c_mult : int, optional
+        The c size multiplier to use on ucell before running the phonon
+        calculation.  Must be an int and not a tuple.  Default value is 3.
+    distance : float, optional
+        The atomic displacement distance used for computing the phonons.
+        Default value is 0.01.
+    symprec : float, optional
+        Absolute length tolerance to use in identifying symmetry of atomic
+        sites and system boundaries. Default value is 1e-5.
+    strainrange : float, optional
+        The range of strains to apply to the unit cell to use with the
+        quasiharmonic calculations.  Default value is 0.01.
+    numstrains : int, optional
+        The number of strains to use for the quasiharmonic calculations.
+        Must be an odd integer.  If 1, then the quasiharmonic calculations
+        will not be performed.  Default value is 5.
+    """
     # Build filedict if function was called from iprPy
     try:
         assert __name__ == pkg_name
@@ -82,9 +121,214 @@ def phonon(lammps_command, ucell, potential, mpi_command=None, a_mult=3, b_mult=
     
     # Get lammps version date
     lammps_date = lmp.checkversion(lammps_command)['date']
+    
+    # Get original box vectors
+    vects = ucell.box.vects
 
-    # Generate pair_info
-    pair_info = potential.pair_info(ucell.symbols)
+    # Generate the range of strains
+    if numstrains == 1:
+        zerostrain = phononcalc(lammps_command, ucell, potential,
+                                mpi_command=mpi_command,
+                                a_mult=a_mult, b_mult=b_mult, c_mult=c_mult,
+                                distance=distance, symprec=symprec,
+                                lammps_date=lammps_date)
+        phonons = [zerostrain['phonon']]
+        qha = None
+
+    elif numstrains % 2 == 0 or numstrains < 5:
+        raise ValueError('Invalid number of strains: must be odd and 1 or >= 5')
+    else:
+        strains = np.linspace(-strainrange, strainrange, numstrains)
+        istrains = np.linspace(-(numstrains-1)/2, (numstrains-1)/2, numstrains, dtype=int)
+
+        volumes = []
+        energies = []
+        phonons = []
+        temperatures = None
+        free_energy = None
+        heat_capacity = None
+        entropy = None
+
+        # Loop over all strains
+        for istrain, strain in zip(istrains, strains):
+
+            # Identify the zero strain run
+            if istrain == 0:
+                zerostrainrun = True
+                savefile = 'phonopy_params.yaml'
+            else:
+                zerostrainrun = False
+                savefile = f'phonopy_params_{istrain}.yaml'
+            
+            # Generate system at the strain
+            newvects = vects * (1 + strain)
+            ucell.box_set(vects=newvects, scale=True)
+            volumes.append(ucell.box.volume)
+            system = ucell.supersize(a_mult, b_mult, c_mult)
+
+            # Define lammps variables
+            lammps_variables = {}
+            system_info = system.dump('atom_data', f='disp.dat',
+                                    potential=potential,
+                                    return_pair_info=True)
+            lammps_variables['atomman_system_pair_info'] = system_info
+
+            # Set dump_modify_format based on lammps_date
+            if lammps_date < datetime.date(2016, 8, 3):
+                lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e %.13e %.13e"'
+            else:
+                lammps_variables['dump_modify_format'] = 'float %.13e'
+
+            # Write lammps input script
+            template_file = 'phonon.template'
+            lammps_script = 'phonon.in'
+            template = iprPy.tools.read_calc_file(template_file, filedict)
+            with open(lammps_script, 'w') as f:
+                f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
+
+            # Run LAMMPS
+            output = lmp.run(lammps_command, 'phonon.in', mpi_command=mpi_command)
+
+            # Extract system energy
+            thermo = output.simulations[0]['thermo']
+            energy = uc.set_in_units(thermo.PotEng.values[-1], lammps_units['energy'])
+
+            # Scale energy by sizemults and append to list
+            energies.append(energy / (a_mult * b_mult * c_mult))
+
+            # Compute phonon info for ucell
+            phononinfo = phononcalc(lammps_command, ucell, potential, mpi_command=mpi_command,
+                                    a_mult=a_mult, b_mult=b_mult, c_mult=c_mult,
+                                    distance=distance, symprec=symprec, savefile=savefile,
+                                    plot=zerostrainrun, lammps_date=lammps_date)
+            phonons.append(phononinfo['phonon'])
+            
+            # Extract temperature values from the first run
+            if temperatures is None:
+                temperatures = phononinfo['thermal_properties']['temperatures']
+                
+                # Initialize QHA input arrays
+                free_energy = np.empty((len(temperatures), len(strains)))
+                heat_capacity = np.empty((len(temperatures), len(strains)))
+                entropy = np.empty((len(temperatures), len(strains)))
+            
+            # Get values for zerostrainrun
+            if zerostrainrun is True:
+                zerostrain = phononinfo
+            
+            # Copy values to qha input arrays
+            free_energy[:, istrain] = phononinfo['thermal_properties']['free_energy']
+            entropy[:, istrain] = phononinfo['thermal_properties']['entropy']
+            heat_capacity[:, istrain] = phononinfo['thermal_properties']['heat_capacity']
+        
+        # Compute qha
+        qha = phonopy.PhonopyQHA(volumes=volumes,
+                    electronic_energies=energies,
+                    temperatures=temperatures,
+                    free_energy=free_energy,
+                    cv=heat_capacity,
+                    entropy=entropy)
+    
+    results = {}    
+    
+    # Add phonopy objects
+    results['phonon_objects'] = phonons
+    results['qha_object'] = qha
+    
+    # Extract zerostrain properties
+    results['band_structure'] = zerostrain['band_structure']
+    results['density_of_states'] = zerostrain['dos']
+    results['thermal_properties'] = zerostrain['thermal_properties']
+    results['thermal_properties']['heat_capacity_v'] = results['thermal_properties'].pop('heat_capacity')
+    results['thermal_properties']['temperature'] = results['thermal_properties'].pop('temperatures')
+
+    if qha is not None:
+
+        # Create QHA plots
+        qha.plot_bulk_modulus()
+        plt.savefig('bulk_modulus.png', dpi=400)
+        plt.close()
+
+        qha.plot_helmholtz_volume()
+        plt.savefig('helmholtz.png', dpi=400)
+        plt.close()
+
+        # Package volume vs energy scans
+        results['volume_scan'] = {}
+        results['volume_scan']['volume'] = np.array(volumes)
+        results['volume_scan']['strain'] = strains
+        results['volume_scan']['energy'] = np.array(energies)
+        
+        # Compute and add QHA properties
+        results['E0'], results['B0'], results['B0prime'], results['V0'] = qha.get_bulk_modulus_parameters()
+        results['thermal_properties']['volume'] = np.hstack([qha.get_volume_temperature(), np.nan])
+        results['thermal_properties']['thermal_expansion'] = np.hstack([qha.get_thermal_expansion(), np.nan])
+        results['thermal_properties']['Gibbs'] = np.hstack([qha.get_gibbs_temperature(), np.nan])
+        results['thermal_properties']['bulk_modulus'] = np.hstack([qha.get_bulk_modulus_temperature(), np.nan])
+        results['thermal_properties']['heat_capacity_p_numerical'] = np.hstack([qha.get_heat_capacity_P_numerical(), np.nan])
+        results['thermal_properties']['heat_capacity_p_polyfit'] = np.hstack([qha.get_heat_capacity_P_polyfit(), np.nan])
+        results['thermal_properties']['gruneisen'] = np.hstack([qha.get_gruneisen_temperature(), np.nan])
+    
+    return results
+
+
+def phononcalc(lammps_command, ucell, potential, mpi_command=None,
+               a_mult=3, b_mult=3, c_mult=3, distance=0.01, symprec=1e-5, 
+               savefile='phonopy_params.yaml', plot=True, lammps_date=None):
+    """
+    Uses phonopy to compute the phonons for a unit cell structure using a
+    LAMMPS interatomic potential.
+
+    Parameters
+    ----------
+    lammps_command :str
+        Command for running LAMMPS.
+    ucell : atomman.System
+        The unit cell system to perform the calculation on.
+    potential : atomman.lammps.Potential
+        The LAMMPS implemented potential to use.
+    mpi_command : str, optional
+        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+        will run serially.
+    a_mult : int, optional
+        The a size multiplier to use on ucell before running the phonon
+        calculation.  Must be an int and not a tuple.  Default value is 3.
+    b_mult : int, optional
+        The b size multiplier to use on ucell before running the phonon
+        calculation.  Must be an int and not a tuple.  Default value is 3.
+    c_mult : int, optional
+        The c size multiplier to use on ucell before running the phonon
+        calculation.  Must be an int and not a tuple.  Default value is 3.
+    distance : float, optional
+        The atomic displacement distance used for computing the phonons.
+        Default value is 0.01.
+    symprec : float, optional
+        Absolute length tolerance to use in identifying symmetry of atomic
+        sites and system boundaries. Default value is 1e-5.
+    savefile: str, optional
+        The name of the phonopy yaml backup file.  Default value is
+        'phonopy_params.yaml'.
+    plot : bool, optional
+        Flag indicating if band structure and DOS figures are to be generated.
+        Default value is True.
+    lammps_date : datetime.date, optional
+        The version date associated with lammps_command.  If not given, the
+        version will be identified.
+    """
+    # Build filedict if function was called from iprPy
+    try:
+        assert __name__ == pkg_name
+        calc = iprPy.load_calculation(calculation_style)
+        filedict = calc.filedict
+    except:
+        filedict = {}
+
+    # Get lammps units
+    lammps_units = lmp.style.unit(potential.units)
+    
+    # Get lammps version date
+    if lammps_date is None:
+        lammps_date = lmp.checkversion(lammps_command)['date']
     
     # Use spglib to find primitive unit cell of ucell
     convcell = ucell.dump('spglib_cell')
@@ -92,7 +336,9 @@ def phonon(lammps_command, ucell, potential, mpi_command=None, a_mult=3, b_mult=
     primucell = am.load('spglib_cell', primcell, symbols=ucell.symbols).normalize()
     
     # Initialize Phonopy object
-    phonon = phonopy.Phonopy(primucell.dump('phonopy_Atoms'), [[a_mult, 0, 0], [0, b_mult, 0], [0, 0, c_mult]])
+    phonon = phonopy.Phonopy(primucell.dump('phonopy_Atoms'),
+                             [[a_mult, 0, 0], [0, b_mult, 0], [0, 0, c_mult]],
+                             factor=phonopy.units.VaspToTHz)
     phonon.generate_displacements(distance=distance)
     
     # Loop over displaced supercells to compute forces
@@ -101,12 +347,13 @@ def phonon(lammps_command, ucell, potential, mpi_command=None, a_mult=3, b_mult=
         
         # Save to LAMMPS data file
         system = am.load('phonopy_Atoms', supercell)
-        system_info = system.dump('atom_data', f='disp.dat')
+        system_info = system.dump('atom_data', f='disp.dat',
+                                  potential=potential,
+                                  return_pair_info=True)
         
         # Define lammps variables
         lammps_variables = {}
-        lammps_variables['atomman_system_info'] = system_info
-        lammps_variables['atomman_pair_info'] = pair_info
+        lammps_variables['atomman_system_pair_info'] = system_info
 
         # Set dump_modify_format based on lammps_date
         if lammps_date < datetime.date(2016, 8, 3):
@@ -125,40 +372,39 @@ def phonon(lammps_command, ucell, potential, mpi_command=None, a_mult=3, b_mult=
         lmp.run(lammps_command, 'phonon.in', mpi_command=mpi_command)
         
         # Extract forces from dump file
-        results = am.load('atom_dump', 'forces.dump')
-        forces = uc.set_in_units(results.atoms.force, lammps_units['force'])
+        forcestructure = am.load('atom_dump', 'forces.dump')
+        forces = uc.set_in_units(forcestructure.atoms.force, lammps_units['force'])
         forcearrays.append(forces)
     
+    results = {}
+
     # Set computed forces
     phonon.set_forces(forcearrays)
     
     # Save to yaml file    
-    phonon.save('phonopy_params.yaml')
+    phonon.save(savefile)
     
     # Compute band structure    
     phonon.produce_force_constants()
-    phonon.auto_band_structure(plot=True)
+    phonon.auto_band_structure(plot=plot)
+    results['band_structure'] = phonon.get_band_structure_dict()
+    if plot:
+        plt.savefig(Path('.', 'band.png'), dpi=400)
+        plt.close()
     
-    plt.savefig(Path('.', 'band.png'), dpi=400)
-    plt.close()
-    
-    # Compute total density of states
-    phonon.auto_total_dos(plot=True)
-    plt.savefig('total_dos.png', dpi=400)
-    plt.close()
-    
-    # Compute partial density of states
-    phonon.auto_projected_dos(plot=True)
-    plt.savefig('projected_dos.png', dpi=400)
-    plt.close()
+    # Compute density of states
+    phonon.auto_total_dos(plot=False)
+    phonon.auto_projected_dos(plot=False)
+    dos = phonon.get_total_dos_dict()
+    dos['projected_dos'] = phonon.get_projected_dos_dict()['projected_dos']
+    results['dos'] = dos
     
     # Compute thermal properties
     phonon.run_thermal_properties()
-    phonon.plot_thermal_properties()
-    plt.savefig('thermal.png', dpi=400)
-    plt.close()
+    results['thermal_properties'] = phonon.get_thermal_properties_dict()
     
-    return {}
+    results['phonon'] = phonon
+    return results
 
 def process_input(input_dict, UUID=None, build=True):
     """
@@ -198,10 +444,11 @@ def process_input(input_dict, UUID=None, build=True):
     # None for this calculation
     
     # These are calculation-specific default integers
-    # None for this calculation
+    input_dict['numstrains'] = int(input_dict.get('numstrains', 5))
     
     # These are calculation-specific default unitless floats
     input_dict['symmetryprecision'] = float(input_dict.get('symmetryprecision', 1e-5))
+    input_dict['strainrange'] = float(input_dict.get('strainrange', 0.01))
     
     # These are calculation-specific default floats with units
     input_dict['displacementdistance'] = iprPy.input.value(input_dict, 'displacementdistance',

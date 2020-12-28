@@ -1,5 +1,5 @@
 # coding: utf-8
-raise NotImplementedError('Needs updating to iprPy 0.10')
+
 # iprPy imports
 from .. import Calculation
 from ...input import subset
@@ -20,7 +20,7 @@ class Phonon(Calculation):
         super().__init__()
 
         # Define calc shortcut    
-        self.calc = self.script.phonon
+        self.calc = self.script.phonon_quasiharmonic
 
     @property
     def files(self):
@@ -39,12 +39,9 @@ class Phonon(Calculation):
         return universalfiles + files
     
     @property
-    def template(self):
-        """
-        str: The template to use for generating calc.in files.
-        """
-        # Specify the subsets to include in the template
-        subsets = [
+    def inputsubsets(self):
+        """list: The subsets whose input key sets are used for the calculation"""
+        return  [
             'lammps_commands', 
             'lammps_potential',
             'atomman_systemload',
@@ -52,13 +49,13 @@ class Phonon(Calculation):
             'units',
         ]
         
-        # Specify the calculation-specific run parameters
-        runkeys = [
+    @property
+    def inputkeys(self):
+        """list: the calculation-specific input keys"""
+        return [
             'displacementdistance',
             'symmetryprecision',
         ]
-        
-        return self._buildtemplate(subsets, runkeys)
 
     @property
     def singularkeys(self):
