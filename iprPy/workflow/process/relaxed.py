@@ -35,7 +35,7 @@ def relaxed(database_name, crystal_match_file, all_crystals_file,
     """
     results = compile_relaxation_results(database_name, crystal_match_file,
                                          all_crystals_file)
-                               
+
     create_relaxed_crystal_records(database_name, results=results)
     
     identify_duplicates(database_name, unique_crystals_file, results=results)
@@ -44,7 +44,7 @@ def save_keys():
     """The list of keys to include in the all and unique results csv files"""
     return ['calc_key', 'potential_LAMMPS_key', 'potential_LAMMPS_id', 'potential_key',
             'potential_id', 'composition', 'prototype', 'family', 'parent_key', 'method',
-            'transformed', 'E_coh', 'a', 'b', 'c', 'alpha', 'beta', 'gamma']
+            'transformed', 'E_pot', 'E_coh', 'a', 'b', 'c', 'alpha', 'beta', 'gamma']
 
 def results_keys():
     """
@@ -181,7 +181,7 @@ def compile_relaxation_results(database_name, crystal_match_file,
     results['family'] = merged_df.family
     results['method'] = merged_df.method
     results['parent_key'] = merged_df.parent
-    results['E_coh'] = merged_df.E_cohesive
+    results['E_pot'] = merged_df.E_cohesive
     results['prototype'] = merged_df.prototype
     results['ucell'] = merged_df.ucell
     results['ucell_family'] = merged_df.ucell_family
@@ -221,12 +221,104 @@ def compile_relaxation_results(database_name, crystal_match_file,
     results['beta'] = merged_df.apply(get_beta, axis=1)
     results['gamma'] = merged_df.apply(get_gamma, axis=1)
 
-    # Create results DataFrame and save to all_crystals_file
+    # Create results DataFrame
     results = pd.DataFrame(results, columns=results_keys()).sort_values(sort_keys())
+
+    # Compute the cohesive energies
+    calculate_cohesive_energy(database_name, results=results)
+
+    # Save to all_crystals_file csv
     results[save_keys()].to_csv(all_crystals_file, index=False)
     print(all_crystals_file, 'updated')
 
     return results
+
+def get_isolated_atom_energies(database_name):
+    """
+    Extracts the isolated atom energies from either calculation_isolated_atom
+    record values or from plateaus found in calculation_diatom_scan plots.
+    
+    Parameters
+    ----------
+    database_name : str
+        The name of the database to access.
+    """
+    # Load database and fetch finished records
+    database = load_database(database_name)
+    isorecords = database.get_records_df(style='calculation_isolated_atom',
+                                    full=True, flat=False, status='finished')
+    diatomrecords = database.get_records_df(style='calculation_diatom_scan',
+                                    full=True, flat=False, status='finished')
+
+    # Extract isolated atom energies
+    results = []
+    for i in isorecords.index:
+        series = isorecords.loc[i]
+        
+        for symbol in series.energy:
+            data = {}
+            data['potential_LAMMPS_key'] = series.potential_LAMMPS_key
+            data['potential_LAMMPS_id'] = series.potential_LAMMPS_id
+            data['symbol'] = symbol
+            data['isolated_energy'] = series.energy[symbol]
+            results.append(data)
+    results = pd.DataFrame(results)
+
+    # Replace with first plateau energies if different
+    for i in diatomrecords.index:
+        series = diatomrecords.loc[i]
+        
+        if len(series.symbols) == 1 or series.symbols[0] == series.symbols[1]:
+            symbol = series.symbols[0]
+        else:
+            continue
+            
+        r = series.diatom_plot.r
+        energy = series.diatom_plot.energy
+        unique_energies, counts = np.unique(energy[r>=2.0], return_counts=True)
+        plateau_energies = list(unique_energies[counts > 1] / 2)
+        
+        if len(plateau_energies) > 0:
+            plateau_energy = plateau_energies[0]
+            
+            mask = (results.symbol==symbol) & (results.potential_LAMMPS_key==series.potential_LAMMPS_key)
+            
+            isolated_energy = results.loc[mask].isolated_energy.values[0]
+            
+            if not np.isclose(isolated_energy, plateau_energy, rtol=1e-8):
+                results.loc[mask, 'isolated_energy'] = plateau_energy
+
+    return results
+
+def calculate_cohesive_energy(database_name, results):
+    """
+    Adds the cohesive energy to the results using the isolated atom energies,
+    structure composition, and the measured potential energy.
+    """
+    
+    # Get isolated atom energies
+    print('Identifying isolated atom energies')
+    isoresults = get_isolated_atom_energies(database_name)
+
+    def cohesive_energy(series):
+        """
+        Function to apply to results to compute cohesive energies
+        """
+        # Compute base_energy
+        atypes, counts = np.unique(series.ucell.atoms.atype, return_counts=True)
+        base_energy = 0
+        for symbol, count in zip(series.ucell.symbols, counts):
+            E = isoresults[(isoresults.potential_LAMMPS_key==series.potential_LAMMPS_key)
+                        &(isoresults.symbol==symbol)].isolated_energy.values[0]
+            base_energy += E * count
+        base_energy = base_energy / series.ucell.natoms
+
+        # Compute cohesive energy
+        return series.E_pot - base_energy
+
+    # Compute and set cohesive energies
+    print('Calculating cohesive energies')
+    results['E_coh'] = results.apply(cohesive_energy, axis=1)
 
 def create_relaxed_crystal_records(database_name, results=None, all_crystals_file=None):
     """
@@ -289,6 +381,7 @@ def create_relaxed_crystal_records(database_name, results=None, all_crystals_fil
         input_dict['parent_key'] = series.calc_key
         input_dict['length_unit'] = 'angstrom'
         input_dict['energy_unit'] = 'eV'
+        input_dict['E_pot'] = series.E_pot
         input_dict['E_coh'] = series.E_coh
         
         # Set potential

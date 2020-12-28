@@ -92,7 +92,8 @@ class RelaxedCrystal(Record):
                                                 box_unit=input_dict['length_unit'])
         crystal['atomic-system'] = system_model['atomic-system']
         
-        # Save cohesive energy value
+        # Save potential and cohesive energy values
+        crystal['potential-energy'] = uc.model(input_dict['E_pot'], input_dict['energy_unit'])
         crystal['cohesive-energy'] = uc.model(input_dict['E_coh'], input_dict['energy_unit'])
         
         self.content = output
@@ -135,7 +136,12 @@ class RelaxedCrystal(Record):
         ucell = am.load('system_model', self.content, key='atomic-system')
         params['composition'] = ucell.composition
 
-        params['E_coh'] = uc.value_unit(crystal['cohesive-energy'])
+        #print('potential-energy' in crystal)
+        if 'potential-energy' in crystal:
+            params['E_pot'] = uc.value_unit(crystal['potential-energy'])
+            params['E_coh'] = uc.value_unit(crystal['cohesive-energy'])
+        else:
+            params['E_coh'] = params['E_pot'] = uc.value_unit(crystal['cohesive-energy'])
         
         if flat is True:
             params['symbols'] = list(ucell.symbols)
