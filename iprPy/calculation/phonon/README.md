@@ -2,13 +2,13 @@
 
 **Lucas M. Hale**, [lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), *Materials Science and Engineering Division, NIST*.
 
-Description updated: 2019-07-26
-
 ## Introduction
 
 The phonon calculation style applies small atomic displacements to a unit cell system and evaluates the forces on the atoms to evaluate phonon-based properties.
 
 ### Version notes
+
+- 2020-12-21: Script extended to include quasiharmonic calculations.
 
 ### Additional dependencies
 
