@@ -97,17 +97,20 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
                     content_dict[record_name].json(fp=f, indent=4)
 
             elif terms[0] == 'tarfile':
-                tar = database.get_tar(name=terms[1])
-                file_name = terms[1] + '/' + ' '.join(terms[2:])
-                tar.extract(file_name, calc_directory)
-                tar.close()
-            
+                try:
+                    tar = database.get_tar(name=terms[1])
+                except:
+                    print(f'No tar for {terms[1]} found')
+                else:
+                    file_name = terms[1] + '/' + ' '.join(terms[2:])
+                    tar.extract(file_name, calc_directory)
+                    tar.close()
+
             elif terms[0] == 'tar':
                 try:
                     tar = database.get_tar(name=terms[1])
                 except:
-                    #print(f'No tar for {terms[1]} found')
-                    pass
+                    print(f'No tar for {terms[1]} found')
                 else:
                     tar.extractall(calc_directory)
                     tar.close()
