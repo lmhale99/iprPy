@@ -42,7 +42,11 @@ global_kwargs = {}
 # Potential-based modifiers
 pot_kwargs = {}
 pot_kwargs['status'] = 'all'
-#pot_kwargs['id'] = ['2020--Starikov-S--Si-Au-Al--LAMMPS--ipr1']
+pot_kwargs['id'] = [
+    '2001--Lee-B-J--Cr--LAMMPS--ipr1',
+    '2020--Mori-H--Fe--LAMMPS--ipr1',    
+    ]
+
 #pot_kwargs['pair_style'] = ['eam', 'eam/alloy', 'eam/fs', 'eam/cd']
 
 ########################### Calculation parameters #############################
@@ -282,11 +286,8 @@ if style in calc_settings:
     # Prepare bop
     pair_style = kwargs.pop('prototype_potential_pair_style', None)
     if pair_style is None or 'bop' in pair_style:
-        try:
-            prepare.E_vs_r_scan.bop(database_name, run_directory_name, **kwargs)
-        except:
-            print('No bops to give')
-
+        prepare.E_vs_r_scan.bop(database_name, run_directory_name, **kwargs)
+        
     # Prepare everything else
     if pair_style is not None:
         kwargs['prototype_potential_pair_style'] = pair_style
@@ -500,10 +501,7 @@ if style in calc_settings:
             kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
         
         # Prepare
-        try:
-            prepare.surface_energy_static.main(database_name, run_directory_name, **kwargs)
-        except:
-            print('0 record combinations to check')
+        prepare.surface_energy_static.main(database_name, run_directory_name, **kwargs)
 
     # Fix LAMMPS versions
     if calc_settings[style]['fix_lammps_versions']:
@@ -534,10 +532,7 @@ if style in calc_settings:
             kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
         
         # Prepare
-        try:
-            prepare.stacking_fault_map_2D.main(database_name, run_directory_name, **kwargs)
-        except:
-            print('0 record combinations to check')
+        prepare.stacking_fault_map_2D.main(database_name, run_directory_name, **kwargs)
 
     # Fix LAMMPS versions
     if calc_settings[style]['fix_lammps_versions']:

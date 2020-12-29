@@ -4,7 +4,7 @@ from ...input import parse
 def prepare(database_name, run_directory_name, calculation_name,
             inputscript, **kwargs):
     
-    print(f'Preparing {calculation_name}', flush=True)
+    print(f'Preparing {calculation_name} branch {kwargs.get("branch", "main")} in {run_directory_name}', flush=True)
 
     # Load iprPy parameters
     database = load_database(database_name)
@@ -19,9 +19,11 @@ def prepare(database_name, run_directory_name, calculation_name,
         input_dict[key] = kwargs[key]
     
     # Prepare
-    database.prepare(run_directory, calculation, **input_dict)
-
-    print()
+    try:
+        database.prepare(run_directory, calculation, **input_dict)
+    except:
+        print('Prepare failed, no matches to check?', flush=True)
+    print(flush=True)
 
 from . import crystal_space_group
 from . import diatom_scan
