@@ -2,13 +2,13 @@
 
 **Lucas M. Hale**, [lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), *Materials Science and Engineering Division, NIST*.
 
-Description updated: 2019-07-26
-
 ## Introduction
 
 The point_defect_static calculation style computes the formation energy of a point defect by comparing the energies of a system before and after a point defect is inserted. The resulting defect system is analyzed using a few different metrics to help characterize if the defect reconfigures to a different structure upon relaxation.
 
 ### Version notes
+
+- 2020-12-30 Version 0.10+ update
 
 ### Additional dependencies
 
