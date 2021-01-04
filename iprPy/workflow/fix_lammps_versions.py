@@ -44,19 +44,20 @@ def fix_lammps_versions(run_directory_name, commands):
         for pot_id in kim_pots():
             replacementdict[pot_id] = key + commands['lammps_command_kim']
 
-    # Change the lammps commands in the input files
-    run_directory = load_run_directory(run_directory_name)
-    for inscript in run_directory.glob('*/calc_*.in'):
-        with open(inscript) as f:
-            content = f.read()
-        
-        for pot_id, lammps in replacementdict.items():
-            if pot_id in content:
-                content = content.replace(oldlammps, lammps)
-                break
-                
-        with open(inscript, 'w') as f:
-            f.write(content)
+    if len(replacementdict) > 0:
+        # Change the lammps commands in the input files
+        run_directory = load_run_directory(run_directory_name)
+        for inscript in run_directory.glob('*/calc_*.in'):
+            with open(inscript) as f:
+                content = f.read()
+            
+            for pot_id, lammps in replacementdict.items():
+                if pot_id in content:
+                    content = content.replace(oldlammps, lammps)
+                    break
+                    
+            with open(inscript, 'w') as f:
+                f.write(content)
 
 def snap1_pots():
     return ['2015--Thompson-A-P--Ta--LAMMPS--ipr1']

@@ -19,10 +19,10 @@ def prepare(database_name, run_directory_name, calculation_name,
         input_dict[key] = kwargs[key]
     
     # Prepare
-    try:
-        database.prepare(run_directory, calculation, **input_dict)
-    except:
-        print('Prepare failed, no matches to check?', flush=True)
+    #try:
+    database.prepare(run_directory, calculation, **input_dict)
+    #except:
+    #    print('Prepare failed, no matches to check?', flush=True)
     print(flush=True)
 
 from . import crystal_space_group

@@ -1,11 +1,17 @@
 # https://github.com/usnistgov/DataModelDict 
 from DataModelDict import DataModelDict as DM
 
+import numpy as np
+
 __all__ = ['atomicparent']
 
 def atomicparent(database, keys, content_dict=None, record=None,
                  load_key='atomic-system', query=None, **kwargs):
     
+    # Initialize inputs and content dict
+    inputs = {}
+    for key in keys:
+        inputs[key] = []
     if content_dict is None:
         content_dict = {}
 
@@ -34,7 +40,8 @@ def atomicparent(database, keys, content_dict=None, record=None,
                                                         **potential_kwargs)
         print(len(potential_df), 'matching interatomic potentials found')
         if len(potential_df) == 0:
-            raise ValueError('No matching interatomic potentials found')           
+            return inputs, content_dict
+        kwargs['potential_LAMMPS_key'] = list(np.unique(potential_df.key))          
 
     else:
         include_potentials = False
@@ -44,12 +51,7 @@ def atomicparent(database, keys, content_dict=None, record=None,
                                               query=query, **kwargs)
     print(len(parent_df), 'matching atomic parents found')    
     if len(parent_df) == 0:
-        raise ValueError('No matching atomic parents found')
-
-    # Setup
-    inputs = {}
-    for key in keys:
-        inputs[key] = []
+        return inputs, content_dict
 
     # Loop over all parents
     for i in parent_df.index:

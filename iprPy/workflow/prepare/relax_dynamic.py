@@ -6,7 +6,7 @@ from . import prepare
 
 calculation_name = 'relax_dynamic'
 
-def main(database_name, run_directory_name, lammps_command, **kwargs):
+def main(database_name, run_directory_name, pot_kwargs=None, **kwargs):
     """
     Prepares relax_dynamic calculations from reference_crystal and E_vs_r_scan
     records for 0K and 0 pressure relaxations.
@@ -21,14 +21,18 @@ def main(database_name, run_directory_name, lammps_command, **kwargs):
         The name of the pre-set database to use.
     run_directory_name : str
         The name of the pre-set run_directory to use.
-    lammps_command : str
-        The LAMMPS executable to use.
+    pot_kwargs : dict, optional
+        Values for potential-specific limiters.
     **kwargs : str or list, optional
         Values for any additional or replacement prepare parameters. 
     """
+    # Check for required kwargs
+    assert 'lammps_command' in kwargs
+
     # Set default branch value to match current function's name
     kwargs['branch'] = kwargs.get('branch', sys._getframe().f_code.co_name)
-
+    
+    # Define script with default parameter values
     script = "\n".join(
         [
         # Build load information based on reference structures
@@ -40,6 +44,7 @@ def main(database_name, run_directory_name, lammps_command, **kwargs):
         # Specify parent buildcombos terms (parent record's style and the load_key to access)
         'parent_record               calculation_E_vs_r_scan',         
         'parent_load_key             minimum-atomic-system',
+        'parent_status               finished',
 
         # System manipulations
         'sizemults                   10 10 10',
@@ -60,14 +65,17 @@ def main(database_name, run_directory_name, lammps_command, **kwargs):
         'randomseed                  ',
         ])
 
-    # Add additional required terms to kwargs
-    kwargs['lammps_command'] = lammps_command
+    # Add pot_kwargs with the appropriate prefix
+    if pot_kwargs is not None:
+        for key in pot_kwargs:
+            kwargs[f'reference_potential_{key}'] = pot_kwargs[key] 
+            kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
 
     # Prepare 
     prepare(database_name, run_directory_name, calculation_name,
                  script, **kwargs)
 
-def at_temp(database_name, run_directory_name, lammps_command, **kwargs):
+def at_temp(database_name, run_directory_name, pot_kwargs=None, **kwargs):
     """
     Prepares relax_dynamic calculations from relaxed_crystal records for every 100K
     up to 3000K, and 0 pressure.
@@ -81,21 +89,25 @@ def at_temp(database_name, run_directory_name, lammps_command, **kwargs):
         The name of the pre-set database to use.
     run_directory_name : str
         The name of the pre-set run_directory to use.
-    lammps_command : str
-        The LAMMPS executable to use.
+    pot_kwargs : dict, optional
+        Values for potential-specific limiters.
     **kwargs : str or list, optional
         Values for any additional or replacement prepare parameters. 
     """
+    # Check for required kwargs
+    assert 'lammps_command' in kwargs
+
     # Set default branch value to match current function's name
     kwargs['branch'] = kwargs.get('branch', sys._getframe().f_code.co_name)
 
+    # Define script with default parameter values
     script = "\n".join(
         [
         # Build load information from crystal_space_group results
         'buildcombos                 atomicparent load_file parent',
         'parent_record               relaxed_crystal',
-        #'parent_method               dynamic',
-        'parent_method               manual',
+        'parent_method               dynamic',
+        'parent_standing             good',
 
         # System manipulations  
         'sizemults                   10 10 10',
@@ -144,10 +156,12 @@ def at_temp(database_name, run_directory_name, lammps_command, **kwargs):
         'equilsteps                  20000',
         'randomseed                  ',
         ])
-
-    # Add additional required terms to kwargs
-    kwargs['lammps_command'] = lammps_command
     
+    # Add pot_kwargs with the appropriate prefix
+    if pot_kwargs is not None:
+        for key in pot_kwargs: 
+            kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
+
     # Prepare 
     prepare(database_name, run_directory_name, calculation_name,
                  script, **kwargs)

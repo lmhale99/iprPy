@@ -8,6 +8,10 @@ def interatomicpotential(database, keys, content_dict=None, record='potential_LA
     """
     Builds parameter sets related to interatomic potentials.
     """
+    # Initialize inputs and content dict
+    inputs = {}
+    for key in keys:
+        inputs[key] = []
     if content_dict is None:
         content_dict = {}
 
@@ -20,12 +24,7 @@ def interatomicpotential(database, keys, content_dict=None, record='potential_LA
                                                     query=query, status=status, **kwargs)
     print(len(potential_df), 'matching interatomic potentials found')
     if len(potential_df) == 0:
-        raise ValueError('No matching interatomic potentials found')
-
-    # Initialize inputs keys
-    inputs = {}
-    for key in keys:
-        inputs[key] = []
+        return inputs, content_dict
     
     # Loop over all potentials 
     for i in potential_df.index:

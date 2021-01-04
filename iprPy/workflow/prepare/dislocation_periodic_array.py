@@ -6,7 +6,7 @@ from . import prepare
 
 calculation_name = 'dislocation_periodic_array'
 
-def fcc_edge_mix(database_name, run_directory_name, lammps_command, **kwargs):
+def fcc_edge_mix(database_name, run_directory_name, pot_kwargs=None, **kwargs):
     """
     Prepares dislocation_periodic_array calculations from elastic_constants_static
     records for fcc dislocations with edge components.
@@ -21,14 +21,18 @@ def fcc_edge_mix(database_name, run_directory_name, lammps_command, **kwargs):
         The name of the pre-set database to use.
     run_directory_name : str
         The name of the pre-set run_directory to use.
-    lammps_command : str
-        The LAMMPS executable to use.
+    pot_kwargs : dict, optional
+        Values for potential-specific limiters.
     **kwargs : str or list, optional
         Values for any additional or replacement prepare parameters. 
     """
+    # Check for required kwargs
+    assert 'lammps_command' in kwargs
+
     # Set default branch value to match current function's name
     kwargs['branch'] = kwargs.get('branch', sys._getframe().f_code.co_name)
 
+    # Define script with default parameter values
     script = "\n".join(
         [
         # Build load information from crystal_space_group results
@@ -61,15 +65,17 @@ def fcc_edge_mix(database_name, run_directory_name, lammps_command, **kwargs):
         'maxatommotion               ',
         ])        
 
-    # Add additional required terms to kwargs
-    kwargs['lammps_command'] = lammps_command
+    # Add pot_kwargs with the appropriate prefix
+    if pot_kwargs is not None:
+        for key in pot_kwargs:
+            kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
 
     # Prepare 
     prepare(database_name, run_directory_name, calculation_name,
                  script, **kwargs)
 
 
-def fcc_screw(database_name, run_directory_name, lammps_command, **kwargs):
+def fcc_screw(database_name, run_directory_name, pot_kwargs=None, **kwargs):
     """
     Prepares dislocation_periodic_array calculations from elastic_constants_static
     records.  Same as fcc_edge_mix, except uselinear is set to True and defect is
@@ -85,14 +91,18 @@ def fcc_screw(database_name, run_directory_name, lammps_command, **kwargs):
         The name of the pre-set database to use.
     run_directory_name : str
         The name of the pre-set run_directory to use.
-    lammps_command : str
-        The LAMMPS executable to use.
+    pot_kwargs : dict, optional
+        Values for potential-specific limiters.
     **kwargs : str or list, optional
         Values for any additional or replacement prepare parameters. 
     """
+    # Check for required kwargs
+    assert 'lammps_command' in kwargs
+
     # Set default branch value to match current function's name
     kwargs['branch'] = kwargs.get('branch', sys._getframe().f_code.co_name)
 
+    # Define script with default parameter values
     script = "\n".join(
         [
         # Build load information from crystal_space_group results
@@ -125,8 +135,10 @@ def fcc_screw(database_name, run_directory_name, lammps_command, **kwargs):
         'maxatommotion               ',
         ])        
 
-    # Add additional required terms to kwargs
-    kwargs['lammps_command'] = lammps_command
+    # Add pot_kwargs with the appropriate prefix
+    if pot_kwargs is not None:
+        for key in pot_kwargs:
+            kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
 
     # Prepare 
     prepare(database_name, run_directory_name, calculation_name,

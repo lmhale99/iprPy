@@ -1,0 +1,64 @@
+# Input script for master_prepare.py
+
+# Name of the database to prepare the calculations for
+database_name               test
+
+# Machine-dependent mpi command with variable np_per_runner
+mpi_command                 mpiexec -localonly {np_per_runner}
+
+# Primary lammps executable
+lammps_command              E:/LAMMPS/2020-03-03/bin/lmp_mpi
+
+# Optional alternate lammps executables
+#lammps_command_snap_1       E:/LAMMPS/2017-01-27/bin/lmp_mpi
+#lammps_command_snap_2       E:/LAMMPS/2019-06-05/bin/lmp_mpi
+#lammps_command_old          E:/LAMMPS/2019-06-05/bin/lmp_mpi
+
+# Indicate if lammps executables are to be tested (default is True)
+test_commands               True
+
+# List of calculation styles to run_directory pools 
+# Must have equal number of lines for run_directory_name, np_per_runner and styles
+
+styles                      isolated_atom diatom_scan E_vs_r_scan
+run_directory_name          test_1
+np_per_runner               1
+
+styles                      relax_box relax_dynamic relax_static 
+run_directory_name          test_2
+np_per_runner               1
+
+styles                      relax_static_from_dynamic
+run_directory_name          test_3
+np_per_runner               1
+
+styles                      crystal_space_group
+run_directory_name          test_4
+np_per_runner               1
+
+styles                      elastic_constants_static phonon
+run_directory_name          test_5
+np_per_runner               1
+
+styles                      point_defect_static surface_energy_static stacking_fault_map_2D
+run_directory_name          test_6
+np_per_runner               1
+
+styles                      dislocation_monopole dislocation_periodic_array
+run_directory_name          test_7
+np_per_runner               8
+
+# Potential status limiter - all, active, superseded or retracted (default is active)
+#potential_status            all
+
+# Potential id limiters (only potentials listed will be prepared)
+potential_id                1999--Mishin-Y--Al--LAMMPS--ipr1
+
+# Potential pair_style limiters (only pair_styles listed will be prepared)
+#potential_pair_style        eam
+#potential_pair_style        eam/alloy
+#potential_pair_style        eam/fs
+#potential_pair_style        eam/cd
+
+# Other modifications
+elastic_constants_static_strainrange   1e-5

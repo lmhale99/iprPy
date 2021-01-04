@@ -238,10 +238,10 @@ def build_testrecords(database, calculation, content_dict, **kwargs):
                             content_dict[record_name] = crecord.content
         
         # Build incomplete record
-        #try:
-        calculation.process_input(input_dict, calc_key, build=False)
-        #except:
-        #    continue
+        try:
+            calculation.process_input(input_dict, calc_key, build=False)
+        except:
+            continue
         
         new_record = load_record(style=calculation.record_style, name=calc_key)
         new_record.buildcontent(input_dict)

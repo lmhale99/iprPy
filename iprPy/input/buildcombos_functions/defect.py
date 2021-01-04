@@ -5,16 +5,11 @@ __all__ = ['defect']
 
 def defect(database, keys, content_dict=None, record=None, query=None, **kwargs):
 
+    # Initialize inputs and content dict
     if content_dict is None:
         content_dict = {}
 
-    defects, defect_df = database.get_records(style=record, return_df=True,
-                                              query=query, **kwargs)
-    print(len(defect_df), 'matching defects')
-    if len(defect_df) == 0:
-        raise ValueError('No matching defects found')
-        
-    # Search for defect keys
+    # Initialize input and search for defect keys
     file_key = None
     content_key = None
     family_key = None
@@ -44,9 +39,13 @@ def defect(database, keys, content_dict=None, record=None, query=None, **kwargs)
         raise KeyError('No <defect>_content key found')
     if family_key is None:
         raise KeyError('No <defect>_family key found')
-    
 
-
+    defects, defect_df = database.get_records(style=record, return_df=True,
+                                              query=query, **kwargs)
+    print(len(defect_df), 'matching defects')
+    if len(defect_df) == 0:
+        return inputs, content_dict
+ 
     # Generate 
     for i in defect_df.index:
         defect_series = defect_df.loc[i]

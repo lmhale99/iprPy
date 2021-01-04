@@ -10,6 +10,10 @@ def atomicreference(database, keys, content_dict=None,
                     record='reference_crystal', elements=None,
                     query=None, **kwargs):
     
+    # Initialize inputs and content dict
+    inputs = {}
+    for key in keys:
+        inputs[key] = []
     if content_dict is None:
         content_dict = {}
 
@@ -30,15 +34,6 @@ def atomicreference(database, keys, content_dict=None,
                                                     query=query, **kwargs)
     print(len(reference_df), 'matching atomic references found')
     if len(reference_df) == 0:
-        raise ValueError('No matching atomic references found')
-
-    # Initialize inputs keys
-    inputs = {}
-    for key in keys:
-        inputs[key] = []
-    
-    # Do nothing if no references found
-    if len(references) == 0:
         return inputs, content_dict
 
     # Build with potentials
@@ -59,7 +54,7 @@ def atomicreference(database, keys, content_dict=None,
                                                         **potential_kwargs)
         print(len(potential_df), 'matching interatomic potentials found')
         if len(potential_df) == 0:
-            raise ValueError('No matching interatomic potentials found')
+            return inputs, content_dict
         
         # Loop over all unique reference element sets
         reference_df['elementstr'] = reference_df.symbols.apply(' '.join)

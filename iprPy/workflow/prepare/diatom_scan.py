@@ -7,7 +7,7 @@ from ... import load_database
 
 calculation_name = 'diatom_scan'
 
-def main(database_name, run_directory_name, lammps_command, **kwargs):
+def main(database_name, run_directory_name, pot_kwargs=None, **kwargs):
     """
     Prepares diatom_scan calculations for potentials.
 
@@ -20,27 +20,24 @@ def main(database_name, run_directory_name, lammps_command, **kwargs):
         The name of the pre-set database to use.
     run_directory_name : str
         The name of the pre-set run_directory to use.
-    lammps_command : str
-        The LAMMPS executable to use.
+    pot_kwargs : dict, optional
+        Values for potential-specific limiters.
     **kwargs : str or list, optional
         Values for any additional or replacement prepare parameters. 
     """
+    # Check for required kwargs
+    assert 'lammps_command' in kwargs
+
     # Set default branch value to match current function's name
     kwargs['branch'] = kwargs.get('branch', sys._getframe().f_code.co_name)
-
-    # Extract kwargs starting with "potential"
-    potential_kwargs = {}
-    for key in list(kwargs.keys()):
-        if key[:10] == 'potential_':
-            potential_kwargs[key[10:]] = kwargs.pop(key)
 
     # Fetch potential records and df
     database = load_database(database_name)
 
     # Pull out potential get_records parameters
-    potential_record = potential_kwargs.pop('record', 'potential_LAMMPS')
-    potential_query = potential_kwargs.pop('query', None)
-    status = potential_kwargs.pop('status', 'active')
+    potential_record = pot_kwargs.pop('record', 'potential_LAMMPS')
+    potential_query = pot_kwargs.pop('query', None)
+    status = pot_kwargs.pop('status', 'active')
     
     # Set all status value
     if status is 'all':
@@ -48,7 +45,7 @@ def main(database_name, run_directory_name, lammps_command, **kwargs):
 
     potentials, potential_df = database.get_records(style=potential_record, return_df=True,
                                                     query=potential_query, status=status,
-                                                    **potential_kwargs)
+                                                    **pot_kwargs)
 
     kwargs['symbols'] = []
     kwargs['potential_file'] = []
@@ -74,18 +71,16 @@ def main(database_name, run_directory_name, lammps_command, **kwargs):
                 kwargs['potential_content'].append(f'record {potential.name}')
                 kwargs['potential_dir'].append(potential.name)
                 kwargs['potential_dir_content'].append(f'tar {potential.name}')
-            
+    
+    # Define script with default parameter values
     script = "\n".join(
         [
         # Run parameters
         'minimum_r                   0.02',
-        'maximum_r                   6.0',
-        'number_of_steps_r           300', 
+        'maximum_r                   10.0',
+        'number_of_steps_r           500', 
         ]) 
-    
-    # Add additional required terms to kwargs
-    kwargs['lammps_command'] = lammps_command
 
     # Prepare 
     prepare(database_name, run_directory_name, calculation_name,
-                 script, **kwargs)
+            script, **kwargs)

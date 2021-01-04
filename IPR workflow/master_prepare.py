@@ -1,5 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# Standard Python libraries
 from copy import deepcopy
-from multiprocessing import Pool
+import sys
 from pathlib import Path
 from datetime import date
 
@@ -9,583 +13,268 @@ import atomman.lammps as lmp
 
 import iprPy
 
-from iprPy.workflow import prepare, process, fix_lammps_versions
-
+from iprPy.workflow import prepare, process, fix_lammps_versions, test_lammps_versions
+from iprPy.input import boolean
 from iprPy.tools import aslist
 
-############################### Global parameters ##############################
-
-# *database_name* is the name of the saved database settings to use for
-# preparing the calculations
-
-# *run_location* specifies the machines that the calculations are to be
-# performed on.  This allows for machine-specific executables to be defined
-# below in the corresponding section and automatically set later.
-
-# *test_commands* indicates if the machine-specific LAMMPS commands are tested
-# prior to preparing the calculations.
-
-# *global_kwargs* are global settings to use with all calculations - not sure
-# there are any that work on all...
-
-# *pot_kwargs* are global settings that limit which potential(s) are included
-# when preparing.  
-
-# Specify machine and set database
-database_name = 'iprhub'
-run_location = 'ruth'
-test_commands = True
-
-# Generic settings for all calcs
-global_kwargs = {}
-
-# Potential-based modifiers
-pot_kwargs = {}
-pot_kwargs['status'] = 'all'
-pot_kwargs['id'] = [
-    '2001--Lee-B-J--Cr--LAMMPS--ipr1',
-    '2020--Mori-H--Fe--LAMMPS--ipr1',    
-    ]
-
-#pot_kwargs['pair_style'] = ['eam', 'eam/alloy', 'eam/fs', 'eam/cd']
-
-########################### Calculation parameters #############################
-
-# *np_per_runner* is number of processors that each prepared calculation will
-# expect. It determines the mpi_command to call LAMMPS with for most
-# calculations, and should be the number of processors assigned to the
-# associated runners.
-
-# *run_directory_name* indicates which directory calculations are prepared in.
-# All calcs in the directory should be prepared with the same np_per_runner.
-# This allows for different pools of calculations to be created.
-
-# *fix_lammps_versions* indicates if the fix_lammps_versions() function is to
-# be called after preparing the calculation.  Ideally, this should only be
-# True for the last calculation prepared in any given run_directory.
-
-calc_settings = {}
-
-style = 'isolated_atom'
-calc_settings[style] = {}
-calc_settings[style]['np_per_runner'] = 1
-calc_settings[style]['run_directory_name'] = f'{database_name}_3'
-calc_settings[style]['fix_lammps_versions'] = False
-
-style = 'diatom_scan'
-calc_settings[style] = {}
-calc_settings[style]['np_per_runner'] = 1
-calc_settings[style]['run_directory_name'] = f'{database_name}_3'
-calc_settings[style]['fix_lammps_versions'] = False
-
-style = 'E_vs_r_scan'
-calc_settings[style] = {}
-calc_settings[style]['np_per_runner'] = 1
-calc_settings[style]['run_directory_name'] = f'{database_name}_3'
-calc_settings[style]['fix_lammps_versions'] = True
-
-style = 'relax_box'
-calc_settings[style] = {}
-calc_settings[style]['np_per_runner'] = 1
-calc_settings[style]['run_directory_name'] = f'{database_name}_4'
-calc_settings[style]['fix_lammps_versions'] = False
-
-style = 'relax_dynamic'
-calc_settings[style] = {}
-calc_settings[style]['np_per_runner'] = 1
-calc_settings[style]['run_directory_name'] = f'{database_name}_4'
-calc_settings[style]['fix_lammps_versions'] = False
-
-style = 'relax_static'
-calc_settings[style] = {}
-calc_settings[style]['np_per_runner'] = 1
-calc_settings[style]['run_directory_name'] = f'{database_name}_4'
-calc_settings[style]['fix_lammps_versions'] = True
-
-style = 'relax_static_from_dynamic'
-calc_settings[style] = {}
-calc_settings[style]['np_per_runner'] = 1
-calc_settings[style]['run_directory_name'] = f'{database_name}_5'
-calc_settings[style]['fix_lammps_versions'] = True
-
-style = 'crystal_space_group'
-calc_settings[style] = {}
-calc_settings[style]['np_per_runner'] = 1
-calc_settings[style]['run_directory_name'] = f'{database_name}_6'
-calc_settings[style]['fix_lammps_versions'] = True
-
-style = 'elastic_constants_static'
-calc_settings[style] = {}
-calc_settings[style]['np_per_runner'] = 1
-calc_settings[style]['run_directory_name'] = f'{database_name}_7'
-calc_settings[style]['fix_lammps_versions'] = False
-
-style = 'phonon'
-calc_settings[style] = {}
-calc_settings[style]['np_per_runner'] = 1
-calc_settings[style]['run_directory_name'] = f'{database_name}_7'
-calc_settings[style]['fix_lammps_versions'] = False
-
-style = 'surface_energy_static'
-calc_settings[style] = {}
-calc_settings[style]['np_per_runner'] = 1
-calc_settings[style]['run_directory_name'] = f'{database_name}_7'
-calc_settings[style]['fix_lammps_versions'] = True
-
-#style = 'stacking_fault_map_2D'
-#calc_settings[style] = {}
-#calc_settings[style]['np_per_runner'] = 1
-#calc_settings[style]['run_directory_name'] = f'{database_name}_8'
-#calc_settings[style]['fix_lammps_versions'] = True
-
-#style = 'dislocation_monopole'
-#calc_settings[style] = {}
-#calc_settings[style]['np_per_runner'] = 16
-#calc_settings[style]['run_directory_name'] = f'{database_name}_9'
-#calc_settings[style]['fix_lammps_versions'] = False
-
-#style = 'dislocation_periodic_array'
-#calc_settings[style] = {}
-#calc_settings[style]['np_per_runner'] = 16
-#calc_settings[style]['run_directory_name'] = f'{database_name}_9'
-#calc_settings[style]['fix_lammps_versions'] = True
-
-########################## Machine-specific commands ###########################
-
-allcommands = {}
-
-commands = allcommands['desktop'] = {}
-commands['mpi_command'] = 'mpiexec -localonly {np_per_runner}' 
-commands['lammps_command'] = 'E:/LAMMPS/2020-03-03/bin/lmp_mpi'
-commands['lammps_command_snap_1'] = 'E:/LAMMPS/2017-01-27/bin/lmp_mpi'
-commands['lammps_command_snap_2'] = 'E:/LAMMPS/2019-06-05/bin/lmp_mpi'
-commands['lammps_command_old'] = 'E:/LAMMPS/2019-06-05/bin/lmp_mpi'
-
-commands = allcommands['laptop'] = {}
-commands['mpi_command'] = 'C:/Program Files/MPICH2/bin/mpiexec -localonly {np_per_runner}' 
-commands['lammps_command_snap_1'] = 'C:/Program Files/LAMMPS/2017-01-27/bin/lmp_mpi'
-commands['lammps_command_snap_2'] = 'C:/Program Files/LAMMPS/2019-06-05/bin/lmp_mpi'
-commands['lammps_command_old'] = 'C:/Program Files/LAMMPS/2019-06-05/bin/lmp_mpi'
-
-commands = allcommands['ruth'] = {}
-commands['mpi_command'] = '/cluster/deb9/bin/mpirun -n {np_per_runner}' 
-commands['lammps_command'] = 'lmp_mpi'
-commands['lammps_command_snap_1'] = '/users/lmh1/LAMMPS/bin/lmp_mpi_2017_03_31'
-commands['lammps_command_snap_2'] = '/users/lmh1/LAMMPS/bin/lmp_mpi_2019_06_05'
-commands['lammps_command_old'] = '/users/lmh1/LAMMPS/bin/lmp_mpi_2019_06_05'
-commands['lammps_command_aenet'] = '/users/lmh1/LAMMPS/bin/lmp_mpi_2020_03_03_aenet'
-commands['lammps_command_kim'] = '/users/lmh1/LAMMPS/bin/lmp_mpi_2020_03_03_kim'
-
-# Select commands for the machine in use
-commands = allcommands[run_location]
-global_kwargs['lammps_command'] = commands['lammps_command']
-
-############################# Test LAMMPS commands ############################
-
-if test_commands:
+def main(*args):
     
-    # Test main LAMMPS command
-    lammps_command = commands['lammps_command']
-    lammpsdate = lmp.checkversion(lammps_command)['date']
-    assert lammpsdate >= date(2019, 10, 30)
+    # Read input file in as dictionary
+    with open(args[0]) as f:
+        input_dict = iprPy.input.parse(f)
 
-    # Define test for older LAMMPS commands
-    def test_old(commands, key, startdate=None, enddate=None):
-        if key in commands:
-            command = commands[key]
+    # Get database_name
+    database_name = input_dict.pop('database_name')
+
+    # Get commands
+    commands = {}
+    commands['mpi_command'] = input_dict.pop('mpi_command')
+    allkeys = list(input_dict.keys())
+    for key in allkeys:
+        if key[:14] == 'lammps_command':
+            commands[key] = input_dict.pop(key)
+
+    # Get pools
+    all_styles = aslist(input_dict.pop('styles'))
+    all_np_per_runner = aslist(input_dict.pop('np_per_runner'))
+    all_run_directory_name = aslist(input_dict.pop('run_directory_name'))
+    if len(all_styles) != len(all_np_per_runner) or len(all_styles) != len(all_run_directory_name):
+        raise ValueError('Equal numbers of styles, np_per_runner and run_directory_name lines required')
+    pools = []
+    for styles, np_per_runner, run_directory_name in zip(all_styles, all_np_per_runner, all_run_directory_name):
+        pool = {}
+        pool['styles'] = styles.split()
+        pool['np_per_runner'] = int(np_per_runner)
+        pool['run_directory_name'] = run_directory_name
+        pools.append(pool)
+
+    # Get pot_kwargs:
+    pot_kwargs = {}
+    allkeys = list(input_dict.keys())
+    for key in allkeys:
+        if key[:10] == 'potential_':
+            pot_kwargs[key[10:]] = input_dict.pop(key)
+
+    # Get test_commands
+    test_commands = boolean(input_dict.pop('test_commands', True))
+
+    master_prepare(database_name, commands, pools, pot_kwargs=pot_kwargs,
+                   test_commands=test_commands, **input_dict)
+
+def master_prepare(database_name, commands, pools, pot_kwargs=None,
+                   test_commands=True, **global_kwargs):
+    """
+    Primary workflow script for preparing calculations consistent with the
+    NIST Interatomic Potentials Repository workflow.
+
+    Parameters
+    ----------
+    database_name : str
+        The name of the database that the calculations will be prepared for.
+    commands : dict
+        Lists mpi_command, the primary lammps_command and any alternate lammps
+        commands
+    pools : list
+        Indicates the pools for preparing the calculations in.  Each pool
+        is a dict containing styles (list of str), np_per_runner (int), and
+        run_directory_name (str).
+    pot_kwargs : dict, optional
+        Any potential limiting parameters.
+    test_commands : bool, optional
+        If True, the lammps_commands listed in run_command_filename will be
+        tested before calculations are prepared.  Default value is True.
+    global_kwargs : any
+        Any other kwargs will be taken as global parameters to apply to all
+        calculations.  
+    """
+    
+    global_kwargs = {}
+    global_kwargs['lammps_command'] = commands['lammps_command']
+
+    # Load pot kwargs
+    if pot_kwargs is None:
+        pot_kwargs = {}
+
+    # Loop over calculation pools
+    for pool in pools:
+        run_directory_name = pool['run_directory_name']
+        np_per_runner = pool['np_per_runner']
+        if np_per_runner > 1:
+            mpi_command = commands['mpi_command'].format(np_per_runner=np_per_runner)
         else:
-            return True
+            mpi_command = ''
 
-        try:
-            lammpsdate = lmp.checkversion(command)['date']
-        except:
-            print(f'{key} not found or not working')
-        else:
-            if startdate is not None and lammpsdate < startdate:
-                print(f'{key} too old')
-            elif enddate is not None and lammpsdate > enddate:
-                print(f'{key} too new')
-            else:
-                return True
-        return False
+        # Loop over styles to prepare in that pool
+        for style in pool['styles']:
+            prepare_switch(style, database_name, run_directory_name,
+                           pot_kwargs=pot_kwargs,
+                           mpi_command=mpi_command, **global_kwargs)
 
-    # Test older LAMMPS commands
-    if not test_old(commands, 'lammps_command_snap_1', date(2014,  8,  8), date(2017,  5, 30)):
-        del commands['lammps_command_snap_1']
-    if not test_old(commands, 'lammps_command_snap_2', date(2018, 12,  3), date(2019,  6, 12)):
-        del commands['lammps_command_snap_2']
-    if not test_old(commands, 'lammps_command_old', None, date(2019, 10, 30)):   
-        del commands['lammps_command_old']
-
-################################ isolated_atom ################################
-
-style = 'isolated_atom'
-if style in calc_settings:
-    
-    # Load settings
-    np_per_runner = calc_settings[style]['np_per_runner']
-    run_directory_name = calc_settings[style]['run_directory_name']
-    
-    # Build kwargs
-    kwargs = deepcopy(global_kwargs)
-    if np_per_runner > 1:
-        kwargs['mpi_command'] = commands['mpi_command'].format(np_per_runner=np_per_runner)
-    for key in pot_kwargs:
-        kwargs[f'intpot_{key}'] = pot_kwargs[key]
-
-    # Prepare
-    prepare.isolated_atom.main(database_name, run_directory_name, **kwargs)
-
-    # Fix LAMMPS versions
-    if calc_settings[style]['fix_lammps_versions']:
+        # Fix lammps versions in the pool
         fix_lammps_versions(run_directory_name, commands)
 
-################################## diatom_scan ##################################
 
-style = 'diatom_scan'
-if style in calc_settings:
-    
-    # Load settings
-    np_per_runner = calc_settings[style]['np_per_runner']
-    run_directory_name = calc_settings[style]['run_directory_name']
-    
-    # Build kwargs
-    kwargs = deepcopy(global_kwargs)
-    if np_per_runner > 1:
-        kwargs['mpi_command'] = commands['mpi_command'].format(np_per_runner=np_per_runner)
+def prepare_switch(style, database_name, run_directory_name, pot_kwargs=None,
+                   **kwargs):
+    """
+    Wrapper function that calls the corresponding prepare function for a given
+    style.
 
-    kwargs['maximum_r'] = '10.0',
-    kwargs['number_of_steps_r'] = '500'
-    for key in pot_kwargs:
-        kwargs[f'potential_{key}'] = pot_kwargs[key]
-    
-    # Prepare
-    prepare.diatom_scan.main(database_name, run_directory_name, **kwargs)
+    Parameters
+    ----------
+    style : str
+        The calculation (sub)style to prepare.
+    database_name : str
+        The name of the pre-set database to use.
+    run_directory_name : str
+        The name of the pre-set run_directory to use.
+    pot_kwargs : dict, optional
+        Values for potential-specific limiters.
+    **kwargs : str or list, optional
+        Values for any additional or replacement prepare parameters.
+    """
+    # Define dict mapping style to prepare function
+    switch = {}
+    switch['isolated_atom'] = prepare.isolated_atom.main
+    switch['diatom_scan'] = prepare.diatom_scan.main
+    switch['E_vs_r_scan'] = prepare_E_vs_r_scan
+    switch['relax_box'] = prepare.relax_box.main
+    switch['relax_dynamic'] = prepare.relax_dynamic.main
+    switch['relax_static'] = prepare.relax_static.main
+    switch['relax_static_from_dynamic'] = prepare.relax_static.from_dynamic
+    switch['crystal_space_group'] = prepare_crystal_space_group
+    switch['elastic_constants_static'] = prepare.elastic_constants_static.main
+    switch['phonon'] = prepare.phonon.main
+    switch['point_defect_static'] = prepare_point_defect_static
+    switch['surface_energy_static'] = prepare_surface_energy_static
+    switch['stacking_fault_map_2D'] = prepare_stacking_fault_map_2D
+    switch['dislocation_monopole'] = prepare_dislocation_monopole
+    switch['dislocation_periodic_array'] = prepare_dislocation_periodic_array
 
-    # Fix LAMMPS versions
-    if calc_settings[style]['fix_lammps_versions']:
-        fix_lammps_versions(run_directory_name, commands)
+    # Shorten calculation-specific kwargs
+    for key in kwargs:
+        if key[:len(style)] == style:
+            kwargs[key[:len(style)].lstrip('_')] = kwargs.pop(key)
 
-################################## E_vs_r_scan ##################################
+    # Call the corresponding function
+    switch[style](database_name, run_directory_name, pot_kwargs=pot_kwargs,
+                  **kwargs)
 
-style = 'E_vs_r_scan'
-if style in calc_settings:
-    
-    # Load settings
-    np_per_runner = calc_settings[style]['np_per_runner']
-    run_directory_name = calc_settings[style]['run_directory_name']
-    
-    # Build kwargs
-    kwargs = deepcopy(global_kwargs)
-    if np_per_runner > 1:
-        kwargs['mpi_command'] = commands['mpi_command'].format(np_per_runner=np_per_runner)
+def prepare_E_vs_r_scan(database_name, run_directory_name, pot_kwargs=None,
+                        **kwargs):
+    """
+    Calls main and bop versions of prepare E_vs_r_scan
+    """
+    # Deep copy pot_kwargs to allow manipulation
+    pot_kwargs = deepcopy(pot_kwargs)
 
-    for key in pot_kwargs:
-        kwargs[f'prototype_potential_{key}'] = pot_kwargs[key]
+    # Extract pair_style from pot_kwargs
+    pair_style = pot_kwargs.pop('pair_style', None)
 
-    # Prepare bop
-    pair_style = kwargs.pop('prototype_potential_pair_style', None)
-    if pair_style is None or 'bop' in pair_style:
-        prepare.E_vs_r_scan.bop(database_name, run_directory_name, **kwargs)
-        
+    # Prepare bop calculations
+    if pair_style is None or pair_style=='bop' or 'bop' in pair_style:
+        prepare.E_vs_r_scan.bop(database_name, run_directory_name,
+                                pot_kwargs=pot_kwargs, **kwargs)
+
     # Prepare everything else
     if pair_style is not None:
-        kwargs['prototype_potential_pair_style'] = pair_style
-    prepare.E_vs_r_scan.main(database_name, run_directory_name, **kwargs)
+        kwargs['pair_style'] = pair_style
+    prepare.E_vs_r_scan.main(database_name, run_directory_name, 
+                             pot_kwargs=pot_kwargs, **kwargs)
 
-    # Fix LAMMPS versions
-    if calc_settings[style]['fix_lammps_versions']:
-        fix_lammps_versions(run_directory_name, commands)
+def prepare_crystal_space_group(database_name, run_directory_name,
+                                pot_kwargs=None, **kwargs):
+    """
+    Calls prototype, reference and relax versions of prepare crystal_space_group
+    """
+    # Prepare using prototype, reference and relax references
+    #prepare.crystal_space_group.prototype(database_name, run_directory_name,
+    #                             pot_kwargs=pot_kwargs, **kwargs)
+    #prepare.crystal_space_group.reference(database_name, run_directory_name,
+    #                             pot_kwargs=pot_kwargs, **kwargs)
+    prepare.crystal_space_group.relax(database_name, run_directory_name,
+                                 pot_kwargs=pot_kwargs, **kwargs)
 
-################################## relax_box ##################################
-
-style = 'relax_box'
-if style in calc_settings:
-    
-    # Load settings
-    np_per_runner = calc_settings[style]['np_per_runner']
-    run_directory_name = calc_settings[style]['run_directory_name']
-    
-    # Build kwargs
-    kwargs = deepcopy(global_kwargs)
-    if np_per_runner > 1:
-        kwargs['mpi_command'] = commands['mpi_command'].format(np_per_runner=np_per_runner)
-    
-    kwargs['parent_status'] = 'finished'
-    for key in pot_kwargs:
-        kwargs[f'reference_potential_{key}'] = pot_kwargs[key] 
-        kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
-
-    # Prepare
-    prepare.relax_box.main(database_name, run_directory_name, **kwargs)
-
-    # Fix LAMMPS versions
-    if calc_settings[style]['fix_lammps_versions']:
-        fix_lammps_versions(run_directory_name, commands)
-
-################################ relax_dynamic ################################
-
-style = 'relax_dynamic'
-if style in calc_settings:
-    
-    # Load settings
-    np_per_runner = calc_settings[style]['np_per_runner']
-    run_directory_name = calc_settings[style]['run_directory_name']
-    
-    # Build kwargs
-    kwargs = deepcopy(global_kwargs)
-    if np_per_runner > 1:
-        kwargs['mpi_command'] = commands['mpi_command'].format(np_per_runner=np_per_runner)
-
-    kwargs['parent_status'] = 'finished'
-    for key in pot_kwargs:
-        kwargs[f'reference_potential_{key}'] = pot_kwargs[key] 
-        kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
-    
-    # Prepare
-    prepare.relax_dynamic.main(database_name, run_directory_name, **kwargs)
-
-    # Fix LAMMPS versions
-    if calc_settings[style]['fix_lammps_versions']:
-        fix_lammps_versions(run_directory_name, commands)
-
-################################# relax_static ################################
-
-style = 'relax_static'
-if style in calc_settings:
-    
-    # Load settings
-    np_per_runner = calc_settings[style]['np_per_runner']
-    run_directory_name = calc_settings[style]['run_directory_name']
-    
-    # Build kwargs
-    kwargs = deepcopy(global_kwargs)
-    if np_per_runner > 1:
-        kwargs['mpi_command'] = commands['mpi_command'].format(np_per_runner=np_per_runner)
-
-    kwargs['parent_status'] = 'finished'
-    for key in pot_kwargs:
-        kwargs[f'reference_potential_{key}'] = pot_kwargs[key] 
-        kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
-
-    # Prepare
-    prepare.relax_static.main(database_name, run_directory_name, **kwargs)
-
-    # Fix LAMMPS versions
-    if calc_settings[style]['fix_lammps_versions']:
-        fix_lammps_versions(run_directory_name, commands)
-
-
-########################## relax_static_from_dynamic ##########################
-
-style = 'relax_static_from_dynamic'
-if style in calc_settings:
-    
-    # Load settings
-    np_per_runner = calc_settings[style]['np_per_runner']
-    run_directory_name = calc_settings[style]['run_directory_name']
-    
-    # Build kwargs
-    kwargs = deepcopy(global_kwargs)
-    if np_per_runner > 1:
-        kwargs['mpi_command'] = commands['mpi_command'].format(np_per_runner=np_per_runner)
-
-    kwargs['archive_status'] = 'finished'
-    for key in pot_kwargs:
-        kwargs[f'archive_potential_{key}'] = pot_kwargs[key]
-
-    # Prepare
-    prepare.relax_static.from_dynamic(database_name, run_directory_name, **kwargs)
-
-    # Fix LAMMPS versions
-    if calc_settings[style]['fix_lammps_versions']:
-        fix_lammps_versions(run_directory_name, commands)
-
-############################# crystal_space_group #############################
-
-style = 'crystal_space_group'
-if style in calc_settings:
-    
-    # Load settings
-    np_per_runner = calc_settings[style]['np_per_runner']
-    run_directory_name = calc_settings[style]['run_directory_name']
-    
-    # Build kwargs
-    kwargs = deepcopy(global_kwargs)
-    if np_per_runner > 1:
-        kwargs['mpi_command'] = commands['mpi_command'].format(np_per_runner=np_per_runner)
-
-    kwargs['relax_static_status'] = 'finished'
-    kwargs['relax_box_status'] = 'finished'
-
-    # Prepare
-    prepare.crystal_space_group.prototype(database_name, run_directory_name, **kwargs)
-    prepare.crystal_space_group.reference(database_name, run_directory_name, **kwargs)
-    prepare.crystal_space_group.relax(database_name, run_directory_name, **kwargs)
-
-    # Fix LAMMPS versions
-    if calc_settings[style]['fix_lammps_versions']:
-        fix_lammps_versions(run_directory_name, commands)
-
-########################### elastic_constants_static ##########################
-
-style = 'elastic_constants_static'
-if style in calc_settings:
-    
-    # Load settings
-    np_per_runner = calc_settings[style]['np_per_runner']
-    run_directory_name = calc_settings[style]['run_directory_name']
-    
-    # Build kwargs
-    kwargs = deepcopy(global_kwargs)
-    if np_per_runner > 1:
-        kwargs['mpi_command'] = commands['mpi_command'].format(np_per_runner=np_per_runner)
-
-    kwargs['parent_standing'] = 'good'
-    for key in pot_kwargs:
-        kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
-
-    # Prepare
-    prepare.elastic_constants_static.main(database_name, run_directory_name, **kwargs)
-
-    # Fix LAMMPS versions
-    if calc_settings[style]['fix_lammps_versions']:
-        fix_lammps_versions(run_directory_name, commands)
-
-#################################### phonon ###################################
-
-style = 'phonon'
-if style in calc_settings:
-    
-    # Load settings
-    np_per_runner = calc_settings[style]['np_per_runner']
-    run_directory_name = calc_settings[style]['run_directory_name']
-    
-    # Build kwargs
-    kwargs = deepcopy(global_kwargs)
-    if np_per_runner > 1:
-        kwargs['mpi_command'] = commands['mpi_command'].format(np_per_runner=np_per_runner)
-
-    kwargs['parent_method'] = 'dynamic'
-    kwargs['parent_standing'] = 'good'
-
-    # Prepare
-    prepare.phonon.main(database_name, run_directory_name, **kwargs)
-
-    # Fix LAMMPS versions
-    if calc_settings[style]['fix_lammps_versions']:
-        fix_lammps_versions(run_directory_name, commands)
-
-############################ surface_energy_static ############################
-
-style = 'surface_energy_static'
-if style in calc_settings:
+def prepare_point_defect_static(database_name, run_directory_name,
+                                pot_kwargs=None, **kwargs):
+    """
+    Calls prepare point_defect_static for each unique family
+    """
+    # Load database
     database = iprPy.load_database(database_name)
+    
+    # Build kwargs for each family
+    families = np.unique(database.get_records_df(style='point_defect').family)
+    for family in families:
+        print(family, flush=True)        
+        kwargs['parent_family'] = kwargs['defect_family'] = family 
+        
+        # Prepare
+        prepare.point_defect_static.main(database_name, run_directory_name,
+                                           pot_kwargs=pot_kwargs, **kwargs)
 
-    # Load settings
-    np_per_runner = calc_settings[style]['np_per_runner']
-    run_directory_name = calc_settings[style]['run_directory_name']
+def prepare_surface_energy_static(database_name, run_directory_name,
+                                pot_kwargs=None, **kwargs):
+    """
+    Calls prepare surface_energy_static for each unique family
+    """
+    # Load database
+    database = iprPy.load_database(database_name)
     
     # Build kwargs for each family
     families = np.unique(database.get_records_df(style='free_surface').family)
     for family in families:
-        print(family)
-        kwargs = deepcopy(global_kwargs)
-        if np_per_runner > 1:
-            kwargs['mpi_command'] = commands['mpi_command'].format(np_per_runner=np_per_runner)
-        
-        kwargs['parent_method'] = 'dynamic'
-        kwargs['parent_standing'] = 'good'
+        print(family, flush=True)        
         kwargs['parent_family'] = kwargs['defect_family'] = family 
-        for key in pot_kwargs:
-            kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
         
         # Prepare
-        prepare.surface_energy_static.main(database_name, run_directory_name, **kwargs)
+        prepare.surface_energy_static.main(database_name, run_directory_name,
+                                           pot_kwargs=pot_kwargs, **kwargs)
 
-    # Fix LAMMPS versions
-    if calc_settings[style]['fix_lammps_versions']:
-        fix_lammps_versions(run_directory_name, commands)
-
-############################ stacking_fault_map_2D ############################
-
-style = 'stacking_fault_map_2D'
-if style in calc_settings:
+def prepare_stacking_fault_map_2D(database_name, run_directory_name,
+                                pot_kwargs=None, **kwargs):
+    """
+    Calls prepare stacking_fault_map_2D for each unique family
+    """
+    # Load database
     database = iprPy.load_database(database_name)
-
-    # Load settings
-    np_per_runner = calc_settings[style]['np_per_runner']
-    run_directory_name = calc_settings[style]['run_directory_name']
     
     # Build kwargs for each family
     families = np.unique(database.get_records_df(style='stacking_fault').family)
     for family in families:
-        print(family)
-        kwargs = deepcopy(global_kwargs)
-        if np_per_runner > 1:
-            kwargs['mpi_command'] = commands['mpi_command'].format(np_per_runner=np_per_runner)
-        
-        kwargs['parent_method'] = 'dynamic'
-        kwargs['parent_standing'] = 'good'
-        kwargs['parent_family'] = kwargs['defect_family'] = family
-        for key in pot_kwargs:
-            kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
+        print(family, flush=True)        
+        kwargs['parent_family'] = kwargs['defect_family'] = family 
         
         # Prepare
-        prepare.stacking_fault_map_2D.main(database_name, run_directory_name, **kwargs)
+        prepare.stacking_fault_map_2D.main(database_name, run_directory_name,
+                                           pot_kwargs=pot_kwargs, **kwargs)
 
-    # Fix LAMMPS versions
-    if calc_settings[style]['fix_lammps_versions']:
-        fix_lammps_versions(run_directory_name, commands)
-
-############################# dislocation_monopole ############################
-
-style = 'dislocation_monopole'
-if style in calc_settings:
-    
-    # Load settings
-    np_per_runner = calc_settings[style]['np_per_runner']
-    run_directory_name = calc_settings[style]['run_directory_name']
-    
-    # Build kwargs
-    kwargs = deepcopy(global_kwargs)
-    if np_per_runner > 1:
-        kwargs['mpi_command'] = commands['mpi_command'].format(np_per_runner=np_per_runner)
-
-    for key in pot_kwargs:
-        kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
-
+def prepare_dislocation_monopole(database_name, run_directory_name,
+                                pot_kwargs=None, **kwargs):
+    """
+    Calls prepare dislocation_monopole for each dislocation type
+    """
     # Prepare
-    prepare.dislocation_monopole.bcc_screw(database_name, run_directory_name, **kwargs)
-    prepare.dislocation_monopole.bcc_edge(database_name, run_directory_name, **kwargs)
-    prepare.dislocation_monopole.bcc_edge_112(database_name, run_directory_name, **kwargs)
-    prepare.dislocation_monopole.fcc_edge_100(database_name, run_directory_name, **kwargs)
+    prepare.dislocation_monopole.bcc_screw(database_name, run_directory_name,
+                                           pot_kwargs=pot_kwargs, **kwargs)
+    prepare.dislocation_monopole.bcc_edge(database_name, run_directory_name,
+                                           pot_kwargs=pot_kwargs, **kwargs)
+    prepare.dislocation_monopole.bcc_edge_112(database_name, run_directory_name,
+                                           pot_kwargs=pot_kwargs, **kwargs)
+    prepare.dislocation_monopole.fcc_edge_100(database_name, run_directory_name,
+                                           pot_kwargs=pot_kwargs, **kwargs)
 
-    # Fix LAMMPS versions
-    if calc_settings[style]['fix_lammps_versions']:
-        fix_lammps_versions(run_directory_name, commands)
-
-########################## dislocation_periodic_array #########################
-
-style = 'dislocation_periodic_array'
-if style in calc_settings:
+def prepare_dislocation_periodic_array(database_name, run_directory_name,
+                                pot_kwargs=None, **kwargs):
+    """
+    Calls prepare dislocation_periodic_array for each dislocation type
+    """
     
-    # Load settings
-    np_per_runner = calc_settings[style]['np_per_runner']
-    run_directory_name = calc_settings[style]['run_directory_name']
-    
-    # Build kwargs
-    kwargs = deepcopy(global_kwargs)
-    if np_per_runner > 1:
-        kwargs['mpi_command'] = commands['mpi_command'].format(np_per_runner=np_per_runner)
-
-    for key in pot_kwargs:
-        kwargs[f'parent_potential_{key}'] = pot_kwargs[key]
-
     # Prepare
-    prepare.dislocation_periodic_array.fcc_edge_mix(database_name, run_directory_name, **kwargs)
-    prepare.dislocation_periodic_array.fcc_screw(database_name, run_directory_name, **kwargs)
+    prepare.dislocation_periodic_array.fcc_edge_mix(database_name, run_directory_name,
+                                           pot_kwargs=pot_kwargs, **kwargs)
+    prepare.dislocation_periodic_array.fcc_screw(database_name, run_directory_name,
+                                           pot_kwargs=pot_kwargs, **kwargs)
 
-    # Fix LAMMPS versions
-    if calc_settings[style]['fix_lammps_versions']:
-        fix_lammps_versions(run_directory_name, commands)
+if __name__ == '__main__':
+    main(*sys.argv[1:])
