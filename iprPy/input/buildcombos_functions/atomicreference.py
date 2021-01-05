@@ -45,7 +45,7 @@ def atomicreference(database, keys, content_dict=None,
         status = potential_kwargs.pop('status', 'active')
         
         # Set all status value
-        if status is 'all':
+        if status == 'all':
             status = ['active', 'retracted', 'superseded']
 
         # Fetch potential records 

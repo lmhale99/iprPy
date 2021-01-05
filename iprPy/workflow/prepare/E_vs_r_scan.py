@@ -102,7 +102,8 @@ def bop(database_name, run_directory_name, pot_kwargs=None, **kwargs):
     # Add pot_kwargs with the appropriate prefix
     if pot_kwargs is not None:
         for key in pot_kwargs:
-            kwargs[f'prototype_potential_{key}'] = pot_kwargs[key]
+            if key != 'pair_style':
+                kwargs[f'prototype_potential_{key}'] = pot_kwargs[key]
 
     # Prepare 
     prepare(database_name, run_directory_name, calculation_name,

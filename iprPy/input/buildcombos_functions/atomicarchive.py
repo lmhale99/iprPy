@@ -33,7 +33,7 @@ def atomicarchive(database, keys, content_dict=None, record=None, load_key='atom
         status = potential_kwargs.pop('status', 'active')
         
         # Set all status value
-        if status is 'all':
+        if status == 'all':
             status = ['active', 'retracted', 'superseded']
         
         # Fetch potential records 

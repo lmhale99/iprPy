@@ -40,7 +40,7 @@ def main(database_name, run_directory_name, pot_kwargs=None, **kwargs):
     status = pot_kwargs.pop('status', 'active')
     
     # Set all status value
-    if status is 'all':
+    if status == 'all':
         status = ['active', 'retracted', 'superseded']
 
     potentials, potential_df = database.get_records(style=potential_record, return_df=True,

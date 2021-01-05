@@ -16,7 +16,7 @@ def interatomicpotential(database, keys, content_dict=None, record='potential_LA
         content_dict = {}
 
     # Set all status value
-    if status is 'all':
+    if status == 'all':
         status = ['active', 'retracted', 'superseded']
 
     # Fetch potential records and df
@@ -43,5 +43,5 @@ def interatomicpotential(database, keys, content_dict=None, record='potential_LA
                 inputs['potential_dir_content'].append(f'tar {potential.name}')
             else:
                 inputs[key].append('')
-    
+
     return inputs, content_dict

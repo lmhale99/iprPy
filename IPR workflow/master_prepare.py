@@ -178,7 +178,7 @@ def prepare_E_vs_r_scan(database_name, run_directory_name, pot_kwargs=None,
 
     # Prepare everything else
     if pair_style is not None:
-        kwargs['pair_style'] = pair_style
+        pot_kwargs['pair_style'] = pair_style
     prepare.E_vs_r_scan.main(database_name, run_directory_name, 
                              pot_kwargs=pot_kwargs, **kwargs)
 
