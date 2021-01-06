@@ -56,12 +56,12 @@ def fcc_edge_mix(database_name, run_directory_name, pot_kwargs=None, **kwargs):
         'dislocation_duplicatecutoff 1 angstrom',
         'dislocation_onlylinear      False',
         'annealtemperature           10',
-        'annealsteps                 10000',
+        'annealsteps                 10000000',
         'randomseed                  ',
         'energytolerance             ',
         'forcetolerance              ',
-        'maxiterations               ',
-        'maxevaluations              ',
+        'maxiterations               10000',
+        'maxevaluations              100000',
         'maxatommotion               ',
         ])        
 
@@ -126,12 +126,12 @@ def fcc_screw(database_name, run_directory_name, pot_kwargs=None, **kwargs):
         'dislocation_duplicatecutoff 1 angstrom',
         'dislocation_onlylinear      True',
         'annealtemperature           10',
-        'annealsteps                 10000',
+        'annealsteps                 10000000',
         'randomseed                  ',
         'energytolerance             ',
         'forcetolerance              ',
-        'maxiterations               ',
-        'maxevaluations              ',
+        'maxiterations               10000',
+        'maxevaluations              100000',
         'maxatommotion               ',
         ])        
 
