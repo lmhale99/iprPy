@@ -607,7 +607,7 @@ class RunManager():
         if temp:
             td = tempfile.TemporaryDirectory()
             temp_directory = td.name
-            print(f'using temporary directory {temp_directory}')
+            print(f'using temporary directory {temp_directory}', flush=True)
 
         bidcount = 0
 
