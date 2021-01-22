@@ -61,8 +61,76 @@ class MongoDatabase(Database):
         """pymongo.Database : The underlying database API object."""
         return self.__mongodb
     
+    def build_query(self, style, name=None, **kwargs):
+        """
+        Constructs a mongo query based on the expected paths associated with
+        certain keyword parameters.  The optional parameters below is the list
+        of recognized keywords.
+        
+        NOTE: The constructed query assumes that the record follows the
+        same convention of the majority of iprPy calculation records.  If the
+        expected path is not in the record then any resulting mongo queries
+        will fail.
+        
+        Parameters
+        ----------
+        style : str
+            The record style.
+        name : str or list, optional
+            One or more record names to limit by.
+        family : str or list, optional
+            One or more system-info families to limit by.
+        potential_LAMMPS_id : str or list, optional
+            One or more LAMMPS potential implementation ids.
+        potential_LAMMPS_key : str or list, optional
+            One or more LAMMPS potential implementation keys.
+        potential_id : str or list, optional
+            One or more potential model ids.
+        potential_key : str or list, optional
+            One or more potential model keys.
+        status : str, optional
+            The calculation's status: 'finished', 'not calculated' or 'error'.
+            Lists of status not (yet) supported.
+            
+        Returns
+        -------
+        query : dict
+            The Mongo query as composed as a dict that pymongo can interpret.
+        kwargs : dict
+            Any remaining kwargs that were not recognized as having a known
+            common record path.
+        
+        """
+        root = style.replace('_', '-')
+        
+        query = {}
+
+        # pop known kwargs and convert to query path
+        if name is not None:
+            query['name'] = {'$in': aslist(name)}
+        if 'family' in kwargs:
+            query[f'content.{root}.system-info.family'] = {'$in': aslist(kwargs.pop('family'))}
+        if 'potential_LAMMPS_id' in kwargs:
+            query[f'content.{root}.potential-LAMMPS.id'] = {'$in': aslist(kwargs.pop('potential_LAMMPS_id'))}
+        if 'potential_LAMMPS_key' in kwargs:
+            query[f'content.{root}.potential-LAMMPS.key'] = {'$in': aslist(kwargs.pop('potential_LAMMPS_key'))}
+        if 'potential_id' in kwargs:
+            query[f'content.{root}.potential-LAMMPS.potential.id'] = {'$in': aslist(kwargs.pop('potential_id'))}
+        if 'potential_key' in kwargs:
+            query[f'content.{root}.potential-LAMMPS.potential.key'] = {'$in': aslist(kwargs.pop('potential_key'))}
+            
+        if 'status' in kwargs:
+            status = kwargs.pop('status')
+            assert isinstance(status, str), 'lists of status not yet supported'
+            if status == 'finished':
+                query[f'content.{root}.status'] = {'$exists': False}
+            else:
+                query[f'content.{root}.status'] = status
+
+        return query, kwargs
+    
     def get_records(self, name=None, style=None, query=None, return_df=False,
-                    **kwargs):
+                    fast=False, **kwargs):
         """
         Produces a list of all matching records in the database.
         
@@ -72,30 +140,53 @@ class MongoDatabase(Database):
             The record name or id to limit the search by.
         style : str, optional
             The record style to limit the search by.
-        query : str, optional
-            A query str for identifying records.  Not supported by this style.
+        query : dict, optional
+            A Mongo-style query to use for limiting the search.
         return_df : bool, optional
+            Indicates if the corresponding pandas DataFrame for the records
+            is to be also returned.  Default value is False.
+        fast : bool, optional
+            If True, the given kwargs will be passed through build_query to
+            construct a mongo query based on expected paths for parameters.
+            If True, then exactly one style value is required and query cannot
+            be given.  Default value is False.
+        **kwargs : any, optional
+            Any extra keyword parameters will be used to parse records further
+            based on record.todict() key-values.
             
         Returns
         ------
-        list of iprPy.Records
+        numpy.NDArray of iprPy.Records
             All records from the database matching the given parameters.
+        pandas.DataFrame
+            The corresponding DataFrame for the records.  Returned if 
+            return_df is True.
         """
-        
-        if style is None:
-            style = list(record_styles.keys())
-        else:
+        # Build query if fast is True
+        if fast is True:
+            if not isinstance(style, str):
+                raise TypeError('Exactly one style is required if fast is True')
+            if query is not None:
+                raise ValueError('query cannot be given if fast is True')
+            query, kwargs = self.build_query(style, name=name, **kwargs)
             style = aslist(style)
-
-        # Handle query-based parameters
-        if query is None:
-            query = {}
-            if name is not None:
-                query['name'] = {}
-                query['name']['$in'] = aslist(name)
-        elif name is not None:
-            raise ValueError('name and query cannot both be given')
         
+        # Build query if fast is False
+        else:
+            if style is None:
+                style = list(record_styles.keys())
+            else:
+                style = aslist(style)
+
+            # Handle query-based parameters
+            if query is None:
+                query = {}
+                if name is not None:
+                    query['name'] = {'$in': aslist(name)}
+            elif name is not None:
+                raise ValueError('name and query cannot both be given')
+        
+        # Query the collection to construct records and df
         df = []
         records = []
         for s in style:
@@ -106,23 +197,24 @@ class MongoDatabase(Database):
                 record = load_record(s, entry['name'], entry['content'])
                 records.append(record)
                 df.append(record.todict(full=False, flat=True))
-                
         records = np.array(records)
         df = pd.DataFrame(df)
 
+        # Further filter records using kwargs
         if len(df) > 0:
             for key in kwargs:
                 df = df[df[key].isin(aslist(kwargs[key]))]
 
+        # Return records (and df)
         if return_df:
-            return list(records[df.index.tolist()]), df.reset_index(drop=True)
+            return records[df.index.tolist()], df.reset_index(drop=True)
         else:
-            return list(records[df.index.tolist()])
+            return records[df.index.tolist()]
 
     def get_records_df(self, name=None, style=None, query=None, full=True,
-                       flat=False, **kwargs):
+                       flat=False, fast=False, **kwargs):
         """
-        Produces a list of all matching records in the database.
+        Produces a pandas.Dataframe of all matching records in the database.
         
         Parameters
         ----------
@@ -130,27 +222,55 @@ class MongoDatabase(Database):
             The record name or id to limit the search by.
         style : str, optional
             The record style to limit the search by.
+        query : dict, optional
+            A Mongo-style query to use for limiting the search.
+        full : bool, optional
+            Indicates if the entries in the dataframe contain both input and
+            results data (True) or only input data (False).  Default value is
+            True.
+        flat : bool, optional
+            Indicates if the dataframe elements are to be flattened to simple
+            terms (True) or left as complex objects (False).  Some values may
+            be excluded if flat is True.  Default value is False.
+        fast : bool, optional
+            If True, the given kwargs will be passed through build_query to
+            construct a mongo query based on expected paths for parameters.
+            If True, then exactly one style value is required and query cannot
+            be given.  Default value is False.
+        **kwargs : any, optional
+            Any extra keyword parameters will be used to parse records further
+            based on record.todict() key-values.
             
         Returns
         ------
         list of iprPy.Records
             All records from the database matching the given parameters.
         """
-        
-        if style is None:
-            style = list(record_styles.keys())
-        else:
+        # Build query if fast is True
+        if fast is True:
+            if not isinstance(style, str):
+                raise TypeError('Exactly one style is required if fast is True')
+            if query is not None:
+                raise ValueError('query cannot be given if fast is True')
+            query, kwargs = self.build_query(style, name=name, **kwargs)
             style = aslist(style)
-
-        # Handle query-based parameters
-        if query is None:
-            query = {}
-            if name is not None:
-                query['name'] = {}
-                query['name']['$in'] = aslist(name)
-        elif name is not None:
-            raise ValueError('name and query cannot both be given')
         
+        # Build query if fast is False
+        else:
+            if style is None:
+                style = list(record_styles.keys())
+            else:
+                style = aslist(style)
+
+            # Handle query-based parameters
+            if query is None:
+                query = {}
+                if name is not None:
+                    query['name'] = {'$in': aslist(name)}
+            elif name is not None:
+                raise ValueError('name and query cannot both be given')
+        
+        # Query the collection to construct df
         df = []
         for s in style:
             collection = self.mongodb[s]
@@ -159,18 +279,20 @@ class MongoDatabase(Database):
                 # Load as Record object
                 record = load_record(s, entry['name'], entry['content'])
                 df.append(record.todict(full=full, flat=flat))
-                
         df = pd.DataFrame(df)
         
+        # Further filter records using kwargs
         if len(df) > 0:
             for key in kwargs:
                 df = df[df[key].isin(aslist(kwargs[key]))]
         
+        # Return df
         return df.reset_index(drop=True)
     
-    def get_record(self, name=None, style=None, query=None, **kwargs):
+    def get_record(self, name=None, style=None, query=None, fast=False,
+                   **kwargs):
         """
-        Returns a single matching record from the database.
+        Retrieves a single matching record from the database.
         
         Parameters
         ----------
@@ -178,11 +300,21 @@ class MongoDatabase(Database):
             The record name or id to limit the search by.
         style : str, optional
             The record style to limit the search by.
+        query : dict, optional
+            A Mongo-style query to use for limiting the search.
+        fast : bool, optional
+            If True, the given kwargs will be passed through build_query to
+            construct a mongo query based on expected paths for parameters.
+            If True, then exactly one style value is required and query cannot
+            be given.  Default value is False.
+        **kwargs : any, optional
+            Any extra keyword parameters will be used to parse records further
+            based on record.todict() key-values.
             
         Returns
         ------
         iprPy.Record
-            The single record from the database matching the given parameters.
+            The record from the database matching the given parameters.
         
         Raises
         ------
@@ -191,7 +323,8 @@ class MongoDatabase(Database):
         """
         
         # Get records
-        record = self.get_records(name=name, style=style, query=None, **kwargs)
+        record = self.get_records(name=name, style=style, query=query,
+                                  fast=fast, **kwargs)
         
         # Verify that there is only one matching record
         if len(record) == 1:
