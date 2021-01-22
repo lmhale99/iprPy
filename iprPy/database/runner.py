@@ -73,10 +73,10 @@ def runner(database, run_directory, calc_name=None, orphan_directory=None,
                            temp_directory=temp_directory)
     
     else:
-        print(f'Runner operating on {calc_name} with pid {runmanager.pid}')
+        print(f'Runner operating on {calc_name} with pid {runmanager.pid}', flush=True)
         status = runmanager.run(calc_name=calc_name, temp=temp,
                                  temp_directory=temp_directory)
-        print(status)
+        print(status, flush=True)
 
 class RunManager():
     """
@@ -524,7 +524,7 @@ class RunManager():
             if temp:
                 td = tempfile.TemporaryDirectory()
                 temp_directory = td.name
-                print(f'using temporary directory {temp_directory}')
+                print(f'using temporary directory {temp_directory}', flush=True)
             
             if temp_directory is not None and status != 'error':
                 exe_directory = Path(temp_directory, calc_name)
