@@ -133,10 +133,10 @@ def elastic_constants_static(lammps_command, system, potential, mpi_command=None
     # Define lammps variables
     lammps_variables = {}
     system_info = system.dump('atom_data', f='init.dat',
-                              units=potential.units,
-                              atom_style=potential.atom_style)
-    lammps_variables['atomman_system_info'] = system_info
-    lammps_variables['atomman_pair_info'] = potential.pair_info(system.symbols)
+                              potential=potential,
+                              return_pair_info=True)
+    lammps_variables['atomman_system_pair_info'] = system_info
+    lammps_variables['restart_commands'] = restart_commands(potential, system.symbols)
     lammps_variables['strainrange'] = strainrange
     lammps_variables['etol'] = etol
     lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])
@@ -149,12 +149,6 @@ def elastic_constants_static(lammps_command, system, potential, mpi_command=None
     lammps_script = 'cij.in'
     template = iprPy.tools.read_calc_file(template_file, filedict)
     with open(lammps_script, 'w') as f:
-        f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
-
-    template_file2 = 'potential.template'
-    lammps_script2 = 'potential.in'
-    template = iprPy.tools.read_calc_file(template_file2, filedict)
-    with open(lammps_script2, 'w') as f:
         f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
     
     # Run LAMMPS
@@ -216,6 +210,36 @@ def elastic_constants_static(lammps_command, system, potential, mpi_command=None
     results_dict['C'] = am.ElasticConstants(Cij=cij)
     
     return results_dict
+
+def restart_commands(potential, symbols):
+    """
+    Command lines to restart calculation from the initial relaxation
+    """
+
+    if potential.pair_style == 'kim':
+        pair_info = potential.pair_info(symbols)
+        commands = '\n'.join([
+            pair_info.split('\n')[0],
+            'read_restart initial.restart',
+        ])
+        commands += '\n' + '\n'.join(pair_info.split('\n')[1:])
+
+    else:
+        commands = '\n'.join([
+            'read_restart initial.restart',
+            potential.pair_info(symbols),
+        ])
+
+    commands += '\n'.join([
+        '',
+        '# Setup minimization style',
+        'min_modify dmax ${dmax}',
+        '',
+        '# Setup output',
+        'thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe',
+        'thermo_modify format float %.13e'])
+    return commands
+
 
 def process_input(input_dict, UUID=None, build=True):
     """

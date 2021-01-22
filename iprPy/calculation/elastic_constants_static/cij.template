@@ -3,7 +3,7 @@
 
 box tilt large
 
-<atomman_system_info>
+<atomman_system_pair_info>
 
 change_box all triclinic
 
@@ -26,7 +26,12 @@ variable lz0 equal $(lz)
 variable peatom equal pe/atoms
 
 # Read in potential and thermo information
-include potential.in
+# Setup minimization style
+min_modify dmax ${dmax}
+
+# Setup output
+thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe
+thermo_modify format float %.13e
 
 # Relax initial configuration and save as restart
 minimize ${etol} ${ftol} ${maxiter} ${maxeval}
@@ -34,8 +39,7 @@ write_restart initial.restart
 
 # Apply -xx strain
 clear
-read_restart initial.restart
-include potential.in
+<restart_commands>
 
 variable delta equal -${strain}*${lx0}
 change_box all x delta 0 ${delta} remap units box
@@ -43,8 +47,7 @@ minimize ${etol} ${ftol} ${maxiter} ${maxeval}
 
 # Apply +xx strain
 clear
-read_restart initial.restart
-include potential.in
+<restart_commands>
 
 variable delta equal ${strain}*${lx0}
 change_box all x delta 0 ${delta} remap units box
@@ -52,8 +55,7 @@ minimize ${etol} ${ftol} ${maxiter} ${maxeval}
 
 # Apply -yy strain
 clear
-read_restart initial.restart
-include potential.in
+<restart_commands>
 
 variable delta equal -${strain}*${ly0}
 change_box all y delta 0 ${delta} remap units box
@@ -61,8 +63,7 @@ minimize ${etol} ${ftol} ${maxiter} ${maxeval}
 
 # Apply +yy strain
 clear
-read_restart initial.restart
-include potential.in
+<restart_commands>
 
 variable delta equal ${strain}*${ly0}
 change_box all y delta 0 ${delta} remap units box
@@ -70,8 +71,7 @@ minimize ${etol} ${ftol} ${maxiter} ${maxeval}
 
 # Apply -zz strain
 clear
-read_restart initial.restart
-include potential.in
+<restart_commands>
 
 variable delta equal -${strain}*${lz0}
 change_box all z delta 0 ${delta} remap units box
@@ -79,8 +79,7 @@ minimize ${etol} ${ftol} ${maxiter} ${maxeval}
 
 # Apply +zz strain
 clear
-read_restart initial.restart
-include potential.in
+<restart_commands>
 
 variable delta equal ${strain}*${lz0}
 change_box all z delta 0 ${delta} remap units box
@@ -88,8 +87,7 @@ minimize ${etol} ${ftol} ${maxiter} ${maxeval}
 
 # Apply -yz strain
 clear
-read_restart initial.restart
-include potential.in
+<restart_commands>
 
 variable delta equal -${strain}*${lz0}
 change_box all yz delta ${delta} remap units box
@@ -97,8 +95,7 @@ minimize ${etol} ${ftol} ${maxiter} ${maxeval}
 
 # Apply +yz strain
 clear
-read_restart initial.restart
-include potential.in
+<restart_commands>
 
 variable delta equal ${strain}*${lz0}
 change_box all yz delta ${delta} remap units box
@@ -106,8 +103,7 @@ minimize ${etol} ${ftol} ${maxiter} ${maxeval}
 
 # Apply -xz strain
 clear
-read_restart initial.restart
-include potential.in
+<restart_commands>
 
 variable delta equal -${strain}*${lz0}
 change_box all xz delta ${delta} remap units box
@@ -115,8 +111,7 @@ minimize ${etol} ${ftol} ${maxiter} ${maxeval}
 
 # Apply +xz strain
 clear
-read_restart initial.restart
-include potential.in
+<restart_commands>
 
 variable delta equal ${strain}*${lz0}
 change_box all xz delta ${delta} remap units box
@@ -124,8 +119,7 @@ minimize ${etol} ${ftol} ${maxiter} ${maxeval}
 
 # Apply -xy strain
 clear
-read_restart initial.restart
-include potential.in
+<restart_commands>
 
 variable delta equal -${strain}*${ly0}
 change_box all xy delta ${delta} remap units box
@@ -133,8 +127,7 @@ minimize ${etol} ${ftol} ${maxiter} ${maxeval}
 
 # Apply +xy strain
 clear
-read_restart initial.restart
-include potential.in
+<restart_commands>
 
 variable delta equal ${strain}*${ly0}
 change_box all xy delta ${delta} remap units box

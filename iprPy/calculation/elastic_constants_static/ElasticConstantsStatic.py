@@ -33,7 +33,6 @@ class ElasticConstantsStatic(Calculation):
         # Specify calculation-specific keys 
         files = [
             'cij.template',
-            'potential.template',
         ]
                 
         # Join and return
