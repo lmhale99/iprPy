@@ -48,8 +48,8 @@ def main(database_name, run_directory_name, pot_kwargs=None, **kwargs):
         'sizemults                   5 5 10',
 
         # Run parameters
-        'stackingfault_numshifts1    30',
-        'stackingfault_numshifts2    30',
+        'stackingfault_num_a1        30',
+        'stackingfault_num_a2        30',
         'energytolerance             ',
         'forcetolerance              ',
         'maxiterations               ',

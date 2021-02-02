@@ -160,8 +160,30 @@ class CalculationStackingFaultMap2D(CalculationRecord):
         subset('stackingfault').todict(calc, params, full=full, flat=flat)
         
         if full is True and params['status'] == 'finished':
-        
+            
+            if 'intrinsic-fault-energy' in calc:
+                params['E_isf'] = uc.value_unit(calc['intrinsic-fault-energy'])
+
             if flat is False:
                 params['gammasurface'] = am.defect.GammaSurface(model=calc)
+
+                if 'slip-path' in calc:
+                    params['slip-path'] = {}
+                    for sp in calc.iteraslist('slip-path'):
+                        params['slip-path'][sp['direction']] = spp = {}
+                        coord = uc.value_unit(sp['minimum-energy-path'])
+                        spp['path'] = params['gammasurface'].path(coord)
+                        spp['E_usf_mep'] = uc.value_unit(sp['unstable-fault-energy-mep'])
+                        spp['E_usf_urp'] = uc.value_unit(sp['unstable-fault-energy-unrelaxed-path'])
+                        spp['τ_ideal_mep'] = uc.value_unit(sp['ideal-shear-stress-mep'])
+                        spp['τ_ideal_urp'] = uc.value_unit(sp['ideal-shear-stress-unrelaxed-path'])
+            else:
+                if 'slip-path' in calc:
+                    for sp in calc.iteraslist('slip-path'):
+                        direction = sp['direction']
+                        params[f'E_usf_mep_[{direction}]'] = uc.value_unit(sp['unstable-fault-energy-mep'])
+                        params[f'E_usf_urp_[{direction}]'] = uc.value_unit(sp['unstable-fault-energy-unrelaxed-path'])
+                        params[f'τ_ideal_mep_[{direction}]'] = uc.value_unit(sp['ideal-shear-stress-mep'])
+                        params[f'τ_ideal_urp_[{direction}]'] = uc.value_unit(sp['ideal-shear-stress-unrelaxed-path'])
         
         return params
