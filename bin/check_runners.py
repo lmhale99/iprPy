@@ -16,7 +16,7 @@ def main():
     """
     
     # Build data
-    jobs = squeue(user='lmh1') # personal user id - change to your own
+    jobs = squeue(user='lmh1', name='iprPy_1') # personal user id - change to your own
     logs = parse_runner_logs()
     rundirs, runners = check_run_directories()
 
@@ -25,7 +25,7 @@ def main():
     runlogjobs = logjobs.merge(runners, how='outer', on='pid')
 
     # Loop over all run directories
-    keys = ['jobid', 'pid', 'status', 'time', 'calcid', 'tmpdir', 'message']
+    keys = ['jobid', 'pid', 'status', 'time', 'calcid', 'tmpdir',]# 'message']
     for i in rundirs.index:
         rundir = rundirs.loc[i]
 
@@ -164,6 +164,8 @@ def parse_runner_log(filename):
         elif line.strip() == "Didn't find an open simulation":
             data['status'] = 'finished'
         elif line.strip() == "No simulations left to run":
+            data['status'] = 'finished'
+        elif line.strip() == "success":
             data['status'] = 'finished'
 
         # Anything else is an error message from the runner crashing
