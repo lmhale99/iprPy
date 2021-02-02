@@ -301,27 +301,26 @@ def calc_cij(lammps_command, system, potential,
     
     # Run lammps
     output = lmp.run(lammps_command, lammps_script, mpi_command=mpi_command,
-                     return_style='model')
-    shutil.move('log.lammps', 'cij-'+str(cycle)+'-log.lammps')
+                    logfile=f'cij-{cycle}-log.lammps')
+    thermo = output.flatten('all').thermo
     
     # Extract LAMMPS thermo data. Each term ranges i=0-12 where i=0 is undeformed
     # The remaining values are for -/+ strain pairs in the six unique directions
-    lx = uc.set_in_units(np.array(output.finds('Lx')), lammps_units['length'])
-    ly = uc.set_in_units(np.array(output.finds('Ly')), lammps_units['length'])
-    lz = uc.set_in_units(np.array(output.finds('Lz')), lammps_units['length'])
-    xy = uc.set_in_units(np.array(output.finds('Xy')), lammps_units['length'])
-    xz = uc.set_in_units(np.array(output.finds('Xz')), lammps_units['length'])
-    yz = uc.set_in_units(np.array(output.finds('Yz')), lammps_units['length'])
+    lx = uc.set_in_units(thermo.Lx, lammps_units['length'])
+    ly = uc.set_in_units(thermo.Ly, lammps_units['length'])
+    lz = uc.set_in_units(thermo.Lz, lammps_units['length'])
+    xy = uc.set_in_units(thermo.Xy, lammps_units['length'])
+    xz = uc.set_in_units(thermo.Xz, lammps_units['length'])
+    yz = uc.set_in_units(thermo.Yz, lammps_units['length'])
     
-    pxx = uc.set_in_units(np.array(output.finds('Pxx')), lammps_units['pressure'])
-    pyy = uc.set_in_units(np.array(output.finds('Pyy')), lammps_units['pressure'])
-    pzz = uc.set_in_units(np.array(output.finds('Pzz')), lammps_units['pressure'])
-    pxy = uc.set_in_units(np.array(output.finds('Pxy')), lammps_units['pressure'])
-    pxz = uc.set_in_units(np.array(output.finds('Pxz')), lammps_units['pressure'])
-    pyz = uc.set_in_units(np.array(output.finds('Pyz')), lammps_units['pressure'])
+    pxx = uc.set_in_units(thermo.Pxx, lammps_units['pressure'])
+    pyy = uc.set_in_units(thermo.Pyy, lammps_units['pressure'])
+    pzz = uc.set_in_units(thermo.Pzz, lammps_units['pressure'])
+    pxy = uc.set_in_units(thermo.Pxy, lammps_units['pressure'])
+    pxz = uc.set_in_units(thermo.Pxz, lammps_units['pressure'])
+    pyz = uc.set_in_units(thermo.Pyz, lammps_units['pressure'])
     
-    pe = uc.set_in_units(np.array(output.finds('PotEng')) / system.natoms,
-                         lammps_units['energy'])
+    pe = uc.set_in_units(thermo.PotEng / system.natoms, lammps_units['energy'])
     
     # Set the six non-zero strain values
     strains = np.array([ (lx[2] -  lx[1])  / lx[0],
