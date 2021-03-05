@@ -222,12 +222,15 @@ def phonon_quasiharmonic(lammps_command, ucell, potential, mpi_command=None, a_m
             heat_capacity[:, istrain] = phononinfo['thermal_properties']['heat_capacity']
         
         # Compute qha
-        qha = phonopy.PhonopyQHA(volumes=volumes,
-                    electronic_energies=energies,
-                    temperatures=temperatures,
-                    free_energy=free_energy,
-                    cv=heat_capacity,
-                    entropy=entropy)
+        try:
+            qha = phonopy.PhonopyQHA(volumes=volumes,
+                        electronic_energies=energies,
+                        temperatures=temperatures,
+                        free_energy=free_energy,
+                        cv=heat_capacity,
+                        entropy=entropy)
+        except:
+            qha = None
     
     results = {}    
     
@@ -238,19 +241,25 @@ def phonon_quasiharmonic(lammps_command, ucell, potential, mpi_command=None, a_m
     # Extract zerostrain properties
     results['band_structure'] = zerostrain['band_structure']
     results['density_of_states'] = zerostrain['dos']
-    results['thermal_properties'] = zerostrain['thermal_properties']
-    results['thermal_properties']['heat_capacity_v'] = results['thermal_properties'].pop('heat_capacity')
-    results['thermal_properties']['temperature'] = results['thermal_properties'].pop('temperatures')
 
+    # Convert units on thermal properties
+    results['thermal_properties'] = zerostrain['thermal_properties']
+    results['thermal_properties']['temperature'] = results['thermal_properties'].pop('temperatures')
+    results['thermal_properties']['Helmholtz'] = uc.set_in_units(results['thermal_properties'].pop('free_energy'), 'kJ/mol')
+    results['thermal_properties']['entropy'] = uc.set_in_units(results['thermal_properties'].pop('entropy'), 'J/K/mol')
+    results['thermal_properties']['heat_capacity_v'] = uc.set_in_units(results['thermal_properties'].pop('heat_capacity'), 'J/K/mol')
+    
     if qha is not None:
 
         # Create QHA plots
         qha.plot_bulk_modulus()
-        plt.savefig('bulk_modulus.png', dpi=400)
+        plt.xlabel('Volume ($Å^3$)', size='large')
+        plt.ylabel('Energy ($eV$)', size='large')
+        plt.savefig('bulk_modulus.png', dpi=400, bbox_inches='tight')
         plt.close()
 
         qha.plot_helmholtz_volume()
-        plt.savefig('helmholtz.png', dpi=400)
+        plt.savefig('helmholtz_volume.png', dpi=400)
         plt.close()
 
         # Package volume vs energy scans
@@ -260,13 +269,18 @@ def phonon_quasiharmonic(lammps_command, ucell, potential, mpi_command=None, a_m
         results['volume_scan']['energy'] = np.array(energies)
         
         # Compute and add QHA properties
-        results['E0'], results['B0'], results['B0prime'], results['V0'] = qha.get_bulk_modulus_parameters()
-        results['thermal_properties']['volume'] = np.hstack([qha.get_volume_temperature(), np.nan])
+        properties = qha.get_bulk_modulus_parameters()
+        results['E0'] = uc.set_in_units(properties[0], 'eV')
+        results['B0'] = uc.set_in_units(properties[1], 'eV/angstrom^3')
+        results['B0prime'] = uc.set_in_units(properties[2], 'eV/angstrom^3')
+        results['V0'] = uc.set_in_units(properties[3], 'angstrom^3')
+        
+        results['thermal_properties']['volume'] = uc.set_in_units(np.hstack([qha.get_volume_temperature(), np.nan]), 'angstrom^3')
         results['thermal_properties']['thermal_expansion'] = np.hstack([qha.get_thermal_expansion(), np.nan])
-        results['thermal_properties']['Gibbs'] = np.hstack([qha.get_gibbs_temperature(), np.nan])
-        results['thermal_properties']['bulk_modulus'] = np.hstack([qha.get_bulk_modulus_temperature(), np.nan])
-        results['thermal_properties']['heat_capacity_p_numerical'] = np.hstack([qha.get_heat_capacity_P_numerical(), np.nan])
-        results['thermal_properties']['heat_capacity_p_polyfit'] = np.hstack([qha.get_heat_capacity_P_polyfit(), np.nan])
+        results['thermal_properties']['Gibbs'] = uc.set_in_units(np.hstack([qha.get_gibbs_temperature(), np.nan]), 'eV')
+        results['thermal_properties']['bulk_modulus'] = uc.set_in_units(np.hstack([qha.get_bulk_modulus_temperature(), np.nan]), 'GPa')
+        results['thermal_properties']['heat_capacity_p_numerical'] = uc.set_in_units(np.hstack([qha.get_heat_capacity_P_numerical(), np.nan]), 'J/K/mol')
+        results['thermal_properties']['heat_capacity_p_polyfit'] = uc.set_in_units(np.hstack([qha.get_heat_capacity_P_polyfit(), np.nan]), 'J/K/mol')
         results['thermal_properties']['gruneisen'] = np.hstack([qha.get_gruneisen_temperature(), np.nan])
     
     return results
@@ -336,7 +350,7 @@ def phononcalc(lammps_command, ucell, potential, mpi_command=None,
     primucell = am.load('spglib_cell', primcell, symbols=ucell.symbols).normalize()
     
     # Initialize Phonopy object
-    phonon = phonopy.Phonopy(primucell.dump('phonopy_Atoms'),
+    phonon = phonopy.Phonopy(primucell.dump('phonopy_Atoms', symbols=potential.elements(primucell.symbols)),
                              [[a_mult, 0, 0], [0, b_mult, 0], [0, 0, c_mult]],
                              factor=phonopy.units.VaspToTHz)
     phonon.generate_displacements(distance=distance)
@@ -346,7 +360,7 @@ def phononcalc(lammps_command, ucell, potential, mpi_command=None,
     for supercell in phonon.supercells_with_displacements:
         
         # Save to LAMMPS data file
-        system = am.load('phonopy_Atoms', supercell)
+        system = am.load('phonopy_Atoms', supercell, symbols=primucell.symbols)
         system_info = system.dump('atom_data', f='disp.dat',
                                   potential=potential,
                                   return_pair_info=True)
@@ -389,6 +403,7 @@ def phononcalc(lammps_command, ucell, potential, mpi_command=None,
     phonon.auto_band_structure(plot=plot)
     results['band_structure'] = phonon.get_band_structure_dict()
     if plot:
+        plt.ylabel('Frequency (THz)')
         plt.savefig(Path('.', 'band.png'), dpi=400)
         plt.close()
     
@@ -396,6 +411,7 @@ def phononcalc(lammps_command, ucell, potential, mpi_command=None,
     phonon.auto_total_dos(plot=False)
     phonon.auto_projected_dos(plot=False)
     dos = phonon.get_total_dos_dict()
+    dos['frequency'] = uc.set_in_units(dos.pop('frequency_points'), 'THz')
     dos['projected_dos'] = phonon.get_projected_dos_dict()['projected_dos']
     results['dos'] = dos
     

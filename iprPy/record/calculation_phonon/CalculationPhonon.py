@@ -112,22 +112,37 @@ class CalculationPhonon(CalculationRecord):
                 calc['band-structure'].append('frequencies', uc.model(frequencies))
 
             calc['density-of-states'] = DM()
-            for key in results_dict['density_of_states']:
-                calc['density-of-states'][key] = uc.model(results_dict['density_of_states'][key])
+            calc['density-of-states']['frequency'] = uc.model(results_dict['density_of_states']['frequency'], 'THz')
+            calc['density-of-states']['total_dos'] = uc.model(results_dict['density_of_states']['total_dos'])
+            calc['density-of-states']['projected_dos'] = uc.model(results_dict['density_of_states']['projected_dos'])
 
             calc['thermal-properties'] = DM()
+            calc['thermal-properties']['temperature'] = uc.model(results_dict['thermal_properties']['temperature'], 'K')
+            calc['thermal-properties']['Helmholtz'] = uc.model(results_dict['thermal_properties']['Helmholtz'], 'eV')
+            calc['thermal-properties']['entropy'] = uc.model(results_dict['thermal_properties']['entropy'], 'J/K/mol')
+            calc['thermal-properties']['heat_capacity_v'] = uc.model(results_dict['thermal_properties']['heat_capacity_v'], 'J/K/mol')
+
             for key in results_dict['thermal_properties']:
                 calc['thermal-properties'][key] = uc.model(results_dict['thermal_properties'][key])
 
             if results_dict['qha_object'] is not None:
+                calc['thermal-properties']['volume'] = uc.model(results_dict['thermal_properties']['volume'], 'angstrom^3')
+                calc['thermal-properties']['thermal_expansion'] = uc.model(results_dict['thermal_properties']['thermal_expansion'])
+                calc['thermal-properties']['Gibbs'] = uc.model(results_dict['thermal_properties']['Gibbs'], 'eV')
+                calc['thermal-properties']['bulk_modulus'] = uc.model(results_dict['thermal_properties']['bulk_modulus'], 'GPa')
+                calc['thermal-properties']['heat_capacity_p_numerical'] = uc.model(results_dict['thermal_properties']['heat_capacity_p_numerical'], 'J/K/mol')
+                calc['thermal-properties']['heat_capacity_p_polyfit'] = uc.model(results_dict['thermal_properties']['heat_capacity_p_polyfit'], 'J/K/mol')
+                calc['thermal-properties']['gruneisen'] = uc.model(results_dict['thermal_properties']['gruneisen'])
+                
                 calc['volume-scan'] = DM()
-                for key in results_dict['volume_scan']:
-                    calc['volume-scan'][key] = uc.model(results_dict['volume_scan'][key])
+                calc['volume-scan']['volume'] = uc.model(results_dict['volume_scan']['volume'], 'angstrom^3')
+                calc['volume-scan']['strain'] = uc.model(results_dict['volume_scan']['strain'])
+                calc['volume-scan']['energy'] = uc.model(results_dict['volume_scan']['energy'], 'eV')
+
                 calc['E0'] = uc.model(results_dict['E0'], 'eV')
-                calc['B0'] = uc.model(results_dict['B0'], 'eV/angstrom^3')
-                calc['B0prime'] = uc.model(results_dict['B0prime'], 'eV/angstrom^3')
+                calc['B0'] = uc.model(results_dict['B0'], 'GPa')
+                calc['B0prime'] = uc.model(results_dict['B0prime'], 'GPa')
                 calc['V0'] = uc.model(results_dict['V0'], 'angstrom^3')
-        #print(calc)
 
     def todict(self, full=True, flat=False):
         """
@@ -190,9 +205,11 @@ class CalculationPhonon(CalculationRecord):
                     for key in calc['volume-scan']:
                         volume_scan[key] = uc.value_unit(calc['volume-scan'][key])
                     params['volume_scan'] = pd.DataFrame(volume_scan)
-                    params['E0'] = uc.value_unit(calc['E0'])
-                    params['B0'] = uc.value_unit(calc['B0'])
-                    params['B0prime'] = uc.value_unit(calc['B0prime'])
-                    params['V0'] = uc.value_unit(calc['V0'])
+            
+            if 'volume-scan' in calc:
+                params['E0'] = uc.value_unit(calc['E0'])
+                params['B0'] = uc.value_unit(calc['B0'])
+                params['B0prime'] = uc.value_unit(calc['B0prime'])
+                params['V0'] = uc.value_unit(calc['V0'])
 
         return params
