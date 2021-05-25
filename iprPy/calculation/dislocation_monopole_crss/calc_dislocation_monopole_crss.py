@@ -1,48 +1,72 @@
 #!/usr/bin/env python
-import os
+# coding: utf-8
+
+# Python script created by Lucas Hale
+
+# Standard library imports
+from pathlib import Path
 import sys
-import numpy as np
+import uuid
 from copy import deepcopy
 
-import iprPy
+# http://www.numpy.org/
+import numpy as np 
 
+# https://github.com/usnistgov/DataModelDict 
+from DataModelDict import DataModelDict as DM
+
+# https://github.com/usnistgov/atomman 
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
-__calc_name__ = os.path.splitext(os.path.basename(__file__))[0]
-assert __calc_name__[:5] == 'calc_', 'Calculation file name must start with "calc_"'
-__calc_type__ = __calc_name__[5:]
+# https://github.com/usnistgov/iprPy
+import iprPy
+
+# Define calculation metadata
+calculation_style = 'dislocation_monopole_crss'
+record_style = f'calculation_{calculation_style}'
+script = Path(__file__).stem
+pkg_name = f'iprPy.calculation.{calculation_style}.{script}'
 
 def main(*args):    
     """Main function for running calculation"""
 
-    #Read in parameters from input file
+    # Read input file in as dictionary
     with open(args[0]) as f:
-        input_dict = iprPy.calculation_read_input(__calc_type__, f, *args[1:])
-        
+        input_dict = iprPy.input.parse(f, allsingular=True)
+    
+    # Interpret and process input parameters
+    process_input(input_dict, *args[1:])
+
+
     #Read in potential
     potential = lmp.Potential(input_dict['potential'], input_dict['potential_dir'])            
     
     #Get axes info
     axes = np.array([input_dict['x-axis'], input_dict['y-axis'], input_dict['z-axis']])
     
-    #Perform crss calculation
-    results_dict = crss(input_dict['lammps_command'], input_dict['initial_system'], 
-                        potential, input_dict['symbols'], input_dict['C'], 
+    # Perform crss calculation
+    results_dict = crss(input_dict['lammps_command'], 
+                        input_dict['initial_system'], 
+                        potential, 
+                        input_dict['C'], 
                         mpi_command=input_dict['mpi_command'], 
-                        chi=input_dict['chi_angle'], sigma=input_dict['sigma'], 
-                        tau_1=input_dict['tau_1'], tau_2=input_dict['tau_2'], 
-                        press=input_dict['press'], rss_steps=input_dict['rss_steps'],
+                        chi=input_dict['chi_angle'],
+                        sigma=input_dict['sigma'], 
+                        tau_1=input_dict['tau_1'],
+                        tau_2=input_dict['tau_2'], 
+                        press=input_dict['press'],
+                        rss_steps=input_dict['rss_steps'],
                         axes=axes)
     
-    #Save data model of results 
-    results = iprPy.calculation_data_model(__calc_type__, input_dict, results_dict)
+    # Build and save data model of results
+    record = iprPy.load_record(record_style)
+    record.buildcontent(input_dict, results_dict)
     with open('results.json', 'w') as f:
-        results.json(fp=f, indent=4)    
+        record.content.json(fp=f, indent=4)
         
-
-def crss(lammps_command, system, potential, symbols, C, mpi_command=None, 
+def crss(lammps_command, system, potential, C, mpi_command=None, 
          chi=0.0, sigma=0.0, tau_1=0.0, tau_2=0.0, press=0.0, rss_steps=0,
          axes=None, etol=0.0, ftol=1e-6, maxiter=100000, maxeval=100000):
     """
@@ -267,5 +291,90 @@ def strain_system(lammps_command, system, potential, symbols, mpi_command=None,
     return {'lammps_step':lammps_step, 'E_total':E_total, 'p_xx':p_xx, 'p_yy':p_yy, 'p_zz':p_zz, 
             'p_xy':p_xy, 'p_xz':p_xz, 'p_yz':p_yz, 'strain_step':strain_step}
 
+def process_input(input_dict, UUID=None, build=True):
+    """
+    Processes str input parameters, assigns default values if needed, and
+    generates new, more complex terms as used by the calculation.
+    
+    Parameters
+    ----------
+    input_dict :  dict
+        Dictionary containing the calculation input parameters with string
+        values.  The allowed keys depends on the calculation style.
+    UUID : str, optional
+        Unique identifier to use for the calculation instance.  If not 
+        given and a 'UUID' key is not in input_dict, then a random UUID4 
+        hash tag will be assigned.
+    build : bool, optional
+        Indicates if all complex terms are to be built.  A value of False
+        allows for default values to be assigned even if some inputs 
+        required by the calculation are incomplete.  (Default is True.)
+    """
+    # Set script's name
+    input_dict['script'] = script
+
+    # Set calculation UUID
+    if UUID is not None: 
+        input_dict['calc_key'] = UUID
+    else: 
+        input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
+    
+    # Set default input/output units
+    iprPy.input.subset('units').interpret(input_dict)
+    
+    # These are calculation-specific default strings
+    input_dict['dislocation_boundaryshape'] = input_dict.get('dislocation_boundaryshape',
+                                                             'cylinder')
+    input_dict['forcetolerance'] = input_dict.get('forcetolerance',
+                                                  '1.0e-6 eV/angstrom')
+    
+    # These are calculation-specific default booleans
+    input_dict['dislocation_boundaryscale'] = iprPy.input.boolean(input_dict.get('dislocation_boundaryscale',
+                                                                                 False))
+    
+    # These are calculation-specific default integers
+    input_dict['rss_steps'] = int(input_dict.get('number_rss_steps', 0))
+    
+    # These are calculation-specific default unitless floats
+    input_dict['chi_angle'] = float(input_dict.get('chi_angle', 0.0))
+    
+    # These are calculation-specific default floats with units
+    input_dict['sigma'] = iprPy.input.value(input_dict, 'rss_per_step',
+                                            default_unit=input_dict['pressure_unit'],
+                                            default_term='0.0 GPa')
+    input_dict['tau_1'] = iprPy.input.value(input_dict, 'tau_1',
+                                            default_unit=input_dict['pressure_unit'],
+                                            default_term='0.0 GPa')
+    input_dict['tau_2'] = iprPy.input.value(input_dict, 'tau_2',
+                                            default_unit=input_dict['pressure_unit'],
+                                            default_term='0.0 GPa')
+    input_dict['press'] = iprPy.input.value(input_dict, 'hydrostaticpressure',
+                                            default_unit=input_dict['pressure_unit'],
+                                            default_term='0.0 GPa')
+
+    # These are calculation-specific dependent parameters
+    if input_dict['annealtemperature'] == 0.0:
+        input_dict['annealsteps'] = int(input_dict.get('annealsteps', 0))
+    else:
+        input_dict['annealsteps'] = int(input_dict.get('annealsteps', 10000))
+
+    # Check lammps_command and mpi_command
+    iprPy.input.subset('lammps_commands').interpret(input_dict)
+    
+    # Set default system minimization parameters
+    iprPy.input.subset('lammps_minimize').interpret(input_dict)
+    
+    # Load potential
+    iprPy.input.subset('lammps_potential').interpret(input_dict)
+    
+    # Load system
+    iprPy.input.subset('atomman_systemload').interpret(input_dict, build=build)
+    
+    # Load dislocation parameters
+    iprPy.input.subset('dislocation').interpret(input_dict)
+    
+    # Load elastic constants
+    iprPy.input.subset('atomman_elasticconstants').interpret(input_dict, build=build)
+
 if __name__ == '__main__':
-    main(*sys.argv[1:])              
+    main(*sys.argv[1:])
