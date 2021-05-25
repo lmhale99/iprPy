@@ -168,9 +168,9 @@ class CalculationStackingFaultMap2D(CalculationRecord):
                 params['gammasurface'] = am.defect.GammaSurface(model=calc)
 
                 if 'slip-path' in calc:
-                    params['slip-path'] = {}
+                    params['slippath'] = {}
                     for sp in calc.iteraslist('slip-path'):
-                        params['slip-path'][sp['direction']] = spp = {}
+                        params['slippath'][sp['direction']] = spp = {}
                         coord = uc.value_unit(sp['minimum-energy-path'])
                         spp['path'] = params['gammasurface'].path(coord)
                         spp['E_usf_mep'] = uc.value_unit(sp['unstable-fault-energy-mep'])
