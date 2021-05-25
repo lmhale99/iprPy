@@ -1,0 +1,84 @@
+# LAMMPS input script for exploring the three-body phase space
+
+# Specify loop ranges
+variable rmin equal <rmin>
+variable rmax equal <rmax>
+variable rnum equal <rnum>
+variable thetamin equal <thetamin>
+variable thetamax equal <thetamax>
+variable thetanum equal <thetanum>
+
+# Define dummy values for loop indices
+#variable i equal 1
+#variable j equal 1
+#variable k equal 1
+
+# Define variable atom coordinates
+variable rij equal ${rmin}+(v_i-1)*(${rmax}-${rmin})/(${rnum}-1)
+variable rik equal ${rmin}+(v_j-1)*(${rmax}-${rmin})/(${rnum}-1)
+variable theta equal ${thetamin}+(v_k-1)*(${thetamax}-${thetamin})/(${thetanum}-1)
+variable rtheta equal v_theta*PI/180.0
+variable j_x equal v_rij
+variable k_x equal v_rik*cos(v_rtheta)
+variable k_y equal v_rik*sin(v_rtheta)
+variable energy equal pe
+
+# Define box bounds based on rmax
+variable rlo equal -3*${rmax}
+variable rhi equal 3*${rmax}
+
+units <units>
+
+atom_style <atom_style>
+
+boundary f f f
+
+region rbox block ${rlo} ${rhi} ${rlo} ${rhi} -1.0 1.0
+
+create_box <natypes> rbox
+
+<atomman_pair_info>
+
+thermo_style custom step pe
+thermo_modify format float %.13e
+
+# Create atom 1
+create_atoms <atype1> single 0.0 0.0 0.0 units box
+
+# Empty print to reset energies.txt if it exists
+print "" file energies.txt screen no
+
+# Loop i over r_ij values
+variable i loop ${rnum}
+    label loopi
+
+    # Create atom 2
+    create_atoms <atype2> single ${j_x} 0.0 0.0 units box
+    group id2 id 2
+
+    # Loop j over r_ik values
+    variable j loop ${rnum}
+        label loopj
+        
+        # Loop k over theta values
+        variable k loop ${thetanum}
+            label loopk
+
+            # Create atom 3
+            create_atoms <atype3> single ${k_x} ${k_y} 0.0 units box
+            group id3 id 3
+
+            # Compute energy and output it to energies.txt
+            run 0
+            print "${energy}" append energies.txt screen no
+            delete_atoms group id3
+
+            next k
+            jump bondscan.in loopk
+            
+        next j
+        jump bondscan.in loopj
+
+    delete_atoms group id2
+    next i
+    jump bondscan.in loopi
