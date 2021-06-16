@@ -1,39 +1,44 @@
-"""
-Attributes
-----------
-loaded : dict
-    Dictionary of the record styles that were successfully imported. The
-    dictionary keys are the database style names, and the values are the
-    loaded modules.
-failed : dict
-    Dictionary listing the record styles that failed import. Values
-    contain the error messages thrown by the style.
-"""
-from ..tools import dynamic_import
-from .Record import Record
-from .CalculationRecord import CalculationRecord
+import sys
 
-ignorelist = ['Record', 'CalculationRecord']
-loaded, failed = dynamic_import(__name__, ignorelist=ignorelist)
+from atomman.library.record import Record, load_record, recordmanager
+__all__ = ['Record', 'load_record', 'recordmanager']
 
-def load_record(style, name=None, content=None):
-    """
-    Loads a Record subclass associated with a given record style
+#### Non-calculation records ####
 
-    Parameters
-    ----------
-    style : str
-        The record style
-    name : str
-        The name to give to the specific record
-    content : 
-        The record's data model content
-    
-    Returns
-    -------
-    subclass of iprPy.record.Record 
-        A Record object for the style
-    """
-    return loaded[style](name=name, content=content)
+# Import FreeSurface
+try:
+    from .FreeSurface import FreeSurface
+except Exception as e:
+    recordmanager.failed_styles['free_surface'] = '%s: %s' % sys.exc_info()[:2]
+else:
+    recordmanager.loaded_styles['free_surface'] = FreeSurface
+    __all__.append('FreeSurface')
 
-__all__ = ['Record', 'load_record', 'failed', 'loaded']
+# Import StackingFault
+try:
+    from .StackingFault import StackingFault
+except Exception as e:
+    recordmanager.failed_styles['stacking_fault'] = '%s: %s' % sys.exc_info()[:2]
+else:
+    recordmanager.loaded_styles['stacking_fault'] = StackingFault
+    __all__.append('StackingFault')
+
+# Import PointDefect
+try:
+    from .PointDefect import PointDefect
+except Exception as e:
+    recordmanager.failed_styles['point_defect'] = '%s: %s' % sys.exc_info()[:2]
+else:
+    recordmanager.loaded_styles['point_defect'] = PointDefect
+    __all__.append('PointDefect')
+
+# Import Dislocation
+try:
+    from .Dislocation import Dislocation
+except Exception as e:
+    recordmanager.failed_styles['dislocation'] = '%s: %s' % sys.exc_info()[:2]
+else:
+    recordmanager.loaded_styles['dislocation'] = Dislocation
+    __all__.append('Dislocation')
+
+__all__.sort()

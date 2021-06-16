@@ -1,26 +1,22 @@
 # coding: utf-8
-def read_calc_file(filename, filedict):
-    """
-    Utility function for reading the contents of required calculation files, whether
-    the calculation was called using the script or through an iprPy Calculation
-    object.
+# Standard Python libraries
+from pathlib import Path
+from importlib import resources
 
+def read_calc_file(parent_module, filename):
+    """
+    Loads a file from the working directory if it is there, or from within
+    iprPy if not.  Allows for quick modifications.
+    
     Parameters
     ----------
+    parent_module : str
+        The 
     filename : str
         The name of the file to read/get content for.
-    filedict : dict
-        Should be empty if calculation is called by script, and should have all
-        file names and contents if calculation is called through iprPy.
-
-    Returns
-    -------
-    str
-        The file's contents, either by reading the file or from filedict 
     """
-    
-    if filename in filedict:
-        return filedict[filename]
-    else:
+    if Path(filename).is_file():
         with open(filename) as f:
             return f.read()
+    else:
+        return resources.read_text(parent_module, filename)

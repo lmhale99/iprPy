@@ -1,10 +1,5 @@
-# coding: utf-8
-
-from ..tools import screen_input
-from . import loaded
-from .. import Settings
-
-__all__ = ['load_database']
+from .. import settings
+import datamodelbase
 
 def load_database(name=None, style=None, host=None, **kwargs):
     """
@@ -26,48 +21,8 @@ def load_database(name=None, style=None, host=None, **kwargs):
     
     Returns
     -------
-    Subclass of iprPy.Database
+    Subclass of datamodelbase.Database
         The database object.
     """
-    
-    # Create new Database based on parameters
-    if style is not None:
-        assert name is None, 'name and style cannot both be given'
-
-        if style in loaded:
-            return loaded[style](host, **kwargs)
-        else:
-            raise KeyError(f'Unknown database style {style}')
-
-    # Load Database from saved info
-    else:
-        assert host is None and len(kwargs) == 0, 'style must be given with host, kwargs'
-
-        # Get information from settings file
-        settings = Settings()
-        database_names = settings.list_databases
-        
-        # Ask for name if not given
-        if name is None:
-            if len(database_names) > 0:
-                print('Select a database:')
-                for i, database in enumerate(database_names):
-                    print(i+1, database)
-                choice = screen_input(':')
-                try:
-                    choice = int(choice)
-                except:
-                    name = choice
-                else:
-                    name = database_names[choice-1]
-            else:
-                raise KeyError('No databases currently set')
-        
-        try:
-            database = settings.databases[name]
-        except:
-            raise ValueError(f'database {name} not found')
-
-        style = database.pop('style')
-        return loaded[style](**database)
-    
+    return datamodelbase.load_database(name=name, style=style, host=host,
+                                       settings=settings, **kwargs)

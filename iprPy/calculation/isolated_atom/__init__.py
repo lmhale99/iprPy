@@ -1,5 +1,4 @@
-# coding: utf-8
-
-# iprPy imports
 from .IsolatedAtom import IsolatedAtom
-__all__ = ['IsolatedAtom']
+from .isolated_atom import isolated_atom
+
+__all__ = ['IsolatedAtom', 'isolated_atom']

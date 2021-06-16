@@ -15,11 +15,12 @@ import requests
 from DataModelDict import DataModelDict as DM
 
 # iprPy imports
-from .. import Settings, load_run_directory
+from .. import settings, load_run_directory
+from ..calculation import run_paramfile2json
 
 def runner(database, run_directory, calc_name=None, orphan_directory=None,
-           hold_directory=None, python_exe=None, log=True,
-           bidtries=10, temp=False, temp_directory=None):
+           hold_directory=None, log=True, bidtries=10, temp=False,
+           temp_directory=None):
     """
     High-throughput calculation runner.
     
@@ -41,10 +42,6 @@ def runner(database, run_directory, calc_name=None, orphan_directory=None,
         The path for the hold directory where tar archives that failed to be
         uploaded are moved to.  If None (default) then will use 'hold' at the
         same level as the run_directory.
-    python_exe : str, optional
-        The Python executable to use when running the calculations.  If not given,
-        will try to use the current Python executable, and if not available will use
-        'python'.
     log : bool, optional
         If True (default), the runner will create and save a log file detailing the
         status of each calculation that it runs.
@@ -58,13 +55,11 @@ def runner(database, run_directory, calc_name=None, orphan_directory=None,
     temp_directory : path-like object, optional
         The path to an existing temporary directory where the calculations
         are to be copied to and executed there instead of in the run_directory.
-    
     """
     # Initialize a RunManager
     runmanager = RunManager(database, run_directory,
-                             orphan_directory=orphan_directory,
-                             hold_directory=hold_directory,
-                             python_exe=python_exe, log=log)
+                            orphan_directory=orphan_directory,
+                            hold_directory=hold_directory, log=log)
     
     # Run all calculations
     if calc_name is None:
@@ -73,10 +68,9 @@ def runner(database, run_directory, calc_name=None, orphan_directory=None,
                            temp_directory=temp_directory)
     
     else:
-        print(f'Runner operating on {calc_name} with pid {runmanager.pid}', flush=True)
+        print(f'Runner started with pid {runmanager.pid} for calculation {calc_name}', flush=True)
         status = runmanager.run(calc_name=calc_name, temp=temp,
-                                 temp_directory=temp_directory)
-        print(status, flush=True)
+                                temp_directory=temp_directory)
 
 class RunManager():
     """
@@ -84,7 +78,7 @@ class RunManager():
     """
     
     def __init__(self, database, run_directory, orphan_directory=None,
-                 hold_directory=None, python_exe=None, log=True):
+                 hold_directory=None, log=True):
         """
         Class initializer
         
@@ -103,17 +97,10 @@ class RunManager():
             The path for the hold directory where tar archives that failed to be
             uploaded are moved to.  If None (default) then will use 'hold' at the
             same level as the run_directory.
-        python_exe : str, optional
-            The Python executable to use when running the calculations.  If not given,
-            will try to use the current Python executable, and if not available will use
-            'python'.
         log : bool, optional
             If True (default), the runner will create and save a log file detailing the
             status of each calculation that it runs.
         """
-        
-        # Set python executable for subprocesses
-        self.python_exe = python_exe
         
         # Set database
         self.__database = database
@@ -132,7 +119,7 @@ class RunManager():
         
         # Build log file name
         if log is True:
-            log_directory = Settings().runner_log_directory
+            log_directory = settings.runner_log_directory
             if not log_directory.is_dir():
                 log_directory.mkdir(parents=True)
             self.__logfilename = Path(log_directory, f'{datetime.datetime.now():%Y-%m-%d-%H-%M-%S-%f}-{self.pid}.log')   
@@ -146,19 +133,6 @@ class RunManager():
         string += f'with pid {self.pid}'
 
         return string
-
-    @property
-    def python_exe(self):
-        """str : The Python executable to use for the subprocess calculations."""
-        return self.__python_exe
-    
-    @python_exe.setter
-    def python_exe(self, exe):
-        if exe is None:
-            exe = sys.executable
-            if exe is None:
-                exe = 'Python'
-        self.__python_exe = exe
         
     @property
     def database(self):
@@ -222,7 +196,7 @@ class RunManager():
     
     @property
     def logfilename(self):
-        """pathlib.Path : The name/path of the log file the runner save info to."""
+        """pathlib.Path : The name/path of the log file the runner saves info to."""
         return self.__logfilename
     
     @property
@@ -332,13 +306,14 @@ class RunManager():
             print(f'failed to delete {calc_directory}', flush=True)
     
     def __logwrite(self, content):
+        print(content, end='', flush=True)
         if self.logfilename is not None:
             with open(self.logfilename, 'a+') as log:
                 log.write(content)
     
     def __filecheck(self, calc_directory):
         """
-        Check if the calculation has calc_*.py and calc_*.in files and an
+        Check if the calculation has a calc_*.in file and an
         associated record in the database. If one or more are missing, then
         will return all None values.
         
@@ -349,42 +324,53 @@ class RunManager():
         
         Returns
         -------
-        record : iprPy.Record or None
-            The record object associated with the calculation.
-        calc_py : path-like object or None
-            The location of the calculation's Python script.
+        calculation : iprPy.Calculation or None
+            The calculation record object.
         calc_in : path-like object or None
             The location of the calculation's input parameter file. 
         """
         calc_name = calc_directory.name
+        incomplete = False
         
-        # Count py and in files
-        calc_pys = [i for i in calc_directory.glob('calc_*.py')]
+        # Search for calc_*.in file 
         calc_ins = [i for i in calc_directory.glob('calc_*.in')]
-        
-        try:  
-            # Check for matching database record
-            record = self.database.get_record(name=calc_name)
-    
-            # Assert one py and in file
-            assert len(calc_pys) == 1
-            assert len(calc_ins) == 1
-            
-        # Pass ConnectionErrors forward killing runner
-        except requests.ConnectionError as e:
-            raise requests.ConnectionError(e)
+        if len(calc_ins) == 1:
+            calc_in = calc_ins[0]
+            style = calc_in.stem.replace('calc_', 'calculation_')
+        elif len(calc_ins) == 0:
+            incomplete = True
+            message = 'No calc_*.in file found: moved to orphan directory\n\n'
+        else:
+            incomplete = True
+            message = 'Multiple calc_*.in files found: moved to orphan directory\n\n'
 
-        # If not complete, zip and move to the orphan directory
-        except:
-            self.__logwrite('Incomplete simulation: moved to orphan directory\n\n')
+        # Search database for calculation record
+        if incomplete is False:
+            try:
+                calculation = self.database.get_record(style=style, name=calc_name)
+            
+            # Kill runner for ConnectionErrors
+            except requests.ConnectionError as e:
+                self.__logwrite(e)
+                raise requests.ConnectionError(e)
+            
+            except:
+                incomplete = True
+                message = f'Failed to find matching record in database: moved to orphan directory\n\n'
+            
+        if incomplete is False:
+            return calculation, calc_in.name
+
+        else:
+            # If not complete, zip and move to the orphan directory
+            self.__logwrite(message)
             shutil.make_archive(Path(self.orphan_directory, calc_name), 'gztar',
                                 root_dir=self.run_directory,
                                 base_dir=calc_name)
             self.__removecalc(Path(calc_directory))
             
-            return None, None, None
-        else:
-            return record, calc_pys[0].name, calc_ins[0].name
+            return None, None
+
     
     def __parentcheck(self, calc_directory):
         """
@@ -412,6 +398,7 @@ class RunManager():
                 # Delete pre-existing results file
                 if parent_name == 'results':
                     path.unlink()
+                    continue
                 
                 # Get status of local record copy
                 parent = DM(path)
@@ -422,9 +409,9 @@ class RunManager():
 
                 if parentstatus == 'not calculated':
                     # Get status of remote copy
-                    parent = self.database.get_record(name=parent_name).content
+                    parent = self.database.get_record(name=parent_name)
                     try:
-                        parentstatus = parent.find('status')
+                        parentstatus = parent.status
                     except:
                         parentstatus = 'finished'
                     
@@ -432,9 +419,9 @@ class RunManager():
                     if parentstatus in ['finished', 'error']:
                         with open(path, 'w', encoding='utf-8') as f:
                             if path.suffix == '.json':
-                                parent.json(fp=f, indent=4, ensure_ascii=False)
+                                parent.build_model().json(fp=f, indent=4, ensure_ascii=False)
                             elif path.suffix == '.xml':
-                                parent.xml(fp=f)
+                                parent.build_model().xml(fp=f)
                         self.__logwrite(f'parent {parent_name} copied to sim folder\n')
                 
                 # Identify errors and not calculated parents
@@ -444,31 +431,11 @@ class RunManager():
                     break
 
                 elif parentstatus == 'not calculated':
-                    status = 'not'
+                    status = 'not ready'
                     message = parent_name
                     self.__logwrite(f'parent {parent_name} not calculated yet\n\n')
 
         return status, message
-    
-    def __error_results(self, exe_directory, record, message):
-        """
-        Creates results.json with error status
-        """
-        # Load content
-        model = record.content
-        
-        # Update status and error fields
-        root = list(model.keys())[0]
-        model[root]['status'] = 'error'
-        model[root]['error'] = message
-        
-        # Save to execution directory
-        with open(Path(exe_directory, 'results.json'), 'w', encoding='utf-8') as f:
-            model.json(fp=f, indent=4, ensure_ascii=False)
-            
-        self.__logwrite(f"error: {message}\n")
-
-        return model
     
     def run(self, calc_name, temp=False, temp_directory=None):
         """
@@ -499,64 +466,72 @@ class RunManager():
         # Write calc_name to log file
         self.__logwrite(f'{calc_name}\n')
 
-        # Check that record and calc scripts exist
-        record, calc_py, calc_in = self.__filecheck(calc_directory)
-        
-        if record is None:
+        # Find calculation and calc script
+        calculation, calc_in = self.__filecheck(calc_directory)
+        if calculation is None:
             return 'orphan'
         
         # Check on the status of the parent calculations
         status, message = self.__parentcheck(calc_directory)
 
-        if status == 'not':
+        # Remove bidfile and move to another calc if parents are not ready
+        if status == 'not ready':
             for bidfile in calc_directory.glob('*.bid'):
                 bidfile.unlink()
             return 'need to run ' + message
         
+        # Change calculation's status to error if parents issued errors
         elif status == 'error':
-            model = self.__error_results(calc_directory, record, message)
+            calculation.status = 'error'
+            calculation.error = message
             exe_directory = calc_directory
             zip_directory = self.run_directory
+            self.__logwrite(f'error: {message}')
 
+        # Setup and run calculation
         elif status == 'ready':
             
-            # Move to temp_directory if needed
             if temp:
+                # Create new temp directory
                 td = tempfile.TemporaryDirectory()
                 temp_directory = td.name
-                print(f'using temporary directory {temp_directory}', flush=True)
+                self.__logwrite(f'using temporary directory {temp_directory}\n')
             
             if temp_directory is not None and status != 'error':
+                # Copy files to temp directory
                 exe_directory = Path(temp_directory, calc_name)
                 zip_directory = temp_directory
                 shutil.copytree(calc_directory, exe_directory)
+            
             else:
+                # Default locations
                 exe_directory = calc_directory
                 zip_directory = self.run_directory
 
-            # Run calc as subprocess
-            command = self.python_exe.split() + calc_py.split() + calc_in.split() + [calc_name]
-            run = subprocess.run(command, cwd=exe_directory, capture_output=True, encoding='UTF-8')
+            # Run calc
+            os.chdir(exe_directory)
+            calculation.load_parameters(calc_in)
+            calculation.run(results_json=True)
+            os.chdir(self.run_directory)
 
-            # Load results
-            resultsfile = Path(exe_directory, 'results.json')
-            if resultsfile.is_file():
-                model = DM(resultsfile)
+            # Check status
+            if calculation.status == 'finished':
                 self.__logwrite('sim calculated successfully\n')
                 status = 'success'
             
             # If no results file, then calc failed - add error to record
-            else:
-                model = self.__error_results(exe_directory, record, run.stderr)
+            elif calculation.status == 'error':
                 status = 'error'
+                self.__logwrite(f'error: {calculation.error}')
+
         else:
-            raise ValueError(f'Unknown calculation status {status}')
+            raise RuntimeError(f'Unknown status {status}')
 
         # Update record
         tries = 0
         while tries < 10:
             try:
-                self.database.update_record(content=model, name=calc_name)
+                self.database.update_record(record=calculation)
                 break
             except:
                 tries += 1
@@ -578,6 +553,7 @@ class RunManager():
 
             self.__removecalc(calc_directory)
 
+        # Clean temp_directory if needed
         if temp:
             td.cleanup()
             

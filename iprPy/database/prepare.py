@@ -1,17 +1,19 @@
 # coding: utf-8
 # Standard Python libraries
 from pathlib import Path
-import uuid
-import shutil
 from copy import deepcopy
+import shutil
 
 import atomman as am
+
+import numpy as np
 
 import pandas as pd
 
 # iprPy imports
 from ..tools import aslist, filltemplate
-from .. import load_record
+from .. import load_calculation, load_run_directory
+from . import load_database
 from ..input import buildcombos, parse
 
 def prepare(database, run_directory, calculation, input_script=None, **kwargs):
@@ -22,105 +24,94 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
     
     Parameters
     ----------
-    database : iprPy.database.Database
-        The database that will host the records for the prepared calculations
+    database : iprPy.database.Database or str
+        The database or database name that will host the records for the
+        prepared calculations.
     run_directory : str
-        The path to the local run_directory where the prepared calculations
+        The path or name for the run_directory where the prepared calculations
         are to be placed.
-    calculation : iprPy.calculation.Calculation
-        The calculation to prepare.
+    calculation : iprPy.calculation.Calculation or str
+        The calculation style or an instance of the calculation style to prepare.
     input_script : str or file-like object, optional
         The file, path to file, or contents of an input script containing
-        parameters for preparing the calculation.  Cannot be given with kwargs.
+        parameters for preparing the calculation.
     **kwargs : str or list
-        Input parameters for preparing the calculation.  Values must be strings
-        or list of strings if allowed by the calculation.
+        Allows for input parameters for preparing the calculation to be
+        directly specified.  Any kwargs parameters that have names matching
+        input_script parameters will overwrite the input_script values.
+        Values must be strings or list of strings if allowed by the
+        calculation for the particular parameter.
     """
-    filedict = calculation.filedict
-    record = load_record(calculation.record_style)
+    # Handle database and calculation
+    if isinstance(database, str):
+        database = load_database(database)
+    if isinstance(calculation, str):
+        calculation = load_calculation(calculation)
+    dbwargs = {}
+    if database.style == 'local':
+        dbwargs['refresh_cache'] = True
 
-    # Parse input_script to kwargs if given
+    # Handle run_directory 
+    try:
+        run_directory = load_run_directory(run_directory)
+    except:
+        run_directory = Path(run_directory)
+    if not run_directory.is_absolute():
+        run_directory = Path(Path.cwd(), run_directory)
+    run_directory.resolve()
+
+    # Parse input_script
     if input_script is not None:
-        if len(kwargs) == 0:
-            kwargs = parse(input_script, singularkeys=calculation.singularkeys)
-        else:
-            raise ValueError('input_script cannot be given with other keyword parameters')
+        temp = kwargs
+        kwargs = parse(input_script, singularkeys=calculation.singularkeys)
+        for key in temp:
+            kwargs[key] = temp[key]
     
     # Build dataframe of all existing records for the calculation style
-    record_df = database.get_records_df(style=calculation.record_style,
-                                        full=False, flat=True,
-                                        script='calc_' + calculation.style)
-    print(len(record_df), 'existing calculation records found', flush=True)
-
-    # Complete kwargs with default values and buildcombos actions
-    kwargs, content_dict = fill_kwargs(database, calculation, kwargs)
-
-    # Build all combinations
-    test_records, test_record_df, test_inputfiles, test_contents, content_dict = build_testrecords(database, calculation, content_dict, **kwargs)
-    print(len(test_record_df), 'record combinations to check', flush=True)
-    if len(test_record_df) == 0:
-        return
+    old_calcs_df = database.get_records_df(style=calculation.style, **dbwargs)
+    print(len(old_calcs_df), 'existing calculation records found', flush=True)
     
-    # Find new unique combinations
-    newrecord_df = new_calculations(record_df, test_record_df, record.compare_terms, record.compare_fterms)
-    print(len(newrecord_df), 'new records to prepare', flush=True)
+    # Complete kwargs with default values and buildcombos actions
+    kwargs, content_dict = fill_kwargs(database, calculation, **kwargs)
+    
+    # Build all combinations
+    test_calcs, test_calcs_df, test_inputfiles, test_contents, content_dict = build_test_calcs(database, calculation, content_dict, **kwargs)
+    print(len(test_calcs_df), 'calculation combinations to check', flush=True)
+    if len(test_calcs_df) == 0:
+        return
 
-    # Iterate over new records and prepare
-    for i, newrecord_series in newrecord_df.iterrows():
-        newrecord = test_records[i]
+    # Find new unique combinations
+    new_calcs_df = new_calculations(old_calcs_df, test_calcs_df, calculation.compare_terms, calculation.compare_fterms)
+    print(len(new_calcs_df), 'new records to prepare', flush=True)
+    
+    # Iterate over new calculations and prepare
+    for i in new_calcs_df.index:
+        new_calc = test_calcs[i]
         inputfile = test_inputfiles[i]
         copy_content = test_contents[i]
         
-        # Generate calculation folder
-        calc_directory = Path(run_directory, newrecord_series.key)
-        if not calc_directory.is_dir():
-            calc_directory.mkdir(parents=True)
-
-        # Save inputfile to calculation folder
-        with open(Path(calc_directory, f'calc_{calculation.style}.in'), 'w', encoding='UTF-8') as f:
-            f.write(inputfile)
-
-        # Copy calculation files to calculation folder
-        for filename in filedict:
-            calc_file = Path(calc_directory, filename)
-            with open(calc_file, 'w', encoding='UTF-8') as f:
-                f.write(filedict[filename])
-
-        # Copy/generate content files keys
-        for content in copy_content:
-            terms = content.split()
-
-            if terms[0] == 'record':
-                record_name = terms[1]
-                record_file = Path(calc_directory, record_name+'.json')
-                with open(record_file, 'w') as f:
-                    content_dict[record_name].json(fp=f, indent=4)
-
-            elif terms[0] == 'tarfile':
-                try:
-                    tar = database.get_tar(name=terms[1])
-                except:
-                    print(f'No tar for {terms[1]} found')
-                else:
-                    file_name = terms[1] + '/' + ' '.join(terms[2:])
-                    tar.extract(file_name, calc_directory)
-                    tar.close()
-
-            elif terms[0] == 'tar':
-                try:
-                    tar = database.get_tar(name=terms[1])
-                except:
-                    print(f'No tar for {terms[1]} found')
-                else:
-                    tar.extractall(calc_directory)
-                    tar.close()
+        prepare_calc(database, run_directory, new_calc, inputfile, copy_content, content_dict)
         
-        # Add record to database
-        database.add_record(record=newrecord)
-
-def fill_kwargs(database, calculation, kwargs):
+def fill_kwargs(database, calculation, **kwargs):
     """
     Fills in kwargs with default values and buildcombos results.
+    
+    Parameters
+    ----------
+    database : iprPy.database.Database
+        The database to use for building combos.
+    calculation : iprPy.calculation.Calculation
+        An instance of the calculation being prepared.
+    **kwargs : dict
+        Input parameters for preparing the calculation.
+        
+    Returns
+    -------
+    kwargs : dict
+        The full, updated input parameters.
+    content_dict : dict
+        Keys are the file name and values are the associated loaded file
+        contents for extra input files needed for the calculations.
     """
     # Check multikeys
     for keyset in calculation.multikeys:
@@ -192,40 +183,65 @@ def fill_kwargs(database, calculation, kwargs):
             if len(kwargs[key]) == 0:
                 kwargs[key] = ['']
     
-    return kwargs, content_dict
+    return kwargs, content_dict        
 
-def build_testrecords(database, calculation, content_dict, **kwargs):
+def build_test_calcs(database, calculation, content_dict, **kwargs):
+    """
+    Builds calculations based on iterating over the sets of kwargs values.
+    
+    Parameters
+    ----------
+    database : iprPy.database.Database
+        Here, the database is used to fetch parent records when needed.
+    calculation : iprPy.calculation.Calculation
+        An instance of the calculation style being prepared.
+    content_dict : dict
+        Keys are the file name and values are the associated loaded file
+        contents for extra input files needed for the calculations.
+    **kwargs : dict
+        The full input parameters to use for preparing the calculations.
+        
+    Returns
+    -------
+    test_calcs : numpy.NDArray
+        The list of built calculations.
+    test_calcs_df : pandas.DataFrame
+        A table of the metadata associated with the test_calcs.
+    test_inputfiles : list
+        The calculation input files associated with the test_calcs.
+    test_contents : list
+        A list of the "content" input parameters used when building the
+        calcuations.  The content parameters allow for 
+    content_dict : dic
+        The content_dict with parent records added in.
+    """
 
     # Start calculation_dict with all singularkeys
     calculation_dict = {}
-    calculation_dict['script'] = 'calc_' + calculation.style
     for key in calculation.singularkeys:
         calculation_dict[key] = kwargs[key]
 
-    new_records = []
-    new_record_df = []
-    new_inputfiles = []
-    copy_contents = []
+    test_calcs = []
+    test_calcs_df = []
+    test_inputfiles = []
+    test_contents = []
     
     # Iterate over multidict combinations
     for subdict in itermultidict(calculation.multikeys, **kwargs):
         calculation_dict.update(subdict)
         
         # Generate inputfile
-        inputfile = filltemplate(calculation.template, calculation_dict, '<', '>')
-
-        # Create calc_key
-        calc_key = str(uuid.uuid4())
-
+        test_inputfile = filltemplate(calculation.template, calculation_dict, '<', '>')
+        
         # Build input_dict from calculation_dict
         input_dict = {}
-        copy_content = []
+        test_content = []
         for key in calculation_dict:
             if calculation_dict[key] != '':
                 input_dict[key] = deepcopy(calculation_dict[key])
 
                 if key[-8:] == '_content':
-                    copy_content.append(calculation_dict[key])
+                    test_content.append(calculation_dict[key])
                     terms = calculation_dict[key].split()
 
                     if terms[0] == 'record':
@@ -234,33 +250,38 @@ def build_testrecords(database, calculation, content_dict, **kwargs):
                             input_dict[key] = content_dict[record_name].json()
                         except:
                             crecord = database.get_record(name=record_name)
-                            input_dict[key] = crecord.content.json()
-                            content_dict[record_name] = crecord.content
+                            input_dict[key] = crecord.build_model().json() 
+                            content_dict[record_name] = crecord.build_model()
         
-        # Build incomplete record
-        try:
-            calculation.process_input(input_dict, calc_key, build=False)
-        except:
-            continue
+        # Build new calculation
+        test_calc = load_calculation(calculation.calc_style, params=input_dict)
         
-        new_record = load_record(style=calculation.record_style, name=calc_key)
-        new_record.buildcontent(input_dict)
-
-        # Check if record is valid
-        if new_record.isvalid():
-            new_records.append(new_record)
-            new_record_df.append(new_record.todict(full=False, flat=True))
-            new_inputfiles.append(inputfile)
-            copy_contents.append(copy_content)
+        # Check if calculation is valid
+        if test_calc.isvalid():
+            test_calcs.append(test_calc)
+            test_calcs_df.append(test_calc.metadata())
+            test_inputfiles.append(test_inputfile)
+            test_contents.append(test_content)
             
-    new_record_df = pd.DataFrame(new_record_df)
+    test_calcs_df = pd.DataFrame(test_calcs_df)
     
-    return new_records, new_record_df, new_inputfiles, copy_contents, content_dict
+    return test_calcs, test_calcs_df, test_inputfiles, test_contents, content_dict
 
 def itermultidict(multikeys, **kwargs):
     """
-    Generates each combination of kwargs by iterating over 
-    multikeys sets.
+    Generates each combination of kwargs by iterating over multikeys sets.
+    
+    Parameters
+    ----------
+    multikeys : list
+        The key sets that should be iterated over together.
+    **kwargs : dict
+        The calculation input parameter terms as given.
+        
+    Yields
+    ------
+    dict
+        A combination of individual kwargs values.
     """
     # End recursion
     if len(multikeys) == 0:
@@ -278,17 +299,37 @@ def itermultidict(multikeys, **kwargs):
                 yield merge_dicts(multidict, subdict)
 
 def merge_dicts(dict1, dict2):
-    """
-    Returns a new dict containing terms in both dict1 and dict2
-    """
+    """Returns a new dict containing terms in both dict1 and dict2"""
     newdict = dict1.copy()
     newdict.update(dict2)
     return newdict
 
 def new_calculations(old, test, dterms, fterms):
+    """
+    Identifies which test calculations are new by comparing metadata field
+    values
+    
+    Parameters
+    ----------
+    old : pandas.DataFrame
+        The metadata of existing calculations.
+    test :pandas.DataFrame
+        The metadata of calculation combinations to check.
+    dterms : list
+        The names of metadata fields to directly compare.
+    fterms : dict
+        The names and tolerances to use for comparing float metadata fields.
+        
+    Returns
+    -------
+    pandas.DataFrame
+        The rows of test that are unique when compared with old and later rows
+        in test. 
+    """
     old_count = len(old)
     allrecords = pd.concat([old, test], ignore_index=True)
     
+    # Check direction-independent mult terms
     if 'a_mult' in dterms:
         allrecords['a_mult'] = allrecords.a_mult2 - allrecords.a_mult1
     if 'b_mult' in dterms:
@@ -296,7 +337,79 @@ def new_calculations(old, test, dterms, fterms):
     if 'c_mult' in dterms:
         allrecords['c_mult'] = allrecords.c_mult2 - allrecords.c_mult1
     
-    isdup = am.tools.duplicates_allclose(allrecords, dterms, fterms)
+    try:
+        isdup = am.tools.duplicates_allclose(allrecords, dterms, fterms)
+    except:
+        return test
+    else:
+        isnew = ~isdup[old_count:].values
+        return test[isnew]
+
+def prepare_calc(database, run_directory, new_calc, inputfile, copy_content, content_dict):
+    """
+    Prepares a single calculation by building the calculation folder and adding
+    a record to the database.
     
-    isnew = ~isdup[old_count:].values
-    return test[isnew]
+    Parameters
+    ----------
+    database : iprPy.database.Database
+        The database where records for the prepared calculations are added.
+    run_directory : str or path-like object
+        The path to the local run_directory where the prepared calculations
+        are to be placed.
+    new_calc : iprPy.calculation.Calculation
+        The new calculation to prepare.
+    inputfile : str
+        The contents of the input file associated with new_calc.
+    copy_content : list
+        The list of extra input files to copy for new_calc.
+    content_dict : dict
+        Keys are the file name and values are the associated loaded file
+        contents for extra input files needed for the calculations.
+    """
+    
+    # Generate calculation folder
+    calc_directory = Path(run_directory, new_calc.name)
+    if not calc_directory.is_dir():
+        calc_directory.mkdir(parents=True)
+
+    # Save inputfile to calculation folder
+    with open(Path(calc_directory, f'calc_{new_calc.calc_style}.in'), 'w', encoding='UTF-8') as f:
+        f.write(inputfile)
+
+    # Copy/generate content files keys
+    for content in copy_content:
+        terms = content.split()
+
+        if terms[0] == 'record':
+            record_name = terms[1]
+            record_file = Path(calc_directory, f'{record_name}.json')
+            with open(record_file, 'w') as f:
+                content_dict[record_name].json(fp=f, indent=4)
+
+        elif terms[0] == 'tarfile':
+            try:
+                tar = database.get_tar(name=terms[1])
+            except:
+                print(f'No tar for {terms[1]} found')
+            else:
+                file_name = f'{terms[1]}/{" ".join(terms[2:])}'
+                tar.extract(file_name, calc_directory)
+                tar.close()
+
+        elif terms[0] == 'tar':
+            try:
+                tar = database.get_tar(name=terms[1])
+            except:
+                try:
+                    dirpath = database.get_folder(name=terms[1])
+                except:
+                    print(f'No tar for {terms[1]} found')
+                else:
+                    shutil.copytree(dirpath, Path(calc_directory, dirpath.name))
+            else:
+                tar.extractall(calc_directory)
+                tar.close()
+
+    # Add record to database
+    database.add_record(record=new_calc)

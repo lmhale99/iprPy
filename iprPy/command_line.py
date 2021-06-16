@@ -6,7 +6,9 @@ import argparse
 
 # https://github.com/usnistgov/iprPy
 from . import (load_database, load_run_directory, load_calculation,
-               check_modules, Settings)
+               check_modules, settings)
+from .calculation import run_paramfile2json
+from .database import runner, prepare
 
 def command_line():
     args = command_line_parser()
@@ -24,7 +26,22 @@ def command_line_actions(args):
     # Actions for subcommand check_records
     elif args.action == 'check_records':
         database = load_database(args.database)
-        database.check_records(record_style=args.record_style)
+        style = args.record_style
+        
+        # Always refresh local calculation records
+        if database.style == 'local' and style[:12] == 'calculation_':
+            kwargs = {'refresh_cache': True}
+        else:
+            kwargs = {}
+
+        df = database.get_records_df(style=style, **kwargs)
+        print(f'{len(df)} records in database')
+        
+        # Count status values of calculations
+        if 'status' in df:
+            print(f" - {len(df[df.status=='finished'])} finished")
+            print(f" - {len(df[df.status=='not calculated'])} not finished")
+            print(f" - {len(df[df.status=='error'])} issued errors")
     
     # Actions for subcommand check_modules
     elif args.action == 'check_modules':
@@ -34,7 +51,8 @@ def command_line_actions(args):
     elif args.action == 'clean_records':
         database = load_database(args.database)
         run_directory = load_run_directory(args.run_directory)
-        database.clean_records(run_directory=run_directory, record_style=args.record_style)
+        database.clean_records(run_directory=run_directory,
+                               record_style=args.record_style)
     
     # Actions for subcommand copy_records
     elif args.action == 'copy_records':
@@ -52,75 +70,84 @@ def command_line_actions(args):
         database = load_database(args.database)
         run_directory = load_run_directory(args.run_directory)
         calculation = load_calculation(args.calculation)
-        database.prepare(run_directory, calculation, input_script=args.input_script)
+        prepare(database, run_directory, calculation,
+                input_script=args.input_script)
     
+    elif args.action == 'run':
+        status, error = run_paramfile2json(args.filename)
+        if status == 'finished':
+            print('sim calculated successfully')
+        elif status == 'error':
+            print('error:', error)
+
     # Actions for subcommand runner
     elif args.action == 'runner':
         database = load_database(args.database)
         run_directory = load_run_directory(args.run_directory)
-        database.runner(run_directory, calc_name=args.calc_name, temp=args.temp, bidtries=args.bidtries)
+        runner(database, run_directory, calc_name=args.calc_name,
+               temp=args.temp, bidtries=args.bidtries)
     
     # Actions for subcommand set_database
     elif args.action == 'set_database':
-        Settings().set_database(args.name)
+        settings.set_database(args.name)
     
     # Actions for subcommand unset_database
     elif args.action == 'unset_database':
-        Settings().unset_database(args.name)
+        settings.unset_database(args.name)
     
     # Actions for list_databases
     elif args.action == 'list_databases':
-        for name in Settings().list_databases:
+        for name in settings.list_databases:
             print(name)
 
     # Actions for subcommand set_run_directory
     elif args.action == 'set_run_directory':
-        Settings().set_run_directory(args.name)
+        settings.set_run_directory(args.name)
     
     # Actions for subcommand unset_run_directory
     elif args.action == 'unset_run_directory':
-        Settings().unset_run_directory(args.name)
+        settings.unset_run_directory(args.name)
     
     # Actions for list_run_directories
     elif args.action == 'list_run_directories':
-        for name in Settings().list_run_directories:
+        for name in settings.list_run_directories:
             print(name)
 
     # Actions for directory
     elif args.action == 'directory':
-        print(Settings().directory)
+        print(settings.directory)
 
     # Actions for set_directory
     elif args.action == 'set_directory':
-        Settings().set_directory(args.path)
+        settings.set_directory(args.path)
 
     # Actions for unset_directory
     elif args.action == 'unset_directory':
-        Settings().unset_directory()
+        settings.unset_directory()
 
     # Actions for library_directory
     elif args.action == 'library_directory':
-        print(Settings().library_directory)
+        print(settings.library_directory)
 
     # Actions for set_library_directory
     elif args.action == 'set_library_directory':
-        Settings().set_library_directory(args.path)
+        settings.set_library_directory(args.path)
 
     # Actions for unset_library_directory
     elif args.action == 'unset_library_directory':
-        Settings().unset_library_directory()
+        settings.unset_library_directory()
 
     # Actions for runner_log_directory
     elif args.action == 'runner_log_directory':
-        print(Settings().runner_log_directory)
+        print(settings.runner_log_directory)
 
     # Actions for set_runner_log_directory
     elif args.action == 'set_runner_log_directory':
-        Settings().set_runner_log_directory(args.path)
+        settings.set_runner_log_directory(args.path)
 
     # Actions for unset_runner_log_directory
     elif args.action == 'unset_runner_log_directory':
-        Settings().unset_runner_log_directory()
+        settings.unset_runner_log_directory()
 
     else:
         raise ValueError('Unknown action argument')
@@ -190,6 +217,12 @@ def command_line_parser():
     subparser.add_argument('input_script',
                         help='input parameter script')
     
+    # Define subparser for run
+    subparser = subparsers.add_parser('run',
+                        help='run a single calculation from a parameter file')
+    subparser.add_argument('filename',
+                        help='path to a parameter file')
+
     # Define subparser for runner
     subparser = subparsers.add_parser('runner',
                         help='start runner working on prepared calculations')

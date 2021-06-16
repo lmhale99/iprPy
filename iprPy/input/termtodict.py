@@ -53,3 +53,25 @@ def termtodict(term, keys):
                 param_dict[key] = word
     
     return param_dict
+
+def dicttoterm(param_dict):
+    """
+    Takes a dictionary and converts it into a single str term that can be
+    parsed by termtodict().
+    
+    Parameters
+    ----------
+    param_dict : dict
+        The dictionary of separated parameter terms.
+    
+    Returns
+    -------
+    str
+        The single str term representation.
+    """
+    term = ''
+    for key, value in param_dict.items():
+        term += f'{key} '
+        for v in aslist(value):
+            term += f'{v} '
+    return term
