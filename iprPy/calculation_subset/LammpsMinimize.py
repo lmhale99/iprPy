@@ -63,7 +63,9 @@ class LammpsMinimize(CalculationSubset):
 
     @maxiterations.setter
     def maxiterations(self, value):
-        self.__maxiterations = int(value)
+        value = int(value)
+        assert value >= 0
+        self.__maxiterations = value
     
     @property
     def maxevaluations(self):
@@ -71,7 +73,9 @@ class LammpsMinimize(CalculationSubset):
 
     @maxevaluations.setter
     def maxevaluations(self, value):
-        self.__maxevaluations = int(value)
+        value = int(value)
+        assert value >= 0
+        self.__maxevaluations = value
 
     @property
     def maxatommotion(self):
@@ -201,7 +205,7 @@ class LammpsMinimize(CalculationSubset):
         
         Parameters
         ----------
-        record_model : DataModelDict.DataModelDict
+        model : DataModelDict.DataModelDict
             The record content (after root element) to add content to.
         input_dict : dict
             Dictionary of all input parameter terms.
@@ -220,7 +224,7 @@ class LammpsMinimize(CalculationSubset):
             model['calculation']['run-parameter'] = DM()
         
         # Save values
-        run_params = record_model['calculation']['run-parameter']
+        run_params = model['calculation']['run-parameter']
         run_params[f'{self.modelprefix}energytolerance'] = self.energytolerance
         run_params[f'{self.modelprefix}forcetolerance'] = uc.model(self.forcetolerance,
                                                               self.parent.units.force_unit)

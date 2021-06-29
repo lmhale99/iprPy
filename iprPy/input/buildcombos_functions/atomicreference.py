@@ -1,6 +1,8 @@
 # http://www.numpy.org/
 import numpy as np
 
+import potentials
+
 # https://github.com/usnistgov/atomman
 import atomman.lammps as lmp
 
@@ -8,7 +10,7 @@ __all__ = ['atomicreference']
 
 def atomicreference(database, keys, content_dict=None, 
                     record='reference_crystal', elements=None,
-                    query=None, **kwargs):
+                    **kwargs):
     
     # Initialize inputs and content dict
     inputs = {}
@@ -18,20 +20,20 @@ def atomicreference(database, keys, content_dict=None,
         content_dict = {}
 
     # Check if potential info is in keys
-    if 'potential_file' in keys or 'potential_content' in keys or 'potential_dir' in keys:
+    if 'potential_file' in keys:
         include_potentials = True
         
         # Extract kwargs starting with "potential"
-        potential_kwargs = {}
+        potkwargs = {}
         for key in list(kwargs.keys()):
             if key[:10] == 'potential_':
-                potential_kwargs[key[10:]] = kwargs.pop(key)
+                potkwargs[key[10:]] = kwargs.pop(key)
     else:
         include_potentials = False
     
     # Fetch reference records
     references, reference_df = database.get_records(style=record, return_df=True,
-                                                    query=query, **kwargs)
+                                                    **kwargs)
     print(len(reference_df), 'matching atomic references found')
     if len(reference_df) == 0:
         return inputs, content_dict
@@ -39,21 +41,15 @@ def atomicreference(database, keys, content_dict=None,
     # Build with potentials
     if include_potentials:
         
-        # Pull out potential get_records parameters
-        potential_record = potential_kwargs.pop('record', 'potential_LAMMPS')
-        potential_query = potential_kwargs.pop('query', None)
-        status = potential_kwargs.pop('status', 'active')
-        
         # Set all status value
-        if status == 'all':
-            status = ['active', 'retracted', 'superseded']
+        if 'status' in potkwargs and potkwargs['status'] == 'all':
+            potkwargs['status'] = None
 
         # Fetch potential records 
-        potentials, potential_df = database.get_records(style=potential_record, return_df=True,
-                                                        query=potential_query, status=status,
-                                                        **potential_kwargs)
-        print(len(potential_df), 'matching interatomic potentials found')
-        if len(potential_df) == 0:
+        potdb = potentials.Database(local_database=database, local=True, remote=False)
+        lmppots, lmppots_df = potdb.get_lammps_potentials(return_df=True, **potkwargs)
+        print(len(lmppots_df), 'matching interatomic potentials found')
+        if len(lmppots_df) == 0:
             return inputs, content_dict
         
         # Loop over all unique reference element sets
@@ -62,31 +58,31 @@ def atomicreference(database, keys, content_dict=None,
             reference_symbols = elementstr.split()
             
             # Loop over all potentials
-            for j in potential_df.index:
-                potential = potentials[j]
-                potential_series = potential_df.loc[j]
-                content_dict[potential.name] = potential.content
-                potential_symbols = potential_series.symbols
-                potential_elements = potential_series.elements
+            for j in lmppots_df.index:
+                lmppot = lmppots[j]
+                lmppot_series = lmppots_df.loc[j]
+                content_dict[lmppot.name] = lmppot.build_model()
+                lmppot_symbols = lmppot_series.symbols
+                lmppot_elements = lmppot_series.elements
                 
                 # Loop over all potential element-symbol sets
-                for symbolstr in symbolstrings(reference_symbols, potential_elements, potential_symbols):
+                for symbolstr in symbolstrings(reference_symbols, lmppot_elements, lmppot_symbols):
                     
                     # Loop over all references with the reference element set
                     for i in reference_df[reference_df.elementstr==elementstr].index:
                         reference = references[i]
-                        content_dict[reference.name] = reference.content
+                        content_dict[reference.name] = reference.build_model()
                 
                         # Loop over input keys
                         for key in keys:
                             if key == 'potential_file':
-                                inputs['potential_file'].append(potential.name + '.json')
+                                inputs['potential_file'].append(lmppot.name + '.json')
                             elif key == 'potential_content':
-                                inputs['potential_content'].append(f'record {potential.name}')
+                                inputs['potential_content'].append(f'record {lmppot.name}')
                             elif key == 'potential_dir':
-                                inputs['potential_dir'].append(potential.name)
+                                inputs['potential_dir'].append(lmppot.name)
                             elif key == 'potential_dir_content':
-                                inputs['potential_dir_content'].append(f'tar {potential.name}')
+                                inputs['potential_dir_content'].append(f'tar {lmppot.name}')
                             elif key == 'load_file':
                                 inputs['load_file'].append(reference.name+'.json')
                             elif key == 'load_content':
@@ -108,7 +104,7 @@ def atomicreference(database, keys, content_dict=None,
         # Loop over all references
         for i in reference_df.index:
             reference = references[i]
-            content_dict[reference.name] = reference.content
+            content_dict[reference.name] = reference.build_model()
             
             # Loop over input keys
             for key in keys:

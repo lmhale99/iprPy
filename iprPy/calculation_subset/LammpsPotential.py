@@ -80,13 +80,14 @@ class LammpsPotential(CalculationSubset):
     def potential(self):
         """potentials.PotentialLAMMPS: The record object for the LAMMPS implementation"""
         if (self.__potential is None and (
-                self.__potential_LAMMPS_id is not None
-                or self.__potential_LAMMPS_key is not None)):
+                self.potential_LAMMPS_id is not None
+                or self.potential_LAMMPS_key is not None)):
             
             self.potential = am.load_lammps_potential(
-                id=self.__potential_LAMMPS_id,
-                key=self.__potential_LAMMPS_key,
-                pot_dir_style = 'local'
+                id = self.potential_LAMMPS_id,
+                key = self.potential_LAMMPS_key,
+                pot_dir_style = 'local',
+                database = self.parent.database
             )
         return self.__potential
     
@@ -211,8 +212,14 @@ class LammpsPotential(CalculationSubset):
         """
 
         # Check required parameters
-        if self.potential is None:
-            raise ValueError('potential information not set')
+        if (self.potential_key is None or self.potential_id is None
+            or self.potential_LAMMPS_key is None
+            or self.potential_LAMMPS_id is None):
+            try:
+                potential = self.potential
+                assert potential is not None
+            except:
+                raise ValueError('potential information not set')
 
         pot = DM()
 
@@ -236,8 +243,14 @@ class LammpsPotential(CalculationSubset):
             The dictionary to add the subset content to
         """
         # Check required parameters
-        if self.potential is None:
-            raise ValueError('potential information not set')
+        if (self.potential_key is None or self.potential_id is None
+            or self.potential_LAMMPS_key is None
+            or self.potential_LAMMPS_id is None):
+            try:
+                potential = self.potential
+                assert potential is not None
+            except:
+                raise ValueError('potential information not set')
 
         meta[f'{self.prefix}potential_LAMMPS_key'] = self.potential_LAMMPS_key
         meta[f'{self.prefix}potential_LAMMPS_id'] = self.potential_LAMMPS_id

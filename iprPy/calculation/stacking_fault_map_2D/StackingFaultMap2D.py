@@ -1,4 +1,5 @@
 # coding: utf-8
+
 # Standard Python libraries
 import uuid
 from copy import deepcopy
@@ -17,42 +18,93 @@ from DataModelDict import DataModelDict as DM
 
 # iprPy imports
 from .. import Calculation
-from .diatom_scan import diatom_scan
+from .stacking_fault_map_2D import stackingfaultmap
 from ...calculation_subset import *
 from ...input import value, boolean
 from ...tools import aslist, dict_insert
 
 # Global class properties
-modelroot = 'calculation-diatom-scan'
+modelroot = 'calculation-stacking-fault-map-2D'
 
-class DiatomScan(Calculation):
-    """Class for managing diatom energy scan calculations"""
+class StackingFaultPath():
+    """Class for managing a path along a stacking fault map"""
+
+    def __init__(self, sp):
+        self.__direction = sp['direction']
+        self.__coord = uc.value_unit(sp['minimum-energy-path'])
+        self.__path = self.gamma.path(self.coord)
+        self.__usf_mep = uc.value_unit(sp['unstable-fault-energy-mep'])
+        self.__usf_urp = uc.value_unit(sp['unstable-fault-energy-unrelaxed-path'])
+        self.__shear_mep = uc.value_unit(sp['ideal-shear-stress-mep'])
+        self.__shear_urp = uc.value_unit(sp['ideal-shear-stress-unrelaxed-path'])
+
+    @property
+    def direction(self):
+        return self.__direction
+
+    @property
+    def coord(self):
+        return self.__coord
+
+    @property
+    def path(self):
+        return self.__path
+
+    @property
+    def usf_mep(self):
+        return self.__usf_mep
+
+    @property
+    def usf_urp(self):
+        return self.__usf_urp
+
+    @property
+    def shear_mep(self):
+        return self.__shear_mep
+
+    @property
+    def shear_urp(self):
+        return self.__shear_urp
+
+    def build_model(self, length_unit, energy_unit, stress_unit):
+        sp = DM()
+        sp['direction'] = self.direction
+        sp['minimum-energy-path'] = uc.model(self.coord, length_unit)
+        sp['unstable-fault-energy-mep'] = uc.model(self.usf_mep, energy_unit)
+        sp['unstable-fault-energy-unrelaxed-path'] = uc.model(self.usf_urp, energy_unit)
+        sp['ideal-shear-stress-mep'] = uc.model(self.shear_mep, stress_unit)
+        sp['ideal-shear-stress-unrelaxed-path'] = uc.model(self.shear_urp, stress_unit)
+        return sp
+
+class StackingFaultMap2D(Calculation):
+    """Class for managing 2D maps of stacking fault energy calculations"""
 
 ############################# Core properties #################################
 
     def __init__(self, model=None, name=None, params=None, **kwargs):
         """Initializes a Calculation object for a given style."""
-
+        
         # Initialize subsets used by the calculation
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
         self.__units = Units(self)
+        self.__system = AtommanSystemLoad(self)
+        self.__minimize = LammpsMinimize(self)
+        self.__defect = StackingFault(self)
 
         # Initialize unique calculation attributes
-        self.symbols = []
-        self.number_of_steps_r = 300
-        self.minimum_r = uc.set_in_units(0.02, 'angstrom')
-        self.maximum_r = uc.set_in_units(6.0, 'angstrom')
-        self.r_values = None
-        self.energy_values = None
+        self.num_a1 = 10
+        self.num_a2 = 10
+        self.__gamma = None
+        self.__paths = None
 
         # Define calc shortcut
-        self.calc = diatom_scan
+        self.calc = stackingfaultmap
 
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
 
-############################## Class attributes ###############################                
+############################## Class attributes ################################
 
     @property
     def commands(self):
@@ -68,93 +120,75 @@ class DiatomScan(Calculation):
     def units(self):
         """Units subset"""
         return self.__units
+
+    @property
+    def system(self):
+        """AtommanSystemLoad subset"""
+        return self.__system
     
     @property
-    def symbols(self):
-        """The potential symbols to use"""
-        return self.__symbols
-
-    @symbols.setter
-    def symbols(self, value):
-        if value is None:
-            self.__symbols = []
-        else:
-            value = aslist(value)
-            # Replicate single symbol
-            if len(value) == 1:
-                value += value
-            
-            # Check that at most 2 symbols given for calc
-            elif len(value) > 2:
-                raise ValueError('Invalid number of symbols')
-            
-            self.__symbols = value
+    def minimize(self):
+        """LammpsMinimize subset"""
+        return self.__minimize
 
     @property
-    def number_of_steps_r(self):
-        return self.__number_of_steps_r
-
-    @number_of_steps_r.setter
-    def number_of_steps_r(self, value):
-        value = int(value)
-        assert value > 0
-        self.__number_of_steps_r = value
+    def defect(self):
+        """FreeSurface subset"""
+        return self.__defect
 
     @property
-    def minimum_r(self):
-        return self.__minimum_r
+    def num_a1(self):
+        """int: Number of fractional shifts along the a1vect direction to evaluate"""
+        return self.__num_a1
 
-    @minimum_r.setter
-    def minimum_r(self, value):
-        value = float(value)
-        assert value > 0
-        self.__minimum_r = value
-
-    @property
-    def maximum_r(self):
-        return self.__maximum_r
-
-    @maximum_r.setter
-    def maximum_r(self, value):
-        value = float(value)
-        assert value > 0
-        self.__maximum_r = value
+    @num_a1.setter
+    def num_a1(self, value):
+        self.__num_a1 = int(value)
 
     @property
-    def r_values(self):
-        """numpy.NDArray : Interatomic distances used for the scan."""
-        if self.__r_values is None:
+    def num_a2(self):
+        """int: Number of fractional shifts along the a2vect direction to evaluate"""
+        return self.__num_a2
+
+    @num_a2.setter
+    def num_a2(self, value):
+        self.__num_a2 = int(value)
+
+    @property
+    def gamma(self):
+        """atomman.defect.GammaSurface: GSF results"""
+        if self.__gamma is None:
             raise ValueError('No results yet!')
-        return self.__r_values
-
-    @r_values.setter
-    def r_values(self, value):
-        if value is None:
-            self.__r_values = value
-        else:
-            value = np.asarray(value, dtype=float)
-            self.__r_values = value
-            self.number_of_steps_r = len(value)
-            self.minimum_r = value[0]
-            self.maximum_r = value[-1]
+        if not isinstance(self.__gamma, am.defect.GammaSurface):
+            self.__gamma = am.defect.GammaSurface(model=self.__gamma)
+        return self.__gamma
 
     @property
-    def energy_values(self):
-        """numpy.NDArray : Measured potential energy for each r value."""
-        if self.__energy_values is None:
-            raise ValueError('No results yet!')
-        return self.__energy_values
-
-    @energy_values.setter
-    def energy_values(self, value):
-        if value is None:
-            self.__energy_values = value
+    def paths(self):
+        if self.__paths is None:
+            raise ValueError('No path results!')
+        elif not isinstance(self.__paths, list):
+            pass
         else:
-            value = np.asarray(value, dtype=float)
-            self.__energy_values = value
+            return self.__paths
+
+    def load_paths(self, model=None):
+
+        if model is None:
+            model = self.__paths
+            if model is None:
+                raise ValueError('No path results!')
+            if isinstance(model, list):
+                return
+        
+        model = DM(model)
+        self.__paths = []
+        for sp in model.iteraslist('slip-path'):
+            self.paths.append(StackingFaultPath(sp))            
 
     def set_values(self, name=None, **kwargs):
         """Used to set initial common values for the calculation."""
+        
         # Set universal content
         super().set_values(name=None, **kwargs)
 
@@ -162,17 +196,16 @@ class DiatomScan(Calculation):
         self.units.set_values(**kwargs)
         self.potential.set_values(**kwargs)
         self.commands.set_values(**kwargs)
+        self.system.set_values(**kwargs)
+        self.minimize.set_values(**kwargs)
+        self.defect.set_values(**kwargs)
 
         # Set calculation-specific values
-        if 'symbols' in kwargs:
-            self.symbols = kwargs['symbols']
-        if 'number_of_steps_r' in kwargs:
-            self.number_of_steps_r = kwargs['number_of_steps_r']
-        if 'minimum_r' in kwargs:
-            self.minimum_r = kwargs['minimum_r']
-        if 'maximum_r' in kwargs:
-            self.maximum_r = kwargs['maximum_r']
-    
+        if 'num_a1' in kwargs:
+            self.num_a1 = kwargs['num_a1']
+        if 'num_a2' in kwargs:
+            self.num_a2 = kwargs['num_a2']
+
 ####################### Parameter file interactions ########################### 
 
     def load_parameters(self, params, key=None):
@@ -183,29 +216,37 @@ class DiatomScan(Calculation):
         # Load input/output units
         self.units.load_parameters(input_dict)
         
+        # Change default values for subset terms
+        input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
+        input_dict['forcetolerance'] = input_dict.get('forcetolerance',
+                                                  '1.0e-6 eV/angstrom')
+
         # Load calculation-specific strings
-        self.symbols = input_dict['symbols'].split()
 
         # Load calculation-specific booleans
         
         # Load calculation-specific integers
-        self.number_of_steps_r = int(input_dict.get('number_of_steps_r', 300))
+        self.num_a1 = int(input_dict.get('stackingfault_num_a1', 10))
+        self.num_a2 = int(input_dict.get('stackingfault_num_a2', 10))
 
         # Load calculation-specific unitless floats
         
         # Load calculation-specific floats with units
-        self.minimum_r = value(input_dict, 'minimum_r',
-                               default_unit=self.units.length_unit,
-                               default_term='0.02 angstrom')
-        self.maximum_r = value(input_dict, 'maximum_r',
-                               default_unit=self.units.length_unit,
-                               default_term='6.0 angstrom')
         
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
         
+        # Load minimization parameters
+        self.minimize.load_parameters(input_dict)
+
         # Load LAMMPS potential
         self.potential.load_parameters(input_dict)
+
+        # Load initial system
+        self.system.load_parameters(input_dict)
+
+        # Load defect parameters
+        self.defect.load_parameters(input_dict)
 
     def master_prepare_inputs(self, branch='main', **kwargs):
         """
@@ -238,45 +279,58 @@ class DiatomScan(Calculation):
             assert 'lammps_command' in kwargs
 
             # Set default workflow settings
-            params['buildcombos'] = 'diatom potential_file intpot'
-            params['minimum_r'] = '0.02 angstrom'
-            params['maximum_r'] = '10.0 angstrom'
-            params['number_of_steps_r'] = '500'
-
+            params['buildcombos'] = [
+                'atomicparent load_file parent',
+                'defect stackingfault_file'
+            ]
+            params['parent_record'] = 'relaxed_crystal'
+            params['parent_method'] = 'dynamic'
+            params['parent_standing'] = 'good'
+            params['defect_record'] = 'stacking_fault'
+            params['sizemults'] = '5 5 10'
+            params['stackingfault_num_a1'] = '30'
+            params['stackingfault_num_a2'] = '30'
+            
             # Copy kwargs to params
             for key in kwargs:
                 
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
-                    params[f'intpot_{key}'] = kwargs[key]
+                    params[f'parent_{key}'] = kwargs[key]
                 
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
-        
+
         else:
             raise ValueError(f'Unknown branch {branch}')
 
         return params
-
-
+        
     @property
     def template(self):
         """str: The template to use for generating calc.in files."""
+        
         # Build universal content
         template = super().template
 
         # Build subset content
         template += self.commands.template()
         template += self.potential.template()
+        template += self.system.template()
+        template += self.defect.template()
+        template += self.minimize.template()
         template += self.units.template()
-
+        
         # Build calculation-specific content
         header = 'Run parameters'
-        keys = ['symbols', 'minimum_r', 'maximum_r', 'number_of_steps_r']
+        keys = [
+            'stackingfault_num_a1',
+            'stackingfault_num_a2', 
+        ]
         template += self._template_builder(header, keys)
         
-        return template   
+        return template     
 
     @property
     def singularkeys(self):
@@ -293,29 +347,31 @@ class DiatomScan(Calculation):
             # Calculation-specific keys
         )
         return keys 
-    
+
     @property
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
+
+        # Fetch universal key sets from parent
+        universalkeys = super().multikeys
         
-        keys = [
-            
-            # Universal keys
-            #super().multikeys,
-            
-            # Subset keys
-            self.potential.keyset + ['symbols'],
-
-            # Calculation-specific keys
+        # Specify calculation-specific key sets 
+        keys =  [
+            self.potential.keyset + self.system.keyset,
             [
-                'minimum_r',
-                'maximum_r',
-                'number_of_steps_r',
+                'sizemults',
+                'stackingfault_minwidth',
             ],
+            self.defect.keyset,
+            [
+                'stackingfault_num_a1',
+                'stackingfault_num_a2',
+            ],            
+            self.minimize.keyset,
         ]
-
-        return keys
-
+               
+        # Join and return
+        return universalkeys + keys
 
 ########################### Data model interactions ###########################
 
@@ -325,9 +381,6 @@ class DiatomScan(Calculation):
 
     def build_model(self):
 
-        if len(self.symbols) is None:
-            raise ValueError('symbols not set')
-
         # Build universal content
         model = super().build_model()
         calc = model[self.modelroot]
@@ -335,28 +388,33 @@ class DiatomScan(Calculation):
         # Build subset content
         self.commands.build_model(calc, after='atomman-version')
         self.potential.build_model(calc, after='calculation')
+        self.system.build_model(calc, after='potential-LAMMPS')
+        self.defect.build_model(calc, after='system-info')
+        self.minimize.build_model(calc)
 
         # Build calculation-specific content
         if 'calculation' not in calc:
             calc['calculation'] = DM()
         if 'run-parameter' not in calc['calculation']:
             calc['calculation']['run-parameter'] = DM()
-        calc['calculation']['run-parameter'] = run_params = DM()
-        run_params['minimum_r'] = uc.model(self.minimum_r,
-                                           self.units.length_unit)
-        run_params['maximum_r'] = uc.model(self.maximum_r,
-                                           self.units.length_unit)
-        run_params['number_of_steps_r'] = self.number_of_steps_r
-
-        dict_insert(calc, 'system-info', DM(), after='potential-LAMMPS')
-        calc['system-info']['symbol'] = self.symbols
+        run_params = calc['calculation']['run-parameter']
+        run_params['stackingfault_num_a1'] = self.num_a1
+        run_params['stackingfault_num_a2'] = self.num_a2
         
         # Build results
         if self.status == 'finished':
-            calc['diatom-energy-relation'] = scan = DM()
-            scan['r'] = uc.model(self.r_values, self.units.length_unit)
-            scan['potential-energy'] = uc.model(self.energy_values,
-                                                self.units.energy_unit)
+            energy_per_area_unit = f'{self.units.energy_unit}/{self.units.length_unit}^2'
+            gamma_model = self.gamma.model(length_unit=self.units.length_unit,
+                                           energyperarea_unit=energy_per_area_unit)
+            calc['stacking-fault-map'] = gamma_model['stacking-fault-map']
+
+            try:
+                paths = self.paths
+            except:
+                pass
+            else:
+                for path in paths:
+                    calc.append('slip-path', path.build_model())
 
         return model
 
@@ -370,28 +428,29 @@ class DiatomScan(Calculation):
         #self.units.load_model(calc)
         self.potential.load_model(calc)
         self.commands.load_model(calc)
+        self.system.load_model(calc)
+        self.minimize.load_model(calc)
+        self.defect.load_model(calc)
 
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
-        self.minimum_r = uc.value_unit(run_params['minimum_r'])
-        self.minimum_r = uc.value_unit(run_params['maximum_r'])
-        self.number_of_steps_r = run_params['number_of_steps_r']
-
-        self.symbols = calc['system-info']['symbol']
+        self.num_a1 = run_params['stackingfault_num_a1']
+        self.nun_a2 = run_params['stackingfault_num_a2']
 
         # Load results
         if self.status == 'finished':
-           scan = calc['diatom-energy-relation']
-           self.r_values = uc.value_unit(scan['r'])
-           self.energy_values = uc.value_unit(scan['potential-energy'])
+            self.__gamma = calc
+
+            if 'slip-path' in calc:
+                self.__paths = calc          
 
     @staticmethod
     def mongoquery(name=None, key=None, iprPy_version=None,
                    atomman_version=None, script=None, branch=None,
                    status=None, lammps_version=None,
                    potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                   potential_key=None, potential_id=None, minimum_r=None,
-                   maximum_r=None, number_of_steps_r=None, symbols=None):
+                   potential_key=None, potential_id=None, 
+                   stackingfault_key=None, stackingfault_id=None):
         
         # Build universal terms
         mquery = Calculation.mongoquery(modelroot, name=name, key=key,
@@ -408,13 +467,17 @@ class DiatomScan(Calculation):
                                                  potential_LAMMPS_id=potential_LAMMPS_id,
                                                  potential_key=potential_key,
                                                  potential_id=potential_id))
+        #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
+        #mquery.update(AtommanSystemManipulate.mongoquery(modelroot,...)
+        mquery.update(StackingFault.mongoquery(modelroot,
+                                             stackingfault_key=stackingfault_key,
+                                             stackingfault_id=stackingfault_id))
 
         # Build calculation-specific terms
         root = f'content.{modelroot}'
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
-        query.in_list.mongo(mquery, f'{root}.system-info.symbols', symbols)
+        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
+        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
+        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
 
         return mquery
 
@@ -423,8 +486,8 @@ class DiatomScan(Calculation):
                   atomman_version=None, script=None, branch=None,
                   status=None, lammps_version=None,
                   potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                  potential_key=None, potential_id=None, minimum_r=None,
-                  maximum_r=None, number_of_steps_r=None, symbols=None):
+                  potential_key=None, potential_id=None, 
+                  stackingfault_key=None, stackingfault_id=None):
         
         # Build universal terms
         mquery = Calculation.cdcsquery(modelroot, key=key,
@@ -441,13 +504,17 @@ class DiatomScan(Calculation):
                                                 potential_LAMMPS_id=potential_LAMMPS_id,
                                                 potential_key=potential_key,
                                                 potential_id=potential_id))
+        #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
+        #mquery.update(AtommanSystemManipulate.mongoquery(modelroot,...)
+        mquery.update(StackingFault.mongoquery(modelroot,
+                                             stackingfault_key=stackingfault_key,
+                                             stackingfault_id=stackingfault_id))
 
         # Build calculation-specific terms
         root = modelroot
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
-        query.in_list.mongo(mquery, f'{root}.system-info.symbols', symbols)
+        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
+        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
+        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
 
         return mquery
 
@@ -462,27 +529,31 @@ class DiatomScan(Calculation):
         dict
             A dictionary representation of the record's content.
         """
-        # Check required parameters
-        if len(self.symbols) is None:
-            raise ValueError('symbols not set')
-
         # Extract universal content
         meta = super().metadata()
         
         # Extract subset content
         self.potential.metadata(meta)
         self.commands.metadata(meta)
+        self.system.metadata(meta)
+        self.minimize.metadata(meta)
+        self.defect.metadata(meta)
 
         # Extract calculation-specific content
-        meta['minimum_r'] = self.minimum_r
-        meta['maximum_r'] = self.maximum_r
-        meta['number_of_steps_r'] = self.number_of_steps_r
-        meta['symbols'] = ' '.join(sorted(self.symbols))
         
         # Extract results
-        if self.status == 'finished':
-            meta['r_values'] = self.r_values
-            meta['energy_values'] = self.energy_values
+        if self.status == 'finished':      
+            try:
+                paths = self.paths
+            except:
+                pass
+            else:
+                for path in paths:
+                    direction = path.direction
+                    meta[f'E_usf_mep_[{direction}]'] = path.usf_mep
+                    meta[f'E_usf_urp_[{direction}]'] = path.usf_urp
+                    meta[f'τ_ideal_mep_[{direction}]'] = path.shear_mep
+                    meta[f'τ_ideal_urp_[{direction}]'] = path.shear_urp
 
         return meta
 
@@ -491,8 +562,21 @@ class DiatomScan(Calculation):
         """list: The terms to compare metadata values absolutely."""
         return [
             'script',
+            
+            'load_file',
+            'load_options',
             'symbols',
+            
             'potential_LAMMPS_key',
+            
+            'a_mult',
+            'b_mult',
+            'c_mult',
+            
+            'stackingfault_key',
+
+            'num_a1',
+            'num_a2'
         ]
     
     @property
@@ -500,13 +584,16 @@ class DiatomScan(Calculation):
         """dict: The terms to compare metadata values using a tolerance."""
         return {}
 
+    def isvalid(self):
+        return self.system.family == self.defect.family
+    
     @staticmethod
     def pandasfilter(dataframe, name=None, key=None, iprPy_version=None,
                      atomman_version=None, script=None, branch=None,
                      status=None, lammps_version=None,
                      potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                     potential_key=None, potential_id=None, minimum_r=None,
-                     maximum_r=None, number_of_steps_r=None, symbols=None):
+                     potential_key=None, potential_id=None, 
+                     stackingfault_key=None, stackingfault_id=None):
         matches = (
             # Filter by universal terms
             Calculation.pandasfilter(dataframe, name=name, key=key,
@@ -522,12 +609,17 @@ class DiatomScan(Calculation):
                                           potential_LAMMPS_id=potential_LAMMPS_id,
                                           potential_key=potential_key,
                                           potential_id=potential_id)
+            #&AtommanSystemLoad.pandasfilter(dataframe, ...)
+            #&AtommanSystemManipulate.pandasfilter(dataframe, ...)
+            &StackingFault.pandasfilter(dataframe,
+                                      stackingfault_key=stackingfault_key,
+                                      stackingfault_id=stackingfault_id)
 
             # Filter by calculation-specific terms
-            &query.str_match.pandas(dataframe, 'minimum_r', minimum_r)
-            &query.str_match.pandas(dataframe, 'maximum_r', maximum_r)
-            &query.str_match.pandas(dataframe, 'number_of_steps_r', number_of_steps_r)
-            &query.in_list.pandas(dataframe, 'symbols', symbols)
+            #&query.str_match.pandas(dataframe, 'minimum_r', minimum_r)
+            #&query.str_match.pandas(dataframe, 'maximum_r', maximum_r)
+            #&query.str_match.pandas(dataframe, 'number_of_steps_r', number_of_steps_r)
+            #&query.str_contains.pandas(dataframe, 'symbols', symbols)
         )
         
         return matches
@@ -537,22 +629,21 @@ class DiatomScan(Calculation):
     def calc_inputs(self):
         """Builds calculation inputs from the class's attributes"""
         
-        # Check required parameters
-        if len(self.symbols) is None:
-            raise ValueError('symbols not set')
-
         # Initialize input_dict
         input_dict = {}
 
         # Add subset inputs
         self.commands.calc_inputs(input_dict)
         self.potential.calc_inputs(input_dict)
+        self.system.calc_inputs(input_dict)
+        self.minimize.calc_inputs(input_dict)
+        self.defect.calc_inputs(input_dict)
+
+        # Remove unused subset inputs
 
         # Add calculation-specific inputs
-        input_dict['symbols'] = self.symbols
-        input_dict['rmin'] = self.minimum_r
-        input_dict['rmax'] = self.maximum_r
-        input_dict['rsteps'] = self.number_of_steps_r
+        input_dict['num_a1'] = self.num_a1
+        input_dict['num_a2'] = self.num_a2
 
         # Return input_dict
         return input_dict
@@ -580,7 +671,6 @@ class DiatomScan(Calculation):
         
         # Process results
         if self.status == 'finished':
-            self.r_values = results_dict['r_values']
-            self.energy_values = results_dict['energy_values']
-        
+            self.__gamma = results_dict['gamma']
+
         self._results(json=results_json)

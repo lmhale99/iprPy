@@ -1,12 +1,14 @@
 # https://github.com/usnistgov/DataModelDict 
 from DataModelDict import DataModelDict as DM
 
+import potentials
+
 import numpy as np
 
 __all__ = ['atomicarchive']
 
 def atomicarchive(database, keys, content_dict=None, record=None, load_key='atomic-system',
-                  query=None, **kwargs):
+                  **kwargs):
     """
     Build parameter sets based on loading files from within a calculation tar archive.
     """
@@ -18,38 +20,32 @@ def atomicarchive(database, keys, content_dict=None, record=None, load_key='atom
         content_dict = {}
 
     # Check if potential info is in keys
-    if 'potential_file' in keys or 'potential_dir' in keys:
+    if 'potential_file' in keys:
         include_potentials = True
         
         # Extract kwargs starting with "potential"
-        potential_kwargs = {}
+        potkwargs = {}
         for key in list(kwargs.keys()):
             if key[:10] == 'potential_':
-                potential_kwargs[key[10:]] = kwargs.pop(key)
-
-        # Pull out potential get_records parameters
-        potential_record = potential_kwargs.pop('record', 'potential_LAMMPS')
-        potential_query = potential_kwargs.pop('query', None)
-        status = potential_kwargs.pop('status', 'active')
+                potkwargs[key[10:]] = kwargs.pop(key)
         
         # Set all status value
-        if status == 'all':
-            status = ['active', 'retracted', 'superseded']
+        if 'status' in potkwargs and potkwargs['status'] == 'all':
+            potkwargs['status'] = None
         
         # Fetch potential records 
-        potentials, potential_df = database.get_records(style=potential_record, return_df=True,
-                                                        query=potential_query, status=status,
-                                                        **potential_kwargs)
-        print(len(potential_df), 'matching interatomic potentials found')
-        if len(potential_df) == 0:
+        potdb = potentials.Database(local_database=database, local=True, remote=False)
+        lmppots, lmppots_df = potdb.get_lammps_potentials(return_df=True, **potkwargs)
+        print(len(lmppots_df), 'matching interatomic potentials found')
+        if len(lmppots_df) == 0:
             return inputs, content_dict
-        kwargs['potential_LAMMPS_key'] = list(np.unique(potential_df.key))
+        kwargs['potential_LAMMPS_key'] = list(np.unique(lmppots_df.key))
     else:
         include_potentials = False
 
     # Fetch reference records
     parents, parent_df = database.get_records(style=record, return_df=True,
-                                              query=query, **kwargs)
+                                              **kwargs)
     print(len(parent_df), 'matching atomic archives found')
     if len(parent_df) == 0:
         return inputs, content_dict
@@ -62,28 +58,28 @@ def atomicarchive(database, keys, content_dict=None, record=None, load_key='atom
         # Find potential
         if include_potentials:
             try:
-                potential_id = parent_series.potential_LAMMPS_id
+                potential_LAMMPS_key = parent_series.potential_LAMMPS_key
             except:
                 # Search grandparents for name of potential
-                potential_id = None
+                potential_LAMMPS_key = None
                 for grandparent in database.get_parent_records(record=parent):
                     try:
-                        potential_id = grandparent.todict(full=False, flat=True)['potential_LAMMPS_id']
+                        potential_LAMMPS_key = grandparent.todict(full=False, flat=True)['potential_LAMMPS_key']
                     except:
                         pass
                     else:
                         break
-                if potential_id is None:
+                if potential_LAMMPS_key is None:
                     raise ValueError('potential info not found')
             try:
-                potential_series = potential_df[potential_df.id == potential_id].iloc[0]
+                lmppot_series = lmppots_df[lmppots_df.key == potential_LAMMPS_key].iloc[0]
             except:
                 continue
-            potential = potentials[potential_series.name]
-            content_dict[potential.name] = potential.content
+            lmppot = lmppots[lmppot_series.name]
+            content_dict[lmppot.name] = lmppot.build_model()
         
         # Loop over each system in parent
-        for load_info in parent.content.finds(load_key):
+        for load_info in parent.build_model().finds(load_key):
             
             # Extract system load info
             load_file = load_info['artifact']['file']
@@ -94,13 +90,13 @@ def atomicarchive(database, keys, content_dict=None, record=None, load_key='atom
             # Loop over input keys
             for key in keys:
                 if key == 'potential_file':
-                    inputs['potential_file'].append(f'{potential.name}.json')
+                    inputs['potential_file'].append(f'{lmppot.name}.json')
                 elif key == 'potential_content':
-                    inputs['potential_content'].append(f'record {potential.name}')
+                    inputs['potential_content'].append(f'record {lmppot.name}')
                 elif key == 'potential_dir':
-                    inputs['potential_dir'].append(potential.name)
+                    inputs['potential_dir'].append(lmppot.name)
                 elif key == 'potential_dir_content':
-                    inputs['potential_dir_content'].append(f'tar {potential.name}')
+                    inputs['potential_dir_content'].append(f'tar {lmppot.name}')
                 elif key == 'load_file':
                     inputs['load_file'].append(f'{parent.name}/{load_file}')
                 elif key == 'load_content':

@@ -1,9 +1,5 @@
 # coding: utf-8
 # Standard Python libraries
-import uuid
-from copy import deepcopy
-
-import numpy as np
 
 from datamodelbase import query
 
@@ -17,42 +13,43 @@ from DataModelDict import DataModelDict as DM
 
 # iprPy imports
 from .. import Calculation
-from .diatom_scan import diatom_scan
+from .elastic_constants_static import elastic_constants_static
 from ...calculation_subset import *
 from ...input import value, boolean
 from ...tools import aslist, dict_insert
 
 # Global class properties
-modelroot = 'calculation-diatom-scan'
+modelroot = 'calculation-relax-static'
 
-class DiatomScan(Calculation):
-    """Class for managing diatom energy scan calculations"""
+class ElasticConstantsStatic(Calculation):
+    """Class for managing static elastic constants calculations from small strains"""
 
 ############################# Core properties #################################
 
     def __init__(self, model=None, name=None, params=None, **kwargs):
         """Initializes a Calculation object for a given style."""
-
+        
         # Initialize subsets used by the calculation
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
         self.__units = Units(self)
+        self.__system = AtommanSystemLoad(self)
+        self.__system_mods = AtommanSystemManipulate(self)
+        self.__minimize = LammpsMinimize(self)
 
         # Initialize unique calculation attributes
-        self.symbols = []
-        self.number_of_steps_r = 300
-        self.minimum_r = uc.set_in_units(0.02, 'angstrom')
-        self.maximum_r = uc.set_in_units(6.0, 'angstrom')
-        self.r_values = None
-        self.energy_values = None
-
+        self.strainrange = 1e-6
+        self.__C = None
+        self.__raw_Cij_positive = None
+        self.__raw_Cij_negative = None
+        
         # Define calc shortcut
-        self.calc = diatom_scan
+        self.calc = elastic_constants_static
 
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
 
-############################## Class attributes ###############################                
+############################## Class attributes ################################
 
     @property
     def commands(self):
@@ -68,93 +65,55 @@ class DiatomScan(Calculation):
     def units(self):
         """Units subset"""
         return self.__units
+
+    @property
+    def system(self):
+        """AtommanSystemLoad subset"""
+        return self.__system
+
+    @property
+    def system_mods(self):
+        """AtommanSystemManipulate subset"""
+        return self.__system_mods
     
     @property
-    def symbols(self):
-        """The potential symbols to use"""
-        return self.__symbols
-
-    @symbols.setter
-    def symbols(self, value):
-        if value is None:
-            self.__symbols = []
-        else:
-            value = aslist(value)
-            # Replicate single symbol
-            if len(value) == 1:
-                value += value
-            
-            # Check that at most 2 symbols given for calc
-            elif len(value) > 2:
-                raise ValueError('Invalid number of symbols')
-            
-            self.__symbols = value
+    def minimize(self):
+        """LammpsMinimize subset"""
+        return self.__minimize
 
     @property
-    def number_of_steps_r(self):
-        return self.__number_of_steps_r
+    def strainrange(self):
+        """float: Strain step size used in estimating elastic constants"""
+        return self.__strainrange
 
-    @number_of_steps_r.setter
-    def number_of_steps_r(self, value):
-        value = int(value)
-        assert value > 0
-        self.__number_of_steps_r = value
-
+    @strainrange.setter
+    def strainrange(self, value):
+        self.__strainrange = float(value)
+        
     @property
-    def minimum_r(self):
-        return self.__minimum_r
-
-    @minimum_r.setter
-    def minimum_r(self, value):
-        value = float(value)
-        assert value > 0
-        self.__minimum_r = value
-
-    @property
-    def maximum_r(self):
-        return self.__maximum_r
-
-    @maximum_r.setter
-    def maximum_r(self, value):
-        value = float(value)
-        assert value > 0
-        self.__maximum_r = value
-
-    @property
-    def r_values(self):
-        """numpy.NDArray : Interatomic distances used for the scan."""
-        if self.__r_values is None:
+    def C(self):
+        """atomman.ElasticConstants: Averaged elastic constants"""
+        if self.__C is None:
             raise ValueError('No results yet!')
-        return self.__r_values
-
-    @r_values.setter
-    def r_values(self, value):
-        if value is None:
-            self.__r_values = value
-        else:
-            value = np.asarray(value, dtype=float)
-            self.__r_values = value
-            self.number_of_steps_r = len(value)
-            self.minimum_r = value[0]
-            self.maximum_r = value[-1]
+        return self.__C
 
     @property
-    def energy_values(self):
-        """numpy.NDArray : Measured potential energy for each r value."""
-        if self.__energy_values is None:
+    def raw_Cij_positive(self):
+        """numpy.NDArray: Cij 6x6 array measured using positive strain steps"""
+        if self.__raw_Cij_positive is None:
             raise ValueError('No results yet!')
-        return self.__energy_values
+        return self.__raw_Cij_positive
 
-    @energy_values.setter
-    def energy_values(self, value):
-        if value is None:
-            self.__energy_values = value
-        else:
-            value = np.asarray(value, dtype=float)
-            self.__energy_values = value
+    @property
+    def raw_Cij_negative(self):
+        """numpy.NDArray: Cij 6x6 array measured using negative strain steps"""
+        if self.__raw_Cij_negative is None:
+            raise ValueError('No results yet!')
+        return self.__raw_Cij_negative
 
     def set_values(self, name=None, **kwargs):
         """Used to set initial common values for the calculation."""
+        
         # Set universal content
         super().set_values(name=None, **kwargs)
 
@@ -162,17 +121,14 @@ class DiatomScan(Calculation):
         self.units.set_values(**kwargs)
         self.potential.set_values(**kwargs)
         self.commands.set_values(**kwargs)
+        self.system.set_values(**kwargs)
+        self.system_mods.set_values(**kwargs)
+        self.minimize.set_values(**kwargs)
 
         # Set calculation-specific values
-        if 'symbols' in kwargs:
-            self.symbols = kwargs['symbols']
-        if 'number_of_steps_r' in kwargs:
-            self.number_of_steps_r = kwargs['number_of_steps_r']
-        if 'minimum_r' in kwargs:
-            self.minimum_r = kwargs['minimum_r']
-        if 'maximum_r' in kwargs:
-            self.maximum_r = kwargs['maximum_r']
-    
+        if 'strainrange' in kwargs:
+            self.strainrange = kwargs['strainrange']
+
 ####################### Parameter file interactions ########################### 
 
     def load_parameters(self, params, key=None):
@@ -183,29 +139,36 @@ class DiatomScan(Calculation):
         # Load input/output units
         self.units.load_parameters(input_dict)
         
+        # Change default values for subset terms
+        input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
+        input_dict['forcetolerance'] = input_dict.get('forcetolerance',
+                                                  '1.0e-6 eV/angstrom')
+
         # Load calculation-specific strings
-        self.symbols = input_dict['symbols'].split()
 
         # Load calculation-specific booleans
         
         # Load calculation-specific integers
-        self.number_of_steps_r = int(input_dict.get('number_of_steps_r', 300))
 
         # Load calculation-specific unitless floats
-        
+        self.strainrange = float(input_dict.get('strainrange', 1e-6))
+
         # Load calculation-specific floats with units
-        self.minimum_r = value(input_dict, 'minimum_r',
-                               default_unit=self.units.length_unit,
-                               default_term='0.02 angstrom')
-        self.maximum_r = value(input_dict, 'maximum_r',
-                               default_unit=self.units.length_unit,
-                               default_term='6.0 angstrom')
         
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
         
+        # Load minimization parameters
+        self.minimize.load_parameters(input_dict)
+
         # Load LAMMPS potential
         self.potential.load_parameters(input_dict)
+
+        # Load initial system
+        self.system.load_parameters(input_dict)
+
+        # Manipulate system
+        self.system_mods.load_parameters(input_dict)
 
     def master_prepare_inputs(self, branch='main', **kwargs):
         """
@@ -238,45 +201,53 @@ class DiatomScan(Calculation):
             assert 'lammps_command' in kwargs
 
             # Set default workflow settings
-            params['buildcombos'] = 'diatom potential_file intpot'
-            params['minimum_r'] = '0.02 angstrom'
-            params['maximum_r'] = '10.0 angstrom'
-            params['number_of_steps_r'] = '500'
+            params['buildcombos'] = 'atomicparent load_file parent'
+            params['parent_record'] = 'relaxed_crystal'
+            params['parent_standing'] = 'good'
+            params['sizemults'] = '10 10 10'
+            params['maxiterations'] = '5000'
+            params['maxevaluations'] = '10000'
+            params['strainrange'] = ['1e-6', '1e-7', '1e-8']
+
 
             # Copy kwargs to params
             for key in kwargs:
                 
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
-                    params[f'intpot_{key}'] = kwargs[key]
+                    params[f'parent_{key}'] = kwargs[key]
                 
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
-        
+
         else:
             raise ValueError(f'Unknown branch {branch}')
 
         return params
 
-
     @property
     def template(self):
-        """str: The template to use for generating calc.in files."""
+        """
+        str: The template to use for generating calc.in files.
+        """
         # Build universal content
         template = super().template
 
         # Build subset content
         template += self.commands.template()
         template += self.potential.template()
+        template += self.system.template()
+        template += self.system_mods.template()
+        template += self.minimize.template()
         template += self.units.template()
 
         # Build calculation-specific content
         header = 'Run parameters'
-        keys = ['symbols', 'minimum_r', 'maximum_r', 'number_of_steps_r']
+        keys = ['strainrange']
         template += self._template_builder(header, keys)
         
-        return template   
+        return template
 
     @property
     def singularkeys(self):
@@ -292,30 +263,27 @@ class DiatomScan(Calculation):
 
             # Calculation-specific keys
         )
-        return keys 
+        return keys
     
     @property
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
         
-        keys = [
-            
-            # Universal keys
-            #super().multikeys,
-            
-            # Subset keys
-            self.potential.keyset + ['symbols'],
-
-            # Calculation-specific keys
+        # Fetch universal key sets from parent
+        universalkeys = super().multikeys
+        
+        # Specify calculation-specific key sets 
+        keys =  [
+            self.potential.keyset + self.system.keyset,
+            self.system_mods.keyset,
             [
-                'minimum_r',
-                'maximum_r',
-                'number_of_steps_r',
+                'strainrange',
             ],
+            self.minimize.keyset,
         ]
-
-        return keys
-
+               
+        # Join and return
+        return universalkeys + keys
 
 ########################### Data model interactions ###########################
 
@@ -325,9 +293,6 @@ class DiatomScan(Calculation):
 
     def build_model(self):
 
-        if len(self.symbols) is None:
-            raise ValueError('symbols not set')
-
         # Build universal content
         model = super().build_model()
         calc = model[self.modelroot]
@@ -335,28 +300,32 @@ class DiatomScan(Calculation):
         # Build subset content
         self.commands.build_model(calc, after='atomman-version')
         self.potential.build_model(calc, after='calculation')
+        self.system.build_model(calc, after='potential-LAMMPS')
+        self.system_mods.build_model(calc)
+        self.minimize.build_model(calc)
 
         # Build calculation-specific content
         if 'calculation' not in calc:
             calc['calculation'] = DM()
         if 'run-parameter' not in calc['calculation']:
             calc['calculation']['run-parameter'] = DM()
-        calc['calculation']['run-parameter'] = run_params = DM()
-        run_params['minimum_r'] = uc.model(self.minimum_r,
-                                           self.units.length_unit)
-        run_params['maximum_r'] = uc.model(self.maximum_r,
-                                           self.units.length_unit)
-        run_params['number_of_steps_r'] = self.number_of_steps_r
+        run_params = calc['calculation']['run-parameter']
+        run_params['strain-range'] = self.strainrange
 
-        dict_insert(calc, 'system-info', DM(), after='potential-LAMMPS')
-        calc['system-info']['symbol'] = self.symbols
-        
         # Build results
         if self.status == 'finished':
-            calc['diatom-energy-relation'] = scan = DM()
-            scan['r'] = uc.model(self.r_values, self.units.length_unit)
-            scan['potential-energy'] = uc.model(self.energy_values,
-                                                self.units.energy_unit)
+            cij = DM()
+            cij['Cij'] = uc.model(self.raw_Cij_negative,
+                                  self.units.pressure_unit)
+            calc.append('raw-elastic-constants', cij)
+            cij = DM()
+            cij['Cij'] = uc.model(self.raw_Cij_positive,
+                                  self.units.pressure_unit)
+            calc.append('raw-elastic-constants', cij)
+            
+            calc['elastic-constants'] = DM()
+            calc['elastic-constants']['Cij'] = uc.model(self.C.Cij,
+                                                        self.units.pressure_unit)
 
         return model
 
@@ -370,28 +339,28 @@ class DiatomScan(Calculation):
         #self.units.load_model(calc)
         self.potential.load_model(calc)
         self.commands.load_model(calc)
+        self.system.load_model(calc)
+        self.system_mods.load_model(calc)
+        self.minimize.load_model(calc)
 
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
-        self.minimum_r = uc.value_unit(run_params['minimum_r'])
-        self.minimum_r = uc.value_unit(run_params['maximum_r'])
-        self.number_of_steps_r = run_params['number_of_steps_r']
-
-        self.symbols = calc['system-info']['symbol']
+        self.strainrange = run_params['strain-range']
 
         # Load results
         if self.status == 'finished':
-           scan = calc['diatom-energy-relation']
-           self.r_values = uc.value_unit(scan['r'])
-           self.energy_values = uc.value_unit(scan['potential-energy'])
+            self.__raw_Cij_negative = uc.value_unit(calc['raw-elastic-constants'][0]['Cij'])
+            self.__raw_Cij_positive = uc.value_unit(calc['raw-elastic-constants'][1]['Cij'])
+            Cij = uc.value_unit(calc['elastic-constants']['Cij'])
+            self.__C = am.ElasticConstants(Cij=Cij)
 
     @staticmethod
     def mongoquery(name=None, key=None, iprPy_version=None,
                    atomman_version=None, script=None, branch=None,
                    status=None, lammps_version=None,
                    potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                   potential_key=None, potential_id=None, minimum_r=None,
-                   maximum_r=None, number_of_steps_r=None, symbols=None):
+                   potential_key=None, potential_id=None, strainrange=None,
+                   ):
         
         # Build universal terms
         mquery = Calculation.mongoquery(modelroot, name=name, key=key,
@@ -408,13 +377,14 @@ class DiatomScan(Calculation):
                                                  potential_LAMMPS_id=potential_LAMMPS_id,
                                                  potential_key=potential_key,
                                                  potential_id=potential_id))
+        #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
+        #mquery.update(AtommanSystemManipulate.mongoquery(modelroot,...)
 
         # Build calculation-specific terms
         root = f'content.{modelroot}'
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
-        query.in_list.mongo(mquery, f'{root}.system-info.symbols', symbols)
+        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.strain-range', strainrange)
+        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
+        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
 
         return mquery
 
@@ -423,8 +393,8 @@ class DiatomScan(Calculation):
                   atomman_version=None, script=None, branch=None,
                   status=None, lammps_version=None,
                   potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                  potential_key=None, potential_id=None, minimum_r=None,
-                  maximum_r=None, number_of_steps_r=None, symbols=None):
+                  potential_key=None, potential_id=None, strainrange=None
+                  ):
         
         # Build universal terms
         mquery = Calculation.cdcsquery(modelroot, key=key,
@@ -441,13 +411,14 @@ class DiatomScan(Calculation):
                                                 potential_LAMMPS_id=potential_LAMMPS_id,
                                                 potential_key=potential_key,
                                                 potential_id=potential_id))
+        #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
+        #mquery.update(AtommanSystemManipulate.mongoquery(modelroot,...)
 
         # Build calculation-specific terms
         root = modelroot
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
-        query.in_list.mongo(mquery, f'{root}.system-info.symbols', symbols)
+        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.strain-range', strainrange)
+        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
+        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
 
         return mquery
 
@@ -462,27 +433,24 @@ class DiatomScan(Calculation):
         dict
             A dictionary representation of the record's content.
         """
-        # Check required parameters
-        if len(self.symbols) is None:
-            raise ValueError('symbols not set')
-
         # Extract universal content
         meta = super().metadata()
         
         # Extract subset content
         self.potential.metadata(meta)
         self.commands.metadata(meta)
+        self.system.metadata(meta)
+        self.system_mods.metadata(meta)
+        self.minimize.metadata(meta)
 
         # Extract calculation-specific content
-        meta['minimum_r'] = self.minimum_r
-        meta['maximum_r'] = self.maximum_r
-        meta['number_of_steps_r'] = self.number_of_steps_r
-        meta['symbols'] = ' '.join(sorted(self.symbols))
+        meta['strainrange'] = self.strainrange
         
         # Extract results
         if self.status == 'finished':
-            meta['r_values'] = self.r_values
-            meta['energy_values'] = self.energy_values
+            meta['C'] = self.C
+            meta['raw_Cij_negative'] = self.raw_Cij_negative
+            meta['raw_Cij_positive'] = self.raw_Cij_positive
 
         return meta
 
@@ -491,22 +459,32 @@ class DiatomScan(Calculation):
         """list: The terms to compare metadata values absolutely."""
         return [
             'script',
+        
+            'load_file',
+            'load_options',
             'symbols',
+            
             'potential_LAMMPS_key',
+            
+            'a_mult',
+            'b_mult',
+            'c_mult',
         ]
     
     @property
     def compare_fterms(self):
         """dict: The terms to compare metadata values using a tolerance."""
-        return {}
+        return {
+            'strainrange':1e-10,
+        }
 
     @staticmethod
     def pandasfilter(dataframe, name=None, key=None, iprPy_version=None,
                      atomman_version=None, script=None, branch=None,
                      status=None, lammps_version=None,
                      potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                     potential_key=None, potential_id=None, minimum_r=None,
-                     maximum_r=None, number_of_steps_r=None, symbols=None):
+                     potential_key=None, potential_id=None, strainrange=None,
+                     ):
         matches = (
             # Filter by universal terms
             Calculation.pandasfilter(dataframe, name=name, key=key,
@@ -522,12 +500,14 @@ class DiatomScan(Calculation):
                                           potential_LAMMPS_id=potential_LAMMPS_id,
                                           potential_key=potential_key,
                                           potential_id=potential_id)
+            #&AtommanSystemLoad.pandasfilter(dataframe, ...)
+            #&AtommanSystemManipulate.pandasfilter(dataframe, ...)
 
             # Filter by calculation-specific terms
-            &query.str_match.pandas(dataframe, 'minimum_r', minimum_r)
-            &query.str_match.pandas(dataframe, 'maximum_r', maximum_r)
-            &query.str_match.pandas(dataframe, 'number_of_steps_r', number_of_steps_r)
-            &query.in_list.pandas(dataframe, 'symbols', symbols)
+            &query.str_match.pandas(dataframe, 'strainrange', strainrange)
+            #&query.str_match.pandas(dataframe, 'maximum_r', maximum_r)
+            #&query.str_match.pandas(dataframe, 'number_of_steps_r', number_of_steps_r)
+            #&query.str_contains.pandas(dataframe, 'symbols', symbols)
         )
         
         return matches
@@ -537,22 +517,21 @@ class DiatomScan(Calculation):
     def calc_inputs(self):
         """Builds calculation inputs from the class's attributes"""
         
-        # Check required parameters
-        if len(self.symbols) is None:
-            raise ValueError('symbols not set')
-
         # Initialize input_dict
         input_dict = {}
 
         # Add subset inputs
         self.commands.calc_inputs(input_dict)
         self.potential.calc_inputs(input_dict)
+        #self.system.calc_inputs(input_dict)
+        self.system_mods.calc_inputs(input_dict)
+        self.minimize.calc_inputs(input_dict)
+
+        # Remove unused subset inputs
+        del input_dict['transform']
 
         # Add calculation-specific inputs
-        input_dict['symbols'] = self.symbols
-        input_dict['rmin'] = self.minimum_r
-        input_dict['rmax'] = self.maximum_r
-        input_dict['rsteps'] = self.number_of_steps_r
+        input_dict['strainrange'] = self.strainrange
 
         # Return input_dict
         return input_dict
@@ -580,7 +559,8 @@ class DiatomScan(Calculation):
         
         # Process results
         if self.status == 'finished':
-            self.r_values = results_dict['r_values']
-            self.energy_values = results_dict['energy_values']
-        
+            self.__C = results_dict['C']
+            self.__raw_Cij_negative = results_dict['raw_Cij_negative']
+            self.__raw_Cij_positive = results_dict['raw_Cij_positive']
+
         self._results(json=results_json)

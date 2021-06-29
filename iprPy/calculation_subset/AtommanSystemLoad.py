@@ -40,12 +40,12 @@ class AtommanSystemLoad(CalculationSubset):
         self.load_file = None
         self.load_style = 'system_model'
         self.__load_options = {}
+        self.__load_content = None
         self.family = None
-        self.symbols = []
+        self.symbols = None
         self.__ucell = None
         self.box_parameters = None
         
-
 ############################## Class attributes ################################
     
     @property
@@ -58,17 +58,6 @@ class AtommanSystemLoad(CalculationSubset):
             self.__load_file = None
         else:
             self.__load_file = Path(value)
-
-            # Extract values for family and symbols from system_model
-            if self.load_style == 'system_model':
-                if self.family is None or len(self.symbols) == 0:
-                    family, symbols = self.__extract_model_terms(value)
-                    if self.family is None:
-                        self.family = family
-                    if len(self.symbols) == 0:
-                        self.symbols = symbols
-            elif self.family is None:
-                self.family = Path(value).stem
 
     @property
     def load_style(self):
@@ -84,6 +73,10 @@ class AtommanSystemLoad(CalculationSubset):
     @property
     def load_options(self):
         return self.__load_options
+
+    @property
+    def load_content(self):
+        return self.__load_content
 
     @property
     def family(self):
@@ -104,7 +97,7 @@ class AtommanSystemLoad(CalculationSubset):
     @symbols.setter
     def symbols(self, value):
         if value is None:
-            self.__symbols = []
+            self.__symbols = None
         else:
             value = aslist(value)
             self.__symbols = value
@@ -123,7 +116,6 @@ class AtommanSystemLoad(CalculationSubset):
             self.__box_parameters = value
         if self.__ucell is not None:
             self.scale_ucell()
-
 
     @property
     def ucell(self):
@@ -161,24 +153,26 @@ class AtommanSystemLoad(CalculationSubset):
         """
         self.set_values(**kwargs)
 
-        # Check for required attributes
-        if self.load_file is None:
+        # Check for file and contents
+        if self.load_content is not None:
+            load_file = self.load_content
+        elif self.load_file is not None:
+            load_file = self.load_file
+        else:
             raise ValueError('load_file not set')
 
         # Change load symbols kwarg to None if symbols attribute is empty
-        if len(self.symbols) == 0:
+        if self.symbols is None or len(self.symbols) == 0:
             symbols = None
         else:
             symbols = self.symbols
 
         # Load ucell
-        self.__ucell = am.load(self.load_style, self.load_file,
+        self.__ucell = am.load(self.load_style, load_file,
                                symbols=symbols, **self.load_options)
+        self.ucell.wrap()
         
-        # Check that ucell's symbols are set
-        for symbol in self.ucell.symbols:
-            if symbol is None:
-                raise ValueError('symbols not found/assigned for all atypes')
+        # Update object's symbols
         self.symbols = self.ucell.symbols
 
         self.scale_ucell()
@@ -228,6 +222,9 @@ class AtommanSystemLoad(CalculationSubset):
             information.
         load_options : dict, optional
             Any other atomman.load() keyword options to use when loading.
+        load_content : str or DataModelDict, optional
+            The contents of load_file.  Allows for ucell and symbols/family
+            to be extracted without the file being accessible at the moment.
         box_parameters : list or None, optional
             A list of 3 orthorhombic box parameters or 6 trigonal box length
             and angle parameters to scale the loaded system by.  Setting a
@@ -239,6 +236,8 @@ class AtommanSystemLoad(CalculationSubset):
         """
         if 'load_style' in kwargs:
             self.load_style = kwargs['load_style']
+        if 'load_content' in kwargs:
+            self.__load_content = kwargs['load_content']
         if 'load_file' in kwargs:
             self.load_file = kwargs['load_file']
         if 'load_options' in kwargs:
@@ -251,24 +250,45 @@ class AtommanSystemLoad(CalculationSubset):
         if 'box_parameters' in kwargs:
             self.box_parameters = kwargs['box_parameters']
 
-    def __extract_model_terms(self, load_file):
-        """
-        Searches data model files and extracts family and symbols values
-        without loading.
-        """
-        symbols = None
-        family = None
-        models = DM(load_file).finds(f'{self.modelprefix}system-info')
+        if self.load_file is not None:
+            if self.family is None or self.symbols is None:
+                self.__extract_model_terms()
+
+    def __extract_model_terms(self):
+        """Extracts family and symbols values from load_file if needed"""
+
+        # Check for file and contents
+        if self.load_content is not None:
+            load_file = self.load_content
+        elif self.load_file is not None:
+            load_file = self.load_file.as_posix()
+        else:
+            raise ValueError('load_file not set')
+
+        # Try to extract info from system_model files
+        if self.load_style == 'system_model':
+            
+            try:
+                model = DM(load_file).finds(f'{self.modelprefix}system-info')[0]
+            except:
+                pass
+            else:
+                # Extract family value or set as load_file's name
+                if self.family is None:
+                    self.family = model.get('family', Path(self.load_file).stem)
+
+                if self.symbols is None:
+                    symbols = model.get('symbol', None)
+                    if symbols is not None and len(symbols) > 0:
+                        self.symbols = symbols
         
-        # Extract values from first instance only (allow index later?)
-        for model in models:
-            family = model.get('family', Path(load_file).stem)
-            symbols = model.get('symbol', None)
-            if symbols is not None and len(symbols) == 0:
-                symbols = None
-            break
-        
-        return family, symbols
+        # Try to extract info from other files
+        else:
+            if self.family is None:
+                self.family = Path(self.load_file).stem
+            
+            if self.symbols is None:
+                symbols = self.ucell.symbols
 
 ####################### Parameter file interactions ###########################
 
@@ -339,13 +359,11 @@ class AtommanSystemLoad(CalculationSubset):
         # Build dict for set_values()
         d = {}
         d['load_style'] = load_style
-
-        # Use load_content over load_file
-        if load_content is not None:
-            d['load_file'] = load_content
-        else:
-            d['load_file'] = load_file
+        d['load_file'] = load_file
         
+        if load_content is not None:
+            d['load_content'] = load_content
+            
         # Set family
         if family is not None:
             d['family'] = family
@@ -400,8 +418,8 @@ class AtommanSystemLoad(CalculationSubset):
         d['family'] = sub['family']
         d['load_style'] = sub['artifact']['format']
         d['load_file'] = sub['artifact']['file']
-        load_options = sub['load_options']
-        d['symbols'] = sub['symbols']
+        load_options = sub['artifact'].get('load_options', None)
+        d['symbols'] = sub['symbol']
 
         if load_options is not None:
             d['load_options'] = {}
@@ -429,8 +447,6 @@ class AtommanSystemLoad(CalculationSubset):
         # Check required parameters
         if self.load_file is None:
             raise ValueError('load_file not set')
-        if len(self.symbols) == 0:
-            self.load_ucell()
 
         system = DM()
 
@@ -442,6 +458,7 @@ class AtommanSystemLoad(CalculationSubset):
             system['artifact']['load_options'] = None
         else:
             system['artifact']['load_options'] = dicttoterm(self.load_options)
+        
         system['symbol'] = self.symbols
 
         dict_insert(model, self.modelroot, system, **kwargs)
@@ -458,14 +475,20 @@ class AtommanSystemLoad(CalculationSubset):
         # Check required parameters
         if self.load_file is None:
             raise ValueError('load_file not set')
-        if len(self.symbols) == 0:
-            self.load_ucell()
 
         meta[f'{self.prefix}load_file'] = self.load_file.as_posix()
         meta[f'{self.prefix}load_style'] = self.load_style
         meta[f'{self.prefix}load_options'] = dicttoterm(self.load_options)
         meta[f'{self.prefix}family'] = self.family
-        meta[f'{self.prefix}symbols'] = ' '.join(self.symbols)
+        if self.symbols is None:
+            symbolstr = ''
+        else:
+            symbolstr = ''
+            for s in self.symbols:
+                if s is not None:
+                    symbolstr += f'{s} '
+            symbolstr = symbolstr.strip()
+        meta[f'{self.prefix}symbols'] = symbolstr
         
         parent_file = Path(self.load_file)
         if parent_file.parent.as_posix() == '.':

@@ -5,18 +5,18 @@ from copy import deepcopy
 
 from datamodelbase import query
 
-#
+# https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
-#
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
 # iprPy imports
 from .. import Calculation
 from .isolated_atom import isolated_atom
-from ...calculation_subset import LammpsPotential, LammpsCommands, Units
+from ...calculation_subset import *
 
 # Global class properties
 modelroot = 'calculation-isolated-atom'
@@ -27,9 +27,7 @@ class IsolatedAtom(Calculation):
 ############################# Core properties #################################
 
     def __init__(self, model=None, name=None, params=None, **kwargs):
-        """
-        Initializes a Calculation object for a given style.
-        """
+        """Initializes a Calculation object for a given style."""
 
         # Initialize subsets used by the calculation
         self.__potential = LammpsPotential(self)
@@ -159,9 +157,7 @@ class IsolatedAtom(Calculation):
 
     @property
     def template(self):
-        """
-        str: The template to use for generating calc.in files.
-        """
+        """str: The template to use for generating calc.in files."""
         # Build universal content
         template = super().template
 
@@ -414,10 +410,11 @@ class IsolatedAtom(Calculation):
             printed upon completion.  Default value is False.
         """
         # Run calculation
-        results_dict = super().run(newkey=newkey, results_json=results_json,
-                                   verbose=verbose)
+        results_dict = super().run(newkey=newkey, verbose=verbose)
         
         # Process results
         if self.status == 'finished':
             for symbol, energy in results_dict['energy'].items():
                 self.isolated_atom_energy[symbol] = energy
+
+        self._results(json=results_json)

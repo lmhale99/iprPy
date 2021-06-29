@@ -539,10 +539,12 @@ class RunManager():
             self.__logwrite('failed to update record\n')
             status += ' - record upload failed'
         else:
-            try:
+            if True:
+            #try:
                 # tar.gz calculation and add to database
                 self.database.add_tar(root_dir=zip_directory, name=calc_name)
-            except:
+            else:
+            #except:
                 status += ' - tar upload failed'
                 self.__logwrite('failed to upload archive\n')
                 

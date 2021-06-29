@@ -16,6 +16,8 @@ from .. import load_calculation, load_run_directory
 from . import load_database
 from ..input import buildcombos, parse
 
+debug = True
+
 def prepare(database, run_directory, calculation, input_script=None, **kwargs):
     """
     Function for preparing any iprPy calculation for high-throughput execution.
@@ -83,7 +85,7 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
     # Find new unique combinations
     new_calcs_df = new_calculations(old_calcs_df, test_calcs_df, calculation.compare_terms, calculation.compare_fterms)
     print(len(new_calcs_df), 'new records to prepare', flush=True)
-    
+
     # Iterate over new calculations and prepare
     for i in new_calcs_df.index:
         new_calc = test_calcs[i]
@@ -126,7 +128,7 @@ def fill_kwargs(database, calculation, **kwargs):
                 else:
                     if len(kwargs[key]) != length:
                         raise ValueError('Incompatible multikey lengths')
-
+    
         # Fill in necessary blanks
         if length is None:
             for key in keyset:
@@ -225,7 +227,8 @@ def build_test_calcs(database, calculation, content_dict, **kwargs):
     test_calcs_df = []
     test_inputfiles = []
     test_contents = []
-    
+    numinvalid = 0
+
     # Iterate over multidict combinations
     for subdict in itermultidict(calculation.multikeys, **kwargs):
         calculation_dict.update(subdict)
@@ -252,16 +255,33 @@ def build_test_calcs(database, calculation, content_dict, **kwargs):
                             crecord = database.get_record(name=record_name)
                             input_dict[key] = crecord.build_model().json() 
                             content_dict[record_name] = crecord.build_model()
-        
-        # Build new calculation
-        test_calc = load_calculation(calculation.calc_style, params=input_dict)
-        
-        # Check if calculation is valid
-        if test_calc.isvalid():
+        if debug is False:
+            try:
+                # Build test calculation and check if valid
+                test_calc = load_calculation(calculation.calc_style, params=input_dict)
+                assert test_calc.isvalid()
+            except:
+                numinvalid += 1
+            else:
+                # Add test calculation data to lists
+                test_calcs.append(test_calc)
+                test_calcs_df.append(test_calc.metadata())
+                test_inputfiles.append(test_inputfile)
+                test_contents.append(test_content)
+        else:
+            
+            # Build test calculation and check if valid
+            test_calc = load_calculation(calculation.calc_style, params=input_dict)
+            assert test_calc.isvalid()
+            
+            # Add test calculation data to lists
             test_calcs.append(test_calc)
             test_calcs_df.append(test_calc.metadata())
             test_inputfiles.append(test_inputfile)
             test_contents.append(test_content)
+    
+    if numinvalid >= 1:
+        print(numinvalid, 'invalid calculations skipped')
             
     test_calcs_df = pd.DataFrame(test_calcs_df)
     

@@ -151,8 +151,8 @@ class LammpsCommands(CalculationSubset):
     
     def build_model(self, model, **kwargs):
         # Check required parameters
-        if self.lammps_command is None:
-            raise ValueError('lammps_command not set')
+        #if self.lammps_command is None:
+        #    raise ValueError('lammps_command not set')
             
         dict_insert(model['calculation'], self.modelroot, self.lammps_version,
                     **kwargs)
@@ -183,11 +183,11 @@ class LammpsCommands(CalculationSubset):
             The dictionary to add the interpreted content to
         """
         # Check required parameters
-        if self.lammps_command is None:
-            raise ValueError('lammps_command not set')
+        #if self.lammps_command is None:
+        #    raise ValueError('lammps_command not set')
 
-        meta[f'{self.prefix}lammps_command'] = self.lammps_command
-        meta[f'{self.prefix}mpi_command'] = self.mpi_command
+        #meta[f'{self.prefix}lammps_command'] = self.lammps_command
+        #meta[f'{self.prefix}mpi_command'] = self.mpi_command
         meta[f'{self.prefix}lammps_version'] = self.lammps_version
         
     @staticmethod

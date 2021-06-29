@@ -7,12 +7,12 @@ import numpy as np
 
 from datamodelbase import query
 
-#
+# https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
-#
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
 # iprPy imports
@@ -26,14 +26,12 @@ from ...tools import aslist, dict_insert
 modelroot = 'calculation-E-vs-r-scan'
 
 class EvsRScan(Calculation):
-    """Class for managing diatom energy scan calculations"""
+    """Class for managing energy versus r volumetric scans for crystals"""
 
-    ############################# Core properties #################################
+############################# Core properties #################################
 
     def __init__(self, model=None, name=None, params=None, **kwargs):
-        """
-        Initializes a Calculation object for a given style.
-        """
+        """Initializes a Calculation object for a given style."""
 
         # Initialize subsets used by the calculation
         self.__potential = LammpsPotential(self)
@@ -76,12 +74,12 @@ class EvsRScan(Calculation):
 
     @property
     def system(self):
-        """Initial loaded system"""
+        """AtommanSystemLoad subset"""
         return self.__system
 
     @property
     def system_mods(self):
-        """Modifications to the loaded system"""
+        """AtommanSystemManipulate subset"""
         return self.__system_mods
 
     @property
@@ -180,9 +178,8 @@ class EvsRScan(Calculation):
             self.__min_cells = aslist(value)
 
     def set_values(self, name=None, **kwargs):
-        """
-        Used to set initial common values for the calculation.
-        """
+        """Used to set initial common values for the calculation."""
+        
         # Set universal content
         super().set_values(name=None, **kwargs)
 
@@ -207,12 +204,9 @@ class EvsRScan(Calculation):
         
         # Load universal content
         input_dict = super().load_parameters(params, key=key)
-        
+
         # Load input/output units
         self.units.load_parameters(input_dict)
-        
-        # Load calculation-specific strings
-        self.symbols = input_dict['symbols'].split()
 
         # Load calculation-specific booleans
         
@@ -321,9 +315,7 @@ class EvsRScan(Calculation):
 
     @property
     def template(self):
-        """
-        str: The template to use for generating calc.in files.
-        """
+        """str: The template to use for generating calc.in files."""
         # Build universal content
         template = super().template
 
@@ -340,7 +332,6 @@ class EvsRScan(Calculation):
         template += self._template_builder(header, keys)
         
         return template   
-
 
     @property
     def singularkeys(self):
@@ -440,7 +431,7 @@ class EvsRScan(Calculation):
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
         self.minimum_r = uc.value_unit(run_params['minimum_r'])
-        self.minimum_r = uc.value_unit(run_params['maximum_r'])
+        self.maximum_r = uc.value_unit(run_params['maximum_r'])
         self.number_of_steps_r = run_params['number_of_steps_r']
 
         # Load results
@@ -451,8 +442,8 @@ class EvsRScan(Calculation):
             self.energy_values = uc.value_unit(scan['cohesive-energy'])
 
             self.min_cells = []
-            for cell in model.aslist('minimum-atomic-system'):
-               self.min_cells.append(DM('atomic-system', cell))
+            for cell in calc.aslist('minimum-atomic-system'):
+               self.min_cells.append(DM([('atomic-system', cell)]))
 
     @staticmethod
     def mongoquery(name=None, key=None, iprPy_version=None,
@@ -483,7 +474,7 @@ class EvsRScan(Calculation):
         # Build calculation-specific terms
         root = f'content.{modelroot}'
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
+        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maximum_r', maximum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
 
         return mquery
@@ -517,7 +508,7 @@ class EvsRScan(Calculation):
         # Build calculation-specific terms
         root = modelroot
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
+        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maximum_r', maximum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
 
         return mquery
@@ -655,8 +646,7 @@ class EvsRScan(Calculation):
             printed upon completion.  Default value is False.
         """
         # Run calculation
-        results_dict = super().run(newkey=newkey, results_json=results_json,
-                                   verbose=verbose)
+        results_dict = super().run(newkey=newkey, verbose=verbose)
         
         # Process results
         if self.status == 'finished':
@@ -664,3 +654,5 @@ class EvsRScan(Calculation):
             self.a_values = results_dict['a_values']
             self.energy_values = results_dict['Ecoh_values']
             self.min_cells = results_dict['min_cell']
+        
+        self._results(json=results_json)

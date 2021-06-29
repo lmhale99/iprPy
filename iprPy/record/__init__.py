@@ -5,6 +5,15 @@ __all__ = ['Record', 'load_record', 'recordmanager']
 
 #### Non-calculation records ####
 
+# Import ReferenceCrystal
+try:
+    from .ReferenceCrystal import ReferenceCrystal
+except Exception as e:
+    recordmanager.failed_styles['reference_crystal'] = '%s: %s' % sys.exc_info()[:2]
+else:
+    recordmanager.loaded_styles['reference_crystal'] = ReferenceCrystal
+    __all__.append('ReferenceCrystal')
+
 # Import FreeSurface
 try:
     from .FreeSurface import FreeSurface

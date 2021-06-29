@@ -7,6 +7,7 @@ from datamodelbase import query
 
 from DataModelDict import DataModelDict as DM
 
+import atomman as am
 from atomman import __version__ as atomman_version
 
 from .. import __version__ as iprPy_version
@@ -20,7 +21,8 @@ class Calculation(Record):
 
 ############################# Core properties #################################
 
-    def __init__(self, model=None, name=None, params=None, **kwargs):
+    def __init__(self, model=None, name=None, params=None, database=None,
+                 **kwargs):
         """
         Initializes a Calculation object for a given style.
 
@@ -35,6 +37,13 @@ class Calculation(Record):
         params : str, file-like object or dict, optional
             Calculation input parameters or input parameter file.  Cannot be
             given with model.
+        database : atomman.library.Database or Database, optional
+            A Database object to associate with the calculation record.  Some
+            calculation styles may have options where additional data can be
+            accessed from other records in a database.  Specifying a database
+            ensures that those calculations are retrieving that reference
+            information from the correct location.  If not given, then will
+            use the settings for the local potentials/atomman database.
         **kwargs : any
             Any other core Calculation record attributes to set.  Cannot be
             given with model.
@@ -51,6 +60,8 @@ class Calculation(Record):
         module_terms = self.__module__.split('.')
         self.__parent_module = '.'.join(module_terms[:-1])
         self.__calc_style = module_terms[-2]
+
+        self.database = database
 
         # Call Record's init
         super().__init__(model=model, name=name, **kwargs)
@@ -102,6 +113,22 @@ class Calculation(Record):
     @property
     def parent_module(self):
         return self.__parent_module
+
+    @property
+    def database(self):
+        return self.__database
+
+    @database.setter
+    def database(self, value):
+
+        # Set None or atomman.library.Database values
+        if value is None or isinstance(value, am.library.Database):
+            self.__database = value
+        
+        # Otherwise assume that it is a datamodelbase/iprPy database
+        else:
+            self.__database = am.library.Database(local_database=value,
+                                                  remote=False)
 
     def set_values(self, name=None, **kwargs):
         """
@@ -373,7 +400,6 @@ class Calculation(Record):
 
         return mquery
 
-
 ########################### Calculation interactions ##########################
 
     def clean(self):
@@ -388,7 +414,7 @@ class Calculation(Record):
         """Calls the calculation's primary function(s)"""
         raise AttributeError('calc not defined for Calculation style')
 
-    def run(self, newkey=False, results_json=False, verbose=False):
+    def run(self, newkey=False, verbose=False):
         """
         Runs the calculation using the current class attribute values. Status
         after running will be either "finished" or "error".
@@ -399,9 +425,6 @@ class Calculation(Record):
             If True, then the calculation's key and name will be replaced with
             a new UUID4.  This allows for iterations on previous runs to be
             uniquely labeled.  Default value is False.
-        results_json : bool, optional
-            If True, then a "results.json" file will be generated following
-            the run.
         verbose : bool, optional
             If True, a message relating to the calculation's status will be
             printed upon completion.  Default value is False.
@@ -433,10 +456,6 @@ class Calculation(Record):
         else:
             self.__status = 'finished'
         
-        if results_json is True:
-            with open('results.json', 'w', encoding='UTF-8') as f:
-                self.build_model().json(fp=f, indent=4, ensure_ascii=False)
-
         if verbose:
             if self.status == 'finished':
                 print('Calculation finished successfully')
@@ -444,3 +463,8 @@ class Calculation(Record):
                 print('Error:', self.error)
 
         return results_dict
+    
+    def _results(self, json=False, ):
+        if json is True:
+            with open('results.json', 'w', encoding='UTF-8') as f:
+                self.build_model().json(fp=f, indent=4, ensure_ascii=False)

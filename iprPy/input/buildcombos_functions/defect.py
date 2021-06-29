@@ -50,7 +50,7 @@ def defect(database, keys, content_dict=None, record=None, query=None, **kwargs)
     for i in defect_df.index:
         defect_series = defect_df.loc[i]
         defect = defects[i]
-        content_dict[defect.name] = defect.content
+        content_dict[defect.name] = defect.build_model()
 
         for key in keys:
             if key == file_key:

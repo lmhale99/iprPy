@@ -1,10 +1,12 @@
+import potentials
+
 # https://github.com/usnistgov/atomman
 import atomman.lammps as lmp
 
 __all__ = ['crystalprototype']
 
 def crystalprototype(database, keys, content_dict=None, 
-                     record='crystal_prototype', query=None, **kwargs):
+                     record='crystal_prototype', **kwargs):
     
     # Initialize inputs and content dict
     inputs = {}
@@ -14,57 +16,51 @@ def crystalprototype(database, keys, content_dict=None,
         content_dict = {}
 
     # Check if potential info is in keys
-    if 'potential_file' in keys or 'potential_dir' in keys:
+    if 'potential_file' in keys:
         include_potentials = True
         
         # Extract kwargs starting with "potential"
-        potential_kwargs = {}
+        potkwargs = {}
         for key in list(kwargs.keys()):
             if key[:10] == 'potential_':
-                potential_kwargs[key[10:]] = kwargs.pop(key)
+                potkwargs[key[10:]] = kwargs.pop(key)
     else:
         include_potentials = False
 
     # Fetch prototype records
     prototypes, prototype_df = database.get_records(style=record, return_df=True,
-                                                 query=query, **kwargs)
+                                                    **kwargs)
     print(len(prototype_df), 'matching crystal prototypes found')
     if len(prototype_df) == 0:
         return inputs, content_dict
         
     # Build with potentials
     if include_potentials:
-
-        # Pull out potential get_records parameters
-        potential_record = potential_kwargs.pop('record', 'potential_LAMMPS')
-        potential_query = potential_kwargs.pop('query', None)
-        status = potential_kwargs.pop('status', 'active')
         
         # Set all status value
-        if status == 'all':
-            status = ['active', 'retracted', 'superseded']
+        if 'status' in potkwargs and potkwargs['status'] == 'all':
+            potkwargs['status'] = None
 
         # Fetch potential records 
-        potentials, potential_df = database.get_records(style=potential_record, return_df=True,
-                                                        query=potential_query, status=status,
-                                                        **potential_kwargs)
-        print(len(potential_df), 'matching interatomic potentials found')
-        if len(potential_df) == 0:
+        potdb = potentials.Database(local_database=database, local=True, remote=False)
+        lmppots, lmppots_df = potdb.get_lammps_potentials(return_df=True, **potkwargs)
+        print(len(lmppots_df), 'matching interatomic potentials found')
+        if len(lmppots_df) == 0:
             return inputs, content_dict
 
         # Loop over prototypes
         for i in prototype_df.index:
             prototype = prototypes[i]
             prototype_series = prototype_df.loc[i]
-            content_dict[prototype.name] = prototype.content
+            content_dict[prototype.name] = prototype.build_model()
             natypes = prototype_series.natypes
             
             # Loop over potentials
-            for j in potential_df.index:
-                potential = potentials[j]
-                potential_series = potential_df.loc[j]
-                content_dict[potential.name] = potential.content
-                allsymbols = potential_series.symbols
+            for j in lmppots_df.index:
+                lmppot = lmppots[j]
+                lmppot_series = lmppots_df.loc[j]
+                content_dict[lmppot.name] = lmppot.build_model()
+                allsymbols = lmppot_series.symbols
                 
                 # Loop over all symbol combinations
                 for symbols in itersymbols(allsymbols, natypes):
@@ -72,13 +68,13 @@ def crystalprototype(database, keys, content_dict=None,
                     # Loop over input keys
                     for key in keys:
                         if key == 'potential_file':
-                            inputs['potential_file'].append(f'{potential.name}.json')
+                            inputs['potential_file'].append(f'{lmppot.name}.json')
                         elif key == 'potential_content':
-                            inputs['potential_content'].append(f'record {potential.name}')
+                            inputs['potential_content'].append(f'record {lmppot.name}')
                         elif key == 'potential_dir':
-                            inputs['potential_dir'].append(potential.name)
+                            inputs['potential_dir'].append(lmppot.name)
                         elif key == 'potential_dir_content':
-                            inputs['potential_dir_content'].append(f'tar {potential.name}')
+                            inputs['potential_dir_content'].append(f'tar {lmppot.name}')
                         elif key == 'load_file':
                             inputs['load_file'].append(f'{prototype.name}.json')
                         elif key == 'load_content':
@@ -97,7 +93,7 @@ def crystalprototype(database, keys, content_dict=None,
         # Loop over prototypes
         for i in prototype_df.index:
             prototype = prototypes[i]
-            content_dict[prototype.name] = prototype.content
+            content_dict[prototype.name] = prototype.build_model()
             
             # Loop over input keys
             for key in keys:
