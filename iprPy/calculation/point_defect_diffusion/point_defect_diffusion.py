@@ -1,63 +1,27 @@
-#!/usr/bin/env python
 # coding: utf-8
 
 # Python script created by Lucas Hale
 
 # Standard library imports
 from pathlib import Path
-import sys
-import uuid
-import random
+from copy import deepcopy
+import shutil
 import datetime
+import random
 
 # http://www.numpy.org/
-import numpy as np
+import numpy as np 
 
-# https://github.com/usnistgov/DataModelDict
-from DataModelDict import DataModelDict as DM
-
-# https://github.com/usnistgov/atomman
+# https://github.com/usnistgov/atomman 
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
-# https://github.com/usnistgov/iprPy
-import iprPy
+# iprPy imports
+from ...tools import filltemplate, read_calc_file
 
 # Define calculation metadata
-calculation_style = 'point_defect_diffusion'
-record_style = f'calculation_{calculation_style}'
-script = Path(__file__).stem
-pkg_name = f'iprPy.calculation.{calculation_style}.{script}'
-
-def main(*args):
-    """Main function called when script is executed directly."""
-    
-    # Read in parameters from input file
-    with open(args[0]) as f:
-        input_dict = iprPy.input.parse(f, allsingular=True)
-    
-    # Interpret and process input parameters
-    process_input(input_dict, *args[1:])
-    
-    #Run pointdiffusion 
-    results_dict = pointdiffusion(input_dict['lammps_command'],
-                                  input_dict['initialsystem'],
-                                  input_dict['potential'],
-                                  input_dict['point_kwargs'],
-                                  mpi_command = input_dict['mpi_command'],
-                                  temperature = input_dict['temperature'],
-                                  runsteps = input_dict['runsteps'],
-                                  thermosteps = input_dict['thermosteps'],
-                                  dumpsteps = input_dict['dumpsteps'],
-                                  equilsteps = input_dict['equilsteps'],
-                                  randomseed = input_dict['randomseed'])
-    
-    # Build and save data model of results
-    record = iprPy.load_record(record_style)
-    record.buildcontent(input_dict, results_dict)
-    with open('results.json', 'w') as f:
-        record.content.json(fp=f, indent=4)
+parent_module = '.'.join(__name__.split('.')[:-1])
 
 def pointdiffusion(lammps_command, system, potential, point_kwargs,
                    mpi_command=None, temperature=300,
@@ -135,18 +99,12 @@ def pointdiffusion(lammps_command, system, potential, point_kwargs,
           y-direction.
         - **'d'** (*float*) - The total computed diffusion constant.
     """
-    # Build filedict if function was called from iprPy
-    try:
-        assert __name__ == pkg_name
-        calc = iprPy.load_calculation(calculation_style)
-        filedict = calc.filedict
-    except:
-        filedict = {}
 
     # Add defect(s) to the initially perfect system
     if not isinstance(point_kwargs, (list, tuple)):
         point_kwargs = [point_kwargs]
     for pkwargs in point_kwargs:
+        #print(pkwargs)
         system = am.defect.point(system, **pkwargs)
     
     # Get lammps units
@@ -171,11 +129,10 @@ def pointdiffusion(lammps_command, system, potential, point_kwargs,
     
     # Define lammps variables
     lammps_variables = {}
-    system_info = system.dump('atom_data', f='initial.dat',
-                              units=potential.units,
-                              atom_style=potential.atom_style)
-    lammps_variables['atomman_system_info'] = system_info
-    lammps_variables['atomman_pair_info'] = potential.pair_info(system.symbols)
+    system_info = system.dump('atom_data', f='perfect.dat',
+                              potential=potential,
+                              return_pair_info=True)
+    lammps_variables['atomman_system_pair_info'] = system_info
     lammps_variables['temperature'] = temperature
     lammps_variables['runsteps'] = runsteps
     lammps_variables['equilsteps'] = equilsteps
@@ -205,9 +162,9 @@ def pointdiffusion(lammps_command, system, potential, point_kwargs,
     # Write lammps input script
     template_file = 'diffusion.template'
     lammps_script = 'diffusion.in'
-    template = iprPy.tools.read_calc_file(template_file, filedict)
+    template = read_calc_file(parent_module, template_file)
     with open(lammps_script, 'w') as f:
-        f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
+        f.write(filltemplate(template, lammps_variables, '<', '>'))
     
     # Run lammps
     output = lmp.run(lammps_command, lammps_script, mpi_command)
@@ -218,7 +175,8 @@ def pointdiffusion(lammps_command, system, potential, point_kwargs,
     pxxs = uc.set_in_units(thermo.Pxx.values, lammps_units['pressure'])
     pyys = uc.set_in_units(thermo.Pyy.values, lammps_units['pressure'])
     pzzs = uc.set_in_units(thermo.Pzz.values, lammps_units['pressure'])
-    potengs = uc.set_in_units(thermo.PotEng.values, lammps_units['energy'])
+    E_pots = uc.set_in_units(thermo.PotEng.values, lammps_units['energy'])
+    E_totals = uc.set_in_units(thermo.TotEng.values, lammps_units['energy'])
     steps = thermo.Step.values
     
     # Read user-defined thermo data
@@ -244,8 +202,9 @@ def pointdiffusion(lammps_command, system, potential, point_kwargs,
     # Initialize results dict
     results = {}
     results['natoms'] = system.natoms
+    results['nsamples'] = len(thermo)
     
-    # Get mean and std for temperature, pressure, and potential energy
+    # Get mean and std for temperature, pressure, and energy
     results['temp'] = np.mean(temps)
     results['temp_std'] = np.std(temps)
     results['pxx'] = np.mean(pxxs)
@@ -254,8 +213,10 @@ def pointdiffusion(lammps_command, system, potential, point_kwargs,
     results['pyy_std'] = np.std(pyys)
     results['pzz'] = np.mean(pzzs)
     results['pzz_std'] = np.std(pzzs)
-    results['Epot'] = np.mean(potengs)
-    results['Epot_std'] = np.std(potengs)
+    results['E_pot'] = np.mean(E_pots)
+    results['E_pot_std'] = np.std(E_pots)
+    results['E_total'] = np.mean(E_totals)
+    results['E_total_std'] = np.std(E_totals)
     
     # Convert steps to times
     times = steps * uc.set_in_units(lammps_variables['timestep'], lammps_units['time'])
@@ -275,71 +236,3 @@ def pointdiffusion(lammps_command, system, potential, point_kwargs,
     
     return results
 
-def process_input(input_dict, UUID=None, build=True):
-    """
-    Processes str input parameters, assigns default values if needed, and
-    generates new, more complex terms as used by the calculation.
-    
-    Parameters
-    ----------
-    input_dict :  dict
-        Dictionary containing the calculation input parameters with string
-        values.  The allowed keys depends on the calculation style.
-    UUID : str, optional
-        Unique identifier to use for the calculation instance.  If not 
-        given and a 'UUID' key is not in input_dict, then a random UUID4 
-        hash tag will be assigned.
-    build : bool, optional
-        Indicates if all complex terms are to be built.  A value of False
-        allows for default values to be assigned even if some inputs 
-        required by the calculation are incomplete.  (Default is True.)
-    """
-    # Set script's name
-    input_dict['script'] = script
-    
-    # Set calculation UUID
-    if UUID is not None:
-        input_dict['calc_key'] = UUID
-    else:
-        input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
-    
-    # Set default input/output units
-    iprPy.input.subset('units').interpret(input_dict)
-    
-    # These are calculation-specific default strings
-    input_dict['sizemults'] = input_dict.get('sizemults', '10 10 10')
-    
-    # These are calculation-specific default booleans
-    # None for this calculation
-    
-    # These are calculation-specific default integers
-    input_dict['runsteps'] = int(input_dict.get('runsteps', 200000))
-    input_dict['thermosteps'] = int(input_dict.get('thermosteps', 100))
-    input_dict['dumpsteps'] = int(input_dict.get('dumpsteps', 0))
-    input_dict['equilsteps'] = int(input_dict.get('equilsteps', 20000))
-    input_dict['randomseed'] = int(input_dict.get('randomseed',
-                                      random.randint(1, 900000000)))
-    
-    # These are calculation-specific default unitless floats
-    input_dict['temperature'] = float(input_dict.get('temperature', 300.0))
-    
-    # These are calculation-specific default floats with units
-    # None for this calculation
-    
-    # Check lammps_command and mpi_command
-    iprPy.input.subset('lammps_commands').interpret(input_dict)
-    
-    # Load potential
-    iprPy.input.subset('lammps_potential').interpret(input_dict)
-    
-    # Load system
-    iprPy.input.subset('atomman_systemload').interpret(input_dict, build=build)
-    
-    # Load point defect parameters
-    iprPy.input.subset('pointdefect').interpret(input_dict, build=build)
-    
-    # Construct initialsystem by manipulating ucell system
-    iprPy.input.subset('atomman_systemmanipulate').interpret(input_dict, build=build)
-
-if __name__ == '__main__':
-    main(*sys.argv[1:])

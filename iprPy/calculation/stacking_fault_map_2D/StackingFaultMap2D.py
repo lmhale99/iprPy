@@ -133,7 +133,7 @@ class StackingFaultMap2D(Calculation):
 
     @property
     def defect(self):
-        """FreeSurface subset"""
+        """StackingFault subset"""
         return self.__defect
 
     @property

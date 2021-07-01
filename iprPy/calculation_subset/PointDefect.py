@@ -7,6 +7,8 @@ import numpy as np
 # https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+from datamodelbase import query
+
 # https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.unitconvert as uc
@@ -64,12 +66,13 @@ class PointDefectParams():
     def pos(self, value):
         if value is None:
             self.__pos = None
-        elif isinstance(value, str):
-            value = np.array(value.strip().split(), dtype=float)
         else:
-            value = np.asarray(value, dtype=float)
-        assert value.shape == (3,)
-        self.__pos = value
+            if isinstance(value, str):
+                value = np.array(value.strip().split(), dtype=float)
+            else:
+                value = np.asarray(value, dtype=float)
+            assert value.shape == (3,)
+            self.__pos = value
 
     @property
     def db_vect(self):
@@ -79,12 +82,13 @@ class PointDefectParams():
     def db_vect(self, value):
         if value is None:
             self.__db_vect = None
-        elif isinstance(value, str):
-            value = np.array(value.strip().split(), dtype=float)
         else:
-            value = np.asarray(value, dtype=float)
-        assert value.shape == (3,)
-        self.__db_vect = value
+            if isinstance(value, str):
+                value = np.array(value.strip().split(), dtype=float)
+            else:
+                value = np.asarray(value, dtype=float)
+            assert value.shape == (3,)
+            self.__db_vect = value
 
     @property
     def scale(self):
@@ -427,6 +431,31 @@ class PointDefect(CalculationSubset):
         meta[f'{prefix}pointdefect_key'] = self.key
         meta[f'{prefix}pointdefect_id'] = self.id
         meta[f'{prefix}pointdefect_family'] = self.family
+
+    @staticmethod
+    def pandasfilter(dataframe, pointdefect_key=None, pointdefect_id=None):
+
+        matches = (
+            query.str_match.pandas(dataframe, 'pointdefect_key', pointdefect_key)
+            &query.str_match.pandas(dataframe, 'pointdefect_id', pointdefect_id)
+        )
+        return matches
+
+    @staticmethod
+    def mongoquery(modelroot, pointdefect_key=None, pointdefect_id=None):
+        mquery = {}
+        root = f'content.{modelroot}'
+        query.str_match.mongo(mquery, f'{root}.point-defect.key', pointdefect_key)
+        query.str_match.mongo(mquery, f'{root}.point-defect.id', pointdefect_id)
+        return mquery
+
+    @staticmethod
+    def cdcsquery(modelroot, pointdefect_key=None, pointdefect_id=None):
+        mquery = {}
+        root = modelroot
+        query.str_match.mongo(mquery, f'{root}.point-defect.key', pointdefect_key)
+        query.str_match.mongo(mquery, f'{root}.point-defect.id', pointdefect_id)
+        return mquery      
 
 ########################### Calculation interactions ##########################
 

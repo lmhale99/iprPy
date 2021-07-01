@@ -1,64 +1,26 @@
-#!/usr/bin/env python
 # coding: utf-8
 
 # Python script created by Lucas Hale
 
 # Standard library imports
 from pathlib import Path
-import sys
-import uuid
+from copy import deepcopy
 import shutil
 import datetime
-from copy import deepcopy
 
 # http://www.numpy.org/
 import numpy as np 
-
-# https://github.com/usnistgov/DataModelDict 
-from DataModelDict import DataModelDict as DM
 
 # https://github.com/usnistgov/atomman 
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
-# https://github.com/usnistgov/iprPy
-import iprPy
+# iprPy imports
+from ...tools import filltemplate, read_calc_file
 
 # Define calculation metadata
-calculation_style = 'point_defect_static'
-record_style = f'calculation_{calculation_style}'
-script = Path(__file__).stem
-pkg_name = f'iprPy.calculation.{calculation_style}.{script}'
-
-def main(*args):
-    """Main function called when script is executed directly."""
-    
-    # Read input file in as dictionary
-    with open(args[0]) as f:
-        input_dict = iprPy.input.parse(f, allsingular=True)
-    
-    # Interpret and process input parameters
-    process_input(input_dict, *args[1:])
-    
-    # Run ptd_energy to refine values
-    results_dict = calc(input_dict['lammps_command'],
-                        input_dict['initialsystem'],
-                        input_dict['potential'],
-                        input_dict['point_kwargs'],
-                        1.05 * input_dict['ucell'].box.a,
-                        mpi_command = input_dict['mpi_command'],
-                        etol = input_dict['energytolerance'],
-                        ftol = input_dict['forcetolerance'],
-                        maxiter = input_dict['maxiterations'],
-                        maxeval = input_dict['maxevaluations'],
-                        dmax = input_dict['maxatommotion'])
-    
-    # Build and save data model of results
-    record = iprPy.load_record(record_style)
-    record.buildcontent(input_dict, results_dict)
-    with open('results.json', 'w') as f:
-        record.content.json(fp=f, indent=4)
+parent_module = '.'.join(__name__.split('.')[:-1])
 
 def calc(lammps_command, system, potential, point_kwargs, cutoff,
          mpi_command=None, etol=0.0, ftol=0.0, maxiter=10000,
@@ -219,14 +181,6 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
         - **'dumpfile_ptd'** (*str*) - The filename of the LAMMPS dump file
           for the relaxed defect system.
     """
-    # Build filedict if function was called from iprPy
-    try:
-        assert __name__ == pkg_name
-        calc = iprPy.load_calculation(calculation_style)
-        filedict = calc.filedict
-    except:
-        filedict = {}
-
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
     
@@ -254,9 +208,9 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
     # Write lammps input script
     template_file = 'min.template'
     lammps_script = 'min.in'
-    template = iprPy.tools.read_calc_file(template_file, filedict)
+    template = read_calc_file(parent_module, template_file)
     with open(lammps_script, 'w') as f:
-        f.write(iprPy.tools.filltemplate(template, lammps_variables, '<', '>'))
+        f.write(filltemplate(template, lammps_variables, '<', '>'))
 
     # Run lammps to relax perfect.dat
     output = lmp.run(lammps_command, lammps_script, mpi_command)
@@ -300,8 +254,7 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
     
     # Write lammps input script
     with open(lammps_script, 'w') as f:
-        f.write(iprPy.tools.filltemplate(template, lammps_variables,
-                                         '<', '>'))
+        f.write(filltemplate(template, lammps_variables, '<', '>'))
     
     # Run lammps
     output = lmp.run(lammps_command, lammps_script, mpi_command)
@@ -451,72 +404,3 @@ def check_ptd_config(system, point_kwargs, cutoff,
     else:
         return {'has_reconfigured': has_reconfigured,
                 'centrosummation': centrosummation}
-
-def process_input(input_dict, UUID=None, build=True):
-    """
-    Processes str input parameters, assigns default values if needed, and
-    generates new, more complex terms as used by the calculation.
-    
-    Parameters
-    ----------
-    input_dict :  dict
-        Dictionary containing the calculation input parameters with string
-        values.  The allowed keys depends on the calculation style.
-    UUID : str, optional
-        Unique identifier to use for the calculation instance.  If not 
-        given and a 'UUID' key is not in input_dict, then a random UUID4 
-        hash tag will be assigned.
-    build : bool, optional
-        Indicates if all complex terms are to be built.  A value of False
-        allows for default values to be assigned even if some inputs 
-        required by the calculation are incomplete.  (Default is True.)
-    """
-    # Set script's name
-    input_dict['script'] = script
-    
-    # Set calculation UUID
-    if UUID is not None:
-        input_dict['calc_key'] = UUID
-    else:
-        input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
-    
-    # Set default input/output units
-    iprPy.input.subset('units').interpret(input_dict)
-    
-    # These are calculation-specific default strings
-    input_dict['sizemults'] = input_dict.get('sizemults', '5 5 5')
-    input_dict['forcetolerance'] = input_dict.get('forcetolerance',
-                                                  '1.0e-6 eV/angstrom')
-    
-    # These are calculation-specific default booleans
-    # None for this calculation
-    
-    # These are calculation-specific default integers
-    # None for this calculation
-    
-    # These are calculation-specific default unitless floats
-    # None for this calculation
-    
-    # These are calculation-specific default floats with units
-    # None for this calculation
-    
-    # Check lammps_command and mpi_command
-    iprPy.input.subset('lammps_commands').interpret(input_dict)
-    
-    # Set default system minimization parameters
-    iprPy.input.subset('lammps_minimize').interpret(input_dict)
-    
-    # Load potential
-    iprPy.input.subset('lammps_potential').interpret(input_dict)
-    
-    # Load system
-    iprPy.input.subset('atomman_systemload').interpret(input_dict, build=build)
-    
-    # Load point defect parameters
-    iprPy.input.subset('pointdefect').interpret(input_dict, build=build)
-    
-    # Construct initialsystem by manipulating ucell system
-    iprPy.input.subset('atomman_systemmanipulate').interpret(input_dict, build=build)
-
-if __name__ == '__main__':
-    main(*sys.argv[1:])

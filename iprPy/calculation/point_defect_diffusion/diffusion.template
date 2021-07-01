@@ -2,9 +2,7 @@
 
 box tilt large
 
-<atomman_system_info>
-
-<atomman_pair_info>
+<atomman_system_pair_info>
 
 # Assign simulation parameter values
 variable temperature equal <temperature>
@@ -23,7 +21,7 @@ compute msd all msd com yes
 
 # Define thermo data
 thermo ${thermosteps}
-thermo_style custom step temp pe pxx pyy pzz c_msd[1] c_msd[2] c_msd[3] c_msd[4]
+thermo_style custom step temp pe ke etotal pxx pyy pzz c_msd[1] c_msd[2] c_msd[3] c_msd[4]
 thermo_modify format float %.13e
 
 # Specify timestep
