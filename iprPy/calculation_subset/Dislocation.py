@@ -7,6 +7,8 @@ import numpy as np
 # https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+from datamodelbase import query
+
 # https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.unitconvert as uc
@@ -43,12 +45,12 @@ class Dislocation(CalculationSubset):
         self.slip_hkl = None
         self.ξ_uvw = None
         self.burgers = None
-        self.m = 'p'
-        self.n = 'c'
+        self.m = None
+        self.n = None
         self.shift = None
-        self.shiftscale = None
+        self.shiftscale = False
         self.shiftindex = 0
-        self.sizemults = None
+        self.sizemults = [1,1,1]
         self.amin = 0.0
         self.bmin = 0.0
         self.cmin = 0.0
@@ -99,12 +101,13 @@ class Dislocation(CalculationSubset):
     def slip_hkl(self, value):
         if value is None:
             self.__slip_hkl = None
-        elif isinstance(value, str):
-            value = np.array(value.strip().split(), dtype=float)
         else:
-            value = np.asarray(value, dtype=float)
-        assert value.shape == (3,) or value.shape == (4,)
-        self.__slip_hkl = value.tolist()
+            if isinstance(value, str):
+                value = np.array(value.strip().split(), dtype=float)
+            else:
+                value = np.asarray(value, dtype=float)
+            assert value.shape == (3,) or value.shape == (4,)
+            self.__slip_hkl = value.tolist()
 
     @property
     def ξ_uvw(self):
@@ -114,12 +117,13 @@ class Dislocation(CalculationSubset):
     def ξ_uvw(self, value):
         if value is None:
             self.__ξ_uvw = None
-        elif isinstance(value, str):
-            value = np.array(value.strip().split(), dtype=float)
         else:
-            value = np.asarray(value, dtype=float)
-        assert value.shape == (3,) or value.shape == (4,)
-        self.__ξ_uvw = value.tolist()
+            if isinstance(value, str):
+                value = np.array(value.strip().split(), dtype=float)
+            else:
+                value = np.asarray(value, dtype=float)
+            assert value.shape == (3,) or value.shape == (4,)
+            self.__ξ_uvw = value.tolist()
 
     @property
     def burgers(self):
@@ -129,12 +133,13 @@ class Dislocation(CalculationSubset):
     def burgers(self, value):
         if value is None:
             self.__burgers = None
-        elif isinstance(value, str):
-            value = np.array(value.strip().split(), dtype=float)
         else:
-            value = np.asarray(value, dtype=float)
-        assert value.shape == (3,) or value.shape == (4,)
-        self.__burgers = value.tolist()
+            if isinstance(value, str):
+                value = np.array(value.strip().split(), dtype=float)
+            else:
+                value = np.asarray(value, dtype=float)
+            assert value.shape == (3,) or value.shape == (4,)
+            self.__burgers = value
 
     @property
     def m(self):
@@ -144,14 +149,15 @@ class Dislocation(CalculationSubset):
     def m(self, value):
         if value is None:
             self.__m = None
-        elif isinstance(value, str):
-            value = np.array(value.strip().split(), dtype=float)
         else:
-            value = np.asarray(value, dtype=float)
-        assert value.shape == (3,)
-        assert np.isclose(value[0], 1.0) or np.isclose(value[1], 1.0) or np.isclose(value[2], 1.0)
-        assert np.isclose(np.linalg.norm(value), 1.0)
-        self.__m = value.tolist()
+            if isinstance(value, str):
+                value = np.array(value.strip().split(), dtype=float)
+            else:
+                value = np.asarray(value, dtype=float)
+            assert value.shape == (3,)
+            assert np.isclose(value[0], 1.0) or np.isclose(value[1], 1.0) or np.isclose(value[2], 1.0)
+            assert np.isclose(np.linalg.norm(value), 1.0)
+            self.__m = value
 
     @property
     def n(self):
@@ -161,14 +167,15 @@ class Dislocation(CalculationSubset):
     def n(self, value):
         if value is None:
             self.__n = None
-        elif isinstance(value, str):
-            value = np.array(value.strip().split(), dtype=float)
         else:
-            value = np.asarray(value, dtype=float)
-        assert value.shape == (3,)
-        assert np.isclose(value[0], 1.0) or np.isclose(value[1], 1.0) or np.isclose(value[2], 1.0)
-        assert np.isclose(np.linalg.norm(value), 1.0)
-        self.__n = value.tolist()
+            if isinstance(value, str):
+                value = np.array(value.strip().split(), dtype=float)
+            else:
+                value = np.asarray(value, dtype=float)
+            assert value.shape == (3,)
+            assert np.isclose(value[0], 1.0) or np.isclose(value[1], 1.0) or np.isclose(value[2], 1.0)
+            assert np.isclose(np.linalg.norm(value), 1.0)
+            self.__n = value
 
     @property
     def shift(self):
@@ -178,12 +185,13 @@ class Dislocation(CalculationSubset):
     def shift(self, value):
         if value is None:
             self.__shift = None
-        elif isinstance(value, str):
-            value = np.array(value.strip().split(), dtype=float)
         else:
-            value = np.asarray(value, dtype=float)
-        assert value.shape == (3,)
-        self.__shift = value.tolist()
+            if isinstance(value, str):
+                value = np.array(value.strip().split(), dtype=float)
+            else:
+                value = np.asarray(value, dtype=float)
+            assert value.shape[0] == 3
+            self.__shift = value
 
     @property
     def shiftscale(self):
@@ -199,21 +207,127 @@ class Dislocation(CalculationSubset):
 
     @shiftindex.setter
     def shiftindex(self, value):
-        self.__shiftindex = int(value)
+        if value is None:
+            self.__shiftindex = None
+        else:
+            self.__shiftindex = int(value)
+
+    @property
+    def a_mults(self):
+        """tuple: Size multipliers for the rotated a box vector"""
+        return self.__a_mults
+
+    @a_mults.setter
+    def a_mults(self, value):
+        value = aslist(value)
+        
+        if len(value) == 1:
+            value[0] = int(value[0])
+            if value[0] > 0:
+                value = [0, value[0]]
+            
+            # Add 0 after if value is negative
+            elif value[0] < 0:
+                value = [value[0], 0]
+            
+            else:
+                raise ValueError('a_mults values cannot both be 0')
+        
+        elif len(value) == 2:
+            value[0] = int(value[0])
+            value[1] = int(value[1])
+            if value[0] > 0:
+                raise ValueError('First a_mults value must be <= 0')
+            if value[1] < 0:
+                raise ValueError('Second a_mults value must be >= 0')
+            if value[0] == value[1]:
+                raise ValueError('a_mults values cannot both be 0')
+        
+        self.__a_mults = tuple(value)
+
+    @property
+    def b_mults(self):
+        """tuple: Size multipliers for the rotated b box vector"""
+        return self.__b_mults
+
+    @b_mults.setter
+    def b_mults(self, value):
+        value = aslist(value)
+        
+        if len(value) == 1:
+            value[0] = int(value[0])
+            if value[0] > 0:
+                value = [0, value[0]]
+            
+            # Add 0 after if value is negative
+            elif value[0] < 0:
+                value = [value[0], 0]
+            
+            else:
+                raise ValueError('b_mults values cannot both be 0')
+        
+        elif len(value) == 2:
+            value[0] = int(value[0])
+            value[1] = int(value[1])
+            if value[0] > 0:
+                raise ValueError('First b_mults value must be <= 0')
+            if value[1] < 0:
+                raise ValueError('Second b_mults value must be >= 0')
+            if value[0] == value[1]:
+                raise ValueError('b_mults values cannot both be 0')
+        
+        self.__b_mults = tuple(value)
+    
+    @property
+    def c_mults(self):
+        """tuple: Size multipliers for the rotated c box vector"""
+        return self.__c_mults
+
+    @c_mults.setter
+    def c_mults(self, value):
+        value = aslist(value)
+        
+        if len(value) == 1:
+            value[0] = int(value[0])
+            if value[0] > 0:
+                value = [0, value[0]]
+            
+            # Add 0 after if value is negative
+            elif value[0] < 0:
+                value = [value[0], 0]
+            
+            else:
+                raise ValueError('c_mults values cannot both be 0')
+        
+        elif len(value) == 2:
+            value[0] = int(value[0])
+            value[1] = int(value[1])
+            if value[0] > 0:
+                raise ValueError('First c_mults value must be <= 0')
+            if value[1] < 0:
+                raise ValueError('Second c_mults value must be >= 0')
+            if value[0] == value[1]:
+                raise ValueError('c_mults values cannot both be 0')
+        
+        self.__c_mults = tuple(value)
 
     @property
     def sizemults(self):
-        return self.__sizemults
+        """tuple: All three sets of size multipliers"""
+        return (self.a_mults, self.b_mults, self.c_mults)
 
     @sizemults.setter
     def sizemults(self, value):
-        if isinstance(value, str):
-            value = np.array(value.strip().split(), dtype=int)
+        if len(value) == 3:
+            self.a_mults = value[0]
+            self.b_mults = value[1]
+            self.c_mults = value[2]
+        elif len(value) == 6:
+            self.a_mults = value[0:2]
+            self.b_mults = value[2:4]
+            self.c_mults = value[4:6]
         else:
-            value = np.asarray(value, dtype=int)
-        if value.shape != (3,):
-            raise ValueError('Invalid sizemults command: exactly 3 sizemults required for this calculation')
-        self.__sizemults = value.tolist()
+            raise ValueError('len of sizemults must be 3 or 6')
 
     @property
     def amin(self):
@@ -312,7 +426,6 @@ class Dislocation(CalculationSubset):
         if 'family' in kwargs:
             self.family = kwargs['family']         
         
-
 ####################### Parameter file interactions ###########################
 
     @property
@@ -448,7 +561,8 @@ class Dislocation(CalculationSubset):
             raise ValueError("dislocation_m and dislocation_n must be orthogonal")
 
         # Set default values for fault system manipulations
-        self.sizemults = input_dict.get(keymap['sizemults'], '1 1 1')
+        sizemults = input_dict.get(keymap['sizemults'], '1 1 1')
+        self.sizemults = np.array(sizemults.strip().split(), dtype=int)
         self.amin = float(input_dict.get(keymap['amin'], 0.0))
         self.bmin = float(input_dict.get(keymap['bmin'], 0.0))
         self.cmin = float(input_dict.get(keymap['cmin'], 0.0))
@@ -462,30 +576,30 @@ class Dislocation(CalculationSubset):
 
     def load_model(self, model):
         """Loads subset attributes from an existing model."""
-        sf = model[self.modelroot]
+        disl = model[self.modelroot]
 
         self.__model = None
         self.__param_file = None
-        self.key = sf['key']
-        self.id = sf['id']
-        self.family = sf['system-family']
+        self.key = disl['key']
+        self.id = disl['id']
+        self.family = disl['system-family']
 
-        cp = sf['calculation-parameter']
-        self.hkl = cp['hkl']
-        self.a1vect_uvw = cp['a1vect_uvw']
-        self.a2vect_uvw = cp['a2vect_uvw']
-        self.shiftindex = int(cp['shiftindex'])
-        self.cutboxvector = cp['cutboxvector']
-        self.faultpos_rel = float(cp['faultpos_rel'])
-        self.cellsetting = cp['cellsetting'] 
+        cp = disl['calculation-parameter']
+        self.slip_hkl = cp['slip_hkl']
+        self.burgers = cp['burgers']
+        self.m = cp['m']
+        self.n = cp['n']
+        if 'shift' in cp:
+            self.shift = cp['shift']
+        if 'shiftindex' in cp:
+            self.shiftindex = cp['shiftindex']
+        self.shiftscale = cp['shiftscale']
 
         run_params = model['calculation']['run-parameter']
         
-        a_mult = run_params[f'{self.modelprefix}size-multipliers']['a'][1]
-        b_mult = run_params[f'{self.modelprefix}size-multipliers']['b'][1]
-        c_mult = run_params[f'{self.modelprefix}size-multipliers']['c'][1]
-        self.sizemults = [a_mult, b_mult, c_mult]
-        self.minwidth = uc.value_unit(run_params[f'{self.modelprefix}minimum-width'])
+        self.a_mults = run_params[f'{self.modelprefix}size-multipliers']['a']
+        self.b_mults = run_params[f'{self.modelprefix}size-multipliers']['b']
+        self.c_mults = run_params[f'{self.modelprefix}size-multipliers']['c']
 
     def build_model(self, model, **kwargs):
         """
@@ -529,11 +643,10 @@ class Dislocation(CalculationSubset):
             model['calculation']['run-parameter'] = DM()
 
         run_params = model['calculation']['run-parameter']
-        
         run_params[f'{self.modelprefix}size-multipliers'] = DM()
-        run_params[f'{self.modelprefix}size-multipliers']['a'] = sorted([0, self.sizemults[0]])
-        run_params[f'{self.modelprefix}size-multipliers']['b'] = sorted([0, self.sizemults[1]])
-        run_params[f'{self.modelprefix}size-multipliers']['c'] = sorted([0, self.sizemults[2]])
+        run_params[f'{self.modelprefix}size-multipliers']['a'] = list(self.a_mults)
+        run_params[f'{self.modelprefix}size-multipliers']['b'] = list(self.b_mults)
+        run_params[f'{self.modelprefix}size-multipliers']['c'] = list(self.c_mults)
         
     def metadata(self, meta):
         """
@@ -557,26 +670,54 @@ class Dislocation(CalculationSubset):
         meta[f'{prefix}dislocation_shift'] = self.shift
         meta[f'{prefix}dislocation_shiftscale'] = self.shiftscale
         meta[f'{prefix}dislocation_shiftindex'] = self.shiftindex
-        meta[f'{prefix}a_mult1'] = 0
-        meta[f'{prefix}a_mult2'] = self.sizemults[0]
-        meta[f'{prefix}b_mult1'] = 0
-        meta[f'{prefix}b_mult2'] = self.sizemults[1]
-        meta[f'{prefix}c_mult1'] = 0
-        meta[f'{prefix}c_mult2'] = self.sizemults[2]
+        meta[f'{prefix}a_mult1'] = self.a_mults[0]
+        meta[f'{prefix}a_mult2'] = self.a_mults[1]
+        meta[f'{prefix}b_mult1'] = self.b_mults[0]
+        meta[f'{prefix}b_mult2'] = self.b_mults[1]
+        meta[f'{prefix}c_mult1'] = self.c_mults[0]
+        meta[f'{prefix}c_mult2'] = self.c_mults[1]
+
+    @staticmethod
+    def pandasfilter(dataframe, dislocation_key=None, dislocation_id=None):
+
+        matches = (
+            query.str_match.pandas(dataframe, 'dislocation_key', dislocation_key)
+            &query.str_match.pandas(dataframe, 'dislocation_id', dislocation_id)
+        )
+        return matches
+
+    @staticmethod
+    def mongoquery(modelroot, dislocation_key=None, dislocation_id=None):
+        mquery = {}
+        root = f'content.{modelroot}'
+        query.str_match.mongo(mquery, f'{root}.dislocation.key', dislocation_key)
+        query.str_match.mongo(mquery, f'{root}.dislocation.id', dislocation_id)
+        return mquery
+
+    @staticmethod
+    def cdcsquery(modelroot, dislocation_key=None, dislocation_id=None):
+        mquery = {}
+        root = modelroot
+        query.str_match.mongo(mquery, f'{root}.dislocation.key', dislocation_key)
+        query.str_match.mongo(mquery, f'{root}.dislocation.id', dislocation_id)
+        return mquery      
 
 ########################### Calculation interactions ##########################
 
     def calc_inputs(self, input_dict):
 
-        input_dict['dislocation_burgers'] = self.burgers
-        input_dict['dislocation_ξ_uvw'] = self.ξ_uvw
-        input_dict['dislocation_slip_hkl'] = self.slip_hkl
-        input_dict['dislocation_m'] = self.m
-        input_dict['dislocation_n'] = self.n
-        input_dict['sizemults'] = self.sizemults
+        input_dict['burgers'] = self.burgers
+        input_dict['ξ_uvw'] = self.ξ_uvw
+        input_dict['slip_hkl'] = self.slip_hkl
+        input_dict['m'] = self.m
+        input_dict['n'] = self.n
+        a_mult = self.a_mults[1] - self.a_mults[0]
+        b_mult = self.b_mults[1] - self.b_mults[0]
+        c_mult = self.c_mults[1] - self.c_mults[0]
+        input_dict['sizemults'] = [a_mult, b_mult, c_mult]
         input_dict['amin'] = self.amin
         input_dict['bmin'] = self.bmin
         input_dict['cmin'] = self.cmin
-        input_dict['dislocation_shift'] = self.shift
-        input_dict['dislocation_shiftscale'] = self.shiftscale
-        input_dict['dislocation_shiftindex'] = self.shiftindex
+        input_dict['shift'] = self.shift
+        input_dict['shiftscale'] = self.shiftscale
+        input_dict['shiftindex'] = self.shiftindex

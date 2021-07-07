@@ -3,6 +3,7 @@
 # Standard Python libraries
 import uuid
 from copy import deepcopy
+import random
 
 import numpy as np
 
@@ -18,16 +19,16 @@ from DataModelDict import DataModelDict as DM
 
 # iprPy imports
 from .. import Calculation
-from .stacking_fault_static import stackingfault
+from .dislocation_periodic_array import dislocation_array
 from ...calculation_subset import *
 from ...input import value, boolean
 from ...tools import aslist, dict_insert
 
 # Global class properties
-modelroot = 'calculation-stacking-fault-static'
+modelroot = 'calculation-dislocation-periodic-array'
 
-class StackingFaultStatic(Calculation):
-    """Class for managing stacking fault energy calculations"""
+class DislocationPeriodicArray(Calculation):
+    """Class for managing periodic array of dislocations constructions and relaxations"""
 
 ############################# Core properties #################################
 
@@ -40,23 +41,28 @@ class StackingFaultStatic(Calculation):
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
         self.__minimize = LammpsMinimize(self)
-        self.__defect = StackingFault(self)
+        self.__defect = Dislocation(self)
+        self.__elastic = AtommanElasticConstants(self)
 
         # Initialize unique calculation attributes
-        self.a1 = 0.0
-        self.a2 = 0.0
+        self.annealtemperature = 0.0
+        self.annealsteps = None
+        self.randomseed = None
+        self.duplicatecutoff = uc.set_in_units(0.5, 'angstrom')
+        self.boundarywidth = 0.0
+        self.boundaryscale = False
+        self.onlylinear = False
         self.__dumpfile_base = None
         self.__dumpfile_defect = None
-        self.__potential_energy_base = None
+        self.__symbols_base = None
+        self.__symbols_defect = None
         self.__potential_energy_defect = None
-        #self.__displacement_base = None
-        #self.__displacement_defect = None
-        #self.__surface_area = None
-        self.__gsf_energy = None
-        self.__gsf_displacement = None
+        self.__dislocation = None
+        self.__preln = None
+        self.__K_tensor = None
         
         # Define calc shortcut
-        self.calc = stackingfault
+        self.calc = dislocation_array
 
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
@@ -90,26 +96,96 @@ class StackingFaultStatic(Calculation):
 
     @property
     def defect(self):
-        """StackingFault subset"""
+        """Dislocation subset"""
         return self.__defect
 
     @property
-    def a1(self):
-        """float: Fractional shift along the a1vect direction to apply"""
-        return self.__a1
-
-    @a1.setter
-    def a1(self, value):
-        self.__a1 = float(value)
+    def elastic(self):
+        """AtommanElasticConstants subset"""
+        return self.__elastic
 
     @property
-    def a2(self):
-        """float: Fractional shift along the a2vect direction to apply"""
-        return self.__a2
+    def annealtemperature(self):
+        """float: Temperature to use for annealing the system"""
+        return self.__annealtemperature
 
-    @a2.setter
-    def a2(self, value):
-        self.__a2 = float(value)
+    @annealtemperature.setter
+    def annealtemperature(self, value):
+        value = float(value)
+        assert value >= 0.0
+        self.__annealtemperature = float(value)
+
+    @property
+    def annealsteps(self):
+        """int: Number of time steps to use for annealing the system"""
+        if self.__annealsteps is None:
+            if self.annealtemperature == 0.0:
+                return 0
+            else:
+                return 10000
+        else:
+            return self.__annealsteps
+
+    @annealsteps.setter
+    def annealsteps(self, value):
+        if value is None:
+            self.__annealsteps = None
+        else:
+            self.__annealsteps = int(value)
+
+    @property
+    def randomseed(self):
+        """str: MD integration scheme"""
+        return self.__randomseed
+
+    @randomseed.setter
+    def randomseed(self, value):
+        if value is None:
+            value = random.randint(1, 900000000)
+        else:
+            value = int(value)
+            assert value > 0 and value <= 900000000
+        self.__randomseed = value
+
+    @property
+    def duplicatecutoff(self):
+        """float: The cutoff used to identify duplicate atoms"""
+        return self.__duplicatecutoff
+
+    @duplicatecutoff.setter
+    def duplicatecutoff(self, value):
+        value = float(value)
+        assert value >= 0.0
+        self.__duplicatecutoff = value
+
+    @property
+    def boundarywidth(self):
+        """float: The minimum width of the boundary region"""
+        return self.__boundarywidth
+
+    @boundarywidth.setter
+    def boundarywidth(self, value):
+        value = float(value)
+        assert value >= 0.0
+        self.__boundarywidth = float(value)
+
+    @property
+    def boundaryscale(self):
+        """bool: Flag indicating if boundarywidth is scaled versus the system or absolute"""
+        return self.__boundaryscale
+
+    @boundaryscale.setter
+    def boundaryscale(self, value):
+        self.__boundaryscale = boolean(value)
+
+    @property
+    def onlylinear(self):
+        """bool: Flag indicating if only linear gradient displacements are used"""
+        return self.__onlylinear
+
+    @onlylinear.setter
+    def onlylinear(self, value):
+        self.__onlylinear = boolean(value)
 
     @property
     def dumpfile_base(self):
@@ -126,11 +202,18 @@ class StackingFaultStatic(Calculation):
         return self.__dumpfile_defect
 
     @property
-    def potential_energy_base(self):
-        """float: Potential energy of the 0 shift reference system"""
-        if self.__potential_energy_base is None:
+    def symbols_base(self):
+        """list: Model symbols for the base system"""
+        if self.__symbols_base is None:
             raise ValueError('No results yet!')
-        return self.__potential_energy_base
+        return self.__symbols_base
+    
+    @property
+    def symbols_defect(self):
+        """list: Model symbols for the defect system"""
+        if self.__symbols_defect is None:
+            raise ValueError('No results yet!')
+        return self.__symbols_defect
 
     @property
     def potential_energy_defect(self):
@@ -139,40 +222,26 @@ class StackingFaultStatic(Calculation):
             raise ValueError('No results yet!')
         return self.__potential_energy_defect
 
-    #@property
-    #def displacement_base(self):
-    #    """float: Planar displacement in the 0 shift reference system"""
-    #    if self.__displacement_base is None:
-    #        raise ValueError('No results yet!')
-    #    return self.__displacement_base
-
-    #@property
-    #def displacement_defect(self):
-    #    """float: Planar displacement in the defect system"""
-    #    if self.__displacement_defect is None:
-    #        raise ValueError('No results yet!')
-    #    return self.__displacement_defect
+    @property
+    def dislocation(self):
+        """atomman.defect.Dislocation: Volterra dislocation solution"""
+        if self.__dislocation is None:
+            raise ValueError('No results yet!')
+        return self.__dislocation
 
     @property
-    def gsf_displacement(self):
-        """float: Difference in planar displacement between reference and defect systems"""
-        if self.__gsf_displacement is None:
-            raise ValueError('No results yet!')
-        return self.__gsf_displacement
-
-    #@property
-    #def surface_area(self):
-    #    """float: Area associated with the free surface"""
-    #    if self.__surface_area is None:
-    #        raise ValueError('No results yet!')
-    #    return self.__surface_area
+    def preln(self):
+        if self.__preln is None:
+            return self.dislocation.dislsol.preln
+        else:
+            return self.__preln
 
     @property
-    def gsf_energy(self):
-        """float: Generalized stacking fault energy associated with the defect system"""
-        if self.__gsf_energy is None:
-            raise ValueError('No results yet!')
-        return self.__gsf_energy
+    def K_tensor(self):
+        if self.__K_tensor is None:
+            return self.dislocation.dislsol.K_tensor
+        else:
+            return self.__K_tensor
 
     def set_values(self, name=None, **kwargs):
         """Used to set initial common values for the calculation."""
@@ -187,12 +256,23 @@ class StackingFaultStatic(Calculation):
         self.system.set_values(**kwargs)
         self.minimize.set_values(**kwargs)
         self.defect.set_values(**kwargs)
+        self.elastic.set_values(**kwargs)
 
         # Set calculation-specific values
-        if 'a1' in kwargs:
-            self.a1 = kwargs['a1']
-        if 'a2' in kwargs:
-            self.a2 = kwargs['a2']
+        if 'annealtemperature' in kwargs:
+            self.annealtemperature = kwargs['annealtemperature']
+        if 'annealsteps' in kwargs:
+            self.annealsteps = kwargs['annealsteps']
+        if 'randomseed' in kwargs:
+            self.randomseed = kwargs['randomseed']
+        if 'duplicatecutoff' in kwargs:
+            self.duplicatecutoff = kwargs['duplicatecutoff']
+        if 'boundarywidth' in kwargs:
+            self.boundarywidth = kwargs['boundarywidth']
+        if 'boundaryscale' in kwargs:
+            self.boundaryscale = kwargs['boundaryscale']
+        if 'onlylinear' in kwargs:
+            self.onlylinear = kwargs['onlylinear']
 
 ####################### Parameter file interactions ########################### 
 
@@ -205,21 +285,32 @@ class StackingFaultStatic(Calculation):
         self.units.load_parameters(input_dict)
         
         # Change default values for subset terms
-        input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
         input_dict['forcetolerance'] = input_dict.get('forcetolerance',
                                                   '1.0e-6 eV/angstrom')
 
         # Load calculation-specific strings
+        self.boundaryshape = input_dict.get('dislocation_boundaryshape',
+                                            'cylinder')
 
         # Load calculation-specific booleans
-        
+        self.onlylinear = boolean(input_dict.get('dislocation_onlylinear', False))
+        self.boundaryscale = boolean(input_dict.get('dislocation_boundaryscale',
+                                                    False))
+
         # Load calculation-specific integers
+        self.randomseed = input_dict.get('randomseed', None)
+        self.annealsteps = input_dict.get('annealsteps', None)
 
         # Load calculation-specific unitless floats
-        self.a1 = float(input_dict.get('stackingfault_a1', 0.0))
-        self.a2 = float(input_dict.get('stackingfault_a2', 0.0))
+        self.annealtemperature = float(input_dict.get('annealtemperature', 0.0))
         
         # Load calculation-specific floats with units
+        self.boundarywidth = value(input_dict, 'dislocation_boundarywidth',
+                                   default_unit=self.units.length_unit,
+                                   default_term='0 angstrom')
+        self.duplicatecutoff = value(input_dict, 'dislocation_duplicatecutoff',
+                                     default_unit=self.units.length_unit,
+                                     default_term='0.5 angstrom')
         
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
@@ -235,6 +326,9 @@ class StackingFaultStatic(Calculation):
 
         # Load defect parameters
         self.defect.load_parameters(input_dict)
+
+        # Load elastic constants
+        self.elastic.load_parameters(input_dict)
 
     def master_prepare_inputs(self, branch='main', **kwargs):
         """
@@ -256,7 +350,59 @@ class StackingFaultStatic(Calculation):
         params : dict
             The full set of prepare parameters based on the workflow branch
         """
-        raise NotImplementedError('Not implemented for this calculation style')
+        # Initialize params and copy over branch
+        params = {}
+        params['branch'] = branch
+
+        # Check for required kwargs
+        assert 'lammps_command' in kwargs
+
+        # Set common workflow settings
+        params['buildcombos'] = [
+            'atomicparent load_file parent',
+            'defect dislocation_file'
+        ]
+        params['parent_record'] = 'calculation_elastic_constants_static'
+        params['parent_load_key'] = 'system-info'
+        params['parent_strainrange'] = '1e-7'
+        params['defect_record'] = 'dislocation'
+
+        params['dislocation_boundarywidth'] = '3'
+        params['dislocation_boundaryscale'] = 'True'
+        params['dislocation_duplicatecutoff'] = '1 angstrom'
+        params['annealtemperature'] = '10'
+        params['annealsteps'] = '10000000'
+        params['maxiterations'] = '10000'
+        params['maxevaluations'] = '100000'
+
+        # Set branch-specific parameters
+        if branch == 'fcc_edge_mix':
+            params['parent_family'] = 'A1--Cu--fcc'
+            params['defect_id'] = 'A1--Cu--fcc--a-2-110--90-edge--{111}'
+            params['sizemults'] = '1 200 50'
+            params['dislocation_onlylinear'] = 'False'
+
+        elif branch == 'fcc_screw':
+            params['parent_family'] = 'A1--Cu--fcc'
+            params['defect_id'] = 'A1--Cu--fcc--a-2-110--0-screw--{111}'
+            params['sizemults'] = '1 200 50'
+            params['dislocation_onlylinear'] = 'True'
+
+        else:
+            raise ValueError(f'Unknown branch {branch}')
+
+        # Copy kwargs to params
+        for key in kwargs:
+            
+            # Rename potential-related terms for buildcombos
+            if key[:10] == 'potential_':
+                params[f'parent_{key}'] = kwargs[key]
+            
+            # Copy/overwrite other terms
+            else:
+                params[key] = kwargs[key]
+
+        return params
         
     @property
     def template(self):
@@ -269,6 +415,7 @@ class StackingFaultStatic(Calculation):
         template += self.commands.template()
         template += self.potential.template()
         template += self.system.template()
+        template += self.elastic.template()
         template += self.defect.template()
         template += self.minimize.template()
         template += self.units.template()
@@ -276,17 +423,26 @@ class StackingFaultStatic(Calculation):
         # Build calculation-specific content
         header = 'Run parameters'
         keys = [
-            'stackingfault_a1',
-            'stackingfault_a2', 
+            'annealtemperature',
+            'annealsteps',
+            'randomseed',
+            'dislocation_duplicatecutoff',
+            'dislocation_boundarywidth',
+            'dislocation_boundaryscale',
+            'dislocation_onlylinear',
         ]
         template += self._template_builder(header, keys)
         
         return template     
-
+    
     @property
     def singularkeys(self):
         """list: Calculation keys that can have single values during prepare."""
+
+        # Fetch universal key sets from parent
+        universalkeys = super().singularkeys
         
+        # Specify calculation-specific key sets 
         keys = (
             # Universal keys
             super().singularkeys
@@ -296,31 +452,40 @@ class StackingFaultStatic(Calculation):
             + self.units.keyset
 
             # Calculation-specific keys
+            + [
+                'dislocation_duplicatecutoff',
+                'dislocation_boundarywidth',
+                'dislocation_boundaryscale',
+                'dislocation_onlylinear',
+            ]
         )
-        return keys 
-
+        return keys
+    
     @property
     def multikeys(self):
-        """list: Calculation key sets that can have multiple values during prepare."""
-
+        """
+        list: Calculation key sets that can have multiple values during prepare.
+        """
         # Fetch universal key sets from parent
         universalkeys = super().multikeys
         
         # Specify calculation-specific key sets 
-        keys =  [
-            self.potential.keyset + self.system.keyset,
+        keys = [
+            self.potential.keyset + self.system.keyset + self.elastic.keyset,
             [
                 'sizemults',
-                'stackingfault_minwidth',
+                'amin',
+                'bmin',
+                'cmin',
             ],
             self.defect.keyset,
-            [
-                'stackingfault_a1',
-                'stackingfault_a2',
-            ],            
-            self.minimize.keyset,
+            self.minimize.keyset + [
+                'randomseed',
+                'annealtemperature',
+                'annealsteps',
+            ]
         ]
-               
+                    
         # Join and return
         return universalkeys + keys
 
@@ -342,6 +507,7 @@ class StackingFaultStatic(Calculation):
         self.system.build_model(calc, after='potential-LAMMPS')
         self.defect.build_model(calc, after='system-info')
         self.minimize.build_model(calc)
+        self.elastic.build_model(calc)
 
         # Build calculation-specific content
         if 'calculation' not in calc:
@@ -349,36 +515,35 @@ class StackingFaultStatic(Calculation):
         if 'run-parameter' not in calc['calculation']:
             calc['calculation']['run-parameter'] = DM()
         run_params = calc['calculation']['run-parameter']
-        
-        run_params['stackingfault_a1'] = self.a1
-        run_params['stackingfault_a2'] = self.a2
-        
+
+        run_params['dislocation_boundarywidth'] = self.boundarywidth
+        run_params['dislocation_boundaryscale'] = self.boundaryscale
+        run_params['dislocation_onlylinear'] = self.onlylinear
+        run_params['annealtemperature'] = self.annealtemperature
+        run_params['annealsteps'] = self.annealsteps
+
         # Build results
         if self.status == 'finished':
-            calc['defect-free-system'] = DM()
-            calc['defect-free-system']['artifact'] = DM()
-            calc['defect-free-system']['artifact']['file'] = self.dumpfile_base
-            calc['defect-free-system']['artifact']['format'] = 'atom_dump'
-            calc['defect-free-system']['symbols'] = self.system.ucell.symbols
-            calc['defect-free-system']['potential-energy'] = uc.model(self.potential_energy_base, 
-                                                                      self.units.energy_unit)
+            calc['base-system'] = DM()
+            calc['base-system']['artifact'] = DM()
+            calc['base-system']['artifact']['file'] = self.dumpfile_base
+            calc['base-system']['artifact']['format'] = 'atom_dump'
+            calc['base-system']['symbols'] = self.symbols_base
             
             calc['defect-system'] = DM()
             calc['defect-system']['artifact'] = DM()
             calc['defect-system']['artifact']['file'] = self.dumpfile_defect
             calc['defect-system']['artifact']['format'] = 'atom_dump'
-            calc['defect-system']['symbols'] = self.system.ucell.symbols
+            calc['defect-system']['symbols'] = self.symbols_defect
             calc['defect-system']['potential-energy'] = uc.model(self.potential_energy_defect,
                                                                  self.units.energy_unit)
             
-            # Save the stacking fault energy
-            energy_per_area_unit = f'{self.units.energy_unit}/{self.units.length_unit}^2'
-            calc['stacking-fault-energy'] = uc.model(self.gsf_energy,
-                                                     energy_per_area_unit)
+            calc['elastic-solution'] = elsol = DM()
+            elsol['pre-ln-factor'] = uc.model(self.preln,
+                                             f"{self.units.energy_unit}/{self.units.length_unit}")
             
-            # Save the plane separation
-            calc['plane-separation'] = uc.model(self.gsf_displacement,
-                                                self.units.length_unit)
+            elsol['K-tensor'] = uc.model(self.K_tensor,
+                                         self.units.pressure_unit)
 
         return model
 
@@ -395,23 +560,28 @@ class StackingFaultStatic(Calculation):
         self.system.load_model(calc)
         self.minimize.load_model(calc)
         self.defect.load_model(calc)
+        self.elastic.load_model(calc)
 
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
-        self.a1 = run_params['stackingfault_a1']
-        self.a2 = run_params['stackingfault_a2']
+        self.boundarywidth = run_params['dislocation_boundarywidth']
+        self.boundaryscale = run_params['dislocation_boundaryscale']
+        self.onlylinear = run_params['dislocation_onlylinear']
+        self.annealtemperature = run_params['annealtemperature']
+        self.annealsteps = run_params['annealsteps']
 
         # Load results
         if self.status == 'finished':
-            self.__dumpfile_base = calc['defect-free-system']['artifact']['file']
-            self.__potential_energy_base = uc.value_unit(calc['defect-free-system']['potential-energy'])
-            
-            self.__dumpfile_defect= calc['defect-system']['artifact']['file']
+            self.__dumpfile_base = calc['base-system']['artifact']['file']
+            self.__symbols_base = calc['base-system']['symbols']
+                        
+            self.__dumpfile_defect = calc['defect-system']['artifact']['file']
+            self.__symbols_defect = calc['defect-system']['symbols']
             self.__potential_energy_defect = uc.value_unit(calc['defect-system']['potential-energy'])
-
-            self.__gsf_energy = uc.value_unit(calc['stacking-fault-energy'])
-            self.__gsf_displacement = uc.value_unit(calc['plane-separation'])
             
+            elsol = calc['elastic-solution'] 
+            self.__preln = uc.value_unit(elsol['pre-ln-factor'])
+            self.__K_tensor = uc.value_unit(elsol['K-tensor'])
 
     @staticmethod
     def mongoquery(name=None, key=None, iprPy_version=None,
@@ -419,7 +589,7 @@ class StackingFaultStatic(Calculation):
                    status=None, lammps_version=None,
                    potential_LAMMPS_key=None, potential_LAMMPS_id=None,
                    potential_key=None, potential_id=None, 
-                   stackingfault_key=None, stackingfault_id=None):
+                   dislocation_key=None, dislocation_id=None):
         
         # Build universal terms
         mquery = Calculation.mongoquery(modelroot, name=name, key=key,
@@ -438,9 +608,9 @@ class StackingFaultStatic(Calculation):
                                                  potential_id=potential_id))
         #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
         #mquery.update(AtommanSystemManipulate.mongoquery(modelroot,...)
-        mquery.update(StackingFault.mongoquery(modelroot,
-                                             stackingfault_key=stackingfault_key,
-                                             stackingfault_id=stackingfault_id))
+        mquery.update(Dislocation.mongoquery(modelroot,
+                                             dislocation_key=dislocation_key,
+                                             dislocation_id=dislocation_id))
 
         # Build calculation-specific terms
         root = f'content.{modelroot}'
@@ -456,7 +626,7 @@ class StackingFaultStatic(Calculation):
                   status=None, lammps_version=None,
                   potential_LAMMPS_key=None, potential_LAMMPS_id=None,
                   potential_key=None, potential_id=None, 
-                  stackingfault_key=None, stackingfault_id=None):
+                  dislocation_key=None, dislocation_id=None):
         
         # Build universal terms
         mquery = Calculation.cdcsquery(modelroot, key=key,
@@ -475,9 +645,9 @@ class StackingFaultStatic(Calculation):
                                                 potential_id=potential_id))
         #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
         #mquery.update(AtommanSystemManipulate.mongoquery(modelroot,...)
-        mquery.update(StackingFault.mongoquery(modelroot,
-                                             stackingfault_key=stackingfault_key,
-                                             stackingfault_id=stackingfault_id))
+        mquery.update(Dislocation.mongoquery(modelroot,
+                                             dislocation_key=dislocation_key,
+                                             dislocation_id=dislocation_id))
 
         # Build calculation-specific terms
         root = modelroot
@@ -507,17 +677,24 @@ class StackingFaultStatic(Calculation):
         self.system.metadata(meta)
         self.minimize.metadata(meta)
         self.defect.metadata(meta)
+        self.elastic.metadata(meta)
 
         # Extract calculation-specific content
+        meta['boundarywidth'] = self.boundarywidth
+        meta['boundaryscale'] = self.boundaryscale
+        meta['onlylinear'] = self.onlylinear
+        meta['annealtemperature'] = self.annealtemperature
+        meta['annealsteps'] = self.annealsteps
         
         # Extract results
         if self.status == 'finished':            
             meta['dumpfile_base'] = self.dumpfile_base
             meta['dumpfile_defect'] = self.dumpfile_defect
-            meta['E_pot_base'] = self.potential_energy_base
-            meta['E_pot_defect'] = self.potential_energy_defect
-            meta['E_gsf'] = self.gsf_energy
-            meta['delta_gsf'] = self.gsf_displacement
+            meta['symbols_base'] = self.symbols_base
+            meta['symbols_defect'] = self.symbols_defect
+            meta['potential_energy_defect'] = self.potential_energy_defect
+            meta['preln'] = self.preln
+            meta['K_tensor'] = self.K_tensor
 
         return meta
 
@@ -537,15 +714,16 @@ class StackingFaultStatic(Calculation):
             'b_mult',
             'c_mult',
             
-            'stackingfault_key',
+            'dislocation_key',
+
+            'annealsteps',
         ]
     
     @property
     def compare_fterms(self):
         """dict: The terms to compare metadata values using a tolerance."""
         return {
-            'a1':1e-5,
-            'a2':1e-5,
+            'annealtemperature':1,
         }
 
     def isvalid(self):
@@ -557,7 +735,7 @@ class StackingFaultStatic(Calculation):
                      status=None, lammps_version=None,
                      potential_LAMMPS_key=None, potential_LAMMPS_id=None,
                      potential_key=None, potential_id=None, 
-                     stackingfault_key=None, stackingfault_id=None):
+                     dislocation_key=None, dislocation_id=None):
         matches = (
             # Filter by universal terms
             Calculation.pandasfilter(dataframe, name=name, key=key,
@@ -575,9 +753,9 @@ class StackingFaultStatic(Calculation):
                                           potential_id=potential_id)
             #&AtommanSystemLoad.pandasfilter(dataframe, ...)
             #&AtommanSystemManipulate.pandasfilter(dataframe, ...)
-            &StackingFault.pandasfilter(dataframe,
-                                      stackingfault_key=stackingfault_key,
-                                      stackingfault_id=stackingfault_id)
+            &Dislocation.pandasfilter(dataframe,
+                                      dislocation_key=dislocation_key,
+                                      dislocation_id=dislocation_id)
 
             # Filter by calculation-specific terms
             #&query.str_match.pandas(dataframe, 'minimum_r', minimum_r)
@@ -602,12 +780,16 @@ class StackingFaultStatic(Calculation):
         self.system.calc_inputs(input_dict)
         self.minimize.calc_inputs(input_dict)
         self.defect.calc_inputs(input_dict)
+        self.elastic.calc_inputs(input_dict)
 
-        # Remove unused subset inputs
-
-        # Add calculation-specific inputs
-        input_dict['a1'] = self.a1
-        input_dict['a2'] = self.a2
+        # Modify inputs for calculation
+        input_dict['annealtemp'] = self.annealtemperature
+        input_dict['annealsteps'] = self.annealsteps
+        input_dict['randomseed'] = self.randomseed
+        input_dict['linear'] = self.onlylinear
+        input_dict['cutoff'] = self.duplicatecutoff
+        input_dict['boundarywidth'] = self.boundarywidth
+        input_dict['boundaryscale'] = self.boundaryscale
 
         # Return input_dict
         return input_dict
@@ -635,11 +817,11 @@ class StackingFaultStatic(Calculation):
         
         # Process results
         if self.status == 'finished':
-            self.__dumpfile_base = results_dict['dumpfile_0']
-            self.__dumpfile_defect = results_dict['dumpfile_sf']
-            self.__potential_energy_base = results_dict['E_total_0']
-            self.__potential_energy_defect = results_dict['E_total_sf']
-            self.__gsf_energy = results_dict['E_gsf']
-            self.__gsf_displacement = results_dict['delta_disp']
+            self.__dumpfile_base = results_dict['dumpfile_base']
+            self.__dumpfile_defect = results_dict['dumpfile_disl']
+            self.__symbols_base = results_dict['symbols_base']
+            self.__symbols_defect = results_dict['symbols_disl']
+            self.__potential_energy_defect = results_dict['E_total_disl']
+            self.__dislocation = results_dict['dislocation']
 
         self._results(json=results_json)

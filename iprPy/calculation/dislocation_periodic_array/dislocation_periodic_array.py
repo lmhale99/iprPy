@@ -1,93 +1,37 @@
-#!/usr/bin/env python
 # coding: utf-8
 
 # Python script created by Lucas Hale
 
 # Standard library imports
 from pathlib import Path
-import sys
-import uuid
-import glob
-import shutil
-import random
-import datetime
 from copy import deepcopy
+import shutil
+import datetime
+import random
 
 # http://www.numpy.org/
 import numpy as np 
-
-# https://github.com/usnistgov/DataModelDict 
-from DataModelDict import DataModelDict as DM
 
 # https://github.com/usnistgov/atomman 
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
-# https://github.com/usnistgov/iprPy
-import iprPy
+# iprPy imports
+from ...tools import filltemplate, read_calc_file
 
 # Define calculation metadata
-calculation_style = 'dislocation_periodic_array'
-record_style = f'calculation_{calculation_style}'
-script = Path(__file__).stem
-pkg_name = f'iprPy.calculation.{calculation_style}.{script}'
+parent_module = '.'.join(__name__.split('.')[:-1])
 
-def main(*args):
-    """Main function called when script is executed directly."""
-    
-    # Read input file in as dictionary
-    with open(args[0]) as f:
-        input_dict = iprPy.input.parse(f, allsingular=True)
-    
-    # Interpret and process input parameters
-    process_input(input_dict, *args[1:])
-   
-    results_dict = dislocationarray(input_dict['lammps_command'],
-                                    input_dict['ucell'],
-                                    input_dict['potential'],
-                                    input_dict['C'],
-                                    input_dict['dislocation_burgers'],
-                                    input_dict['dislocation_ξ_uvw'],
-                                    input_dict['dislocation_slip_hkl'],
-                                    mpi_command = input_dict['mpi_command'],
-                                    m = input_dict['dislocation_m'],
-                                    n = input_dict['dislocation_n'],
-                                    sizemults = input_dict['sizemults'],
-                                    amin = input_dict['amin'],
-                                    bmin = input_dict['bmin'],
-                                    cmin = input_dict['cmin'],
-                                    shift = input_dict['dislocation_shift'],
-                                    shiftscale = input_dict['dislocation_shiftscale'],
-                                    shiftindex = input_dict['dislocation_shiftindex'],
-                                    etol = input_dict['energytolerance'],
-                                    ftol = input_dict['forcetolerance'],
-                                    maxiter = input_dict['maxiterations'],
-                                    maxeval = input_dict['maxevaluations'],
-                                    dmax = input_dict['maxatommotion'],
-                                    annealtemp =  input_dict['annealtemperature'],
-                                    annealsteps =  input_dict['annealsteps'],
-                                    randomseed = input_dict['randomseed'],
-                                    boundarywidth = input_dict['dislocation_boundarywidth'],
-                                    boundaryscale = input_dict['dislocation_boundaryscale'],
-                                    linear = input_dict['dislocation_onlylinear'],
-                                    cutoff = input_dict['dislocation_duplicatecutoff'])
-    
-    # Build and save data model of results
-    record = iprPy.load_record(record_style)
-    record.buildcontent(input_dict, results_dict)
-    with open('results.json', 'w') as f:
-        record.content.json(fp=f, indent=4)
-
-def dislocationarray(lammps_command, ucell, potential, C, burgers, ξ_uvw,
-                     slip_hkl, mpi_command=None, m=[0,1,0], n=[0,0,1],
-                     sizemults=None, amin=None, bmin=None, cmin=None,
-                     shift=None, shiftscale=False, shiftindex=None, tol=1e-8,
-                     etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000,
-                     dmax=uc.set_in_units(0.01, 'angstrom'),
-                     annealtemp=0.0, annealsteps=None, randomseed=None,
-                     boundaryshape='cylinder', boundarywidth=0.0, boundaryscale=False,
-                     cutoff=None, linear=False):
+def dislocation_array(lammps_command, ucell, potential, C, burgers, ξ_uvw,
+                      slip_hkl, mpi_command=None, m=[0,1,0], n=[0,0,1],
+                      sizemults=None, amin=None, bmin=None, cmin=None,
+                      shift=None, shiftscale=False, shiftindex=None, tol=1e-8,
+                      etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000,
+                      dmax=uc.set_in_units(0.01, 'angstrom'),
+                      annealtemp=0.0, annealsteps=None, randomseed=None,
+                      boundarywidth=0.0, boundaryscale=False,
+                      cutoff=None, linear=False):
     """
     Creates and relaxes a dislocation monopole system.
     
@@ -349,13 +293,6 @@ def disl_relax(lammps_command, system, potential,
         - **'E_total'** (*float*) - The total potential energy for the
           relaxed system.
     """
-    # Build filedict if function was called from iprPy
-    try:
-        assert __name__ == pkg_name
-        calc = iprPy.load_calculation(calculation_style)
-        filedict = calc.filedict
-    except:
-        filedict = {}
 
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
@@ -387,10 +324,9 @@ def disl_relax(lammps_command, system, potential,
     # Write lammps input script
     template_file = 'disl_relax.template'
     lammps_script = 'disl_relax.in'
-    template = iprPy.tools.read_calc_file(template_file, filedict)
+    template = read_calc_file(parent_module, template_file)
     with open(lammps_script, 'w') as f:
-        f.write(iprPy.tools.filltemplate(template, lammps_variables,
-                                         '<', '>'))
+        f.write(filltemplate(template, lammps_variables, '<', '>'))
     
     # Run LAMMPS
     output = lmp.run(lammps_command, lammps_script, mpi_command)
@@ -450,84 +386,3 @@ def anneal_info(temperature=0.0, runsteps=None, randomseed=None, units='metal'):
             ])
     
     return info
-
-def process_input(input_dict, UUID=None, build=True):
-    """
-    Processes str input parameters, assigns default values if needed, and
-    generates new, more complex terms as used by the calculation.
-    
-    Parameters
-    ----------
-    input_dict :  dict
-        Dictionary containing the calculation input parameters with string
-        values.  The allowed keys depends on the calculation style.
-    UUID : str, optional
-        Unique identifier to use for the calculation instance.  If not 
-        given and a 'UUID' key is not in input_dict, then a random UUID4 
-        hash tag will be assigned.
-    build : bool, optional
-        Indicates if all complex terms are to be built.  A value of False
-        allows for default values to be assigned even if some inputs 
-        required by the calculation are incomplete.  (Default is True.)
-    """
-    # Set script's name
-    input_dict['script'] = script
-
-    # Set calculation UUID
-    if UUID is not None: 
-        input_dict['calc_key'] = UUID
-    else: 
-        input_dict['calc_key'] = input_dict.get('calc_key', str(uuid.uuid4()))
-    
-    # Set default input/output units
-    iprPy.input.subset('units').interpret(input_dict)
-    
-    # These are calculation-specific default strings
-    input_dict['forcetolerance'] = input_dict.get('forcetolerance',
-                                                  '1.0e-6 eV/angstrom')
-    
-    # These are calculation-specific default booleans
-    input_dict['dislocation_onlylinear'] = iprPy.input.boolean(input_dict.get('dislocation_onlylinear', False))
-    input_dict['dislocation_boundaryscale'] = iprPy.input.boolean(input_dict.get('dislocation_boundaryscale', False))
-    
-    # These are calculation-specific default integers
-    input_dict['randomseed'] = int(input_dict.get('randomseed',
-                                   random.randint(1, 900000000)))
-    
-    # These are calculation-specific default unitless floats
-    input_dict['annealtemperature'] = float(input_dict.get('annealtemperature', 0.0))
-    
-    # These are calculation-specific default floats with units
-    input_dict['dislocation_duplicatecutoff'] = iprPy.input.value(input_dict, 'dislocation_duplicatecutoff',
-                                            default_unit=input_dict['length_unit'],
-                                            default_term='0.5 angstrom')
-    input_dict['dislocation_boundarywidth'] = iprPy.input.value(input_dict, 'dislocation_boundarywidth',
-                                            default_unit=input_dict['length_unit'],
-                                            default_term='0 angstrom')
-    
-    # These are calculation-specific dependent parameters
-    if input_dict['annealtemperature'] == 0.0:
-        input_dict['annealsteps'] = int(input_dict.get('annealsteps', 0))
-    else:
-        input_dict['annealsteps'] = int(input_dict.get('annealsteps', 10000))
-
-    # Check lammps_command and mpi_command
-    iprPy.input.subset('lammps_commands').interpret(input_dict)
-    
-    # Set default system minimization parameters
-    iprPy.input.subset('lammps_minimize').interpret(input_dict)
-    
-    # Load potential
-    iprPy.input.subset('lammps_potential').interpret(input_dict)
-    
-    # Load system
-    iprPy.input.subset('atomman_systemload').interpret(input_dict, build=build)
-    
-    # Load dislocation parameters
-    iprPy.input.subset('dislocation').interpret(input_dict)
-    
-    # Load elastic constants
-    iprPy.input.subset('atomman_elasticconstants').interpret(input_dict, build=build)
-
-if __name__ == '__main__':
-    main(*sys.argv[1:])

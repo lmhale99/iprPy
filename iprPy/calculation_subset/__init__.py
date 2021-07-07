@@ -8,7 +8,8 @@ from .LammpsMinimize import LammpsMinimize
 
 from .AtommanSystemLoad import AtommanSystemLoad
 from .AtommanSystemManipulate import AtommanSystemManipulate
-
+from .AtommanElasticConstants import AtommanElasticConstants
+from .AtommanGammaSurface import AtommanGammaSurface
 from .FreeSurface import FreeSurface
 from .StackingFault import StackingFault
 from .PointDefect import PointDefect
