@@ -355,6 +355,7 @@ class SurfaceEnergyStatic(Calculation):
             calc['free-surface-energy'] = uc.model(self.surface_energy,
                                                    energy_per_area_unit)
 
+        self._set_model(model)
         return model
 
     def load_model(self, model, name=None):

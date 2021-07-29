@@ -479,6 +479,7 @@ class PointDefectStatic(Calculation):
             if self.__db_vect_shift is not None:
                 r_c['db_vect_shift'] = self.db_vect_shift.tolist()
 
+        self._set_model(model)
         return model
 
     def load_model(self, model, name=None):

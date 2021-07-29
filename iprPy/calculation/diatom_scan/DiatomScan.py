@@ -357,7 +357,8 @@ class DiatomScan(Calculation):
             scan['r'] = uc.model(self.r_values, self.units.length_unit)
             scan['potential-energy'] = uc.model(self.energy_values,
                                                 self.units.energy_unit)
-
+        
+        self._set_model(model)
         return model
 
     def load_model(self, model, name=None):

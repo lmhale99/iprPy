@@ -327,6 +327,7 @@ class ElasticConstantsStatic(Calculation):
             calc['elastic-constants']['Cij'] = uc.model(self.C.Cij,
                                                         self.units.pressure_unit)
 
+        self._set_model(model)
         return model
 
     def load_model(self, model, name=None):

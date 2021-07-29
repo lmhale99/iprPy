@@ -396,6 +396,7 @@ class CrystalSpaceGroup(Calculation):
             system_model = self.spg_ucell.dump('system_model', box_unit=self.units.length_unit)
             calc['unit-cell-atomic-system'] = system_model['atomic-system']
 
+        self._set_model(model)
         return model
 
     def load_model(self, model, name=None):

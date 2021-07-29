@@ -31,12 +31,23 @@ class StackingFaultPath():
 
     def __init__(self, sp):
         self.__direction = sp['direction']
-        self.__coord = uc.value_unit(sp['minimum-energy-path'])
-        self.__path = self.gamma.path(self.coord)
-        self.__usf_mep = uc.value_unit(sp['unstable-fault-energy-mep'])
-        self.__usf_urp = uc.value_unit(sp['unstable-fault-energy-unrelaxed-path'])
-        self.__shear_mep = uc.value_unit(sp['ideal-shear-stress-mep'])
-        self.__shear_urp = uc.value_unit(sp['ideal-shear-stress-unrelaxed-path'])
+        self.__error = sp.get('error', None)
+
+        if self.__error is None:
+            self.__coord = uc.value_unit(sp['minimum-energy-path'])
+            #self.__path = self.gamma.path(self.coord)
+            self.__usf_mep = uc.value_unit(sp['unstable-fault-energy-mep'])
+            self.__usf_urp = uc.value_unit(sp['unstable-fault-energy-unrelaxed-path'])
+            self.__shear_mep = uc.value_unit(sp['ideal-shear-stress-mep'])
+            self.__shear_urp = uc.value_unit(sp['ideal-shear-stress-unrelaxed-path'])
+
+        else:
+            self.__coord = None
+            #self.__path = None
+            self.__usf_mep = None
+            self.__usf_urp = None
+            self.__shear_mep = None
+            self.__shear_urp = None
 
     @property
     def direction(self):
@@ -46,9 +57,9 @@ class StackingFaultPath():
     def coord(self):
         return self.__coord
 
-    @property
-    def path(self):
-        return self.__path
+    #@property
+    #def path(self):
+    #    return self.__path
 
     @property
     def usf_mep(self):
@@ -66,14 +77,24 @@ class StackingFaultPath():
     def shear_urp(self):
         return self.__shear_urp
 
-    def build_model(self, length_unit, energy_unit, stress_unit):
+    @property
+    def error(self):
+        return self.__error
+
+    def build_model(self, length_unit='angstrom', energyperarea_unit='mJ/m^2', stress_unit='GPa'):
         sp = DM()
         sp['direction'] = self.direction
-        sp['minimum-energy-path'] = uc.model(self.coord, length_unit)
-        sp['unstable-fault-energy-mep'] = uc.model(self.usf_mep, energy_unit)
-        sp['unstable-fault-energy-unrelaxed-path'] = uc.model(self.usf_urp, energy_unit)
-        sp['ideal-shear-stress-mep'] = uc.model(self.shear_mep, stress_unit)
-        sp['ideal-shear-stress-unrelaxed-path'] = uc.model(self.shear_urp, stress_unit)
+
+        if self.error is None:
+            sp['minimum-energy-path'] = uc.model(self.coord, length_unit)
+            sp['unstable-fault-energy-mep'] = uc.model(self.usf_mep, energyperarea_unit)
+            sp['unstable-fault-energy-unrelaxed-path'] = uc.model(self.usf_urp, energyperarea_unit)
+            sp['ideal-shear-stress-mep'] = uc.model(self.shear_mep, stress_unit)
+            sp['ideal-shear-stress-unrelaxed-path'] = uc.model(self.shear_urp, stress_unit)
+
+        else:
+            sp['error'] = self.error
+
         return sp
 
 class StackingFaultMap2D(Calculation):
@@ -167,24 +188,22 @@ class StackingFaultMap2D(Calculation):
     def paths(self):
         if self.__paths is None:
             raise ValueError('No path results!')
-        elif not isinstance(self.__paths, list):
-            pass
-        else:
-            return self.__paths
+        #elif not isinstance(self.__paths, list):
+        #    self.load_paths()
 
-    def load_paths(self, model=None):
+        return self.__paths
 
-        if model is None:
-            model = self.__paths
-            if model is None:
-                raise ValueError('No path results!')
-            if isinstance(model, list):
-                return
+    #def load_paths(self, model=None):
+
+    #    if model is None:
+    #        model = self.__paths
+    #        if model is None:
+    #            raise ValueError('No path results!')
         
-        model = DM(model)
-        self.__paths = []
-        for sp in model.iteraslist('slip-path'):
-            self.paths.append(StackingFaultPath(sp))            
+    #    model = DM(model)
+    #    self.__paths = []
+    #    for sp in model.finds('slip-path'):
+    #        self.paths.append(StackingFaultPath(sp))            
 
     def set_values(self, name=None, **kwargs):
         """Used to set initial common values for the calculation."""
@@ -416,6 +435,7 @@ class StackingFaultMap2D(Calculation):
                 for path in paths:
                     calc.append('slip-path', path.build_model())
 
+        self._set_model(model)
         return model
 
     def load_model(self, model, name=None):
@@ -442,7 +462,9 @@ class StackingFaultMap2D(Calculation):
             self.__gamma = calc
 
             if 'slip-path' in calc:
-                self.__paths = calc          
+                self.__paths = []
+                for sp in model.finds('slip-path'):
+                    self.paths.append(StackingFaultPath(sp))  
 
     @staticmethod
     def mongoquery(name=None, key=None, iprPy_version=None,
@@ -550,10 +572,14 @@ class StackingFaultMap2D(Calculation):
             else:
                 for path in paths:
                     direction = path.direction
-                    meta[f'E_usf_mep_[{direction}]'] = path.usf_mep
-                    meta[f'E_usf_urp_[{direction}]'] = path.usf_urp
-                    meta[f'τ_ideal_mep_[{direction}]'] = path.shear_mep
-                    meta[f'τ_ideal_urp_[{direction}]'] = path.shear_urp
+
+                    if path.error is None:
+                        meta[f'E_usf_mep {direction}'] = path.usf_mep
+                        meta[f'E_usf_urp {direction}'] = path.usf_urp
+                        meta[f'τ_ideal_mep {direction}'] = path.shear_mep
+                        meta[f'τ_ideal_urp {direction}'] = path.shear_urp
+                    else:
+                        meta[f'error {direction}'] = path.error
 
         return meta
 

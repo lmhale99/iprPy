@@ -445,6 +445,7 @@ class Phonon(Calculation):
                 calc['B0prime'] = uc.model(self.B0prime, 'GPa')
                 calc['V0'] = uc.model(self.V0, 'angstrom^3')
 
+        self._set_model(model)
         return model
 
     def load_model(self, model, name=None):

@@ -684,6 +684,7 @@ class DislocationSDVPN(Calculation):
             calc['total-energy'] = uc.model(pnsolution.total_energy(), e_per_l_unit)
             calc['total-energy-per-cycle'] = uc.model(self.energies, e_per_l_unit)
 
+        self._set_model(model)
         return model
 
     def load_model(self, model, name=None):

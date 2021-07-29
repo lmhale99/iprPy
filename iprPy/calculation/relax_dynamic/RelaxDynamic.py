@@ -841,6 +841,7 @@ class RelaxDynamic(Calculation):
                                                self.units.energy_unit,
                                                self.total_energy_std)
 
+        self._set_model(model)
         return model
 
     def load_model(self, model, name=None):

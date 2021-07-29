@@ -380,6 +380,7 @@ class StackingFaultStatic(Calculation):
             calc['plane-separation'] = uc.model(self.gsf_displacement,
                                                 self.units.length_unit)
 
+        self._set_model(model)
         return model
 
     def load_model(self, model, name=None):

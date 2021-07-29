@@ -628,6 +628,7 @@ class PointDefectDiffusion(Calculation):
             dr['y-direction'] = uc.model(self.dy, diffusion_unit)
             dr['z-direction'] = uc.model(self.dz, diffusion_unit)
 
+        self._set_model(model)
         return model
 
     def load_model(self, model, name=None):

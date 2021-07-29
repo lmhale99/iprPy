@@ -120,6 +120,7 @@ class Dislocation(Record):
         content['system-family'] = self.family
         content['calculation-parameter'] = DM(self.parameters)
 
+        self._set_model(model)
         return model
 
     def metadata(self):

@@ -545,6 +545,7 @@ class DislocationPeriodicArray(Calculation):
             elsol['K-tensor'] = uc.model(self.K_tensor,
                                          self.units.pressure_unit)
 
+        self._set_model(model)
         return model
 
     def load_model(self, model, name=None):

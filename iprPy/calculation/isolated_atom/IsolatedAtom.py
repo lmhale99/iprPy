@@ -230,6 +230,7 @@ class IsolatedAtom(Calculation):
                 isoatom['energy'] = uc.model(energy, self.units.energy_unit)
                 calc.append('isolated-atom-energy', isoatom)
 
+        self._set_model(model)
         return model
 
     def load_model(self, model, name=None):

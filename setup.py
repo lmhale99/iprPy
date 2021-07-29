@@ -21,6 +21,7 @@ setup(name = 'iprPy',
         'Natural Language :: English',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Topic :: Scientific/Engineering :: Physics'
       ],
       keywords = [
@@ -42,7 +43,7 @@ setup(name = 'iprPy',
         'scipy',
         'pandas',
         'potentials',
-        'atomman==1.3.4',
+        'atomman>=1.4.0',
         'requests',
       ],
       entry_points = {

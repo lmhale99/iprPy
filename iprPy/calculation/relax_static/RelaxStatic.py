@@ -598,6 +598,7 @@ class RelaxStatic(Calculation):
                                                self.units.energy_unit,
                                                None)
 
+        self._set_model(model)
         return model
 
     def load_model(self, model, name=None):
