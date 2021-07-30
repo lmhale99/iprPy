@@ -134,6 +134,7 @@ class LammpsPotential(CalculationSubset):
         """
         return  [
                     'potential_file',
+                    'potential_kim_id',
                     'potential_dir',
                 ]
     
@@ -171,7 +172,8 @@ class LammpsPotential(CalculationSubset):
     
         # Extract input values and assign default values
         potential_file = input_dict[keymap['potential_file']]
-        potential_dir = input_dict.get(keymap['potential_dir'], '')
+        potential_kim_id = input_dict.get(keymap['potential_kim_id'], None)
+        potential_dir = input_dict.get(keymap['potential_dir'], None)
         potential_content = input_dict.get(keymap['potential_content'], None)
 
         # Use potential_content instead of potential_file if given
@@ -179,7 +181,8 @@ class LammpsPotential(CalculationSubset):
             potential_file = potential_content
         
         # Read potential
-        self.potential = lmp.Potential(potential_file, pot_dir=potential_dir)
+        self.potential = lmp.Potential(potential_file, pot_dir=potential_dir,
+                                       kim_id=potential_kim_id)
 
 ########################### Data model interactions ###########################
 

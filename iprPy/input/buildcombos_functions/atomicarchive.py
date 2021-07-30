@@ -93,10 +93,12 @@ def atomicarchive(database, keys, content_dict=None, record=None, load_key='atom
                     inputs['potential_file'].append(f'{lmppot.name}.json')
                 elif key == 'potential_content':
                     inputs['potential_content'].append(f'record {lmppot.name}')
-                elif key == 'potential_dir':
+                elif key == 'potential_dir' and lmppot.pair_style != 'kim':
                     inputs['potential_dir'].append(lmppot.name)
-                elif key == 'potential_dir_content':
+                elif key == 'potential_dir_content' and lmppot.pair_style != 'kim':
                     inputs['potential_dir_content'].append(f'tar {lmppot.name}')
+                elif key == 'potential_kim_id' and lmppot.pair_style == 'kim':
+                    inputs['potential_kim_id'].append(lmppot.id)
                 elif key == 'load_file':
                     inputs['load_file'].append(f'{parent.name}/{load_file}')
                 elif key == 'load_content':

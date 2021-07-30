@@ -79,10 +79,12 @@ def atomicreference(database, keys, content_dict=None,
                                 inputs['potential_file'].append(lmppot.name + '.json')
                             elif key == 'potential_content':
                                 inputs['potential_content'].append(f'record {lmppot.name}')
-                            elif key == 'potential_dir':
+                            elif key == 'potential_dir' and lmppot.pair_style != 'kim':
                                 inputs['potential_dir'].append(lmppot.name)
-                            elif key == 'potential_dir_content':
+                            elif key == 'potential_dir_content' and lmppot.pair_style != 'kim':
                                 inputs['potential_dir_content'].append(f'tar {lmppot.name}')
+                            elif key == 'potential_kim_id' and lmppot.pair_style == 'kim':
+                                inputs['potential_kim_id'].append(lmppot.id)
                             elif key == 'load_file':
                                 inputs['load_file'].append(reference.name+'.json')
                             elif key == 'load_content':
