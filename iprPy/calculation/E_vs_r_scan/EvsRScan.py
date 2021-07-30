@@ -628,32 +628,18 @@ class EvsRScan(Calculation):
         # Return input_dict
         return input_dict
     
-    def run(self, newkey=False, results_json=False, verbose=False):
+    def process_results(self, results_dict):
         """
-        Runs the calculation using the current class attribute values. Status
-        after running will be either "finished" or "error".
+        Processes calculation results and saves them to the object's results
+        attributes.
 
         Parameters
         ----------
-        newkey : bool, optional
-            If True, then the calculation's key and name will be replaced with
-            a new UUID4.  This allows for iterations on previous runs to be
-            uniquely labeled.  Default value is False.
-        results_json : bool, optional
-            If True, then a "results.json" file will be generated following
-            the run.
-        verbose : bool, optional
-            If True, a message relating to the calculation's status will be
-            printed upon completion.  Default value is False.
+        results_dict: dict
+            The dictionary returned by the calc() method.
         """
-        # Run calculation
-        results_dict = super().run(newkey=newkey, verbose=verbose)
+        self.r_values = results_dict['r_values']
+        self.a_values = results_dict['a_values']
+        self.energy_values = results_dict['Ecoh_values']
+        self.min_cells = results_dict['min_cell']
         
-        # Process results
-        if self.status == 'finished':
-            self.r_values = results_dict['r_values']
-            self.a_values = results_dict['a_values']
-            self.energy_values = results_dict['Ecoh_values']
-            self.min_cells = results_dict['min_cell']
-        
-        self._results(json=results_json)

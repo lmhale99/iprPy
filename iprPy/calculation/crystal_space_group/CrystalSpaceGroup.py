@@ -597,37 +597,22 @@ class CrystalSpaceGroup(Calculation):
         # Return input_dict
         return input_dict
     
-    def run(self, newkey=False, results_json=False, verbose=False):
+    def process_results(self, results_dict):
         """
-        Runs the calculation using the current class attribute values. Status
-        after running will be either "finished" or "error".
+        Processes calculation results and saves them to the object's results
+        attributes.
 
         Parameters
         ----------
-        newkey : bool, optional
-            If True, then the calculation's key and name will be replaced with
-            a new UUID4.  This allows for iterations on previous runs to be
-            uniquely labeled.  Default value is False.
-        results_json : bool, optional
-            If True, then a "results.json" file will be generated following
-            the run.
-        verbose : bool, optional
-            If True, a message relating to the calculation's status will be
-            printed upon completion.  Default value is False.
+        results_dict: dict
+            The dictionary returned by the calc() method.
         """
-        # Run calculation
-        results_dict = super().run(newkey=newkey, verbose=verbose)
-        
-        # Process results
-        if self.status == 'finished':
-            self.__pearson = results_dict['pearson']
-            self.__number = results_dict['number']
-            self.__international = results_dict['international']
-            self.__schoenflies = results_dict['schoenflies']
-            self.__wyckoffs = results_dict['wyckoffs']
-            self.__wyckoff_fingerprint = results_dict['wyckoff_fingerprint']
-            #self.__hall_number = results_dict['hall_number']
-            #self.__equivalent_atoms = results_dict['equivalent_atoms']
-            self.__spg_ucell = results_dict['ucell']
-        
-        self._results(json=results_json)
+        self.__pearson = results_dict['pearson']
+        self.__number = results_dict['number']
+        self.__international = results_dict['international']
+        self.__schoenflies = results_dict['schoenflies']
+        self.__wyckoffs = results_dict['wyckoffs']
+        self.__wyckoff_fingerprint = results_dict['wyckoff_fingerprint']
+        #self.__hall_number = results_dict['hall_number']
+        #self.__equivalent_atoms = results_dict['equivalent_atoms']
+        self.__spg_ucell = results_dict['ucell']

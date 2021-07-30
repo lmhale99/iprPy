@@ -51,19 +51,19 @@ def load_calculation(style, **kwargs):
     """
     return calculationmanager.init(style, **kwargs)
 
-def run_paramfile2json(filename, calculation=None):
+def run_calculation(params, calc_style=None):
     """
     Runs a calculation from a parameter file and outputs results to
     results.json.
 
     Parameters
     ----------
-    filename : str
-        The path to a parameter file to read.  The file's name should start
-        with "calc_" followed by the calculation's calc_style.
-    calculation : iprPy.Calculation, optional
-        Allows for an existing calculation object to be used.  If not given,
-        then a new calculation object will be created.
+    params : dict, str or file-like object, optional
+        The parameters or parameter file to read in.  If not given, will
+        run based on the current object attribute values.
+    calc_style : str, optional
+        Specifies the style of calculation to run.  Optional if params is a
+        path to a file where the file's name is calc_<calc_style>.in.
 
     Returns
     -------
@@ -72,13 +72,16 @@ def run_paramfile2json(filename, calculation=None):
     error : str or None
         Any error message thrown by the calculation.
     """
-    # Extract calc_style from filename
-    calc_style = Path(filename).stem.replace('calc_', '')
-    
+    if calc_style is None:
+        # Extract calc_style from filename
+        if isinstance(params, (str, Path)):
+            calc_style = Path(params).stem.replace('calc_', '')
+        else:
+            raise ValueError('calc_style not given and cannot be determined from params')
+
     # Load calculation style and read in paramfile
-    calculation = load_calculation(calc_style, params=filename)
+    calculation = load_calculation(calc_style, params=params)
     
     # Run and create results_json
-    calculation.run(results_json=True)
+    calculation.run(results_json=True, verbose=True)
     
-    return calculation.status, calculation.error

@@ -715,39 +715,24 @@ class Phonon(Calculation):
         # Return input_dict
         return input_dict
     
-    def run(self, newkey=False, results_json=False, verbose=False):
+    def process_results(self, results_dict):
         """
-        Runs the calculation using the current class attribute values. Status
-        after running will be either "finished" or "error".
+        Processes calculation results and saves them to the object's results
+        attributes.
 
         Parameters
         ----------
-        newkey : bool, optional
-            If True, then the calculation's key and name will be replaced with
-            a new UUID4.  This allows for iterations on previous runs to be
-            uniquely labeled.  Default value is False.
-        results_json : bool, optional
-            If True, then a "results.json" file will be generated following
-            the run.
-        verbose : bool, optional
-            If True, a message relating to the calculation's status will be
-            printed upon completion.  Default value is False.
+        results_dict: dict
+            The dictionary returned by the calc() method.
         """
-        # Run calculation
-        results_dict = super().run(newkey=newkey, verbose=verbose)
-        
-        # Process results
-        if self.status == 'finished':
-            self.__phonons = results_dict['phonon_objects']
-            self.__qha = results_dict['qha_object']
-            self.__bandstructure = results_dict['band_structure']
-            self.__dos = results_dict['density_of_states']
-            self.__thermal = results_dict['thermal_properties']
-            if 'volume_scan' in results_dict:
-                self.__volumescan = results_dict['volume_scan']
-                self.__E0 = results_dict['E0']
-                self.__B0 = results_dict['B0']
-                self.__B0prime = results_dict['B0prime']
-                self.__V0 = results_dict['V0']
-
-        self._results(json=results_json)
+        self.__phonons = results_dict['phonon_objects']
+        self.__qha = results_dict['qha_object']
+        self.__bandstructure = results_dict['band_structure']
+        self.__dos = results_dict['density_of_states']
+        self.__thermal = results_dict['thermal_properties']
+        if 'volume_scan' in results_dict:
+            self.__volumescan = results_dict['volume_scan']
+            self.__E0 = results_dict['E0']
+            self.__B0 = results_dict['B0']
+            self.__B0prime = results_dict['B0prime']
+            self.__V0 = results_dict['V0']

@@ -163,7 +163,18 @@ class Calculation(Record):
 ##################### Parameter file interactions ########################### 
 
     def load_parameters(self, params, key=None):
-        
+        """
+        Reads in and sets calculation parameters.
+
+        Parameters
+        ----------
+        params : dict, str or file-like object
+            The parameters or parameter file to read in.
+        key : str, optional
+            A new key value to assign to the object.  If not given, will use
+            calc_key field in params if it exists, or leave the key value
+            unchanged.
+        """
         # Parse params to input_dict if needed
         if isinstance(params, dict):
             input_dict = params
@@ -408,23 +419,43 @@ class Calculation(Record):
 
     def calc_inputs(self):
         """Builds calculation inputs from the class's attributes"""
-        raise AttributeError('calc not defined for Calculation style')
+        raise AttributeError('calc_inputs not defined for Calculation style')
 
     def calc(self, *args, **kwargs):
         """Calls the calculation's primary function(s)"""
         raise AttributeError('calc not defined for Calculation style')
 
-    def run(self, newkey=False, verbose=False):
+    def process_results(self, results_dict):
         """
-        Runs the calculation using the current class attribute values. Status
-        after running will be either "finished" or "error".
+        Processes calculation results and saves them to the object's results
+        attributes.
 
         Parameters
         ----------
+        results_dict: dict
+            The dictionary returned by the calc() method.
+        """
+        raise AttributeError('process_results not defined for Calculation style')
+
+    def run(self, params=None, newkey=False, results_json=False,
+            verbose=False):
+        """
+        Runs the calculation using the current object attribute values or
+        supplied parameters. Status after running will be either "finished"
+        or "error".
+
+        Parameters
+        ----------
+        params : dict, str or file-like object, optional
+            The parameters or parameter file to read in.  If not given, will
+            run based on the current object attribute values.
         newkey : bool, optional
             If True, then the calculation's key and name will be replaced with
             a new UUID4.  This allows for iterations on previous runs to be
             uniquely labeled.  Default value is False.
+        results_json : bool, optional
+            If True, then a "results.json" file will be generated following
+            the run.
         verbose : bool, optional
             If True, a message relating to the calculation's status will be
             printed upon completion.  Default value is False.
@@ -439,6 +470,10 @@ class Calculation(Record):
         # Change the calculation's key if requested
         if newkey:
             self.__key = self.name = str(uuid.uuid4())
+
+        # Load params if given
+        if params is not None:
+            self.load_parameters(params)
 
         # Build calculation inputs
         input_dict = self.calc_inputs()
@@ -455,6 +490,7 @@ class Calculation(Record):
         
         else:
             self.__status = 'finished'
+            self.process_results(results_dict)
         
         if verbose:
             if self.status == 'finished':
@@ -462,9 +498,9 @@ class Calculation(Record):
             else:
                 print('Error:', self.error)
 
-        return results_dict
-    
-    def _results(self, json=False, ):
-        if json is True:
+        # Save results to json
+        if results_json is True:
             with open('results.json', 'w', encoding='UTF-8') as f:
                 self.build_model().json(fp=f, indent=4, ensure_ascii=False)
+
+    

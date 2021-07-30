@@ -868,50 +868,35 @@ class RelaxStatic(Calculation):
         # Return input_dict
         return input_dict
     
-    def run(self, newkey=False, results_json=False, verbose=False):
+    def process_results(self, results_dict):
         """
-        Runs the calculation using the current class attribute values. Status
-        after running will be either "finished" or "error".
+        Processes calculation results and saves them to the object's results
+        attributes.
 
         Parameters
         ----------
-        newkey : bool, optional
-            If True, then the calculation's key and name will be replaced with
-            a new UUID4.  This allows for iterations on previous runs to be
-            uniquely labeled.  Default value is False.
-        results_json : bool, optional
-            If True, then a "results.json" file will be generated following
-            the run.
-        verbose : bool, optional
-            If True, a message relating to the calculation's status will be
-            printed upon completion.  Default value is False.
+        results_dict: dict
+            The dictionary returned by the calc() method.
         """
-        # Run calculation
-        results_dict = super().run(newkey=newkey, verbose=verbose)
-        
-        # Process results
-        if self.status == 'finished':
-            self.__initial_dump = {
-                'filename': results_dict['dumpfile_initial'],
-                'symbols': results_dict['symbols_initial']
-            }
-            self.__final_dump = {
-                'filename': results_dict['dumpfile_final'],
-                'symbols': results_dict['symbols_final']
-            }
-            lx = results_dict['lx'] / (self.system_mods.a_mults[1] - self.system_mods.a_mults[0])
-            ly = results_dict['ly'] / (self.system_mods.b_mults[1] - self.system_mods.b_mults[0])
-            lz = results_dict['lz'] / (self.system_mods.c_mults[1] - self.system_mods.c_mults[0])
-            xy = results_dict['xy'] / (self.system_mods.b_mults[1] - self.system_mods.b_mults[0])
-            xz = results_dict['xz'] / (self.system_mods.c_mults[1] - self.system_mods.c_mults[0])
-            yz = results_dict['yz'] / (self.system_mods.c_mults[1] - self.system_mods.c_mults[0])
-            self.__final_box = am.Box(lx=lx, ly=ly, lz=lz, xy=xy, xz=xz, yz=yz)
-            self.__potential_energy = results_dict['E_pot']
-            self.__measured_pressure_xx = results_dict['measured_pxx']
-            self.__measured_pressure_yy = results_dict['measured_pyy']
-            self.__measured_pressure_zz = results_dict['measured_pzz']
-            self.__measured_pressure_xy = results_dict['measured_pxy']
-            self.__measured_pressure_xz = results_dict['measured_pxz']
-            self.__measured_pressure_yz = results_dict['measured_pyz']
-
-        self._results(json=results_json)
+        self.__initial_dump = {
+            'filename': results_dict['dumpfile_initial'],
+            'symbols': results_dict['symbols_initial']
+        }
+        self.__final_dump = {
+            'filename': results_dict['dumpfile_final'],
+            'symbols': results_dict['symbols_final']
+        }
+        lx = results_dict['lx'] / (self.system_mods.a_mults[1] - self.system_mods.a_mults[0])
+        ly = results_dict['ly'] / (self.system_mods.b_mults[1] - self.system_mods.b_mults[0])
+        lz = results_dict['lz'] / (self.system_mods.c_mults[1] - self.system_mods.c_mults[0])
+        xy = results_dict['xy'] / (self.system_mods.b_mults[1] - self.system_mods.b_mults[0])
+        xz = results_dict['xz'] / (self.system_mods.c_mults[1] - self.system_mods.c_mults[0])
+        yz = results_dict['yz'] / (self.system_mods.c_mults[1] - self.system_mods.c_mults[0])
+        self.__final_box = am.Box(lx=lx, ly=ly, lz=lz, xy=xy, xz=xz, yz=yz)
+        self.__potential_energy = results_dict['E_pot']
+        self.__measured_pressure_xx = results_dict['measured_pxx']
+        self.__measured_pressure_yy = results_dict['measured_pyy']
+        self.__measured_pressure_zz = results_dict['measured_pzz']
+        self.__measured_pressure_xy = results_dict['measured_pxy']
+        self.__measured_pressure_xz = results_dict['measured_pxz']
+        self.__measured_pressure_yz = results_dict['measured_pyz']

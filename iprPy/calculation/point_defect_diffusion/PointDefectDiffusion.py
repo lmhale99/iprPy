@@ -909,56 +909,41 @@ class PointDefectDiffusion(Calculation):
         # Return input_dict
         return input_dict
     
-    def run(self, newkey=False, results_json=False, verbose=False):
+    def process_results(self, results_dict):
         """
-        Runs the calculation using the current class attribute values. Status
-        after running will be either "finished" or "error".
+        Processes calculation results and saves them to the object's results
+        attributes.
 
         Parameters
         ----------
-        newkey : bool, optional
-            If True, then the calculation's key and name will be replaced with
-            a new UUID4.  This allows for iterations on previous runs to be
-            uniquely labeled.  Default value is False.
-        results_json : bool, optional
-            If True, then a "results.json" file will be generated following
-            the run.
-        verbose : bool, optional
-            If True, a message relating to the calculation's status will be
-            printed upon completion.  Default value is False.
+        results_dict: dict
+            The dictionary returned by the calc() method.
         """
-        # Run calculation
-        results_dict = super().run(newkey=newkey, verbose=verbose)
-        
-        # Process results
-        if self.status == 'finished':
             
-            self.__nsamples = results_dict['nsamples']
-            self.__natoms = results_dict['natoms']
-            
-            self.__potential_energy = results_dict['E_pot']
-            self.__potential_energy_std = results_dict['E_pot_std']
-            self.__total_energy = results_dict['E_total']
-            self.__total_energy_std = results_dict['E_total_std']
-
-            self.__measured_pressure_xx = results_dict['pxx']
-            self.__measured_pressure_xx_std = results_dict['pxx_std']
-            self.__measured_pressure_yy = results_dict['pyy']
-            self.__measured_pressure_yy_std = results_dict['pyy_std']
-            self.__measured_pressure_zz = results_dict['pzz']
-            self.__measured_pressure_zz_std = results_dict['pzz_std']
-            #self.__measured_pressure_xy = results_dict['pxy']
-            #self.__measured_pressure_xy_std = results_dict['pxy_std']
-            #self.__measured_pressure_xz = results_dict['pxz']
-            #self.__measured_pressure_xz_std = results_dict['pxz_std']
-            #self.__measured_pressure_yz = results_dict['pyz']
-            #self.__measured_pressure_yz_std = results_dict['pyz_std']
-            self.__measured_temperature = results_dict['temp']
-            self.__measured_temperature_std = results_dict['temp_std']
+        self.__nsamples = results_dict['nsamples']
+        self.__natoms = results_dict['natoms']
         
-            self.__d = results_dict['d'] 
-            self.__dx = results_dict['dx']
-            self.__dy = results_dict['dy']
-            self.__dz = results_dict['dz']
+        self.__potential_energy = results_dict['E_pot']
+        self.__potential_energy_std = results_dict['E_pot_std']
+        self.__total_energy = results_dict['E_total']
+        self.__total_energy_std = results_dict['E_total_std']
 
-        self._results(json=results_json)
+        self.__measured_pressure_xx = results_dict['pxx']
+        self.__measured_pressure_xx_std = results_dict['pxx_std']
+        self.__measured_pressure_yy = results_dict['pyy']
+        self.__measured_pressure_yy_std = results_dict['pyy_std']
+        self.__measured_pressure_zz = results_dict['pzz']
+        self.__measured_pressure_zz_std = results_dict['pzz_std']
+        #self.__measured_pressure_xy = results_dict['pxy']
+        #self.__measured_pressure_xy_std = results_dict['pxy_std']
+        #self.__measured_pressure_xz = results_dict['pxz']
+        #self.__measured_pressure_xz_std = results_dict['pxz_std']
+        #self.__measured_pressure_yz = results_dict['pyz']
+        #self.__measured_pressure_yz_std = results_dict['pyz_std']
+        self.__measured_temperature = results_dict['temp']
+        self.__measured_temperature_std = results_dict['temp_std']
+    
+        self.__d = results_dict['d'] 
+        self.__dx = results_dict['dx']
+        self.__dy = results_dict['dy']
+        self.__dz = results_dict['dz']
