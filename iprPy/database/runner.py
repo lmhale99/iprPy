@@ -16,7 +16,6 @@ from DataModelDict import DataModelDict as DM
 
 # iprPy imports
 from .. import settings, load_run_directory
-from ..calculation import run_paramfile2json
 
 def runner(database, run_directory, calc_name=None, orphan_directory=None,
            hold_directory=None, log=True, bidtries=10, temp=False,

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from .. import load_run_directory
+from . import load_run_directory
 
 def fix_lammps_versions(run_directory, **kwargs):
     """

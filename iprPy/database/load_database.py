@@ -1,3 +1,4 @@
+from . import databasemanager
 from .. import settings
 import datamodelbase
 
@@ -24,5 +25,7 @@ def load_database(name=None, style=None, host=None, **kwargs):
     Subclass of datamodelbase.Database
         The database object.
     """
+    print('iprPy.load_database', databasemanager)
     return datamodelbase.load_database(name=name, style=style, host=host,
-                                       settings=settings, **kwargs)
+                                       settings=settings,
+                                       databasemanager=databasemanager,**kwargs)

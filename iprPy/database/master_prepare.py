@@ -14,18 +14,18 @@ import pandas as pd
 
 # iprPy imports
 from ..tools import aslist, filltemplate
-from .. import load_calculation, load_database, load_run_directory
+from .. import load_calculation, load_run_directory, fix_lammps_versions
 from ..input import parse
-from ..database import prepare
-from . import fix_lammps_versions
 
-def master_prepare(input_script=None, **kwargs):
+def master_prepare(database, input_script=None, **kwargs):
     """
     Prepares one or more calculations according to the workflows used by the
     NIST Interatomic Potentials Repository.
     
     Parameters
     ----------
+    database : iprPy.database.Database
+        The database that will host the records for the prepared calculations.
     input_script : str or file-like object, optional
         The file, path to file, or contents of an input script containing
         parameters for preparing the calculation.
@@ -42,10 +42,6 @@ def master_prepare(input_script=None, **kwargs):
         kwargs = parse(input_script)
         for key in temp:
             kwargs[key] = temp[key]
-
-    # Load database
-    database_name = kwargs.pop('database')
-    database = load_database(database_name)
 
     # Get pools
     styles = aslist(kwargs.pop('styles'))
@@ -100,7 +96,7 @@ def prepare_pool(database, styles, np_per_runner, run_directory, **kwargs):
         params = calculation.master_prepare_inputs(branch=branch, **kwargs)
 
         # Prepare the calculation
-        prepare(database, run_directory, calculation, **params)
+        database.prepare(run_directory, calculation, **params)
         print()
 
     # Update lammps_commands as needed

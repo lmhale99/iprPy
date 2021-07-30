@@ -13,12 +13,10 @@ import pandas as pd
 # iprPy imports
 from ..tools import aslist, filltemplate
 from .. import load_calculation, load_run_directory
-from . import load_database
 from ..input import buildcombos, parse
 
-debug = True
-
-def prepare(database, run_directory, calculation, input_script=None, **kwargs):
+def prepare(database, run_directory, calculation, input_script=None,
+            debug=False, **kwargs):
     """
     Function for preparing any iprPy calculation for high-throughput execution.
     Input parameters for preparing can either be given within an input script
@@ -26,9 +24,8 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
     
     Parameters
     ----------
-    database : iprPy.database.Database or str
-        The database or database name that will host the records for the
-        prepared calculations.
+    database : iprPy.database.Database
+        The database that will host the records for the prepared calculations.
     run_directory : str
         The path or name for the run_directory where the prepared calculations
         are to be placed.
@@ -37,6 +34,9 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
     input_script : str or file-like object, optional
         The file, path to file, or contents of an input script containing
         parameters for preparing the calculation.
+    debug : bool
+        If set to True, will throw errors associated with failed/invalid
+        calculation builds.  Default is False.
     **kwargs : str or list
         Allows for input parameters for preparing the calculation to be
         directly specified.  Any kwargs parameters that have names matching
@@ -44,9 +44,7 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
         Values must be strings or list of strings if allowed by the
         calculation for the particular parameter.
     """
-    # Handle database and calculation
-    if isinstance(database, str):
-        database = load_database(database)
+    # Handle calculation
     if isinstance(calculation, str):
         calculation = load_calculation(calculation)
     dbwargs = {}
@@ -77,7 +75,7 @@ def prepare(database, run_directory, calculation, input_script=None, **kwargs):
     kwargs, content_dict = fill_kwargs(database, calculation, **kwargs)
     
     # Build all combinations
-    test_calcs, test_calcs_df, test_inputfiles, test_contents, content_dict = build_test_calcs(database, calculation, content_dict, **kwargs)
+    test_calcs, test_calcs_df, test_inputfiles, test_contents, content_dict = build_test_calcs(database, calculation, content_dict, debug=debug, **kwargs)
     print(len(test_calcs_df), 'calculation combinations to check', flush=True)
     if len(test_calcs_df) == 0:
         return
@@ -187,7 +185,8 @@ def fill_kwargs(database, calculation, **kwargs):
     
     return kwargs, content_dict        
 
-def build_test_calcs(database, calculation, content_dict, **kwargs):
+def build_test_calcs(database, calculation, content_dict, debug=False, 
+                     **kwargs):
     """
     Builds calculations based on iterating over the sets of kwargs values.
     
@@ -200,6 +199,9 @@ def build_test_calcs(database, calculation, content_dict, **kwargs):
     content_dict : dict
         Keys are the file name and values are the associated loaded file
         contents for extra input files needed for the calculations.
+    debug : bool
+        If set to True, will throw errors associated with failed/invalid
+        calculation builds.  Default is False.
     **kwargs : dict
         The full input parameters to use for preparing the calculations.
         
