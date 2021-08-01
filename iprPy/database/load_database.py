@@ -25,7 +25,6 @@ def load_database(name=None, style=None, host=None, **kwargs):
     Subclass of datamodelbase.Database
         The database object.
     """
-    print('iprPy.load_database', databasemanager)
     return datamodelbase.load_database(name=name, style=style, host=host,
                                        settings=settings,
                                        databasemanager=databasemanager,**kwargs)
