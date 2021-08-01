@@ -128,15 +128,15 @@ class IprPyDatabase():
             resultsfile.unlink()
 
 
-    def copy_references(self, source, includetar=True, overwrite=False):
+    def copy_references(self, dest, includetar=True, overwrite=False):
         """
-        Copies all reference record styles to the database from a source
-        database.
+        Copies all reference record styles from the current database to
+        another database.
 
         Parameters
         ----------
-        source : Database
-            The source location to copy the reference records from.
+        dest : Database
+            The destination database to copy the reference records to.
         includetar : bool, optional
             If True, the tar archives will be copied along with the records.
             If False, only the records will be copied. (Default is True).
@@ -156,8 +156,7 @@ class IprPyDatabase():
             'dislocation',
         ]
         for style in iaslist(refstyles):
-            print(style)
-            source.copy_records(self, record_style=style, includetar=includetar, overwrite=overwrite)
+            self.copy_records(dest, record_style=style, includetar=includetar, overwrite=overwrite)
 
     def get_parent_records(self, record=None, name=None, style=None,
                            ancestors=False):

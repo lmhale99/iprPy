@@ -7,8 +7,9 @@ import argparse
 # https://github.com/usnistgov/iprPy
 from . import (load_database, load_run_directory, load_calculation,
                check_modules, settings)
-from .calculation import run_paramfile2json
+from .calculation import run_calculation
 from .database import runner, prepare
+from .tools import filltemplate
 
 def command_line():
     args = command_line_parser()
@@ -17,31 +18,11 @@ def command_line():
 def command_line_actions(args):
     """
     Calls iprPy actions based on the parsed arguments
-    """
-    # Actions for subcommand build_refs
-    if args.action == 'build_refs':
-        database = load_database(args.database)
-        database.build_refs()
-    
+    """   
     # Actions for subcommand check_records
-    elif args.action == 'check_records':
+    if args.action == 'check_records':
         database = load_database(args.database)
-        style = args.record_style
-        
-        # Always refresh local calculation records
-        if database.style == 'local' and style[:12] == 'calculation_':
-            kwargs = {'refresh_cache': True}
-        else:
-            kwargs = {}
-
-        df = database.get_records_df(style=style, **kwargs)
-        print(f'{len(df)} records in database')
-        
-        # Count status values of calculations
-        if 'status' in df:
-            print(f" - {len(df[df.status=='finished'])} finished")
-            print(f" - {len(df[df.status=='not calculated'])} not finished")
-            print(f" - {len(df[df.status=='error'])} issued errors")
+        database.check_records(args.record_style)
     
     # Actions for subcommand check_modules
     elif args.action == 'check_modules':
@@ -58,8 +39,18 @@ def command_line_actions(args):
     elif args.action == 'copy_records':
         database1 = load_database(args.database1)
         database2 = load_database(args.database2)
-        database1.copy_records(database2, record_style=args.record_style)
+        database1.copy_records(database2, record_style=args.record_style,
+                               includetar=args.notar,
+                               overwrite=args.overwrite)
     
+    # Actions for subcommand copy_references
+    elif args.action == 'copy_references':
+        database1 = load_database(args.database1)
+        database2 = load_database(args.database2)
+        database1.copy_references(database2,
+                                  includetar=args.notar,
+                                  overwrite=args.overwrite)
+
     # Actions for subcommand destroy_records
     elif args.action == 'destroy_records':
         database = load_database(args.database)
@@ -70,11 +61,29 @@ def command_line_actions(args):
         database = load_database(args.database)
         run_directory = load_run_directory(args.run_directory)
         calculation = load_calculation(args.calculation)
-        prepare(database, run_directory, calculation,
-                input_script=args.input_script)
+        database.prepare(run_directory, calculation,
+                         input_script=args.input_script)
     
+    # Actions for subcommand master_prepare
+    elif args.action == 'master_prepare':
+        database = load_database(args.database)
+        database.master_prepare(input_script=args.input_script)
+
+    # Actions for subcommand get_paramfile
+    elif args.action == 'get_paramfile':
+        calculation = load_calculation(args.calculation)
+
+        paramfile = f'calc_{calculation.calc_style}.in'
+        calcdict = {}
+        for key in calculation.allkeys:
+            calcdict[key] = ''
+        with open(paramfile, 'w', encoding='UTF-8') as f:
+            f.write(filltemplate(calculation.template, calcdict, '<', '>'))
+        print(f'{paramfile} created')
+
+    # Actions for subcommand run
     elif args.action == 'run':
-        status, error = run_paramfile2json(args.filename)
+        status, error = run_calculation(args.filename)
         if status == 'finished':
             print('sim calculated successfully')
         elif status == 'error':
@@ -84,7 +93,7 @@ def command_line_actions(args):
     elif args.action == 'runner':
         database = load_database(args.database)
         run_directory = load_run_directory(args.run_directory)
-        runner(database, run_directory, calc_name=args.calc_name,
+        database.runner(run_directory, calc_name=args.calc_name,
                temp=args.temp, bidtries=args.bidtries)
     
     # Actions for subcommand set_database
@@ -100,6 +109,11 @@ def command_line_actions(args):
         for name in settings.list_databases:
             print(name)
 
+    # Actions for database
+    elif args.action == 'database':
+        database = load_database(args.database)
+        print(database)
+
     # Actions for subcommand set_run_directory
     elif args.action == 'set_run_directory':
         settings.set_run_directory(args.name)
@@ -113,6 +127,11 @@ def command_line_actions(args):
         for name in settings.list_run_directories:
             print(name)
 
+    # Actions for run_directory
+    elif args.action == 'run_directory':
+        run_directory = load_run_directory(args.run_directory)
+        print(run_directory)
+
     # Actions for directory
     elif args.action == 'directory':
         print(settings.directory)
@@ -124,18 +143,6 @@ def command_line_actions(args):
     # Actions for unset_directory
     elif args.action == 'unset_directory':
         settings.unset_directory()
-
-    # Actions for library_directory
-    elif args.action == 'library_directory':
-        print(settings.library_directory)
-
-    # Actions for set_library_directory
-    elif args.action == 'set_library_directory':
-        settings.set_library_directory(args.path)
-
-    # Actions for unset_library_directory
-    elif args.action == 'unset_library_directory':
-        settings.unset_library_directory()
 
     # Actions for runner_log_directory
     elif args.action == 'runner_log_directory':
@@ -158,12 +165,6 @@ def command_line_parser():
     """
     parser = argparse.ArgumentParser(description='iprPy high-throughput commands')
     subparsers = parser.add_subparsers(title='actions', dest='action')
-    
-    # Define subparser for build_refs
-    subparser = subparsers.add_parser('build_refs', 
-                        help='add library reference records to a database')
-    subparser.add_argument('database', nargs='?', default=None, 
-                        help='database name')
     
     # Define subparser for check_records
     subparser = subparsers.add_parser('check_records', 
@@ -196,6 +197,22 @@ def command_line_parser():
                         help='database name to copy to')
     subparser.add_argument('record_style', nargs='?', default=None,
                         help='optional record style')
+    subparser.add_argument('-n', '--notar', action='store_false',
+                        help="don't copy tar archives associated with the records")
+    subparser.add_argument('-o', '--overwrite', action='store_true',
+                        help='overwrite and update any records already in database2')
+
+    # Define subparser for copy_references
+    subparser = subparsers.add_parser('copy_references',
+                        help='copy all reference record styles from one database to another')
+    subparser.add_argument('database1', nargs='?', default=None,
+                        help='database name to copy from')
+    subparser.add_argument('database2', nargs='?', default=None,
+                        help='database name to copy to')
+    subparser.add_argument('-n', '--notar', action='store_false',
+                        help="don't copy tar archives associated with the records")
+    subparser.add_argument('-o', '--overwrite', action='store_true',
+                        help='overwrite and update any records already in database2')
     
     # Define subparser for destroy_records
     subparser = subparsers.add_parser('destroy_records',
@@ -217,6 +234,14 @@ def command_line_parser():
     subparser.add_argument('input_script',
                         help='input parameter script')
     
+    # Define subparser for master_prepare
+    subparser = subparsers.add_parser('master_prepare',
+                        help='prepare multiple calculations using iprPy workflow')
+    subparser.add_argument('database',
+                        help='database name')
+    subparser.add_argument('input_script',
+                        help='input parameter script')
+
     # Define subparser for run
     subparser = subparsers.add_parser('run',
                         help='run a single calculation from a parameter file')
@@ -253,6 +278,12 @@ def command_line_parser():
     subparser.add_argument('name', nargs='?', default=None,
                         help='name assigned to the database')
     
+    # Define subparser for database
+    subparser = subparsers.add_parser('database',
+                        help='check info on a set database')
+    subparser.add_argument('database', nargs='?', default=None,
+                        help='database name')
+
     # Define subparser for list_run_directories
     subparser = subparsers.add_parser('list_run_directories',
                         help='prints the names of all set run_directory paths')
@@ -269,6 +300,12 @@ def command_line_parser():
     subparser.add_argument('name', nargs='?', default=None,
                         help='name assigned to the run_directory')
     
+    # Define subparser for run_directory
+    subparser = subparsers.add_parser('run_directory',
+                        help='check info on a set run_directory')
+    subparser.add_argument('run_directory', nargs='?', default=None,
+                        help='run_directory name')
+
     # Define subparser for directory
     subparser = subparsers.add_parser('directory',
                         help='prints the path where iprPy settings are saved')
@@ -282,20 +319,6 @@ def command_line_parser():
     # Define subparser for unset_directory
     subparser = subparsers.add_parser('unset_directory',
                         help="revert to using iprPy's default settings directory path <home>/.iprPy/")
-
-    # Define subparser for library_directory
-    subparser = subparsers.add_parser('library_directory',
-                        help='prints the path where the iprPy library is located')
-
-    # Define subparser for set_library_directory
-    subparser = subparsers.add_parser('set_library_directory',
-                        help='define the path where the iprPy library is located')
-    subparser.add_argument('path', nargs='?', default=None,
-                        help='path for the directory')
-    
-    # Define subparser for unset_library_directory
-    subparser = subparsers.add_parser('unset_library_directory',
-                        help="revert to using default location of <directory>/library/")
 
     # Define subparser for runner_log_directory
     subparser = subparsers.add_parser('runner_log_directory',
