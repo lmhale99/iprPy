@@ -4,6 +4,9 @@
 # Standard Python libraries
 import argparse
 
+# https://github.com/usnistgov/atomman
+import atomman as am
+
 # https://github.com/usnistgov/iprPy
 from . import (load_database, load_run_directory, load_calculation,
                check_modules, settings)
@@ -69,8 +72,8 @@ def command_line_actions(args):
         database = load_database(args.database)
         database.master_prepare(input_script=args.input_script)
 
-    # Actions for subcommand get_paramfile
-    elif args.action == 'get_paramfile':
+    # Actions for subcommand template
+    elif args.action == 'template':
         calculation = load_calculation(args.calculation)
 
         paramfile = f'calc_{calculation.calc_style}.in'
@@ -81,13 +84,47 @@ def command_line_actions(args):
             f.write(filltemplate(calculation.template, calcdict, '<', '>'))
         print(f'{paramfile} created')
 
+    # Actions for subcommand templatedoc
+    elif args.action == 'templatedoc':
+        calculation = load_calculation(args.calculation)
+        print(calculation.templatedoc)
+
+    elif args.action == 'get_lammps_potential':
+        copy = args.copy
+
+        # Initialize an atomman library database
+        potdb = am.library.Database(
+            local_name=args.local,
+            remote_name=args.remote)
+
+        # Set pot_dir_style based on copy's value
+        if copy is True:
+            pot_dir_style='id'
+        else:
+            pot_dir_style='local'
+
+        # Get LAMMPS potential record
+        lammps_potential = potdb.get_lammps_potential(
+            id = args.lammps_potential_id,
+            pot_dir_style=pot_dir_style,
+            verbose=True)
+        print()
+
+        # Save record to the working directory
+        with open(f'{lammps_potential.name}.json', 'w', encoding='UTF-8') as f:
+            lammps_potential.model.json(fp=f, indent=4, ensure_ascii=False)    
+        print(f'{lammps_potential.name}.json copied to working directory' )    
+            
+        if copy is True:
+            # Copy parameter files
+            potdb.get_lammps_potential_files(lammps_potential, verbose=True)
+            print('potential_dir is:', lammps_potential.pot_dir)
+        else:
+            print('potential_dir is:', lammps_potential.pot_dir)
+
     # Actions for subcommand run
     elif args.action == 'run':
-        status, error = run_calculation(args.filename)
-        if status == 'finished':
-            print('sim calculated successfully')
-        elif status == 'error':
-            print('error:', error)
+        run_calculation(args.filename)
 
     # Actions for subcommand runner
     elif args.action == 'runner':
@@ -241,6 +278,30 @@ def command_line_parser():
                         help='database name')
     subparser.add_argument('input_script',
                         help='input parameter script')
+
+    # Define subparser for template
+    subparser = subparsers.add_parser('template',
+                        help='save an empty input script for a calculation to the working directory.')
+    subparser.add_argument('calculation',
+                        help='calculation name')
+
+    # Define subparser for templatedoc
+    subparser = subparsers.add_parser('templatedoc',
+                        help="view the documentation for a calculation's input script.")
+    subparser.add_argument('calculation',
+                        help='calculation name')
+
+    # Define subparser for get_lammps_potential
+    subparser = subparsers.add_parser('get_lammps_potential',
+                        help="copy/download a LAMMPS potential record (and parameter files).")
+    subparser.add_argument('lammps_potential_id',
+                        help='the id of the LAMMPS potential to get')
+    subparser.add_argument('-c', '--copy', action='store_true',
+                        help='if set, the parameter files will be copied as well')
+    subparser.add_argument('-l', '--local', default=None,
+                        help='a different local database name to search')      
+    subparser.add_argument('-r', '--remote', default=None,
+                        help='a different remote database name to search')     
 
     # Define subparser for run
     subparser = subparsers.add_parser('run',
