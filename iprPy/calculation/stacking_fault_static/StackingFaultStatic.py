@@ -41,6 +41,8 @@ class StackingFaultStatic(Calculation):
         self.__system = AtommanSystemLoad(self)
         self.__minimize = LammpsMinimize(self)
         self.__defect = StackingFault(self)
+        self.__subsets = [self.commands, self.potential, self.system,
+                          self.minimize, self.defect, self.units]
 
         # Initialize unique calculation attributes
         self.a1 = 0.0
@@ -60,6 +62,14 @@ class StackingFaultStatic(Calculation):
 
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
+
+    @property
+    def filenames(self):
+        """list: the names of each file used by the calculation."""
+        return [
+            'stacking_fault_static.py',
+            'sfmin.template'
+        ]
 
 ############################## Class attributes ################################
 
@@ -92,6 +102,11 @@ class StackingFaultStatic(Calculation):
     def defect(self):
         """StackingFault subset"""
         return self.__defect
+
+    @property
+    def subsets(self):
+        """list of all subsets"""
+        return self.__subsets
 
     @property
     def a1(self):
@@ -257,31 +272,17 @@ class StackingFaultStatic(Calculation):
             The full set of prepare parameters based on the workflow branch
         """
         raise NotImplementedError('Not implemented for this calculation style')
-        
+    
     @property
-    def template(self):
-        """str: The template to use for generating calc.in files."""
-        
-        # Build universal content
-        template = super().template
+    def templatekeys(self):
+        """dict : The calculation-specific input keys and their descriptions."""
 
-        # Build subset content
-        template += self.commands.template()
-        template += self.potential.template()
-        template += self.system.template()
-        template += self.defect.template()
-        template += self.minimize.template()
-        template += self.units.template()
-        
-        # Build calculation-specific content
-        header = 'Run parameters'
-        keys = [
-            'stackingfault_a1',
-            'stackingfault_a2', 
-        ]
-        template += self._template_builder(header, keys)
-        
-        return template     
+        return {
+            'stackingfault_a1': ' '.join([
+                "The fractional shift to apply along the a1 direction."]),
+            'stackingfault_a2': ' '.join([
+                "The fractional shift to apply along the a2 direction."]),
+        } 
 
     @property
     def singularkeys(self):

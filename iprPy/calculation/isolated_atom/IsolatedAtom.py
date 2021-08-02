@@ -33,6 +33,7 @@ class IsolatedAtom(Calculation):
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
         self.__units = Units(self)
+        self.__subsets = [self.commands, self.potential, self.units]
 
         # Initialize unique calculation attributes
         self.__isolated_atom_energy = {}
@@ -42,6 +43,14 @@ class IsolatedAtom(Calculation):
 
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
+
+    @property
+    def filenames(self):
+        """list: the names of each file used by the calculation."""
+        return [
+            'isolated_atom.py',
+            'run0.template'
+        ]
 
 ############################## Class attributes ################################               
 
@@ -59,6 +68,11 @@ class IsolatedAtom(Calculation):
     def units(self):
         """Units subset"""
         return self.__units
+
+    @property
+    def subsets(self):
+        """list of all subsets"""
+        return self.__subsets
     
     @property
     def isolated_atom_energy(self):
@@ -154,22 +168,6 @@ class IsolatedAtom(Calculation):
             raise ValueError(f'Unknown branch {branch}')
 
         return params
-
-    @property
-    def template(self):
-        """str: The template to use for generating calc.in files."""
-        # Build universal content
-        template = super().template
-
-        # Build subset content
-        template += self.commands.template()
-        template += self.potential.template()
-        template += self.units.template()
-
-        # Build calculation-specific content
-        
-        # Return template
-        return template
 
     @property
     def singularkeys(self):

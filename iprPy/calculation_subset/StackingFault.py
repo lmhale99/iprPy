@@ -22,7 +22,8 @@ class StackingFault(CalculationSubset):
 
 ############################# Core properties #################################
      
-    def __init__(self, parent, prefix=''):
+    def __init__(self, parent, prefix='', templateheader=None,
+                 templatedescription=None):
         """
         Initializes a calculation record subset object.
 
@@ -36,8 +37,13 @@ class StackingFault(CalculationSubset):
             An optional prefix to add to metadata field names to allow for
             differentiating between multiple subsets of the same style within
             a single record
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
         """
-        super().__init__(parent, prefix=prefix)
+        super().__init__(parent, prefix=prefix, templateheader=templateheader,
+                         templatedescription=templatedescription)
 
         self.param_file = None
         self.key = None
@@ -276,29 +282,75 @@ class StackingFault(CalculationSubset):
 
 ####################### Parameter file interactions ###########################
 
-    @property
-    def templateheader(self):
-        """str : The default header to use in the template file for the subset"""
-        return '# Stacking fault defect parameters'
+    def _template_init(self, templateheader=None, templatedescription=None):
+        """
+        Sets the template header and description values.
+
+        Parameters
+        ----------
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
+        """
+        # Set default template header
+        if templateheader is None:
+            templateheader = 'Stacking Fault'
+
+        # Set default template description
+        if templatedescription is None:
+            templatedescription = ' '.join([
+                "Specifies the parameter set that defines a stacking fault."])
+        
+        super()._template_init(templateheader, templatedescription)
 
     @property
     def templatekeys(self):
-        """
-        list : The input keys (without prefix) that appear in the input file.
-        """
-        return [
-            'stackingfault_file',
-            'stackingfault_hkl',
-            'stackingfault_a1vect_uvw',
-            'stackingfault_a2vect_uvw',
-            'stackingfault_cellsetting',
-            'stackingfault_cutboxvector',
-            'stackingfault_shiftindex',
-            'stackingfault_faultpos_rel',
-            'sizemults',
-            'stackingfault_minwidth',
-            'stackingfault_even',
-        ]
+        """dict : The subset-specific input keys and their descriptions."""
+        
+        return {
+            'stackingfault_file': ' '.join([
+                "The path to a stacking_fault record file that collects the",
+                "parameters associated with a specific stacking fault."]),
+            'stackingfault_hkl': ' '.join([
+                "The Miller (hkl) plane for the fault plane given as three",
+                "space-delimited integers."]),
+            'stackingfault_a1vect_uvw': ' '.join([
+                "The Miller [uvw] vector to use for the a1 shift vector",
+                "given as three space-delimited floats."]),
+            'stackingfault_a2vect_uvw': ' '.join([
+                "The Miller [uvw] vector to use for the a2 shift vector",
+                "given as three space-delimited floats."]),
+            'stackingfault_cellsetting': ' '.join([
+                "The conventional cell setting to take stackingfault_hkl relative to",
+                "if the loaded unit cell is a primitive cell.  Allowed values are 'p',",
+                "'c', 'i', 'a', 'b' and 'c'."]),
+            'stackingfault_cutboxvector': ' '.join([
+                "Indicates which of the three box vectors ('a', 'b', or 'c')",
+                "that the surface and fault planes will be made along.",
+                "Default value is 'c'."]),
+            'stackingfault_shiftindex': ' '.join([
+                "A rigid body shift will be applied to the atoms such that the",
+                "created surface plane will be halfway between two atomic planes.",
+                "This is an integer value that changes which set of atomic planes",
+                "that the plane is inserted between.  Changing this effectively",
+                "changes the termination planes."]),
+            'stackingfault_faultpos_rel': ' '.join([
+                "A fractional coordinate from 0 to 1 indicating where along the",
+                "cutboxvector to position the fault plane. Default value is 0.5,",
+                "which if stackingfault_even is True will result in the same",
+                "termination planes at the free surface and the stacking fault."]),
+            'sizemults': ' '.join([
+                "Multiplication parameters to construct a supercell from the rotated",
+                "system.  Limited to three values for stacking fault generation."]),
+            'stackingfault_minwidth': ' '.join([
+                "Specifies a mimimum width in length units that the system must be",
+                "along the cutboxvector direction. The associated sizemult value",
+                "will be increased if necessary to ensure this. Default value is 0.0."]),
+            'stackingfault_even': ' '.join([
+                "If True, the number of replicas in the cutboxvector direction will"
+                "be even. Default value is False."]),
+        }
     
     @property
     def preparekeys(self):
@@ -307,7 +359,7 @@ class StackingFault(CalculationSubset):
         Typically, this is templatekeys plus *_content keys so prepare can access
         content before it exists in the calc folders being prepared.
         """
-        return self.templatekeys + [
+        return list(self.templatekeys.keys()) + [
             'stackingfault_family',
             'stackingfault_content',
         ]

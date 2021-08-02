@@ -15,14 +15,15 @@ import atomman.unitconvert as uc
 
 from . import CalculationSubset
 from ..tools import dict_insert, aslist
-from ..input import termtodict, dicttoterm, boolean
+from ..input import termtodict, dicttoterm, boolean, value
 
 class Dislocation(CalculationSubset):
     """Handles calculation terms for dislocation parameters"""
 
 ############################# Core properties #################################
      
-    def __init__(self, parent, prefix=''):
+    def __init__(self, parent, prefix='', templateheader=None,
+                 templatedescription=None):
         """
         Initializes a calculation record subset object.
 
@@ -36,8 +37,13 @@ class Dislocation(CalculationSubset):
             An optional prefix to add to metadata field names to allow for
             differentiating between multiple subsets of the same style within
             a single record
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
         """
-        super().__init__(parent, prefix=prefix)
+        super().__init__(parent, prefix=prefix, templateheader=templateheader,
+                         templatedescription=templatedescription)
 
         self.param_file = None
         self.key = None
@@ -428,31 +434,95 @@ class Dislocation(CalculationSubset):
         
 ####################### Parameter file interactions ###########################
 
-    @property
-    def templateheader(self):
-        """str : The default header to use in the template file for the subset"""
-        return '# Dislocation defect parameters'
+    def _template_init(self, templateheader=None, templatedescription=None):
+        """
+        Sets the template header and description values.
+
+        Parameters
+        ----------
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
+        """
+        # Set default template header
+        if templateheader is None:
+            templateheader = 'Dislocation'
+
+        # Set default template description
+        if templatedescription is None:
+            templatedescription = ' '.join([
+                "Specifies the parameter set that defines a dislocation type",
+                "and how to orient it relative to the atomic system."])
+        
+        super()._template_init(templateheader, templatedescription)
 
     @property
     def templatekeys(self):
-        """
-        list : The input keys (without prefix) that appear in the input file.
-        """
-        return [
-            'dislocation_file',
-            'dislocation_slip_hkl',
-            'dislocation_ξ_uvw',
-            'dislocation_burgers',
-            'dislocation_m',
-            'dislocation_n',
-            'dislocation_shift',
-            'dislocation_shiftscale',
-            'dislocation_shiftindex',
-            'sizemults',
-            'amin',
-            'bmin',
-            'cmin',
-        ]
+        """dict : The subset-specific input keys and their descriptions."""
+        
+        return {
+            'dislocation_file': ' '.join([
+                "The path to a dislocation record file that collects the",
+                "parameters for a specific dislocation type."]),
+            'dislocation_slip_hkl': ' '.join([
+                "The Miller (hkl) slip plane for the dislocation given as three",
+                "space-delimited integers."]),
+            'dislocation_ξ_uvw': ' '.join([
+                "The Miller [uvw] line vector direction for the dislocation given",
+                "as three space-delimited integers. The angle between burgers and",
+                "ξ_uvw determines the dislocation's character."]),
+            'dislocation_burgers': ' '.join([
+                "The Miller Burgers vector for the dislocation given as three",
+                "space-delimited floats."]),
+            'dislocation_m': ' '.join([
+                "The Cartesian vector of the final system that the dislocation",
+                "solution's m vector (in-plane, perpendicular to ξ) should align",
+                "with. Given as three space-delimited numbers.  Limited to being"
+                "parallel to one of the three Cartesian axes."]),
+            'dislocation_n': ' '.join([
+                "The Cartesian vector of the final system that the dislocation",
+                "solution's n vector (slip plane normal) should align",
+                "with. Given as three space-delimited numbers.  Limited to being"
+                "parallel to one of the three Cartesian axes."]),
+            'dislocation_shift': ' '.join([
+                "A rigid body shift to apply to the atoms in the system after it",
+                "has been rotated to the correct orientation.  This controls where",
+                "the dislocation is placed relative to the atomic positions as the",
+                "dislocation line is always inserted at coordinates (0,0) for the",
+                "two Cartesian axes aligned with m and n.  Specified as three",
+                "floating point numbers."]),
+            'dislocation_shiftscale': ' '.join([
+                "boolean indicating if the dislocation_shift value is a Cartesian",
+                "vector (False, default) or if it is scaled relative to the rotated cell's",
+                "box parameters prior to applying sizemults."]),
+            'dislocation_shiftindex': ' '.join([
+                "An integer that if given will result in a shift being automatically",
+                "determined and used such that the dislocation's slip plane will be",
+                "positioned halfway between two atomic planes.  Changing the integer",
+                "value changes which set of planes the slip plane is positioned between.",
+                "Note that shiftindex values only shift atoms in the slip plane normal",
+                "direction and therefore may not be the ideal positions for some",
+                "dislocation cores."]),
+            'sizemults': ' '.join([
+                "Multiplication parameters to construct a supercell from the rotated",
+                "system.  Limited to three values for dislocation generation.",
+                "Values must be even for the two box vectors not aligned with the",
+                "dislocation line.  The system will be replicated equally in the",
+                "positive and negative directions for those two box vectors."]),
+            'amin': ' '.join([
+                "Specifies a minimum width in length units that the resulting",
+                "system's a box vector must have.  The associated sizemult value",
+                "will be increased if necessary to ensure this. Default value is 0.0."]),
+            'bmin': ' '.join([
+                "Specifies a minimum width in length units that the resulting",
+                "system's b box vector must have.  The associated sizemult value",
+                "will be increased if necessary to ensure this. Default value is 0.0."]),
+            'cmin': ' '.join([
+                "Specifies a minimum width in length units that the resulting",
+                "system's c box vector must have.  The associated sizemult value",
+                "will be increased if necessary to ensure this. Default value is 0.0."]),
+        }
     
     @property
     def preparekeys(self):
@@ -461,7 +531,7 @@ class Dislocation(CalculationSubset):
         Typically, this is templatekeys plus *_content keys so prepare can access
         content before it exists in the calc folders being prepared.
         """
-        return self.templatekeys + [
+        return list(self.templatekeys.keys()) + [
             'dislocation_family',
             'dislocation_content',
         ]
@@ -563,9 +633,13 @@ class Dislocation(CalculationSubset):
         # Set default values for fault system manipulations
         sizemults = input_dict.get(keymap['sizemults'], '1 1 1')
         self.sizemults = np.array(sizemults.strip().split(), dtype=int)
-        self.amin = float(input_dict.get(keymap['amin'], 0.0))
-        self.bmin = float(input_dict.get(keymap['bmin'], 0.0))
-        self.cmin = float(input_dict.get(keymap['cmin'], 0.0))
+        
+        self.amin = value(input_dict, keymap['amin'], default_term='0.0 angstrom',
+                          default_unit=self.parent.units.length_unit)
+        self.bmin = value(input_dict, keymap['bmin'], default_term='0.0 angstrom',
+                          default_unit=self.parent.units.length_unit)
+        self.cmin = value(input_dict, keymap['cmin'], default_term='0.0 angstrom',
+                          default_unit=self.parent.units.length_unit)
 
 ########################### Data model interactions ###########################
 

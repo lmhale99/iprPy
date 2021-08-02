@@ -40,6 +40,8 @@ class RelaxDynamic(Calculation):
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
         self.__system_mods = AtommanSystemManipulate(self)
+        self.__subsets = [self.commands, self.potential, self.system,
+                          self.system_mods, self.units]
 
         # Initialize unique calculation attributes
         self.pressure_xx = 0.0
@@ -91,6 +93,14 @@ class RelaxDynamic(Calculation):
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
 
+    @property
+    def filenames(self):
+        """list: the names of each file used by the calculation."""
+        return [
+            'relax_dynamic.py',
+            'full_relax.template'
+        ]
+
 ############################## Class attributes ################################
 
     @property
@@ -118,6 +128,11 @@ class RelaxDynamic(Calculation):
         """AtommanSystemManipulate subset"""
         return self.__system_mods
     
+    @property
+    def subsets(self):
+        """list of all subsets"""
+        return self.__subsets
+
     @property
     def pressure_xx(self):
         """float: Target relaxation pressure component xx"""
@@ -653,29 +668,51 @@ class RelaxDynamic(Calculation):
         return params
 
     @property
-    def template(self):
-        """
-        str: The template to use for generating calc.in files.
-        """
-        # Build universal content
-        template = super().template
+    def templatekeys(self):
+        """dict : The calculation-specific input keys and their descriptions."""
 
-        # Build subset content
-        template += self.commands.template()
-        template += self.potential.template()
-        template += self.system.template()
-        template += self.system_mods.template()
-        template += self.units.template()
+        return {
+            'temperature': ' '.join([
+                "Target temperature for the simulations.  Default value is 0."]),
+            'pressure_xx': ' '.join([
+                "The Pxx normal pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'pressure_yy': ' '.join([
+                "The Pyy normal pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'pressure_zz': ' '.join([
+                "The Pzz normal pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'pressure_xy': ' '.join([
+                "The Pxy shear pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'pressure_xz': ' '.join([
+                "The Pxz shear pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'pressure_yz': ' '.join([
+                "The Pyz shear pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'integrator': ' '.join([
+                "The MD integration scheme to use.  Default value is"
+                "'nph+l' for temperature = 0, and 'npt' otherwise."]),
+            'thermosteps': ' '.join([
+                "How often LAMMPS will print thermo data.  Default value is",
+                "runsteps//1000 or 1 if runsteps is less than 1000."]),
+            'dumpsteps': ' '.join([
+                "How often LAMMPS will save the atomic configuration to a",
+                "LAMMPS dump file.  Default value is runsteps, meaning only",
+                "the first and last states are saved."]),
+            'runsteps': ' '.join([
+                "The total number of MD integration steps to run including",
+                "equil steps."]),
+            'equilsteps': ' '.join([
+                "The number of MD integration steps at the beginning of",
+                "the simulation to ignore as equilibration time."]),
+            'randomseed': ' '.join([
+                "An int random number seed to use for generating initial velocities.",
+                "A random int will be selected if not given."]),
 
-        # Build calculation-specific content
-        header = 'Run parameters'
-        keys = ['temperature', 'pressure_xx', 'pressure_yy', 'pressure_zz',
-                'pressure_xy', 'pressure_xz', 'pressure_yz', 'integrator',
-                'thermosteps', 'dumpsteps', 'runsteps', 'equilsteps',
-                'randomseed']
-        template += self._template_builder(header, keys)
-        
-        return template     
+        }  
 
     @property
     def singularkeys(self):

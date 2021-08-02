@@ -13,7 +13,8 @@ class LammpsMinimize(CalculationSubset):
     
 ############################# Core properties #################################
      
-    def __init__(self, parent, prefix=''):
+    def __init__(self, parent, prefix='', templateheader=None,
+                 templatedescription=None):
         """
         Initializes a calculation record subset object.
 
@@ -27,8 +28,13 @@ class LammpsMinimize(CalculationSubset):
             An optional prefix to add to metadata field names to allow for
             differentiating between multiple subsets of the same style within
             a single record
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
         """
-        super().__init__(parent, prefix=prefix)
+        super().__init__(parent, prefix=prefix, templateheader=templateheader,
+                         templatedescription=templatedescription)
 
         self.energytolerance = 0.0
         self.forcetolerance = 0.0
@@ -120,23 +126,56 @@ class LammpsMinimize(CalculationSubset):
 
 ####################### Parameter file interactions ###########################
 
-    @property
-    def templateheader(self):
-        """str : The default header to use in the template file for the subset"""
-        return '# Energy/force minimization parameters'
+    def _template_init(self, templateheader=None, templatedescription=None):
+        """
+        Sets the template header and description values.
+
+        Parameters
+        ----------
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
+        """
+        # Set default template header
+        if templateheader is None:
+            templateheader = 'LAMMPS Energy/Force Minimization'
+
+        # Set default template description
+        if templatedescription is None:
+            templatedescription = ' '.join([
+                "Specifies the parameters and options associated with performing",
+                "an energy and/or force minimization in LAMMPS."])
+        
+        super()._template_init(templateheader, templatedescription)
 
     @property
     def templatekeys(self):
-        """
-        list : The input keys (without prefix) that appear in the input file.
-        """
-        return  [
-                    'energytolerance',
-                    'forcetolerance',
-                    'maxiterations',
-                    'maxevaluations',
-                    'maxatommotion',
-                ]
+        """dict : The subset-specific input keys and their descriptions."""
+        
+        return  {
+            'energytolerance': ' '.join([
+                "The energy tolerance to use for the minimization. This value is",
+                "unitless and corresponds to the etol term for the LAMMPS",
+                "minimize command. Default value is 0.0."]),
+            'forcetolerance': ' '.join([
+                "The force tolerance to use for the minimization. This value is",
+                "in force units and corresponds to the ftol term for the LAMMPS",
+                "minimize command. Default value is '0.0 eV/angstrom'."]),
+            'maxiterations': ' '.join([
+                "The maximum number of iterations to use for the minimization.",
+                "This value corresponds to the maxiter term for the LAMMPS",
+                "minimize command. Default value is 100000."]),
+            'maxevaluations': ' '.join([
+                "The maximum number of iterations to use for the minimization.",
+                "This value corresponds to the maxeval term for the LAMMPS",
+                "minimize command. Default value is 1000000."]),
+            'maxatommotion': ' '.join([
+                "The maximum distance that any atom can move during a minimization",
+                "iteration. This value is in units length and corresponds to the",
+                "dmax term for the LAMMPS min_modify command. Default value is",
+                "'0.01 angstrom'."]),
+        }
     
     @property
     def preparekeys(self):
@@ -145,7 +184,7 @@ class LammpsMinimize(CalculationSubset):
         Typically, this is templatekeys plus *_content keys so prepare can access
         content before it exists in the calc folders being prepared.
         """
-        return  self.templatekeys + []
+        return  list(self.templatekeys.keys()) + []
 
     @property
     def interpretkeys(self):

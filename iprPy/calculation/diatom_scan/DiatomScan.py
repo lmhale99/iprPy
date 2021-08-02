@@ -37,6 +37,7 @@ class DiatomScan(Calculation):
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
         self.__units = Units(self)
+        self.__subsets = [self.commands, self.potential, self.units]
 
         # Initialize unique calculation attributes
         self.symbols = []
@@ -51,6 +52,14 @@ class DiatomScan(Calculation):
 
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
+
+    @property
+    def filenames(self):
+        """list: the names of each file used by the calculation."""
+        return [
+            'diatom_scan.py',
+            'run0.template'
+        ]
 
 ############################## Class attributes ###############################                
 
@@ -69,6 +78,11 @@ class DiatomScan(Calculation):
         """Units subset"""
         return self.__units
     
+    @property
+    def subsets(self):
+        """list of all subsets"""
+        return self.__subsets
+
     @property
     def symbols(self):
         """The potential symbols to use"""
@@ -259,24 +273,23 @@ class DiatomScan(Calculation):
 
         return params
 
-
     @property
-    def template(self):
-        """str: The template to use for generating calc.in files."""
-        # Build universal content
-        template = super().template
+    def templatekeys(self):
+        """dict : The calculation-specific input keys and their descriptions."""
 
-        # Build subset content
-        template += self.commands.template()
-        template += self.potential.template()
-        template += self.units.template()
-
-        # Build calculation-specific content
-        header = 'Run parameters'
-        keys = ['symbols', 'minimum_r', 'maximum_r', 'number_of_steps_r']
-        template += self._template_builder(header, keys)
-        
-        return template   
+        return {
+            'symbols': ' '.join([
+                "The one or two model symbols to perform the scan for."]),
+            'minimum_r': ' '.join([
+                "The minimum interatomic spacing, r, for the scan.  Default",
+                "value is '0.02 angstrom'."]),
+            'maximum_r': ' '.join([
+                "The maximum interatomic spacing, r, for the scan.  Default"
+                "value is '6.0 angstrom'."]),
+            'number_of_steps_r': ' '.join([
+                "The number of interatomic spacing values, r, to use.  Default"
+                "value is 300."]),
+        } 
 
     @property
     def singularkeys(self):

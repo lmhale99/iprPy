@@ -40,6 +40,8 @@ class RelaxStatic(Calculation):
         self.__system = AtommanSystemLoad(self)
         self.__system_mods = AtommanSystemManipulate(self)
         self.__minimize = LammpsMinimize(self)
+        self.__subsets = [self.commands, self.potential, self.system,
+                          self.system_mods, self.minimize, self.units]
 
         # Initialize unique calculation attributes
         self.pressure_xx = 0.0
@@ -68,6 +70,14 @@ class RelaxStatic(Calculation):
 
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
+
+    @property
+    def filenames(self):
+        """list: the names of each file used by the calculation."""
+        return [
+            'relax_static.py',
+            'minbox.template'
+        ]
 
 ############################## Class attributes ################################
 
@@ -100,6 +110,11 @@ class RelaxStatic(Calculation):
     def minimize(self):
         """LammpsMinimize subset"""
         return self.__minimize
+
+    @property
+    def subsets(self):
+        """list of all subsets"""
+        return self.__subsets
 
     @property
     def pressure_xx(self):
@@ -449,29 +464,43 @@ class RelaxStatic(Calculation):
         return params
 
     @property
-    def template(self):
-        """
-        str: The template to use for generating calc.in files.
-        """
-        # Build universal content
-        template = super().template
+    def templatekeys(self):
+        """dict : The calculation-specific input keys and their descriptions."""
 
-        # Build subset content
-        template += self.commands.template()
-        template += self.potential.template()
-        template += self.system.template()
-        template += self.system_mods.template()
-        template += self.minimize.template()
-        template += self.units.template()
-
-        # Build calculation-specific content
-        header = 'Run parameters'
-        keys = ['pressure_xx', 'pressure_yy', 'pressure_zz',
-                'pressure_xy', 'pressure_xz', 'pressure_yz',
-                'displacementkick', 'maxcycles', 'cycletolerance']
-        template += self._template_builder(header, keys)
-        
-        return template     
+        return {
+            'pressure_xx': ' '.join([
+                "The Pxx normal pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'pressure_yy': ' '.join([
+                "The Pyy normal pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'pressure_zz': ' '.join([
+                "The Pzz normal pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'pressure_xy': ' '.join([
+                "The Pxy shear pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'pressure_xz': ' '.join([
+                "The Pxz shear pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'pressure_yz': ' '.join([
+                "The Pyz shear pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'displacementkick': ' '.join([
+                "A multiplier for applying a small random displacement",
+                "to all atoms prior to relaxing.  Giving this can break",
+                "the system's initial symmetry to avoid the relaxation",
+                "calculation being constrained by too perfect of symmetry.",
+                "Default value is '0.0 angstrom', i.e. no kick."]),
+            'maxcycles': ' '.join([
+                "The maximum number of minimization runs (cycles) to perform.",
+                "Specifying '1' means that only one minimization is performed",
+                "and no check is made for convergence.  Default value is '100'."]),
+            'cycletolerance': ' '.join([
+                "The tolerance to use in determining if the lattice constants",
+                "have converged between two minimization runs (cycles).  Default",
+                "value is '1e-10 angstrom'."]),
+        }     
 
     @property
     def singularkeys(self):

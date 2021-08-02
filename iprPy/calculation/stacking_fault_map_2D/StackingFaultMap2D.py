@@ -112,6 +112,8 @@ class StackingFaultMap2D(Calculation):
         self.__system = AtommanSystemLoad(self)
         self.__minimize = LammpsMinimize(self)
         self.__defect = StackingFault(self)
+        self.__subsets = [self.commands, self.potential, self.system,
+                          self.minimize, self.defect, self.units]
 
         # Initialize unique calculation attributes
         self.num_a1 = 10
@@ -124,6 +126,14 @@ class StackingFaultMap2D(Calculation):
 
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
+
+    @property
+    def filenames(self):
+        """list: the names of each file used by the calculation."""
+        return [
+            'stacking_fault_map_2D.py',
+            'sfmin.template'
+        ]
 
 ############################## Class attributes ################################
 
@@ -156,6 +166,11 @@ class StackingFaultMap2D(Calculation):
     def defect(self):
         """StackingFault subset"""
         return self.__defect
+
+    @property
+    def subsets(self):
+        """list of all subsets"""
+        return self.__subsets
 
     @property
     def num_a1(self):
@@ -325,31 +340,19 @@ class StackingFaultMap2D(Calculation):
             raise ValueError(f'Unknown branch {branch}')
 
         return params
-        
+    
     @property
-    def template(self):
-        """str: The template to use for generating calc.in files."""
-        
-        # Build universal content
-        template = super().template
+    def templatekeys(self):
+        """dict : The calculation-specific input keys and their descriptions."""
 
-        # Build subset content
-        template += self.commands.template()
-        template += self.potential.template()
-        template += self.system.template()
-        template += self.defect.template()
-        template += self.minimize.template()
-        template += self.units.template()
-        
-        # Build calculation-specific content
-        header = 'Run parameters'
-        keys = [
-            'stackingfault_num_a1',
-            'stackingfault_num_a2', 
-        ]
-        template += self._template_builder(header, keys)
-        
-        return template     
+        return {
+            'stackingfault_num_a1': ' '.join([
+                "The number of fractional shift steps to measure along the a1",
+                "shift vector. Default value is 10."]),
+            'stackingfault_num_a2': ' '.join([
+                "The number of fractional shift steps to measure along the a2",
+                "shift vector. Default value is 10."]),
+        }  
 
     @property
     def singularkeys(self):

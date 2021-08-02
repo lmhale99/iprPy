@@ -20,7 +20,8 @@ class AtommanGammaSurface(CalculationSubset):
     
 ############################# Core properties #################################
      
-    def __init__(self, parent, prefix=''):
+    def __init__(self, parent, prefix='', templateheader=None,
+                 templatedescription=None):
         """
         Initializes a calculation record subset object.
 
@@ -34,8 +35,13 @@ class AtommanGammaSurface(CalculationSubset):
             An optional prefix to add to metadata field names to allow for
             differentiating between multiple subsets of the same style within
             a single record
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
         """
-        super().__init__(parent, prefix=prefix)
+        super().__init__(parent, prefix=prefix, templateheader=templateheader,
+                         templatedescription=templatedescription)
 
         self.gammasurface_file = None
         self.__gammasurface_content = None
@@ -76,19 +82,37 @@ class AtommanGammaSurface(CalculationSubset):
 
 ####################### Parameter file interactions ###########################
 
-    @property
-    def templateheader(self):
-        """str : The default header to use in the template file for the subset"""
-        return '# Gamma surface parameters'
+    def _template_init(self, templateheader=None, templatedescription=None):
+        """
+        Sets the template header and description values.
+
+        Parameters
+        ----------
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
+        """
+        # Set default template header
+        if templateheader is None:
+            templateheader = 'Gamma Surface'
+
+        # Set default template description
+        if templatedescription is None:
+            templatedescription = "Specifies the gamma surface results to load."
+        
+        super()._template_init(templateheader, templatedescription)
 
     @property
     def templatekeys(self):
-        """
-        list : The input keys (without prefix) that appear in the input file.
-        """
-        return [
-            'gammasurface_file',
-        ]
+        """dict : The subset-specific input keys and their descriptions."""
+        
+        return {
+            'gammasurface_file': ' '.join([
+                "The path to a file that contains a data model associated with",
+                "an atomman.defect.GammaSurface object.  Can be a record for a",
+                "finished stacking_fault_map_2D calculation."])
+        }
     
     @property
     def preparekeys(self):
@@ -97,7 +121,7 @@ class AtommanGammaSurface(CalculationSubset):
         Typically, this is templatekeys plus *_content keys so prepare can access
         content before it exists in the calc folders being prepared.
         """
-        return self.templatekeys + [
+        return list(self.templatekeys.keys()) + [
             'gammasurface_content',
         ]
 

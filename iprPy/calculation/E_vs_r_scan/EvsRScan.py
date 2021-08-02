@@ -39,6 +39,8 @@ class EvsRScan(Calculation):
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
         self.__system_mods = AtommanSystemManipulate(self)
+        self.__subsets = [self.commands, self.potential, self.system,
+                          self.system_mods, self.units]
 
         # Initialize unique calculation attributes
         self.number_of_steps_r = 201
@@ -54,6 +56,14 @@ class EvsRScan(Calculation):
 
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
+
+    @property
+    def filenames(self):
+        """list: the names of each file used by the calculation."""
+        return [
+            'e_vs_r_scan.py',
+            'run0.template'
+        ]
 
 ############################## Class attributes ################################
 
@@ -81,6 +91,11 @@ class EvsRScan(Calculation):
     def system_mods(self):
         """AtommanSystemManipulate subset"""
         return self.__system_mods
+
+    @property
+    def subsets(self):
+        """list of all subsets"""
+        return self.__subsets
 
     @property
     def number_of_steps_r(self):
@@ -314,24 +329,20 @@ class EvsRScan(Calculation):
         return params
 
     @property
-    def template(self):
-        """str: The template to use for generating calc.in files."""
-        # Build universal content
-        template = super().template
+    def templatekeys(self):
+        """dict : The calculation-specific input keys and their descriptions."""
 
-        # Build subset content
-        template += self.commands.template()
-        template += self.potential.template()
-        template += self.system.template()
-        template += self.system_mods.template()
-        template += self.units.template()
-
-        # Build calculation-specific content
-        header = 'Run parameters'
-        keys = ['minimum_r', 'maximum_r', 'number_of_steps_r']
-        template += self._template_builder(header, keys)
-        
-        return template   
+        return {
+            'minimum_r': ' '.join([
+                "The minimum interatomic spacing, r, for the scan.  Default",
+                "value is '2.0 angstrom'."]),
+            'maximum_r': ' '.join([
+                "The maximum interatomic spacing, r, for the scan.  Default"
+                "value is '6.0 angstrom'."]),
+            'number_of_steps_r': ' '.join([
+                "The number of interatomic spacing values, r, to use.  Default"
+                "value is 201."]),
+        } 
 
     @property
     def singularkeys(self):

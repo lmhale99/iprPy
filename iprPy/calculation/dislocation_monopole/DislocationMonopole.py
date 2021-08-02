@@ -43,6 +43,9 @@ class DislocationMonopole(Calculation):
         self.__minimize = LammpsMinimize(self)
         self.__defect = Dislocation(self)
         self.__elastic = AtommanElasticConstants(self)
+        self.__subsets = [self.commands, self.potential, self.system,
+                          self.elastic, self.minimize, self.defect,
+                          self.units]
 
         # Initialize unique calculation attributes
         self.annealtemperature = 0.0
@@ -65,6 +68,14 @@ class DislocationMonopole(Calculation):
 
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
+
+    @property
+    def filenames(self):
+        """list: the names of each file used by the calculation."""
+        return [
+            'dislocation_monopole.py',
+            'disl_relax.template'
+        ]
 
 ############################## Class attributes ################################
 
@@ -102,6 +113,12 @@ class DislocationMonopole(Calculation):
     def elastic(self):
         """AtommanElasticConstants subset"""
         return self.__elastic
+
+    @property
+    def subsets(self):
+        """list of all subsets"""
+        return self.__subsets
+
 
     @property
     def annealtemperature(self):
@@ -394,36 +411,34 @@ class DislocationMonopole(Calculation):
                 params[key] = kwargs[key]
 
         return params
-        
+    
     @property
-    def template(self):
-        """str: The template to use for generating calc.in files."""
-        
-        # Build universal content
-        template = super().template
+    def templatekeys(self):
+        """dict : The calculation-specific input keys and their descriptions."""
 
-        # Build subset content
-        template += self.commands.template()
-        template += self.potential.template()
-        template += self.system.template()
-        template += self.elastic.template()
-        template += self.defect.template()
-        template += self.minimize.template()
-        template += self.units.template()
-        
-        # Build calculation-specific content
-        header = 'Run parameters'
-        keys = [
-            'annealtemperature',
-            'annealsteps',
-            'randomseed',
-            'dislocation_boundaryshape',
-            'dislocation_boundarywidth',
-            'dislocation_boundaryscale',
-        ]
-        template += self._template_builder(header, keys)
-        
-        return template     
+        return {
+            'annealtemperature': ' '.join([
+                "The temperature at which to anneal the dislocation system",
+                "If 0, then no MD anneal will be performed."]),
+            'annealsteps': ' '.join([
+                "The number of MD steps to perform at  the anneal temperature",
+                "before running the energy/force minimization.  Default value",
+                "is 0 if annealtemperature=0, and 10,000 if annealtemperature > 0."]),
+            'randomseed': ' '.join([
+                "An int random number seed to use for generating initial velocities.",
+                "A random int will be selected if not given."]),
+            'dislocation_boundaryshape': ' '.join([
+                "'box' or 'cylinder' specifying the resulting shape of the active",
+                "region after defining the boundary atoms.  For 'box', the boundary",
+                "width is constant at the two non-periodic box edges.  For 'cylinder',",
+                "the active region is a cylinder centered around the dislocation line.",
+                "Default value is 'cylinder'."]),
+            'dislocation_boundarywidth': ' '.join([
+                "The minimum thickness of the boundary region."]),
+            'dislocation_boundaryscale': ' '.join([
+                "Boolean indicating if boundarywidth is taken as Cartesian (False)",
+                "or scaled by the loaded unit cell's a lattice parameter."]),
+        } 
     
     @property
     def singularkeys(self):

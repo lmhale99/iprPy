@@ -19,7 +19,8 @@ class AtommanSystemManipulate(CalculationSubset):
     
 ############################# Core properties #################################
 
-    def __init__(self, parent, prefix=''):
+    def __init__(self, parent, prefix='', templateheader=None,
+                 templatedescription=None):
         """
         Initializes a calculation record subset object.
 
@@ -33,8 +34,13 @@ class AtommanSystemManipulate(CalculationSubset):
             An optional prefix to add to metadata field names to allow for
             differentiating between multiple subsets of the same style within
             a single record
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
         """
-        super().__init__(parent, prefix=prefix)
+        super().__init__(parent, prefix=prefix, templateheader=templateheader,
+                         templatedescription=templatedescription)
 
         self.a_uvw = [1, 0, 0]
         self.b_uvw = [0, 1, 0]
@@ -317,23 +323,64 @@ class AtommanSystemManipulate(CalculationSubset):
 
 ####################### Parameter file interactions ###########################
 
-    @property
-    def templateheader(self):
-        """str : The default header to use in the template file for the subset"""
-        return '# System manipulations'
+    def _template_init(self, templateheader=None, templatedescription=None):
+        """
+        Sets the template header and description values.
+
+        Parameters
+        ----------
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
+        """
+        # Set default template header
+        if templateheader is None:
+            templateheader = 'System Manipulations'
+
+        # Set default template description
+        if templatedescription is None:
+            templatedescription = 'Performs simple manipulations on the loaded initial system.'
+        
+        super()._template_init(templateheader, templatedescription)
 
     @property
     def templatekeys(self):
-        """
-        list : The input keys (without prefix) that appear in the input file.
-        """
-        return  [
-            'a_uvw',
-            'b_uvw',
-            'c_uvw',
-            'atomshift',
-            'sizemults',
-        ]
+        """dict : The subset-specific input keys and their descriptions."""
+        
+        return  {
+            'a_uvw': ' '.join([
+                "The Miller(-Bravais) crystal vector relative to the loaded system",
+                "to orient with the a box vector of a resulting rotated system.",
+                "Specified as three or four space-delimited numbers.",
+                "Either all or none of the uvw parameters must be given."]),
+            'b_uvw': ' '.join([
+                "The Miller(-Bravais) crystal vector relative to the loaded system",
+                "to orient with the b box vector of a resulting rotated system.",
+                "Specified as three or four space-delimited numbers.",
+                "Either all or none of the uvw parameters must be given."]),
+            'c_uvw': ' '.join([
+                "The Miller(-Bravais) crystal vector relative to the loaded system",
+                "to orient with the c box vector of a resulting rotated system.",
+                "Specified as three or four space-delimited numbers.",
+                "Either all or none of the uvw parameters must be given."]),
+            'atomshift': ' '.join([
+                "A rigid-body shift vector to apply to all atoms in the rotated",
+                "configuration.  Specified as three space-delimited numbers that",
+                "are relative to the size of the system after rotating, but before",
+                "sizemults have been applied. This allows for the same relative",
+                "shift of similar systems regardless of box_parameters and sizemults.",
+                "Default value is '0.0 0.0 0.0' (i.e. no shift)."]),
+            'sizemults': ' '.join([
+                "Multiplication parameters to construct a supercell from the rotated",
+                "system.  Given as either three or six space-delimited integers.",
+                "For three integers, each value indicates the number of replicas",
+                "to make along the corresponding a, b, c box vector with negative",
+                "values replicating in the negative Cartesian space.",
+                "For six integers, the values are divided into three pairs with",
+                "each pair indicating the number of 'negative' and 'positive'",
+                "replications to make for a given a, b, c box vector."])
+        }
     
     @property
     def preparekeys(self):
@@ -342,7 +389,7 @@ class AtommanSystemManipulate(CalculationSubset):
         Typically, this is templatekeys plus *_content keys so prepare can access
         content before it exists in the calc folders being prepared.
         """
-        return self.templatekeys + []
+        return list(self.templatekeys.keys()) + []
 
     @property
     def interpretkeys(self):

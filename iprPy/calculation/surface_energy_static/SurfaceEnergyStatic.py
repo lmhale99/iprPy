@@ -41,6 +41,8 @@ class SurfaceEnergyStatic(Calculation):
         self.__system = AtommanSystemLoad(self)
         self.__minimize = LammpsMinimize(self)
         self.__defect = FreeSurface(self)
+        self.__subsets = [self.commands, self.potential, self.system,
+                          self.minimize, self.defect, self.units]
 
         # Initialize unique calculation attributes
         self.__dumpfile_base = None
@@ -56,6 +58,14 @@ class SurfaceEnergyStatic(Calculation):
 
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
+
+    @property
+    def filenames(self):
+        """list: the names of each file used by the calculation."""
+        return [
+            'surface_energy_static.py',
+            'min.template'
+        ]
 
 ############################## Class attributes ################################
 
@@ -88,6 +98,11 @@ class SurfaceEnergyStatic(Calculation):
     def defect(self):
         """FreeSurface subset"""
         return self.__defect
+
+    @property
+    def subsets(self):
+        """list of all subsets"""
+        return self.__subsets
 
     @property
     def dumpfile_base(self):
@@ -249,29 +264,7 @@ class SurfaceEnergyStatic(Calculation):
         else:
             raise ValueError(f'Unknown branch {branch}')
 
-        return params
-
-    @property
-    def template(self):
-        """str: The template to use for generating calc.in files."""
-        
-        # Build universal content
-        template = super().template
-
-        # Build subset content
-        template += self.commands.template()
-        template += self.potential.template()
-        template += self.system.template()
-        template += self.defect.template()
-        template += self.minimize.template()
-        template += self.units.template()
-        
-        # Build calculation-specific content
-        #header = 'Run parameters'
-        #keys = []
-        #template += self._template_builder(header, keys)
-        
-        return template     
+        return params 
 
     @property
     def singularkeys(self):

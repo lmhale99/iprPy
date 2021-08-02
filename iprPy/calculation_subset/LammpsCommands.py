@@ -19,7 +19,8 @@ class LammpsCommands(CalculationSubset):
 
 ############################# Core properties #################################
      
-    def __init__(self, parent, prefix=''):
+    def __init__(self, parent, prefix='', templateheader=None,
+                 templatedescription=None):
         """
         Initializes a calculation record subset object.
 
@@ -33,8 +34,13 @@ class LammpsCommands(CalculationSubset):
             An optional prefix to add to metadata field names to allow for
             differentiating between multiple subsets of the same style within
             a single record
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
         """
-        super().__init__(parent, prefix=prefix)
+        super().__init__(parent, prefix=prefix, templateheader=templateheader,
+                         templatedescription=templatedescription)
 
         self.__lammps_command = None
         self.__mpi_command = None
@@ -90,32 +96,57 @@ class LammpsCommands(CalculationSubset):
 
 ####################### Parameter file interactions ###########################
 
-    @property
-    def templateheader(self):
-        """str : The default header to use in the template file for the subset"""
-        return '# Command lines for LAMMPS and MPI'
+    def _template_init(self, templateheader=None, templatedescription=None):
+        """
+        Sets the template header and description values.
+
+        Parameters
+        ----------
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
+        """
+        # Set default template header
+        if templateheader is None:
+            templateheader = 'LAMMPS and MPI Commands'
+
+        # Set default template description
+        if templatedescription is None:
+            templatedescription = ' '.join([
+                "Specifies the external commands for running LAMMPS and MPI."])
+        
+        super()._template_init(templateheader, templatedescription)
 
     @property
     def templatekeys(self):
-        """
-        list : The default input keys used by the calculation.
-        """
-        return  [
-                    'lammps_command',
-                    'mpi_command',
-                ]
+        """dict : The subset-specific input keys and their descriptions."""
+        
+        return  {
+            'lammps_command': ' '.join([
+                "The path to the executable for running LAMMPS on your system.",
+                "Don't include command line options."]),
+            'mpi_command': ' '.join([
+                "The path to the MPI executable and any command line options to",
+                "use for calling LAMMPS to run in parallel on your system. LAMMPS",
+                "will run as a serial process if not given."]),
+        }
     
     @property
     def preparekeys(self):
         """
-        list : The default input keys used by prepare.
+        list : The input keys (without prefix) used when preparing a calculation.
+        Typically, this is templatekeys plus *_content keys so prepare can access
+        content before it exists in the calc folders being prepared.
         """
-        return  self.templatekeys + []
+        return list(self.templatekeys.keys()) + []
         
     @property
     def interpretkeys(self):
         """
-        list : The default input keys accessed when interpreting input files.
+        list : The input keys (without prefix) accessed when interpreting the 
+        calculation input file.  Typically, this is preparekeys plus any extra
+        keys used or generated when processing the inputs.
         """
         return  self.preparekeys + [
                     'lammps_version',

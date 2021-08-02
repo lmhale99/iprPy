@@ -35,6 +35,8 @@ class Phonon(Calculation):
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
         self.__system_mods = AtommanSystemManipulate(self)
+        self.__subsets = [self.commands, self.potential, self.system,
+                          self.system_mods, self.units]
 
         # Initialize unique calculation attributes
         self.strainrange = 0.01
@@ -57,6 +59,14 @@ class Phonon(Calculation):
 
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
+
+    @property
+    def filenames(self):
+        """list: the names of each file used by the calculation."""
+        return [
+            'calc_phonon.py',
+            'phonon.template'
+        ]
 
 ############################## Class attributes ################################
 
@@ -84,6 +94,11 @@ class Phonon(Calculation):
     def system_mods(self):
         """AtommanSystemManipulate subset"""
         return self.__system_mods
+
+    @property
+    def subsets(self):
+        """list of all subsets"""
+        return self.__subsets
 
     @property
     def strainrange(self):
@@ -311,27 +326,24 @@ class Phonon(Calculation):
         return params
 
     @property
-    def template(self):
-        """
-        str: The template to use for generating calc.in files.
-        """
-        # Build universal content
-        template = super().template
+    def templatekeys(self):
+        """dict : The calculation-specific input keys and their descriptions."""
 
-        # Build subset content
-        template += self.commands.template()
-        template += self.potential.template()
-        template += self.system.template()
-        template += self.system_mods.template()
-        template += self.units.template()
-
-        # Build calculation-specific content
-        header = 'Run parameters'
-        keys = ['displacementdistance', 'symmetryprecision', 'numstrains',
-                'strainrange']
-        template += self._template_builder(header, keys)
-        
-        return template
+        return {
+            'displacementdistance': ' '.join([
+                "Max distance atoms are displaced for the phonon evaluations.",
+                "Default  value is 0.01 angstrom"]),
+            'symmetryprecision': ' '.join([
+                "Precision tolerance to use for identifying symmetry elements.",
+                "Default value is 1e-5."]),
+            'numstrains': ' '.join([
+                "The number of strain states to evaluate for performing the",
+                "quasiharmonic approximation.  If set to 1, then the quasiharmonic",
+                "calculations will be skipped.  Default value is 5."]),
+            'strainrange': ' '.join([
+                "The range of strains to apply for performing the",
+                "quasiharmonic approximation.  Default value is 1e-6"]),
+        } 
 
     @property
     def singularkeys(self):

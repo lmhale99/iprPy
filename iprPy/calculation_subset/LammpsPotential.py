@@ -15,7 +15,8 @@ class LammpsPotential(CalculationSubset):
 
 ############################# Core properties #################################
 
-    def __init__(self, parent, prefix=''):
+    def __init__(self, parent, prefix='', templateheader=None,
+                 templatedescription=None):
         """
         Initializes a calculation record subset object.
 
@@ -29,8 +30,13 @@ class LammpsPotential(CalculationSubset):
             An optional prefix to add to metadata field names to allow for
             differentiating between multiple subsets of the same style within
             a single record
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
         """
-        super().__init__(parent, prefix=prefix)
+        super().__init__(parent, prefix=prefix, templateheader=templateheader,
+                         templatedescription=templatedescription)
 
         self.__potential_key = None
         self.__potential_id = None
@@ -122,28 +128,58 @@ class LammpsPotential(CalculationSubset):
 
 ####################### Parameter file interactions ###########################
 
-    @property
-    def templateheader(self):
-        """str : The default header to use in the template file for the subset"""
-        return '# Potential definition and directory containing associated files'
+    def _template_init(self, templateheader=None, templatedescription=None):
+        """
+        Sets the template header and description values.
+
+        Parameters
+        ----------
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
+        """
+        # Set default template header
+        if templateheader is None:
+            templateheader = 'Interatomic Potential'
+
+        # Set default template description
+        if templatedescription is None:
+            templatedescription = ' '.join([
+                "Specifies the interatomic potential to use and the directory",
+                "where any associated parameter files are located."])
+        
+        super()._template_init(templateheader, templatedescription)
 
     @property
     def templatekeys(self):
-        """
-        list : The default input keys used by the calculation.
-        """
-        return  [
-                    'potential_file',
-                    'potential_kim_id',
-                    'potential_dir',
-                ]
+        """dict : The subset-specific input keys and their descriptions."""
+        
+        return  {
+            'potential_file': ' '.join([
+                "The path to the potential_LAMMPS or potential_LAMMPS_KIM record",
+                "that defines the interatomic potential to use for LAMMPS",
+                "calculations."]),
+            'potential_kim_id': ' '.join([
+                "If potential_file is a potential_LAMMPS_KIM record, this allows",
+                "for the specification of which version of the KIM model to",
+                "use by specifying a full kim model id.  If not given, the newest",
+                "known version of the kim model will be assumed."]),
+            'potential_dir': ' '.join([
+                "The path to the directory containing any potential parameter files",
+                "(eg. eam.alloy setfl files) that are needed for the potential. If",
+                "not given, then any required files are expected to be in the",
+                "working directory where the calculation is executed."]),
+        }
     
     @property
     def preparekeys(self):
         """
-        list : The default input keys used by prepare.
+        list : The input keys (without prefix) used when preparing a calculation.
+        Typically, this is templatekeys plus *_content keys so prepare can access
+        content before it exists in the calc folders being prepared.
         """
-        return  self.templatekeys + [
+        return  list(self.templatekeys.keys()) + [
                     'potential_content',
                     'potential_dir_content',
                 ]
@@ -151,7 +187,9 @@ class LammpsPotential(CalculationSubset):
     @property
     def interpretkeys(self):
         """
-        list : The default input keys accessed when interpreting input files.
+        list : The input keys (without prefix) accessed when interpreting the 
+        calculation input file.  Typically, this is preparekeys plus any extra
+        keys used or generated when processing the inputs.
         """
         return  self.preparekeys + [
                     'potential',

@@ -35,6 +35,7 @@ class CrystalSpaceGroup(Calculation):
         # Initialize subsets used by the calculation
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
+        self.__subsets = [self.system, self.units]
 
         # Initialize unique calculation attributes
         self.primitivecell = False
@@ -56,6 +57,13 @@ class CrystalSpaceGroup(Calculation):
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
 
+    @property
+    def filenames(self):
+        """list: the names of each file used by the calculation."""
+        return [
+            'crystal_space_group.py'
+        ]
+
 ############################## Class attributes ################################
 
     @property
@@ -67,6 +75,11 @@ class CrystalSpaceGroup(Calculation):
     def system(self):
         """AtommanSystemLoad subset"""
         return self.__system
+
+    @property
+    def subsets(self):
+        """list of all subsets"""
+        return self.__subsets
 
     @property
     def primitivecell(self):
@@ -302,21 +315,22 @@ class CrystalSpaceGroup(Calculation):
         return params
 
     @property
-    def template(self):
-        """str: The template to use for generating calc.in files."""
-        # Build universal content
-        template = super().template
+    def templatekeys(self):
+        """dict : The calculation-specific input keys and their descriptions."""
 
-        # Build subset content
-        template += self.system.template()
-        template += self.units.template()
-
-        # Build calculation-specific content
-        header = 'Run parameters'
-        keys = ['symmetryprecision', 'primitivecell', 'idealcell']
-        template += self._template_builder(header, keys)
-        
-        return template
+        return {
+            'symmetryprecision': ' '.join([
+                "The precision tolerance used for the atomic positions and box",
+                "dimensions for determining symmetry elements.  Default value is",
+                "'0.01 angstrom'."]),
+            'primitivecell': ' '.join([
+                "A boolean flag indicating if the returned unit cell is to be",
+                "primitive (True) or conventional (False).  Default value is False."]),
+            'idealcell': ' '.join([
+                "A boolean flag indicating if the box dimensions and atomic positions",
+                "are to be idealized based on the space group (True) or averaged based",
+                "on their actual values (False).  Default value is True."]),
+        } 
 
     @property
     def singularkeys(self):

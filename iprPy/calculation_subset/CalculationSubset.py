@@ -6,7 +6,8 @@ class CalculationSubset():
 
 ############################# Core properties #################################
 
-    def __init__(self, parent, prefix=''):
+    def __init__(self, parent, prefix='', templateheader=None,
+                 templatedescription=None):
         """
         Initializes a calculation record subset object.
 
@@ -19,7 +20,11 @@ class CalculationSubset():
         prefix : str, optional
             An optional prefix to add to metadata field names to allow for
             differentiating between multiple subsets of the same style within
-            a single record
+            a single record.
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
         """
         # Get module information for current class
         if self.__module__ == __name__:
@@ -27,6 +32,8 @@ class CalculationSubset():
         
         self.__parent = parent
         self.__prefix = prefix
+        self._template_init(templateheader=templateheader,
+                            templatedescription=templatedescription)
 
     @property
     def parent(self):
@@ -66,27 +73,44 @@ class CalculationSubset():
 
 ####################### Parameter file interactions ###########################
 
-    @property
-    def templateheader(self):
-        """str : The default header to use in the template file for the subset"""
-        return ''
-    
+    def _template_init(self, templateheader=None, templatedescription=None):
+        """
+        Sets the template header and description values.
+
+        Parameters
+        ----------
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
+        """
+        self.__templateheader = templateheader
+        self.__templatedescription = templatedescription
+
     @property
     def templatekeys(self):
-        """list : The default input keys used by the calculation."""
-        return []
+        """dict : The subset-specific input keys and their descriptions."""
+        return {}
 
-    def template(self, header=None):
+    @property
+    def templateheader(self):
+        """str : The header to use in the template file for the subset"""
+        return self.__templateheader
+    
+    @property
+    def templatedescription(self):
+        """str : Provides a description of the subset for the templatedoc."""
+        return self.__templatedescription
+
+    @property
+    def template(self):
         """str : The input file template lines for the subset."""
-        # Specify default header
-        if header is None:
-            header = self.templateheader
-        
+
         # Specify keys to include
-        keys = self._pre(self.templatekeys)
+        keys = self._pre(list(self.templatekeys.keys()))
         
         # Define lines and specify content header
-        lines = [header]
+        lines = [f'# {self.templateheader}']
 
         # Build input template lines
         for key in keys:
@@ -97,7 +121,21 @@ class CalculationSubset():
             lines.append(f'{key}{space}<{key}>')
         
         # Join and return lines
-        return '\n'.join(lines) + '\n\n'
+        return '\n'.join(lines) + '\n'
+
+    @property
+    def templatedoc(self):
+        """str : The documentation for the template lines for this subset."""
+
+        # Define lines and specify content header and description
+        lines = [f'## {self.templateheader}', '', self.templatedescription, '']
+
+        # Build lines for each template key
+        for key, doc in self.templatekeys.items():
+            lines.append(f'- __{self._pre(key)}__: {doc}')
+
+        # Join and return lines
+        return '\n'.join(lines) + '\n'
 
     def set_values(self, input_dict, results_dict=None):
         raise NotImplementedError()

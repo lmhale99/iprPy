@@ -154,7 +154,8 @@ class PointDefect(CalculationSubset):
 
 ############################# Core properties #################################
      
-    def __init__(self, parent, prefix=''):
+    def __init__(self, parent, prefix='', templateheader=None,
+                 templatedescription=None):
         """
         Initializes a calculation record subset object.
 
@@ -168,8 +169,13 @@ class PointDefect(CalculationSubset):
             An optional prefix to add to metadata field names to allow for
             differentiating between multiple subsets of the same style within
             a single record
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
         """
-        super().__init__(parent, prefix=prefix)
+        super().__init__(parent, prefix=prefix, templateheader=templateheader,
+                         templatedescription=templatedescription)
 
         self.param_file = None
         self.key = None
@@ -275,24 +281,61 @@ class PointDefect(CalculationSubset):
 
 ####################### Parameter file interactions ###########################
 
-    @property
-    def templateheader(self):
-        """str : The default header to use in the template file for the subset"""
-        return '# Point defect parameters'
+    def _template_init(self, templateheader=None, templatedescription=None):
+        """
+        Sets the template header and description values.
+
+        Parameters
+        ----------
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
+        """
+        # Set default template header
+        if templateheader is None:
+            templateheader = 'Point Defect'
+
+        # Set default template description
+        if templatedescription is None:
+            templatedescription = ' '.join([
+                "Specifies the parameter set that defines a point defect."])
+        
+        super()._template_init(templateheader, templatedescription)
 
     @property
     def templatekeys(self):
-        """
-        list : The input keys (without prefix) that appear in the input file.
-        """
-        return  [
-                    'pointdefect_file',
-                    'pointdefect_type',
-                    'pointdefect_atype',
-                    'pointdefect_pos',
-                    'pointdefect_dumbbell_vect',
-                    'pointdefect_scale',
-                ]
+        """dict : The subset-specific input keys and their descriptions."""
+        
+        return  {
+            'pointdefect_file': ' '.join([
+                "The path to a point_defect record file that contains input",
+                "parameters associated with a specific point defect or a set",
+                "of point defects."]),
+            'pointdefect_type': ' '.join([
+                "Indicates which type of point defect to generate.",
+                "'v' or 'vacancy' for a vacancy,",
+                "'i' or 'interstitial' for a position-based interstitial,",
+                "'s' or 'substitutional' for a substitutional, and",
+                "'d', 'db' or 'dumbbell' for a dumbbell interstitial."]),
+            'pointdefect_atype': ' '.join([
+                "Indicates the integer atom type to assign to an interstitial,",
+                "substitutional, or dumbbell interstitial atom."]),
+            'pointdefect_pos': ' '.join([
+                "Indicates the position where the point defect is to be placed.",
+                "For the interstitial type, this cannot correspond to a current",
+                "atom's position. For the other styles, this must correspond to a",
+                "current atom's position."]),
+            'pointdefect_dumbbell_vect': ' '.join([
+                "Specifies the dumbbell vector to use for a dumbbell interstitial.",
+                "The atom defined by pointdefect_pos is shifted by",
+                "-pointdefect_dumbbell_vect, and the inserted interstitial atom is",
+                "placed at pointdefect_pos + pointdefect_dumbbell_vect."]),
+            'pointdefect_scale': ' '.join([
+                "Boolean indicating if pointdefect_pos and pointdefect_dumbbell_vect",
+                "are taken as absolute Cartesian vectors, or taken as scaled values",
+                "relative to the loaded system. Default value is False."]),
+        }
     
     @property
     def preparekeys(self):
@@ -301,7 +344,7 @@ class PointDefect(CalculationSubset):
         Typically, this is templatekeys plus *_content keys so prepare can access
         content before it exists in the calc folders being prepared.
         """
-        return  self.templatekeys + [
+        return  list(self.templatekeys.keys()) + [
                     'pointdefect_family',
                     'pointdefect_content',
                 ]

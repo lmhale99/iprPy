@@ -17,14 +17,15 @@ import atomman.unitconvert as uc
 
 from . import CalculationSubset
 from ..tools import dict_insert, aslist
-from ..input import boolean
+from ..input import boolean, value
 
 class FreeSurface(CalculationSubset):
     """Handles calculation terms for free surface parameters"""
 
 ############################# Core properties #################################
      
-    def __init__(self, parent, prefix=''):
+    def __init__(self, parent, prefix='', templateheader=None,
+                 templatedescription=None):
         """
         Initializes a calculation record subset object.
 
@@ -38,8 +39,13 @@ class FreeSurface(CalculationSubset):
             An optional prefix to add to metadata field names to allow for
             differentiating between multiple subsets of the same style within
             a single record
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
         """
-        super().__init__(parent, prefix=prefix)
+        super().__init__(parent, prefix=prefix, templateheader=templateheader,
+                         templatedescription=templatedescription)
 
         self.param_file = None
         self.key = None
@@ -229,26 +235,64 @@ class FreeSurface(CalculationSubset):
 
 ####################### Parameter file interactions ###########################
 
-    @property
-    def templateheader(self):
-        """str : The default header to use in the template file for the subset"""
-        return '# Free surface defect parameters'
+    def _template_init(self, templateheader=None, templatedescription=None):
+        """
+        Sets the template header and description values.
+
+        Parameters
+        ----------
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
+        """
+        # Set default template header
+        if templateheader is None:
+            templateheader = 'Free Surface'
+
+        # Set default template description
+        if templatedescription is None:
+            templatedescription = ' '.join([
+                "Specifies the parameter set that defines a free surface."])
+        
+        super()._template_init(templateheader, templatedescription)
 
     @property
     def templatekeys(self):
-        """
-        list : The input keys (without prefix) that appear in the input file.
-        """
-        return [
-            'surface_file',
-            'surface_hkl',
-            'surface_cellsetting',
-            'surface_cutboxvector',
-            'surface_shiftindex',
-            'sizemults',
-            'surface_minwidth',
-            'surface_even',
-        ]
+        """dict : The subset-specific input keys and their descriptions."""
+        
+        return {
+            'surface_file': ' '.join([
+                "The path to a free_surface record file that collects the",
+                "parameters associated with a specific free surface."]),
+            'surface_hkl': ' '.join([
+                "The Miller (hkl) plane for the surface given as three",
+                "space-delimited integers."]),
+            'surface_cellsetting': ' '.join([
+                "The conventional cell setting to take surface_hkl relative to",
+                "if the loaded unit cell is a primitive cell.  Allowed values are 'p',",
+                "'c', 'i', 'a', 'b' and 'c'."]),
+            'surface_cutboxvector': ' '.join([
+                "Indicates which of the three box vectors ('a', 'b', or 'c')",
+                "that the surface plane will be made along.",
+                "surface. Default value is 'c'."]),
+            'surface_shiftindex': ' '.join([
+                "A rigid body shift will be applied to the atoms such that the",
+                "created surface plane will be halfway between two atomic planes.",
+                "This is an integer value that changes which set of atomic planes",
+                "that the plane is inserted between.  Changing this effectively",
+                "changes the termination planes."]),
+            'sizemults': ' '.join([
+                "Multiplication parameters to construct a supercell from the rotated",
+                "system.  Limited to three values for free surface generation."]),
+            'surface_minwidth': ' '.join([
+                "Specifies a mimimum width in length units that the system must be",
+                "along the cutboxvector direction. The associated sizemult value",
+                "will be increased if necessary to ensure this. Default value is 0.0."]),
+            'surface_even': ' '.join([
+                "If True, the number of replicas in the cutboxvector direction will"
+                "be even. Default value is False."]),
+        }
     
     @property
     def preparekeys(self):
@@ -257,7 +301,7 @@ class FreeSurface(CalculationSubset):
         Typically, this is templatekeys plus *_content keys so prepare can access
         content before it exists in the calc folders being prepared.
         """
-        return self.templatekeys + [
+        return list(self.templatekeys.keys()) + [
             'surface_family',
             'surface_content'
         ]
@@ -330,7 +374,8 @@ class FreeSurface(CalculationSubset):
     
         # Set default values for fault system manipulations
         self.sizemults = input_dict.get(keymap['sizemults'], '1 1 1')
-        self.minwidth = float(input_dict.get(keymap['surface_minwidth'], 0.0))
+        self.minwidth = value(input_dict, keymap['surface_minwidth'], default_term='0.0 angstrom',
+                              default_unit=self.parent.units.length_unit)
         self.even = boolean(input_dict.get(keymap['surface_even'], False))
 
 

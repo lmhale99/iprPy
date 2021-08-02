@@ -41,6 +41,8 @@ class DislocationSDVPN(Calculation):
         self.__defect = Dislocation(self)
         self.__elastic = AtommanElasticConstants(self)
         self.__gamma = AtommanGammaSurface(self)
+        self.__subsets = [self.system, self.elastic, self.gamma,
+                          self.defect, self.units]
 
         # Initialize unique calculation attributes
         self.xnum = None
@@ -70,6 +72,13 @@ class DislocationSDVPN(Calculation):
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
 
+    @property
+    def filenames(self):
+        """list: the names of each file used by the calculation."""
+        return [
+            'dislocation_SDVPN.py'
+        ]
+
 ############################## Class attributes ################################
 
     @property
@@ -96,6 +105,11 @@ class DislocationSDVPN(Calculation):
     def gamma(self):
         """AtommanGammaSurface subset"""
         return self.__gamma
+
+    @property
+    def subsets(self):
+        """list of all subsets"""
+        return self.__subsets
 
     @property
     def xnum(self):
@@ -498,7 +512,117 @@ class DislocationSDVPN(Calculation):
             raise ValueError(f'Unknown branch {branch}')
 
         return params
-        
+
+    @property
+    def templatekeys(self):
+        """dict : The calculation-specific input keys and their descriptions."""
+
+        return {
+            'xmax': ' '.join([
+                "The maximum value of the x-coordinates to use for the points",
+                "where the disregistry is evaluated.  The solution is centered",
+                "around x=0, therefore this also corresponds to the minimum value",
+                "of x used.  The set of x-coordinates used is fully defined by",
+                "giving at least two of xmax, xstep and xnum."]),
+            'xstep': ' '.join([
+                "The step size (delta x) value between the x-coordinates used to",
+                "evaluate the disregistry.  The set of x-coordinates used is fully",
+                "defined by giving at least two of xmax, xstep and xnum."]),
+            'xnum': ' '.join([
+                "The total number of x-coordinates at which to evaluate the",
+                "disregistry.  The set of x-coordinates used is fully defined by",
+                "giving at least two of xmax, xstep and xnum."]),
+            'xscale': ' '.join([
+                "Boolean indicating if xmax and xstep are taken in angstroms (False) or",
+                "relative to the unit cell's a box vector (True).  Default value is False."]),
+            'minimize_style': ' '.join([
+                "The scipy.optimize.minimize method style to use when solving for the",
+                "disregistry.  Default value is 'Powell', which seems to do decently",
+                "well for this problem."]),
+            'minimize_options': ' '.join([
+                "Allows for the specification of the options dictionary used by",
+                "scipy.optimize.minimize. This is given as 'key value key value...'."]),
+            'minimize_cycles': ' '.join([
+                "Specifies the number of times to run the minimization in succession.",
+                "The minimization algorithms used by the underlying scipy code often",
+                "benefit from restarting and rerunning the minimized configuration to",
+                "achive a better fit.  Default value is 10."]),
+            'cutofflongrange': ' '.join([
+                "The radial cutoff (in distance units) to use for the long-range",
+                "elastic energy.  The long-range elastic energy is",
+                "configuration-independent, so this value changes the dislocation's",
+                "energy but not the computed disregistry profile. Default value is",
+                "1000 angstroms."]),
+            'tau_xy': ' '.join([
+                "Shear stress (in units of pressure) to apply to the system.",
+                "Default value is 0 GPa."]),
+            'tau_yy': ' '.join([
+                "Normal stress (in units of pressure) to apply to the system.",
+                "Default value is 0 GPa."]),
+            'tau_yz': ' '.join([
+                "Shear stress (in units of pressure) to apply to the system.",
+                "Default value is 0 GPa."]),
+            'alpha': ' '.join([
+                "Coefficient(s) (in pressure/length units) of the non-local",
+                "energy correction term to use.  Default value is 0.0, meaning",
+                "this correction is not applied."]),
+            'beta_xx': ' '.join([
+                "The xx component of the surface energy coefficient tensor",
+                "(in units pressure-length) to use. Default value is 0.0",
+                "GPa-Angstrom."]),
+            'beta_xx': ' '.join([
+                "The xx component of the surface energy coefficient tensor",
+                "(in units pressure-length) to use. Default value is 0.0",
+                "GPa-Angstrom."]),
+            'beta_yy': ' '.join([
+                "The yy component of the surface energy coefficient tensor",
+                "(in units pressure-length) to use. Default value is 0.0",
+                "GPa-Angstrom."]),
+            'beta_zz': ' '.join([
+                "The zz component of the surface energy coefficient tensor",
+                "(in units pressure-length) to use. Default value is 0.0",
+                "GPa-Angstrom."]),
+            'beta_xy': ' '.join([
+                "The xy component of the surface energy coefficient tensor",
+                "(in units pressure-length) to use. Default value is 0.0",
+                "GPa-Angstrom."]),
+            'beta_xz': ' '.join([
+                "The xz component of the surface energy coefficient tensor",
+                "(in units pressure-length) to use. Default value is 0.0",
+                "GPa-Angstrom."]),
+            'beta_yz': ' '.join([
+                "The yz component of the surface energy coefficient tensor",
+                "(in units pressure-length) to use. Default value is 0.0",
+                "GPa-Angstrom."]),
+            'cdiffelastic': ' '.join([
+                "Boolean indicating if the dislocation density is computed",
+                "using central difference for the elastic term.  Default",
+                "value is False"]),
+            'cdiffsurface': ' '.join([
+                "Boolean indicating if the dislocation density is computed",
+                "using central difference for the surface term.  Default",
+                "value is True"]),
+            'cdiffstress': ' '.join([
+                "Boolean indicating if the dislocation density is computed",
+                "using central difference for the stress term.  Default",
+                "value is False"]),
+            'halfwidth': ' '.join([
+                "The arctan disregistry halfwidth (in length units) to use",
+                "for creating the initial disregistry guess."]),
+            'normalizedisreg': ' '.join([
+                "Boolean indicating how the disregistry profile is handled.",
+                "If True (default), the disregistry is scaled such that the",
+                "minimum x value has a disregistry of 0 and the maximum x",
+                "value has a disregistry equal to the dislocation's Burgers",
+                "vector.  Note that the disregistry for these endpoints is",
+                "fixed, so if you use False the initial disregistry should be",
+                "close to the final solution."]),
+            'fullstress': ' '.join([
+                "Boolean indicating which of two stress formulas to use.",
+                "True uses the original full formulation, while False uses a",
+                "newer, simpler representation.  Default value is True."]),
+        } 
+
     @property
     def template(self):
         """str: The template to use for generating calc.in files."""

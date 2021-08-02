@@ -42,6 +42,8 @@ class PointDefectDiffusion(Calculation):
         self.__system = AtommanSystemLoad(self)
         self.__system_mods = AtommanSystemManipulate(self)
         self.__defect = PointDefect(self)
+        self.__subsets = [self.commands, self.potential, self.system,
+                          self.system_mods, self.defect, self.units]
 
         # Initialize unique calculation attributes  
         self.temperature = 0.0
@@ -82,6 +84,14 @@ class PointDefectDiffusion(Calculation):
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
 
+    @property
+    def filenames(self):
+        """list: the names of each file used by the calculation."""
+        return [
+            'point_defect_diffusion.py',
+            'diffusion.template'
+        ]
+
 ############################## Class attributes ################################
 
     @property
@@ -113,6 +123,11 @@ class PointDefectDiffusion(Calculation):
     def defect(self):
         """PointDefect subset"""
         return self.__defect
+
+    @property
+    def subsets(self):
+        """list of all subsets"""
+        return self.__subsets
 
     @property
     def temperature(self):
@@ -482,27 +497,30 @@ class PointDefectDiffusion(Calculation):
         return params
 
     @property
-    def template(self):
-        """str: The template to use for generating calc.in files."""
-        
-        # Build universal content
-        template = super().template
+    def templatekeys(self):
+        """dict : The calculation-specific input keys and their descriptions."""
 
-        # Build subset content
-        template += self.commands.template()
-        template += self.potential.template()
-        template += self.system.template()
-        template += self.system_mods.template()
-        template += self.defect.template()
-        template += self.units.template()
-        
-        # Build calculation-specific content
-        header = 'Run parameters'
-        keys = ['temperature', 'thermosteps', 'dumpsteps', 'runsteps',
-                'equilsteps', 'randomseed']
-        template += self._template_builder(header, keys)
-        
-        return template     
+        return {
+            'temperature': ' '.join([
+                "Target temperature for the simulations.  The NVT equilibrium",
+                "steps will use this for the thermostat, then the energy scaled",
+                "to try to capture this temperature for the NVE runs."]),
+            'thermosteps': ' '.join([
+                "How often LAMMPS will print thermo data.  Default value is",
+                "runsteps//1000 or 1 if runsteps is less than 1000."]),
+            'dumpsteps': ' '.join([
+                "How often LAMMPS will save the atomic configuration to a",
+                "LAMMPS dump file.  Default value is runsteps, meaning only",
+                "the first and last states are saved."]),
+            'runsteps': ' '.join([
+                "The number of MD integration steps to perform in the NVE run."]),
+            'equilsteps': ' '.join([
+                "The number of MD integration steps to perform in the
+                "equlibriation NVT run."]),
+            'randomseed': ' '.join([
+                "An int random number seed to use for generating initial velocities.",
+                "A random int will be selected if not given."]),
+        }    
     
     @property
     def singularkeys(self):

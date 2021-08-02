@@ -20,7 +20,8 @@ class AtommanSystemLoad(CalculationSubset):
 
 ############################# Core properties #################################
      
-    def __init__(self, parent, prefix=''):
+    def __init__(self, parent, prefix='', templateheader=None,
+                 templatedescription=None):
         """
         Initializes a calculation record subset object.
 
@@ -34,8 +35,13 @@ class AtommanSystemLoad(CalculationSubset):
             An optional prefix to add to metadata field names to allow for
             differentiating between multiple subsets of the same style within
             a single record
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
         """
-        super().__init__(parent, prefix=prefix)
+        super().__init__(parent, prefix=prefix, templateheader=templateheader,
+                         templatedescription=templatedescription)
 
         self.load_file = None
         self.load_style = 'system_model'
@@ -292,24 +298,57 @@ class AtommanSystemLoad(CalculationSubset):
 
 ####################### Parameter file interactions ###########################
 
-    @property
-    def templateheader(self):
-        """str : The default header to use in the template file for the subset"""
-        return '# Initial system configuration to load'
+    def _template_init(self, templateheader=None, templatedescription=None):
+        """
+        Sets the template header and description values.
+
+        Parameters
+        ----------
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
+        """
+        # Set default template header
+        if templateheader is None:
+            templateheader = 'Initial System Configuration'
+
+        # Set default template description
+        if templatedescription is None:
+            templatedescription = ' '.join([
+                "Specifies the file and options to load for the initial",
+                "atomic configuration."])
+        
+        super()._template_init(templateheader, templatedescription)
 
     @property
     def templatekeys(self):
-        """
-        list : The input keys (without prefix) that appear in the input file.
-        """
-        return  [
-                    'load_file',
-                    'load_style',
-                    'load_options',
-                    'family',
-                    'symbols',
-                    'box_parameters',
-                ]
+        """dict : The subset-specific input keys and their descriptions."""
+        
+        return  {
+            'load_file': 
+                "The path to the initial configuration file to load.",
+            'load_style': 
+                "The atomman.load() style indicating the format of the load_file.",
+            'load_options': ' '.join([
+                "A space-delimited list of key-value pairs for optional",
+                "style-specific arguments used by atomman.load()."]),
+            'family': ' '.join([
+                "A metadata descriptor for relating the load_file back to the",
+                "original crystal structure or prototype that the load_file was",
+                "based on.  If not given, will use the family field in load_file",
+                "if load_style is 'system_model', or the file's name otherwise."]),
+            'symbols': ' '.join([
+                "A space-delimited list of the potential's atom-model symbols to",
+                "associate with the loaded system's atom types.  Required if",
+                "load_file does not contain symbol/species information."]),
+            'box_parameters': ' '.join([
+                "Specifies new box parameters to scale the loaded configuration by.",
+                "Can be given either as a list of three or six numbers: 'a b c' for",
+                "orthogonal boxes, or 'a b c alpha beta gamma' for triclinic boxes.",
+                "The a, b, c parameters are in units of length and the alpha, beta,",
+                "gamma angles are in degrees."]),
+        }
     
     @property
     def preparekeys(self):
@@ -318,7 +357,7 @@ class AtommanSystemLoad(CalculationSubset):
         Typically, this is templatekeys plus *_content keys so prepare can access
         content before it exists in the calc folders being prepared.
         """
-        return  self.templatekeys + [
+        return  list(self.templatekeys.keys()) + [
                     'load_content',
                 ]
     @property

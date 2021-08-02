@@ -38,6 +38,8 @@ class RelaxBox(Calculation):
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
         self.__system_mods = AtommanSystemManipulate(self)
+        self.__subsets = [self.commands, self.potential, self.system,
+                          self.system_mods, self.units]
 
         # Initialize unique calculation attributes
         self.pressure_xx = 0.0
@@ -60,6 +62,14 @@ class RelaxBox(Calculation):
 
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
+
+    @property
+    def filenames(self):
+        """list: the names of each file used by the calculation."""
+        return [
+            'relax_box.py',
+            'cij.template'
+        ]
 
 ############################## Class attributes ################################
 
@@ -87,6 +97,11 @@ class RelaxBox(Calculation):
     def system_mods(self):
         """AtommanSystemManipulate subset"""
         return self.__system_mods
+
+    @property
+    def subsets(self):
+        """list of all subsets"""
+        return self.__subsets
     
     @property
     def pressure_xx(self):
@@ -324,24 +339,23 @@ class RelaxBox(Calculation):
         return params
 
     @property
-    def template(self):
-        """str: The template to use for generating calc.in files."""
-        # Build universal content
-        template = super().template
+    def templatekeys(self):
+        """dict : The calculation-specific input keys and their descriptions."""
 
-        # Build subset content
-        template += self.commands.template()
-        template += self.potential.template()
-        template += self.system.template()
-        template += self.system_mods.template()
-        template += self.units.template()
-
-        # Build calculation-specific content
-        header = 'Run parameters'
-        keys = ['pressure_xx', 'pressure_yy', 'pressure_zz','strainrange',]
-        template += self._template_builder(header, keys)
-        
-        return template
+        return {
+            'pressure_xx': ' '.join([
+                "The Pxx normal pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'pressure_yy': ' '.join([
+                "The Pyy normal pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'pressure_zz': ' '.join([
+                "The Pzz normal pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'strainrange': ' '.join([
+                "The strain range to use when estimating the elastic constants",
+                "used to relax the box dimensions.  Default value is 1e-6."]),
+        } 
 
     @property
     def singularkeys(self):

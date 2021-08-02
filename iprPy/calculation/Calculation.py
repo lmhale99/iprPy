@@ -2,6 +2,7 @@
 # Standard Python libraries
 from pathlib import Path
 from copy import deepcopy
+from importlib import resources
 
 from datamodelbase import query
 
@@ -70,7 +71,42 @@ class Calculation(Record):
         if params is not None:
             self.load_parameters(params, key=kwargs.get('key', None))
 
+    @property
+    def maindoc(self):
+        """str: the overview documentation for the calculation"""
+        try:
+            return resources.read_text(self.parent_module, 'README.md')
+        except:
+            return ""
+
+    @property
+    def theorydoc(self):
+        """str: the methods and theory documentation for the calculation"""
+        try:
+            return resources.read_text(self.parent_module, 'theory.md')
+        except:
+            return ""
+
+    @property
+    def filenames(self):
+        """list: the names of each file used by the calculation."""        
+        return []
+    
+    @property
+    def files(self):
+        """dict: the names and contents of all required files."""
+        files = {}
+        for filename in self.filenames:
+            files[filename] = resources.read_text(self.parent_module, filename)
+        
+        return files
+
 ############################### Class attributes ##############################
+
+    @property
+    def subsets(self):
+        """list of all subsets"""
+        return []
 
     @property
     def style(self):
@@ -242,17 +278,84 @@ class Calculation(Record):
         return allkeys
 
     @property
+    def commontemplatekeys(self):
+        """dict : The input keys and their descriptions shared by all calculations."""
+        
+        return {
+            'branch': ' '.join([
+                "A metadata group name that the calculation can be parsed by.",
+                "Primarily meant for differentiating runs with different",
+                "settings parameters."
+            ])
+        }
+
+    @property
+    def templatekeys(self):
+        """dict : The calculation-specific input keys and their descriptions."""
+        return {}
+
+    @property
     def template(self):
         """str: The template to use for generating calc.in files."""
         # Start template
-        template = f'# Input script for calc_{self.style}.py\n'
+        lines = [f'# Input script for iprPy calculation {self.calc_style}', '']
         
         # Build common content
-        header = 'Calculation metadata'
-        keys = ['branch']
-        template += '\n' +self._template_builder(header, keys) + '\n'
+        lines += ['# Calculation Metadata']
+        for key in self.commontemplatekeys.keys():
+            spacelen = 32 - len(key)
+            if spacelen < 1:
+                spacelen = 1
+            space = ' ' * spacelen
+            lines.append(f'{key}{space}<{key}>')
+        lines.append('')
 
-        return template
+        # Add subset content
+        for subset in self.subsets:
+            lines.append(subset.template)
+
+        # Build calculation-specific run parameters
+        if len(self.templatekeys) > 0:
+            lines += ['# Run Parameters']
+            for key in self.templatekeys.keys():
+                spacelen = 32 - len(key)
+                if spacelen < 1:
+                    spacelen = 1
+                space = ' ' * spacelen
+                lines.append(f'{key}{space}<{key}>')    
+        
+        # Join and return lines
+        return '\n'.join(lines)
+
+    @property
+    def templatedoc(self):
+        """str: The documentation for the template lines for this calculation."""
+        
+        lines = [f'# {self.calc_style} Input Terms', '']
+        
+        # Specify common content
+        lines += ['## Calculation Metadata',
+                  '',
+                  "Specifies metadata descriptors common to all calculation styles.",
+                  '']
+
+        # Build lines for each common template key
+        for key, doc in self.commontemplatekeys.items():
+            lines.append(f'- __{key}__: {doc}')
+        lines.append('')
+
+        # Add subset content
+        for subset in self.subsets:
+            lines.append(subset.templatedoc)
+
+        # Build lines for each calculation-specific template key
+        if len(self.templatekeys) > 0:
+            lines.append('## Run Parameters\n')
+            for key, doc in self.templatekeys.items():
+                lines.append(f'- __{key}__: {doc}')
+
+        # Join and return lines
+        return '\n'.join(lines)
 
     def _template_builder(self, header, keys):
         """Builds a section of the template for a set of parameter keys"""

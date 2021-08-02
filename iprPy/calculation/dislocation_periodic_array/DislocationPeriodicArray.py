@@ -43,6 +43,9 @@ class DislocationPeriodicArray(Calculation):
         self.__minimize = LammpsMinimize(self)
         self.__defect = Dislocation(self)
         self.__elastic = AtommanElasticConstants(self)
+        self.__subsets = [self.commands, self.potential, self.system,
+                          self.elastic, self.minimize, self.defect,
+                          self.units]
 
         # Initialize unique calculation attributes
         self.annealtemperature = 0.0
@@ -66,6 +69,14 @@ class DislocationPeriodicArray(Calculation):
 
         # Call parent constructor
         super().__init__(model=model, name=name, params=params, **kwargs)
+
+    @property
+    def filenames(self):
+        """list: the names of each file used by the calculation."""
+        return [
+            'dislocation_periodic_array.py',
+            'disl_relax.template'
+        ]
 
 ############################## Class attributes ################################
 
@@ -103,6 +114,11 @@ class DislocationPeriodicArray(Calculation):
     def elastic(self):
         """AtommanElasticConstants subset"""
         return self.__elastic
+
+    @property
+    def subsets(self):
+        """list of all subsets"""
+        return self.__subsets
 
     @property
     def annealtemperature(self):
@@ -403,37 +419,38 @@ class DislocationPeriodicArray(Calculation):
                 params[key] = kwargs[key]
 
         return params
-        
-    @property
-    def template(self):
-        """str: The template to use for generating calc.in files."""
-        
-        # Build universal content
-        template = super().template
 
-        # Build subset content
-        template += self.commands.template()
-        template += self.potential.template()
-        template += self.system.template()
-        template += self.elastic.template()
-        template += self.defect.template()
-        template += self.minimize.template()
-        template += self.units.template()
-        
-        # Build calculation-specific content
-        header = 'Run parameters'
-        keys = [
-            'annealtemperature',
-            'annealsteps',
-            'randomseed',
-            'dislocation_duplicatecutoff',
-            'dislocation_boundarywidth',
-            'dislocation_boundaryscale',
-            'dislocation_onlylinear',
-        ]
-        template += self._template_builder(header, keys)
-        
-        return template     
+    @property
+    def templatekeys(self):
+        """dict : The calculation-specific input keys and their descriptions."""
+
+        return {
+            'annealtemperature': ' '.join([
+                "The temperature at which to anneal the dislocation system",
+                "If 0, then no MD anneal will be performed."]),
+            'annealsteps': ' '.join([
+                "The number of MD steps to perform at  the anneal temperature",
+                "before running the energy/force minimization.  Default value",
+                "is 0 if annealtemperature=0, and 10,000 if annealtemperature > 0."]),
+            'randomseed': ' '.join([
+                "An int random number seed to use for generating initial velocities.",
+                "A random int will be selected if not given."]),
+            'dislocation_duplicatecutoff': ' '.join([
+                "The cutoff distance to use for determining duplicate atoms to delete",
+                "associated with the extra half-plane formed by a dislocation's edge",
+                "component.  Default value is 0.5 Angstroms."]),
+            'dislocation_boundarywidth': ' '.join([
+                "The minimum thickness of the boundary region."]),
+            'dislocation_boundaryscale': ' '.join([
+                "Boolean indicating if boundarywidth is taken as Cartesian (False)",
+                "or scaled by the loaded unit cell's a lattice parameter."]),
+            'dislocation_onlylinear': ' '.join([
+                "Boolean, which if True will only use linear gradient displacements",
+                "to form the dislocation and not the Volterra solution displacements.",
+                "Setting this to be True is useful for screw dislocations that",
+                "dissociate as it ensures that the resulting structure will dissociate",
+                "along the correct slip plane."]),
+        } 
     
     @property
     def singularkeys(self):

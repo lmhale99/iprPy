@@ -20,7 +20,8 @@ class AtommanElasticConstants(CalculationSubset):
     
 ############################# Core properties #################################
      
-    def __init__(self, parent, prefix=''):
+    def __init__(self, parent, prefix='', templateheader=None,
+                 templatedescription=None):
         """
         Initializes a calculation record subset object.
 
@@ -33,9 +34,14 @@ class AtommanElasticConstants(CalculationSubset):
         prefix : str, optional
             An optional prefix to add to metadata field names to allow for
             differentiating between multiple subsets of the same style within
-            a single record
+            a single record.
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
         """
-        super().__init__(parent, prefix=prefix)
+        super().__init__(parent, prefix=prefix, templateheader=templateheader,
+                         templatedescription=templatedescription)
 
         self.elasticconstants_file = None
         self.__elasticconstants_content = None
@@ -67,46 +73,98 @@ class AtommanElasticConstants(CalculationSubset):
 
 ####################### Parameter file interactions ###########################
 
-    @property
-    def templateheader(self):
-        """str : The default header to use in the template file for the subset"""
-        return '# Elastic constants'
+    def _template_init(self, templateheader=None, templatedescription=None):
+        """
+        Sets the template header and description values.
+
+        Parameters
+        ----------
+        templateheader : str, optional
+            An alternate header to use in the template file for the subset.
+        templatedescription : str, optional
+            An alternate description of the subset for the templatedoc.
+        """
+        # Set default template header
+        if templateheader is None:
+            templateheader = 'Elastic Constants'
+
+        # Set default template description
+        if templatedescription is None:
+            templatedescription = ' '.join([
+                "Specifies the computed elastic constants for the interatomic potential",
+                "and crystal structure, relative to the loaded system's orientation.",
+                "If the values are specified with the Voigt Cij terms and the system",
+                "is in a standard setting for a crystal type, then only the unique",
+                "Cij values for that crystal type are necessary.  If isotropic",
+                "values are used, only two idependent parameters are necessary."])
+        
+        super()._template_init(templateheader, templatedescription)
 
     @property
     def templatekeys(self):
-        """list : The input keys (without prefix) that appear in the input file."""
-        
-        return  [
-                    'elasticconstants_file',
-                    'C11',
-                    'C12',
-                    'C13',
-                    'C14',
-                    'C15',
-                    'C16',
-                    'C22',
-                    'C23',
-                    'C24',
-                    'C25',
-                    'C26',
-                    'C33',
-                    'C34',
-                    'C35',
-                    'C36',
-                    'C44',
-                    'C45',
-                    'C46',
-                    'C55',
-                    'C56',
-                    'C66',
-                    'C_M',
-                    'C_lambda',
-                    'C_mu',
-                    'C_E',
-                    'C_nu',
-                    'C_K',
-                ]
-    
+        """dict : The subset-specific input keys and their descriptions."""
+                
+        return  {
+            'elasticconstants_file': ' '.join([
+                "The path to a record containing the elastic constants to use.  If",
+                "neither this or the individual Cij components (below) are given",
+                "and load_style is 'system_model', this will be set to load_file."]),
+            'C11':
+                "The C11 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C12': 
+                "The C12 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C13': 
+                "The C13 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C14': 
+                "The C14 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C15': 
+                "The C15 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C16': 
+                "The C16 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C22': 
+                "The C22 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C23': 
+                "The C23 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C24': 
+                "The C24 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C25': 
+                "The C25 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C26': 
+                "The C26 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C33': 
+                "The C33 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C34': 
+                "The C34 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C35': 
+                "The C35 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C36': 
+                "The C36 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C44': 
+                "The C44 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C45': 
+                "The C45 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C46': 
+                "The C46 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C55': 
+                "The C55 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C56': 
+                "The C56 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C66': 
+                "The C66 component of the 6x6 Cij Voigt Cij elastic stiffness tensor (units of pressure).",
+            'C_M': 
+                "The isotropic P-wave modulus (units of pressure).",
+            'C_lambda': 
+                "The isotropic Lame's first parameter (units of pressure).",
+            'C_mu': 
+                "The isotropic shear modulus (units of pressure).",
+            'C_E': 
+                "The isotropic Young's modulus (units of pressure).",
+            'C_nu': 
+                "The isotropic Poisson's ratio (unitless).",
+            'C_K': 
+                "The isotropic bulk modulus (units of pressure)."
+        }
+
     @property
     def preparekeys(self):
         """
@@ -114,7 +172,7 @@ class AtommanElasticConstants(CalculationSubset):
         Typically, this is templatekeys plus *_content keys so prepare can access
         content before it exists in the calc folders being prepared.
         """
-        return  self.templatekeys + [
+        return  list(self.templatekeys.keys()) + [
                     'elasticconstants_content',
                 ]
     @property
