@@ -129,8 +129,7 @@ def baintransformation(lammps_command, a_bcc, a_fcc, symbol, sizemults, potentia
             
         # Define lammps variables
         system_info = system.dump('atom_data', f=Path(sim_directory, 'atom.dat').as_posix(),
-                                  potential=potential,
-                                  return_pair_info=True)
+                                  potential=potential)
         lammps_variables['atomman_system_pair_info'] = system_info
         lammps_variables['sim_directory'] = sim_directory
         

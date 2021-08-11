@@ -104,8 +104,7 @@ def e_vs_r_scan(lammps_command, system, potential,
         # Define lammps variables
         lammps_variables = {}
         system_info = system.dump('atom_data', f='atom.dat',
-                                  potential=potential,
-                                  return_pair_info=True)
+                                  potential=potential)
         lammps_variables['atomman_system_pair_info'] = system_info
         
         # Write lammps input script

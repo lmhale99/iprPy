@@ -117,8 +117,7 @@ def stackingfaultrelax(lammps_command, system, potential,
     lammps_variables = {}
     system_info = system.dump('atom_data',
                               f=Path(sim_directory, 'system.dat').as_posix(),
-                              potential=potential,
-                              return_pair_info=True)
+                              potential=potential)
     lammps_variables['atomman_system_pair_info'] = system_info
     lammps_variables['fix_cut_setforce'] = fix_cut_setforce
     lammps_variables['sim_directory'] = sim_directory

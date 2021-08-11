@@ -88,8 +88,7 @@ def elastic_constants_static(lammps_command, system, potential, mpi_command=None
     # Define lammps variables
     lammps_variables = {}
     system_info = system.dump('atom_data', f='init.dat',
-                              potential=potential,
-                              return_pair_info=True)
+                              potential=potential)
     lammps_variables['atomman_system_pair_info'] = system_info
     lammps_variables['restart_commands'] = restart_commands(potential, system.symbols)
     lammps_variables['strainrange'] = strainrange

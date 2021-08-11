@@ -190,8 +190,7 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
     # Define lammps variables
     lammps_variables = {}
     system_info = system.dump('atom_data', f='perfect.dat',
-                              potential=potential,
-                              return_pair_info=True)
+                              potential=potential)
     lammps_variables['atomman_system_pair_info'] = system_info
     lammps_variables['etol'] = etol
     lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])
@@ -248,8 +247,7 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
     
     # Update lammps variables
     system_info = system_ptd.dump('atom_data', f='defect.dat',
-                                  potential=potential,
-                                  return_pair_info=True)
+                                  potential=potential)
     lammps_variables['atomman_system_pair_info'] = system_info
     
     # Write lammps input script

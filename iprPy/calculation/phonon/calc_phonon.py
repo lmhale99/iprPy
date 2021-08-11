@@ -125,8 +125,7 @@ def phonon_quasiharmonic(lammps_command, ucell, potential, mpi_command=None, a_m
             # Define lammps variables
             lammps_variables = {}
             system_info = system.dump('atom_data', f='disp.dat',
-                                    potential=potential,
-                                    return_pair_info=True)
+                                    potential=potential)
             lammps_variables['atomman_system_pair_info'] = system_info
 
             # Set dump_modify_format based on lammps_date
@@ -310,8 +309,7 @@ def phononcalc(lammps_command, ucell, potential, mpi_command=None,
         # Save to LAMMPS data file
         system = am.load('phonopy_Atoms', supercell, symbols=primucell.symbols)
         system_info = system.dump('atom_data', f='disp.dat',
-                                  potential=potential,
-                                  return_pair_info=True)
+                                  potential=potential)
         
         # Define lammps variables
         lammps_variables = {}

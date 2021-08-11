@@ -303,8 +303,7 @@ def disl_relax(lammps_command, system, potential,
     # Define lammps variables
     lammps_variables = {}
     system_info = system.dump('atom_data', f='system.dat',
-                              potential=potential,
-                              return_pair_info=True)
+                              potential=potential)
     lammps_variables['atomman_system_pair_info'] = system_info
     lammps_variables['anneal_info'] = anneal_info(annealtemp, annealsteps, 
                                                   randomseed, potential.units)

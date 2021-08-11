@@ -130,8 +130,7 @@ def pointdiffusion(lammps_command, system, potential, point_kwargs,
     # Define lammps variables
     lammps_variables = {}
     system_info = system.dump('atom_data', f='perfect.dat',
-                              potential=potential,
-                              return_pair_info=True)
+                              potential=potential)
     lammps_variables['atomman_system_pair_info'] = system_info
     lammps_variables['temperature'] = temperature
     lammps_variables['runsteps'] = runsteps

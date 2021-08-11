@@ -89,8 +89,7 @@ def diatom_scan(lammps_command, potential, symbols,
 
         # Save configuration
         system_info = system.dump('atom_data', f='diatom.dat',
-                                  potential=potential,
-                                  return_pair_info=True)
+                                  potential=potential)
         lammps_variables['atomman_system_pair_info'] = system_info
         
         # Write lammps input script

@@ -252,8 +252,7 @@ def calc_cij(lammps_command, system, potential,
     # Define lammps variables
     lammps_variables = {}
     system_info = system.dump('atom_data', f='init.dat',
-                              potential=potential,
-                              return_pair_info=True)
+                              potential=potential)
     lammps_variables['atomman_system_pair_info'] = system_info
     
     lammps_variables['delta'] = strainrange

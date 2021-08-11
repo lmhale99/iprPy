@@ -244,8 +244,7 @@ def relax_system(lammps_command, system, potential,
     # Define lammps variables
     lammps_variables = {}
     system_info = system.dump('atom_data', f='system.dat',
-                              potential=potential,
-                              return_pair_info=True)
+                              potential=potential)
     lammps_variables['atomman_system_pair_info'] = system_info
     lammps_variables['etol'] = etol
     lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])

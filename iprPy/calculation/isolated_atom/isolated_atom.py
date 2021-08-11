@@ -62,8 +62,7 @@ def isolated_atom(lammps_command, potential, mpi_command=None):
 
         # Save configuration
         system_info = system.dump('atom_data', f='isolated.dat',
-                                  potential=potential,
-                                  return_pair_info=True)
+                                  potential=potential)
         lammps_variables['atomman_system_pair_info'] = system_info
         
         # Write lammps input script
