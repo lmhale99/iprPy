@@ -3,7 +3,7 @@ from DataModelDict import DataModelDict as DM
 
 __all__ = ['defect']
 
-def defect(database, keys, content_dict=None, record=None, query=None, **kwargs):
+def defect(database, keys, content_dict=None, record=None, **kwargs):
 
     # Initialize inputs and content dict
     if content_dict is None:
@@ -41,7 +41,7 @@ def defect(database, keys, content_dict=None, record=None, query=None, **kwargs)
         raise KeyError('No <defect>_family key found')
 
     defects, defect_df = database.get_records(style=record, return_df=True,
-                                              query=query, **kwargs)
+                                              **kwargs)
     print(len(defect_df), 'matching defects')
     if len(defect_df) == 0:
         return inputs, content_dict
