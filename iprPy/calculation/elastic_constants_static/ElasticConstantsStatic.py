@@ -18,9 +18,6 @@ from ...calculation_subset import *
 from ...input import value, boolean
 from ...tools import aslist, dict_insert
 
-# Global class properties
-modelroot = 'calculation-relax-static'
-
 class ElasticConstantsStatic(Calculation):
     """Class for managing static elastic constants calculations from small strains"""
 
@@ -36,8 +33,8 @@ class ElasticConstantsStatic(Calculation):
         self.__system = AtommanSystemLoad(self)
         self.__system_mods = AtommanSystemManipulate(self)
         self.__minimize = LammpsMinimize(self)
-        self.__subsets = [self.commands, self.potential, self.system,
-                          self.system_mods, self.minimize, self.units]
+        subsets = (self.commands, self.potential, self.system,
+                   self.system_mods, self.minimize, self.units)
 
         # Initialize unique calculation attributes
         self.strainrange = 1e-6
@@ -49,7 +46,8 @@ class ElasticConstantsStatic(Calculation):
         self.calc = elastic_constants_static
 
         # Call parent constructor
-        super().__init__(model=model, name=name, params=params, **kwargs)
+        super().__init__(model=model, name=name, params=params,
+                         subsets=subsets, **kwargs)
 
     @property
     def filenames(self):
@@ -59,7 +57,7 @@ class ElasticConstantsStatic(Calculation):
             'cij.template'
         ]
 
-############################## Class attributes ################################
+############################## Class attributes ###############################
 
     @property
     def commands(self):
@@ -92,11 +90,6 @@ class ElasticConstantsStatic(Calculation):
         return self.__minimize
 
     @property
-    def subsets(self):
-        """list of all subsets"""
-        return self.__subsets
-
-    @property
     def strainrange(self):
         """float: Strain step size used in estimating elastic constants"""
         return self.__strainrange
@@ -127,18 +120,23 @@ class ElasticConstantsStatic(Calculation):
         return self.__raw_Cij_negative
 
     def set_values(self, name=None, **kwargs):
-        """Used to set initial common values for the calculation."""
-        
-        # Set universal content
-        super().set_values(name=None, **kwargs)
+        """
+        Set calculation values directly.  Any terms not given will be set
+        or reset to the calculation's default values.
 
-        # Set subset values
-        self.units.set_values(**kwargs)
-        self.potential.set_values(**kwargs)
-        self.commands.set_values(**kwargs)
-        self.system.set_values(**kwargs)
-        self.system_mods.set_values(**kwargs)
-        self.minimize.set_values(**kwargs)
+        Parameter
+        ---------
+        name : str, optional
+            The name to assign to the calculation.  By default, this is set as
+            the calculation's key.
+        strainrange : float, optional
+            The magnitude of strain to use.
+        **kwargs : any, optional
+            Any keyword parameters supported by the set_values() methods of
+            the parent Calculation class and the subset classes.
+        """
+        # Call super to set universal and subset content
+        super().set_values(name=None, **kwargs)
 
         # Set calculation-specific values
         if 'strainrange' in kwargs:
@@ -271,11 +269,8 @@ class ElasticConstantsStatic(Calculation):
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
         
-        # Fetch universal key sets from parent
-        universalkeys = super().multikeys
-        
-        # Specify calculation-specific key sets 
         keys =  [
+            #super().multikeys,
             self.potential.keyset + self.system.keyset,
             self.system_mods.keyset,
             [
@@ -284,17 +279,19 @@ class ElasticConstantsStatic(Calculation):
             self.minimize.keyset,
         ]
                
-        # Join and return
-        return universalkeys + keys
+        return keys
 
 ########################### Data model interactions ###########################
 
     @property
     def modelroot(self):
-        return modelroot
+        """str: The root element of the content"""
+        return 'calculation-relax-static'
 
     def build_model(self):
-
+        """
+        Generates and returns model content based on the values set to object.
+        """
         # Build universal content
         model = super().build_model()
         calc = model[self.modelroot]
@@ -333,18 +330,20 @@ class ElasticConstantsStatic(Calculation):
         return model
 
     def load_model(self, model, name=None):
+        """
+        Loads record contents from a given model.
 
-        # Load universal content
+        Parameters
+        ----------
+        model : str or DataModelDict
+            The model contents of the record to load.
+        name : str, optional
+            The name to assign to the record.  Often inferred from other
+            attributes if not given.
+        """
+        # Load universal and subset content
         super().load_model(model, name=name)
         calc = self.model[self.modelroot]
-
-        # Load subset content
-        #self.units.load_model(calc)
-        self.potential.load_model(calc)
-        self.commands.load_model(calc)
-        self.system.load_model(calc)
-        self.system_mods.load_model(calc)
-        self.minimize.load_model(calc)
 
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
@@ -357,94 +356,68 @@ class ElasticConstantsStatic(Calculation):
             Cij = uc.value_unit(calc['elastic-constants']['Cij'])
             self.__C = am.ElasticConstants(Cij=Cij)
 
-    @staticmethod
-    def mongoquery(name=None, key=None, iprPy_version=None,
-                   atomman_version=None, script=None, branch=None,
-                   status=None, lammps_version=None,
-                   potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                   potential_key=None, potential_id=None, strainrange=None,
-                   ):
-        
-        # Build universal terms
-        mquery = Calculation.mongoquery(modelroot, name=name, key=key,
-                                    iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version,
-                                    script=script, branch=branch,
-                                    status=status)
+    def mongoquery(self, strainrange=None, **kwargs):
+        """
+        Builds a Mongo-style query based on kwargs values for the record style.
 
-        # Build subset terms
-        mquery.update(LammpsCommands.mongoquery(modelroot,
-                                                lammps_version=lammps_version))
-        mquery.update(LammpsPotential.mongoquery(modelroot,
-                                                 potential_LAMMPS_key=potential_LAMMPS_key,
-                                                 potential_LAMMPS_id=potential_LAMMPS_id,
-                                                 potential_key=potential_key,
-                                                 potential_id=potential_id))
-        #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
-        #mquery.update(AtommanSystemManipulate.mongoquery(modelroot,...)
+        Parameters
+        ----------
+        strainrange : float or list, optional
+            strainrange values to parse by.
+        **kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets.        
+        
+        Returns
+        -------
+        dict
+            The Mongo-style query.
+        """
+        # Call super to build universal and subset terms
+        mquery = super().mongoquery(**kwargs)
 
         # Build calculation-specific terms
-        root = f'content.{modelroot}'
+        root = f'content.{self.modelroot}'
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.strain-range', strainrange)
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
 
         return mquery
 
-    @staticmethod
-    def cdcsquery(key=None, iprPy_version=None,
-                  atomman_version=None, script=None, branch=None,
-                  status=None, lammps_version=None,
-                  potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                  potential_key=None, potential_id=None, strainrange=None
-                  ):
-        
-        # Build universal terms
-        mquery = Calculation.cdcsquery(modelroot, key=key,
-                                    iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version,
-                                    script=script, branch=branch,
-                                    status=status)
+    def cdcsquery(self, strainrange=None, **kwargs):
+        """
+        Builds a CDCS-style query based on kwargs values for the record style.
 
-        # Build subset terms
-        mquery.update(LammpsCommands.cdcsquery(modelroot,
-                                               lammps_version=lammps_version))
-        mquery.update(LammpsPotential.cdcsquery(modelroot,
-                                                potential_LAMMPS_key=potential_LAMMPS_key,
-                                                potential_LAMMPS_id=potential_LAMMPS_id,
-                                                potential_key=potential_key,
-                                                potential_id=potential_id))
-        #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
-        #mquery.update(AtommanSystemManipulate.mongoquery(modelroot,...)
+        Parameters
+        ----------
+        strainrange : float or list, optional
+            strainrange values to parse by.
+        **kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets.        
+        
+        Returns
+        -------
+        dict
+            The CDCS-style query.
+        """
+        # Call super to build universal and subset terms
+        mquery = super().cdcsquery(**kwargs)
 
         # Build calculation-specific terms
-        root = modelroot
+        root = self.modelroot
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.strain-range', strainrange)
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
-
+        
         return mquery
 
 ########################## Metadata interactions ##############################
 
     def metadata(self):
         """
-        Converts the structured content to a simpler dictionary.
-        
-        Returns
-        -------
-        dict
-            A dictionary representation of the record's content.
+        Generates a dict of simple metadata values associated with the record.
+        Useful for quickly comparing records and for building pandas.DataFrames
+        for multiple records of the same style.
         """
-        # Extract universal content
+        # Call super to extract universal and subset content
         meta = super().metadata()
-        
-        # Extract subset content
-        self.potential.metadata(meta)
-        self.commands.metadata(meta)
-        self.system.metadata(meta)
-        self.system_mods.metadata(meta)
-        self.minimize.metadata(meta)
 
         # Extract calculation-specific content
         meta['strainrange'] = self.strainrange
@@ -481,36 +454,35 @@ class ElasticConstantsStatic(Calculation):
             'strainrange':1e-10,
         }
 
-    @staticmethod
-    def pandasfilter(dataframe, name=None, key=None, iprPy_version=None,
-                     atomman_version=None, script=None, branch=None,
-                     status=None, lammps_version=None,
-                     potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                     potential_key=None, potential_id=None, strainrange=None,
-                     ):
-        matches = (
-            # Filter by universal terms
-            Calculation.pandasfilter(dataframe, name=name, key=key,
-                                 iprPy_version=iprPy_version,
-                                 atomman_version=atomman_version,
-                                 script=script, branch=branch, status=status)
-            
-            # Filter by subset terms
-            &LammpsCommands.pandasfilter(dataframe,
-                                         lammps_version=lammps_version)
-            &LammpsPotential.pandasfilter(dataframe,
-                                          potential_LAMMPS_key=potential_LAMMPS_key,
-                                          potential_LAMMPS_id=potential_LAMMPS_id,
-                                          potential_key=potential_key,
-                                          potential_id=potential_id)
-            #&AtommanSystemLoad.pandasfilter(dataframe, ...)
-            #&AtommanSystemManipulate.pandasfilter(dataframe, ...)
+    def pandasfilter(dataframe, strainrange=None, **kwargs):
+        """
+        Parses a pandas dataframe containing the subset's metadata to find 
+        entries matching the terms and values given. Ideally, this should find
+        the same matches as the mongoquery and cdcsquery methods for the same
+        search parameters.
 
-            # Filter by calculation-specific terms
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            The metadata dataframe to filter.
+        strainrange : float or list, optional
+            strainrange values to parse by.
+        kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets. 
+
+        Returns
+        -------
+        pandas.Series of bool
+            True for each entry where all filter terms+values match, False for
+            all other entries.
+        """
+        # Call super to filter by universal and subset terms
+        matches = super().pandasfilter(dataframe, **kwargs)
+
+        # Filter by calculation-specific terms
+        matches = (matches
             &query.str_match.pandas(dataframe, 'strainrange', strainrange)
-            #&query.str_match.pandas(dataframe, 'maximum_r', maximum_r)
-            #&query.str_match.pandas(dataframe, 'number_of_steps_r', number_of_steps_r)
-            #&query.str_contains.pandas(dataframe, 'symbols', symbols)
         )
         
         return matches
@@ -524,14 +496,12 @@ class ElasticConstantsStatic(Calculation):
         input_dict = {}
 
         # Add subset inputs
-        self.commands.calc_inputs(input_dict)
-        self.potential.calc_inputs(input_dict)
-        #self.system.calc_inputs(input_dict)
-        self.system_mods.calc_inputs(input_dict)
-        self.minimize.calc_inputs(input_dict)
+        for subset in self.subsets:
+            subset.calc_inputs(input_dict)
 
         # Remove unused subset inputs
         del input_dict['transform']
+        del input_dict['ucell']
 
         # Add calculation-specific inputs
         input_dict['strainrange'] = self.strainrange

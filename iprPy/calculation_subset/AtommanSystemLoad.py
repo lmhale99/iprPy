@@ -11,6 +11,8 @@ from DataModelDict import DataModelDict as DM
 import atomman as am
 import atomman.unitconvert as uc
 
+from datamodelbase import query
+
 from . import CalculationSubset
 from ..tools import dict_insert, aslist
 from ..input import termtodict, dicttoterm
@@ -446,6 +448,7 @@ class AtommanSystemLoad(CalculationSubset):
 
     @property
     def modelroot(self):
+        """str : The root element name for the subset terms."""
         baseroot = 'system-info'
         return f'{self.modelprefix}{baseroot}'
 
@@ -472,16 +475,15 @@ class AtommanSystemLoad(CalculationSubset):
 
     def build_model(self, model, **kwargs):
         """
-        Converts the structured content to a simpler dictionary.
+        Adds the subset model to the parent model.
         
         Parameters
         ----------
-        record_model : DataModelDict.DataModelDict
+        model : DataModelDict.DataModelDict
             The record content (after root element) to add content to.
-        input_dict : dict
-            Dictionary of all input parameter terms.
-        results_dict : dict, optional
-            Dictionary containing any results produced by the calculation.
+        kwargs : any
+            Any options to pass on to dict_insert that specify where the subset
+            content gets added to in the parent model.
         """
         # Check required parameters
         if self.load_file is None:
@@ -501,6 +503,80 @@ class AtommanSystemLoad(CalculationSubset):
         system['symbol'] = self.symbols
 
         dict_insert(model, self.modelroot, system, **kwargs)
+
+    def mongoquery(self, load_file=None, family=None, symbol=None,
+                   **kwargs):
+        """
+        Generate a query to parse records with the subset from a Mongo-style
+        database.
+        
+        Parameters
+        ----------
+        load_file : str
+            The name of the loaded structure file.
+        family : str
+            The family crystal structure/prototype associated with the loaded
+            file.
+        symbol : str
+            Element model symbols.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+
+        Returns
+        -------
+        dict
+            The Mongo-style find query terms.
+        """
+        # Init query and set root paths
+        mquery = {}
+        parentroot = f'content.{self.parent.modelroot}'
+        root = f'{parentroot}.{self.modelroot}'
+
+        # Build query terms
+        query.str_match.mongo(mquery, f'{root}.artifact.file', load_file)
+        query.str_match.mongo(mquery, f'{root}.family', family)
+        query.str_match.mongo(mquery, f'{root}.symbol', symbol)
+        
+        # Return query dict
+        return mquery
+
+    def cdcsquery(self, load_file=None, family=None, symbol=None,
+                  **kwargs):
+        """
+        Generate a query to parse records with the subset from a CDCS-style
+        database.
+        
+        Parameters
+        ----------
+        load_file : str
+            The name of the loaded structure file.
+        family : str
+            The family crystal structure/prototype associated with the loaded
+            file.
+        symbol : str
+            Element model symbols.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+
+        Returns
+        -------
+        dict
+            The CDCS-style find query terms.
+        """
+        # Init query and set root paths
+        mquery = {}
+        parentroot = self.parent.modelroot
+        root = f'{parentroot}.{self.modelroot}'
+
+        # Build query terms
+        query.str_match.mongo(mquery, f'{root}.artifact.file', load_file)
+        query.str_match.mongo(mquery, f'{root}.family', family)
+        query.str_match.mongo(mquery, f'{root}.symbol', symbol)
+        
+        # Return query dict
+        return mquery
+
+########################## Metadata interactions ##############################
 
     def metadata(self, meta):
         """
@@ -536,10 +612,57 @@ class AtommanSystemLoad(CalculationSubset):
             parent = parent_file.parent.name
         meta[f'{self.prefix}parent_key'] = parent
 
+    def pandasfilter(self, dataframe, load_file=None, family=None, symbol=None,
+                     **kwargs):
+        """
+        Parses a pandas dataframe containing the subset's metadata to find 
+        entries matching the terms and values given. Ideally, this should find
+        the same matches as the mongoquery and cdcsquery methods for the same
+        search parameters.
+
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            The metadata dataframe to filter.
+        load_file : str
+            The name of the loaded structure file.
+        family : str
+            The family crystal structure/prototype associated with the loaded
+            file.
+        symbol : str
+            Element model symbols.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+
+        Returns
+        -------
+        pandas.Series of bool
+            True for each entry where all filter terms+values match, False for
+            all other entries.
+        """
+        prefix = self.prefix
+        matches = (
+            query.str_match.pandas(dataframe, f'{prefix}load_file',
+                                   load_file)
+            &query.str_match.pandas(dataframe, f'{prefix}family',
+                                    family)
+            &query.str_contains.pandas(dataframe, f'{prefix}symbols',
+                                       symbol)
+        )
+        return matches
+
 ########################### Calculation interactions ##########################
 
     def calc_inputs(self, input_dict):
-        
+        """
+        Generates calculation function input parameters based on the values
+        assigned to attributes of the subset.
+
+        Parameters
+        ----------
+        input_dict : dict
+            The dictionary of input parameters to add subset terms to.
+        """
         if self.ucell is None:
             raise ValueError('ucell not loaded')
 

@@ -46,9 +46,7 @@ class CalculationSubset():
         return self.__prefix
 
     def _pre(self, keys):
-        """
-        Adds prefix to a key or list of keys
-        """
+        """Adds prefix to a key or list of keys"""
         if isinstance(keys, str):
             return f'{self.prefix}{keys}'
         else:
@@ -56,16 +54,12 @@ class CalculationSubset():
 
     @property
     def keyset(self):
-        """
-        list : The input keyset for preparing.
-        """
+        """list : The input keyset for preparing."""
         return self._pre(self.preparekeys)
 
     @property
     def keymap(self):
-        """
-        dict : Maps the keys to the basekeys 
-        """
+        """dict : Maps the keys to the basekeys"""
         km = {}
         for key in self.interpretkeys:
             km[key] = self._pre(key)
@@ -137,10 +131,16 @@ class CalculationSubset():
         # Join and return lines
         return '\n'.join(lines) + '\n'
 
-    def set_values(self, input_dict, results_dict=None):
-        raise NotImplementedError()
+    def set_values(self, **kwargs):
+        pass
 
 ########################### Data model interactions ###########################
+
+    @property
+    def modelroot(self):
+        """str : The root element name for the subset terms."""
+        baseroot = ''
+        return f'{self.modelprefix}{baseroot}'
 
     @property
     def modelprefix(self):
@@ -148,17 +148,118 @@ class CalculationSubset():
         return self.prefix.replace('_', '-')
 
     def load_model(self, model):
-        raise NotImplementedError()
+        """Loads subset attributes from an existing model."""
+        pass
 
-    def build_model(self):
-        raise NotImplementedError()
+    def build_model(self, model, **kwargs):
+        """
+        Adds the subset model to the parent model.
+        
+        Parameters
+        ----------
+        model : DataModelDict.DataModelDict
+            The record content (after root element) to add content to.
+        kwargs : any
+            Any options to pass on to dict_insert that specify where the subset
+            content gets added to in the parent model.
+        """
+        pass
+
+    def mongoquery(self, **kwargs):
+        """
+        Generate a query to parse records with the subset from a Mongo-style
+        database.
+        
+        Parameters
+        ----------
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+
+        Returns
+        -------
+        dict
+            The Mongo-style find query terms.
+        """
+        # Init query and set root paths
+        mquery = {}
+        parentroot = f'content.{self.parent.modelroot}'
+        root = f'{parentroot}.{self.modelroot}'
+        
+        # Build query terms
+
+        # Return query dict
+        return mquery
+
+    def cdcsquery(self, **kwargs):
+        """
+        Generate a query to parse records with the subset from a CDCS-style
+        database.
+        
+        Parameters
+        ----------
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+        
+        Returns
+        -------
+        dict
+            The CDCS-style find query terms.
+        """
+        # Init query and set root paths
+        mquery = {}
+        parentroot = {self.parent.modelroot}
+        root = f'{parentroot}.{self.modelroot}'
+        
+        # Build query terms
+
+        # Return query dict
+        return mquery
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self):
-        raise NotImplementedError()
+    def metadata(self, meta):
+        """
+        Converts the structured content to a simpler dictionary.
+        
+        Parameters
+        ----------
+        meta : dict
+            The dictionary to add the subset content to
+        """
+        pass
+
+    def pandasfilter(self, dataframe, **kwargs):
+        """
+        Parses a pandas dataframe containing the subset's metadata to find 
+        entries matching the terms and values given. Ideally, this should find
+        the same matches as the mongoquery and cdcsquery methods for the same
+        search parameters.
+
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            The metadata dataframe to filter.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+
+        Returns
+        -------
+        pandas.Series of bool
+            True for each entry where all filter terms+values match, False for
+            all other entries.
+        """
+        return dataframe.apply(lambda series:True, axis=1)
 
 ########################### Calculation interactions ##########################
     
     def calc_inputs(self, input_dict):
-        raise NotImplementedError()
+        """
+        Generates calculation function input parameters based on the values
+        assigned to attributes of the subset.
+
+        Parameters
+        ----------
+        input_dict : dict
+            The dictionary of input parameters to add subset terms to.
+        """
+        pass

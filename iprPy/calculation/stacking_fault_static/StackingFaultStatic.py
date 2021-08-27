@@ -23,9 +23,6 @@ from ...calculation_subset import *
 from ...input import value, boolean
 from ...tools import aslist, dict_insert
 
-# Global class properties
-modelroot = 'calculation-stacking-fault-static'
-
 class StackingFaultStatic(Calculation):
     """Class for managing stacking fault energy calculations"""
 
@@ -41,8 +38,8 @@ class StackingFaultStatic(Calculation):
         self.__system = AtommanSystemLoad(self)
         self.__minimize = LammpsMinimize(self)
         self.__defect = StackingFault(self)
-        self.__subsets = [self.commands, self.potential, self.system,
-                          self.minimize, self.defect, self.units]
+        subsets = (self.commands, self.potential, self.system,
+                   self.minimize, self.defect, self.units)
 
         # Initialize unique calculation attributes
         self.a1 = 0.0
@@ -51,9 +48,6 @@ class StackingFaultStatic(Calculation):
         self.__dumpfile_defect = None
         self.__potential_energy_base = None
         self.__potential_energy_defect = None
-        #self.__displacement_base = None
-        #self.__displacement_defect = None
-        #self.__surface_area = None
         self.__gsf_energy = None
         self.__gsf_displacement = None
         
@@ -61,7 +55,8 @@ class StackingFaultStatic(Calculation):
         self.calc = stackingfault
 
         # Call parent constructor
-        super().__init__(model=model, name=name, params=params, **kwargs)
+        super().__init__(model=model, name=name, params=params,
+                         subsets=subsets, **kwargs)
 
     @property
     def filenames(self):
@@ -71,7 +66,7 @@ class StackingFaultStatic(Calculation):
             'sfmin.template'
         ]
 
-############################## Class attributes ################################
+############################## Class attributes ###############################
 
     @property
     def commands(self):
@@ -102,11 +97,6 @@ class StackingFaultStatic(Calculation):
     def defect(self):
         """StackingFault subset"""
         return self.__defect
-
-    @property
-    def subsets(self):
-        """list of all subsets"""
-        return self.__subsets
 
     @property
     def a1(self):
@@ -154,33 +144,12 @@ class StackingFaultStatic(Calculation):
             raise ValueError('No results yet!')
         return self.__potential_energy_defect
 
-    #@property
-    #def displacement_base(self):
-    #    """float: Planar displacement in the 0 shift reference system"""
-    #    if self.__displacement_base is None:
-    #        raise ValueError('No results yet!')
-    #    return self.__displacement_base
-
-    #@property
-    #def displacement_defect(self):
-    #    """float: Planar displacement in the defect system"""
-    #    if self.__displacement_defect is None:
-    #        raise ValueError('No results yet!')
-    #    return self.__displacement_defect
-
     @property
     def gsf_displacement(self):
         """float: Difference in planar displacement between reference and defect systems"""
         if self.__gsf_displacement is None:
             raise ValueError('No results yet!')
         return self.__gsf_displacement
-
-    #@property
-    #def surface_area(self):
-    #    """float: Area associated with the free surface"""
-    #    if self.__surface_area is None:
-    #        raise ValueError('No results yet!')
-    #    return self.__surface_area
 
     @property
     def gsf_energy(self):
@@ -190,18 +159,25 @@ class StackingFaultStatic(Calculation):
         return self.__gsf_energy
 
     def set_values(self, name=None, **kwargs):
-        """Used to set initial common values for the calculation."""
-        
-        # Set universal content
-        super().set_values(name=None, **kwargs)
+        """
+        Set calculation values directly.  Any terms not given will be set
+        or reset to the calculation's default values.
 
-        # Set subset values
-        self.units.set_values(**kwargs)
-        self.potential.set_values(**kwargs)
-        self.commands.set_values(**kwargs)
-        self.system.set_values(**kwargs)
-        self.minimize.set_values(**kwargs)
-        self.defect.set_values(**kwargs)
+        Parameter
+        ---------
+        name : str, optional
+            The name to assign to the calculation.  By default, this is set as
+            the calculation's key.
+        a1 : float, optional
+            The fractional shift to make along the a1 shift vector.
+        a2 : float, optional
+            The fractional shift to make along the a2 shift vector.
+        **kwargs : any, optional
+            Any keyword parameters supported by the set_values() methods of
+            the parent Calculation class and the subset classes.
+        """
+        # Call super to set universal and subset content
+        super().set_values(name=None, **kwargs)
 
         # Set calculation-specific values
         if 'a1' in kwargs:
@@ -304,11 +280,8 @@ class StackingFaultStatic(Calculation):
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
 
-        # Fetch universal key sets from parent
-        universalkeys = super().multikeys
-        
-        # Specify calculation-specific key sets 
         keys =  [
+            #super().multikeys,
             self.potential.keyset + self.system.keyset,
             [
                 'sizemults',
@@ -322,17 +295,19 @@ class StackingFaultStatic(Calculation):
             self.minimize.keyset,
         ]
                
-        # Join and return
-        return universalkeys + keys
+        return keys
 
 ########################### Data model interactions ###########################
 
     @property
     def modelroot(self):
-        return modelroot
+        """str: The root element of the content"""
+        return 'calculation-stacking-fault-static'
 
     def build_model(self):
-
+        """
+        Generates and returns model content based on the values set to object.
+        """
         # Build universal content
         model = super().build_model()
         calc = model[self.modelroot]
@@ -385,18 +360,20 @@ class StackingFaultStatic(Calculation):
         return model
 
     def load_model(self, model, name=None):
+        """
+        Loads record contents from a given model.
 
-        # Load universal content
+        Parameters
+        ----------
+        model : str or DataModelDict
+            The model contents of the record to load.
+        name : str, optional
+            The name to assign to the record.  Often inferred from other
+            attributes if not given.
+        """
+        # Load universal and subset content
         super().load_model(model, name=name)
         calc = self.model[self.modelroot]
-
-        # Load subset content
-        #self.units.load_model(calc)
-        self.potential.load_model(calc)
-        self.commands.load_model(calc)
-        self.system.load_model(calc)
-        self.minimize.load_model(calc)
-        self.defect.load_model(calc)
 
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
@@ -414,101 +391,63 @@ class StackingFaultStatic(Calculation):
             self.__gsf_energy = uc.value_unit(calc['stacking-fault-energy'])
             self.__gsf_displacement = uc.value_unit(calc['plane-separation'])
             
+    def mongoquery(self, **kwargs):
+        """
+        Builds a Mongo-style query based on kwargs values for the record style.
 
-    @staticmethod
-    def mongoquery(name=None, key=None, iprPy_version=None,
-                   atomman_version=None, script=None, branch=None,
-                   status=None, lammps_version=None,
-                   potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                   potential_key=None, potential_id=None, 
-                   stackingfault_key=None, stackingfault_id=None):
+        Parameters
+        ----------
+        **kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets.        
         
-        # Build universal terms
-        mquery = Calculation.mongoquery(modelroot, name=name, key=key,
-                                    iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version,
-                                    script=script, branch=branch,
-                                    status=status)
-
-        # Build subset terms
-        mquery.update(LammpsCommands.mongoquery(modelroot,
-                                                lammps_version=lammps_version))
-        mquery.update(LammpsPotential.mongoquery(modelroot,
-                                                 potential_LAMMPS_key=potential_LAMMPS_key,
-                                                 potential_LAMMPS_id=potential_LAMMPS_id,
-                                                 potential_key=potential_key,
-                                                 potential_id=potential_id))
-        #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
-        #mquery.update(AtommanSystemManipulate.mongoquery(modelroot,...)
-        mquery.update(StackingFault.mongoquery(modelroot,
-                                             stackingfault_key=stackingfault_key,
-                                             stackingfault_id=stackingfault_id))
+        Returns
+        -------
+        dict
+            The Mongo-style query.
+        """
+        # Call super to build universal and subset terms
+        mquery = super().mongoquery(**kwargs)
 
         # Build calculation-specific terms
-        root = f'content.{modelroot}'
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
-
+        root = f'content.{self.modelroot}'
+       
         return mquery
 
-    @staticmethod
-    def cdcsquery(key=None, iprPy_version=None,
-                  atomman_version=None, script=None, branch=None,
-                  status=None, lammps_version=None,
-                  potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                  potential_key=None, potential_id=None, 
-                  stackingfault_key=None, stackingfault_id=None):
+    def cdcsquery(self, **kwargs):
         
-        # Build universal terms
-        mquery = Calculation.cdcsquery(modelroot, key=key,
-                                    iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version,
-                                    script=script, branch=branch,
-                                    status=status)
+        """
+        Builds a CDCS-style query based on kwargs values for the record style.
 
-        # Build subset terms
-        mquery.update(LammpsCommands.cdcsquery(modelroot,
-                                               lammps_version=lammps_version))
-        mquery.update(LammpsPotential.cdcsquery(modelroot,
-                                                potential_LAMMPS_key=potential_LAMMPS_key,
-                                                potential_LAMMPS_id=potential_LAMMPS_id,
-                                                potential_key=potential_key,
-                                                potential_id=potential_id))
-        #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
-        #mquery.update(AtommanSystemManipulate.mongoquery(modelroot,...)
-        mquery.update(StackingFault.mongoquery(modelroot,
-                                             stackingfault_key=stackingfault_key,
-                                             stackingfault_id=stackingfault_id))
+        Parameters
+        ----------
+        **kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets.        
+        
+        Returns
+        -------
+        dict
+            The CDCS-style query.
+        """
+        # Call super to build universal and subset terms
+        mquery = super().cdcsquery(**kwargs)
 
         # Build calculation-specific terms
-        root = modelroot
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
-
+        root = self.modelroot
+        
         return mquery
 
 ########################## Metadata interactions ##############################
 
     def metadata(self):
         """
-        Converts the structured content to a simpler dictionary.
-        
-        Returns
-        -------
-        dict
-            A dictionary representation of the record's content.
+        Generates a dict of simple metadata values associated with the record.
+        Useful for quickly comparing records and for building pandas.DataFrames
+        for multiple records of the same style.
         """
-        # Extract universal content
+        # Call super to extract universal and subset content
         meta = super().metadata()
-        
-        # Extract subset content
-        self.potential.metadata(meta)
-        self.commands.metadata(meta)
-        self.system.metadata(meta)
-        self.minimize.metadata(meta)
-        self.defect.metadata(meta)
 
         # Extract calculation-specific content
         
@@ -553,40 +492,31 @@ class StackingFaultStatic(Calculation):
     def isvalid(self):
         return self.system.family == self.defect.family
     
-    @staticmethod
-    def pandasfilter(dataframe, name=None, key=None, iprPy_version=None,
-                     atomman_version=None, script=None, branch=None,
-                     status=None, lammps_version=None,
-                     potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                     potential_key=None, potential_id=None, 
-                     stackingfault_key=None, stackingfault_id=None):
-        matches = (
-            # Filter by universal terms
-            Calculation.pandasfilter(dataframe, name=name, key=key,
-                                 iprPy_version=iprPy_version,
-                                 atomman_version=atomman_version,
-                                 script=script, branch=branch, status=status)
-            
-            # Filter by subset terms
-            &LammpsCommands.pandasfilter(dataframe,
-                                         lammps_version=lammps_version)
-            &LammpsPotential.pandasfilter(dataframe,
-                                          potential_LAMMPS_key=potential_LAMMPS_key,
-                                          potential_LAMMPS_id=potential_LAMMPS_id,
-                                          potential_key=potential_key,
-                                          potential_id=potential_id)
-            #&AtommanSystemLoad.pandasfilter(dataframe, ...)
-            #&AtommanSystemManipulate.pandasfilter(dataframe, ...)
-            &StackingFault.pandasfilter(dataframe,
-                                      stackingfault_key=stackingfault_key,
-                                      stackingfault_id=stackingfault_id)
+    def pandasfilter(self, dataframe, **kwargs):
+        """
+        Parses a pandas dataframe containing the subset's metadata to find 
+        entries matching the terms and values given. Ideally, this should find
+        the same matches as the mongoquery and cdcsquery methods for the same
+        search parameters.
 
-            # Filter by calculation-specific terms
-            #&query.str_match.pandas(dataframe, 'minimum_r', minimum_r)
-            #&query.str_match.pandas(dataframe, 'maximum_r', maximum_r)
-            #&query.str_match.pandas(dataframe, 'number_of_steps_r', number_of_steps_r)
-            #&query.str_contains.pandas(dataframe, 'symbols', symbols)
-        )
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            The metadata dataframe to filter.
+        kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets. 
+
+        Returns
+        -------
+        pandas.Series of bool
+            True for each entry where all filter terms+values match, False for
+            all other entries.
+        """
+        # Call super to filter by universal and subset terms
+        matches = super().pandasfilter(dataframe, **kwargs)
+
+        # Filter by calculation-specific terms
         
         return matches
 
@@ -599,13 +529,8 @@ class StackingFaultStatic(Calculation):
         input_dict = {}
 
         # Add subset inputs
-        self.commands.calc_inputs(input_dict)
-        self.potential.calc_inputs(input_dict)
-        self.system.calc_inputs(input_dict)
-        self.minimize.calc_inputs(input_dict)
-        self.defect.calc_inputs(input_dict)
-
-        # Remove unused subset inputs
+        for subset in self.subsets:
+            subset.calc_inputs(input_dict)
 
         # Add calculation-specific inputs
         input_dict['a1'] = self.a1

@@ -21,9 +21,6 @@ from ...calculation_subset import *
 from ...input import value, boolean
 from ...tools import aslist, dict_insert
 
-# Global class properties
-modelroot = 'calculation-crystal-space-group'
-
 class CrystalSpaceGroup(Calculation):
     """Class for managing space group analysis of crystals"""
 
@@ -35,7 +32,7 @@ class CrystalSpaceGroup(Calculation):
         # Initialize subsets used by the calculation
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
-        self.__subsets = [self.system, self.units]
+        subsets = (self.system, self.units)
 
         # Initialize unique calculation attributes
         self.primitivecell = False
@@ -47,15 +44,14 @@ class CrystalSpaceGroup(Calculation):
         self.__schoenflies = None
         self.__wyckoffs = None
         self.__wyckoff_fingerprint = None
-        #self.__hall_number = None
-        #self.__equivalent_atoms = None
         self.__spg_ucell = None
 
         # Define calc shortcut
         self.calc = crystal_space_group
 
         # Call parent constructor
-        super().__init__(model=model, name=name, params=params, **kwargs)
+        super().__init__(model=model, name=name, params=params,
+                         subsets=subsets, **kwargs)
 
     @property
     def filenames(self):
@@ -64,7 +60,7 @@ class CrystalSpaceGroup(Calculation):
             'crystal_space_group.py'
         ]
 
-############################## Class attributes ################################
+############################## Class attributes ###############################
 
     @property
     def units(self):
@@ -75,11 +71,6 @@ class CrystalSpaceGroup(Calculation):
     def system(self):
         """AtommanSystemLoad subset"""
         return self.__system
-
-    @property
-    def subsets(self):
-        """list of all subsets"""
-        return self.__subsets
 
     @property
     def primitivecell(self):
@@ -101,7 +92,7 @@ class CrystalSpaceGroup(Calculation):
 
     @property
     def symmetryprecision(self):
-        """Length tolerance used in identifying symmetry of atomic sites and system dimensions"""
+        """float : Length tolerance used in identifying symmetry of atomic sites and system dimensions"""
         return self.__symmetryprecision
 
     @symmetryprecision.setter
@@ -150,20 +141,6 @@ class CrystalSpaceGroup(Calculation):
             raise ValueError('No results yet!')
         return self.__wyckoff_fingerprint
 
-    #@property
-    #def hall_number(self):
-    #    """str: Hall number."""
-    #    if self.__hall_number is None:
-    #        raise ValueError('No results yet!')
-    #    return self.__hall_number
-
-    #@property
-    #def equivalent_atoms(self):
-    #    """list: Indicates which atoms are at equivalent sites."""
-    #    if self.__equivalent_atoms is None:
-    #        raise ValueError('No results yet!')
-    #    return self.__equivalent_atoms
-
     @property
     def spg_ucell(self):
         """atomman.System: The unit cell identified following the space-group analysis"""
@@ -174,14 +151,29 @@ class CrystalSpaceGroup(Calculation):
         return self.__spg_ucell
 
     def set_values(self, name=None, **kwargs):
-        """Used to set initial common values for the calculation."""
-        
-        # Set universal content
-        super().set_values(name=None, **kwargs)
+        """
+        Set calculation values directly.  Any terms not given will be set
+        or reset to the calculation's default values.
 
-        # Set subset values
-        self.units.set_values(**kwargs)
-        self.system.set_values(**kwargs)
+        Parameter
+        ---------
+        name : str, optional
+            The name to assign to the calculation.  By default, this is set as
+            the calculation's key.
+        primitivecell : bool, optional
+            Indicates if spg_ucell is conventional (False) or primitive (True).
+        idealcell : bool, optional
+            Indicates if spg_ucell atoms are averaged (False) or idealized
+            (True).
+        symmetryprecision : float, optional
+            Length tolerance used in identifying symmetry of atomic sites and
+            system dimensions.
+        **kwargs : any, optional
+            Any keyword parameters supported by the set_values() methods of
+            the parent Calculation class and the subset classes.
+        """
+        # Call super to set universal and subset content
+        super().set_values(name=None, **kwargs)
 
         # Set calculation-specific values
         if 'primitivecell' in kwargs:
@@ -350,11 +342,9 @@ class CrystalSpaceGroup(Calculation):
     @property
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
-        # Fetch universal key sets from parent
-        universalkeys = super().multikeys
         
-        # Specify calculation-specific key sets 
         keys = [
+            #super().multikeys,
             self.system.keyset,
             [
             'symmetryprecision',
@@ -363,17 +353,19 @@ class CrystalSpaceGroup(Calculation):
             ],
         ]
         
-        # Join and return
-        return universalkeys + keys
+        return keys
 
 ########################### Data model interactions ###########################
 
     @property
     def modelroot(self):
-        return modelroot
+        """str: The root element of the content"""
+        return 'calculation-crystal-space-group'
 
     def build_model(self):
-
+        """
+        Generates and returns model content based on the values set to object.
+        """
         # Build universal content
         model = super().build_model()
         calc = model[self.modelroot]
@@ -414,14 +406,20 @@ class CrystalSpaceGroup(Calculation):
         return model
 
     def load_model(self, model, name=None):
+        """
+        Loads record contents from a given model.
 
-        # Load universal content
+        Parameters
+        ----------
+        model : str or DataModelDict
+            The model contents of the record to load.
+        name : str, optional
+            The name to assign to the record.  Often inferred from other
+            attributes if not given.
+        """
+        # Load universal and subset content
         super().load_model(model, name=name)
         calc = self.model[self.modelroot]
-
-        # Load subset content
-        #self.units.load_model(calc)
-        self.system.load_model(calc)
 
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
@@ -442,54 +440,88 @@ class CrystalSpaceGroup(Calculation):
 
             self.__spg_ucell = DM([('atomic-system', calc['unit-cell-atomic-system'])])
 
-    @staticmethod
-    def mongoquery(name=None, key=None, iprPy_version=None,
-                   atomman_version=None, script=None, branch=None,
-                   status=None, symbols=None, 
-                   symmetryprecision=None, idealcell=None, primitivecell=None,
-                   pearson=None, number=None, international=None, schoenflies=None):
-        
-        # Build universal terms
-        mquery = Calculation.mongoquery(modelroot, name=name, key=key,
-                                    iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version,
-                                    script=script, branch=branch,
-                                    status=status)
+    def mongoquery(self, symmetryprecision=None, idealcell=None,
+                   primitivecell=None, pearson=None, number=None,
+                   international=None, schoenflies=None, **kwargs):
+        """
+        Builds a Mongo-style query based on kwargs values for the record style.
 
-        # Build subset terms
-        #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
+        Parameters
+        ----------
+        symmetryprecision : float or list, optional
+            symmetryprecision parameter value(s) to parse by.
+        idealcell : bool or list, optional
+            idealcell parameter value(s) to parse by.
+        primitivecell : bool or list, optional
+            primitivecell parameter value(s) to parse by.
+        pearson : str or list, optional
+            Pearson symbol(s) to parse by.
+        number : int or list, optional
+            Space group numbers to parse by.
+        international : str or list, optional
+            International space group symbols to parse by.
+        schoenflies : str or list, optional
+            Schoenflies space group symbol(s) to parse by.
+        **kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets.        
+        
+        Returns
+        -------
+        dict
+            The Mongo-style query.
+        """
+        # Call super to build universal and subset terms
+        mquery = super().mongoquery(**kwargs)
 
         # Build calculation-specific terms
-        root = f'content.{modelroot}'
+        root = f'content.{self.modelroot}'
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.symmetryprecision', symmetryprecision)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.idealcell', idealcell)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.primitivecell', primitivecell)
         query.str_match.mongo(mquery, f'{root}.Pearson-symbol', pearson)
-        query.str_match.mongo(mquery, f'{root}.space-group.number', pearson)
+        query.str_match.mongo(mquery, f'{root}.space-group.number', number)
         query.str_match.mongo(mquery, f'{root}.space-group.Hermann-Maguin', international)
         query.str_match.mongo(mquery, f'{root}.space-group.Schoenflies', schoenflies)
 
         return mquery
 
-    @staticmethod
-    def cdcsquery(key=None, iprPy_version=None,
-                   atomman_version=None, script=None, branch=None,
-                   status=None, symbols=None, 
-                   symmetryprecision=None, idealcell=None, primitivecell=None,
-                   pearson=None, number=None, international=None, schoenflies=None):
-        
-        # Build universal terms
-        mquery = Calculation.cdcsquery(modelroot, key=key,
-                                    iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version,
-                                    script=script, branch=branch,
-                                    status=status)
+    def cdcsquery(self, symmetryprecision=None, idealcell=None,
+                  primitivecell=None, pearson=None, number=None,
+                  international=None, schoenflies=None, **kwargs):
+        """
+        Builds a CDCS-style query based on kwargs values for the record style.
 
-        # Build subset terms
-        #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
+        Parameters
+        ----------
+        symmetryprecision : float or list, optional
+            symmetryprecision parameter value(s) to parse by.
+        idealcell : bool or list, optional
+            idealcell parameter value(s) to parse by.
+        primitivecell : bool or list, optional
+            primitivecell parameter value(s) to parse by.
+        pearson : str or list, optional
+            Pearson symbol(s) to parse by.
+        number : int or list, optional
+            Space group numbers to parse by.
+        international : str or list, optional
+            International space group symbols to parse by.
+        schoenflies : str or list, optional
+            Schoenflies space group symbol(s) to parse by.
+        **kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets.        
+        
+        Returns
+        -------
+        dict
+            The CDCS-style query.
+        """
+        # Call super to build universal and subset terms
+        mquery = super().cdcsquery(**kwargs)
 
         # Build calculation-specific terms
-        root = modelroot
+        root = self.modelroot
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.symmetryprecision', symmetryprecision)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.idealcell', idealcell)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.primitivecell', primitivecell)
@@ -504,18 +536,12 @@ class CrystalSpaceGroup(Calculation):
 
     def metadata(self):
         """
-        Converts the structured content to a simpler dictionary.
-        
-        Returns
-        -------
-        dict
-            A dictionary representation of the record's content.
+        Generates a dict of simple metadata values associated with the record.
+        Useful for quickly comparing records and for building pandas.DataFrames
+        for multiple records of the same style.
         """
-        # Extract universal content
+        # Call super to extract universal and subset content
         meta = super().metadata()
-        
-        # Extract subset content
-        self.system.metadata(meta)
 
         # Extract calculation-specific content
         meta['symmetryprecision'] = self.symmetryprecision
@@ -560,31 +586,57 @@ class CrystalSpaceGroup(Calculation):
             'symmetryprecision':1e-5,
         }
 
-    @staticmethod
-    def pandasfilter(dataframe, name=None, key=None, iprPy_version=None,
+    def pandasfilter(self, dataframe, name=None, key=None, iprPy_version=None,
                    atomman_version=None, script=None, branch=None,
                    status=None, symbols=None, 
                    symmetryprecision=None, idealcell=None, primitivecell=None,
                    pearson=None, number=None, international=None, schoenflies=None):
-        matches = (
-            # Filter by universal terms
-            Calculation.pandasfilter(dataframe, name=name, key=key,
-                                 iprPy_version=iprPy_version,
-                                 atomman_version=atomman_version,
-                                 script=script, branch=branch, status=status)
-            
-            # Filter by subset terms
-            #&AtommanSystemLoad.pandasfilter(dataframe, ...)
+        """
+        Parses a pandas dataframe containing the subset's metadata to find 
+        entries matching the terms and values given. Ideally, this should find
+        the same matches as the mongoquery and cdcsquery methods for the same
+        search parameters.
 
-            # Filter by calculation-specific terms
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            The metadata dataframe to filter.
+        symmetryprecision : float or list, optional
+            symmetryprecision parameter value(s) to parse by.
+        idealcell : bool or list, optional
+            idealcell parameter value(s) to parse by.
+        primitivecell : bool or list, optional
+            primitivecell parameter value(s) to parse by.
+        pearson : str or list, optional
+            Pearson symbol(s) to parse by.
+        number : int or list, optional
+            Space group numbers to parse by.
+        international : str or list, optional
+            International space group symbols to parse by.
+        schoenflies : str or list, optional
+            Schoenflies space group symbol(s) to parse by.
+        kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets. 
+
+        Returns
+        -------
+        pandas.Series of bool
+            True for each entry where all filter terms+values match, False for
+            all other entries.
+        """
+        # Call super to filter by universal and subset terms
+        matches = super().pandasfilter(dataframe, **kwargs)
+
+        # Filter by calculation-specific terms
+        matches = (matches
             &query.str_match.pandas(dataframe, 'symmetryprecision', symmetryprecision)
             &query.str_match.pandas(dataframe, 'idealcell', idealcell)
             &query.str_match.pandas(dataframe, 'primitivecell', primitivecell)
             &query.str_match.pandas(dataframe, 'pearson', pearson)
             &query.str_match.pandas(dataframe, 'number', number)
             &query.str_match.pandas(dataframe, 'international', international)
-            &query.str_match.pandas(dataframe, 'schoenflies', schoenflies)
-            
+            &query.str_match.pandas(dataframe, 'schoenflies', schoenflies) 
         )
         
         return matches
@@ -598,7 +650,8 @@ class CrystalSpaceGroup(Calculation):
         input_dict = {}
 
         # Add subset inputs
-        self.system.calc_inputs(input_dict)
+        for subset in self.subsets:
+            subset.calc_inputs(input_dict)
         
         # Modify subset inputs
         input_dict['system'] = input_dict.pop('ucell')
@@ -627,6 +680,4 @@ class CrystalSpaceGroup(Calculation):
         self.__schoenflies = results_dict['schoenflies']
         self.__wyckoffs = results_dict['wyckoffs']
         self.__wyckoff_fingerprint = results_dict['wyckoff_fingerprint']
-        #self.__hall_number = results_dict['hall_number']
-        #self.__equivalent_atoms = results_dict['equivalent_atoms']
         self.__spg_ucell = results_dict['ucell']

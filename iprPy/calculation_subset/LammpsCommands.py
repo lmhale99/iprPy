@@ -174,32 +174,83 @@ class LammpsCommands(CalculationSubset):
 
     @property
     def modelroot(self):
+        """str : The root element name for the subset terms."""
         baseroot = 'LAMMPS-version'
         return f'{self.modelprefix}{baseroot}'
 
     def load_model(self, model):
+        """Loads subset attributes from an existing model."""
         self.__lammps_version = model['calculation'][self.modelroot]
     
     def build_model(self, model, **kwargs):
-        # Check required parameters
-        #if self.lammps_command is None:
-        #    raise ValueError('lammps_command not set')
-            
+        """
+        Adds the subset model to the parent model.
+        
+        Parameters
+        ----------
+        model : DataModelDict.DataModelDict
+            The record content (after root element) to add content to.
+        kwargs : any
+            Any options to pass on to dict_insert that specify where the subset
+            content gets added to in the parent model.
+        """
         dict_insert(model['calculation'], self.modelroot, self.lammps_version,
                     **kwargs)
 
-    @staticmethod
-    def mongoquery(modelroot, lammps_version=None):
+    def mongoquery(self, lammps_version=None, **kwargs):
+        """
+        Generate a query to parse records with the subset from a Mongo-style
+        database.
+        
+        Parameters
+        ----------
+        lammps_version : str
+            The version of LAMMPS used.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+
+        Returns
+        -------
+        dict
+            The Mongo-style find query terms.
+        """
+        # Init query and set root paths
         mquery = {}
-        root = f'content.{modelroot}'
-        query.str_match.mongo(mquery, f'{root}.calculation.LAMMPS-version', lammps_version)
+        parentroot = f'content.{self.parent.modelroot}'
+        root = f'{parentroot}.calculation.{self.modelroot}'
+        
+        # Build query terms
+        query.str_match.mongo(mquery, root, lammps_version)
+        
+        # Return query dict
         return mquery
 
-    @staticmethod
-    def cdcsquery(modelroot, lammps_version=None):
+    def cdcsquery(self, lammps_version=None, **kwargs):
+        """
+        Generate a query to parse records with the subset from a CDCS-style
+        database.
+        
+        Parameters
+        ----------
+        lammps_version : str
+            The version of LAMMPS used.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+        
+        Returns
+        -------
+        dict
+            The CDCS-style find query terms.
+        """
+        # Init query and set root paths
         mquery = {}
-        root = modelroot
-        query.str_match.mongo(mquery, f'{root}.calculation.LAMMPS-version', lammps_version)
+        parentroot = self.parent.modelroot
+        root = f'{parentroot}.calculation.{self.modelroot}'
+        
+        # Build query terms
+        query.str_match.mongo(mquery, root, lammps_version)
+        
+        # Return query dict
         return mquery
 
 ########################## Metadata interactions ##############################
@@ -213,26 +264,49 @@ class LammpsCommands(CalculationSubset):
         meta : dict
             The dictionary to add the interpreted content to
         """
-        # Check required parameters
-        #if self.lammps_command is None:
-        #    raise ValueError('lammps_command not set')
-
-        #meta[f'{self.prefix}lammps_command'] = self.lammps_command
-        #meta[f'{self.prefix}mpi_command'] = self.mpi_command
         meta[f'{self.prefix}lammps_version'] = self.lammps_version
         
-    @staticmethod
-    def pandasfilter(dataframe, lammps_version=None):
+    def pandasfilter(self, dataframe, lammps_version=None, **kwargs):
+        """
+        Parses a pandas dataframe containing the subset's metadata to find 
+        entries matching the terms and values given. Ideally, this should find
+        the same matches as the mongoquery and cdcsquery methods for the same
+        search parameters.
 
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            The metadata dataframe to filter.
+        lammps_version : str
+            The version of LAMMPS used.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+
+        Returns
+        -------
+        pandas.Series of bool
+            True for each entry where all filter terms+values match, False for
+            all other entries.
+        """
+        prefix = self.prefix
         matches = (
-            query.str_match.pandas(dataframe, 'lammps_version', lammps_version)
+            query.str_match.pandas(dataframe, f'{prefix}lammps_version',
+                                   lammps_version)
         )
         return matches
 
 ########################### Calculation interactions ##########################
     
     def calc_inputs(self, input_dict):
-        
+        """
+        Generates calculation function input parameters based on the values
+        assigned to attributes of the subset.
+
+        Parameters
+        ----------
+        input_dict : dict
+            The dictionary of input parameters to add subset terms to.
+        """
         if self.lammps_command is None:
             raise ValueError('lammps_command not set!')
             

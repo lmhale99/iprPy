@@ -246,6 +246,7 @@ class AtommanElasticConstants(CalculationSubset):
 
     @property
     def modelroot(self):
+        """str : The root element name for the subset terms."""
         baseroot = 'elastic-constants'
         return f'{self.modelprefix}{baseroot}'
 
@@ -256,20 +257,21 @@ class AtommanElasticConstants(CalculationSubset):
 
     def build_model(self, model, **kwargs):
         """
-        Converts the structured content to a simpler dictionary.
+        Adds the subset model to the parent model.
         
         Parameters
         ----------
-        record_model : DataModelDict.DataModelDict
+        model : DataModelDict.DataModelDict
             The record content (after root element) to add content to.
-        input_dict : dict
-            Dictionary of all input parameter terms.
-        results_dict : dict, optional
-            Dictionary containing any results produced by the calculation.
+        kwargs : any
+            Any options to pass on to dict_insert that specify where the subset
+            content gets added to in the parent model.
         """
         # Save info on system file loaded
         c_model = self.C.model(unit=self.parent.units.pressure_unit)
         model[self.modelroot] = c_model['elastic-constants']
+
+########################## Metadata interactions ##############################
 
     def metadata(self, meta):
         """
@@ -307,5 +309,13 @@ class AtommanElasticConstants(CalculationSubset):
 ########################### Calculation interactions ##########################
 
     def calc_inputs(self, input_dict):
+        """
+        Generates calculation function input parameters based on the values
+        assigned to attributes of the subset.
 
+        Parameters
+        ----------
+        input_dict : dict
+            The dictionary of input parameters to add subset terms to.
+        """
         input_dict['C'] = self.C

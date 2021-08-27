@@ -169,6 +169,7 @@ class AtommanGammaSurface(CalculationSubset):
 
     @property
     def modelroot(self):
+        """str : The root element name for the subset terms."""
         baseroot = 'stacking-fault-map'
         return f'{self.modelprefix}{baseroot}'
 
@@ -180,22 +181,23 @@ class AtommanGammaSurface(CalculationSubset):
 
     def build_model(self, model, **kwargs):
         """
-        Converts the structured content to a simpler dictionary.
+        Adds the subset model to the parent model.
         
         Parameters
         ----------
-        record_model : DataModelDict.DataModelDict
+        model : DataModelDict.DataModelDict
             The record content (after root element) to add content to.
-        input_dict : dict
-            Dictionary of all input parameter terms.
-        results_dict : dict, optional
-            Dictionary containing any results produced by the calculation.
+        kwargs : any
+            Any options to pass on to dict_insert that specify where the subset
+            content gets added to in the parent model.
         """
         # Save info on system file loaded
         g_model = self.gamma.model(length_unit=self.parent.units.length_unit)
         model[self.modelroot] = g_model['stacking-fault-map']
         model[self.modelroot]['calc_key'] = self.calc_key
-        
+
+########################## Metadata interactions ##############################
+
     def metadata(self, meta):
         """
         Converts the structured content to a simpler dictionary.
@@ -208,9 +210,16 @@ class AtommanGammaSurface(CalculationSubset):
         meta[f'{self.prefix}gamma'] = self.gamma
         meta[f'{self.prefix}gammasurface_calc_key'] = self.calc_key
 
-
 ########################### Calculation interactions ##########################
 
     def calc_inputs(self, input_dict):
+        """
+        Generates calculation function input parameters based on the values
+        assigned to attributes of the subset.
 
+        Parameters
+        ----------
+        input_dict : dict
+            The dictionary of input parameters to add subset terms to.
+        """
         input_dict['gamma'] = self.gamma

@@ -22,9 +22,6 @@ from ...calculation_subset import *
 from ...input import value, boolean
 from ...tools import aslist, dict_insert
 
-# Global class properties
-modelroot = 'calculation-E-vs-r-scan'
-
 class EvsRScan(Calculation):
     """Class for managing energy versus r volumetric scans for crystals"""
 
@@ -39,8 +36,8 @@ class EvsRScan(Calculation):
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
         self.__system_mods = AtommanSystemManipulate(self)
-        self.__subsets = [self.commands, self.potential, self.system,
-                          self.system_mods, self.units]
+        subsets = (self.commands, self.potential, self.system,
+                   self.system_mods, self.units)
 
         # Initialize unique calculation attributes
         self.number_of_steps_r = 201
@@ -55,7 +52,8 @@ class EvsRScan(Calculation):
         self.calc = e_vs_r_scan
 
         # Call parent constructor
-        super().__init__(model=model, name=name, params=params, **kwargs)
+        super().__init__(model=model, name=name, params=params,
+                         subsets=subsets, **kwargs)
 
     @property
     def filenames(self):
@@ -65,7 +63,7 @@ class EvsRScan(Calculation):
             'run0.template'
         ]
 
-############################## Class attributes ################################
+############################## Class attributes ###############################
 
     @property
     def commands(self):
@@ -91,11 +89,6 @@ class EvsRScan(Calculation):
     def system_mods(self):
         """AtommanSystemManipulate subset"""
         return self.__system_mods
-
-    @property
-    def subsets(self):
-        """list of all subsets"""
-        return self.__subsets
 
     @property
     def number_of_steps_r(self):
@@ -193,17 +186,27 @@ class EvsRScan(Calculation):
             self.__min_cells = aslist(value)
 
     def set_values(self, name=None, **kwargs):
-        """Used to set initial common values for the calculation."""
-        
-        # Set universal content
-        super().set_values(name=None, **kwargs)
+        """
+        Set calculation values directly.  Any terms not given will be set
+        or reset to the calculation's default values.
 
-        # Set subset values
-        self.units.set_values(**kwargs)
-        self.potential.set_values(**kwargs)
-        self.commands.set_values(**kwargs)
-        self.system.set_values(**kwargs)
-        self.system_mods.set_values(**kwargs)
+        Parameter
+        ---------
+        name : str, optional
+            The name to assign to the calculation.  By default, this is set as
+            the calculation's key.
+        number_of_steps_r : int, optional
+            The number of evaluation steps to use for the r spacing.
+        minimum_r : float, optional
+            The minimum r spacing value to evaluate.
+        maximum_r : float, optional
+            The maximum r spacing value to evaluate.
+        **kwargs : any, optional
+            Any keyword parameters supported by the set_values() methods of
+            the parent Calculation class and the subset classes.
+        """
+        # Call super to set universal and subset content
+        super().set_values(name=None, **kwargs)
 
         # Set calculation-specific values
         if 'number_of_steps_r' in kwargs:
@@ -362,14 +365,9 @@ class EvsRScan(Calculation):
 
     @property
     def multikeys(self):
-        """
-        list: Calculation key sets that can have multiple values during prepare.
-        """
-        # Fetch universal key sets from parent
-        universalkeys = super().multikeys
-        
-        # Specify calculation-specific key sets 
+        """list: Calculation key sets that can have multiple values during prepare."""
         keys =  [
+            #super().multikeys,
             self.potential.keyset + self.system.keyset,
             self.system_mods.keyset,
             [
@@ -379,17 +377,19 @@ class EvsRScan(Calculation):
             ],
         ]
                
-        # Join and return
-        return universalkeys + keys
+        return keys
 
 ########################### Data model interactions ###########################
 
     @property
     def modelroot(self):
-        return modelroot
+        """str: The root element of the content"""
+        return 'calculation-E-vs-r-scan'
 
     def build_model(self):
-
+        """
+        Generates and returns model content based on the values set to object.
+        """
         # Build universal content
         model = super().build_model()
         calc = model[self.modelroot]
@@ -428,17 +428,20 @@ class EvsRScan(Calculation):
         return model
 
     def load_model(self, model, name=None):
+        """
+        Loads record contents from a given model.
 
-        # Load universal content
+        Parameters
+        ----------
+        model : str or DataModelDict
+            The model contents of the record to load.
+        name : str, optional
+            The name to assign to the record.  Often inferred from other
+            attributes if not given.
+        """
+        # Load universal and subset content
         super().load_model(model, name=name)
         calc = self.model[self.modelroot]
-
-        # Load subset content
-        #self.units.load_model(calc)
-        self.potential.load_model(calc)
-        self.commands.load_model(calc)
-        self.system.load_model(calc)
-        self.system_mods.load_model(calc)
 
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
@@ -457,34 +460,33 @@ class EvsRScan(Calculation):
             for cell in calc.aslist('minimum-atomic-system'):
                self.min_cells.append(DM([('atomic-system', cell)]))
 
-    @staticmethod
-    def mongoquery(name=None, key=None, iprPy_version=None,
-                   atomman_version=None, script=None, branch=None,
-                   status=None, lammps_version=None,
-                   potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                   potential_key=None, potential_id=None, minimum_r=None,
-                   maximum_r=None, number_of_steps_r=None, symbols=None):
-        
-        # Build universal terms
-        mquery = Calculation.mongoquery(modelroot, name=name, key=key,
-                                    iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version,
-                                    script=script, branch=branch,
-                                    status=status)
+    def mongoquery(self, minimum_r=None, maximum_r=None,
+                   number_of_steps_r=None, **kwargs):
+        """
+        Builds a Mongo-style query based on kwargs values for the record style.
 
-        # Build subset terms
-        mquery.update(LammpsCommands.mongoquery(modelroot,
-                                                lammps_version=lammps_version))
-        mquery.update(LammpsPotential.mongoquery(modelroot,
-                                                 potential_LAMMPS_key=potential_LAMMPS_key,
-                                                 potential_LAMMPS_id=potential_LAMMPS_id,
-                                                 potential_key=potential_key,
-                                                 potential_id=potential_id))
-        #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
-        #mquery.update(AtommanSystemManipulate.mongoquery(modelroot,...)
+        Parameters
+        ----------
+        minimum_r : float or list, optional
+            The minimum_r run parameter value(s) to parse by.
+        maximum_r : float or list, optional
+            The maximum_r run parameter value(s) to parse by.
+        number_of_steps_r : int or list, optional
+            The number_of_steps_r run parameter value(s) to parse by.
+        **kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets.        
+        
+        Returns
+        -------
+        dict
+            The Mongo-style query.
+        """
+        # Call super to build universal and subset terms
+        mquery = super().mongoquery(**kwargs)
 
         # Build calculation-specific terms
-        root = f'content.{modelroot}'
+        root = f'content.{self.modelroot}'
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maximum_r', maximum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
@@ -492,33 +494,33 @@ class EvsRScan(Calculation):
         return mquery
 
     @staticmethod
-    def cdcsquery(key=None, iprPy_version=None,
-                  atomman_version=None, script=None, branch=None,
-                  status=None, lammps_version=None,
-                  potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                  potential_key=None, potential_id=None, minimum_r=None,
-                  maximum_r=None, number_of_steps_r=None, symbols=None):
-        
-        # Build universal terms
-        mquery = Calculation.cdcsquery(modelroot, key=key,
-                                    iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version,
-                                    script=script, branch=branch,
-                                    status=status)
+    def cdcsquery(self, minimum_r=None, maximum_r=None,
+                  number_of_steps_r=None, **kwargs):
+        """
+        Builds a CDCS-style query based on kwargs values for the record style.
 
-        # Build subset terms
-        mquery.update(LammpsCommands.cdcsquery(modelroot,
-                                               lammps_version=lammps_version))
-        mquery.update(LammpsPotential.cdcsquery(modelroot,
-                                                potential_LAMMPS_key=potential_LAMMPS_key,
-                                                potential_LAMMPS_id=potential_LAMMPS_id,
-                                                potential_key=potential_key,
-                                                potential_id=potential_id))
-        #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
-        #mquery.update(AtommanSystemManipulate.mongoquery(modelroot,...)
+        Parameters
+        ----------
+        minimum_r : float or list, optional
+            The minimum_r run parameter value(s) to parse by.
+        maximum_r : float or list, optional
+            The maximum_r run parameter value(s) to parse by.
+        number_of_steps_r : int or list, optional
+            The number_of_steps_r run parameter value(s) to parse by.
+        **kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets.        
+        
+        Returns
+        -------
+        dict
+            The CDCS-style query.
+        """
+        # Call super to build universal and subset terms
+        mquery = super().cdcsquery(**kwargs)
 
         # Build calculation-specific terms
-        root = modelroot
+        root = self.modelroot
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maximum_r', maximum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
@@ -529,21 +531,12 @@ class EvsRScan(Calculation):
 
     def metadata(self):
         """
-        Converts the structured content to a simpler dictionary.
-        
-        Returns
-        -------
-        dict
-            A dictionary representation of the record's content.
+        Generates a dict of simple metadata values associated with the record.
+        Useful for quickly comparing records and for building pandas.DataFrames
+        for multiple records of the same style.
         """
-        # Extract universal content
+        # Call super to extract universal and subset content
         meta = super().metadata()
-        
-        # Extract subset content
-        self.potential.metadata(meta)
-        self.commands.metadata(meta)
-        self.system.metadata(meta)
-        self.system_mods.metadata(meta)
 
         # Extract calculation-specific content
         meta['minimum_r'] = self.minimum_r
@@ -580,32 +573,39 @@ class EvsRScan(Calculation):
         """dict: The terms to compare metadata values using a tolerance."""
         return {}
 
-    @staticmethod
-    def pandasfilter(dataframe, name=None, key=None, iprPy_version=None,
-                     atomman_version=None, script=None, branch=None,
-                     status=None, lammps_version=None,
-                     potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                     potential_key=None, potential_id=None, minimum_r=None,
-                     maximum_r=None, number_of_steps_r=None, symbols=None):
-        matches = (
-            # Filter by universal terms
-            Calculation.pandasfilter(dataframe, name=name, key=key,
-                                 iprPy_version=iprPy_version,
-                                 atomman_version=atomman_version,
-                                 script=script, branch=branch, status=status)
-            
-            # Filter by subset terms
-            &LammpsCommands.pandasfilter(dataframe,
-                                         lammps_version=lammps_version)
-            &LammpsPotential.pandasfilter(dataframe,
-                                          potential_LAMMPS_key=potential_LAMMPS_key,
-                                          potential_LAMMPS_id=potential_LAMMPS_id,
-                                          potential_key=potential_key,
-                                          potential_id=potential_id)
-            #&AtommanSystemLoad.pandasfilter(dataframe, ...)
-            #&AtommanSystemManipulate.pandasfilter(dataframe, ...)
+    def pandasfilter(dataframe, minimum_r=None, maximum_r=None,
+                     number_of_steps_r=None, **kwargs):
+        """
+        Parses a pandas dataframe containing the subset's metadata to find 
+        entries matching the terms and values given. Ideally, this should find
+        the same matches as the mongoquery and cdcsquery methods for the same
+        search parameters.
 
-            # Filter by calculation-specific terms
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            The metadata dataframe to filter.
+        minimum_r : float or list, optional
+            The minimum_r run parameter value(s) to parse by.
+        maximum_r : float or list, optional
+            The maximum_r run parameter value(s) to parse by.
+        number_of_steps_r : int or list, optional
+            The number_of_steps_r run parameter value(s) to parse by.
+        kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets. 
+
+        Returns
+        -------
+        pandas.Series of bool
+            True for each entry where all filter terms+values match, False for
+            all other entries.
+        """
+        # Call super to filter by universal and subset terms
+        matches = super().pandasfilter(dataframe, **kwargs)
+
+        # Filter by calculation-specific terms
+        matches = (matches
             &query.str_match.pandas(dataframe, 'minimum_r', minimum_r)
             &query.str_match.pandas(dataframe, 'maximum_r', maximum_r)
             &query.str_match.pandas(dataframe, 'number_of_steps_r', number_of_steps_r)
@@ -623,10 +623,8 @@ class EvsRScan(Calculation):
         input_dict = {}
 
         # Add subset inputs
-        self.commands.calc_inputs(input_dict)
-        self.potential.calc_inputs(input_dict)
-        self.system.calc_inputs(input_dict)
-        self.system_mods.calc_inputs(input_dict)
+        for subset in self.subsets:
+            subset.calc_inputs(input_dict)
         
         # Remove unused subset inputs
         del input_dict['transform']

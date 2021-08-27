@@ -24,9 +24,6 @@ from ...calculation_subset import *
 from ...input import termtodict, value, boolean
 from ...tools import aslist, dict_insert
 
-# Global class properties
-modelroot = 'calculation-dislocation-SDVPN'
-
 class DislocationSDVPN(Calculation):
     """Class for managing semi-discrete variational Peierls-Nabarro calcuations"""
 
@@ -41,8 +38,8 @@ class DislocationSDVPN(Calculation):
         self.__defect = Dislocation(self)
         self.__elastic = AtommanElasticConstants(self)
         self.__gamma = AtommanGammaSurface(self)
-        self.__subsets = [self.system, self.elastic, self.gamma,
-                          self.defect, self.units]
+        subsets = (self.system, self.elastic, self.gamma,
+                   self.defect, self.units)
 
         # Initialize unique calculation attributes
         self.xnum = None
@@ -70,7 +67,8 @@ class DislocationSDVPN(Calculation):
         self.calc = sdvpn
 
         # Call parent constructor
-        super().__init__(model=model, name=name, params=params, **kwargs)
+        super().__init__(model=model, name=name, params=params,
+                         subsets=subsets, **kwargs)
 
     @property
     def filenames(self):
@@ -79,7 +77,7 @@ class DislocationSDVPN(Calculation):
             'dislocation_SDVPN.py'
         ]
 
-############################## Class attributes ################################
+############################## Class attributes ###############################
 
     @property
     def units(self):
@@ -105,11 +103,6 @@ class DislocationSDVPN(Calculation):
     def gamma(self):
         """AtommanGammaSurface subset"""
         return self.__gamma
-
-    @property
-    def subsets(self):
-        """list of all subsets"""
-        return self.__subsets
 
     @property
     def xnum(self):
@@ -287,8 +280,8 @@ class DislocationSDVPN(Calculation):
             raise ValueError('No results yet!')
         elif not isinstance(self.__sdvpn_solution, am.defect.SDVPN):
             self.__sdvpn_solution = am.defect.SDVPN(model=self.__sdvpn_solution)
-        else:
-            return self.__sdvpn_solution
+        
+        return self.__sdvpn_solution
 
     @property
     def energies(self):
@@ -307,17 +300,54 @@ class DislocationSDVPN(Calculation):
             return self.__disregistries
 
     def set_values(self, name=None, **kwargs):
-        """Used to set initial common values for the calculation."""
-        
-        # Set universal content
-        super().set_values(name=None, **kwargs)
+        """
+        Set calculation values directly.  Any terms not given will be set
+        or reset to the calculation's default values.
 
-        # Set subset values
-        self.units.set_values(**kwargs)
-        self.system.set_values(**kwargs)
-        self.defect.set_values(**kwargs)
-        self.elastic.set_values(**kwargs)
-        self.gamma.set_values(**kwargs)
+        Parameter
+        ---------
+        name : str, optional
+            The name to assign to the calculation.  By default, this is set as
+            the calculation's key.
+        xnum : int, optional
+            The number of x coordinates to use.
+        xmax : flaot, optional
+            The maximum x coordinate to use.
+        xstep : float, optional
+            The step size to use between the x coordinates.
+        minimize_style : str, optional
+            The scipy.minimize style to use.
+        minimize_options : dict, optional
+            kwarg options to pass to scipy.minimize.
+        minimize_cycles : int, optional
+            The number of mimimization cycles to perform.
+        cutofflongrange : float, optional
+            The cutoff to use for the longrange energy term.
+        tau : array-like object, optional
+            The applied stress values to use.
+        alpha : list, optional
+            The non-local correction parameters to use.
+        beta : array-like object, optional
+            The surface correction parameters to use.
+        cdiffelastic : bool, optional
+            Flag if central difference is used for the elastic term.
+        cdiffsurface : bool, optional
+            Flag if central difference is used for the surface term.
+        cdiffstress : bool, optional
+            Flag if central difference is used for the stress term.
+        halfwidth : float, optional
+            An initial arctan halfwidth guess.
+        normalizedisreg : bool, optional
+            Flag indicating if the disregistry is normalized to the Burgers
+            vector.
+        fullstress : bool, optional
+            Flag that determines which stress term expression is used.
+        **kwargs : any, optional
+            Any keyword parameters supported by the set_values() methods of
+            the parent Calculation class and the subset classes.
+        """
+        # Call super to set universal and subset content
+        super().set_values(name=None, **kwargs)
 
         # Set calculation-specific values
         if 'xnum' in kwargs:
@@ -466,7 +496,6 @@ class DislocationSDVPN(Calculation):
                 self.xmax *= self.system.ucell.box.a
             if self.xstep is not None:
                 self.xstep *= self.system.ucell.box.a
-
 
     def master_prepare_inputs(self, branch='main', **kwargs):
         """
@@ -624,59 +653,9 @@ class DislocationSDVPN(Calculation):
         } 
 
     @property
-    def template(self):
-        """str: The template to use for generating calc.in files."""
-        
-        # Build universal content
-        template = super().template
-
-        # Build subset content
-        template += self.system.template()
-        template += self.gamma.template()
-        template += self.elastic.template()
-        template += self.defect.template()
-        template += self.units.template()
-        
-        # Build calculation-specific content
-        header = 'Run parameters'
-        keys = [
-            'xmax',
-            'xstep',
-            'xnum',
-            'xscale',
-            'minimize_style',
-            'minimize_options',
-            'minimize_cycles',
-            'cutofflongrange',
-            'tau_xy',
-            'tau_yy',
-            'tau_yz',
-            'alpha',
-            'beta_xx',
-            'beta_yy',
-            'beta_zz',
-            'beta_xy',
-            'beta_xz',
-            'beta_yz',
-            'cdiffelastic',
-            'cdiffsurface',
-            'cdiffstress',
-            'halfwidth',
-            'normalizedisreg',
-            'fullstress',
-        ]
-        template += self._template_builder(header, keys)
-        
-        return template     
-    
-    @property
     def singularkeys(self):
         """list: Calculation keys that can have single values during prepare."""
 
-        # Fetch universal key sets from parent
-        universalkeys = super().singularkeys
-        
-        # Specify calculation-specific key sets 
         keys = (
             # Universal keys
             super().singularkeys
@@ -685,9 +664,6 @@ class DislocationSDVPN(Calculation):
             + self.units.keyset
 
             # Calculation-specific keys
-            + [
-                
-            ]
         )
         return keys
     
@@ -696,11 +672,8 @@ class DislocationSDVPN(Calculation):
         """
         list: Calculation key sets that can have multiple values during prepare.
         """
-        # Fetch universal key sets from parent
-        universalkeys = super().multikeys
-        
-        # Specify calculation-specific key sets 
         keys = [
+            #super().multikeys,
             self.system.keyset + self.elastic.keyset + self.gamma.keyset,
             self.defect.keyset,
             [
@@ -730,17 +703,19 @@ class DislocationSDVPN(Calculation):
             ]
         ]
                    
-        # Join and return
-        return universalkeys + keys
+        return keys
 
 ########################### Data model interactions ###########################
 
     @property
     def modelroot(self):
-        return modelroot
+        """str: The root element of the content"""
+        return 'calculation-dislocation-SDVPN'
 
     def build_model(self):
-
+        """
+        Generates and returns model content based on the values set to object.
+        """
         # Build universal content
         model = super().build_model()
         calc = model[self.modelroot]
@@ -812,17 +787,20 @@ class DislocationSDVPN(Calculation):
         return model
 
     def load_model(self, model, name=None):
+        """
+        Loads record contents from a given model.
 
-        # Load universal content
+        Parameters
+        ----------
+        model : str or DataModelDict
+            The model contents of the record to load.
+        name : str, optional
+            The name to assign to the record.  Often inferred from other
+            attributes if not given.
+        """
+        # Load universal and subset content
         super().load_model(model, name=name)
         calc = self.model[self.modelroot]
-
-        # Load subset content
-        #self.units.load_model(calc)
-        self.system.load_model(calc)
-        self.gamma.load_model(calc)
-        self.defect.load_model(calc)
-        self.elastic.load_model(calc)
 
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
@@ -854,101 +832,63 @@ class DislocationSDVPN(Calculation):
             self.__sdvpn_solution = calc
             self.__energies = uc.value_unit(calc['total-energy-per-cycle'])
          
+    def mongoquery(self, **kwargs):
+        """
+        Builds a Mongo-style query based on kwargs values for the record style.
 
-    @staticmethod
-    def mongoquery(name=None, key=None, iprPy_version=None,
-                   atomman_version=None, script=None, branch=None,
-                   status=None, lammps_version=None,
-                   potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                   potential_key=None, potential_id=None, 
-                   dislocation_key=None, dislocation_id=None):
+        Parameters
+        ----------
+        **kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets.        
         
-        # Build universal terms
-        mquery = Calculation.mongoquery(modelroot, name=name, key=key,
-                                    iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version,
-                                    script=script, branch=branch,
-                                    status=status)
-
-        # Build subset terms
-        mquery.update(LammpsCommands.mongoquery(modelroot,
-                                                lammps_version=lammps_version))
-        mquery.update(LammpsPotential.mongoquery(modelroot,
-                                                 potential_LAMMPS_key=potential_LAMMPS_key,
-                                                 potential_LAMMPS_id=potential_LAMMPS_id,
-                                                 potential_key=potential_key,
-                                                 potential_id=potential_id))
-        #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
-        #mquery.update(AtommanSystemManipulate.mongoquery(modelroot,...)
-        mquery.update(Dislocation.mongoquery(modelroot,
-                                             dislocation_key=dislocation_key,
-                                             dislocation_id=dislocation_id))
+        Returns
+        -------
+        dict
+            The Mongo-style query.
+        """
+        # Call super to build universal and subset terms
+        mquery = super().mongoquery(**kwargs)
 
         # Build calculation-specific terms
-        root = f'content.{modelroot}'
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
-
+        root = f'content.{self.modelroot}'
+       
         return mquery
 
-    @staticmethod
-    def cdcsquery(key=None, iprPy_version=None,
-                  atomman_version=None, script=None, branch=None,
-                  status=None, lammps_version=None,
-                  potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                  potential_key=None, potential_id=None, 
-                  dislocation_key=None, dislocation_id=None):
+    def cdcsquery(self, **kwargs):
         
-        # Build universal terms
-        mquery = Calculation.cdcsquery(modelroot, key=key,
-                                    iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version,
-                                    script=script, branch=branch,
-                                    status=status)
+        """
+        Builds a CDCS-style query based on kwargs values for the record style.
 
-        # Build subset terms
-        mquery.update(LammpsCommands.cdcsquery(modelroot,
-                                               lammps_version=lammps_version))
-        mquery.update(LammpsPotential.cdcsquery(modelroot,
-                                                potential_LAMMPS_key=potential_LAMMPS_key,
-                                                potential_LAMMPS_id=potential_LAMMPS_id,
-                                                potential_key=potential_key,
-                                                potential_id=potential_id))
-        #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
-        #mquery.update(AtommanSystemManipulate.mongoquery(modelroot,...)
-        mquery.update(Dislocation.mongoquery(modelroot,
-                                             dislocation_key=dislocation_key,
-                                             dislocation_id=dislocation_id))
+        Parameters
+        ----------
+        **kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets.        
+        
+        Returns
+        -------
+        dict
+            The CDCS-style query.
+        """
+        # Call super to build universal and subset terms
+        mquery = super().cdcsquery(**kwargs)
 
         # Build calculation-specific terms
-        root = modelroot
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
-
+        root = self.modelroot
+        
         return mquery
 
 ########################## Metadata interactions ##############################
 
     def metadata(self):
         """
-        Converts the structured content to a simpler dictionary.
-        
-        Returns
-        -------
-        dict
-            A dictionary representation of the record's content.
+        Generates a dict of simple metadata values associated with the record.
+        Useful for quickly comparing records and for building pandas.DataFrames
+        for multiple records of the same style.
         """
-        # Extract universal content
+        # Call super to extract universal and subset content
         meta = super().metadata()
-        
-        # Extract subset content
-        #self.units.metadata(meta)
-        self.system.metadata(meta)
-        self.defect.metadata(meta)
-        self.elastic.metadata(meta)
-        self.gamma.metadata(meta)
 
         # Extract calculation-specific content
         meta['halfwidth'] = self.halfwidth
@@ -965,12 +905,6 @@ class DislocationSDVPN(Calculation):
         meta['fullstress'] = self.fullstress
         meta['min_method'] = self.minimize_style
         meta['min_options'] = self.minimize_options
-        
-        # Extract results
-        #if self.status == 'finished':      
-            #meta['preln'] = self.sdvpn_solution.dislsol.preln
-            #meta['K_tensor'] = self.sdvpn_solution.dislsol.K_tensor
-            #meta['SDVPN_model'] = self.sdvpn_solution
 
         return meta
 
@@ -1029,40 +963,31 @@ class DislocationSDVPN(Calculation):
     def isvalid(self):
         return self.system.family == self.defect.family
     
-    @staticmethod
-    def pandasfilter(dataframe, name=None, key=None, iprPy_version=None,
-                     atomman_version=None, script=None, branch=None,
-                     status=None, lammps_version=None,
-                     potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                     potential_key=None, potential_id=None, 
-                     dislocation_key=None, dislocation_id=None):
-        matches = (
-            # Filter by universal terms
-            Calculation.pandasfilter(dataframe, name=name, key=key,
-                                 iprPy_version=iprPy_version,
-                                 atomman_version=atomman_version,
-                                 script=script, branch=branch, status=status)
-            
-            # Filter by subset terms
-            &LammpsCommands.pandasfilter(dataframe,
-                                         lammps_version=lammps_version)
-            &LammpsPotential.pandasfilter(dataframe,
-                                          potential_LAMMPS_key=potential_LAMMPS_key,
-                                          potential_LAMMPS_id=potential_LAMMPS_id,
-                                          potential_key=potential_key,
-                                          potential_id=potential_id)
-            #&AtommanSystemLoad.pandasfilter(dataframe, ...)
-            #&AtommanSystemManipulate.pandasfilter(dataframe, ...)
-            &Dislocation.pandasfilter(dataframe,
-                                      dislocation_key=dislocation_key,
-                                      dislocation_id=dislocation_id)
+    def pandasfilter(self, dataframe, **kwargs):
+        """
+        Parses a pandas dataframe containing the subset's metadata to find 
+        entries matching the terms and values given. Ideally, this should find
+        the same matches as the mongoquery and cdcsquery methods for the same
+        search parameters.
 
-            # Filter by calculation-specific terms
-            #&query.str_match.pandas(dataframe, 'minimum_r', minimum_r)
-            #&query.str_match.pandas(dataframe, 'maximum_r', maximum_r)
-            #&query.str_match.pandas(dataframe, 'number_of_steps_r', number_of_steps_r)
-            #&query.str_contains.pandas(dataframe, 'symbols', symbols)
-        )
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            The metadata dataframe to filter.
+        kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets. 
+
+        Returns
+        -------
+        pandas.Series of bool
+            True for each entry where all filter terms+values match, False for
+            all other entries.
+        """
+        # Call super to filter by universal and subset terms
+        matches = super().pandasfilter(dataframe, **kwargs)
+
+        # Filter by calculation-specific terms
         
         return matches
 
@@ -1075,10 +1000,8 @@ class DislocationSDVPN(Calculation):
         input_dict = {}
 
         # Add subset inputs
-        self.system.calc_inputs(input_dict)
-        self.defect.calc_inputs(input_dict)
-        self.elastic.calc_inputs(input_dict)
-        self.gamma.calc_inputs(input_dict)
+        for subset in self.subsets:
+            subset.calc_inputs(input_dict)
 
         # Remove unused subset inputs
         del input_dict['sizemults']

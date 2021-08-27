@@ -18,9 +18,6 @@ from .. import Calculation
 from .isolated_atom import isolated_atom
 from ...calculation_subset import *
 
-# Global class properties
-modelroot = 'calculation-isolated-atom'
-
 class IsolatedAtom(Calculation):
     """Class for managing isolated atom energy calculations"""
 
@@ -33,7 +30,7 @@ class IsolatedAtom(Calculation):
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
         self.__units = Units(self)
-        self.__subsets = [self.commands, self.potential, self.units]
+        subsets = (self.commands, self.potential, self.units)
 
         # Initialize unique calculation attributes
         self.__isolated_atom_energy = {}
@@ -42,7 +39,8 @@ class IsolatedAtom(Calculation):
         self.calc = isolated_atom
 
         # Call parent constructor
-        super().__init__(model=model, name=name, params=params, **kwargs)
+        super().__init__(model=model, name=name, params=params,
+                         subsets=subsets, **kwargs)
 
     @property
     def filenames(self):
@@ -52,7 +50,7 @@ class IsolatedAtom(Calculation):
             'run0.template'
         ]
 
-############################## Class attributes ################################               
+############################## Class attributes ###############################               
 
     @property
     def commands(self):
@@ -68,11 +66,6 @@ class IsolatedAtom(Calculation):
     def units(self):
         """Units subset"""
         return self.__units
-
-    @property
-    def subsets(self):
-        """list of all subsets"""
-        return self.__subsets
     
     @property
     def isolated_atom_energy(self):
@@ -81,20 +74,24 @@ class IsolatedAtom(Calculation):
 
     def set_values(self, name=None, **kwargs):
         """
-        Used to set initial common values for the calculation.
-        """
-        # Set universal content
-        super().set_values(name=None, **kwargs)
+        Set calculation values directly.  Any terms not given will be set
+        or reset to the calculation's default values.
 
-        # Set subset values
-        self.units.set_values(**kwargs)
-        self.potential.set_values(**kwargs)
-        self.commands.set_values(**kwargs)
+        Parameter
+        ---------
+        name : str, optional
+            The name to assign to the calculation.  By default, this is set as
+            the calculation's key.
+        **kwargs : any, optional
+            Any keyword parameters supported by the set_values() methods of
+            the parent Calculation class and the subset classes.
+        """
+        # Call super to set universal and subset content
+        super().set_values(name=None, **kwargs)
 
         # Set calculation-specific values
 
-
-##################### Parameter file interactions ########################### 
+####################### Parameter file interactions ########################### 
 
     def load_parameters(self, params, key=None):
         
@@ -190,14 +187,8 @@ class IsolatedAtom(Calculation):
         """list: Calculation key sets that can have multiple values during prepare."""
         
         keys = [
-            
-            # Universal keys
             #super().multikeys,
-            
-            # Subset keys
             self.potential.keyset
-
-            # Calculation-specific keys
         ]
 
         return keys
@@ -206,10 +197,13 @@ class IsolatedAtom(Calculation):
 
     @property
     def modelroot(self):
-        return modelroot
+        """str: The root element of the content"""
+        return 'calculation-isolated-atom'
 
     def build_model(self):
-
+        """
+        Generates and returns model content based on the values set to object.
+        """
         # Build universal content
         model = super().build_model()
         calc = model[self.modelroot]
@@ -232,15 +226,20 @@ class IsolatedAtom(Calculation):
         return model
 
     def load_model(self, model, name=None):
+        """
+        Loads record contents from a given model.
 
-        # Load universal content
+        Parameters
+        ----------
+        model : str or DataModelDict
+            The model contents of the record to load.
+        name : str, optional
+            The name to assign to the record.  Often inferred from other
+            attributes if not given.
+        """
+        # Load universal and subset content
         super().load_model(model, name=name)
         calc = self.model[self.modelroot]
-
-        # Load subset content
-        #self.units.load_model(calc)
-        self.potential.load_model(calc)
-        self.commands.load_model(calc)
 
         # Load calculation-specific content
 
@@ -251,79 +250,63 @@ class IsolatedAtom(Calculation):
                energy = uc.value_unit(isoatom['energy'])
                self.isolated_atom_energy[symbol] = energy
 
-    @staticmethod
-    def mongoquery(name=None, key=None, iprPy_version=None,
-                   atomman_version=None, script=None, branch=None,
-                   status=None, lammps_version=None,
-                   potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                   potential_key=None, potential_id=None):
-        
-        # Build universal terms
-        mquery = Calculation.mongoquery(modelroot, name=name, key=key,
-                                    iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version,
-                                    script=script, branch=branch,
-                                    status=status)
+    def mongoquery(self, **kwargs):
+        """
+        Builds a Mongo-style query based on kwargs values for the record style.
 
-        # Build subset terms
-        mquery.update(LammpsCommands.mongoquery(modelroot,
-                                                lammps_version=lammps_version))
-        mquery.update(LammpsPotential.mongoquery(modelroot,
-                                                 potential_LAMMPS_key=potential_LAMMPS_key,
-                                                 potential_LAMMPS_id=potential_LAMMPS_id,
-                                                 potential_key=potential_key,
-                                                 potential_id=potential_id))
+        Parameters
+        ----------
+        **kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets.        
+        
+        Returns
+        -------
+        dict
+            The Mongo-style query.
+        """
+        # Call super to build universal and subset terms
+        mquery = super().mongoquery(**kwargs)
 
         # Build calculation-specific terms
-        root = f'content.{modelroot}'
-
+        root = f'content.{self.modelroot}'
+       
         return mquery
 
-    @staticmethod
-    def cdcsquery(key=None, iprPy_version=None,
-                  atomman_version=None, script=None, branch=None,
-                  status=None, lammps_version=None,
-                  potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                  potential_key=None, potential_id=None):
+    def cdcsquery(self, **kwargs):
         
-        # Build universal terms
-        mquery = Calculation.cdcsquery(modelroot, key=key,
-                                    iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version,
-                                    script=script, branch=branch,
-                                    status=status)
+        """
+        Builds a CDCS-style query based on kwargs values for the record style.
 
-        # Build subset terms
-        mquery.update(LammpsCommands.cdcsquery(modelroot,
-                                               lammps_version=lammps_version))
-        mquery.update(LammpsPotential.cdcsquery(modelroot,
-                                                potential_LAMMPS_key=potential_LAMMPS_key,
-                                                potential_LAMMPS_id=potential_LAMMPS_id,
-                                                potential_key=potential_key,
-                                                potential_id=potential_id))
+        Parameters
+        ----------
+        **kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets.        
+        
+        Returns
+        -------
+        dict
+            The CDCS-style query.
+        """
+        # Call super to build universal and subset terms
+        mquery = super().cdcsquery(**kwargs)
 
         # Build calculation-specific terms
-        root = modelroot
-
+        root = self.modelroot
+        
         return mquery
 
 ########################## Metadata interactions ##############################
 
     def metadata(self):
         """
-        Converts the structured content to a simpler dictionary.
-        
-        Returns
-        -------
-        dict
-            A dictionary representation of the record's content.
+        Generates a dict of simple metadata values associated with the record.
+        Useful for quickly comparing records and for building pandas.DataFrames
+        for multiple records of the same style.
         """
-        # Extract universal content
+        # Call super to extract universal and subset content
         meta = super().metadata()
-        
-        # Extract subset content
-        self.potential.metadata(meta)
-        self.commands.metadata(meta)
 
         # Extract calculation-specific content
         
@@ -346,30 +329,31 @@ class IsolatedAtom(Calculation):
         """dict: The terms to compare metadata values using a tolerance."""
         return {}
 
-    @staticmethod
-    def pandasfilter(dataframe, name=None, key=None, iprPy_version=None,
-                     atomman_version=None, script=None, branch=None,
-                     status=None, lammps_version=None,
-                     potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                     potential_key=None, potential_id=None):
-        matches = (
-            # Filter by universal terms
-            Calculation.pandasfilter(dataframe, name=name, key=key,
-                                 iprPy_version=iprPy_version,
-                                 atomman_version=atomman_version,
-                                 script=script, branch=branch, status=status)
-            
-            # Filter by subset terms
-            &LammpsCommands.pandasfilter(dataframe,
-                                         lammps_version=lammps_version)
-            &LammpsPotential.pandasfilter(dataframe,
-                                          potential_LAMMPS_key=potential_LAMMPS_key,
-                                          potential_LAMMPS_id=potential_LAMMPS_id,
-                                          potential_key=potential_key,
-                                          potential_id=potential_id)
+    def pandasfilter(self, dataframe, **kwargs):
+        """
+        Parses a pandas dataframe containing the subset's metadata to find 
+        entries matching the terms and values given. Ideally, this should find
+        the same matches as the mongoquery and cdcsquery methods for the same
+        search parameters.
 
-            # Filter by calculation-specific terms
-        )
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            The metadata dataframe to filter.
+        kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets. 
+
+        Returns
+        -------
+        pandas.Series of bool
+            True for each entry where all filter terms+values match, False for
+            all other entries.
+        """
+        # Call super to filter by universal and subset terms
+        matches = super().pandasfilter(dataframe, **kwargs)
+
+        # Filter by calculation-specific terms
         
         return matches
 
@@ -382,8 +366,8 @@ class IsolatedAtom(Calculation):
         input_dict = {}
 
         # Add subset inputs
-        self.commands.calc_inputs(input_dict)
-        self.potential.calc_inputs(input_dict)
+        for subset in self.subsets:
+            subset.calc_inputs(input_dict)
 
         # Add calculation-specific inputs
 

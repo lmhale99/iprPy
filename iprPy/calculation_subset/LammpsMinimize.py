@@ -240,16 +240,15 @@ class LammpsMinimize(CalculationSubset):
 
     def build_model(self, model, **kwargs):
         """
-        Converts the structured content to a simpler dictionary.
+        Adds the subset model to the parent model.
         
         Parameters
         ----------
         model : DataModelDict.DataModelDict
             The record content (after root element) to add content to.
-        input_dict : dict
-            Dictionary of all input parameter terms.
-        results_dict : dict, optional
-            Dictionary containing any results produced by the calculation.
+        kwargs : any
+            Any options to pass on to dict_insert that specify where the subset
+            content gets added to in the parent model.
         """
 
         # Check that one of the tolerances is set
@@ -297,7 +296,15 @@ class LammpsMinimize(CalculationSubset):
 ########################### Calculation interactions ##########################
 
     def calc_inputs(self, input_dict):
-        
+        """
+        Generates calculation function input parameters based on the values
+        assigned to attributes of the subset.
+
+        Parameters
+        ----------
+        input_dict : dict
+            The dictionary of input parameters to add subset terms to.
+        """
         # Check that one of the tolerances is set
         if self.energytolerance == 0.0 and self.forcetolerance == 0.0:
             raise ValueError('energytolerance and forcetolerance cannot both be 0.0')

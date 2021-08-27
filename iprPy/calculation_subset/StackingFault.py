@@ -449,6 +449,7 @@ class StackingFault(CalculationSubset):
 
     @property
     def modelroot(self):
+        """str : The root element name for the subset terms."""
         baseroot = 'stacking-fault'
         return f'{self.modelprefix}{baseroot}'
 
@@ -481,16 +482,15 @@ class StackingFault(CalculationSubset):
 
     def build_model(self, model, **kwargs):
         """
-        Converts the structured content to a simpler dictionary.
+        Adds the subset model to the parent model.
         
         Parameters
         ----------
-        record_model : DataModelDict.DataModelDict
+        model : DataModelDict.DataModelDict
             The record content (after root element) to add content to.
-        input_dict : dict
-            Dictionary of all input parameter terms.
-        results_dict : dict, optional
-            Dictionary containing any results produced by the calculation.
+        kwargs : any
+            Any options to pass on to dict_insert that specify where the subset
+            content gets added to in the parent model.
         """
         # Save defect parameters
         model[self.modelroot] = surf = DM()
@@ -529,7 +529,123 @@ class StackingFault(CalculationSubset):
         run_params[f'{self.modelprefix}size-multipliers']['c'] = sorted([0, self.sizemults[2]])
         run_params[f'{self.modelprefix}minimum-width'] = uc.model(self.minwidth,
                                                              self.parent.units.length_unit)
+
+    def mongoquery(self, stackingfault_key=None, stackingfault_id=None,
+                   stackingfault_family=None, a_mult1=None, a_mult2=None,
+                   b_mult1=None, b_mult2=None, c_mult1=None, c_mult2=None,
+                   **kwargs):
+        """
+        Generate a query to parse records with the subset from a Mongo-style
+        database.
         
+        Parameters
+        ----------
+        stackingfault_id : str
+            The id associated with a stacking fault parameter set.
+        stackingfault_key : str
+            The key associated with a stacking fault parameter set.
+        stackingfault_family : str
+            The "family" crystal structure/prototype that the stacking fault
+            is defined for.
+        a_mult1 : int
+            The lower size multiplier for the a box direction.
+        a_mult2 : int
+            The upper size multiplier for the a box direction.
+        b_mult1 : int
+            The lower size multiplier for the b box direction.
+        b_mult2 : int
+            The upper size multiplier for the b box direction.
+        c_mult1 : int
+            The lower size multiplier for the c box direction.
+        c_mult2 : int
+            The upper size multiplier for the c box direction.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+
+        Returns
+        -------
+        dict
+            The Mongo-style find query terms.
+        """
+        # Init query and set root paths
+        mquery = {}
+        parentroot = f'content.{self.parent.modelroot}'
+        root = f'{parentroot}.{self.modelroot}'
+        runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
+
+        # Build query terms
+        query.str_match.mongo(mquery, f'{root}.key', stackingfault_key)
+        query.str_match.mongo(mquery, f'{root}.id', stackingfault_id)
+        query.str_match.mongo(mquery, f'{root}.system-family', stackingfault_family)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.0', a_mult1)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.1', a_mult2)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.0', b_mult1)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.1', b_mult2)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.0', c_mult1)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.1', c_mult2)
+
+        # Return query dict
+        return mquery
+
+    def cdcsquery(self, stackingfault_key=None, stackingfault_id=None,
+                  stackingfault_family=None, a_mult1=None, a_mult2=None,
+                  b_mult1=None, b_mult2=None, c_mult1=None, c_mult2=None,
+                  **kwargs):
+        """
+        Generate a query to parse records with the subset from a CDCS-style
+        database.
+        
+        Parameters
+        ----------
+        stackingfault_id : str
+            The id associated with a stacking fault parameter set.
+        stackingfault_key : str
+            The key associated with a stacking fault parameter set.
+        stackingfault_family : str
+            The "family" crystal structure/prototype that the stacking fault
+            is defined for.
+        a_mult1 : int
+            The lower size multiplier for the a box direction.
+        a_mult2 : int
+            The upper size multiplier for the a box direction.
+        b_mult1 : int
+            The lower size multiplier for the b box direction.
+        b_mult2 : int
+            The upper size multiplier for the b box direction.
+        c_mult1 : int
+            The lower size multiplier for the c box direction.
+        c_mult2 : int
+            The upper size multiplier for the c box direction.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+        
+        Returns
+        -------
+        dict
+            The CDCS-style find query terms.
+        """
+        # Init query and set root paths
+        mquery = {}
+        parentroot = self.parent.modelroot
+        root = f'{parentroot}.{self.modelroot}'
+        runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
+        
+        # Build query terms
+        query.str_match.mongo(mquery, f'{root}.stacking-fault.key', stackingfault_key)
+        query.str_match.mongo(mquery, f'{root}.stacking-fault.id', stackingfault_id)
+        query.str_match.mongo(mquery, f'{root}.system-family', stackingfault_family)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.0', a_mult1)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.1', a_mult2)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.0', b_mult1)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.1', b_mult2)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.0', c_mult1)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.1', c_mult2)
+
+        # Return query dict
+        return mquery      
+
+########################## Metadata interactions ##############################
+
     def metadata(self, meta):
         """
         Converts the structured content to a simpler dictionary.
@@ -555,35 +671,77 @@ class StackingFault(CalculationSubset):
         meta[f'{prefix}c_mult1'] = 0
         meta[f'{prefix}c_mult2'] = self.sizemults[2]
 
-    @staticmethod
-    def pandasfilter(dataframe, stackingfault_key=None, stackingfault_id=None):
+    def pandasfilter(self, dataframe, stackingfault_key=None,
+                     stackingfault_id=None, stackingfault_family=None,
+                     a_mult1=None, a_mult2=None, b_mult1=None, b_mult2=None,
+                     c_mult1=None, c_mult2=None, **kwargs):
+        """
+        Parses a pandas dataframe containing the subset's metadata to find 
+        entries matching the terms and values given. Ideally, this should find
+        the same matches as the mongoquery and cdcsquery methods for the same
+        search parameters.
 
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            The metadata dataframe to filter.
+        stackingfault_id : str
+            The id associated with a stacking fault parameter set.
+        stackingfault_key : str
+            The key associated with a stacking fault parameter set.
+        stackingfault_family : str
+            The "family" crystal structure/prototype that the stacking fault
+            is defined for.
+        a_mult1 : int
+            The lower size multiplier for the a box direction.
+        a_mult2 : int
+            The upper size multiplier for the a box direction.
+        b_mult1 : int
+            The lower size multiplier for the b box direction.
+        b_mult2 : int
+            The upper size multiplier for the b box direction.
+        c_mult1 : int
+            The lower size multiplier for the c box direction.
+        c_mult2 : int
+            The upper size multiplier for the c box direction.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+
+        Returns
+        -------
+        pandas.Series of bool
+            True for each entry where all filter terms+values match, False for
+            all other entries.
+        """
+        prefix = self.prefix
         matches = (
-            query.str_match.pandas(dataframe, 'stackingfault_key', stackingfault_key)
-            &query.str_match.pandas(dataframe, 'stackingfault_id', stackingfault_id)
+            query.str_match.pandas(dataframe, f'{prefix}stackingfault_key',
+                                   stackingfault_key)
+            &query.str_match.pandas(dataframe, f'{prefix}stackingfault_id',
+                                    stackingfault_id)
+            &query.str_match.pandas(dataframe, f'{prefix}stackingfault_family',
+                                    stackingfault_family)
+            &query.int_match.pandas(dataframe, f'{prefix}a_mult1', a_mult1)
+            &query.int_match.pandas(dataframe, f'{prefix}a_mult2', a_mult2)
+            &query.int_match.pandas(dataframe, f'{prefix}b_mult1', b_mult1)
+            &query.int_match.pandas(dataframe, f'{prefix}b_mult2', b_mult2)
+            &query.int_match.pandas(dataframe, f'{prefix}c_mult1', c_mult1)
+            &query.int_match.pandas(dataframe, f'{prefix}c_mult2', c_mult2)                    
         )
         return matches
-
-    @staticmethod
-    def mongoquery(modelroot, stackingfault_key=None, stackingfault_id=None):
-        mquery = {}
-        root = f'content.{modelroot}'
-        query.str_match.mongo(mquery, f'{root}.stacking-fault.key', stackingfault_key)
-        query.str_match.mongo(mquery, f'{root}.stacking-fault.id', stackingfault_id)
-        return mquery
-
-    @staticmethod
-    def cdcsquery(modelroot, stackingfault_key=None, stackingfault_id=None):
-        mquery = {}
-        root = modelroot
-        query.str_match.mongo(mquery, f'{root}.stacking-fault.key', stackingfault_key)
-        query.str_match.mongo(mquery, f'{root}.stacking-fault.id', stackingfault_id)
-        return mquery      
 
 ########################### Calculation interactions ##########################
 
     def calc_inputs(self, input_dict):
-        
+        """
+        Generates calculation function input parameters based on the values
+        assigned to attributes of the subset.
+
+        Parameters
+        ----------
+        input_dict : dict
+            The dictionary of input parameters to add subset terms to.
+        """
         if self.hkl is None:
             raise ValueError('hkl not set')
 

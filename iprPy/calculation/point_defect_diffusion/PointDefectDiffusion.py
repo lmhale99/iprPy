@@ -24,9 +24,6 @@ from ...calculation_subset import *
 from ...input import value, boolean
 from ...tools import aslist, dict_insert
 
-# Global class properties
-modelroot = 'calculation-point-defect-static'
-
 class PointDefectDiffusion(Calculation):
     """Class for managing point defect diffusion calculations"""
 
@@ -42,8 +39,8 @@ class PointDefectDiffusion(Calculation):
         self.__system = AtommanSystemLoad(self)
         self.__system_mods = AtommanSystemManipulate(self)
         self.__defect = PointDefect(self)
-        self.__subsets = [self.commands, self.potential, self.system,
-                          self.system_mods, self.defect, self.units]
+        subsets = (self.commands, self.potential, self.system,
+                   self.system_mods, self.defect, self.units)
 
         # Initialize unique calculation attributes  
         self.temperature = 0.0
@@ -65,12 +62,6 @@ class PointDefectDiffusion(Calculation):
         self.__measured_pressure_yy_std = None
         self.__measured_pressure_zz = None
         self.__measured_pressure_zz_std = None
-        #self.__measured_pressure_xy = None
-        #self.__measured_pressure_xy_std = None
-        #self.__measured_pressure_xz = None
-        #self.__measured_pressure_xz_std = None
-        #self.__measured_pressure_yz = None
-        #self.__measured_pressure_yz_std = None
         self.__measured_temperature = None
         self.__measured_temperature_std = None
         self.__dx = None
@@ -82,7 +73,8 @@ class PointDefectDiffusion(Calculation):
         self.calc = pointdiffusion
 
         # Call parent constructor
-        super().__init__(model=model, name=name, params=params, **kwargs)
+        super().__init__(model=model, name=name, params=params,
+                         subsets=subsets, **kwargs)
 
     @property
     def filenames(self):
@@ -92,7 +84,7 @@ class PointDefectDiffusion(Calculation):
             'diffusion.template'
         ]
 
-############################## Class attributes ################################
+############################## Class attributes ###############################
 
     @property
     def commands(self):
@@ -125,11 +117,6 @@ class PointDefectDiffusion(Calculation):
         return self.__defect
 
     @property
-    def subsets(self):
-        """list of all subsets"""
-        return self.__subsets
-
-    @property
     def temperature(self):
         """float: Target relaxation temperature"""
         return self.__temperature
@@ -142,6 +129,7 @@ class PointDefectDiffusion(Calculation):
 
     @property
     def thermosteps(self):
+        """int : How often termo data is recorded"""
         return self.__thermosteps
 
     @thermosteps.setter
@@ -152,6 +140,7 @@ class PointDefectDiffusion(Calculation):
 
     @property
     def dumpsteps(self):
+        """int : How often atomic configurations are dumped"""
         if self.__dumpsteps is None:
             return self.runsteps
         else:
@@ -168,6 +157,7 @@ class PointDefectDiffusion(Calculation):
 
     @property
     def runsteps(self):
+        """int : The number of NVE MD steps where diffusion is evaluated"""
         return self.__runsteps
 
     @runsteps.setter
@@ -178,6 +168,7 @@ class PointDefectDiffusion(Calculation):
 
     @property
     def equilsteps(self):
+        """int : The number of NVT MD steps performed before the NVE runsteps"""
         return self.__equilsteps
 
     @equilsteps.setter
@@ -188,7 +179,7 @@ class PointDefectDiffusion(Calculation):
 
     @property
     def randomseed(self):
-        """str: MD integration scheme"""
+        """int: A random generator seed"""
         return self.__randomseed
 
     @randomseed.setter
@@ -284,48 +275,6 @@ class PointDefectDiffusion(Calculation):
             raise ValueError('No results yet!')
         return self.__measured_pressure_zz_std
 
-    #@property
-    #def measured_pressure_xy(self):
-    #    """float: Measured relaxation pressure component xy"""
-    #    if self.__measured_pressure_xy is None:
-    #        raise ValueError('No results yet!')
-    #    return self.__measured_pressure_xy
-    
-    #@property
-    #def measured_pressure_xy_std(self):
-    #    """float: Standard deviation for measured_pressure_xy"""
-    #    if self.__measured_pressure_xy_std is None:
-    #        raise ValueError('No results yet!')
-    #    return self.__measured_pressure_xy_std
-
-    #@property
-    #def measured_pressure_xz(self):
-    #    """float: Measured relaxation pressure component xz"""
-    #    if self.__measured_pressure_xz is None:
-    #        raise ValueError('No results yet!')
-    #    return self.__measured_pressure_xz
-    
-    #@property
-    #def measured_pressure_xz_std(self):
-    #    """float: Standard deviation for measured_pressure_xz"""
-    #    if self.__measured_pressure_xz_std is None:
-    #        raise ValueError('No results yet!')
-    #    return self.__measured_pressure_xz_std
-
-    #@property
-    #def measured_pressure_yz(self):
-    #    """float: Measured relaxation pressure component yz"""
-    #    if self.__measured_pressure_yz is None:
-    #        raise ValueError('No results yet!')
-    #    return self.__measured_pressure_yz
-
-    #@property
-    #def measured_pressure_yz_std(self):
-    #    """float: Standard deviation for measured_pressure_yz"""
-    #    if self.__measured_pressure_yz_std is None:
-    #        raise ValueError('No results yet!')
-    #    return self.__measured_pressure_yz_std
-
     @property
     def measured_temperature(self):
         """float: Measured temperature for the relaxed system"""
@@ -369,18 +318,36 @@ class PointDefectDiffusion(Calculation):
         return self.__d
 
     def set_values(self, name=None, **kwargs):
-        """Used to set initial common values for the calculation."""
-        
-        # Set universal content
-        super().set_values(name=None, **kwargs)
+        """
+        Set calculation values directly.  Any terms not given will be set
+        or reset to the calculation's default values.
 
-        # Set subset values
-        self.units.set_values(**kwargs)
-        self.potential.set_values(**kwargs)
-        self.commands.set_values(**kwargs)
-        self.system.set_values(**kwargs)
-        self.system_mods.set_values(**kwargs)
-        self.defect.set_values(**kwargs)
+        Parameter
+        ---------
+        name : str, optional
+            The name to assign to the calculation.  By default, this is set as
+            the calculation's key.
+        temperature : str, optional
+            The target run temperature
+        thermosteps : int, optional
+            Indicates how frequently thermo data is recorded.
+        dumpsteps : int, optional
+            Indicates how frequently atomic configurations are saved as LAMMPS
+            dump files.
+        runsteps : int, optional
+            The number of NVE MD steps to perform where the atomic mean
+            squared displacements are measured.
+        equilsteps : int, optional
+            The number of NVT MD steps to perform prior to the NVE run steps.
+        randomseed : int, optional
+            A random number generator seed that is used to create initial
+            atomic velocities.
+        **kwargs : any, optional
+            Any keyword parameters supported by the set_values() methods of
+            the parent Calculation class and the subset classes.
+        """
+        # Call super to set universal and subset content
+        super().set_values(name=None, **kwargs)
 
         # Set calculation-specific values
         if 'temperature' in kwargs:
@@ -395,6 +362,7 @@ class PointDefectDiffusion(Calculation):
             self.equilsteps = kwargs['equilsteps']
         if 'randomseed' in kwargs:
             self.randomseed = kwargs['randomseed']
+
 ####################### Parameter file interactions ########################### 
 
     def load_parameters(self, params, key=None):
@@ -515,8 +483,8 @@ class PointDefectDiffusion(Calculation):
             'runsteps': ' '.join([
                 "The number of MD integration steps to perform in the NVE run."]),
             'equilsteps': ' '.join([
-                "The number of MD integration steps to perform in the
-                "equlibriation NVT run."]),
+                "The number of NVT MD integration steps to perform prior to the",
+                "NVE runsteps to allow the system to equilibriate."]),
             'randomseed': ' '.join([
                 "An int random number seed to use for generating initial velocities.",
                 "A random int will be selected if not given."]),
@@ -524,9 +492,7 @@ class PointDefectDiffusion(Calculation):
     
     @property
     def singularkeys(self):
-        """list: Calculation keys that can have single values during prepare."""
-        # Fetch universal key sets from parent
-        universalkeys = super().singularkeys
+        """list: Calculation keys that can have single values during prepare."""        
         
         keys = (
             # Universal keys
@@ -544,11 +510,8 @@ class PointDefectDiffusion(Calculation):
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
         
-        # Fetch universal key sets from parent
-        universalkeys = super().multikeys
-        
-        # Specify calculation-specific key sets 
         keys =  [
+            #super().multikeys,
             self.potential.keyset + self.system.keyset,
             self.system_mods.keyset,
             self.defect.keyset,
@@ -564,17 +527,19 @@ class PointDefectDiffusion(Calculation):
             ),
         ]
                      
-        # Join and return
-        return universalkeys + keys
+        return keys
 
 ########################### Data model interactions ###########################
 
     @property
     def modelroot(self):
-        return modelroot
+        """str: The root element of the content"""
+        return 'calculation-point-defect-diffusion'
 
     def build_model(self):
-
+        """
+        Generates and returns model content based on the values set to object.
+        """
         # Build universal content
         model = super().build_model()
         calc = model[self.modelroot]
@@ -622,15 +587,6 @@ class PointDefectDiffusion(Calculation):
             mps['pressure-zz'] = uc.model(self.measured_pressure_zz,
                                           self.units.pressure_unit,
                                           self.measured_pressure_zz_std)
-            #mps['pressure-xy'] = uc.model(self.measured_pressure_xy,
-            #                              self.units.pressure_unit,
-            #                              self.measured_pressure_xy_std)
-            #mps['pressure-xz'] = uc.model(self.measured_pressure_xz,
-            #                              self.units.pressure_unit,
-            #                              self.measured_pressure_xz_std)
-            #mps['pressure-yz'] = uc.model(self.measured_pressure_yz,
-            #                              self.units.pressure_unit,
-            #                              self.measured_pressure_yz_std)
             mps['potential-energy'] = uc.model(self.potential_energy,
                                                self.units.energy_unit,
                                                self.potential_energy_std)
@@ -650,18 +606,20 @@ class PointDefectDiffusion(Calculation):
         return model
 
     def load_model(self, model, name=None):
+        """
+        Loads record contents from a given model.
 
-        # Load universal content
+        Parameters
+        ----------
+        model : str or DataModelDict
+            The model contents of the record to load.
+        name : str, optional
+            The name to assign to the record.  Often inferred from other
+            attributes if not given.
+        """
+        # Load universal and subset content
         super().load_model(model, name=name)
         calc = self.model[self.modelroot]
-
-        # Load subset content
-        #self.units.load_model(calc)
-        self.potential.load_model(calc)
-        self.commands.load_model(calc)
-        self.system.load_model(calc)
-        self.system_mods.load_model(calc)
-        self.defect.load_model(calc)
 
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
@@ -689,12 +647,6 @@ class PointDefectDiffusion(Calculation):
             self.__measured_pressure_yy_std = uc.error_unit(mps['pressure-yy'])
             self.__measured_pressure_zz = uc.value_unit(mps['pressure-zz'])
             self.__measured_pressure_zz_std = uc.error_unit(mps['pressure-zz'])
-            #self.__measured_pressure_xy = uc.value_unit(mps['pressure-xy'])
-            #self.__measured_pressure_xy_std = uc.error_unit(mps['pressure-xy'])
-            #self.__measured_pressure_xz = uc.value_unit(mps['pressure-xz'])
-            #self.__measured_pressure_xz_std = uc.error_unit(mps['pressure-xz'])
-            #self.__measured_pressure_yz = uc.value_unit(mps['pressure-yz'])
-            #self.__measured_pressure_yz_std = uc.error_unit(mps['pressure-yz'])
             self.__potential_energy = uc.value_unit(mps['potential-energy'])
             self.__potential_energy_std = uc.error_unit(mps['potential-energy'])
             self.__total_energy = uc.value_unit(mps['total-energy'])
@@ -706,100 +658,63 @@ class PointDefectDiffusion(Calculation):
             self.__dy = uc.value_unit(dr['y-direction'])
             self.__dz = uc.value_unit(dr['z-direction'])
 
-    @staticmethod
-    def mongoquery(name=None, key=None, iprPy_version=None,
-                   atomman_version=None, script=None, branch=None,
-                   status=None, lammps_version=None,
-                   potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                   potential_key=None, potential_id=None, 
-                   pointdefect_key=None, pointdefect_id=None):
-        
-        # Build universal terms
-        mquery = Calculation.mongoquery(modelroot, name=name, key=key,
-                                    iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version,
-                                    script=script, branch=branch,
-                                    status=status)
+    def mongoquery(self, **kwargs):
+        """
+        Builds a Mongo-style query based on kwargs values for the record style.
 
-        # Build subset terms
-        mquery.update(LammpsCommands.mongoquery(modelroot,
-                                                lammps_version=lammps_version))
-        mquery.update(LammpsPotential.mongoquery(modelroot,
-                                                 potential_LAMMPS_key=potential_LAMMPS_key,
-                                                 potential_LAMMPS_id=potential_LAMMPS_id,
-                                                 potential_key=potential_key,
-                                                 potential_id=potential_id))
-        #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
-        #mquery.update(AtommanSystemManipulate.mongoquery(modelroot,...)
-        mquery.update(PointDefect.mongoquery(modelroot,
-                                             pointdefect_key=pointdefect_key,
-                                             pointdefect_id=pointdefect_id))
+        Parameters
+        ----------
+        **kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets.        
+        
+        Returns
+        -------
+        dict
+            The Mongo-style query.
+        """
+        # Call super to build universal and subset terms
+        mquery = super().mongoquery(**kwargs)
 
         # Build calculation-specific terms
-        root = f'content.{modelroot}'
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
+        root = f'content.{self.modelroot}'
 
         return mquery
 
-    @staticmethod
-    def cdcsquery(key=None, iprPy_version=None,
-                  atomman_version=None, script=None, branch=None,
-                  status=None, lammps_version=None,
-                  potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                  potential_key=None, potential_id=None, 
-                  pointdefect_key=None, pointdefect_id=None):
+    def cdcsquery(self, **kwargs):
         
-        # Build universal terms
-        mquery = Calculation.cdcsquery(modelroot, key=key,
-                                    iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version,
-                                    script=script, branch=branch,
-                                    status=status)
+        """
+        Builds a CDCS-style query based on kwargs values for the record style.
 
-        # Build subset terms
-        mquery.update(LammpsCommands.cdcsquery(modelroot,
-                                               lammps_version=lammps_version))
-        mquery.update(LammpsPotential.cdcsquery(modelroot,
-                                                potential_LAMMPS_key=potential_LAMMPS_key,
-                                                potential_LAMMPS_id=potential_LAMMPS_id,
-                                                potential_key=potential_key,
-                                                potential_id=potential_id))
-        #mquery.update(AtommanSystemLoad.mongoquery(modelroot,...)
-        #mquery.update(AtommanSystemManipulate.mongoquery(modelroot,...)
-        mquery.update(PointDefect.mongoquery(modelroot,
-                                             pointdefect_key=pointdefect_key,
-                                             pointdefect_id=pointdefect_id))
+        Parameters
+        ----------
+        **kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets.        
+        
+        Returns
+        -------
+        dict
+            The CDCS-style query.
+        """
+        # Call super to build universal and subset terms
+        mquery = super().cdcsquery(**kwargs)
 
         # Build calculation-specific terms
-        root = modelroot
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
-        #query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
-
+        root = self.modelroot
+        
         return mquery
 
 ########################## Metadata interactions ##############################
 
     def metadata(self):
         """
-        Converts the structured content to a simpler dictionary.
-        
-        Returns
-        -------
-        dict
-            A dictionary representation of the record's content.
+        Generates a dict of simple metadata values associated with the record.
+        Useful for quickly comparing records and for building pandas.DataFrames
+        for multiple records of the same style.
         """
-        # Extract universal content
+        # Call super to extract universal and subset content
         meta = super().metadata()
-        
-        # Extract subset content
-        self.potential.metadata(meta)
-        self.commands.metadata(meta)
-        self.system.metadata(meta)
-        self.system_mods.metadata(meta)
-        self.defect.metadata(meta)
 
         # Extract calculation-specific content
         meta['temperature'] = self.temperature
@@ -813,6 +728,7 @@ class PointDefectDiffusion(Calculation):
             meta['E_pot_std'] = self.potential_energy_std
             meta['E_total'] = self.total_energy
             meta['E_total_std'] = self.total_energy_std
+
             meta['measured_temperature'] = self.measured_temperature
             meta['measured_temperature_std'] = self.measured_temperature_std
             meta['measured_pressure_xx'] = self.measured_pressure_xx
@@ -821,13 +737,7 @@ class PointDefectDiffusion(Calculation):
             meta['measured_pressure_yy_std'] = self.measured_pressure_yy_std
             meta['measured_pressure_zz'] = self.measured_pressure_zz
             meta['measured_pressure_zz_std'] = self.measured_pressure_zz_std
-            #meta['measured_pressure_xy'] = self.measured_pressure_xy
-            #meta['measured_pressure_xy_std'] = self.measured_pressure_xy_std
-            #meta['measured_pressure_xz'] = self.measured_pressure_xz
-            #meta['measured_pressure_xz_std'] = self.measured_pressure_xz_std
-            #meta['measured_pressure_yz'] = self.measured_pressure_yz
-            #meta['measured_pressure_yz_std'] = self.measured_pressure_yz_std
-
+            
             meta['d'] = self.d
             meta['dx'] = self.dx
             meta['dy'] = self.dy
@@ -861,40 +771,31 @@ class PointDefectDiffusion(Calculation):
             'temperature':1,
         }
 
-    @staticmethod
-    def pandasfilter(dataframe, name=None, key=None, iprPy_version=None,
-                     atomman_version=None, script=None, branch=None,
-                     status=None, lammps_version=None,
-                     potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                     potential_key=None, potential_id=None,
-                     pointdefect_key=None, pointdefect_id=None):
-        matches = (
-            # Filter by universal terms
-            Calculation.pandasfilter(dataframe, name=name, key=key,
-                                 iprPy_version=iprPy_version,
-                                 atomman_version=atomman_version,
-                                 script=script, branch=branch, status=status)
-            
-            # Filter by subset terms
-            &LammpsCommands.pandasfilter(dataframe,
-                                         lammps_version=lammps_version)
-            &LammpsPotential.pandasfilter(dataframe,
-                                          potential_LAMMPS_key=potential_LAMMPS_key,
-                                          potential_LAMMPS_id=potential_LAMMPS_id,
-                                          potential_key=potential_key,
-                                          potential_id=potential_id)
-            #&AtommanSystemLoad.pandasfilter(dataframe, ...)
-            #&AtommanSystemManipulate.pandasfilter(dataframe, ...)
-            &PointDefect.pandasfilter(dataframe,
-                                      pointdefect_key=pointdefect_key,
-                                      pointdefect_id=pointdefect_id)
+    def pandasfilter(self, dataframe, **kwargs):
+        """
+        Parses a pandas dataframe containing the subset's metadata to find 
+        entries matching the terms and values given. Ideally, this should find
+        the same matches as the mongoquery and cdcsquery methods for the same
+        search parameters.
 
-            # Filter by calculation-specific terms
-            #&query.str_match.pandas(dataframe, 'minimum_r', minimum_r)
-            #&query.str_match.pandas(dataframe, 'maximum_r', maximum_r)
-            #&query.str_match.pandas(dataframe, 'number_of_steps_r', number_of_steps_r)
-            #&query.str_contains.pandas(dataframe, 'symbols', symbols)
-        )
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            The metadata dataframe to filter.
+        kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets. 
+
+        Returns
+        -------
+        pandas.Series of bool
+            True for each entry where all filter terms+values match, False for
+            all other entries.
+        """
+        # Call super to filter by universal and subset terms
+        matches = super().pandasfilter(dataframe, **kwargs)
+
+        # Filter by calculation-specific terms
         
         return matches
 
@@ -907,14 +808,12 @@ class PointDefectDiffusion(Calculation):
         input_dict = {}
 
         # Add subset inputs
-        self.commands.calc_inputs(input_dict)
-        self.potential.calc_inputs(input_dict)
-        #self.system.calc_inputs(input_dict)
-        self.system_mods.calc_inputs(input_dict)
-        self.defect.calc_inputs(input_dict)
+        for subset in self.subsets:
+            subset.calc_inputs(input_dict)
 
         # Remove unused subset inputs
         del input_dict['transform']
+        del input_dict['ucell']
 
         # Add calculation-specific inputs
         input_dict['temperature'] = self.temperature
@@ -952,12 +851,6 @@ class PointDefectDiffusion(Calculation):
         self.__measured_pressure_yy_std = results_dict['pyy_std']
         self.__measured_pressure_zz = results_dict['pzz']
         self.__measured_pressure_zz_std = results_dict['pzz_std']
-        #self.__measured_pressure_xy = results_dict['pxy']
-        #self.__measured_pressure_xy_std = results_dict['pxy_std']
-        #self.__measured_pressure_xz = results_dict['pxz']
-        #self.__measured_pressure_xz_std = results_dict['pxz_std']
-        #self.__measured_pressure_yz = results_dict['pyz']
-        #self.__measured_pressure_yz_std = results_dict['pyz_std']
         self.__measured_temperature = results_dict['temp']
         self.__measured_temperature_std = results_dict['temp_std']
     

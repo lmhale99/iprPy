@@ -154,3 +154,9 @@ class Units(CalculationSubset):
         self.energy_unit = input_dict.get(keymap['energy_unit'], 'eV')
         self.pressure_unit = input_dict.get(keymap['pressure_unit'], 'GPa')
         self.force_unit = input_dict.get(keymap['force_unit'], 'eV/angstrom')
+
+########################### Data model interactions ###########################
+
+########################## Metadata interactions ##############################
+
+########################### Calculation interactions ##########################

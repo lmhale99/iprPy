@@ -226,6 +226,7 @@ class LammpsPotential(CalculationSubset):
 
     @property
     def modelroot(self):
+        """str : The root element name for the subset terms."""
         baseroot = 'potential-LAMMPS'
         return f'{self.modelprefix}{baseroot}'
 
@@ -246,10 +247,9 @@ class LammpsPotential(CalculationSubset):
         ----------
         model : DataModelDict.DataModelDict
             The record content (after root element) to add content to.
-        input_dict : dict
-            Dictionary of all input parameter terms.
-        results_dict : dict, optional
-            Dictionary containing any results produced by the calculation.
+        kwargs : any
+            Any options to pass on to dict_insert that specify where the subset
+            content gets added to in the parent model.
         """
 
         # Check required parameters
@@ -271,6 +271,86 @@ class LammpsPotential(CalculationSubset):
         pot['potential']['id'] = self.potential_id
         
         dict_insert(model, self.modelroot, pot, **kwargs)
+
+    def mongoquery(self, potential_LAMMPS_key=None,
+                   potential_LAMMPS_id=None, potential_key=None,
+                   potential_id=None, **kwargs):
+        """
+        Generate a query to parse records with the subset from a Mongo-style
+        database.
+        
+        Parameters
+        ----------
+        potential_LAMMPS_key : str
+            The key associated with the LAMMPS potential implementation.
+        potential_LAMMPS_id : str
+            The id associated with the LAMMPS potential implementation.
+        potential_key : str
+            The key associated with the potential model.
+        potential_id : int
+            The id associated with the potential model.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+
+        Returns
+        -------
+        dict
+            The Mongo-style find query terms.
+        """
+        # Init query and set root paths
+        mquery = {}
+        parentroot = f'content.{self.parent.modelroot}'
+        root = f'{parentroot}.{self.modelroot}'
+        runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
+
+        # Build query terms
+        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.key', potential_LAMMPS_key)
+        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.id', potential_LAMMPS_id)
+        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.potential.key', potential_key)
+        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.potential.id', potential_id)
+        
+        # Return query dict
+        return mquery
+
+    def cdcsquery(self, potential_LAMMPS_key=None,
+                  potential_LAMMPS_id=None, potential_key=None,
+                  potential_id=None, **kwargs):
+        """
+        Generate a query to parse records with the subset from a CDCS-style
+        database.
+        
+        Parameters
+        ----------
+        potential_LAMMPS_key : str
+            The key associated with the LAMMPS potential implementation.
+        potential_LAMMPS_id : str
+            The id associated with the LAMMPS potential implementation.
+        potential_key : str
+            The key associated with the potential model.
+        potential_id : int
+            The id associated with the potential model.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+        
+        Returns
+        -------
+        dict
+            The CDCS-style find query terms.
+        """
+        # Init query and set root paths
+        mquery = {}
+        parentroot = self.parent.modelroot
+        root = f'{parentroot}.{self.modelroot}'
+        runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
+        
+        # Build query terms
+        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.key', potential_LAMMPS_key)
+        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.id', potential_LAMMPS_id)
+        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.potential.key', potential_key)
+        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.potential.id', potential_id)
+        
+        # Return query dict
+        return mquery      
 
 ########################## Metadata interactions ##############################
 
@@ -298,47 +378,61 @@ class LammpsPotential(CalculationSubset):
         meta[f'{self.prefix}potential_key'] = self.potential_key
         meta[f'{self.prefix}potential_id'] = self.potential_id
 
-    @staticmethod
-    def pandasfilter(dataframe, potential_LAMMPS_key=None,
+    def pandasfilter(self, dataframe, potential_LAMMPS_key=None,
                      potential_LAMMPS_id=None, potential_key=None,
-                     potential_id=None):
+                     potential_id=None, **kwargs):
+        """
+        Parses a pandas dataframe containing the subset's metadata to find 
+        entries matching the terms and values given. Ideally, this should find
+        the same matches as the mongoquery and cdcsquery methods for the same
+        search parameters.
 
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            The metadata dataframe to filter.
+        potential_LAMMPS_key : str
+            The key associated with the LAMMPS potential implementation.
+        potential_LAMMPS_id : str
+            The id associated with the LAMMPS potential implementation.
+        potential_key : str
+            The key associated with the potential model.
+        potential_id : int
+            The id associated with the potential model.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+
+        Returns
+        -------
+        pandas.Series of bool
+            True for each entry where all filter terms+values match, False for
+            all other entries.
+        """
+        prefix = self.prefix
         matches = (
-            query.str_match.pandas(dataframe, 'potential_LAMMPS_key', potential_LAMMPS_key)
-            &query.str_match.pandas(dataframe, 'potential_LAMMPS_id', potential_LAMMPS_id)
-            &query.str_match.pandas(dataframe, 'potential_key', potential_key)
-            &query.str_match.pandas(dataframe, 'potential_id', potential_id)
+            query.str_match.pandas(dataframe, f'{prefix}potential_LAMMPS_key',
+                                   potential_LAMMPS_key)
+            &query.str_match.pandas(dataframe, f'{prefix}potential_LAMMPS_id',
+                                    potential_LAMMPS_id)
+            &query.str_match.pandas(dataframe, f'{prefix}potential_key',
+                                    potential_key)
+            &query.str_match.pandas(dataframe, f'{prefix}potential_id',
+                                    potential_id)
         )
         return matches
-
-    @staticmethod
-    def mongoquery(modelroot, potential_LAMMPS_key=None,
-                   potential_LAMMPS_id=None, potential_key=None,
-                   potential_id=None):
-        mquery = {}
-        root = f'content.{modelroot}'
-        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.key', potential_LAMMPS_key)
-        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.id', potential_LAMMPS_id)
-        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.potential.key', potential_key)
-        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.potential.id', potential_id)
-        return mquery
-
-    @staticmethod
-    def cdcsquery(modelroot, potential_LAMMPS_key=None,
-                  potential_LAMMPS_id=None, potential_key=None,
-                  potential_id=None):
-        mquery = {}
-        root = modelroot
-        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.key', potential_LAMMPS_key)
-        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.id', potential_LAMMPS_id)
-        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.potential.key', potential_key)
-        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.potential.id', potential_id)
-        return mquery      
 
 ########################### Calculation interactions ##########################
 
     def calc_inputs(self, input_dict):
-        
+        """
+        Generates calculation function input parameters based on the values
+        assigned to attributes of the subset.
+
+        Parameters
+        ----------
+        input_dict : dict
+            The dictionary of input parameters to add subset terms to.
+        """
         if self.potential is None:
             raise ValueError('potential not set')
             

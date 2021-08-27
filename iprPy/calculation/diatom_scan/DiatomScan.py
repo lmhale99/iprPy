@@ -22,9 +22,6 @@ from ...calculation_subset import *
 from ...input import value, boolean
 from ...tools import aslist, dict_insert
 
-# Global class properties
-modelroot = 'calculation-diatom-scan'
-
 class DiatomScan(Calculation):
     """Class for managing diatom energy scan calculations"""
 
@@ -37,7 +34,7 @@ class DiatomScan(Calculation):
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
         self.__units = Units(self)
-        self.__subsets = [self.commands, self.potential, self.units]
+        subsets = (self.commands, self.potential, self.units)
 
         # Initialize unique calculation attributes
         self.symbols = []
@@ -51,7 +48,8 @@ class DiatomScan(Calculation):
         self.calc = diatom_scan
 
         # Call parent constructor
-        super().__init__(model=model, name=name, params=params, **kwargs)
+        super().__init__(model=model, name=name, params=params,
+                         subsets=subsets, **kwargs)
 
     @property
     def filenames(self):
@@ -77,11 +75,6 @@ class DiatomScan(Calculation):
     def units(self):
         """Units subset"""
         return self.__units
-    
-    @property
-    def subsets(self):
-        """list of all subsets"""
-        return self.__subsets
 
     @property
     def symbols(self):
@@ -106,6 +99,7 @@ class DiatomScan(Calculation):
 
     @property
     def number_of_steps_r(self):
+        """int : The number of r evaluation steps"""
         return self.__number_of_steps_r
 
     @number_of_steps_r.setter
@@ -116,6 +110,7 @@ class DiatomScan(Calculation):
 
     @property
     def minimum_r(self):
+        """float : The minimum value of r"""
         return self.__minimum_r
 
     @minimum_r.setter
@@ -126,6 +121,7 @@ class DiatomScan(Calculation):
 
     @property
     def maximum_r(self):
+        """float : The maximum value of r"""
         return self.__maximum_r
 
     @maximum_r.setter
@@ -168,14 +164,29 @@ class DiatomScan(Calculation):
             self.__energy_values = value
 
     def set_values(self, name=None, **kwargs):
-        """Used to set initial common values for the calculation."""
-        # Set universal content
-        super().set_values(name=None, **kwargs)
+        """
+        Set calculation values directly.  Any terms not given will be set
+        or reset to the calculation's default values.
 
-        # Set subset values
-        self.units.set_values(**kwargs)
-        self.potential.set_values(**kwargs)
-        self.commands.set_values(**kwargs)
+        Parameter
+        ---------
+        name : str, optional
+            The name to assign to the calculation.  By default, this is set as
+            the calculation's key.
+        symbols : str or list, optional
+            One or two model symbols to assign to the atoms.
+        number_of_steps_r : int, optional
+            The number of evaluation steps to use for the r spacing.
+        minimum_r : float, optional
+            The minimum r spacing value to evaluate.
+        maximum_r : float, optional
+            The maximum r spacing value to evaluate.
+        **kwargs : any, optional
+            Any keyword parameters supported by the set_values() methods of
+            the parent Calculation class and the subset classes.
+        """
+        # Call super to set universal and subset content
+        super().set_values(name=None, **kwargs)
 
         # Set calculation-specific values
         if 'symbols' in kwargs:
@@ -190,7 +201,18 @@ class DiatomScan(Calculation):
 ####################### Parameter file interactions ########################### 
 
     def load_parameters(self, params, key=None):
-        
+        """
+        Reads in and sets calculation parameters.
+
+        Parameters
+        ----------
+        params : dict, str or file-like object
+            The parameters or parameter file to read in.
+        key : str, optional
+            A new key value to assign to the object.  If not given, will use
+            calc_key field in params if it exists, or leave the key value
+            unchanged.
+        """
         # Load universal content
         input_dict = super().load_parameters(params, key=key)
         
@@ -312,14 +334,8 @@ class DiatomScan(Calculation):
         """list: Calculation key sets that can have multiple values during prepare."""
         
         keys = [
-            
-            # Universal keys
             #super().multikeys,
-            
-            # Subset keys
             self.potential.keyset + ['symbols'],
-
-            # Calculation-specific keys
             [
                 'minimum_r',
                 'maximum_r',
@@ -329,15 +345,17 @@ class DiatomScan(Calculation):
 
         return keys
 
-
 ########################### Data model interactions ###########################
 
     @property
     def modelroot(self):
-        return modelroot
+        """str: The root element of the content"""
+        return 'calculation-diatom-scan'
 
     def build_model(self):
-
+        """
+        Generates and returns model content based on the values set to object.
+        """
         if len(self.symbols) is None:
             raise ValueError('symbols not set')
 
@@ -375,15 +393,20 @@ class DiatomScan(Calculation):
         return model
 
     def load_model(self, model, name=None):
+        """
+        Loads record contents from a given model.
 
-        # Load universal content
+        Parameters
+        ----------
+        model : str or DataModelDict
+            The model contents of the record to load.
+        name : str, optional
+            The name to assign to the record.  Often inferred from other
+            attributes if not given.
+        """
+        # Load universal and subset content
         super().load_model(model, name=name)
         calc = self.model[self.modelroot]
-
-        # Load subset content
-        #self.units.load_model(calc)
-        self.potential.load_model(calc)
-        self.commands.load_model(calc)
 
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
@@ -399,32 +422,35 @@ class DiatomScan(Calculation):
            self.r_values = uc.value_unit(scan['r'])
            self.energy_values = uc.value_unit(scan['potential-energy'])
 
-    @staticmethod
-    def mongoquery(name=None, key=None, iprPy_version=None,
-                   atomman_version=None, script=None, branch=None,
-                   status=None, lammps_version=None,
-                   potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                   potential_key=None, potential_id=None, minimum_r=None,
-                   maximum_r=None, number_of_steps_r=None, symbols=None):
-        
-        # Build universal terms
-        mquery = Calculation.mongoquery(modelroot, name=name, key=key,
-                                    iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version,
-                                    script=script, branch=branch,
-                                    status=status)
+    def mongoquery(self, minimum_r=None, maximum_r=None,
+                   number_of_steps_r=None, symbols=None, **kwargs):
+        """
+        Builds a Mongo-style query based on kwargs values for the record style.
 
-        # Build subset terms
-        mquery.update(LammpsCommands.mongoquery(modelroot,
-                                                lammps_version=lammps_version))
-        mquery.update(LammpsPotential.mongoquery(modelroot,
-                                                 potential_LAMMPS_key=potential_LAMMPS_key,
-                                                 potential_LAMMPS_id=potential_LAMMPS_id,
-                                                 potential_key=potential_key,
-                                                 potential_id=potential_id))
+        Parameters
+        ----------
+        minimum_r : float
+            The minimum interatomic spacing to use for the scan.
+        maximum_r : float
+            The maximum interatomic spacing to use for the scan.
+        number_of_steps_r : int
+            The number of evaluation points to use for the scan.
+        symbols : str
+            Element model symbol(s) assigned to the two atoms.
+        **kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets.        
+        
+        Returns
+        -------
+        dict
+            The Mongo-style query.
+        """
+        # Call super to build universal and subset terms
+        mquery = super().mongoquery(**kwargs)
 
         # Build calculation-specific terms
-        root = f'content.{modelroot}'
+        root = f'content.{self.modelroot}'
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
@@ -432,32 +458,35 @@ class DiatomScan(Calculation):
 
         return mquery
 
-    @staticmethod
-    def cdcsquery(key=None, iprPy_version=None,
-                  atomman_version=None, script=None, branch=None,
-                  status=None, lammps_version=None,
-                  potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                  potential_key=None, potential_id=None, minimum_r=None,
-                  maximum_r=None, number_of_steps_r=None, symbols=None):
-        
-        # Build universal terms
-        mquery = Calculation.cdcsquery(modelroot, key=key,
-                                    iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version,
-                                    script=script, branch=branch,
-                                    status=status)
+    def cdcsquery(self, minimum_r=None, maximum_r=None, number_of_steps_r=None,
+                  symbols=None, **kwargs):
+        """
+        Builds a CDCS-style query based on kwargs values for the record style.
 
-        # Build subset terms
-        mquery.update(LammpsCommands.cdcsquery(modelroot,
-                                               lammps_version=lammps_version))
-        mquery.update(LammpsPotential.cdcsquery(modelroot,
-                                                potential_LAMMPS_key=potential_LAMMPS_key,
-                                                potential_LAMMPS_id=potential_LAMMPS_id,
-                                                potential_key=potential_key,
-                                                potential_id=potential_id))
+        Parameters
+        ----------
+        minimum_r : float
+            The minimum interatomic spacing to use for the scan.
+        maximum_r : float
+            The maximum interatomic spacing to use for the scan.
+        number_of_steps_r : int
+            The number of evaluation points to use for the scan.
+        symbols : str
+            Element model symbol(s) assigned to the two atoms.
+        **kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets.        
+        
+        Returns
+        -------
+        dict
+            The CDCS-style query.
+        """
+        # Call super to build universal and subset terms
+        mquery = super().cdcsquery(**kwargs)
 
         # Build calculation-specific terms
-        root = modelroot
+        root = self.modelroot
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
@@ -469,24 +498,17 @@ class DiatomScan(Calculation):
 
     def metadata(self):
         """
-        Converts the structured content to a simpler dictionary.
-        
-        Returns
-        -------
-        dict
-            A dictionary representation of the record's content.
+        Generates a dict of simple metadata values associated with the record.
+        Useful for quickly comparing records and for building pandas.DataFrames
+        for multiple records of the same style.
         """
         # Check required parameters
         if len(self.symbols) is None:
             raise ValueError('symbols not set')
 
-        # Extract universal content
+        # Call super to extract universal and subset content
         meta = super().metadata()
         
-        # Extract subset content
-        self.potential.metadata(meta)
-        self.commands.metadata(meta)
-
         # Extract calculation-specific content
         meta['minimum_r'] = self.minimum_r
         meta['maximum_r'] = self.maximum_r
@@ -514,30 +536,41 @@ class DiatomScan(Calculation):
         """dict: The terms to compare metadata values using a tolerance."""
         return {}
 
-    @staticmethod
-    def pandasfilter(dataframe, name=None, key=None, iprPy_version=None,
-                     atomman_version=None, script=None, branch=None,
-                     status=None, lammps_version=None,
-                     potential_LAMMPS_key=None, potential_LAMMPS_id=None,
-                     potential_key=None, potential_id=None, minimum_r=None,
-                     maximum_r=None, number_of_steps_r=None, symbols=None):
-        matches = (
-            # Filter by universal terms
-            Calculation.pandasfilter(dataframe, name=name, key=key,
-                                 iprPy_version=iprPy_version,
-                                 atomman_version=atomman_version,
-                                 script=script, branch=branch, status=status)
-            
-            # Filter by subset terms
-            &LammpsCommands.pandasfilter(dataframe,
-                                         lammps_version=lammps_version)
-            &LammpsPotential.pandasfilter(dataframe,
-                                          potential_LAMMPS_key=potential_LAMMPS_key,
-                                          potential_LAMMPS_id=potential_LAMMPS_id,
-                                          potential_key=potential_key,
-                                          potential_id=potential_id)
+    def pandasfilter(self, dataframe, minimum_r=None, maximum_r=None,
+                     number_of_steps_r=None, symbols=None, **kwargs):
+        """
+        Parses a pandas dataframe containing the subset's metadata to find 
+        entries matching the terms and values given. Ideally, this should find
+        the same matches as the mongoquery and cdcsquery methods for the same
+        search parameters.
 
-            # Filter by calculation-specific terms
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            The metadata dataframe to filter.
+        minimum_r : float
+            The minimum interatomic spacing to use for the scan.
+        maximum_r : float
+            The maximum interatomic spacing to use for the scan.
+        number_of_steps_r : int
+            The number of evaluation points to use for the scan.
+        symbols : str
+            Element model symbol(s) assigned to the two atoms.
+        kwargs : any
+            Any extra query terms that are universal for all calculations
+            or associated with one of the calculation's subsets. 
+
+        Returns
+        -------
+        pandas.Series of bool
+            True for each entry where all filter terms+values match, False for
+            all other entries.
+        """
+        # Call super to filter by universal and subset terms
+        matches = super().pandasfilter(dataframe, **kwargs)
+
+        # Filter by calculation-specific terms
+        matches = (matches
             &query.str_match.pandas(dataframe, 'minimum_r', minimum_r)
             &query.str_match.pandas(dataframe, 'maximum_r', maximum_r)
             &query.str_match.pandas(dataframe, 'number_of_steps_r', number_of_steps_r)
@@ -559,8 +592,8 @@ class DiatomScan(Calculation):
         input_dict = {}
 
         # Add subset inputs
-        self.commands.calc_inputs(input_dict)
-        self.potential.calc_inputs(input_dict)
+        for subset in self.subsets:
+            subset.calc_inputs(input_dict)
 
         # Add calculation-specific inputs
         input_dict['symbols'] = self.symbols

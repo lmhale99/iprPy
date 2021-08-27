@@ -449,6 +449,7 @@ class AtommanSystemManipulate(CalculationSubset):
 ########################### Data model interactions ###########################
 
     def load_model(self, model):
+        """Loads subset attributes from an existing model."""
         run_params = model['calculation']['run-parameter']
         self.a_mults = run_params[f'{self.modelprefix}size-multipliers']['a']
         self.b_mults = run_params[f'{self.modelprefix}size-multipliers']['b']
@@ -460,16 +461,15 @@ class AtommanSystemManipulate(CalculationSubset):
 
     def build_model(self, model, **kwargs):
         """
-        Converts the structured content to a simpler dictionary.
+        Adds the subset model to the parent model.
         
         Parameters
         ----------
-        record_model : DataModelDict.DataModelDict
+        model : DataModelDict.DataModelDict
             The record content (after root element) to add content to.
-        input_dict : dict
-            Dictionary of all input parameter terms.
-        results_dict : dict, optional
-            Dictionary containing any results produced by the calculation.
+        kwargs : any
+            Any options to pass on to dict_insert that specify where the subset
+            content gets added to in the parent model.
         """
 
         # Build paths if needed
@@ -490,6 +490,96 @@ class AtommanSystemManipulate(CalculationSubset):
         #run_params[f'{self.modelprefix}rotation-vector']['b'] = self.b_uvw.tolist()
         #run_params[f'{self.modelprefix}rotation-vector']['c'] = self.c_uvw.tolist()
         
+    def mongoquery(self, a_mult1=None, a_mult2=None, b_mult1=None,
+                       b_mult2=None, c_mult1=None, c_mult2=None, **kwargs):
+        """
+        Generate a query to parse records with the subset from a Mongo-style
+        database.
+        
+        Parameters
+        ----------
+        a_mult1 : int
+            The lower size multiplier for the a box direction.
+        a_mult2 : int
+            The upper size multiplier for the a box direction.
+        b_mult1 : int
+            The lower size multiplier for the b box direction.
+        b_mult2 : int
+            The upper size multiplier for the b box direction.
+        c_mult1 : int
+            The lower size multiplier for the c box direction.
+        c_mult2 : int
+            The upper size multiplier for the c box direction.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+
+        Returns
+        -------
+        dict
+            The Mongo-style find query terms.
+        """
+        # Init query and set root paths
+        mquery = {}
+        parentroot = f'content.{self.parent.modelroot}'
+        root = f'{parentroot}.{self.modelroot}'
+        runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
+
+        # Build query terms
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.0', a_mult1)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.1', a_mult2)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.0', b_mult1)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.1', b_mult2)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.0', c_mult1)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.1', c_mult2)
+        
+        # Return query dict
+        return mquery
+
+    def cdcsquery(self, a_mult1=None, a_mult2=None, b_mult1=None,
+                       b_mult2=None, c_mult1=None, c_mult2=None, **kwargs):
+        """
+        Generate a query to parse records with the subset from a CDCS-style
+        database.
+        
+        Parameters
+        ----------
+        a_mult1 : int
+            The lower size multiplier for the a box direction.
+        a_mult2 : int
+            The upper size multiplier for the a box direction.
+        b_mult1 : int
+            The lower size multiplier for the b box direction.
+        b_mult2 : int
+            The upper size multiplier for the b box direction.
+        c_mult1 : int
+            The lower size multiplier for the c box direction.
+        c_mult2 : int
+            The upper size multiplier for the c box direction.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+
+        Returns
+        -------
+        dict
+            The CDCS-style find query terms.
+        """
+        # Init query and set root paths
+        mquery = {}
+        parentroot = self.parent.modelroot
+        root = f'{parentroot}.{self.modelroot}'
+        runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
+
+        # Build query terms
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.0', a_mult1)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.1', a_mult2)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.0', b_mult1)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.1', b_mult2)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.0', c_mult1)
+        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.1', c_mult2)
+        
+        # Return query dict
+        return mquery
+
     def metadata(self, meta):
         """
         Converts the structured content to a simpler dictionary.
@@ -514,9 +604,62 @@ class AtommanSystemManipulate(CalculationSubset):
         meta[f'{prefix}b_uvw'] = self.b_uvw.tolist()
         meta[f'{prefix}c_uvw'] = self.c_uvw.tolist()
 
+    def pandasfilter(self, dataframe, a_mult1=None, a_mult2=None,
+                     b_mult1=None, b_mult2=None, c_mult1=None, c_mult2=None,
+                     **kwargs):
+        """
+        Parses a pandas dataframe containing the subset's metadata to find 
+        entries matching the terms and values given. Ideally, this should find
+        the same matches as the mongoquery and cdcsquery methods for the same
+        search parameters.
+
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            The metadata dataframe to filter.
+        a_mult1 : int
+            The lower size multiplier for the a box direction.
+        a_mult2 : int
+            The upper size multiplier for the a box direction.
+        b_mult1 : int
+            The lower size multiplier for the b box direction.
+        b_mult2 : int
+            The upper size multiplier for the b box direction.
+        c_mult1 : int
+            The lower size multiplier for the c box direction.
+        c_mult2 : int
+            The upper size multiplier for the c box direction.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+
+        Returns
+        -------
+        pandas.Series of bool
+            True for each entry where all filter terms+values match, False for
+            all other entries.
+        """
+        prefix = self.prefix
+        matches = (
+            query.int_match.pandas(dataframe,  f'{prefix}a_mult1', a_mult1)
+            &query.int_match.pandas(dataframe, f'{prefix}a_mult2', a_mult2)
+            &query.int_match.pandas(dataframe, f'{prefix}b_mult1', b_mult1)
+            &query.int_match.pandas(dataframe, f'{prefix}b_mult2', b_mult2)
+            &query.int_match.pandas(dataframe, f'{prefix}c_mult1', c_mult1)
+            &query.int_match.pandas(dataframe, f'{prefix}c_mult2', c_mult2)
+        )
+        return matches
+
 ########################### Calculation interactions ##########################
 
     def calc_inputs(self, input_dict):
-        
+        """
+        Generates calculation function input parameters based on the values
+        assigned to attributes of the subset.
+
+        Parameters
+        ----------
+        input_dict : dict
+            The dictionary of input parameters to add subset terms to.
+        """
         input_dict['transform'] = self.transform
         input_dict['system'] = self.system

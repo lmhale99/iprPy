@@ -423,6 +423,7 @@ class PointDefect(CalculationSubset):
 
     @property
     def modelroot(self):
+        """str : The root element name for the subset terms."""
         baseroot = 'point-defect'
         return f'{self.modelprefix}{baseroot}'
 
@@ -441,16 +442,15 @@ class PointDefect(CalculationSubset):
         
     def build_model(self, model, **kwargs):
         """
-        Converts the structured content to a simpler dictionary.
+        Adds the subset model to the parent model.
         
         Parameters
         ----------
-        record_model : DataModelDict.DataModelDict
+        model : DataModelDict.DataModelDict
             The record content (after root element) to add content to.
-        input_dict : dict
-            Dictionary of all input parameter terms.
-        results_dict : dict, optional
-            Dictionary containing any results produced by the calculation.
+        kwargs : any
+            Any options to pass on to dict_insert that specify where the subset
+            content gets added to in the parent model.
         """
         # Save defect parameters
         model[self.modelroot] = ptd = DM()
@@ -459,7 +459,84 @@ class PointDefect(CalculationSubset):
         ptd['system-family'] = self.family
         for params in self.params:
             ptd.append('calculation-parameter', params.build_model())
+
+
+    def mongoquery(self, pointdefect_key=None, pointdefect_id=None,
+                   pointdefect_family=None, **kwargs):
+        """
+        Generate a query to parse records with the subset from a Mongo-style
+        database.
         
+        Parameters
+        ----------
+        pointdefect_id : str
+            The id associated with a point defect parameter set.
+        pointdefect_key : str
+            The key associated with a point defect parameter set.
+        pointdefect_family : str
+            The "family" crystal structure/prototype that the point defect
+            is defined for.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+
+        Returns
+        -------
+        dict
+            The Mongo-style find query terms.
+        """
+        # Init query and set root paths
+        mquery = {}
+        parentroot = f'content.{self.parent.modelroot}'
+        root = f'{parentroot}.{self.modelroot}'
+        runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
+
+        # Build query terms
+        query.str_match.mongo(mquery, f'{root}.point-defect.key', pointdefect_key)
+        query.str_match.mongo(mquery, f'{root}.point-defect.id', pointdefect_id)
+        query.str_match.mongo(mquery, f'{root}.system-family', pointdefect_family)
+
+        # Return query dict
+        return mquery
+
+    def cdcsquery(self, pointdefect_key=None, pointdefect_id=None,
+                  pointdefect_family=None, **kwargs):
+        """
+        Generate a query to parse records with the subset from a CDCS-style
+        database.
+        
+        Parameters
+        ----------
+        pointdefect_id : str
+            The id associated with a point defect parameter set.
+        pointdefect_key : str
+            The key associated with a point defect parameter set.
+        pointdefect_family : str
+            The "family" crystal structure/prototype that the point defect
+            is defined for.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+        
+        Returns
+        -------
+        dict
+            The CDCS-style find query terms.
+        """
+        # Init query and set root paths
+        mquery = {}
+        parentroot = self.parent.modelroot
+        root = f'{parentroot}.{self.modelroot}'
+        runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
+        
+        # Build query terms
+        query.str_match.mongo(mquery, f'{root}.point-defect.key', pointdefect_key)
+        query.str_match.mongo(mquery, f'{root}.point-defect.id', pointdefect_id)
+        query.str_match.mongo(mquery, f'{root}.system-family', pointdefect_family)
+
+        # Return query dict
+        return mquery      
+
+########################## Metadata interactions ##############################
+
     def metadata(self, meta):
         """
         Converts the structured content to a simpler dictionary.
@@ -475,35 +552,59 @@ class PointDefect(CalculationSubset):
         meta[f'{prefix}pointdefect_id'] = self.id
         meta[f'{prefix}pointdefect_family'] = self.family
 
-    @staticmethod
-    def pandasfilter(dataframe, pointdefect_key=None, pointdefect_id=None):
+    def pandasfilter(self, dataframe, pointdefect_key=None,
+                     pointdefect_id=None, pointdefect_family=None, **kwargs):
+        """
+        Parses a pandas dataframe containing the subset's metadata to find 
+        entries matching the terms and values given. Ideally, this should find
+        the same matches as the mongoquery and cdcsquery methods for the same
+        search parameters.
 
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            The metadata dataframe to filter.
+        pointdefect_id : str
+            The id associated with a point defect parameter set.
+        pointdefect_key : str
+            The key associated with a point defect parameter set.
+        pointdefect_family : str
+            The "family" crystal structure/prototype that the point defect
+            is defined for.
+        kwargs : any
+            The parent query terms and values ignored by the subset.
+
+        Returns
+        -------
+        pandas.Series of bool
+            True for each entry where all filter terms+values match, False for
+            all other entries.
+        """
+        prefix = self.prefix
         matches = (
-            query.str_match.pandas(dataframe, 'pointdefect_key', pointdefect_key)
-            &query.str_match.pandas(dataframe, 'pointdefect_id', pointdefect_id)
+            query.str_match.pandas(dataframe, f'{prefix}pointdefect_key',
+                                   pointdefect_key)
+            &query.str_match.pandas(dataframe, f'{prefix}pointdefect_id',
+                                    pointdefect_id)
+            &query.str_match.pandas(dataframe, f'{prefix}pointdefect_family',
+                                    pointdefect_family)
         )
         return matches
 
-    @staticmethod
-    def mongoquery(modelroot, pointdefect_key=None, pointdefect_id=None):
-        mquery = {}
-        root = f'content.{modelroot}'
-        query.str_match.mongo(mquery, f'{root}.point-defect.key', pointdefect_key)
-        query.str_match.mongo(mquery, f'{root}.point-defect.id', pointdefect_id)
-        return mquery
-
-    @staticmethod
-    def cdcsquery(modelroot, pointdefect_key=None, pointdefect_id=None):
-        mquery = {}
-        root = modelroot
-        query.str_match.mongo(mquery, f'{root}.point-defect.key', pointdefect_key)
-        query.str_match.mongo(mquery, f'{root}.point-defect.id', pointdefect_id)
-        return mquery      
+    
 
 ########################### Calculation interactions ##########################
 
     def calc_inputs(self, input_dict):
+        """
+        Generates calculation function input parameters based on the values
+        assigned to attributes of the subset.
 
+        Parameters
+        ----------
+        input_dict : dict
+            The dictionary of input parameters to add subset terms to.
+        """
         if len(self.params) == 1:
             input_dict['point_kwargs'] = self.params[0].calc_inputs(self.parent.system.ucell)
         elif len(self.params) > 1:
