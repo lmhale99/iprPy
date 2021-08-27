@@ -6,10 +6,11 @@ from datamodelbase import query
 from . import Record
 from .PotentialPropertiesSubsets import *
 
-modelroot = 'per-potential-properties'
-
 class PotentialProperties(Record):
-    
+    """
+    Class for representing PotentialProperties records that contain the data
+    necessary to generate the properties pages for an interatomic potential.
+    """
     def __init__(self, model=None, name=None, **kwargs):
 
         # Define default core properties
@@ -84,10 +85,12 @@ class PotentialProperties(Record):
 
     @property
     def webdir(self):
+        """str : Root URL for the potential properties content"""
         return f'https://www.ctcms.nist.gov/potentials/entry/{self.potential_id}/{self.potential_LAMMPS_id}'
 
     @property
     def url(self):
+        """str : URL for the potential properties web page"""
         return f'{self.webdir}.html'
 
     def set_values(self, name=None, **kwargs):
@@ -116,7 +119,17 @@ class PotentialProperties(Record):
                 self.name = f'properties.{self.potential_LAMMPS_id}'
 
     def load_model(self, model, name=None):
+        """
+        Loads record contents from a given model.
 
+        Parameters
+        ----------
+        model : str or DataModelDict
+            The model contents of the record to load.
+        name : str, optional
+            The name to assign to the record.  Often inferred from other
+            attributes if not given.
+        """
         super().load_model(model, name=name)
         content = self.model[self.modelroot]
 
@@ -133,6 +146,14 @@ class PotentialProperties(Record):
                 self.name = f'properties.{self.potential_LAMMPS_id}'
 
     def build_model(self):
+        """
+        Returns the object info as data model content
+        
+        Returns
+        ----------
+        DataModelDict
+            The data model content.
+        """
         model = DM()
         model[self.modelroot] = content = DM()
 
@@ -152,19 +173,17 @@ class PotentialProperties(Record):
     @property
     def modelroot(self):
         """str: The root element of the content"""
-        return modelroot
+        return 'per-potential-properties'
     
     def metadata(self):
         """
-        Converts the structured content to a simpler dictionary.
-        
-        Returns
-        -------
-        dict
-            A dictionary representation of the record's content.
+        Generates a dict of simple metadata values associated with the record.
+        Useful for quickly comparing records and for building pandas.DataFrames
+        for multiple records of the same style.
         """
         
         meta = {}
+        meta['name'] = self.name
         meta['potential_key'] = self.potential_key
         meta['potential_id'] = self.potential_id
         meta['potential_LAMMPS_key'] = self.potential_LAMMPS_key
