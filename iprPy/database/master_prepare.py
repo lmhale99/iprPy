@@ -17,7 +17,7 @@ from ..tools import aslist, filltemplate
 from .. import load_calculation, load_run_directory, fix_lammps_versions
 from ..input import parse
 
-def master_prepare(database, input_script=None, **kwargs):
+def master_prepare(database, input_script=None, debug=False, **kwargs):
     """
     Prepares one or more calculations according to the workflows used by the
     NIST Interatomic Potentials Repository.
@@ -29,6 +29,9 @@ def master_prepare(database, input_script=None, **kwargs):
     input_script : str or file-like object, optional
         The file, path to file, or contents of an input script containing
         parameters for preparing the calculation.
+    debug : bool
+        If set to True, will throw errors associated with failed/invalid
+        calculation builds.  Default is False.
     **kwargs : str or list
         Allows for input parameters for preparing the calculation to be
         directly specified.  Any kwargs parameters that have names matching
@@ -53,9 +56,10 @@ def master_prepare(database, input_script=None, **kwargs):
 
     for i in range(len(styles)):
         prepare_pool(database, styles[i], int(np_per_runner[i]),
-                     run_directory[i], **kwargs)
+                     run_directory[i], debug=debug, **kwargs)
 
-def prepare_pool(database, styles, np_per_runner, run_directory, **kwargs):
+def prepare_pool(database, styles, np_per_runner, run_directory, debug=False,
+                 **kwargs):
     """
     Prepares a single pool of calculation styles according to the given kwargs.
 
@@ -70,6 +74,15 @@ def prepare_pool(database, styles, np_per_runner, run_directory, **kwargs):
     run_directory : str
         The path or name for the run_directory where the calculations will
         be prepared.
+    debug : bool
+        If set to True, will throw errors associated with failed/invalid
+        calculation builds.  Default is False.
+    **kwargs : str or list
+        Allows for input parameters for preparing the calculation to be
+        directly specified.  Any kwargs parameters that have names matching
+        input_script parameters will overwrite the input_script values.
+        Values must be strings or list of strings if allowed by the
+        calculation for the particular parameter.
     """
     
     # Modify mpi_command using np_per_runner
@@ -96,7 +109,7 @@ def prepare_pool(database, styles, np_per_runner, run_directory, **kwargs):
         params = calculation.master_prepare_inputs(branch=branch, **kwargs)
 
         # Prepare the calculation
-        database.prepare(run_directory, calculation, **params)
+        database.prepare(run_directory, calculation, debug=debug, **params)
         print()
 
     # Update lammps_commands as needed

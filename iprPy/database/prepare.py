@@ -73,7 +73,7 @@ def prepare(database, run_directory, calculation, input_script=None,
     
     # Complete kwargs with default values and buildcombos actions
     kwargs, content_dict = fill_kwargs(database, calculation, **kwargs)
-    
+
     # Build all combinations
     test_calcs, test_calcs_df, test_inputfiles, test_contents, content_dict = build_test_calcs(database, calculation, content_dict, debug=debug, **kwargs)
     print(len(test_calcs_df), 'calculation combinations to check', flush=True)
