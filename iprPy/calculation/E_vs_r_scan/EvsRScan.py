@@ -366,17 +366,31 @@ class EvsRScan(Calculation):
     @property
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
-        keys =  [
-            #super().multikeys,
-            self.potential.keyset + self.system.keyset,
-            self.system_mods.keyset,
+        
+        keys = (
+            # Universal multikeys
+            super().multikeys +
+
+            # Combination of potential and system keys
             [
-                'minimum_r',
-                'maximum_r',
-                'number_of_steps_r',
-            ],
-        ]
-               
+                self.potential.keyset + 
+                self.system.keyset
+            ] +
+
+            # System mods keys
+            [
+                self.system_mods.keyset
+            ] +
+            
+            # Run parameters
+            [
+                [
+                    'minimum_r',
+                    'maximum_r',
+                    'number_of_steps_r',
+                ]
+            ]
+        )   
         return keys
 
 ########################### Data model interactions ###########################
@@ -573,7 +587,7 @@ class EvsRScan(Calculation):
         """dict: The terms to compare metadata values using a tolerance."""
         return {}
 
-    def pandasfilter(dataframe, minimum_r=None, maximum_r=None,
+    def pandasfilter(self, dataframe, minimum_r=None, maximum_r=None,
                      number_of_steps_r=None, **kwargs):
         """
         Parses a pandas dataframe containing the subset's metadata to find 
@@ -609,7 +623,6 @@ class EvsRScan(Calculation):
             &query.str_match.pandas(dataframe, 'minimum_r', minimum_r)
             &query.str_match.pandas(dataframe, 'maximum_r', maximum_r)
             &query.str_match.pandas(dataframe, 'number_of_steps_r', number_of_steps_r)
-            &query.str_contains.pandas(dataframe, 'symbols', symbols)
         )
         
         return matches

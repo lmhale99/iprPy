@@ -537,25 +537,42 @@ class RelaxStatic(Calculation):
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
 
-        keys =  [
-            #super().multikeys,
-            self.potential.keyset + self.system.keyset,
-            self.system_mods.keyset,
+        keys = (
+            # Universal multikeys
+            super().multikeys +
+
+            # Combination of potential and system keys
             [
-                'pressure_xx',
-                'pressure_yy',
-                'pressure_zz',
-                'pressure_xy',
-                'pressure_xz',
-                'pressure_yz',
-            ],
-            self.minimize.keyset + [
-                'displacementkick',
-                'maxcycles',
-                'cycletolerance',
-            ],
-        ]
-               
+                self.potential.keyset + 
+                self.system.keyset
+            ] +
+
+            # System mods keys
+            [
+                self.system_mods.keyset
+            ] +
+
+            # Pressure parameters
+            [
+                [
+                    'pressure_xx',
+                    'pressure_yy',
+                    'pressure_zz',
+                    'pressure_xy',
+                    'pressure_xz',
+                    'pressure_yz',
+                ]
+            ] +
+
+            # Combination of minimize and run parameter keys
+            [
+                self.minimize.keyset + [
+                    'displacementkick',
+                    'maxcycles',
+                    'cycletolerance',
+                ]
+            ]
+        )       
         return keys
 
 ########################### Data model interactions ###########################

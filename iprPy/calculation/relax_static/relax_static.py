@@ -184,7 +184,8 @@ def relax_static(lammps_command, system, potential, mpi_command=None,
         
         # Run LAMMPS and extract thermo data
         logfile = 'log-' + str(cycle) + '.lammps'
-        output = lmp.run(lammps_command, lammps_script, mpi_command, logfile=logfile)
+        output = lmp.run(lammps_command, script_name=lammps_script,
+                         mpi_command=mpi_command, logfile=logfile)
         thermo = output.simulations[0]['thermo']
         
         # Clean up dump files

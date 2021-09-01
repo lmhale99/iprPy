@@ -174,7 +174,8 @@ def relax_dynamic(lammps_command, system, potential, mpi_command=None,
         f.write(filltemplate(template, lammps_variables, '<', '>'))
     
     # Run lammps 
-    output = lmp.run(lammps_command, lammps_script, mpi_command)
+    output = lmp.run(lammps_command, script_name=lammps_script,
+                     mpi_command=mpi_command)
     
     # Extract LAMMPS thermo data. 
     results = {}

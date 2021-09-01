@@ -383,20 +383,37 @@ class RelaxBox(Calculation):
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
 
-        keys =  [
-            #super().multikeys,
-            self.potential.keyset + self.system.keyset,
-            self.system_mods.keyset,
+        keys = (
+            # Universal multikeys
+            super().multikeys +
+
+            # Combination of potential and system keys
             [
-                'pressure_xx',
-                'pressure_yy',
-                'pressure_zz',
-            ],
+                self.potential.keyset + 
+                self.system.keyset
+            ] +
+
+            # System mods keys
             [
-                'strainrange',
+                self.system_mods.keyset
+            ] +
+
+            # Pressure parameters
+            [
+                [
+                    'pressure_xx',
+                    'pressure_yy',
+                    'pressure_zz',
+                ]
+            ] +
+
+            # Strainrange
+            [
+                [
+                    'strainrange',
+                ]
             ]
-        ]
-               
+        ) 
         return keys
 
 ########################### Data model interactions ###########################

@@ -360,21 +360,32 @@ class StackingFaultMap2D(Calculation):
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
 
-        keys =  [
-            #super().multikeys,
-            self.potential.keyset + self.system.keyset,
+        keys = (
+            # Universal multikeys
+            super().multikeys +
+
+            # Combination of potential and system keys
             [
-                'sizemults',
-                'stackingfault_minwidth',
-            ],
-            self.defect.keyset,
+                self.potential.keyset + 
+                self.system.keyset
+            ] +
+
+            # Defect multikeys
+            self.defect.multikeys + 
+                
+            # Run parameter keys
+            [    
+                [
+                    'stackingfault_num_a1',
+                    'stackingfault_num_a2',
+                ]
+            ] +   
+                
+            # Minimize keys
             [
-                'stackingfault_num_a1',
-                'stackingfault_num_a2',
-            ],            
-            self.minimize.keyset,
-        ]
-               
+                self.minimize.keyset
+            ]
+        ) 
         return keys
 
 ########################### Data model interactions ###########################

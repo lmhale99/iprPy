@@ -101,7 +101,8 @@ def diatom_scan(lammps_command, potential, symbols,
         
         # Run lammps and extract data
         try:
-            output = lmp.run(lammps_command, lammps_script, mpi_command)
+            output = lmp.run(lammps_command, script_name=lammps_script,
+                             mpi_command=mpi_command)
         except:
             energy_values[i] = np.nan
         else:

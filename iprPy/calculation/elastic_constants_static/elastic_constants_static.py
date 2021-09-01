@@ -106,7 +106,8 @@ def elastic_constants_static(lammps_command, system, potential, mpi_command=None
         f.write(filltemplate(template, lammps_variables, '<', '>'))
     
     # Run LAMMPS
-    output = lmp.run(lammps_command, lammps_script, mpi_command)
+    output = lmp.run(lammps_command, script_name=lammps_script,
+                     mpi_command=mpi_command)
     
     # Pull out initial state
     thermo = output.simulations[0]['thermo']

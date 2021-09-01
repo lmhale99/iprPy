@@ -371,18 +371,31 @@ class Phonon(Calculation):
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
 
-        keys =  [
-            #super().multikeys,
-            self.potential.keyset + self.system.keyset,
-            self.system_mods.keyset,
+        keys = (
+            # Universal multikeys
+            super().multikeys +
+
+            # Combination of potential and system keys
             [
-                'displacementdistance',
-                'symmetryprecision',
-                'numstrains',
-                'strainrange',
-            ],
-        ]
-          
+                self.potential.keyset + 
+                self.system.keyset
+            ] +
+
+            # System mods keys
+            [
+                self.system_mods.keyset
+            ] +
+
+            # Run parameters
+            [
+                [
+                    'displacementdistance',
+                    'symmetryprecision',
+                    'numstrains',
+                    'strainrange',
+                ]
+            ]
+        )
         return keys
 
 ########################### Data model interactions ###########################
@@ -662,7 +675,7 @@ class Phonon(Calculation):
             'symmetryprecision':1e-7,
         }
 
-    def pandasfilter(dataframe, strainrange=None, numstrains=None,
+    def pandasfilter(self, dataframe, strainrange=None, numstrains=None,
                      symmetryprecision=None, displacementdistance=None,
                      **kwargs):
         """

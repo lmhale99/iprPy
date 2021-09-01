@@ -142,7 +142,8 @@ def stackingfaultrelax(lammps_command, system, potential,
         f.write(filltemplate(template, lammps_variables, '<', '>'))
     
     # Run LAMMPS
-    output = lmp.run(lammps_command, lammps_script.as_posix(), mpi_command,
+    output = lmp.run(lammps_command, script_name=lammps_script.as_posix(),
+                     mpi_command=mpi_command,
                      logfile=Path(sim_directory, 'log.lammps').as_posix())
     
     # Extract output values

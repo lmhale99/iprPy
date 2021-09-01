@@ -186,11 +186,15 @@ class IsolatedAtom(Calculation):
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
         
-        keys = [
-            #super().multikeys,
-            self.potential.keyset
-        ]
+        keys = (
+            # Universal multikeys
+            super().multikeys +
 
+            # Potential keys
+            [
+                self.potential.keyset
+            ]
+        )
         return keys
 
 ########################### Data model interactions ###########################

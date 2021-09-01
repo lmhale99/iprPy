@@ -510,12 +510,28 @@ class PointDefectDiffusion(Calculation):
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
         
-        keys =  [
-            #super().multikeys,
-            self.potential.keyset + self.system.keyset,
-            self.system_mods.keyset,
-            self.defect.keyset,
-            (
+        keys = (
+            # Universal multikeys
+            super().multikeys +
+
+            # Combination of potential and system keys
+            [
+                self.potential.keyset + 
+                self.system.keyset
+            ] +
+
+            # System mods keys
+            [
+                self.system_mods.keyset
+            ] +
+
+            # Defect keys
+            [
+                self.defect.keyset
+            ] +
+
+            # Run parameters
+            [
                 [
                     'temperature',
                     'thermosteps',
@@ -524,9 +540,8 @@ class PointDefectDiffusion(Calculation):
                     'equilsteps',
                     'randomseed',
                 ]
-            ),
-        ]
-                     
+            ]
+        )                     
         return keys
 
 ########################### Data model interactions ###########################

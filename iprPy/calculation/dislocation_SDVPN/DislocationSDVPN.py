@@ -669,40 +669,51 @@ class DislocationSDVPN(Calculation):
     
     @property
     def multikeys(self):
-        """
-        list: Calculation key sets that can have multiple values during prepare.
-        """
-        keys = [
-            #super().multikeys,
-            self.system.keyset + self.elastic.keyset + self.gamma.keyset,
-            self.defect.keyset,
+        """list: Calculation key sets that can have multiple values during prepare."""
+        
+        keys = (
+            # Universal multikeys
+            super().multikeys +
+
+            # Combination of system, elastic and gamma keys
             [
-                'xmax',
-                'xstep',
-                'xnum',
-                'minimize_style',
-                'minimize_options',
-                'minimize_cycles',
-                'cutofflongrange',
-                'tau_xy',
-                'tau_yy',
-                'tau_yz',
-                'alpha',
-                'beta_xx',
-                'beta_yy',
-                'beta_zz',
-                'beta_xy',
-                'beta_xz',
-                'beta_yz',
-                'cdiffelastic',
-                'cdiffsurface',
-                'cdiffstress',
-                'halfwidth',
-                'normalizedisreg',
-                'fullstress',
+                self.system.keyset + 
+                self.elastic.keyset + 
+                self.gamma.keyset
+            ] +
+        
+            # Defect multikeys
+            self.defect.multikeys +
+
+            # Run parameters
+            [
+                [
+                    'xmax',
+                    'xstep',
+                    'xnum',
+                    'minimize_style',
+                    'minimize_options',
+                    'minimize_cycles',
+                    'cutofflongrange',
+                    'tau_xy',
+                    'tau_yy',
+                    'tau_yz',
+                    'alpha',
+                    'beta_xx',
+                    'beta_yy',
+                    'beta_zz',
+                    'beta_xy',
+                    'beta_xz',
+                    'beta_yz',
+                    'cdiffelastic',
+                    'cdiffsurface',
+                    'cdiffstress',
+                    'halfwidth',
+                    'normalizedisreg',
+                    'fullstress',
+                ]
             ]
-        ]
-                   
+        )    
         return keys
 
 ########################### Data model interactions ###########################

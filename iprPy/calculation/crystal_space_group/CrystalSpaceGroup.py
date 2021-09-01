@@ -343,16 +343,24 @@ class CrystalSpaceGroup(Calculation):
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
         
-        keys = [
-            #super().multikeys,
-            self.system.keyset,
+        keys = (
+            # Universal multikeys
+            super().multikeys +
+
+            # System keys
             [
-            'symmetryprecision',
-            'primitivecell',
-            'idealcell',
-            ],
-        ]
-        
+                self.system.keyset
+            ] +
+            
+            # Run parameter keys
+            [
+                [
+                    'symmetryprecision',
+                    'primitivecell',
+                    'idealcell',
+                ]
+            ]
+        )
         return keys
 
 ########################### Data model interactions ###########################
@@ -587,10 +595,11 @@ class CrystalSpaceGroup(Calculation):
         }
 
     def pandasfilter(self, dataframe, name=None, key=None, iprPy_version=None,
-                   atomman_version=None, script=None, branch=None,
-                   status=None, symbols=None, 
-                   symmetryprecision=None, idealcell=None, primitivecell=None,
-                   pearson=None, number=None, international=None, schoenflies=None):
+                     atomman_version=None, script=None, branch=None,
+                     status=None, symbols=None, 
+                     symmetryprecision=None, idealcell=None, primitivecell=None,
+                     pearson=None, number=None, international=None, schoenflies=None,
+                     **kwargs):
         """
         Parses a pandas dataframe containing the subset's metadata to find 
         entries matching the terms and values given. Ideally, this should find

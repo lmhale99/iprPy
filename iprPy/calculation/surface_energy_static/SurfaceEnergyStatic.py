@@ -274,16 +274,24 @@ class SurfaceEnergyStatic(Calculation):
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
 
-        keys =  [
-            #super().multikeys,
-            self.potential.keyset + self.system.keyset,
+        keys = (
+            # Universal multikeys
+            super().multikeys +
+
+            # Combination of potential and system keys
             [
-                'sizemults',
-            ],
-            self.defect.keyset,
-            self.minimize.keyset,
-        ]
-               
+                self.potential.keyset + 
+                self.system.keyset
+            ] +
+
+            # Defect multikeys
+            self.defect.multikeys + 
+
+            # Minimize keys
+            [
+                self.minimize.keyset
+            ]
+        )
         return keys
 
 ########################### Data model interactions ###########################

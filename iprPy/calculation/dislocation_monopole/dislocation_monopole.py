@@ -320,7 +320,8 @@ def disl_relax(lammps_command, system, potential,
         f.write(filltemplate(template, lammps_variables, '<', '>'))
     
     # Run LAMMPS
-    output = lmp.run(lammps_command, lammps_script, mpi_command)
+    output = lmp.run(lammps_command, script_name=lammps_script,
+                     mpi_command=mpi_command)
     thermo = output.simulations[-1]['thermo']
     
     # Extract output values

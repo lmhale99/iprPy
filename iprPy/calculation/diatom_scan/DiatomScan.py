@@ -333,16 +333,27 @@ class DiatomScan(Calculation):
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
         
-        keys = [
-            #super().multikeys,
-            self.potential.keyset + ['symbols'],
-            [
-                'minimum_r',
-                'maximum_r',
-                'number_of_steps_r',
-            ],
-        ]
+        keys = (
+            # Universal multikeys
+            super().multikeys +
 
+            # Potential keys plus symbols
+            [
+                self.potential.keyset + 
+                [
+                    'symbols'
+                ]
+            ] +
+
+            # Run parameter keys
+            [
+                [
+                    'minimum_r',
+                    'maximum_r',
+                    'number_of_steps_r',
+                ]
+            ]
+        )
         return keys
 
 ########################### Data model interactions ###########################
@@ -423,7 +434,7 @@ class DiatomScan(Calculation):
            self.energy_values = uc.value_unit(scan['potential-energy'])
 
     def mongoquery(self, minimum_r=None, maximum_r=None,
-                   number_of_steps_r=None, symbols=None, **kwargs):
+                   number_of_steps_r=None, symbol=None, **kwargs):
         """
         Builds a Mongo-style query based on kwargs values for the record style.
 
@@ -435,7 +446,7 @@ class DiatomScan(Calculation):
             The maximum interatomic spacing to use for the scan.
         number_of_steps_r : int
             The number of evaluation points to use for the scan.
-        symbols : str
+        symbol : str
             Element model symbol(s) assigned to the two atoms.
         **kwargs : any
             Any extra query terms that are universal for all calculations
@@ -454,12 +465,12 @@ class DiatomScan(Calculation):
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
-        query.in_list.mongo(mquery, f'{root}.system-info.symbols', symbols)
+        query.in_list.mongo(mquery, f'{root}.system-info.symbols', symbol)
 
         return mquery
 
     def cdcsquery(self, minimum_r=None, maximum_r=None, number_of_steps_r=None,
-                  symbols=None, **kwargs):
+                  symbol=None, **kwargs):
         """
         Builds a CDCS-style query based on kwargs values for the record style.
 
@@ -471,7 +482,7 @@ class DiatomScan(Calculation):
             The maximum interatomic spacing to use for the scan.
         number_of_steps_r : int
             The number of evaluation points to use for the scan.
-        symbols : str
+        symbol : str
             Element model symbol(s) assigned to the two atoms.
         **kwargs : any
             Any extra query terms that are universal for all calculations
@@ -490,7 +501,7 @@ class DiatomScan(Calculation):
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
-        query.in_list.mongo(mquery, f'{root}.system-info.symbols', symbols)
+        query.in_list.mongo(mquery, f'{root}.system-info.symbols', symbol)
 
         return mquery
 
@@ -537,7 +548,7 @@ class DiatomScan(Calculation):
         return {}
 
     def pandasfilter(self, dataframe, minimum_r=None, maximum_r=None,
-                     number_of_steps_r=None, symbols=None, **kwargs):
+                     number_of_steps_r=None, symbol=None, **kwargs):
         """
         Parses a pandas dataframe containing the subset's metadata to find 
         entries matching the terms and values given. Ideally, this should find
@@ -554,7 +565,7 @@ class DiatomScan(Calculation):
             The maximum interatomic spacing to use for the scan.
         number_of_steps_r : int
             The number of evaluation points to use for the scan.
-        symbols : str
+        symbol : str
             Element model symbol(s) assigned to the two atoms.
         kwargs : any
             Any extra query terms that are universal for all calculations
@@ -574,7 +585,7 @@ class DiatomScan(Calculation):
             &query.str_match.pandas(dataframe, 'minimum_r', minimum_r)
             &query.str_match.pandas(dataframe, 'maximum_r', maximum_r)
             &query.str_match.pandas(dataframe, 'number_of_steps_r', number_of_steps_r)
-            &query.in_list.pandas(dataframe, 'symbols', symbols)
+            &query.in_list.pandas(dataframe, 'symbols', symbol)
         )
         
         return matches

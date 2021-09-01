@@ -166,7 +166,8 @@ def pointdiffusion(lammps_command, system, potential, point_kwargs,
         f.write(filltemplate(template, lammps_variables, '<', '>'))
     
     # Run lammps
-    output = lmp.run(lammps_command, lammps_script, mpi_command)
+    output = lmp.run(lammps_command, script_name=lammps_script,
+                     mpi_command=mpi_command)
     
     # Extract LAMMPS thermo data.
     thermo = output.simulations[1]['thermo']

@@ -266,8 +266,9 @@ def calc_cij(lammps_command, system, potential,
         f.write(filltemplate(template, lammps_variables, '<', '>'))
     
     # Run lammps
-    output = lmp.run(lammps_command, lammps_script, mpi_command=mpi_command,
-                    logfile=f'cij-{cycle}-log.lammps')
+    output = lmp.run(lammps_command, script_name=lammps_script,
+                     mpi_command=mpi_command,
+                     logfile=f'cij-{cycle}-log.lammps')
     thermo = output.flatten('all').thermo
     
     # Extract LAMMPS thermo data. Each term ranges i=0-12 where i=0 is undeformed

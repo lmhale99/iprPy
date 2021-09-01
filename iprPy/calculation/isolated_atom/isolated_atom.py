@@ -73,7 +73,8 @@ def isolated_atom(lammps_command, potential, mpi_command=None):
             f.write(filltemplate(template, lammps_variables, '<', '>'))
         
         # Run lammps and extract data
-        output = lmp.run(lammps_command, lammps_script, mpi_command)
+        output = lmp.run(lammps_command, script_name=lammps_script,
+                         mpi_command=mpi_command)
         energy = output.simulations[0]['thermo'].PotEng.values[-1]
         energydict[symbol] = uc.set_in_units(energy, lammps_units['energy'])
     

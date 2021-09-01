@@ -212,7 +212,8 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
         f.write(filltemplate(template, lammps_variables, '<', '>'))
 
     # Run lammps to relax perfect.dat
-    output = lmp.run(lammps_command, lammps_script, mpi_command)
+    output = lmp.run(lammps_command, script_name=lammps_script,
+                     mpi_command=mpi_command)
     
     # Extract LAMMPS thermo data.
     thermo = output.simulations[0]['thermo']
@@ -255,7 +256,8 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
         f.write(filltemplate(template, lammps_variables, '<', '>'))
     
     # Run lammps
-    output = lmp.run(lammps_command, lammps_script, mpi_command)
+    output = lmp.run(lammps_command, script_name=lammps_script,
+                     mpi_command=mpi_command)
     
     # Extract lammps thermo data
     thermo = output.simulations[0]['thermo']

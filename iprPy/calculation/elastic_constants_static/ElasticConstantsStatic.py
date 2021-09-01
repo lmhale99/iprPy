@@ -269,16 +269,32 @@ class ElasticConstantsStatic(Calculation):
     def multikeys(self):
         """list: Calculation key sets that can have multiple values during prepare."""
         
-        keys =  [
-            #super().multikeys,
-            self.potential.keyset + self.system.keyset,
-            self.system_mods.keyset,
+        keys = (
+            # Universal multikeys
+            super().multikeys +
+
+            # Combination of potential and system keys
             [
-                'strainrange',
-            ],
-            self.minimize.keyset,
-        ]
-               
+                self.potential.keyset + 
+                self.system.keyset
+            ] +
+
+            # System mods keys
+            [
+                self.system_mods.keyset
+            ] +
+            
+            # Strainrange
+            [
+                [
+                    'strainrange',
+                ]
+            ] +
+            
+            [
+                self.minimize.keyset
+            ]
+        )    
         return keys
 
 ########################### Data model interactions ###########################
@@ -454,7 +470,7 @@ class ElasticConstantsStatic(Calculation):
             'strainrange':1e-10,
         }
 
-    def pandasfilter(dataframe, strainrange=None, **kwargs):
+    def pandasfilter(self, dataframe, strainrange=None, **kwargs):
         """
         Parses a pandas dataframe containing the subset's metadata to find 
         entries matching the terms and values given. Ideally, this should find

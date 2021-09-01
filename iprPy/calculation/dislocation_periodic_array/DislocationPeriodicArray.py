@@ -388,12 +388,12 @@ class DislocationPeriodicArray(Calculation):
 
         # Set common workflow settings
         params['buildcombos'] = [
-            'atomicparent load_file parent',
+            'atomicarchive load_file parent',
             'defect dislocation_file'
         ]
         params['parent_record'] = 'calculation_elastic_constants_static'
         params['parent_load_key'] = 'system-info'
-        params['parent_strainrange'] = '1e-7'
+        params['parent_strainrange'] = 1e-7
         params['defect_record'] = 'dislocation'
 
         params['dislocation_boundarywidth'] = '3'
@@ -489,25 +489,30 @@ class DislocationPeriodicArray(Calculation):
     
     @property
     def multikeys(self):
-        """
-        list: Calculation key sets that can have multiple values during prepare.
-        """
-        keys = [
-            #super().multikeys,
-            self.potential.keyset + self.system.keyset + self.elastic.keyset,
+        """list: Calculation key sets that can have multiple values during prepare."""
+        keys = (
+            # Universal multikeys
+            super().multikeys +
+            
+            # Combination of potential, system and elastic keys
             [
-                'sizemults',
-                'amin',
-                'bmin',
-                'cmin',
-            ],
-            self.defect.keyset,
-            self.minimize.keyset + [
-                'randomseed',
-                'annealtemperature',
-                'annealsteps',
+                self.potential.keyset +
+                self.system.keyset +
+                self.elastic.keyset
+            ] +
+            
+            # Defect multikeys
+            self.defect.multikeys + 
+            
+            # Combination of minimize and run parameter keys
+            [
+                self.minimize.keyset + [
+                    'randomseed',
+                    'annealtemperature',
+                    'annealsteps',
+                ]
             ]
-        ]
+        )
                     
         return keys
 

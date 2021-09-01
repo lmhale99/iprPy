@@ -142,7 +142,8 @@ def phonon_quasiharmonic(lammps_command, ucell, potential, mpi_command=None, a_m
                 f.write(filltemplate(template, lammps_variables, '<', '>'))
 
             # Run LAMMPS
-            output = lmp.run(lammps_command, 'phonon.in', mpi_command=mpi_command)
+            output = lmp.run(lammps_command, script_name='phonon.in',
+                             mpi_command=mpi_command)
 
             # Extract system energy
             thermo = output.simulations[0]['thermo']
@@ -329,7 +330,8 @@ def phononcalc(lammps_command, ucell, potential, mpi_command=None,
             f.write(filltemplate(template, lammps_variables, '<', '>'))
         
         # Run LAMMPS
-        lmp.run(lammps_command, 'phonon.in', mpi_command=mpi_command)
+        lmp.run(lammps_command, script_name='phonon.in',
+                mpi_command=mpi_command)
         
         # Extract forces from dump file
         forcestructure = am.load('atom_dump', 'forces.dump')
