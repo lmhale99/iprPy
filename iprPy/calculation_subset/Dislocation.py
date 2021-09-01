@@ -376,28 +376,47 @@ class Dislocation(CalculationSubset):
 
         Parameters
         ----------
-        load_style : str, optional
-            The style for atomman.load() to use.
-        load_file : str, optional
-            The path to the file to load.
-        symbols : list or None, optional
-            The list of interaction model symbols to associate with the atom
-            types in the load file.  A value of None will default to the
-            symbols listed in the load file if the style contains that
-            information.
-        load_options : dict, optional
-            Any other atomman.load() keyword options to use when loading.
-        load_content : str or DataModelDict, optional
-            The contents of load_file.  Allows for ucell and symbols/family
-            to be extracted without the file being accessible at the moment.
-        box_parameters : list or None, optional
-            A list of 3 orthorhombic box parameters or 6 trigonal box length
-            and angle parameters to scale the loaded system by.  Setting a
-            value of None will perform no scaling.
+        param_file : str, optional
+            The path to a file that fully defines the input parameters for
+            a specific defect type.
+        key : str, optional
+            The UUID4 unique key associated with the defect parameter set.
+        id : str, optional
+            The unique id associated with the defect parameter set.
+        slip_hkl : str or array-like object, optional
+            The Miller (hkl) slip plane.
+        ξ_uvw : str or array-like object, optional
+            The Miller [uvw] line direction.
+        burgers : str or array-like object, optional
+            The Miller Burgers vector
+        m : str or array-like object, optional
+            The Cartesian unit vector to align with the dislocation solution's
+            m coordinate vector (perpendicular to n and ξ).
+        n : str or array-like object, optional
+            The Cartesian unit vector to align with the dislocation solution's
+            n coordinate vector (slip plane normal).
+        shift : str or array-like object, optional
+            A rigid body shift to apply to all atoms.
+        shiftscale : bool, optional
+            Indicates if shift is absolute Cartesian or scaled relative to the
+            rotated cell's box parameters
+        shiftindex : int, optional
+            If given, the shift will automatically be selected to position the
+            slip plane halfway between atomic planes.  Different values select
+            different neighboring atomic planes.
+        sizemults : str or array-like object, optional
+            The system size multipliers.  
+        amin : float, optional
+            A minimum width for the box's a vector direction.  The sizemults
+            will be modified to ensure this as needed.
+        bmin :
+            A minimum width for the box's b vector direction.  The sizemults
+            will be modified to ensure this as needed.
+        cmin :
+            A minimum width for the box's c vector direction.  The sizemults
+            will be modified to ensure this as needed.
         family : str or None, optional
-            The system's family identifier.  If None, then the family will be
-            set according to the family value in the load file if it has one,
-            or as the load file's name otherwise.
+            The system's family identifier that the defect is defined for.
         """
         if 'param_file' in kwargs:
             self.param_file = kwargs['param_file']
@@ -547,17 +566,25 @@ class Dislocation(CalculationSubset):
             'dislocation_model', 
         ]
 
-    #@property
-    #def keyset(self):
-    #    """
-    #    list : The input keyset for preparing.
-    #    """
-    #    keys = self.preparekeys
-    #    keys.pop(keys.index('sizemults'))
-    #    keys.pop(keys.index('amin'))
-    #    keys.pop(keys.index('bmin'))
-    #    keys.pop(keys.index('cmin'))
-    #    return self._pre(keys)
+    @property
+    def multikeys(self):
+        """
+        list: Calculation subset key sets that can have multiple values during prepare.
+        """ 
+        # Define key set for system size parameters
+        sizekeys = ['sizemults', 'amin', 'bmin', 'cmin']
+        
+        # Define key set for defect parameters as the remainder
+        defectkeys = []
+        for key in self.preparekeys:
+            if key not in sizekeys:
+                defectkeys.append(key)
+
+        # Add prefixes and return
+        return [
+            self._pre(sizekeys),
+            self._pre(defectkeys)
+        ]
 
     def load_parameters(self, input_dict):
         """
@@ -661,6 +688,7 @@ class Dislocation(CalculationSubset):
 
         cp = disl['calculation-parameter']
         self.slip_hkl = cp['slip_hkl']
+        self.ξ_uvw = cp['ξ_uvw']
         self.burgers = cp['burgers']
         self.m = cp['m']
         self.n = cp['n']

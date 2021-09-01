@@ -228,28 +228,47 @@ class StackingFault(CalculationSubset):
 
         Parameters
         ----------
-        load_style : str, optional
-            The style for atomman.load() to use.
-        load_file : str, optional
-            The path to the file to load.
-        symbols : list or None, optional
-            The list of interaction model symbols to associate with the atom
-            types in the load file.  A value of None will default to the
-            symbols listed in the load file if the style contains that
-            information.
-        load_options : dict, optional
-            Any other atomman.load() keyword options to use when loading.
-        load_content : str or DataModelDict, optional
-            The contents of load_file.  Allows for ucell and symbols/family
-            to be extracted without the file being accessible at the moment.
-        box_parameters : list or None, optional
-            A list of 3 orthorhombic box parameters or 6 trigonal box length
-            and angle parameters to scale the loaded system by.  Setting a
-            value of None will perform no scaling.
+        param_file : str, optional
+            The path to a file that fully defines the input parameters for
+            a specific defect type.
+        key : str, optional
+            The UUID4 unique key associated with the defect parameter set.
+        id : str, optional
+            The unique id associated with the defect parameter set.
+        hkl : str or array-like object, optional
+            The Miller (hkl) fault plane.
+        cellsetting : str, optional
+            Indicates the setting of the unit cell, if it is not primitive.
+            This allows for the proper identification of the shortest lattice
+            vectors for applying the stacking fault shifts.
+        cutboxvector : str, optional
+            Indicates which box vector will be made non-periodic to allow for
+            the defect to be created.
+        shiftindex : int, optional
+            A rigid shift will be applied to position the cutboxvector's
+            boundary halfway between two atomic planes.  Changing this value
+            changes the termination planes.
+        sizemults : str or array-like object, optional
+            The system size multipliers.  
+        minwidth : float, optional
+            A minimum width for the box's cutboxvector direction.  The sizemults
+            will be modified to ensure this as needed.
+        even : bool, optional
+            If True, the sizemult for the cutboxvector direction will be
+            constrained to be even.  This will ensure that the free surfaces
+            and fault plane surface will have identical neighboring atomic
+            planes.
         family : str or None, optional
-            The system's family identifier.  If None, then the family will be
-            set according to the family value in the load file if it has one,
-            or as the load file's name otherwise.
+            The system's family identifier that the defect is defined for.
+        a1vect_uvw : str or array-like object, optional
+            The in-plane a1 shift vector that indicates a full shift from one
+            lattice site to another.
+        a2vect_uvw : str or array-like object, optional
+            The in-plane a2 shift vector that indicates a full shift from one
+            lattice site to another.
+        faultpos_rel : float, optional
+            The relative position along the cutboxvector where the fault plane
+            is to be located.  Default value is 0.5 (middle).
         """
         if 'param_file' in kwargs:
             self.param_file = kwargs['param_file']
@@ -373,6 +392,26 @@ class StackingFault(CalculationSubset):
         """
         return self.preparekeys + [
             'stackingfault_model',
+        ]
+
+    @property
+    def multikeys(self):
+        """
+        list: Calculation subset key sets that can have multiple values during prepare.
+        """ 
+        # Define key set for system size parameters
+        sizekeys = ['sizemults', 'stackingfault_minwidth', 'stackingfault_even']
+        
+        # Define key set for defect parameters as the remainder
+        defectkeys = []
+        for key in self.preparekeys:
+            if key not in sizekeys:
+                defectkeys.append(key)
+
+        # Add prefixes and return
+        return [
+            self._pre(sizekeys),
+            self._pre(defectkeys)
         ]
 
     def load_parameters(self, input_dict):
