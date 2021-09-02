@@ -51,7 +51,7 @@ def load_calculation(style, **kwargs):
     """
     return calculationmanager.init(style, **kwargs)
 
-def run_calculation(params, calc_style=None):
+def run_calculation(params, calc_style=None, verbose=True):
     """
     Runs a calculation from a parameter file and outputs results to
     results.json.
@@ -64,13 +64,9 @@ def run_calculation(params, calc_style=None):
     calc_style : str, optional
         Specifies the style of calculation to run.  Optional if params is a
         path to a file where the file's name is calc_<calc_style>.in.
-
-    Returns
-    -------
-    status : str
-        The calculation's status ('finished' or 'error') after running.
-    error : str or None
-        Any error message thrown by the calculation.
+    verbose : bool, optional
+            If True, a message relating to the calculation's status will be
+            printed upon completion.  Default value is True.
     """
     if calc_style is None:
         # Extract calc_style from filename
@@ -83,5 +79,5 @@ def run_calculation(params, calc_style=None):
     calculation = load_calculation(calc_style, params=params)
     
     # Run and create results_json
-    calculation.run(results_json=True, verbose=True)
+    calculation.run(results_json=True, verbose=verbose)
     
