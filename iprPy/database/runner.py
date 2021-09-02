@@ -456,6 +456,9 @@ class RunManager():
         status : str
             The status of the calculation after calling run.    
         """
+        # Strip slashes from calc_name due to shell autofills
+        calc_name = calc_name.strip('/')
+
         calc_directory = Path(self.run_directory, calc_name)
         
         # Try bidding for the calc_directory
