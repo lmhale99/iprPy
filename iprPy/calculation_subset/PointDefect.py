@@ -387,6 +387,7 @@ class PointDefect(CalculationSubset):
             self.key = model['key']
             self.id = model['id']
             self.family = model['system-family']
+            self.__params = []
             for cp in model.aslist('calculation-parameter'):
                 self.add_params(**cp)
         
@@ -396,6 +397,7 @@ class PointDefect(CalculationSubset):
             self.key = None
             self.id = None
             self.family = self.parent.system.family
+            self.__params = []
             cp = {}
             for key1, key2 in zip(('pointdefect_type', 'pointdefect_atype',
                                 'pointdefect_pos', 'pointdefect_dumbbell_vect',
@@ -423,7 +425,7 @@ class PointDefect(CalculationSubset):
         self.key = ptd['key']
         self.id = ptd['id']
         self.family = ptd['system-family']
-
+        self.__params = []
         for cp in ptd.aslist('calculation-parameter'):
             self.add_params(**cp)
         

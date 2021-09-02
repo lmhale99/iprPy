@@ -304,10 +304,10 @@ class LammpsPotential(CalculationSubset):
         runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
 
         # Build query terms
-        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.key', potential_LAMMPS_key)
-        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.id', potential_LAMMPS_id)
-        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.potential.key', potential_key)
-        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.potential.id', potential_id)
+        query.str_match.mongo(mquery, f'{root}.key', potential_LAMMPS_key)
+        query.str_match.mongo(mquery, f'{root}.id', potential_LAMMPS_id)
+        query.str_match.mongo(mquery, f'{root}.potential.key', potential_key)
+        query.str_match.mongo(mquery, f'{root}.potential.id', potential_id)
         
         # Return query dict
         return mquery
@@ -344,10 +344,10 @@ class LammpsPotential(CalculationSubset):
         runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
         
         # Build query terms
-        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.key', potential_LAMMPS_key)
-        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.id', potential_LAMMPS_id)
-        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.potential.key', potential_key)
-        query.str_match.mongo(mquery, f'{root}.potential-LAMMPS.potential.id', potential_id)
+        query.str_match.mongo(mquery, f'{root}.key', potential_LAMMPS_key)
+        query.str_match.mongo(mquery, f'{root}.id', potential_LAMMPS_id)
+        query.str_match.mongo(mquery, f'{root}.potential.key', potential_key)
+        query.str_match.mongo(mquery, f'{root}.potential.id', potential_id)
         
         # Return query dict
         return mquery      
