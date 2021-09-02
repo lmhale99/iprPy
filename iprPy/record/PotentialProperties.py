@@ -193,3 +193,118 @@ class PotentialProperties(Record):
             subset.metadata(meta)
 
         return meta
+    
+    def pandasfilter(self, dataframe, name=None, potential_key=None,
+                     potential_id=None, potential_LAMMPS_key=None,
+                     potential_LAMMPS_id=None):
+        """
+        Filters a pandas.DataFrame based on kwargs values for the record style.
+        
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            A table of metadata for multiple records of the record style.
+        name : str or list
+            The record name(s) to parse by.
+        id : str or list
+            The record id(s) to parse by.
+        key : str or list
+            The record key(s) to parse by.
+        family : str or list
+            Parent prototype/reference id(s) to parse by.
+        hkl : str or list
+            Space delimited fault plane(s) to parse by.
+        shiftindex : int or list
+            shiftindex value(s) to parse by.
+        cutboxvector : str or list
+            cutboxvector value(s) to parse by.
+        
+        Returns
+        -------
+        pandas.Series, numpy.NDArray
+            Boolean map of matching values
+        """
+        matches = (
+            query.str_match.pandas(dataframe, 'name', name)
+            &query.str_match.pandas(dataframe, 'potential_key', potential_key)
+            &query.str_match.pandas(dataframe, 'potential_id', potential_id)
+            &query.str_match.pandas(dataframe, 'potential_LAMMPS_key', potential_LAMMPS_key)
+            &query.str_match.pandas(dataframe, 'potential_LAMMPS_id', potential_LAMMPS_id)
+        )
+        return matches
+
+    def mongoquery(self, name=None, potential_key=None,
+                   potential_id=None, potential_LAMMPS_key=None,
+                   potential_LAMMPS_id=None):
+        """
+        Builds a Mongo-style query based on kwargs values for the record style.
+        
+        Parameters
+        ----------
+        name : str or list
+            The record name(s) to parse by.
+        id : str or list
+            The record id(s) to parse by.
+        key : str or list
+            The record key(s) to parse by.
+        family : str or list
+            Parent prototype/reference id(s) to parse by.
+        hkl : str or list
+            Space delimited fault plane(s) to parse by.
+        shiftindex : int or list
+            shiftindex value(s) to parse by.
+        cutboxvector : str or list
+            cutboxvector value(s) to parse by.
+        
+        Returns
+        -------
+        dict
+            The Mongo-style query
+        """   
+        mquery = {}
+        root = f'content.{self.modelroot}'
+
+        query.str_match.mongo(mquery, f'name', name)
+
+        query.str_match.mongo(mquery, f'{root}.potential.key', potential_key)
+        query.str_match.mongo(mquery, f'{root}.potential.id', potential_id)
+        query.str_match.mongo(mquery, f'{root}.implementation.key', potential_LAMMPS_key)
+        query.str_match.mongo(mquery, f'{root}.implementation.id', potential_LAMMPS_id)
+        
+        return mquery
+
+    def cdcsquery(self, potential_key=None,
+                   potential_id=None, potential_LAMMPS_key=None,
+                   potential_LAMMPS_id=None):
+        """
+        Builds a CDCS-style query based on kwargs values for the record style.
+        
+        Parameters
+        ----------
+        id : str or list
+            The record id(s) to parse by.
+        key : str or list
+            The record key(s) to parse by.
+        family : str or list
+            Parent prototype/reference id(s) to parse by.
+        hkl : str or list
+            Space delimited fault plane(s) to parse by.
+        shiftindex : int or list
+            shiftindex value(s) to parse by.
+        cutboxvector : str or list
+            cutboxvector value(s) to parse by.
+        
+        Returns
+        -------
+        dict
+            The CDCS-style query
+        """
+        mquery = {}
+        root = self.modelroot
+
+        query.str_match.mongo(mquery, f'{root}.potential.key', potential_key)
+        query.str_match.mongo(mquery, f'{root}.potential.id', potential_id)
+        query.str_match.mongo(mquery, f'{root}.implementation.key', potential_LAMMPS_key)
+        query.str_match.mongo(mquery, f'{root}.implementation.id', potential_LAMMPS_id)
+
+        return mquery
