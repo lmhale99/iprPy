@@ -127,7 +127,6 @@ class IprPyDatabase():
         for resultsfile in run_directory.glob('*/results.json'):
             resultsfile.unlink()
 
-
     def copy_references(self, dest, includetar=True, overwrite=False):
         """
         Copies all reference record styles from the current database to
@@ -156,6 +155,7 @@ class IprPyDatabase():
             'dislocation',
         ]
         for style in iaslist(refstyles):
+            print(style)
             self.copy_records(dest, record_style=style, includetar=includetar, overwrite=overwrite)
 
     def get_parent_records(self, record=None, name=None, style=None,
