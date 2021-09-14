@@ -1,6 +1,12 @@
+# coding: utf-8
+# Standard Python libraries
 from pathlib import Path
+import shutil
 
-from . import prepare, runner, master_prepare
+import atomman as am
+
+# iprPy imports
+from . import prepare, runner, master_prepare, reset_orphans
 from .. import load_run_directory
 from ..tools import iaslist
 
@@ -9,6 +15,64 @@ class IprPyDatabase():
     Provides methods to extend the datamodelbase.Database classes to support
     iprPy calculation record actions.
     """
+
+    @property
+    def potdb(self):
+        """atomman.library.Database : A library database based on the current object"""
+        try:
+            return self.__potdb
+        except AttributeError:
+            self.build_potdb()
+            return self.__potdb
+
+    def build_potdb(self, remote=None, remote_name=None, remote_database=None,
+                    remote_style=None, remote_host=None, remote_terms=None, 
+                    kim_models=None, kim_api_directory=None, kim_models_file=None):
+        """
+        Creates potdb, an atomman.library.Database with the local_database
+        value set to the current object.  Allows for reference records to be
+        retrieved using the atomman/potentials get methods.
+
+        Parameters
+        ----------
+        remote : bool, optional
+            Indicates if the load operations will check for remote records.
+            Default value is controlled by settings.  If False, then the remote
+            interactions will not be set.
+        remote_name : str, optional
+            The name assigned to a pre-defined database to use for the remote
+            interactions.  Cannot be given with remote_style, remote_host or
+            remote_terms.
+        remote_database : datamodelbase.Database
+            A pre-existing Database object to use for the remote.
+        remote_style : str, optional
+            The database style to use for the remote interactions.
+        remote_host : str, optional
+            The URL/file path where the remote database is hosted.
+        remote_terms : dict, optional
+            Any other keyword parameters defining necessary access/settings
+            information for using the remote database.  Allowed keywords are
+            database style-specific.
+        kim_models : str or list, optional
+            Allows for the list of installed_kim_models to be explicitly given.
+            Cannot be given with the other kim parameters.
+        kim_api_directory : path-like object, optional
+            The directory containing the kim api to use to build the list.
+            Cannot be given with the other kim parameters.
+        kim_models_file : path-like object, optional
+            The path to a whitespace-delimited file listing full kim ids.
+            Cannot be given with the other kim parameters.
+
+        """
+        self.__potdb = am.library.Database(local=True, local_database=self,
+                                           remote=remote, remote_name=remote_name,
+                                           remote_database=remote_database,
+                                           remote_style=remote_style,
+                                           remote_host=remote_host,
+                                           remote_terms=remote_terms,
+                                           kim_models=kim_models,
+                                           kim_api_directory=kim_api_directory,
+                                           kim_models_file=kim_models_file)
 
     def check_records(self, record_style=None):
         """
@@ -49,7 +113,7 @@ class IprPyDatabase():
         
         Parameters
         ----------
-        run_directory : str, optional
+        run_directory : str
             The directory where the cleaned calculation instances are to be
             returned.
         record_style : str, optional
@@ -126,6 +190,84 @@ class IprPyDatabase():
         # Remove results.json files
         for resultsfile in run_directory.glob('*/results.json'):
             resultsfile.unlink()
+
+    def finish_calculations(self, run_directory, verbose=False):
+        """
+        Checks a run directory for calculations that have competed running and
+        moves them to the database by adding/updating the records and archiving
+        the calculation folder. Allows for calculations to be ran in isolation,
+        or to clean up completed calculations if a connection to a remote
+        database is lost.
+
+        Parameters
+        ----------
+        run_directory : str
+            The directory to search for completed calculations.
+        verbose : bool, optional
+            If True, print statements will list the records successfully
+            added/updated to the database.  Default value is False.        
+        """
+        # Check for run_directory first by name then by path
+        try:
+            run_directory = load_run_directory(run_directory)
+        except:
+            run_directory = Path(run_directory).resolve()
+            if not run_directory.is_dir():
+                raise ValueError('run_directory not found/set')
+
+        for calc in Path(run_directory).glob('*'):
+
+            # Check that the path is a directory
+            if not calc.is_dir():
+                continue
+
+            # Check if calc is finished
+            record_file = Path(calc, 'results.json')
+            if not record_file.is_file():
+                continue
+
+            # Check that the calc input script exists and get the style
+            infiles = [i for i in calc.glob('calc_*.in')]
+            if len(infiles) == 1:
+                infile = infiles[0]
+                style = infile.stem.replace('calc_', 'calculation_')
+            else:
+                continue
+
+            # Add record and tar
+            name = calc.name
+            try:
+                self.add_record(name=name, style=style, model=record_file, verbose=verbose)
+            except:
+                self.update_record(name=name, style=style, model=record_file, verbose=verbose)
+            try:
+                self.add_tar(name=name, style=style, root_dir=run_directory)
+            except:
+                self.update_tar(name=name, style=style, root_dir=run_directory)
+
+            # Delete calc folder
+            shutil.rmtree(calc)
+
+    def reset_orphans(self, run_directory, orphan_directory=None):
+        """
+        Resets calculations that were moved to an orphan directory back to a
+        run directory and removes any bid files that they contain.  Can be useful
+        if connection is lost to a remote database or a runner was accidentally
+        started with the wrong database. This is identical to calling
+        iprPy.reset_orphans and is only a class method for consistency with other
+        workflow operations.
+
+        Parameters
+        ----------
+        run_directory : str
+            The directory to move the orphaned calculations to.
+        orphan_directory : str, optional
+            The orphan directory containing archived calculation folders.  The
+            default value assumes that the orphan directory is a directory named
+            "orphan" that is in the same parent directory as run_directory, i.e.
+            is at "../orphan" relative to run_directory.
+        """
+        reset_orphans(run_directory, orphan_directory=orphan_directory)
 
     def copy_references(self, dest, includetar=True, overwrite=False):
         """
@@ -316,4 +458,5 @@ class IprPyDatabase():
         # Call runner with self as database
         runner(self, run_directory, calc_name=calc_name,
                orphan_directory=orphan_directory, hold_directory=hold_directory,
-               log=log, bidtries=bidtries, temp=temp, temp_directory=temp_directory)
+               log=log, bidtries=bidtries, temp=temp,
+               temp_directory=temp_directory)

@@ -1,6 +1,4 @@
 # coding: utf-8
-
-# coding: utf-8
 # Standard Python libraries
 from pathlib import Path
 from copy import deepcopy
