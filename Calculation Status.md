@@ -9,6 +9,13 @@ This is a list of the implemented calculations and the status of the associated 
 - docs: Missing
 - Notebook: Missing
 
+## bond_angle_scan
+
+- script: Needs updated (last update version 0.10)
+- workflow: Not implemented
+- docs: Missing
+- Notebook: Missing
+
 ## crystal_space_group
 
 - script: Current
@@ -23,19 +30,19 @@ This is a list of the implemented calculations and the status of the associated 
 - docs: Current
 - Notebook: Current
 
-## dislocation_crss
-
-- script: Incomplete: needs updating and testing
-- workflow: Not implemented
-- docs: Missing
-- Notebook: Missing
-
 ## dislocation_monopole
 
 - script: Current
 - workflow: Current
 - docs: Current
 - Notebook: Current
+- 
+## dislocation_monopole_crss
+
+- script: Incomplete: needs updating and testing
+- workflow: Not implemented
+- docs: Missing
+- Notebook: Missing
 
 ## dislocation_periodic_array
 
@@ -67,7 +74,7 @@ This is a list of the implemented calculations and the status of the associated 
 
 ## dislocation_vacancy
 
-- script: Needs updating (last update working branch of version 0.7)
+- script: Needs updating
 - workflow: Not implemented
 - docs: Missing
 - Notebook: Missing
@@ -116,24 +123,24 @@ This is a list of the implemented calculations and the status of the associated 
 
 ## phonon
 
-- script: Needs updating
-- workflow: Needs updating
-- docs: Needs updating
-- Notebook: Needs updating
+- script: Current, but requires old phonopy
+- workflow: Current
+- docs: Current
+- Notebook: Current
 
 ## point_defect_diffusion
 
-- script: Needs updating
+- script: Current
 - workflow: Not implemented (needs temperature relaxations)
-- docs: Needs updating
-- Notebook: Needs updating
+- docs: Current
+- Notebook: Current
 
 ## point_defect_static
 
-- script: Needs updating
-- workflow: Needs updating
-- docs: Needs updating
-- Notebook: Needs updating
+- script: Current
+- workflow: Current
+- docs: Current
+- Notebook: Current
 
 ## relax_box
 
