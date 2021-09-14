@@ -32,7 +32,7 @@ from . import calculation_subset
 from . import calculation
 from .calculation import load_calculation, calculationmanager
 
-from .database import load_database, databasemanager
+from .database import load_database, databasemanager, reset_orphans
 
 from .check_modules import check_modules
 

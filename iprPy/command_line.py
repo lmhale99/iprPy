@@ -9,7 +9,7 @@ import atomman as am
 
 # https://github.com/usnistgov/iprPy
 from . import (load_database, load_run_directory, load_calculation,
-               check_modules, settings)
+               check_modules, settings, reset_orphans)
 from .calculation import run_calculation
 from .database import runner, prepare
 from .tools import filltemplate
@@ -59,6 +59,17 @@ def command_line_actions(args):
         database = load_database(args.database)
         database.destroy_records(args.record_style)
     
+    # Actions for subcommand finish_calculations
+    elif args.action == 'finish_calculations':
+        database = load_database(args.database)
+        run_directory = load_run_directory(args.run_directory)
+        database.finish_calculations(run_directory, verbose=args.verbose)
+
+    # Actions for subcommand reset_orphans
+    elif args.action == 'reset_orphans':
+        run_directory = load_run_directory(args.run_directory)
+        reset_orphans(run_directory, orphan_directory=args.orphan_directory)
+
     # Actions for subcommand prepare
     elif args.action == 'prepare':
         database = load_database(args.database)
@@ -89,38 +100,40 @@ def command_line_actions(args):
         calculation = load_calculation(args.calculation)
         print(calculation.templatedoc)
 
-    elif args.action == 'get_lammps_potential':
-        copy = args.copy
-
-        # Initialize an atomman library database
-        potdb = am.library.Database(
-            local_name=args.local,
-            remote_name=args.remote)
-
-        # Set pot_dir_style based on copy's value
-        if copy is True:
-            pot_dir_style='id'
+    # Actions for subcommand retrieve
+    elif args.action == 'retrieve':
+        database = load_database(args.database)
+        style = args.record_style
+        if args.compact is True:
+            indent = None
         else:
-            pot_dir_style='local'
+            indent = 4
 
-        # Get LAMMPS potential record
-        lammps_potential = potdb.get_lammps_potential(
-            id = args.lammps_potential_id,
-            pot_dir_style=pot_dir_style,
-            verbose=True)
-        print()
+        # Call style-specific retrieve for extra functionality
+        if style in ['potential_LAMMPS', 'potential_LAMMPS_KIM']:
+            if args.getfiles is True:
+                pot_dir_style = 'id'
+                getfiles = True
+            else: 
+                pot_dir_style = 'local'
+                getfiles = False
 
-        # Save record to the working directory
-        with open(f'{lammps_potential.name}.json', 'w', encoding='UTF-8') as f:
-            lammps_potential.model.json(fp=f, indent=4, ensure_ascii=False)    
-        print(f'{lammps_potential.name}.json copied to working directory' )    
-            
-        if copy is True:
-            # Copy parameter files
-            potdb.get_lammps_potential_files(lammps_potential, verbose=True)
-            print('potential_dir is:', lammps_potential.pot_dir)
+            database.potdb.retrieve_lammps_potential(name=args.record_name,
+                                                     getfiles=getfiles,
+                                                     format=args.format,
+                                                     indent=indent,
+                                                     pot_dir_style=pot_dir_style,
+                                                     verbose=True)
+        elif style == 'Citation':
+            database.potdb.retrieve_citation(name=args.record_name,
+                                             format=args.format, indent=indent,
+                                             verbose=True)
+
+        # Call generic retrieve
         else:
-            print('potential_dir is:', lammps_potential.pot_dir)
+            database.potdb.retrieve_record(style=style, name=args.record_name,
+                                           format=args.format, indent=indent,
+                                           verbose=True)
 
     # Actions for subcommand run
     elif args.action == 'run':
@@ -259,6 +272,24 @@ def command_line_parser():
     subparser.add_argument('record_style', nargs='?', default=None,
                         help='record style')
     
+    # Define subparser for finish_calculations
+    subparser = subparsers.add_parser('finish_calculations',
+                        help='moves finished calculations to a database')
+    subparser.add_argument('database', nargs='?', default=None,
+                        help='database name')
+    subparser.add_argument('run_directory', nargs='?', default=None,
+                        help='run_directory name')
+    subparser.add_argument('-v', '--verbose', action='store_true',
+                        help='calculations will be listed as added to the database')
+
+    # Define subparser for reset_orphans
+    subparser = subparsers.add_parser('reset_orphans',
+                        help='moves calculations in an orphan directory back to a run directory')
+    subparser.add_argument('run_directory', nargs='?', default=None,
+                        help='run_directory name')
+    subparser.add_argument('orphan_directory', nargs='?', default=None,
+                        help='orphan_directory path')
+
     # Define subparser for prepare
     subparser = subparsers.add_parser('prepare',
                         help='prepare calculations')
@@ -281,27 +312,31 @@ def command_line_parser():
 
     # Define subparser for template
     subparser = subparsers.add_parser('template',
-                        help='save an empty input script for a calculation to the working directory.')
+                        help='save an empty input script for a calculation to the working directory')
     subparser.add_argument('calculation',
                         help='calculation name')
 
     # Define subparser for templatedoc
     subparser = subparsers.add_parser('templatedoc',
-                        help="view the documentation for a calculation's input script.")
+                        help="view the documentation for a calculation's input script")
     subparser.add_argument('calculation',
                         help='calculation name')
 
-    # Define subparser for get_lammps_potential
-    subparser = subparsers.add_parser('get_lammps_potential',
-                        help="copy/download a LAMMPS potential record (and parameter files).")
-    subparser.add_argument('lammps_potential_id',
-                        help='the id of the LAMMPS potential to get')
-    subparser.add_argument('-c', '--copy', action='store_true',
-                        help='if set, the parameter files will be copied as well')
-    subparser.add_argument('-l', '--local', default=None,
-                        help='a different local database name to search')      
-    subparser.add_argument('-r', '--remote', default=None,
-                        help='a different remote database name to search')     
+    # Define subparser for retrieve
+    subparser = subparsers.add_parser('retrieve',
+                        help="copy/download a record to the working directory")
+    subparser.add_argument('database',
+                        help='database name')
+    subparser.add_argument('record_style', 
+                        help='style of the record to retrieve')
+    subparser.add_argument('record_name',
+                        help='the name of the record in the database to retrieve')
+    subparser.add_argument('-f', '--format', default='json', type=str,
+                        help='the format to save the record as')
+    subparser.add_argument('-c', '--compact', action='store_true',
+                        help='indicates if the record is saved in compact format')
+    subparser.add_argument('-g', '--getfiles', action='store_true',
+                        help='if used, any files associated with the record will also be retrieved')    
 
     # Define subparser for run
     subparser = subparsers.add_parser('run',
