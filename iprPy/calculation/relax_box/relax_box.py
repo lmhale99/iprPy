@@ -21,7 +21,8 @@ parent_module = '.'.join(__name__.split('.')[:-1])
 
 def relax_box(lammps_command, system, potential,
               mpi_command=None, strainrange=1e-6,
-              p_xx=0.0, p_yy=0.0, p_zz=0.0, tol=1e-10, diverge_scale=3.):
+              pxx=0.0, pyy=0.0, pzz=0.0, pxy=0.0, pxz=0.0, pyz=0.0,
+              tol=1e-10, diverge_scale=3.):
     """
     Quickly refines static orthorhombic system by evaluating the elastic
     constants and the virial pressure.
@@ -40,14 +41,23 @@ def relax_box(lammps_command, system, potential,
     strainrange : float, optional
         The small strain value to apply when calculating the elastic
         constants (default is 1e-6).
-    p_xx : float, optional
+    pxx : float, optional
         The value to relax the x tensile pressure component to (default is
         0.0).
-    p_yy : float, optional
+    pyy : float, optional
         The value to relax the y tensile pressure component to (default is
         0.0).
-    p_zz : float, optional
+    pzz : float, optional
         The value to relax the z tensile pressure component to (default is
+        0.0).
+    pxy : float, optional
+        The value to relax the xy shear pressure component to (default is
+        0.0).
+    pxz : float, optional
+        The value to relax the xz shear pressure component to (default is
+        0.0).
+    pyz : float, optional
+        The value to relax the yz shear pressure component to (default is
         0.0).
     tol : float, optional
         The relative tolerance used to determine if the lattice constants have
@@ -80,18 +90,8 @@ def relax_box(lammps_command, system, potential,
         - **'yz'** (*float*) - The relaxed yz box tilt.
         - **'E_pot'** (*float*) - The potential energy per atom for the final
           configuration.
-        - **'measured_pxx'** (*float*) - The measured x tensile pressure
-          component for the final configuration.
-        - **'measured_pyy'** (*float*) - The measured y tensile pressure
-          component for the final configuration.
-        - **'measured_pzz'** (*float*) - The measured z tensile pressure
-          component for the final configuration.
-        - **'measured_pxy'** (*float*) - The measured xy shear pressure
-          component for the final configuration.
-        - **'measured_pxz'** (*float*) - The measured xz shear pressure
-          component for the final configuration.
-        - **'measured_pyz'** (*float*) - The measured yz shear pressure
-          component for the final configuration.
+        - **'measured_pij'** (*float*) - The measured pressure tensor
+          for the final configuration.
     
     Raises
     ------
@@ -111,11 +111,13 @@ def relax_box(lammps_command, system, potential,
     for cycle in range(100):
         
         # Run LAMMPS and evaluate results based on system_old
-        results = calc_cij(lammps_command, system_current, potential,
-                           mpi_command=mpi_command,
-                           p_xx=p_xx, p_yy=p_yy, p_zz=p_zz,
-                           strainrange=strainrange, cycle=cycle)
-        system_new = results['system_new']
+        results = cij_run0(lammps_command, system_current, potential,
+                           mpi_command=mpi_command, strainrange=strainrange,
+                           cycle=cycle)
+        pij = results['pij']
+        Cij = results['C'].Cij
+        system_new = update_box(system_current, results['C'], results['pij'],
+                                pxx, pyy, pzz, pxy, pxz, pyz, tol)
         
         # Compare new and current to test for convergence
         if np.allclose(system_new.box.vects,
@@ -128,17 +130,19 @@ def relax_box(lammps_command, system, potential,
         elif system_old is not None and np.allclose(system_new.box.vects,
                                                     system_old.box.vects,
                                                     rtol=tol, atol=0):
+            
             # Update current to average of old and new
             system_current.box_set(a = (system_new.box.a+system_old.box.a) / 2.,
                                    b = (system_new.box.b+system_old.box.b) / 2.,
                                    c = (system_new.box.c+system_old.box.c) / 2.,
                                    scale=True)
+            
             # Calculate Cij for the averaged system
-            results = calc_cij(lammps_command, system_current, potential,
-                               mpi_command=mpi_command,
-                               p_xx=p_xx, p_yy=p_yy, p_zz=p_zz, 
-                               strainrange=strainrange, cycle=cycle+1)
-            system_new = results['system_new']
+            results = cij_run0(lammps_command, system_current, potential,
+                               mpi_command=mpi_command, strainrange=strainrange,
+                               cycle=cycle)
+            system_new = update_box(system_current, results['C'], results['pij'],
+                                    pxx, pyy, pzz, pxy, pxz, pyz, tol)
             converged = True
             break
         
@@ -181,23 +185,17 @@ def relax_box(lammps_command, system, potential,
         results_dict['yz'] = system_new.box.yz
         
         results_dict['E_pot'] = results['E_pot']
-        results_dict['measured_pxx'] = results['measured_pxx']
-        results_dict['measured_pyy'] = results['measured_pyy']
-        results_dict['measured_pzz'] = results['measured_pzz']
-        results_dict['measured_pxy'] = results['measured_pxy']
-        results_dict['measured_pxz'] = results['measured_pxz']
-        results_dict['measured_pyz'] = results['measured_pyz']
+        results_dict['measured_pij'] = results['pij']
         
         return results_dict
     else:
         raise RuntimeError('Failed to converge after 100 cycles')
 
-def calc_cij(lammps_command, system, potential,
-             mpi_command=None, p_xx=0.0, p_yy=0.0, p_zz=0.0,
+def cij_run0(lammps_command, system, potential, mpi_command=None,
              strainrange=1e-6, cycle=0):
     """
-    Runs cij.in LAMMPS script to evaluate Cij, and E_coh of the current system,
-    and define a new system with updated box dimensions to test.
+    Runs cij_run0.in LAMMPS script to evaluate the elastic constants,
+    pressure and potential energy of the current system.
     
     Parameters
     ----------
@@ -213,15 +211,6 @@ def calc_cij(lammps_command, system, potential,
     strainrange : float, optional
         The small strain value to apply when calculating the elastic
         constants (default is 1e-6).
-    p_xx : float, optional
-        The value to relax the x tensile pressure component to (default is
-        0.0).
-    p_yy : float, optional
-        The value to relax the y tensile pressure component to (default is
-        0.0).
-    p_zz : float, optional
-        The value to relax the z tensile pressure component to (default is
-        0.0).
     cycle : int, optional
         Indicates the iteration cycle of quick_a_Cij().  This is used to
         uniquely save the LAMMPS input and output files.
@@ -233,17 +222,10 @@ def calc_cij(lammps_command, system, potential,
         
         - **'E_pot'** (*float*) - The potential energy per atom for the
           supplied system.
-        - **'stress'** (*numpy.array*) - The measured stress state of the
+        - **'pressure'** (*numpy.array*) - The measured pressure state of the
           supplied system.
         - **'C_elastic'** (*atomman.ElasticConstants*) - The supplied system's
           elastic constants.
-        - **'system_new'** (*atomman.System*) - System with updated box
-          dimensions.
-    
-    Raises
-    ------
-    RuntimeError
-        If any of the new box dimensions are less than zero.
     """
 
     # Get lammps units
@@ -253,14 +235,14 @@ def calc_cij(lammps_command, system, potential,
     lammps_variables = {}
     system_info = system.dump('atom_data', f='init.dat',
                               potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
-    
-    lammps_variables['delta'] = strainrange
-    lammps_variables['steps'] = 2
+    restart_info = potential.pair_restart_info('initial.restart', system.symbols)
+    lammps_variables['pair_data_info'] = system_info
+    lammps_variables['pair_restart_info'] = restart_info
+    lammps_variables['strainrange'] = strainrange
     
     # Write lammps input script
-    template_file = 'cij.template'
-    lammps_script = 'cij.in'
+    template_file = 'cij_run0.template'
+    lammps_script = 'cij_run0.in'
     template = read_calc_file(parent_module, template_file)
     with open(lammps_script, 'w') as f:
         f.write(filltemplate(template, lammps_variables, '<', '>'))
@@ -289,6 +271,11 @@ def calc_cij(lammps_command, system, potential,
     
     pe = uc.set_in_units(thermo.PotEng / system.natoms, lammps_units['energy'])
     
+    # Extract the pressure tensor
+    pij = np.array([[pxx[0], pxy[0], pxz[0]],
+                    [pxy[0], pyy[0], pyz[0]],
+                    [pxz[0], pyz[0], pzz[0]]])
+    
     # Set the six non-zero strain values
     strains = np.array([ (lx[2] -  lx[1])  / lx[0],
                          (ly[4] -  ly[3])  / ly[0],
@@ -315,34 +302,84 @@ def calc_cij(lammps_command, system, potential,
     
     C = am.ElasticConstants(Cij=cij)
     
-    S = C.Sij
+    results = {}
+    results['E_pot'] = pe[0]
+    results['pij'] = pij
+    results['C'] = C
     
-    # Extract the current stress state
-    stress = -1 * np.array([[pxx[0], pxy[0], pxz[0]],
-                            [pxy[0], pyy[0], pyz[0]],
-                            [pxz[0], pyz[0], pzz[0]]])
+    return results
     
-    s_xx = stress[0,0] + p_xx
-    s_yy = stress[1,1] + p_yy
-    s_zz = stress[2,2] + p_zz
+def update_box(system, C, pij, target_pxx=0.0, target_pyy=0.0, target_pzz=0.0, 
+               target_pxy=0.0, target_pxz=0.0, target_pyz=0.0, tol=1e-10):    
+    """
+    Generates a new system with an updated box that attempts to reach the target
+    pressure. The new box dimensions are estimated by assuming linear elasticity
+    and using the pressure and elastic constants of the current system.
     
-    new_a = system.box.a / (S[0,0]*s_xx + S[0,1]*s_yy + S[0,2]*s_zz + 1)
-    new_b = system.box.b / (S[1,0]*s_xx + S[1,1]*s_yy + S[1,2]*s_zz + 1)
-    new_c = system.box.c / (S[2,0]*s_xx + S[2,1]*s_yy + S[2,2]*s_zz + 1)
+    Parameters
+    ----------
+    system : atomman.System
+        The system to update
+    C : atomman.ElasticConstants
+        The computed elastic constants for the system.
+    pij : numpy.NDArray
+        The 3x3 array of pressure tensors computed for the system.
+    target_pxx : float, optional
+        The value to relax the x tensile pressure component to. Default is
+        0.0.
+    target_pyy : float, optional
+        The value to relax the y tensile pressure component to. Default is
+        0.0.
+    target_pzz : float, optional
+        The value to relax the z tensile pressure component to. Default is
+        0.0).
+    target_pyz : float, optional
+        The value to relax the yz shear pressure component to. Default is
+        0.0).
+    target_pxz : float, optional
+        The value to relax the xz shear pressure component to. Default is
+        0.0).
+    target_pyz : float, optional
+        The value to relax the xy shear pressure component to. Default is
+        0.0).
+    tol : float, optional
+        The target tolerance.  Any strains less than this will be ignored.
+        Default value is 1e-10.
+        
+    Returns
+    -------
+    atomman.System
+        The System with updated box dimensions.
+    """
+
+    # Build the target pij array
+    target_pij = np.array([[target_pxx, target_pxy, target_pxz],
+                           [target_pxy, target_pyy, target_pyz],
+                           [target_pxz, target_pyz, target_pzz]])
     
-    if new_a <= 0 or new_b <= 0 or new_c <=0:
+    # Adjust pij by the target
+    pij = pij - target_pij
+    
+    # The stress state is the negative of the pressure state
+    σij = -1 * pij
+    
+    # Compute the strain associated with the system relative to the target
+    ϵij = np.einsum('ijkl,kl->ij', C.Sijkl, σij)
+    ϵij[np.abs(ϵij) <= tol] = 0.0
+    
+    # Compute new box dimensions by removing the strain
+    lx = system.box.lx - ϵij[0,0] * system.box.lx
+    ly = system.box.ly - ϵij[1,1] * system.box.ly
+    lz = system.box.lz - ϵij[2,2] * system.box.lz
+    yz = system.box.yz - 2*ϵij[1,2] * system.box.lz
+    xz = system.box.xz - 2*ϵij[0,2] * system.box.lz
+    xy = system.box.xy - 2*ϵij[0,1] * system.box.ly
+
+    if lx <= 0.0 or ly <= 0.0 or lz <= 0.0:
         raise RuntimeError('Divergence of box dimensions to <= 0')
     
+    # Duplicate system and change dimensions
     system_new = deepcopy(system)
-    system_new.box_set(a=new_a, b=new_b, c=new_c, scale=True)
-    
-    results_dict = {}
-    results_dict['E_pot'] = pe[0]
-    results_dict['system_new'] = system_new
-    results_dict['measured_pxx'] = pxx[0]
-    results_dict['measured_pyy'] = pyy[0]
-    results_dict['measured_pzz'] = pzz[0]
-    results_dict['measured_pxy'] = pxy[0]
-    results_dict['measured_pxz'] = pxz[0]
-    results_dict['measured_pyz'] = pyz[0]
-    return results_dict
+    system_new.box_set(lx=lx, ly=ly, lz=lz, yz=yz, xz=xz, xy=xy, scale=True)
+    system_new.wrap()
+    return system_new

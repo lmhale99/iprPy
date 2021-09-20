@@ -1,0 +1,183 @@
+# Evaluates P and Cij using small strains to guess how to relax the box.
+# NOTE: Cij predictions may be poor for some crystal structures: use
+# elastic_constants_static calculation instead.
+
+box tilt large
+
+<pair_data_info>
+
+change_box all triclinic
+
+# Specify strain
+variable strain equal <strainrange>
+
+# Specify variables of the initial configuration's dimensions
+variable lx0 equal $(lx)
+variable ly0 equal $(ly)
+variable lz0 equal $(lz)
+
+# Specify the thermo properties to calculate
+variable peatom equal pe/atoms
+thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe
+thermo_modify format float %.13e
+
+
+# Evaluate and save the initial configuration
+run 0
+write_restart initial.restart
+
+# Reset simulation
+clear
+box tilt large
+<pair_restart_info>
+thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe
+thermo_modify format float %.13e
+
+
+# Apply -xx strain
+variable delta equal -${strain}*${lx0}
+change_box all x delta 0 ${delta} remap units box
+run 0
+
+# Reset simulation
+clear
+box tilt large
+<pair_restart_info>
+thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe
+thermo_modify format float %.13e
+
+
+# Apply +xx strain
+variable delta equal ${strain}*${lx0}
+change_box all x delta 0 ${delta} remap units box
+run 0
+
+# Reset simulation
+clear
+box tilt large
+<pair_restart_info>
+thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe
+thermo_modify format float %.13e
+
+
+# Apply -yy strain
+variable delta equal -${strain}*${ly0}
+change_box all y delta 0 ${delta} remap units box
+run 0
+
+# Reset simulation
+clear
+box tilt large
+<pair_restart_info>
+thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe
+thermo_modify format float %.13e
+
+
+# Apply +yy strain
+variable delta equal ${strain}*${ly0}
+change_box all y delta 0 ${delta} remap units box
+run 0
+
+# Reset simulation
+clear
+box tilt large
+<pair_restart_info>
+thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe
+thermo_modify format float %.13e
+
+
+# Apply -zz strain
+variable delta equal -${strain}*${lz0}
+change_box all z delta 0 ${delta} remap units box
+run 0
+
+# Reset simulation
+clear
+box tilt large
+<pair_restart_info>
+thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe
+thermo_modify format float %.13e
+
+
+# Apply +zz strain
+variable delta equal ${strain}*${lz0}
+change_box all z delta 0 ${delta} remap units box
+run 0
+
+# Reset simulation
+clear
+box tilt large
+<pair_restart_info>
+thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe
+thermo_modify format float %.13e
+
+
+# Apply -yz strain
+variable delta equal -${strain}*${lz0}
+change_box all yz delta ${delta} remap units box
+run 0
+
+# Reset simulation
+clear
+box tilt large
+<pair_restart_info>
+thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe
+thermo_modify format float %.13e
+
+
+# Apply +yz strain
+variable delta equal ${strain}*${lz0}
+change_box all yz delta ${delta} remap units box
+run 0
+
+# Reset simulation
+clear
+box tilt large
+<pair_restart_info>
+thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe
+thermo_modify format float %.13e
+
+
+# Apply -xz strain
+variable delta equal -${strain}*${lz0}
+change_box all xz delta ${delta} remap units box
+run 0
+
+# Reset simulation
+clear
+box tilt large
+<pair_restart_info>
+thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe
+thermo_modify format float %.13e
+
+
+# Apply +xz strain
+variable delta equal ${strain}*${lz0}
+change_box all xz delta ${delta} remap units box
+run 0
+
+# Reset simulation
+clear
+box tilt large
+<pair_restart_info>
+thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe
+thermo_modify format float %.13e
+
+
+# Apply -xy strain
+variable delta equal -${strain}*${ly0}
+change_box all xy delta ${delta} remap units box
+run 0
+
+# Reset simulation
+clear
+box tilt large
+<pair_restart_info>
+thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe
+thermo_modify format float %.13e
+
+
+# Apply +xy strain
+variable delta equal ${strain}*${ly0}
+change_box all xy delta ${delta} remap units box
+run 0

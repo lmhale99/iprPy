@@ -42,6 +42,9 @@ class RelaxBox(Calculation):
         self.pressure_xx = 0.0
         self.pressure_yy = 0.0
         self.pressure_zz = 0.0
+        self.pressure_xy = 0.0
+        self.pressure_xz = 0.0
+        self.pressure_yz = 0.0
         self.strainrange = 1e-6
         self.__initial_dump = None
         self.__final_dump = None
@@ -122,6 +125,33 @@ class RelaxBox(Calculation):
     @pressure_zz.setter
     def pressure_zz(self, value):
         self.__pressure_zz = float(value)
+
+    @property
+    def pressure_xy(self):
+        """float: Target relaxation pressure component xy"""
+        return self.__pressure_xy
+
+    @pressure_xy.setter
+    def pressure_xy(self, value):
+        self.__pressure_xy = float(value)
+
+    @property
+    def pressure_xz(self):
+        """float: Target relaxation pressure component xz"""
+        return self.__pressure_xz
+
+    @pressure_xz.setter
+    def pressure_xz(self, value):
+        self.__pressure_xz = float(value)
+
+    @property
+    def pressure_yz(self):
+        """float: Target relaxation pressure component yz"""
+        return self.__pressure_yz
+
+    @pressure_yz.setter
+    def pressure_yz(self, value):
+        self.__pressure_yz = float(value)
 
     @property
     def strainrange(self):
@@ -220,6 +250,12 @@ class RelaxBox(Calculation):
             The target Pyy pressure component for the relaxation.
         pressure_zz : float, optional
             The target Pzz pressure component for the relaxation.
+        pressure_xy : float, optional
+            The target Pxy pressure component for the relaxation.
+        pressure_xz : float, optional
+            The target Pxz pressure component for the relaxation.
+        pressure_yz : float, optional
+            The target Pyz pressure component for the relaxation.
         strainrange : float, optional
             The magnitide of the strain to use for evaluating the elastic
             constants, which are then used to relax the box dimensions.
@@ -237,6 +273,12 @@ class RelaxBox(Calculation):
             self.pressure_yy = kwargs['pressure_yy']
         if 'pressure_zz' in kwargs:
             self.pressure_zz = kwargs['pressure_zz']
+        if 'pressure_xy' in kwargs:
+            self.pressure_xy = kwargs['pressure_xy']
+        if 'pressure_xz' in kwargs:
+            self.pressure_xz = kwargs['pressure_xz']
+        if 'pressure_yz' in kwargs:
+            self.pressure_yz = kwargs['pressure_yz']
         if 'strainrange' in kwargs:
             self.strainrange = kwargs['strainrange']
 
@@ -271,6 +313,15 @@ class RelaxBox(Calculation):
                                  default_unit=self.units.pressure_unit,
                                  default_term='0.0 GPa')
         self.pressure_zz = value(input_dict, 'pressure_zz',
+                                 default_unit=self.units.pressure_unit,
+                                 default_term='0.0 GPa')
+        self.pressure_xy = value(input_dict, 'pressure_xy',
+                                 default_unit=self.units.pressure_unit,
+                                 default_term='0.0 GPa')
+        self.pressure_xz = value(input_dict, 'pressure_xz',
+                                 default_unit=self.units.pressure_unit,
+                                 default_term='0.0 GPa')
+        self.pressure_yz = value(input_dict, 'pressure_yz',
                                  default_unit=self.units.pressure_unit,
                                  default_term='0.0 GPa')
         
@@ -358,6 +409,15 @@ class RelaxBox(Calculation):
             'pressure_zz': ' '.join([
                 "The Pzz normal pressure component to relax the box to.",
                 "Default value is 0.0 GPa."]),
+            'pressure_xy': ' '.join([
+                "The Pxy normal pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'pressure_xz': ' '.join([
+                "The Pxz normal pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
+            'pressure_yz': ' '.join([
+                "The Pyz normal pressure component to relax the box to.",
+                "Default value is 0.0 GPa."]),
             'strainrange': ' '.join([
                 "The strain range to use when estimating the elastic constants",
                 "used to relax the box dimensions.  Default value is 1e-6."]),
@@ -404,6 +464,9 @@ class RelaxBox(Calculation):
                     'pressure_xx',
                     'pressure_yy',
                     'pressure_zz',
+                    'pressure_xy',
+                    'pressure_xz',
+                    'pressure_yz',
                 ]
             ] +
 
@@ -454,11 +517,11 @@ class RelaxBox(Calculation):
                                                       self.units.pressure_unit)
         calc['phase-state']['pressure-zz'] = uc.model(self.pressure_zz,
                                                       self.units.pressure_unit)
-        calc['phase-state']['pressure-xy'] = uc.model(0.0,
+        calc['phase-state']['pressure-xy'] = uc.model(self.pressure_xy,
                                                       self.units.pressure_unit)
-        calc['phase-state']['pressure-xz'] = uc.model(0.0,
+        calc['phase-state']['pressure-xz'] = uc.model(self.pressure_xz,
                                                       self.units.pressure_unit)
-        calc['phase-state']['pressure-yz'] = uc.model(0.0,
+        calc['phase-state']['pressure-yz'] = uc.model(self.pressure_yz,
                                                       self.units.pressure_unit)
 
         # Build results
@@ -628,9 +691,9 @@ class RelaxBox(Calculation):
         meta['pressure_xx'] = self.pressure_xx
         meta['pressure_yy'] = self.pressure_yy
         meta['pressure_zz'] = self.pressure_zz
-        meta['pressure_xy'] = 0.0
-        meta['pressure_xz'] = 0.0
-        meta['pressure_yz'] = 0.0
+        meta['pressure_xy'] = self.pressure_xy
+        meta['pressure_xz'] = self.pressure_xz
+        meta['pressure_yz'] = self.pressure_yz
         
         # Extract results
         if self.status == 'finished':
@@ -728,9 +791,12 @@ class RelaxBox(Calculation):
 
         # Add calculation-specific inputs
         input_dict['strainrange'] = self.strainrange
-        input_dict['p_xx'] = self.pressure_xx
-        input_dict['p_yy'] = self.pressure_yy
-        input_dict['p_zz'] = self.pressure_zz
+        input_dict['pxx'] = self.pressure_xx
+        input_dict['pyy'] = self.pressure_yy
+        input_dict['pzz'] = self.pressure_zz
+        input_dict['pxy'] = self.pressure_xy
+        input_dict['pxz'] = self.pressure_xz
+        input_dict['pyz'] = self.pressure_yz
 
         # Return input_dict
         return input_dict
@@ -761,9 +827,9 @@ class RelaxBox(Calculation):
         yz = results_dict['yz'] / (self.system_mods.c_mults[1] - self.system_mods.c_mults[0])
         self.__final_box = am.Box(lx=lx, ly=ly, lz=lz, xy=xy, xz=xz, yz=yz)
         self.__potential_energy = results_dict['E_pot']
-        self.__measured_pressure_xx = results_dict['measured_pxx']
-        self.__measured_pressure_yy = results_dict['measured_pyy']
-        self.__measured_pressure_zz = results_dict['measured_pzz']
-        self.__measured_pressure_xy = results_dict['measured_pxy']
-        self.__measured_pressure_xz = results_dict['measured_pxz']
-        self.__measured_pressure_yz = results_dict['measured_pyz']
+        self.__measured_pressure_xx = results_dict['measured_pij'][0,0]
+        self.__measured_pressure_yy = results_dict['measured_pij'][1,1]
+        self.__measured_pressure_zz = results_dict['measured_pij'][2,2]
+        self.__measured_pressure_xy = results_dict['measured_pij'][0,1]
+        self.__measured_pressure_xz = results_dict['measured_pij'][0,2]
+        self.__measured_pressure_yz = results_dict['measured_pij'][1,2]
