@@ -53,6 +53,7 @@ class AtommanSystemLoad(CalculationSubset):
         self.symbols = None
         self.__ucell = None
         self.box_parameters = None
+        self.composition = None
         
 ############################## Class attributes ################################
     
@@ -131,6 +132,24 @@ class AtommanSystemLoad(CalculationSubset):
             self.load_ucell()
         return self.__ucell
     
+    @property
+    def composition(self):
+        if self.__composition is None:
+            try:
+                comp = self.ucell.composition
+            except:
+                pass
+            else:
+                self.composition = comp
+        return self.__composition
+                
+    @composition.setter
+    def composition(self, value):
+        if value is None or isinstance(value, str):
+            self.__composition = value
+        else:
+            raise TypeError('composition must be str or None')
+
     def load_ucell(self, **kwargs):
         """
         Wrapper around atomman.load() for loading files that also saves the
@@ -180,9 +199,9 @@ class AtommanSystemLoad(CalculationSubset):
                                symbols=symbols, **self.load_options)
         self.ucell.wrap()
         
-        # Update object's symbols
+        # Update object's symbols and composition
         self.symbols = self.ucell.symbols
-
+        self.composition
         self.scale_ucell()
 
         # Add model-specific charges if needed
@@ -257,6 +276,8 @@ class AtommanSystemLoad(CalculationSubset):
             self.symbols = kwargs['symbols']
         if 'box_parameters' in kwargs:
             self.box_parameters = kwargs['box_parameters']
+        if 'composition' in kwargs:
+            self.composition = kwargs['composition']
 
         if self.load_file is not None:
             if self.family is None or self.symbols is None:
@@ -289,6 +310,9 @@ class AtommanSystemLoad(CalculationSubset):
                     symbols = model.get('symbol', None)
                     if symbols is not None and len(symbols) > 0:
                         self.symbols = symbols
+
+                if self.composition is None:
+                    self.composition = model.get('composition', None)
         
         # Try to extract info from other files
         else:
@@ -297,6 +321,7 @@ class AtommanSystemLoad(CalculationSubset):
             
             if self.symbols is None:
                 symbols = self.ucell.symbols
+            self.composition
 
 ####################### Parameter file interactions ###########################
 
@@ -462,6 +487,7 @@ class AtommanSystemLoad(CalculationSubset):
         d['load_file'] = sub['artifact']['file']
         load_options = sub['artifact'].get('load_options', None)
         d['symbols'] = sub['symbol']
+        d['composition'] = sub.get('composition', None)
 
         if load_options is not None:
             d['load_options'] = {}
@@ -501,25 +527,29 @@ class AtommanSystemLoad(CalculationSubset):
             system['artifact']['load_options'] = dicttoterm(self.load_options)
         
         system['symbol'] = self.symbols
+        if self.composition is not None:
+            system['composition'] = self.composition
 
         dict_insert(model, self.modelroot, system, **kwargs)
 
     def mongoquery(self, load_file=None, family=None, symbol=None,
-                   **kwargs):
+                   composition=None, **kwargs):
         """
         Generate a query to parse records with the subset from a Mongo-style
         database.
         
         Parameters
         ----------
-        load_file : str
+        load_file : str, optional
             The name of the loaded structure file.
-        family : str
+        family : str, optional
             The family crystal structure/prototype associated with the loaded
             file.
-        symbol : str
+        symbol : str, optional
             Element model symbols.
-        kwargs : any
+        composition : str, optional
+            The reduced composition of the structure.
+        kwargs : any, optional
             The parent query terms and values ignored by the subset.
 
         Returns
@@ -536,26 +566,29 @@ class AtommanSystemLoad(CalculationSubset):
         query.str_match.mongo(mquery, f'{root}.artifact.file', load_file)
         query.str_match.mongo(mquery, f'{root}.family', family)
         query.str_match.mongo(mquery, f'{root}.symbol', symbol)
+        query.str_match.mongo(mquery, f'{root}.composition', composition)
         
         # Return query dict
         return mquery
 
     def cdcsquery(self, load_file=None, family=None, symbol=None,
-                  **kwargs):
+                  composition=None, **kwargs):
         """
         Generate a query to parse records with the subset from a CDCS-style
         database.
         
         Parameters
         ----------
-        load_file : str
+        load_file : str, optional
             The name of the loaded structure file.
-        family : str
+        family : str, optional
             The family crystal structure/prototype associated with the loaded
             file.
-        symbol : str
+        symbol : str, optional
             Element model symbols.
-        kwargs : any
+        composition : str, optional
+            The reduced composition of the structure.
+        kwargs : any, optional
             The parent query terms and values ignored by the subset.
 
         Returns
@@ -572,6 +605,7 @@ class AtommanSystemLoad(CalculationSubset):
         query.str_match.mongo(mquery, f'{root}.artifact.file', load_file)
         query.str_match.mongo(mquery, f'{root}.family', family)
         query.str_match.mongo(mquery, f'{root}.symbol', symbol)
+        query.str_match.mongo(mquery, f'{root}.composition', composition)
         
         # Return query dict
         return mquery
@@ -604,6 +638,9 @@ class AtommanSystemLoad(CalculationSubset):
                     symbolstr += f'{s} '
             symbolstr = symbolstr.strip()
         meta[f'{self.prefix}symbols'] = symbolstr
+
+        if self.composition is not None:
+            meta[f'{self.prefix}composition'] = self.composition
         
         parent_file = Path(self.load_file)
         if parent_file.parent.as_posix() == '.':
@@ -613,7 +650,7 @@ class AtommanSystemLoad(CalculationSubset):
         meta[f'{self.prefix}parent_key'] = parent
 
     def pandasfilter(self, dataframe, load_file=None, family=None, symbol=None,
-                     **kwargs):
+                     composition=None, **kwargs):
         """
         Parses a pandas dataframe containing the subset's metadata to find 
         entries matching the terms and values given. Ideally, this should find
@@ -624,14 +661,16 @@ class AtommanSystemLoad(CalculationSubset):
         ----------
         dataframe : pandas.DataFrame
             The metadata dataframe to filter.
-        load_file : str
+        load_file : str, optional
             The name of the loaded structure file.
-        family : str
+        family : str, optional
             The family crystal structure/prototype associated with the loaded
             file.
-        symbol : str
+        symbol : str, optional
             Element model symbols.
-        kwargs : any
+        composition : str, optional
+            The reduced composition of the structure.
+        kwargs : any, optional
             The parent query terms and values ignored by the subset.
 
         Returns
@@ -648,6 +687,8 @@ class AtommanSystemLoad(CalculationSubset):
                                     family)
             &query.str_contains.pandas(dataframe, f'{prefix}symbols',
                                        symbol)
+            &query.str_match.pandas(dataframe, f'{prefix}composition',
+                                    composition)
         )
         return matches
 
