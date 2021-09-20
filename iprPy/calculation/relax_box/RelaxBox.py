@@ -376,6 +376,7 @@ class RelaxBox(Calculation):
             params['parent_load_key'] = 'minimum-atomic-system'
             params['parent_status'] = 'finished'
             params['sizemults'] = '10 10 10'
+            params['atomshift'] = '0.05 0.05 0.05'
             params['strainrange'] = '1e-6'
 
             # Copy kwargs to params
