@@ -58,6 +58,12 @@ class RelaxDynamic(Calculation):
         self.__initial_dump = None
         self.__final_dump = None
         self.__final_box = None
+        self.__lx_mean = None
+        self.__ly_mean = None
+        self.__lz_mean = None
+        self.__xy_mean = None
+        self.__xz_mean = None
+        self.__yz_mean = None
         self.__lx_std = None
         self.__ly_std = None
         self.__lz_std = None
@@ -287,11 +293,25 @@ class RelaxDynamic(Calculation):
         return self.__final_box
 
     @property
+    def lx_mean(self):
+        """float: Mean lx length used for final_box"""
+        if self.__lx_mean is None:
+            raise ValueError('No results yet!')
+        return self.__lx_mean
+
+    @property
     def lx_std(self):
         """float: Standard deviation for final_box's lx length"""
         if self.__lx_std is None:
             raise ValueError('No results yet!')
         return self.__lx_std
+
+    @property
+    def ly_mean(self):
+        """float: Mean ly length used for final_box"""
+        if self.__ly_mean is None:
+            raise ValueError('No results yet!')
+        return self.__ly_mean
 
     @property
     def ly_std(self):
@@ -301,11 +321,25 @@ class RelaxDynamic(Calculation):
         return self.__ly_std
     
     @property
+    def lz_mean(self):
+        """float: Mean lz length used for final_box"""
+        if self.__lz_mean is None:
+            raise ValueError('No results yet!')
+        return self.__lz_mean
+
+    @property
     def lz_std(self):
         """float: Standard deviation for final_box's lz length"""
         if self.__lz_std is None:
             raise ValueError('No results yet!')
         return self.__lz_std
+
+    @property
+    def xy_mean(self):
+        """float: Mean xy tilt used for final_box"""
+        if self.__xy_mean is None:
+            raise ValueError('No results yet!')
+        return self.__xy_mean
 
     @property
     def xy_std(self):
@@ -315,11 +349,25 @@ class RelaxDynamic(Calculation):
         return self.__xy_std
 
     @property
+    def xz_mean(self):
+        """float: Mean xz tilt used for final_box"""
+        if self.__xz_mean is None:
+            raise ValueError('No results yet!')
+        return self.__xz_mean
+
+    @property
     def xz_std(self):
         """float: Standard deviation for final_box's xz tilt"""
         if self.__xz_std is None:
             raise ValueError('No results yet!')
         return self.__xz_std
+
+    @property
+    def yz_mean(self):
+        """float: Mean yz tilt used for final_box"""
+        if self.__yz_mean is None:
+            raise ValueError('No results yet!')
+        return self.__yz_mean
 
     @property
     def yz_std(self):
@@ -878,17 +926,17 @@ class RelaxDynamic(Calculation):
 
             # Save measured box parameter info
             calc['measured-box-parameter'] = mbp = DM()            
-            mbp['lx'] = uc.model(self.final_box.lx, self.units.length_unit,
+            mbp['lx'] = uc.model(self.lx_mean, self.units.length_unit,
                                  self.lx_std)
-            mbp['ly'] = uc.model(self.final_box.ly, self.units.length_unit,
+            mbp['ly'] = uc.model(self.ly_mean, self.units.length_unit,
                                  self.ly_std)
-            mbp['lz'] = uc.model(self.final_box.lz, self.units.length_unit,
+            mbp['lz'] = uc.model(self.lz_mean, self.units.length_unit,
                                  self.lz_std)
-            mbp['xy'] = uc.model(self.final_box.xy, self.units.length_unit,
+            mbp['xy'] = uc.model(self.xy_mean, self.units.length_unit,
                                  self.xy_std)
-            mbp['xz'] = uc.model(self.final_box.xz, self.units.length_unit,
+            mbp['xz'] = uc.model(self.xz_mean, self.units.length_unit,
                                  self.xz_std)
-            mbp['yz'] = uc.model(self.final_box.yz, self.units.length_unit,
+            mbp['yz'] = uc.model(self.yz_mean, self.units.length_unit,
                                  self.yz_std)
             
             # Save measured phase-state info
@@ -918,9 +966,10 @@ class RelaxDynamic(Calculation):
             calc['cohesive-energy'] = uc.model(self.potential_energy,
                                                self.units.energy_unit,
                                                self.potential_energy_std)
-            calc['average-total-energy'] = uc.model(self.total_energy,
-                                               self.units.energy_unit,
-                                               self.total_energy_std)
+            if not np.isnan(self.total_energy):
+                calc['average-total-energy'] = uc.model(self.total_energy,
+                                                        self.units.energy_unit,
+                                                        self.total_energy_std)
 
         self._set_model(model)
         return model
@@ -974,24 +1023,32 @@ class RelaxDynamic(Calculation):
 
             self.__numsamples = calc['number-of-measurements']
 
-            lx = uc.value_unit(calc['measured-box-parameter']['lx'])
+            self.__lx_mean = uc.value_unit(calc['measured-box-parameter']['lx'])
             self.__lx_std = uc.error_unit(calc['measured-box-parameter']['lx'])
-            ly = uc.value_unit(calc['measured-box-parameter']['ly'])
+            self.__ly_mean = uc.value_unit(calc['measured-box-parameter']['ly'])
             self.__ly_std = uc.error_unit(calc['measured-box-parameter']['ly'])
-            lz = uc.value_unit(calc['measured-box-parameter']['lz'])
+            self.__lz_mean = uc.value_unit(calc['measured-box-parameter']['lz'])
             self.__lz_std = uc.error_unit(calc['measured-box-parameter']['lz'])
-            xy = uc.value_unit(calc['measured-box-parameter']['xy'])
+            self.__xy_mean = uc.value_unit(calc['measured-box-parameter']['xy'])
             self.__xy_std = uc.error_unit(calc['measured-box-parameter']['xy'])
-            xz = uc.value_unit(calc['measured-box-parameter']['xz'])
+            self.__xz_mean = uc.value_unit(calc['measured-box-parameter']['xz'])
             self.__xz_std = uc.error_unit(calc['measured-box-parameter']['xz'])
-            yz = uc.value_unit(calc['measured-box-parameter']['yz'])
+            self.__yz_mean = uc.value_unit(calc['measured-box-parameter']['yz'])
             self.__yz_std = uc.error_unit(calc['measured-box-parameter']['yz'])
-            self.__final_box = am.Box(lx=lx, ly=ly, lz=lz, xy=xy, xz=xz, yz=yz)
+            self.__final_box = am.Box(lx=self.lx_mean, ly=self.ly_mean, lz=self.lz_mean,
+                                      xy=self.xy_mean, xz=self.xz_mean, yz=self.yz_mean)
 
             self.__potential_energy = uc.value_unit(calc['cohesive-energy'])
             self.__potential_energy_std = uc.error_unit(calc['cohesive-energy'])
-            self.__total_energy = uc.value_unit(calc['average-total-energy'])
-            self.__total_energy_std = uc.error_unit(calc['average-total-energy'])
+            if 'average-total-energy' in calc:
+                self.__total_energy = uc.value_unit(calc['average-total-energy'])
+                self.__total_energy_std = uc.error_unit(calc['average-total-energy'])
+            elif self.temperature == 0.0:
+                self.__total_energy = self.__potential_energy
+                self.__total_energy_std = self.__potential_energy_std
+            else:
+                self.__total_energy = np.nan
+                self.__total_energy_std = np.nan
             
             mps = calc['measured-phase-state']
             self.__measured_temperature = uc.value_unit(mps['temperature'])
@@ -1079,18 +1136,18 @@ class RelaxDynamic(Calculation):
         # Extract results
         if self.status == 'finished':
             meta['numsamples'] = self.numsamples
-
-            meta['lx'] = self.final_box.lx
+            
+            meta['lx'] = self.lx_mean
             meta['lx_std'] = self.lx_std
-            meta['ly'] = self.final_box.ly
+            meta['ly'] = self.ly_mean
             meta['ly_std'] = self.ly_std
-            meta['lz'] = self.final_box.lz
+            meta['lz'] = self.lz_mean
             meta['lz_std'] = self.lz_std
-            meta['xy'] = self.final_box.xy
+            meta['xy'] = self.xy_mean
             meta['xy_std'] = self.xy_std
-            meta['xz'] = self.final_box.xz
+            meta['xz'] = self.xz_mean
             meta['xz_std'] = self.xz_std
-            meta['yz'] = self.final_box.yz
+            meta['yz'] = self.yz_mean
             meta['yz_std'] = self.yz_std
             
             meta['E_pot'] = self.potential_energy
@@ -1225,13 +1282,14 @@ class RelaxDynamic(Calculation):
             'symbols': results_dict['symbols_final']
         }
         self.__numsamples = results_dict['nsamples']
-        lx = results_dict['lx'] / (self.system_mods.a_mults[1] - self.system_mods.a_mults[0])
-        ly = results_dict['ly'] / (self.system_mods.b_mults[1] - self.system_mods.b_mults[0])
-        lz = results_dict['lz'] / (self.system_mods.c_mults[1] - self.system_mods.c_mults[0])
-        xy = results_dict['xy'] / (self.system_mods.b_mults[1] - self.system_mods.b_mults[0])
-        xz = results_dict['xz'] / (self.system_mods.c_mults[1] - self.system_mods.c_mults[0])
-        yz = results_dict['yz'] / (self.system_mods.c_mults[1] - self.system_mods.c_mults[0])
-        self.__final_box = am.Box(lx=lx, ly=ly, lz=lz, xy=xy, xz=xz, yz=yz)
+        self.__lx_mean = results_dict['lx'] / (self.system_mods.a_mults[1] - self.system_mods.a_mults[0])
+        self.__ly_mean = results_dict['ly'] / (self.system_mods.b_mults[1] - self.system_mods.b_mults[0])
+        self.__lz_mean = results_dict['lz'] / (self.system_mods.c_mults[1] - self.system_mods.c_mults[0])
+        self.__xy_mean = results_dict['xy'] / (self.system_mods.b_mults[1] - self.system_mods.b_mults[0])
+        self.__xz_mean = results_dict['xz'] / (self.system_mods.c_mults[1] - self.system_mods.c_mults[0])
+        self.__yz_mean = results_dict['yz'] / (self.system_mods.c_mults[1] - self.system_mods.c_mults[0])
+        self.__final_box = am.Box(lx=self.lx_mean, ly=self.ly_mean, lz=self.lz_mean,
+                                  xy=self.xy_mean, xz=self.xz_mean, yz=self.yz_mean)
         
         self.__lx_std = results_dict['lx_std']
         self.__ly_std = results_dict['ly_std']
