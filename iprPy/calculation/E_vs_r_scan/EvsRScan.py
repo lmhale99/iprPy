@@ -559,9 +559,9 @@ class EvsRScan(Calculation):
         
         # Extract results
         if self.status == 'finished':
-            meta['r_values'] = self.r_values
-            meta['a_values'] = self.a_values
-            meta['energy_values'] = self.energy_values
+            meta['r_values'] = self.r_values.tolist()
+            meta['a_values'] = self.a_values.tolist()
+            meta['energy_values'] = self.energy_values.tolist()
 
         return meta
 
