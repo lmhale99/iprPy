@@ -50,6 +50,8 @@ def lammpspotential(database, keys, content_dict=None, **kwargs):
                 inputs['potential_dir_content'].append(f'tar {lmppot.name}')
             elif key == 'potential_kim_id' and lmppot.pair_style == 'kim':
                 inputs['potential_kim_id'].append(lmppot.id)
+            elif key == 'potential_kim_potid' and lmppot.pair_style == 'kim' and len(lmppot.potids) > 1:
+                inputs['potential_kim_potid'].append(lmppot.potid)
             else:
                 inputs[key].append('')
         

@@ -165,6 +165,12 @@ class LammpsPotential(CalculationSubset):
                 "for the specification of which version of the KIM model to",
                 "use by specifying a full kim model id.  If not given, the newest",
                 "known version of the kim model will be assumed."]),
+            'potential_kim_potid': ' '.join([
+                "Some potential_LAMMPS_KIM records are associated with multiple",
+                "potential entries.  This allows for the clear specification of",
+                "which potential (by potid) to associate with those kim models."
+                "This will affect the list of available symbols for the",
+                "calculation."]),
             'potential_dir': ' '.join([
                 "The path to the directory containing any potential parameter files",
                 "(eg. eam.alloy setfl files) that are needed for the potential. If",
@@ -211,6 +217,7 @@ class LammpsPotential(CalculationSubset):
         # Extract input values and assign default values
         potential_file = input_dict[keymap['potential_file']]
         potential_kim_id = input_dict.get(keymap['potential_kim_id'], None)
+        potential_kim_potid = input_dict.get(keymap['potential_kim_potid'], None)
         potential_dir = input_dict.get(keymap['potential_dir'], None)
         potential_content = input_dict.get(keymap['potential_content'], None)
 
@@ -219,8 +226,8 @@ class LammpsPotential(CalculationSubset):
             potential_file = potential_content
         
         # Read potential
-        self.potential = lmp.Potential(potential_file, pot_dir=potential_dir,
-                                       kim_id=potential_kim_id)
+        self.potential = lmp.Potential(potential_file, pot_dir=potential_dir, 
+                                       kim_id=potential_kim_id, potid=potential_kim_potid)
 
 ########################### Data model interactions ###########################
 

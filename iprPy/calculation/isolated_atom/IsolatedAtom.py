@@ -326,6 +326,7 @@ class IsolatedAtom(Calculation):
         return [
             'script',
             'potential_LAMMPS_key',
+            'potential_key',
         ]
     
     @property
