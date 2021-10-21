@@ -727,6 +727,7 @@ class RelaxBox(Calculation):
             'symbols',
             
             'potential_LAMMPS_key',
+            'potential_key',
             
             'a_mult',
             'b_mult',

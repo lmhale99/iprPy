@@ -540,6 +540,7 @@ class DiatomScan(Calculation):
             'script',
             'symbols',
             'potential_LAMMPS_key',
+            'potential_key',
         ]
     
     @property
