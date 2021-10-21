@@ -107,6 +107,8 @@ def atomicparent(database, keys, content_dict=None, record=None,
                     inputs['potential_dir_content'].append(f'tar {lmppot.name}')
                 elif key == 'potential_kim_id' and lmppot.pair_style == 'kim':
                     inputs['potential_kim_id'].append(lmppot.id)
+                elif key == 'potential_kim_potid' and lmppot.pair_style == 'kim' and len(lmppot.potids) > 1:
+                    inputs['potential_kim_potid'].append(lmppot.potid)
                 elif key == 'load_file':
                     inputs['load_file'].append(f'{parent.name}.json')
                 elif key == 'load_content':
