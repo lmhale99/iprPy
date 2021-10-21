@@ -39,7 +39,7 @@ def diatom(database, keys, content_dict=None, **kwargs):
         content_dict[lmppot.name] = lmppot.build_model()
             
         # Loop over symbol sets
-        for symbols in itersymbolsets(lmppot.symbolsets):
+        for symbols in itersymbolpairs(lmppot.symbols):
             for key in keys:
                 if key == 'potential_file':
                     inputs['potential_file'].append(f'{lmppot.name}.json')
@@ -60,8 +60,7 @@ def diatom(database, keys, content_dict=None, **kwargs):
 
     return inputs, content_dict
 
-def itersymbolsets(symbolsets):
-    for symbols in symbolsets:
-        for i in range(len(symbols)):
-            for j in range(i, len(symbols)):
-                yield [symbols[i], symbols[j]]
+def itersymbolpairs(symbols):
+    for i in range(len(symbols)):
+        for j in range(i, len(symbols)):
+            yield [symbols[i], symbols[j]]
