@@ -36,7 +36,8 @@ def lammpspotential(database, keys, content_dict=None, **kwargs):
     # Loop over all potentials 
     for i in lmppots_df.index:
         lmppot = lmppots[i]
-        content_dict[lmppot.name] = lmppot.build_model()
+        if lmppot.name not in content_dict:
+            content_dict[lmppot.name] = lmppot.model
         
         # Loop over input keys
         for key in keys:

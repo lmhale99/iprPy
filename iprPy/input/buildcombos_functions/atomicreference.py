@@ -61,7 +61,8 @@ def atomicreference(database, keys, content_dict=None,
             for j in lmppots_df.index:
                 lmppot = lmppots[j]
                 lmppot_series = lmppots_df.loc[j]
-                content_dict[lmppot.name] = lmppot.build_model()
+                if lmppot.name not in content_dict:
+                    content_dict[lmppot.name] = lmppot.model
                 lmppot_symbols = lmppot_series.symbols
                 lmppot_elements = lmppot_series.elements
                 
@@ -71,7 +72,7 @@ def atomicreference(database, keys, content_dict=None,
                     # Loop over all references with the reference element set
                     for i in reference_df[reference_df.elementstr==elementstr].index:
                         reference = references[i]
-                        content_dict[reference.name] = reference.build_model()
+                        content_dict[reference.name] = reference.model
                 
                         # Loop over input keys
                         for key in keys:
@@ -108,7 +109,7 @@ def atomicreference(database, keys, content_dict=None,
         # Loop over all references
         for i in reference_df.index:
             reference = references[i]
-            content_dict[reference.name] = reference.build_model()
+            content_dict[reference.name] = reference.model
             
             # Loop over input keys
             for key in keys:

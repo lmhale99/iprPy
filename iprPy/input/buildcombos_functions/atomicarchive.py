@@ -59,27 +59,35 @@ def atomicarchive(database, keys, content_dict=None, record=None, load_key='atom
         if include_potentials:
             try:
                 potential_LAMMPS_key = parent_series.potential_LAMMPS_key
+                potential_key = parent_series.potential_key
             except:
                 # Search grandparents for name of potential
                 potential_LAMMPS_key = None
+                potential_key = None
                 for grandparent in database.get_parent_records(record=parent):
                     try:
-                        potential_LAMMPS_key = grandparent.todict(full=False, flat=True)['potential_LAMMPS_key']
+                        grandmeta = grandparent.metadata()
+                        potential_LAMMPS_key = grandmeta['potential_LAMMPS_key']
+                        potential_key = grandmeta['potential_key']
                     except:
                         pass
                     else:
                         break
-                if potential_LAMMPS_key is None:
+                if potential_LAMMPS_key is None or potential_key is None:
                     raise ValueError('potential info not found')
             try:
-                lmppot_series = lmppots_df[lmppots_df.key == potential_LAMMPS_key].iloc[0]
+                match = (lmppots_df.key == potential_LAMMPS_key) & (lmppots_df.potkey == potential_key)
+                assert match.sum() == 1
+
             except:
                 continue
-            lmppot = lmppots[lmppot_series.name]
-            content_dict[lmppot.name] = lmppot.build_model()
+            
+            lmppot = lmppots[match][0]
+            if lmppot.name not in content_dict:
+                content_dict[lmppot.name] = lmppot.model
         
         # Loop over each system in parent
-        for load_info in parent.build_model().finds(load_key):
+        for load_info in parent.model.finds(load_key):
             
             # Extract system load info
             load_file = load_info['artifact']['file']

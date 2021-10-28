@@ -52,14 +52,15 @@ def crystalprototype(database, keys, content_dict=None,
         for i in prototype_df.index:
             prototype = prototypes[i]
             prototype_series = prototype_df.loc[i]
-            content_dict[prototype.name] = prototype.build_model()
+            content_dict[prototype.name] = prototype.model
             natypes = prototype_series.natypes
             
             # Loop over potentials
             for j in lmppots_df.index:
                 lmppot = lmppots[j]
                 lmppot_series = lmppots_df.loc[j]
-                content_dict[lmppot.name] = lmppot.build_model()
+                if lmppot.name not in content_dict:
+                    content_dict[lmppot.name] = lmppot.model
                 allsymbols = lmppot_series.symbols
                 
                 # Loop over all symbol combinations
@@ -97,7 +98,7 @@ def crystalprototype(database, keys, content_dict=None,
         # Loop over prototypes
         for i in prototype_df.index:
             prototype = prototypes[i]
-            content_dict[prototype.name] = prototype.build_model()
+            content_dict[prototype.name] = prototype.model
             
             # Loop over input keys
             for key in keys:
