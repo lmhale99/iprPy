@@ -673,7 +673,7 @@ class Dislocation(CalculationSubset):
     @property
     def modelroot(self):
         """str : The root element name for the subset terms."""
-        baseroot = 'stacking-fault'
+        baseroot = 'dislocation'
         return f'{self.modelprefix}{baseroot}'
 
     def load_model(self, model):

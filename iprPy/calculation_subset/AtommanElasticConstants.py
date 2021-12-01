@@ -254,8 +254,12 @@ class AtommanElasticConstants(CalculationSubset):
 
     def load_model(self, model):
         """Loads subset attributes from an existing model."""
-        c_model = DM([('elastic-constants', model[self.modelroot] )])
-        self.__C = am.ElasticConstants(model=c_model)
+        try:
+            c_model = DM([('elastic-constants', model[self.modelroot] )])
+        except:
+            self.__C = None
+        else:
+            self.__C = am.ElasticConstants(model=c_model)
 
     def build_model(self, model, **kwargs):
         """
@@ -285,28 +289,28 @@ class AtommanElasticConstants(CalculationSubset):
             The dictionary to add the subset content to
         """
         meta[f'{self.prefix}C'] = self.C
-        
-        meta[f'{self.prefix}C11'] = self.C.Cij[0,0]
-        meta[f'{self.prefix}C12'] = self.C.Cij[0,1]
-        meta[f'{self.prefix}C13'] = self.C.Cij[0,2]
-        meta[f'{self.prefix}C14'] = self.C.Cij[0,3]
-        meta[f'{self.prefix}C15'] = self.C.Cij[0,4]
-        meta[f'{self.prefix}C16'] = self.C.Cij[0,5]
-        meta[f'{self.prefix}C22'] = self.C.Cij[1,1]
-        meta[f'{self.prefix}C23'] = self.C.Cij[1,2]
-        meta[f'{self.prefix}C24'] = self.C.Cij[1,3]
-        meta[f'{self.prefix}C25'] = self.C.Cij[1,4]
-        meta[f'{self.prefix}C26'] = self.C.Cij[1,5]
-        meta[f'{self.prefix}C33'] = self.C.Cij[2,2]
-        meta[f'{self.prefix}C34'] = self.C.Cij[2,3]
-        meta[f'{self.prefix}C35'] = self.C.Cij[2,4]
-        meta[f'{self.prefix}C36'] = self.C.Cij[2,5]
-        meta[f'{self.prefix}C44'] = self.C.Cij[3,3]
-        meta[f'{self.prefix}C45'] = self.C.Cij[3,4]
-        meta[f'{self.prefix}C46'] = self.C.Cij[3,5]
-        meta[f'{self.prefix}C55'] = self.C.Cij[4,4]
-        meta[f'{self.prefix}C56'] = self.C.Cij[4,5]
-        meta[f'{self.prefix}C66'] = self.C.Cij[5,5]
+        if self.C is not None:
+            meta[f'{self.prefix}C11'] = self.C.Cij[0,0]
+            meta[f'{self.prefix}C12'] = self.C.Cij[0,1]
+            meta[f'{self.prefix}C13'] = self.C.Cij[0,2]
+            meta[f'{self.prefix}C14'] = self.C.Cij[0,3]
+            meta[f'{self.prefix}C15'] = self.C.Cij[0,4]
+            meta[f'{self.prefix}C16'] = self.C.Cij[0,5]
+            meta[f'{self.prefix}C22'] = self.C.Cij[1,1]
+            meta[f'{self.prefix}C23'] = self.C.Cij[1,2]
+            meta[f'{self.prefix}C24'] = self.C.Cij[1,3]
+            meta[f'{self.prefix}C25'] = self.C.Cij[1,4]
+            meta[f'{self.prefix}C26'] = self.C.Cij[1,5]
+            meta[f'{self.prefix}C33'] = self.C.Cij[2,2]
+            meta[f'{self.prefix}C34'] = self.C.Cij[2,3]
+            meta[f'{self.prefix}C35'] = self.C.Cij[2,4]
+            meta[f'{self.prefix}C36'] = self.C.Cij[2,5]
+            meta[f'{self.prefix}C44'] = self.C.Cij[3,3]
+            meta[f'{self.prefix}C45'] = self.C.Cij[3,4]
+            meta[f'{self.prefix}C46'] = self.C.Cij[3,5]
+            meta[f'{self.prefix}C55'] = self.C.Cij[4,4]
+            meta[f'{self.prefix}C56'] = self.C.Cij[4,5]
+            meta[f'{self.prefix}C66'] = self.C.Cij[5,5]
 
 ########################### Calculation interactions ##########################
 

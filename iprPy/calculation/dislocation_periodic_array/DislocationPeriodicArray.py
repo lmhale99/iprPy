@@ -609,7 +609,7 @@ class DislocationPeriodicArray(Calculation):
                         
             self.__dumpfile_defect = calc['defect-system']['artifact']['file']
             self.__symbols_defect = calc['defect-system']['symbols']
-            self.__potential_energy_defect = uc.value_unit(calc['defect-system']['potential-energy'])
+            #self.__potential_energy_defect = uc.value_unit(calc['defect-system']['potential-energy'])
             
             elsol = calc['elastic-solution'] 
             self.__preln = uc.value_unit(elsol['pre-ln-factor'])
@@ -686,7 +686,7 @@ class DislocationPeriodicArray(Calculation):
             meta['dumpfile_defect'] = self.dumpfile_defect
             meta['symbols_base'] = self.symbols_base
             meta['symbols_defect'] = self.symbols_defect
-            meta['potential_energy_defect'] = self.potential_energy_defect
+            #meta['potential_energy_defect'] = self.potential_energy_defect
             meta['preln'] = self.preln
             meta['K_tensor'] = self.K_tensor
 
@@ -790,5 +790,5 @@ class DislocationPeriodicArray(Calculation):
         self.__dumpfile_defect = results_dict['dumpfile_disl']
         self.__symbols_base = results_dict['symbols_base']
         self.__symbols_defect = results_dict['symbols_disl']
-        self.__potential_energy_defect = results_dict['E_total_disl']
+        #self.__potential_energy_defect = results_dict['E_total_disl']
         self.__dislocation = results_dict['dislocation']
