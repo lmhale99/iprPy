@@ -116,7 +116,7 @@ class PotentialProperties(Record):
 
         if name is None:
             if self.potential_LAMMPS_id is not None:
-                self.name = f'properties.{self.potential_LAMMPS_id}'
+                self.name = f'props.{self.potential_LAMMPS_id}.{self.potential_key[:8]}'
 
     def load_model(self, model, name=None):
         """
