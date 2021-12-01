@@ -3,6 +3,8 @@
 from pathlib import Path
 import shutil
 
+import pandas as pd
+
 import atomman as am
 
 # iprPy imports
@@ -269,6 +271,104 @@ class IprPyDatabase():
         """
         reset_orphans(run_directory, orphan_directory=orphan_directory)
 
+    def merge_records(self, dest, record_style, includetar=True, overwrite=False, dryrun=False):
+        """
+        Copies records from the current database to another database by first comparing
+        the records in the two databases to identify missing (and changed) content.  
+        
+        Parameters
+        ----------
+        dest :  Database
+            The destination database to copy records to.
+        record_style : str
+            The record style to compare existing records between the two
+            databases and copy missing/updated records to dest. 
+        includetar : bool, optional
+            If True, the tar archives will be copied along with the records,
+            and missing tars will also be searched for.
+            If False, only the records will be copied. (Default is True).
+        overwrite : bool, optional
+            If False (default) only new records and tars will be copied.
+            If True, the content of all records will be compared to identify
+            those that have been changed, and those will be updated in dest
+            to match the content in the current database.
+        dryrun : bool, optional
+            If True, the identified records to add/update to dest will be
+            returned as a list rather than sending them to dest. copy_records()
+            can then be called afterwards using the list of records.
+            If False (default), copy_records will automatically be called and
+            the list not returned.
+            
+        Returns
+        -------
+        list
+            The records identified to add/update from the current database to
+            dest.  Only returned if dryrun is True.
+        """
+        
+        # Get records in source database
+        self_records, self_df = self.get_records(record_style, return_df=True)
+        print(len(self_records), 'records in source')
+        
+        # Get records in destination database
+        dest_records, dest_df = dest.get_records(record_style, return_df=True)
+        print(len(dest_records), 'records in destination')
+        
+        # Identify records missing from destination
+        if len(dest_records) > 0:
+            missing = set(self_df.name[~self_df.name.isin(dest_df.name.tolist())])
+        else:
+            missing = set(self_df.name)
+        print(len(missing), 'records missing from destination')
+        
+        if overwrite is True:
+            
+            # Identify records that have changed
+            changed = []
+            for name in self_df.name[~self_df.name.isin(missing)]:
+                self_record = self_records[self_df.name == name][0].model.json(ensure_ascii=False)
+                dest_record = dest_records[dest_df.name == name][0].model.json(ensure_ascii=False)
+                if self_record != dest_record:
+                    changed.append(name)
+            print(len(changed), 'records in destination different in source')
+            missing = missing.union(changed)
+        
+        if includetar is True:
+            
+            # Get metadata for tars in source database
+            self_tar = []
+            for frecord in self.mongodb[f'{record_style}.files'].find():
+                self_tar.append(frecord)
+            self_tar = pd.DataFrame(self_tar)
+            print(len(self_tar), 'tars in source')
+            
+            # Get metadata for tars in destination database
+            dest_tar = []
+            for frecord in dest.mongodb[f'{record_style}.files'].find():
+                dest_tar.append(frecord)
+            dest_tar = pd.DataFrame(dest_tar)
+            print(len(dest_tar), 'tars in destination')   
+            
+            # Identify records missing from destination
+            if len(dest_records) > 0:
+                missingtar = set(self_tar.recordname[~self_tar.recordname.isin(dest_tar.recordname.tolist())])
+            else:
+                missingtar = set(self_tar.recordname)
+            print(len(missingtar), 'tars missing from destination')
+            missing = missing.union(missingtar)
+        
+        if len(missing) > 0:
+            records = self_records[self_df.name.isin(missing)]
+            if dryrun:
+                print(len(records), 'to copy')
+                return records
+            else:
+                self.copy_records(dest, records=records, includetar=includetar, overwrite=overwrite)
+        else:
+            print('No records to copy')
+            if dryrun:
+                return []
+        
     def copy_references(self, dest, includetar=True, overwrite=False):
         """
         Copies all reference record styles from the current database to
