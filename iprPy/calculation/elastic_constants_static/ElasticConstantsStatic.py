@@ -302,7 +302,7 @@ class ElasticConstantsStatic(Calculation):
     @property
     def modelroot(self):
         """str: The root element of the content"""
-        return 'calculation-relax-static'
+        return 'calculation-elastic-constants-static'
 
     def build_model(self):
         """
