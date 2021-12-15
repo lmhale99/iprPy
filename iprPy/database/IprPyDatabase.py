@@ -520,8 +520,8 @@ class IprPyDatabase():
         master_prepare(self, input_script=input_script, **kwargs)
 
     def runner(self, run_directory, calc_name=None, orphan_directory=None,
-               hold_directory=None, log=True, bidtries=10, temp=False,
-               temp_directory=None):
+               hold_directory=None, log=True, bidtries=10, bidverbose=False,
+               temp=False, temp_directory=None):
         """
         High-throughput calculation runner.
         
@@ -548,6 +548,9 @@ class IprPyDatabase():
             The runner will stop if it fails on bidding this many times in a
             row.  This allows for the cleanup of excess competing runners.
             Default value is 10.
+        bidverbose : bool, optional
+            If True, info about the calculation bidding process will be printed.
+            Default value is False.
         temp : bool, optional
             If True, a temporary directory will be automatically created and used
             for this run.
@@ -558,5 +561,5 @@ class IprPyDatabase():
         # Call runner with self as database
         runner(self, run_directory, calc_name=calc_name,
                orphan_directory=orphan_directory, hold_directory=hold_directory,
-               log=log, bidtries=bidtries, temp=temp,
-               temp_directory=temp_directory)
+               log=log, bidtries=bidtries, bidverbose=bidverbose,
+               temp=temp, temp_directory=temp_directory)

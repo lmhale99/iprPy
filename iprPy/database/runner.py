@@ -18,8 +18,8 @@ from DataModelDict import DataModelDict as DM
 from .. import settings, load_run_directory
 
 def runner(database, run_directory, calc_name=None, orphan_directory=None,
-           hold_directory=None, log=True, bidtries=10, temp=False,
-           temp_directory=None):
+           hold_directory=None, log=True, bidtries=10, bidverbose=False,
+           temp=False, temp_directory=None):
     """
     High-throughput calculation runner.
     
@@ -48,6 +48,9 @@ def runner(database, run_directory, calc_name=None, orphan_directory=None,
         The runner will stop if it fails on bidding this many times in a
         row.  This allows for the cleanup of excess competing runners.
         Default value is 10.
+    bidverbose : bool, optional
+        If True, info about the calculation bidding process will be printed.
+        Default value is False.
     temp : bool, optional
         If True, a temporary directory will be automatically created and used
         for this run.
@@ -57,19 +60,21 @@ def runner(database, run_directory, calc_name=None, orphan_directory=None,
     """
     # Initialize a RunManager
     runmanager = RunManager(database, run_directory,
-                            orphan_directory=orphan_directory,
+                            orphan_directory=orphan_directory, 
                             hold_directory=hold_directory, log=log)
     
     # Run all calculations
     if calc_name is None:
         print(f'Runner started with pid {runmanager.pid}', flush=True)
         runmanager.runall(bidtries=bidtries, temp=temp,
-                           temp_directory=temp_directory)
+                          temp_directory=temp_directory,
+                          bidverbose=bidverbose)
     
     else:
         print(f'Runner started with pid {runmanager.pid} for calculation {calc_name}', flush=True)
         status = runmanager.run(calc_name=calc_name, temp=temp,
-                                temp_directory=temp_directory)
+                                temp_directory=temp_directory,
+                                bidverbose=bidverbose)
 
 class RunManager():
     """
@@ -207,7 +212,7 @@ class RunManager():
                 calcs.append(calc.name)
         return calcs
     
-    def __bid(self, calc_directory):
+    def __bid(self, calc_directory, verbose=False):
         """
         Bids for the chance to run a calculation. Used to help avoid
         runner collisions.
@@ -216,6 +221,9 @@ class RunManager():
         ----------
         calc_directory : path-like object
             The calculation directory to bid on.
+        verbose : bool, optional
+            If True, info about the calculation bidding process will be printed.
+            Default value is False.
 
         Returns
         -------
@@ -225,19 +233,29 @@ class RunManager():
         # Wait as calc folder may be in the process of being deleted
         time.sleep(1)
 
-        # Check if calc_directory still exists and if bids mave been made
+        # Check if calc_directory exists and if bids have been made
+        if not calc_directory.is_dir():
+            if verbose:
+                print(f'Bid fail - {calc_directory.name} no longer exists')
+            return False
+
+        # Check if bids have been made
         try:
-            assert calc_directory.is_dir()
             for filename in calc_directory.iterdir():
                 assert filename.suffix != '.bid'
         except:
+            if verbose:
+                print(f'Bid fail - {calc_directory.name} has bids')
             return False
         
         # Try to place a bid - may fail if calc_directory gets deleted
+        bidfile = Path(calc_directory, f'{self.pid}.bid')
         try:
-            with open(Path(calc_directory, f'{self.pid}.bid'), 'w') as f:
-                f.write(f'bid for pid: {self.pid}')
+            with open(bidfile, 'w') as f:
+                f.write(f'bid made using id: {self.pid}')
         except:
+            if verbose:
+                print(f'Bid fail - {calc_directory.name} could not place bid')
             return False
 
         # Wait to make sure all bids are in
@@ -249,13 +267,26 @@ class RunManager():
             for filename in calc_directory.iterdir():
                 if filename.suffix == '.bid':
                     bids.append(int(filename.stem))
+            assert len(bids) > 0
         except:
+            if verbose:
+                print(f'Bid fail - {calc_directory.name} failed to read bids')
+            try:
+                bidfile.unlink()
+            except:
+                pass
             return False
         
         # Competing bids go to the smallest pid
         if min(bids) == self.pid:
             return True
         else:
+            if verbose:
+                print(f'Bid fail - {calc_directory.name} bid {self.pid} > {min(bids)}')
+            try:
+                bidfile.unlink()
+            except:
+                pass
             return False
         
     def __removecalc(self, calc_directory):
@@ -436,7 +467,7 @@ class RunManager():
 
         return status, message
     
-    def run(self, calc_name, temp=False, temp_directory=None):
+    def run(self, calc_name, temp=False, temp_directory=None, bidverbose=False):
         """
         Runs one calculation from the run_directory.
         
@@ -450,7 +481,10 @@ class RunManager():
         temp_directory : path-like object, optional
             The path to an existing temporary directory where the calculations
             are to be performed.
-            
+        bidverbose : bool, optional
+            If True, info about the calculation bidding process will be printed.
+            Default value is False. 
+
         Returns
         -------
         status : str
@@ -462,7 +496,7 @@ class RunManager():
         calc_directory = Path(self.run_directory, calc_name)
         
         # Try bidding for the calc_directory
-        if self.__bid(calc_directory) is False:
+        if self.__bid(calc_directory, verbose=bidverbose) is False:
             return 'bidfail'
         
         # Write calc_name to log file
@@ -564,7 +598,8 @@ class RunManager():
         self.__logwrite('\n')
         return status
     
-    def runall(self, bidtries=10, temp=False, temp_directory=None):
+    def runall(self, bidtries=10, temp=False, temp_directory=None,
+               bidverbose=False):
         """
         Sequentially runs calculations within the run_directory until all
         are finished.
@@ -581,6 +616,9 @@ class RunManager():
         temp_directory : path-like object, optional
             The path to an existing temporary directory where the calculations
             are to be performed.
+        bidverbose : bool, optional
+            If True, info about the calculation bidding process will be printed.
+            Default value is False. 
         """
 
         # Create temp_directory if needed
@@ -598,7 +636,8 @@ class RunManager():
             calc_name = calclist[random.randint(0, len(calclist)-1)]
 
             # Run the calculation
-            status = self.run(calc_name, temp_directory=temp_directory)
+            status = self.run(calc_name, temp_directory=temp_directory,
+                              bidverbose=bidverbose)
 
             if status == 'bidfail':
                 bidcount += 1
