@@ -3,7 +3,12 @@ class PotentialsPropertiesSubset():
     
     def __init__(self, parent):
         self.__parent = parent
-        self.exists = False
+        
+        # Set exists to False if allowed
+        try:
+            self.exists = False
+        except:
+            pass
 
     @property
     def parent(self):

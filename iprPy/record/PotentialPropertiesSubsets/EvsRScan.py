@@ -11,6 +11,10 @@ class EvsRScan(PotentialsPropertiesSubset):
         self.__compositions = []
         super().__init__(parent)
 
+    @property
+    def exists(self):
+        return len(self.compositions) > 0
+
     def table(self, composition):
         """str : URL to the txt table of the diatom plot"""
         assert composition in self.compositions
@@ -31,12 +35,9 @@ class EvsRScan(PotentialsPropertiesSubset):
         return self.__compositions
 
     def load_model(self, model):
-        
-        if 'cohesive-energy-scan' in model:
-            self.exists = True            
+        if 'cohesive-energy-scan' in model:           
             self.__compositions = aslist(model['cohesive-energy-scan'].get('composition', []))
         else:
-            self.exists = False
             self.__compositions = []
 
     def build_model(self, model):
