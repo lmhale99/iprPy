@@ -684,6 +684,7 @@ class RelaxDynamic(Calculation):
             params['parent_load_key'] = 'minimum-atomic-system'
             params['parent_status'] = 'finished'
             params['sizemults'] = '10 10 10'
+            params['atomshift'] = '0.05 0.05 0.05'
             params['temperature'] = '0.0'
             params['integrator'] = 'nph+l'
             params['thermosteps'] = '1000'
@@ -714,6 +715,7 @@ class RelaxDynamic(Calculation):
             params['parent_method'] = 'dynamic'
             params['parent_standing'] = 'good'
             params['sizemults'] = '10 10 10'
+            params['atomshift'] = '0.05 0.05 0.05'
             params['temperature'] = [
                 '100', '200', '300', '400', '500', '600', '700', '800', '900','1000',
                 '1100','1200','1300','1400','1500','1600','1700','1800','1900','2000',

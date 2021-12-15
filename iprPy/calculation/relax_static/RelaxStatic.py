@@ -421,6 +421,7 @@ class RelaxStatic(Calculation):
             params['parent_load_key'] = 'minimum-atomic-system'
             params['parent_status'] = 'finished'
             params['sizemults'] = '10 10 10'
+            params['atomshift'] = '0.05 0.05 0.05'
             params['energytolerance'] = '0.0'
             params['forcetolerance'] = '1e-10 eV/angstrom'
             params['maxiterations'] = '10000'
