@@ -8,7 +8,10 @@ import pandas as pd
 import atomman as am
 
 # iprPy imports
-from . import prepare, runner, master_prepare, reset_orphans
+from .prepare import prepare
+from .runner import runner, RunManager
+from .master_prepare import master_prepare
+from .reset_orphans import reset_orphans
 from .. import load_run_directory
 from ..tools import iaslist
 
@@ -563,3 +566,30 @@ class IprPyDatabase():
                orphan_directory=orphan_directory, hold_directory=hold_directory,
                log=log, bidtries=bidtries, bidverbose=bidverbose,
                temp=temp, temp_directory=temp_directory)
+
+    def runmanager(self, run_directory, orphan_directory=None,
+                    hold_directory=None, log=True):
+        """
+        Creates a RunManager object linked to the database.  This allows users
+        more control on how to perform calculations by being able to directly
+        call the RunManager's run and runall methods.
+
+        Parameters
+        ----------
+        run_directory : path-like object or str
+            The run_directory name or path to the directory where the calculations
+            to run are located.
+        orphan_directory : str, optional
+            The path for the orphan directory where incomplete calculations are
+            moved.  If None (default) then will use 'orphan' at the same level as
+            the run_directory.
+        hold_directory : str, optional
+            The path for the hold directory where tar archives that failed to be
+            uploaded are moved to.  If None (default) then will use 'hold' at the
+            same level as the run_directory.
+        log : bool, optional
+            If True (default), the runner will create and save a log file detailing the
+            status of each calculation that it runs.
+        """
+        return RunManager(self, run_directory, orphan_directory=orphan_directory,
+                          hold_directory=hold_directory, log=log)

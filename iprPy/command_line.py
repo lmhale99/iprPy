@@ -9,9 +9,9 @@ import atomman as am
 
 # https://github.com/usnistgov/iprPy
 from . import (load_database, load_run_directory, load_calculation,
-               check_modules, settings, reset_orphans)
+               check_modules, settings)
 from .calculation import run_calculation
-from .database import runner, prepare
+from .database import reset_orphans
 from .tools import filltemplate
 
 def command_line():

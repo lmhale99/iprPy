@@ -3,14 +3,15 @@ import sys
 from .reset_orphans import reset_orphans
 from .prepare import prepare
 from .master_prepare import master_prepare
-from .runner import runner
+from .runner import runner, RunManager
 from .IprPyDatabase import IprPyDatabase
 
 from datamodelbase.tools import ModuleManager
 databasemanager = ModuleManager('Database')
 from .load_database import load_database
 
-__all__ = ['Database', 'databasemanager', 'load_database']
+__all__ = ['Database', 'databasemanager', 'load_database', 'runner',
+           'RunManager', 'reset_orphans', 'prepare', 'master_prepare']
 
 # Import LocalDatabase
 try:
