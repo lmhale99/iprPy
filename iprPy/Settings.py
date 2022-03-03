@@ -1,7 +1,7 @@
 # Standard Python libraries
 from copy import deepcopy
 from pathlib import Path
-import json
+from typing import Optional, Union
 
 import potentials
 
@@ -14,7 +14,7 @@ class Settings(potentials.Settings.Settings):
     """
     
     @property
-    def runner_log_directory(self):
+    def runner_log_directory(self) -> Path:
         """pathlib.Path : Path to the directory where runner logs are saved to."""
 
         # Check runner_log_directory value
@@ -24,18 +24,19 @@ class Settings(potentials.Settings.Settings):
             return Path(self.directory, 'runner-logs')
 
     @property
-    def run_directories(self):
+    def run_directories(self) -> dict:
         """dict: The pre-defined run_directory paths organized by name"""
         if 'iprPy_run_directory' not in self.__content:
             self.__content['iprPy_run_directory'] = {}
         return deepcopy(self.__content['iprPy_run_directory'])
 
     @property
-    def list_run_directories(self):
+    def list_run_directories(self) -> list:
         """list: The names of the pre-defined database names"""
         return list(self.run_directories.keys())
     
-    def set_runner_log_directory(self, path=None):
+    def set_runner_log_directory(self,
+                                 path: Union[str, Path, None] = None):
         """
         Sets the runner log directory to a different location.
 
@@ -84,7 +85,9 @@ class Settings(potentials.Settings.Settings):
             # Save changes
             self.save()
                   
-    def set_run_directory(self, name=None, path=None):
+    def set_run_directory(self,
+                          name: Optional[str] = None,
+                          path: Optional[str] = None):
         """
         Allows for run_directory information to be defined in the settings file.
 
@@ -122,14 +125,15 @@ class Settings(potentials.Settings.Settings):
 
         self.save()
 
-    def unset_run_directory(self, name=None):
+    def unset_run_directory(self,
+                            name: Optional[str] = None):
         """
         Deletes the settings for a pre-defined run_directory from the settings
         file.
 
         Parameters
         ----------
-        name : str
+        name : str, optional
             The name assigned to a pre-defined run_directory.
         """
         run_directory_names = self.list_run_directories
@@ -160,7 +164,7 @@ class Settings(potentials.Settings.Settings):
         print(f'Run directory {name} found')
         test = screen_input('Delete settings? (must type yes):').lower()
         if test == 'yes':
-            del(self.__content['iprPy_run_directory'][name])                  
+            del(self.__content['iprPy_run_directory'][name])
             self.save()
 
 settings = Settings()
