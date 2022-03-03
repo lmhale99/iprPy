@@ -1,4 +1,5 @@
 # coding: utf-8
+
 # Standard Python libraries
 from importlib import resources
 
@@ -11,23 +12,19 @@ __all__ = ['__version__', 'tools', 'settings', 'input',
            'calculation_subset',
            'calculation', 'load_calculation', 'calculationmanager',
            'database', 'load_database', 'databasemanager',
-           'check_modules', 'command_line']
+           'check_modules', 'command_line', 'reset_orphans']
 __all__.sort()
 
 # iprPy imports
 from . import tools
-
 from .Settings import settings
 from .load_run_directory import load_run_directory
 from .fix_lammps_versions import fix_lammps_versions
-
-#from . import analysis
 from . import input
 
 from . import record
 from .record import load_record, recordmanager
 
-#from .library import Library
 from . import calculation_subset
 from . import calculation
 from .calculation import load_calculation, calculationmanager
@@ -35,5 +32,4 @@ from .calculation import load_calculation, calculationmanager
 from .database import load_database, databasemanager, reset_orphans
 
 from .check_modules import check_modules
-
 from .command_line import command_line

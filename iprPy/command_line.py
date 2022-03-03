@@ -4,9 +4,6 @@
 # Standard Python libraries
 import argparse
 
-# https://github.com/usnistgov/atomman
-import atomman as am
-
 # https://github.com/usnistgov/iprPy
 from . import (load_database, load_run_directory, load_calculation,
                check_modules, settings)

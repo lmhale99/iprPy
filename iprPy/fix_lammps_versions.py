@@ -1,8 +1,13 @@
+# coding: utf-8
+
+# Standard Python libraries
 from pathlib import Path
 
+# iprPy imports
 from . import load_run_directory
 
-def fix_lammps_versions(run_directory, **kwargs):
+def fix_lammps_versions(run_directory: str,
+                        **kwargs):
     """
     Iterates over all prepared calculations in a run_directory and updates
     the LAMMPS version to use.
