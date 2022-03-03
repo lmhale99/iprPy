@@ -4,7 +4,7 @@ import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
-from datamodelbase import query
+from yabadaba import query
 
 # https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM

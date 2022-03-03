@@ -1,49 +1,41 @@
-import sys
+# coding: utf-8
 
+# https://github.com/usnistgov/yabadaba
+from yabadaba.tools import ModuleManager
+databasemanager = ModuleManager('Database')
+from yabadaba import databasemanager as coredatabasemanager
+
+# Local imports
 from .reset_orphans import reset_orphans
 from .prepare import prepare
 from .master_prepare import master_prepare
 from .runner import runner, RunManager
 from .IprPyDatabase import IprPyDatabase
-
-from datamodelbase.tools import ModuleManager
-databasemanager = ModuleManager('Database')
 from .load_database import load_database
 
-__all__ = ['Database', 'databasemanager', 'load_database', 'runner',
-           'RunManager', 'reset_orphans', 'prepare', 'master_prepare']
+__all__ = sorted(['Database', 'databasemanager', 'load_database', 'runner',
+                  'RunManager', 'reset_orphans', 'prepare', 'master_prepare'])
 
-# Import LocalDatabase
-try:
-    from datamodelbase.database import LocalDatabase as LocalParent
-except Exception as e:
-    databasemanager.failed_styles['local'] = '%s: %s' % sys.exc_info()[:2]
-else:
-    class LocalDatabase(LocalParent, IprPyDatabase):
+# Upgrade LocalDatabase to an IprPyDatabase
+if 'local' in coredatabasemanager.loaded_styles:
+    class LocalDatabase(coredatabasemanager.loaded_styles['local'], IprPyDatabase):
         pass
     databasemanager.loaded_styles['local'] = LocalDatabase
-    __all__.append('LocalDatabase')
-
-# Import MongoDatabase
-try:
-    from datamodelbase.database import MongoDatabase as MongoParent
-except Exception as e:
-    databasemanager.failed_styles['mongo'] = '%s: %s' % sys.exc_info()[:2]
 else:
-    class MongoDatabase(MongoParent, IprPyDatabase):
+    databasemanager.failed_styles['local'] = coredatabasemanager.failed_styles['local']
+
+# Upgrade MongoDatabase to an IprPyDatabase
+if 'mongo' in coredatabasemanager.loaded_styles:
+    class MongoDatabase(coredatabasemanager.loaded_styles['mongo'], IprPyDatabase):
         pass
     databasemanager.loaded_styles['mongo'] = MongoDatabase
-    __all__.append('MongoDatabase')
-
-# Import CDCSDatabase
-try:
-    from datamodelbase.database import CDCSDatabase as CDCSParent
-except Exception as e:
-    databasemanager.failed_styles['cdcs'] = '%s: %s' % sys.exc_info()[:2]
 else:
-    class CDCSDatabase(CDCSParent, IprPyDatabase):
+    databasemanager.failed_styles['mongo'] = coredatabasemanager.failed_styles['mongo']
+
+# Upgrade CDCSDatabase to an IprPyDatabase
+if 'cdcs' in coredatabasemanager.loaded_styles:
+    class CDCSDatabase(coredatabasemanager.loaded_styles['cdcs'], IprPyDatabase):
         pass
     databasemanager.loaded_styles['cdcs'] = CDCSDatabase
-    __all__.append('CDCSDatabase')
-
-__all__.sort()
+else:
+    databasemanager.failed_styles['cdcs'] = coredatabasemanager.failed_styles['cdcs']
