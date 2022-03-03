@@ -1,9 +1,17 @@
+# coding: utf-8
+
+# Standard Python libraries
+from typing import Optional
+
 # https://github.com/usnistgov/atomman
 import atomman.unitconvert as uc
 
 __all__ = ['value']
 
-def value(input_dict, key, default_unit=None, default_term=None):
+def value(input_dict: dict,
+          key: str,
+          default_unit: Optional[str] = None,
+          default_term: Optional[str] = None) -> float:
     """
     Interprets a calculation parameter by converting it from a string to a
     float in working units.

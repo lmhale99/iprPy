@@ -1,9 +1,18 @@
+# coding: utf-8
+
+# Standard Python libraries
+from typing import Optional, Tuple
+
 # iprPy imports
 from .buildcombos_functions import loaded
 
 __all__ = ['buildcombos']
 
-def buildcombos(style, database, keys, content_dict=None, **kwargs):
+def buildcombos(style: str,
+                database,
+                keys: list,
+                content_dict: Optional[dict] = None,
+                **kwargs) -> Tuple[dict, dict]:
     """
     Wrapper function for the modular buildcombos styles
 

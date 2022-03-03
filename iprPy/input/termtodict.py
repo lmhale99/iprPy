@@ -1,16 +1,22 @@
+# coding: utf-8
+
+# Standard Python libraries
+from typing import List
+
 # iprPy imports
 from ..tools import aslist
 
 __all__ = ['termtodict']
 
-def termtodict(term, keys):
+def termtodict(term: str,
+               keys: List[str]) -> dict:
     """
     Takes a str term and parses it into a dictionary of key-value pairs
     based on the supplied key list.
     
     Parameters
     ----------
-    term : str, unicode
+    term : str
         The str term to parse.
     keys : list of str
         The list of keys to parse by.
@@ -54,7 +60,7 @@ def termtodict(term, keys):
     
     return param_dict
 
-def dicttoterm(param_dict):
+def dicttoterm(param_dict: dict) -> str:
     """
     Takes a dictionary and converts it into a single str term that can be
     parsed by termtodict().

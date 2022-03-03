@@ -1,6 +1,11 @@
+# coding: utf-8
+
+# Standard Python libraries
+from typing import Union
+
 __all__ = ['boolean']
 
-def boolean(value):
+def boolean(value: Union[str, bool]) -> bool:
     """
     Allows conversion of strings to Booleans.
     

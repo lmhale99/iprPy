@@ -1,12 +1,20 @@
+# coding: utf-8
+
+# Standard Python libraries
+from typing import Union, Optional, List
+import io
+
 # https://github.com/usnistgov/atomman
 from atomman.tools import uber_open_rmode
-                       
+
 # iprPy imports
 from ..tools import aslist
 
 __all__ = ['parse']
 
-def parse(inscript, singularkeys=[], allsingular=False):
+def parse(inscript: Union[str, io.IOBase],
+          singularkeys: Optional[List[str]] = None,
+          allsingular: bool = False) -> dict:
     """
     Parses an input file and returns a dictionary of parameter terms.
     
@@ -47,6 +55,8 @@ def parse(inscript, singularkeys=[], allsingular=False):
     """
     
     # Argument check
+    if singularkeys is None:
+        singularkeys = []
     singularkeys = aslist(singularkeys)
     if allsingular and len(singularkeys) > 0:
         raise ValueError('allsingular and singularkeys options cannot both be given')
