@@ -1,6 +1,10 @@
+# coding: utf-8
+
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
-from datamodelbase import query
+# https://github.com/usnistgov/yabadaba
+from yabadaba import query
 
 # iprPy imports
 from . import Record
