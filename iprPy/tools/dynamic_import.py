@@ -1,4 +1,6 @@
 # coding: utf-8
+
+# Standard Python libraries
 from importlib import import_module, resources
 from pathlib import Path
 import sys

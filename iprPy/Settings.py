@@ -1,8 +1,11 @@
+# coding: utf-8
+
 # Standard Python libraries
 from copy import deepcopy
 from pathlib import Path
 from typing import Optional, Union
 
+# https://github.com/usnistgov/potentials
 import potentials
 
 # iprPy imports
