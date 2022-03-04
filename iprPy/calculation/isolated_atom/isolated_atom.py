@@ -2,21 +2,21 @@
 
 # Python script created by Lucas Hale
 
-# http://www.numpy.org/
-import numpy as np
+# Standard Python libraries
+from typing import Optional
 
 # https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
+from atomman.tools import filltemplate
 
 # iprPy imports
-from ...tools import filltemplate, read_calc_file
+from ...tools import read_calc_file
 
-# Define calculation metadata
-parent_module = '.'.join(__name__.split('.')[:-1])
-
-def isolated_atom(lammps_command, potential, mpi_command=None):
+def isolated_atom(lammps_command: str,
+                  potential: am.lammps.Potential, 
+                  mpi_command: Optional[str] = None) -> dict:
     """
     Evaluates the isolated atom energy for each elemental model of a potential.
     
@@ -66,9 +66,8 @@ def isolated_atom(lammps_command, potential, mpi_command=None):
         lammps_variables['atomman_system_pair_info'] = system_info
         
         # Write lammps input script
-        template_file = 'run0.template'
         lammps_script = 'run0.in'
-        template = read_calc_file(parent_module, template_file)
+        template = read_calc_file('iprPy.calculation.isolated_atom', 'run0.template')
         with open(lammps_script, 'w') as f:
             f.write(filltemplate(template, lammps_variables, '<', '>'))
         

@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from datamodelbase import query
+from yabadaba import query
 
 # https://github.com/usnistgov/atomman
 import atomman as am

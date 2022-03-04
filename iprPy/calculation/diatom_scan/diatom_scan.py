@@ -2,25 +2,28 @@
 
 # Python script created by Lucas Hale
 
+# Standard Python libraries
+from typing import Optional
+
 # http://www.numpy.org/
 import numpy as np
-
 
 # https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
+from atomman.tools import filltemplate, aslist
 
 # iprPy imports
-from ...tools import filltemplate, read_calc_file, aslist
+from ...tools import read_calc_file
 
-# Define calculation metadata
-parent_module = '.'.join(__name__.split('.')[:-1])
-
-def diatom_scan(lammps_command, potential, symbols,
-                mpi_command=None, 
-                rmin=uc.set_in_units(0.02, 'angstrom'), 
-                rmax=uc.set_in_units(6.0, 'angstrom'), rsteps=300):
+def diatom_scan(lammps_command: str,
+                potential: am.lammps.Potential, 
+                symbols: list,
+                mpi_command: Optional[str] = None, 
+                rmin: float = uc.set_in_units(0.02, 'angstrom'), 
+                rmax: float = uc.set_in_units(6.0, 'angstrom'),
+                rsteps: int = 300) -> dict:
     """
     Performs a diatom energy scan over a range of interatomic spaces, r.
     
@@ -93,9 +96,8 @@ def diatom_scan(lammps_command, potential, symbols,
         lammps_variables['atomman_system_pair_info'] = system_info
         
         # Write lammps input script
-        template_file = 'run0.template'
         lammps_script = 'run0.in'
-        template = read_calc_file(parent_module, template_file)
+        template = read_calc_file('iprPy.calculation.diatom_scan', 'run0.template')
         with open(lammps_script, 'w') as f:
             f.write(filltemplate(template, lammps_variables, '<', '>'))
         

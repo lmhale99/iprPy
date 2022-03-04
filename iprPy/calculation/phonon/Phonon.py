@@ -1,7 +1,7 @@
 # coding: utf-8
 # Standard Python libraries
 
-from datamodelbase import query
+from yabadaba import query
 
 # https://github.com/usnistgov/atomman
 import atomman as am
