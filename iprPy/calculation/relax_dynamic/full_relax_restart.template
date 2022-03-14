@@ -2,7 +2,7 @@
 
 box tilt large
 
-<atomman_system_pair_info>
+<atomman_pair_restart_info>
 
 change_box all triclinic
 
@@ -13,9 +13,8 @@ compute stress all stress/atom <stressterm>
 thermo <thermosteps>
 thermo_style custom step temp pe ke etotal lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy
 thermo_modify format float %.13e
-timestep 0.001
 
-<integrator_info>
+<integrator_restart_info>
 
 dump dumpit all custom <dumpsteps> *.dump <dump_keys>
 dump_modify dumpit format <dump_modify_format>

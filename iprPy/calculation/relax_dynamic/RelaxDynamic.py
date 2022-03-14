@@ -51,6 +51,7 @@ class RelaxDynamic(Calculation):
         self.integrator = None
         self.thermosteps = 100
         self.dumpsteps = None
+        self.restartsteps = None
         self.runsteps = 220000
         self.equilsteps = 20000
         self.randomseed = None
@@ -236,6 +237,22 @@ class RelaxDynamic(Calculation):
             value = int(value)
             assert value >= 0
             self.__dumpsteps = value
+
+    @property
+    def restartsteps(self):
+        if self.__restartsteps is None:
+            return self.runsteps
+        else:
+            return self.__restartsteps
+
+    @restartsteps.setter
+    def restartsteps(self, value):
+        if value is None:
+            self.__restartsteps = None
+        else:
+            value = int(value)
+            assert value >= 0
+            self.__restartsteps = value
 
     @property
     def runsteps(self):
@@ -540,6 +557,9 @@ class RelaxDynamic(Calculation):
         dumpsteps : int, optional
             Indicates how often the atomic configuration is output to a LAMMPS
             dump file.
+        restartsteps : int, optional
+            Indicates how often the atomic configuration is output to a LAMMPS
+            restart file.
         runsteps : int, optional
             The total number of integration steps.
         equilsteps : int, optional
@@ -553,7 +573,7 @@ class RelaxDynamic(Calculation):
             the parent Calculation class and the subset classes.
         """
         # Call super to set universal and subset content
-        super().set_values(name=None, **kwargs)
+        super().set_values(name=name, **kwargs)
 
         # Set calculation-specific values
         if 'pressure_xx' in kwargs:
@@ -576,6 +596,8 @@ class RelaxDynamic(Calculation):
             self.thermosteps = kwargs['thermosteps']
         if 'dumpsteps' in kwargs:
             self.dumpsteps = kwargs['dumpsteps']
+        if 'restartsteps' in kwargs:
+            self.restartsteps = kwargs['restartsteps']
         if 'runsteps' in kwargs:
             self.runsteps = kwargs['runsteps']
         if 'equilsteps' in kwargs:
@@ -605,6 +627,7 @@ class RelaxDynamic(Calculation):
         self.runsteps = int(input_dict.get('runsteps', 220000))
         self.thermosteps = int(input_dict.get('thermosteps', 100))
         self.dumpsteps = input_dict.get('dumpsteps', None)
+        self.restartsteps = input_dict.get('restartsteps', None)
         self.equilsteps = int(input_dict.get('equilsteps', 20000))
         if self.equilsteps >= self.runsteps:
             raise ValueError('runsteps must be greater than equilsteps')
@@ -778,6 +801,10 @@ class RelaxDynamic(Calculation):
                 "How often LAMMPS will save the atomic configuration to a",
                 "LAMMPS dump file.  Default value is runsteps, meaning only",
                 "the first and last states are saved."]),
+            'restartsteps': ' '.join([
+                "How often LAMMPS will save the atomic configuration to a",
+                "LAMMPS restart file.  Default value is runsteps, meaning only",
+                "the first and last states are saved."]),
             'runsteps': ' '.join([
                 "The total number of MD integration steps to run including",
                 "equil steps."]),
@@ -850,6 +877,7 @@ class RelaxDynamic(Calculation):
                     'integrator',
                     'thermosteps',
                     'dumpsteps',
+                    'restartsteps',
                     'runsteps',
                     'equilsteps',
                     'randomseed',
@@ -889,6 +917,7 @@ class RelaxDynamic(Calculation):
         run_params['integrator'] = self.integrator
         run_params['thermosteps'] = self.thermosteps
         run_params['dumpsteps'] = self.dumpsteps
+        run_params['restartsteps'] = self.restartsteps
         run_params['runsteps'] = self.runsteps
         run_params['equilsteps'] = self.equilsteps
         run_params['randomseed'] = self.randomseed
@@ -927,7 +956,7 @@ class RelaxDynamic(Calculation):
             calc['number-of-measurements'] = self.numsamples
 
             # Save measured box parameter info
-            calc['measured-box-parameter'] = mbp = DM()            
+            calc['measured-box-parameter'] = mbp = DM()
             mbp['lx'] = uc.model(self.lx_mean, self.units.length_unit,
                                  self.lx_std)
             mbp['ly'] = uc.model(self.ly_mean, self.units.length_unit,
@@ -997,6 +1026,7 @@ class RelaxDynamic(Calculation):
         self.integrator = run_params['integrator']
         self.thermosteps = run_params['thermosteps']
         self.dumpsteps = run_params['dumpsteps']
+        self.restartsteps = run_params['restartsteps']
         self.runsteps = run_params['runsteps']
         self.equilsteps = run_params['equilsteps']
         self.randomseed = run_params['randomseed']
@@ -1260,6 +1290,7 @@ class RelaxDynamic(Calculation):
         input_dict['integrator'] = self.integrator
         input_dict['thermosteps'] = self.thermosteps
         input_dict['dumpsteps'] = self.dumpsteps
+        input_dict['restartsteps'] = self.restartsteps
         input_dict['equilsteps'] = self.equilsteps
         input_dict['randomseed'] = self.randomseed
 
