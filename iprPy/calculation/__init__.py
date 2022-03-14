@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 from importlib import import_module, resources
 
-from datamodelbase.tools import ModuleManager
+from yabadaba.tools import ModuleManager
 
 calculationmanager = ModuleManager('Calculation')
 from .. import recordmanager
@@ -65,8 +65,8 @@ def run_calculation(params, calc_style=None, verbose=True):
         Specifies the style of calculation to run.  Optional if params is a
         path to a file where the file's name is calc_<calc_style>.in.
     verbose : bool, optional
-            If True, a message relating to the calculation's status will be
-            printed upon completion.  Default value is True.
+        If True, a message relating to the calculation's status will be
+        printed upon completion.  Default value is True.
     """
     if calc_style is None:
         # Extract calc_style from filename

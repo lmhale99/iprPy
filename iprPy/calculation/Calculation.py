@@ -266,13 +266,15 @@ class Calculation(Record):
         if isinstance(params, dict):
             input_dict = params
         else:
-            try:
-                assert Path(params).is_file()
-            except:
-                input_dict = parse(params, allsingular=True)
-            else:
-                with open(params) as f:
-                    input_dict = parse(f, allsingular=True)
+            input_dict = parse(params, allsingular=True)
+        
+        #    try:
+        #        assert Path(params).is_file()
+        #    except:
+        #        input_dict = parse(params, allsingular=True)
+        #    else:
+        #        with open(params) as f:
+        #            input_dict = parse(f, allsingular=True)
         
         self.__branch = input_dict.get('branch', 'main')
         

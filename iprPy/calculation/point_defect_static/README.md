@@ -9,6 +9,7 @@ The point_defect_static calculation style computes the formation energy of a poi
 ### Version notes
 
 - 2020-12-30 Version 0.10+ update
+- 2022-03-11: Notebook updated to reflect version 0.11.
 
 ### Additional dependencies
 

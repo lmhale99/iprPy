@@ -9,7 +9,7 @@ The isolated_atom calculation style evaluates the base energies of all atomic mo
 ### Version notes
 
 - 2020-09-22: Notebook first added.
-- 2022-02-16: Notebook updated to reflect version 0.11.
+- 2022-03-11: Notebook updated to reflect version 0.11.
 
 ### Additional dependencies
 
