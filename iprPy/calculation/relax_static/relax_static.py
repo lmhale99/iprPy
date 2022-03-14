@@ -3,10 +3,10 @@
 # Python script created by Lucas Hale
 
 # Standard library imports
-from copy import deepcopy
 import shutil
 from pathlib import Path
 import datetime
+from typing import Optional
 
 # http://www.numpy.org/
 import numpy as np
@@ -15,18 +15,29 @@ import numpy as np
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
+from atomman.tools import filltemplate
 
 # iprPy imports
-from ...tools import filltemplate, read_calc_file
+from ...tools import read_calc_file
 
-# Define calculation metadata
-parent_module = '.'.join(__name__.split('.')[:-1])
-
-def relax_static(lammps_command, system, potential, mpi_command=None,
-                 p_xx=0.0, p_yy=0.0, p_zz=0.0, p_xy=0.0, p_xz=0.0, p_yz=0.0,
-                 dispmult=0.0, etol=0.0, ftol=0.0,  maxiter=100000,
-                 maxeval=1000000, dmax=uc.set_in_units(0.01, 'angstrom'),
-                 maxcycles=100, ctol=1e-10):
+def relax_static(lammps_command: str,
+                 system: am.System,
+                 potential: lmp.Potential,
+                 mpi_command: Optional[str] = None,
+                 p_xx: float = 0.0,
+                 p_yy: float = 0.0,
+                 p_zz: float = 0.0,
+                 p_xy: float = 0.0,
+                 p_xz: float = 0.0,
+                 p_yz: float = 0.0,
+                 dispmult: float = 0.0,
+                 etol: float = 0.0,
+                 ftol: float = 0.0,
+                 maxiter: int = 100000,
+                 maxeval: int = 1000000,
+                 dmax: float = uc.set_in_units(0.01, 'angstrom'),
+                 maxcycles: int = 100,
+                 ctol: float = 1e-10) -> dict:
     """
     Repeatedly runs the ELASTIC example distributed with LAMMPS until box
     dimensions converge within a tolerance.
@@ -176,9 +187,9 @@ def relax_static(lammps_command, system, potential, mpi_command=None,
             lammps_variables['dump_modify_format'] = 'float %.13e'
         
         # Write lammps input script
-        template_file = 'minbox.template'
         lammps_script = 'minbox.in'
-        template = read_calc_file(parent_module, template_file)
+        template = read_calc_file('iprPy.calculation.relax_static',
+                                  'minbox.template')
         with open(lammps_script, 'w') as f:
             f.write(filltemplate(template, lammps_variables, '<', '>'))
         

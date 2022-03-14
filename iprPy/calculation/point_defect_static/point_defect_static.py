@@ -7,6 +7,7 @@ from pathlib import Path
 from copy import deepcopy
 import shutil
 import datetime
+from typing import Optional, Union
 
 # http://www.numpy.org/
 import numpy as np 
@@ -15,17 +16,23 @@ import numpy as np
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
+from atomman.tools import filltemplate
 
 # iprPy imports
-from ...tools import filltemplate, read_calc_file
+from ...tools import read_calc_file
 
-# Define calculation metadata
-parent_module = '.'.join(__name__.split('.')[:-1])
-
-def calc(lammps_command, system, potential, point_kwargs, cutoff,
-         mpi_command=None, etol=0.0, ftol=0.0, maxiter=10000,
-         maxeval=100000, dmax=uc.set_in_units(0.01, 'angstrom'),
-         tol=uc.set_in_units(1e-5, 'angstrom')):
+def calc(lammps_command: str,
+         system: am.System,
+         potential: lmp.Potential,
+         point_kwargs: Union[list, dict],
+         cutoff: float,
+         mpi_command: Optional[str] = None,
+         etol: float = 0.0,
+         ftol: float = 0.0,
+         maxiter: int = 10000,
+         maxeval: int = 100000,
+         dmax: float = uc.set_in_units(0.01, 'angstrom'),
+         tol: float = uc.set_in_units(1e-5, 'angstrom')) -> dict:
     """
     Adds one or more point defects to a system and evaluates the defect 
     formation energy. Evaluates a relaxed system containing a point defect
@@ -50,7 +57,7 @@ def calc(lammps_command, system, potential, point_kwargs, cutoff,
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
         will run serially.
     sim_directory : str, optional
-        The path to the directory to perform the simuation in.  If not
+        The path to the directory to perform the simulation in.  If not
         given, will use the current working directory.
     etol : float, optional
         The energy tolerance for the structure minimization. This value is
@@ -77,12 +84,14 @@ def calc(lammps_command, system, potential, point_kwargs, cutoff,
     dict
         Dictionary of results consisting of keys:
         
-        - **'E_coh'** (*float*) - The cohesive energy of the bulk system.
-        - **'E_ptd_f'** (*float*) - The point.defect formation energy.
+        - **'E_pot'** (*float*) - The per-atom potential energy of the bulk system.
+        - **'E_ptd_f'** (*float*) - The point defect formation energy.
         - **'E_total_base'** (*float*) - The total potential energy of the
           relaxed bulk system.
         - **'E_total_ptd'** (*float*) - The total potential energy of the
           relaxed defect system.
+        - **'pij_tensor'** (*numpy.ndarray of float*) - The elastic dipole
+          tensor associated with the defect.
         - **'system_base'** (*atomman.System*) - The relaxed bulk system.
         - **'system_ptd'** (*atomman.System*) - The relaxed defect system.
         - **'dumpfile_base'** (*str*) - The filename of the LAMMPS dump file
@@ -91,12 +100,12 @@ def calc(lammps_command, system, potential, point_kwargs, cutoff,
           for the relaxed defect system.
         - **'has_reconfigured'** (*bool*) - Flag indicating if the structure
           has been identified as relaxing to a different defect configuration.
-        - **'centrosummation'** (*numpy.array of float*) - The centrosummation
+        - **'centrosummation'** (*numpy.ndarray of float*) - The centrosummation
           parameter used for evaluating if the configuration has relaxed.
-        - **'position_shift'** (*numpy.array of float*) - The position_shift
+        - **'position_shift'** (*numpy.ndarray of float*) - The position_shift
           parameter used for evaluating if the configuration has relaxed.
           Only given for interstitial and substitutional-style defects.
-        - **'db_vect_shift'** (*numpy.array of float*) - The db_vect_shift
+        - **'db_vect_shift'** (*numpy.ndarray of float*) - The db_vect_shift
           parameter used for evaluating if the configuration has relaxed.
           Only given for dumbbell-style defects.
     """
@@ -116,14 +125,21 @@ def calc(lammps_command, system, potential, point_kwargs, cutoff,
     # Run check_ptd_config
     results_dict2 = check_ptd_config(results_dict['system_ptd'],
                                      point_kwargs,
-                                     cutoff)
+                                     cutoff, tol)
     results_dict.update(results_dict2)
 
     return results_dict
 
-def pointdefect(lammps_command, system, potential, point_kwargs,
-                mpi_command=None, etol=0.0, ftol=0.0, maxiter=10000,
-                maxeval=100000, dmax=uc.set_in_units(0.01, 'angstrom')):
+def pointdefect(lammps_command: str,
+                system: am.System,
+                potential: lmp.Potential,
+                point_kwargs: Union[list, dict],
+                mpi_command: Optional[str] = None,
+                etol: float = 0.0,
+                ftol: float = 0.0,
+                maxiter: int = 10000,
+                maxeval: int = 100000,
+                dmax: float = uc.set_in_units(0.01, 'angstrom')) -> dict:
     """
     Adds one or more point defects to a system and evaluates the defect 
     formation energy.
@@ -144,7 +160,7 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
         will run serially.
     sim_directory : str, optional
-        The path to the directory to perform the simuation in.  If not
+        The path to the directory to perform the simulation in.  If not
         given, will use the current working directory.
     etol : float, optional
         The energy tolerance for the structure minimization. This value is
@@ -168,12 +184,14 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
     dict
         Dictionary of results consisting of keys:
         
-        - **'E_coh'** (*float*) - The cohesive energy of the bulk system.
-        - **'E_ptd_f'** (*float*) - The point.defect formation energy.
+        - **'E_pot'** (*float*) - The per-atom potential energy of the bulk system.
+        - **'E_ptd_f'** (*float*) - The point defect formation energy.
         - **'E_total_base'** (*float*) - The total potential energy of the
           relaxed bulk system.
         - **'E_total_ptd'** (*float*) - The total potential energy of the
           relaxed defect system.
+        - **'pij_tensor'** (*numpy.ndarray of float*) - The elastic dipole
+          tensor associated with the defect.
         - **'system_base'** (*atomman.System*) - The relaxed bulk system.
         - **'system_ptd'** (*atomman.System*) - The relaxed defect system.
         - **'dumpfile_base'** (*str*) - The filename of the LAMMPS dump file
@@ -205,9 +223,9 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
         lammps_variables['dump_modify_format'] = 'float %.13e'
     
     # Write lammps input script
-    template_file = 'min.template'
     lammps_script = 'min.in'
-    template = read_calc_file(parent_module, template_file)
+    template = read_calc_file('iprPy.calculation.point_defect_static',
+                              'min.template')
     with open(lammps_script, 'w') as f:
         f.write(filltemplate(template, lammps_variables, '<', '>'))
 
@@ -219,7 +237,7 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
     thermo = output.simulations[0]['thermo']
     E_total_base = uc.set_in_units(thermo.PotEng.values[-1],
                                    lammps_units['energy'])
-    E_coh = E_total_base / system.natoms
+    E_pot = E_total_base / system.natoms
     
     pxx = uc.set_in_units(thermo.Pxx.values[-1], lammps_units['pressure'])
     pyy = uc.set_in_units(thermo.Pyy.values[-1], lammps_units['pressure'])
@@ -282,7 +300,7 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
     system_ptd.dump('atom_dump', f='defect.dump')
     
     # Compute defect formation energy
-    E_ptd_f = E_total_ptd - E_coh * system_ptd.natoms
+    E_ptd_f = E_total_ptd - E_pot * system_ptd.natoms
     
     # Compute strain tensor
     pij = -(pressure_base - pressure_ptd) * system_base.box.volume
@@ -295,7 +313,7 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
     
     # Return results
     results_dict = {}
-    results_dict['E_coh'] = E_coh
+    results_dict['E_pot'] = E_pot
     results_dict['E_ptd_f'] = E_ptd_f
     results_dict['E_total_base'] = E_total_base
     results_dict['E_total_ptd'] = E_total_ptd
@@ -307,8 +325,10 @@ def pointdefect(lammps_command, system, potential, point_kwargs,
     
     return results_dict
 
-def check_ptd_config(system, point_kwargs, cutoff,
-                     tol=uc.set_in_units(1e-5, 'angstrom')):
+def check_ptd_config(system: am.System,
+                     point_kwargs: Union[list, dict],
+                     cutoff: float,
+                     tol: float = uc.set_in_units(1e-5, 'angstrom')) -> dict:
     """
     Evaluates a relaxed system containing a point defect to determine if the
     defect structure has transformed to a different configuration.
@@ -334,12 +354,12 @@ def check_ptd_config(system, point_kwargs, cutoff,
         
         - **'has_reconfigured'** (*bool*) - Flag indicating if the structure
           has been identified as relaxing to a different defect configuration.
-        - **'centrosummation'** (*numpy.array of float*) - The centrosummation
+        - **'centrosummation'** (*numpy.ndarray of float*) - The centrosummation
           parameter used for evaluating if the configuration has relaxed.
-        - **'position_shift'** (*numpy.array of float*) - The position_shift
+        - **'position_shift'** (*numpy.ndarray of float*) - The position_shift
           parameter used for evaluating if the configuration has relaxed.
           Only given for interstitial and substitutional-style defects.
-        - **'db_vect_shift'** (*numpy.array of float*) - The db_vect_shift
+        - **'db_vect_shift'** (*numpy.ndarray of float*) - The db_vect_shift
           parameter used for evaluating if the configuration has relaxed.
           Only given for dumbbell-style defects.
     """

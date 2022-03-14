@@ -6,6 +6,7 @@
 from pathlib import Path
 import shutil
 import datetime
+from typing import Optional, Union
 
 # http://www.numpy.org/
 import numpy as np 
@@ -14,20 +15,23 @@ import numpy as np
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
+from atomman.tools import filltemplate
 
 # iprPy imports
-from ...tools import filltemplate, read_calc_file
+from ...tools import read_calc_file
 
-# Define calculation metadata
-parent_module = '.'.join(__name__.split('.')[:-1])
-
-def stackingfaultrelax(lammps_command, system, potential,
-                       mpi_command=None, sim_directory=None,
-                       cutboxvector='c',
-                       etol=0.0, ftol=0.0,
-                       maxiter=10000, maxeval=100000,
-                       dmax=uc.set_in_units(0.01, 'angstrom'),
-                       lammps_date=None):
+def stackingfaultrelax(lammps_command: str,
+                       system: am.System,
+                       potential: lmp.Potential,
+                       mpi_command: Optional[str] = None,
+                       sim_directory: Optional[str] = None,
+                       cutboxvector: str = 'c',
+                       etol: float = 0.0,
+                       ftol: float = 0.0,
+                       maxiter: int = 10000,
+                       maxeval: int = 100000,
+                       dmax: float = uc.set_in_units(0.01, 'angstrom'),
+                       lammps_date: Optional[datetime.date] = None) -> dict:
     """
     Perform a stacking fault relaxation simulation for a single faultshift.
     
@@ -134,9 +138,9 @@ def stackingfaultrelax(lammps_command, system, potential,
         lammps_variables['dump_modify_format'] = 'float %.13e'
     
     # Write lammps input script
-    template_file = 'sfmin.template'
     lammps_script = Path(sim_directory, 'sfmin.in')
-    template = read_calc_file(parent_module, template_file)
+    template = read_calc_file('iprPy.calculation.stacking_fault_static',
+                              'sfmin.template')
     with open(lammps_script, 'w') as f:
         f.write(filltemplate(template, lammps_variables, '<', '>'))
     
@@ -164,13 +168,29 @@ def stackingfaultrelax(lammps_command, system, potential,
     
     return results_dict
 
-def stackingfault(lammps_command, ucell, potential, hkl,
-                  mpi_command=None, sizemults=None, minwidth=None, even=False,
-                  a1vect_uvw=None, a2vect_uvw=None, conventional_setting='p',
-                  cutboxvector='c', faultpos_rel=None, faultpos_cart=None,
-                  a1=0.0, a2=0.0, atomshift=None, shiftindex=None,
-                  etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000,
-                  dmax=uc.set_in_units(0.01, 'angstrom')):
+def stackingfault(lammps_command: str,
+                  ucell: am.System,
+                  potential: lmp.Potential,
+                  hkl: Union[list, np.ndarray],
+                  mpi_command: Optional[str] = None,
+                  sizemults: Union[list, tuple, None] = None,
+                  minwidth: float = None,
+                  even: bool = False,
+                  a1vect_uvw: Union[list, np.ndarray, None] = None,
+                  a2vect_uvw: Union[list, np.ndarray, None] = None,
+                  conventional_setting: str = 'p',
+                  cutboxvector: str = 'c',
+                  faultpos_rel: Optional[float] = None,
+                  faultpos_cart: Optional[float] = None,
+                  a1: float = 0.0,
+                  a2: float = 0.0,
+                  atomshift: Union[list, np.ndarray, None] = None,
+                  shiftindex: Optional[int] = None,
+                  etol: float = 0.0,
+                  ftol: float = 0.0,
+                  maxiter: int = 10000,
+                  maxeval: int = 100000,
+                  dmax: float = uc.set_in_units(0.01, 'angstrom')) -> dict:
     """
     Computes the generalized stacking fault value for a single faultshift.
     
@@ -297,7 +317,8 @@ def stackingfault(lammps_command, ucell, potential, hkl,
     # Generate the free surface (zero-shift) configuration
     sfsystem = gsf_gen.surface(shift=atomshift, minwidth=minwidth,
                                sizemults=sizemults, even=even,
-                               faultpos_rel=faultpos_rel)
+                               faultpos_rel=faultpos_rel,
+                               faultpos_cart=faultpos_cart)
 
     abovefault = gsf_gen.abovefault
     cutindex = gsf_gen.cutindex

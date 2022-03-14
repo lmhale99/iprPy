@@ -285,7 +285,7 @@ class DislocationPeriodicArray(Calculation):
             the parent Calculation class and the subset classes.
         """
         # Call super to set universal and subset content
-        super().set_values(name=None, **kwargs)
+        super().set_values(name=name, **kwargs)
 
         # Set calculation-specific values
         if 'annealtemperature' in kwargs:
@@ -790,5 +790,5 @@ class DislocationPeriodicArray(Calculation):
         self.__dumpfile_defect = results_dict['dumpfile_disl']
         self.__symbols_base = results_dict['symbols_base']
         self.__symbols_defect = results_dict['symbols_disl']
-        #self.__potential_energy_defect = results_dict['E_total_disl']
+        self.__potential_energy_defect = results_dict['E_total_disl']
         self.__dislocation = results_dict['dislocation']

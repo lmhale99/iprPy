@@ -4,8 +4,7 @@
 
 # Standard library imports
 from pathlib import Path
-from copy import deepcopy
-import shutil
+from typing import Optional, Union
 import datetime
 import random
 
@@ -16,17 +15,22 @@ import numpy as np
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
+from atomman.tools import filltemplate
 
 # iprPy imports
-from ...tools import filltemplate, read_calc_file
+from ...tools import read_calc_file
 
-# Define calculation metadata
-parent_module = '.'.join(__name__.split('.')[:-1])
-
-def pointdiffusion(lammps_command, system, potential, point_kwargs,
-                   mpi_command=None, temperature=300,
-                   runsteps=200000, thermosteps=None, dumpsteps=0,
-                   equilsteps=20000, randomseed=None):
+def pointdiffusion(lammps_command: str,
+                   system: am.System,
+                   potential: lmp.Potential,
+                   point_kwargs: Union[list, dict],
+                   mpi_command: Optional[str] = None,
+                   temperature: float = 300.0,
+                   runsteps: int = 200000,
+                   thermosteps: Optional[int] = None,
+                   dumpsteps: int = 0,
+                   equilsteps: int = 20000,
+                   randomseed: Optional[int] = None) -> dict:
                    
     """
     Evaluates the diffusion rate of a point defect at a given temperature. This
@@ -159,9 +163,9 @@ def pointdiffusion(lammps_command, system, potential, point_kwargs,
             lammps_variables['dump_modify_format'] = 'float %.13e'
     
     # Write lammps input script
-    template_file = 'diffusion.template'
     lammps_script = 'diffusion.in'
-    template = read_calc_file(parent_module, template_file)
+    template = read_calc_file('iprPy.calculation.point_defect_diffusion',
+                              'diffusion.template')
     with open(lammps_script, 'w') as f:
         f.write(filltemplate(template, lammps_variables, '<', '>'))
     

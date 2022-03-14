@@ -6,6 +6,7 @@
 from copy import deepcopy
 import datetime
 import shutil
+from typing import Optional
 
 # http://www.numpy.org/
 import numpy as np
@@ -14,17 +15,19 @@ import numpy as np
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
+from atomman.tools import filltemplate
 
 # iprPy imports
-from ...tools import filltemplate, read_calc_file
+from ...tools import read_calc_file
 
-# Define calculation metadata
-parent_module = '.'.join(__name__.split('.')[:-1])
-
-def e_vs_r_scan(lammps_command, system, potential,
-                mpi_command=None, ucell=None, 
-                rmin=uc.set_in_units(2.0, 'angstrom'), 
-                rmax=uc.set_in_units(6.0, 'angstrom'), rsteps=200):
+def e_vs_r_scan(lammps_command: str,
+                system: am.System,
+                potential: am.lammps.Potential,
+                mpi_command: Optional[str] = None,
+                ucell: Optional[am.System] = None, 
+                rmin: float = uc.set_in_units(2.0, 'angstrom'), 
+                rmax: float = uc.set_in_units(6.0, 'angstrom'),
+                rsteps: int = 200) -> dict:
     """
     Performs a cohesive energy scan over a range of interatomic spaces, r.
     
@@ -73,7 +76,7 @@ def e_vs_r_scan(lammps_command, system, potential,
         ucell = system
     
     # Calculate the r/a ratio for the unit cell
-    r_a = r_a_ratio(ucell)
+    r_a = ucell.r0() / ucell.box.a
     
     # Get ratios of lx, ly, and lz of system relative to a of ucell
     lx_a = system.box.a / ucell.box.a
@@ -108,9 +111,8 @@ def e_vs_r_scan(lammps_command, system, potential,
         lammps_variables['atomman_system_pair_info'] = system_info
         
         # Write lammps input script
-        template_file = 'run0.template'
         lammps_script = 'run0.in'
-        template = read_calc_file(parent_module, template_file)
+        template = read_calc_file('iprPy.calculation.E_vs_r_scan', 'run0.template')
         with open(lammps_script, 'w') as f:
             f.write(filltemplate(template, lammps_variables, '<', '>'))
         
@@ -160,27 +162,3 @@ def e_vs_r_scan(lammps_command, system, potential,
     results_dict['min_cell'] = min_cells
     
     return results_dict
-    
-def r_a_ratio(ucell):
-    """
-    Calculates the r/a ratio by identifying the shortest interatomic spacing, r,
-    for a unit cell.
-    
-    Parameters
-    ----------
-    ucell : atomman.System
-        The unit cell system to evaluate.
-        
-    Returns
-    -------
-    float
-        The shortest interatomic spacing, r, divided by the unit cell's a
-        lattice parameter.
-    """
-    r_a = ucell.box.a
-    for i in range(ucell.natoms):
-        for j in range(i):
-            dmag = np.linalg.norm(ucell.dvect(i,j))
-            if dmag < r_a:
-                r_a = dmag
-    return r_a / ucell.box.a
