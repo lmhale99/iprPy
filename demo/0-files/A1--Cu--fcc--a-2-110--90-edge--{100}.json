@@ -1,0 +1,27 @@
+{
+    "dislocation": {
+        "key": "5f8e131a-5a16-4fbd-b98e-0b03b93afc2c", 
+        "id": "A1--Cu--fcc--a-2-110--90-edge--{100}", 
+        "character": "edge", 
+        "Burgers-vector": "a/2[ 1, 1, 0]", 
+        "slip-plane": [
+            0, 
+            0, 
+            1
+        ], 
+        "line-direction": [
+            -1, 
+            1, 
+            0
+        ], 
+        "system-family": "A1--Cu--fcc", 
+        "calculation-parameter": {
+            "slip_hkl": "-1 1 0", 
+            "ξ_uvw": "0 0 1", 
+            "burgers": "0.5  0.5  0.0", 
+            "m": "0 1 0", 
+            "n": "0 0 1", 
+            "shiftindex": "0"
+        }
+    }
+}
