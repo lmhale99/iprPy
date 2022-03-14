@@ -1,7 +1,7 @@
 import atomman as am
 import atomman.lammps as lmp
 
-from datamodelbase import query
+from yabadaba import query
 
 
 from DataModelDict import DataModelDict as DM

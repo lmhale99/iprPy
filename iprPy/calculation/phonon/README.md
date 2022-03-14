@@ -9,6 +9,7 @@ The phonon calculation style applies small atomic displacements to a unit cell s
 ### Version notes
 
 - 2020-12-21: Script extended to include quasiharmonic calculations.
+- 2022-03-11: Notebook updated to reflect version 0.11.
 
 ### Additional dependencies
 

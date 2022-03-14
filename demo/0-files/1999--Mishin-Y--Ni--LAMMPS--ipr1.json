@@ -1,0 +1,45 @@
+{
+    "potential-LAMMPS": {
+        "key": "a7c9b786-5aa7-481b-86eb-7e4edd9cec02",
+        "id": "1999--Mishin-Y--Ni--LAMMPS--ipr1",
+        "potential": {
+            "key": "81adb388-59eb-4f49-88bf-6f06a1343fae",
+            "id": "1999--Mishin-Y-Farkas-D-Mehl-M-J-Papaconstantopoulos-D-A--Ni",
+            "doi": "10.1103/physrevb.59.3393"
+        },
+        "comments": "Potential 1999--Mishin-Y--Ni--LAMMPS--ipr1 listed in the NIST Interatomic Potentials Repository:\nhttps://www.ctcms.nist.gov/potentials/entry/1999--Mishin-Y-Farkas-D-Mehl-M-J-Papaconstantopoulos-D-A--Ni/1999--Mishin-Y--Ni--LAMMPS--ipr1.html\n",
+        "units": "metal",
+        "atom_style": "atomic",
+        "atom": {
+            "element": "Ni",
+            "mass": 58.71
+        },
+        "pair_style": {
+            "type": "eam/alloy"
+        },
+        "pair_coeff": {
+            "term": [
+                {
+                    "file": "Ni99.eam.alloy"
+                },
+                {
+                    "symbols": "true"
+                }
+            ]
+        },
+        "artifact": [
+            {
+                "web-link": {
+                    "URL": "https://www.ctcms.nist.gov/potentials/Download/1999--Mishin-Y-Farkas-D-Mehl-M-J-Papaconstantopoulos-D-A--Ni/2/Ni99.eam.alloy",
+                    "link-text": "Ni99.eam.alloy"
+                }
+            },
+            {
+                "web-link": {
+                    "URL": "https://www.ctcms.nist.gov/potentials/Download/1999--Mishin-Y-Farkas-D-Mehl-M-J-Papaconstantopoulos-D-A--Ni/2/Ni99_releaseNotes_1.pdf",
+                    "link-text": "Ni99_releaseNotes_1.pdf"
+                }
+            }
+        ]
+    }
+}

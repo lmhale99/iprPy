@@ -4,10 +4,9 @@
 
 # Standard library imports
 from pathlib import Path
-from copy import deepcopy
-import shutil
 import datetime
 import random
+from typing import Optional, Union
 
 # http://www.numpy.org/
 import numpy as np 
@@ -16,21 +15,40 @@ import numpy as np
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
+from atomman.tools import filltemplate
 
 # iprPy imports
-from ...tools import filltemplate, read_calc_file
+from ...tools import read_calc_file
 
-# Define calculation metadata
-parent_module = '.'.join(__name__.split('.')[:-1])
-
-def dislocation_monopole(lammps_command, ucell, potential, C, burgers, ξ_uvw,
-                         slip_hkl, mpi_command=None, m=[0,1,0], n=[0,0,1],
-                         sizemults=None, amin=None, bmin=None, cmin=None,
-                         shift=None, shiftscale=False, shiftindex=None, tol=1e-8,
-                         etol=0.0, ftol=0.0, maxiter=10000, maxeval=100000,
-                         dmax=uc.set_in_units(0.01, 'angstrom'),
-                         annealtemp=0.0, annealsteps=None, randomseed=None,
-                         boundaryshape='cylinder', boundarywidth=0.0, boundaryscale=False):
+def dislocation_monopole(lammps_command: str,
+                         ucell: am.System,
+                         potential: lmp.Potential,
+                         C: am.ElasticConstants,
+                         burgers: Union[list, np.ndarray],
+                         ξ_uvw: Union[list, np.ndarray],
+                         slip_hkl: Union[list, np.ndarray],
+                         mpi_command: Optional[str] = None,
+                         m: Union[list, np.ndarray] = [0,1,0],
+                         n: Union[list, np.ndarray] = [0,0,1],
+                         sizemults=None,
+                         amin: float = None,
+                         bmin: float = None,
+                         cmin: float = None,
+                         shift: Union[list, np.ndarray, None] = None,
+                         shiftscale: bool = False,
+                         shiftindex: int = None,
+                         tol: float = 1e-8,
+                         etol: float = 0.0,
+                         ftol: float = 0.0,
+                         maxiter: int = 10000,
+                         maxeval: int = 100000,
+                         dmax: float = uc.set_in_units(0.01, 'angstrom'),
+                         annealtemp: float = 0.0,
+                         annealsteps: Optional[int] = None,
+                         randomseed: Optional[int] = None,
+                         boundaryshape: str = 'cylinder',
+                         boundarywidth: float = 0.0,
+                         boundaryscale: bool = False) -> dict:
     """
     Creates and relaxes a dislocation monopole system.
     
@@ -227,11 +245,18 @@ def dislocation_monopole(lammps_command, ucell, potential, C, burgers, ξ_uvw,
     
     return results_dict
 
-def disl_relax(lammps_command, system, potential,
-               mpi_command=None, 
-               annealtemp=0.0, annealsteps=None, randomseed=None,
-               etol=0.0, ftol=1e-6, maxiter=10000, maxeval=100000,
-               dmax=uc.set_in_units(0.01, 'angstrom')):
+def disl_relax(lammps_command: str,
+               system: am.System,
+               potential: lmp.Potential,
+               mpi_command: Optional[str] = None, 
+               annealtemp: float = 0.0,
+               annealsteps: Optional[int] = None,
+               randomseed: Optional[int] = None,
+               etol: float = 0.0,
+               ftol: float = 1e-6,
+               maxiter: int = 10000,
+               maxeval: int = 100000,
+               dmax: float = uc.set_in_units(0.01, 'angstrom')) -> dict:
     """
     Sets up and runs the disl_relax.in LAMMPS script for relaxing a
     dislocation monopole system.
@@ -313,9 +338,9 @@ def disl_relax(lammps_command, system, potential,
         lammps_variables['dump_modify_format'] = 'float %.13e'
     
     # Write lammps input script
-    template_file = 'disl_relax.template'
     lammps_script = 'disl_relax.in'
-    template = read_calc_file(parent_module, template_file)
+    template = read_calc_file('iprPy.calculation.dislocation_monopole',
+                              'disl_relax.template')
     with open(lammps_script, 'w') as f:
         f.write(filltemplate(template, lammps_variables, '<', '>'))
     
@@ -333,7 +358,10 @@ def disl_relax(lammps_command, system, potential,
     
     return results
 
-def anneal_info(temperature=0.0, runsteps=None, randomseed=None, units='metal'):
+def anneal_info(temperature: float = 0.0,
+                runsteps: Optional[int] = None,
+                randomseed: Optional[int] = None,
+                units: str = 'metal') -> str:
     """
     Generates LAMMPS commands for thermo anneal.
     

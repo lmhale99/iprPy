@@ -1,7 +1,7 @@
 # https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
-from datamodelbase import query
+from yabadaba import query
 
 # https://github.com/usnistgov/atomman
 import atomman as am

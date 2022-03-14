@@ -1,16 +1,49 @@
-# https://github.com/usnistgov/DataModelDict 
-from DataModelDict import DataModelDict as DM
+# coding: utf-8
 
+# Standard Python libraries
+from typing import Optional, Tuple
+
+# https://github.com/usnistgov/potentials
 import potentials
 
+# https://numpy.org/
 import numpy as np
 
 __all__ = ['atomicarchive']
 
-def atomicarchive(database, keys, content_dict=None, record=None, load_key='atomic-system',
-                  **kwargs):
+def atomicarchive(database,
+                  keys: list,
+                  content_dict: Optional[dict] = None,
+                  record: Optional[str] = None,
+                  load_key: str = 'atomic-system',
+                  **kwargs) -> Tuple[dict, dict]:
     """
-    Build parameter sets based on loading files from within a calculation tar archive.
+    Build parameter sets based on loading system files from within a
+    calculation tar archive.
+
+    Parameters
+    ----------
+    database : iprPy.database.Database
+        The database to use in building combos
+    keys : list
+        The calculation multikey set to build combos for
+    content_dict : dict, optional
+        Contains loaded file content.  If not given, an empty
+        dict will be created
+    record : str, optional
+        The record style to search
+    load_key : str, optional
+        The key of the record where the system info is listed
+    kwargs : any
+        Additional keyword arguments will be used to limit which records from
+        the database are used in building combos values.
+    
+    Returns
+    -------
+    inputs : dict
+        Contains the values generated for each key
+    content_dict : dict
+        Contains loaded file content
     """
     # Initialize inputs and content dict
     inputs = {}

@@ -17,7 +17,7 @@ from ..tools import iaslist
 
 class IprPyDatabase():
     """
-    Provides methods to extend the datamodelbase.Database classes to support
+    Provides methods to extend the yabadaba.Database classes to support
     iprPy calculation record actions.
     """
 
@@ -48,7 +48,7 @@ class IprPyDatabase():
             The name assigned to a pre-defined database to use for the remote
             interactions.  Cannot be given with remote_style, remote_host or
             remote_terms.
-        remote_database : datamodelbase.Database
+        remote_database : yabadaba.Database
             A pre-existing Database object to use for the remote.
         remote_style : str, optional
             The database style to use for the remote interactions.

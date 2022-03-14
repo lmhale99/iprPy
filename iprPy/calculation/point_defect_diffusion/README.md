@@ -10,6 +10,8 @@ The point_defect_diffusion calculation style estimates the diffusion rate of a p
 
 ### Version notes
 
+- 2022-03-11: Notebook updated to reflect version 0.11.
+
 ### Additional dependencies
 
 ### Disclaimers

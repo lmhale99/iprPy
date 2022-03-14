@@ -1,6 +1,6 @@
 from . import databasemanager
 from .. import settings
-import datamodelbase
+import yabadaba
 
 def load_database(name=None, style=None, host=None, **kwargs):
     """
@@ -22,9 +22,9 @@ def load_database(name=None, style=None, host=None, **kwargs):
     
     Returns
     -------
-    Subclass of datamodelbase.Database
+    Subclass of yabadaba.Database
         The database object.
     """
-    return datamodelbase.load_database(name=name, style=style, host=host,
+    return yabadaba.load_database(name=name, style=style, host=host,
                                        settings=settings,
                                        databasemanager=databasemanager,**kwargs)

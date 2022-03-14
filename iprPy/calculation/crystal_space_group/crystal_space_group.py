@@ -11,8 +11,10 @@ import spglib
 # https://github.com/usnistgov/atomman 
 import atomman as am
 
-def crystal_space_group(system, symprec=1e-5, to_primitive=False,
-                        no_idealize=False):
+def crystal_space_group(system: am.System,
+                        symprec: float = 1e-5,
+                        to_primitive: bool = False,
+                        no_idealize: bool = False) -> dict:
     """
     Uses spglib to evaluate space group information for a given system.
     
@@ -34,8 +36,34 @@ def crystal_space_group(system, symprec=1e-5, to_primitive=False,
     Returns
     -------
     dict
-        Results dictionary containing space group information and an associated
-        unit cell system.
+        Dictionary of results consisting of keys:
+
+        - **'number'** (*int*) The spacegroup number.
+        - **'international_short'** (*str*) The short international spacegroup
+          symbol.
+        - **'international_full'** (*str*) The full international spacegroup
+          symbol.
+        - **'international'** (*str*) The international spacegroup symbol.
+        - **'schoenflies'** (*str*) The schoenflies spacegroup symbol.
+        - **'hall_symbol'** (*str*) The Hall symbol.
+        - **'choice'** (*str*) The setting choice if there is one.
+        - **'pointgroup_international'** (*str*) The international pointgroup
+          symbol.
+        - **'pointgroup_schoenflies'** (*str*) The schoenflies pointgroup
+          symbol.
+        - **'arithmetic_crystal_class_number'** (*int*) The arithmetic crystal
+          class number.
+        - **'arithmetic_crystal_class_symbol'** (*str*) The arithmetic crystal
+          class symbol.
+        - **'ucell'** (*am.System*) The spacegroup-processed unit cell.
+        - **'hall_number'** (*int*) The Hall number.
+        - **'wyckoffs'** (*list*) A list of the spacegroup's Wyckoff symbols
+          where atoms are found.
+        - **'equivalent_atoms'** (*list*) A list of indices indicating which
+          atoms are equivalent to others.
+        - **'pearson'** (*str*) The Pearson symbol.
+        - **'wyckoff_fingerprint'** (*str*) The Wyckoff symbols joined
+          together.
     """
     # Identify the standardized unit cell representation
     sym_data = spglib.get_symmetry_dataset(system.dump('spglib_cell'), symprec=symprec)

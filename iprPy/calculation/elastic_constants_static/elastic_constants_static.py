@@ -4,6 +4,7 @@
 # Built around LAMMPS script by Steve Plimpton
 
 # Standard library imports
+from typing import Optional
 
 # http://www.numpy.org/
 import numpy as np
@@ -12,16 +13,21 @@ import numpy as np
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
+from atomman.tools import filltemplate
 
 # iprPy imports
-from ...tools import filltemplate, read_calc_file
+from ...tools import read_calc_file
 
-# Define calculation metadata
-parent_module = '.'.join(__name__.split('.')[:-1])
-
-def elastic_constants_static(lammps_command, system, potential, mpi_command=None,
-                             strainrange=1e-6, etol=0.0, ftol=0.0, maxiter=10000,
-                             maxeval=100000, dmax=uc.set_in_units(0.01, 'angstrom')):
+def elastic_constants_static(lammps_command: str,
+                             system: am.System,
+                             potential: lmp.Potential,
+                             mpi_command: Optional[str] = None,
+                             strainrange: float = 1e-6,
+                             etol: float = 0.0,
+                             ftol: float = 0.0,
+                             maxiter: int = 10000,
+                             maxeval: int = 100000,
+                             dmax: float = uc.set_in_units(0.01, 'angstrom')) -> dict:
     """
     Repeatedly runs the ELASTIC example distributed with LAMMPS until box
     dimensions converge within a tolerance.
@@ -61,18 +67,12 @@ def elastic_constants_static(lammps_command, system, potential, mpi_command=None
     dict
         Dictionary of results consisting of keys:
         
-        - **'a_lat'** (*float*) - The relaxed a lattice constant.
-        - **'b_lat'** (*float*) - The relaxed b lattice constant.
-        - **'c_lat'** (*float*) - The relaxed c lattice constant.
-        - **'alpha_lat'** (*float*) - The alpha lattice angle.
-        - **'beta_lat'** (*float*) - The beta lattice angle.
-        - **'gamma_lat'** (*float*) - The gamma lattice angle.
-        - **'E_coh'** (*float*) - The cohesive energy of the relaxed system.
-        - **'stress'** (*numpy.array*) - The measured stress state of the
-          relaxed system.
-        - **'C_elastic'** (*atomman.ElasticConstants*) - The relaxed system's
-          elastic constants.
-        - **'system_relaxed'** (*atomman.System*) - The relaxed system.
+        - **'raw_Cij_negative'** (*numpy.ndarray*) - The values of Cij obtained
+          from only the negative strains.
+        - **'raw_Cij_positive'** (*numpy.ndarray*) - The values of Cij obtained
+          from only the positive strains.
+        - **'C'** (*atomman.ElasticConstants*) - The computed elastic constants
+          obtained from averaging the negative and positive strain values.
     """
 
     # Convert hexagonal cells to orthorhombic to avoid LAMMPS tilt issues
@@ -99,9 +99,9 @@ def elastic_constants_static(lammps_command, system, potential, mpi_command=None
     lammps_variables['dmax'] = uc.get_in_units(dmax, lammps_units['length'])
     
     # Fill in template files
-    template_file = 'cij.template'
     lammps_script = 'cij.in'
-    template = read_calc_file(parent_module, template_file)
+    template = read_calc_file('iprPy.calculation.elastic_constants_static',
+                              'cij.template')
     with open(lammps_script, 'w') as f:
         f.write(filltemplate(template, lammps_variables, '<', '>'))
     
@@ -166,9 +166,17 @@ def elastic_constants_static(lammps_command, system, potential, mpi_command=None
     
     return results_dict
 
-def restart_commands(potential, symbols):
+def restart_commands(potential: lmp.Potential,
+                     symbols: list) -> str:
     """
     Command lines to restart calculation from the initial relaxation
+
+    Parameters
+    ----------
+    potential : lmp.Potential
+        The interatomic potential.
+    symbols : list
+        The list of symbol models associated with the interatomic potential.
     """
 
     if potential.pair_style == 'kim':

@@ -4,12 +4,12 @@
 
 ## Introduction
 
-The isolated_atom calculation style evaluates the base energies of all atomic models associated with an interatomic potential. 
-For some potentials, the isolated energy values are necessary to properly compute the cohesive energy of crystal structures.  This also provides a simple test whether a potential implementation is compatible with a version of LAMMPS. 
+The isolated_atom calculation style evaluates the base energies of all atomic models associated with an interatomic potential. For some potentials, the isolated energy values are necessary to properly compute the cohesive energy of crystal structures.  This also provides a simple test whether a potential implementation is compatible with a version of LAMMPS.
 
 ### Version notes
 
 - 2020-09-22: Notebook first added.
+- 2022-03-11: Notebook updated to reflect version 0.11.
 
 ### Additional dependencies
 

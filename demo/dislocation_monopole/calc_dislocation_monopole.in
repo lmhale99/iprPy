@@ -1,0 +1,88 @@
+# Input script for iprPy calculation dislocation_monopole
+
+# Calculation Metadata
+branch                          
+
+# LAMMPS and MPI Commands
+lammps_command                  lmp_serial
+mpi_command                     
+
+# Interatomic Potential
+potential_file                  ..\0-files\1999--Mishin-Y--Ni--LAMMPS--ipr1.json
+potential_kim_id                
+potential_kim_potid             
+potential_dir                   ..\0-files\1999--Mishin-Y--Ni--LAMMPS--ipr1
+
+# Initial System Configuration
+load_file                       ..\0-files\A1--Cu--fcc.json
+load_style                      system_model
+load_options                    
+family                          
+symbols                         Ni
+box_parameters                  3.5199994375404287 3.5199994375404287 3.5199994375404287
+
+# Elastic Constants
+elasticconstants_file           
+C11                             247.86233089
+C12                             147.828379816
+C13                             
+C14                             
+C15                             
+C16                             
+C22                             
+C23                             
+C24                             
+C25                             
+C26                             
+C33                             
+C34                             
+C35                             
+C36                             
+C44                             124.83811759
+C45                             
+C46                             
+C55                             
+C56                             
+C66                             
+C_M                             
+C_lambda                        
+C_mu                            
+C_E                             
+C_nu                            
+C_K                             
+
+# LAMMPS Energy/Force Minimization
+energytolerance                 
+forcetolerance                  
+maxiterations                   
+maxevaluations                  
+maxatommotion                   
+
+# Dislocation
+dislocation_file                ..\0-files\A1--Cu--fcc--a-2-110--90-edge--{100}.json
+dislocation_slip_hkl            
+dislocation_ξ_uvw               
+dislocation_burgers             
+dislocation_m                   
+dislocation_n                   
+dislocation_shift               
+dislocation_shiftscale          
+dislocation_shiftindex          
+sizemults                       1 40 58
+amin                            
+bmin                            
+cmin                            
+
+# Input/Output Units
+length_unit                     
+pressure_unit                   
+energy_unit                     
+force_unit                      
+
+# Run Parameters
+annealtemperature               0.0
+annealsteps                     
+randomseed                      
+dislocation_boundaryshape       cylinder
+dislocation_boundarywidth       3
+dislocation_boundaryscale       True

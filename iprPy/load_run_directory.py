@@ -1,15 +1,20 @@
-from pathlib import Path
+# coding: utf-8
 
+# Standard Python libraries
+from pathlib import Path
+from typing import Optional
+
+# iprPy imports
 from . import settings
 from .tools import screen_input
 
-def load_run_directory(name=None):
+def load_run_directory(name: Optional[str] = None):
     """
     Loads a pre-defined run_directory from the settings file.
     
     Parameters
     ----------
-    name : str
+    name : str, optional
         The name assigned to a pre-defined run_directory.
     
     Returns

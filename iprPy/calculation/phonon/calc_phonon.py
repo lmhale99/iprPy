@@ -4,10 +4,8 @@
 
 # Standard Python libraries
 from pathlib import Path
-import sys
-import uuid
+from typing import Optional
 import datetime
-from copy import deepcopy
 
 # http://www.numpy.org/
 import numpy as np
@@ -25,15 +23,22 @@ import spglib
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
+from atomman.tools import filltemplate
 
 # iprPy imports
-from ...tools import filltemplate, read_calc_file
+from ...tools import read_calc_file
 
-# Define calculation metadata
-parent_module = '.'.join(__name__.split('.')[:-1])
-
-def phonon_quasiharmonic(lammps_command, ucell, potential, mpi_command=None, a_mult=3, b_mult=3, c_mult=3,
-           distance=0.01, symprec=1e-5, strainrange=0.01, numstrains=5):
+def phonon_quasiharmonic(lammps_command: str,
+                         ucell: am.System,
+                         potential: lmp.Potential,
+                         mpi_command: Optional[str] = None,
+                         a_mult: int = 3,
+                         b_mult: int = 3,
+                         c_mult: int = 3,
+                         distance: float = 0.01,
+                         symprec: float = 1e-5,
+                         strainrange: float = 0.01,
+                         numstrains: int = 5) -> dict:
     """
     Function that performs phonon and quasiharmonic approximation calculations
     using phonopy and LAMMPS.
@@ -135,9 +140,8 @@ def phonon_quasiharmonic(lammps_command, ucell, potential, mpi_command=None, a_m
                 lammps_variables['dump_modify_format'] = 'float %.13e'
 
             # Write lammps input script
-            template_file = 'phonon.template'
             lammps_script = 'phonon.in'
-            template = read_calc_file(parent_module, template_file)
+            template = read_calc_file('iprPy.calculation.phonon', 'phonon.template')
             with open(lammps_script, 'w') as f:
                 f.write(filltemplate(template, lammps_variables, '<', '>'))
 
@@ -242,9 +246,18 @@ def phonon_quasiharmonic(lammps_command, ucell, potential, mpi_command=None, a_m
     return results
 
 
-def phononcalc(lammps_command, ucell, potential, mpi_command=None,
-               a_mult=3, b_mult=3, c_mult=3, distance=0.01, symprec=1e-5, 
-               savefile='phonopy_params.yaml', plot=True, lammps_date=None):
+def phononcalc(lammps_command: str,
+               ucell: am.System,
+               potential: lmp.Potential,
+               mpi_command: Optional[str] = None,
+               a_mult: int = 3,
+               b_mult: int = 3,
+               c_mult: int = 3,
+               distance: float = 0.01,
+               symprec: float = 1e-5,
+               savefile: str = 'phonopy_params.yaml',
+               plot: bool = True,
+               lammps_date: Optional[datetime.date] = None):
     """
     Uses phonopy to compute the phonons for a unit cell structure using a
     LAMMPS interatomic potential.
@@ -323,9 +336,8 @@ def phononcalc(lammps_command, ucell, potential, mpi_command=None,
             lammps_variables['dump_modify_format'] = 'float %.13e'
 
         # Write lammps input script
-        template_file = 'phonon.template'
         lammps_script = 'phonon.in'
-        template = read_calc_file(parent_module, template_file)
+        template = read_calc_file('iprPy.calculation.phonon', 'phonon.template')
         with open(lammps_script, 'w') as f:
             f.write(filltemplate(template, lammps_variables, '<', '>'))
         

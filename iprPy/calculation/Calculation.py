@@ -4,7 +4,7 @@ from pathlib import Path
 from copy import deepcopy
 from importlib import resources
 
-from datamodelbase import query
+from yabadaba import query
 
 from DataModelDict import DataModelDict as DM
 
@@ -180,7 +180,7 @@ class Calculation(Record):
         if value is None or isinstance(value, am.library.Database):
             self.__database = value
         
-        # Otherwise assume that it is a datamodelbase/iprPy database
+        # Otherwise assume that it is a yabadaba/iprPy database
         else:
             self.__database = am.library.Database(local_database=value,
                                                   remote=False)
@@ -266,13 +266,15 @@ class Calculation(Record):
         if isinstance(params, dict):
             input_dict = params
         else:
-            try:
-                assert Path(params).is_file()
-            except:
-                input_dict = parse(params, allsingular=True)
-            else:
-                with open(params) as f:
-                    input_dict = parse(f, allsingular=True)
+            input_dict = parse(params, allsingular=True)
+        
+        #    try:
+        #        assert Path(params).is_file()
+        #    except:
+        #        input_dict = parse(params, allsingular=True)
+        #    else:
+        #        with open(params) as f:
+        #            input_dict = parse(f, allsingular=True)
         
         self.__branch = input_dict.get('branch', 'main')
         

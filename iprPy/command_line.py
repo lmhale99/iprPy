@@ -4,9 +4,6 @@
 # Standard Python libraries
 import argparse
 
-# https://github.com/usnistgov/atomman
-import atomman as am
-
 # https://github.com/usnistgov/iprPy
 from . import (load_database, load_run_directory, load_calculation,
                check_modules, settings)
@@ -137,7 +134,7 @@ def command_line_actions(args):
 
     # Actions for subcommand run
     elif args.action == 'run':
-        run_calculation(args.filename)
+        run_calculation(args.filename, calc_style=args.calc_style)
 
     # Actions for subcommand runner
     elif args.action == 'runner':
@@ -346,6 +343,8 @@ def command_line_parser():
                         help='run a single calculation from a parameter file')
     subparser.add_argument('filename',
                         help='path to a parameter file')
+    subparser.add_argument('calc_style', nargs='?', default=None,
+                        help='the style of the calculation to run - not needed if filename is "calc_<calc_style>.in"')
 
     # Define subparser for runner
     subparser = subparsers.add_parser('runner',

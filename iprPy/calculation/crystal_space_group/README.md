@@ -11,6 +11,7 @@ The crystal_space_group calculation style characterizes a bulk atomic system (co
 - 2018-07-09: Notebook added.
 - 2019-07-30: Function slightly updated
 - 2020-09-22: Setup and parameter definition streamlined. Method and theory expanded.
+- 2022-03-11: Notebook updated to reflect version 0.11.
 
 ### Additional dependencies
 

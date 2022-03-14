@@ -1,4 +1,12 @@
-def dict_insert(d, key, value, **kwargs):
+# coding: utf-8
+
+# Standard Python libraries
+from typing import Any
+
+def dict_insert(d: dict,
+                key: Any,
+                value: Any,
+                **kwargs):
     """
     Adds a new key, value pair into a dictionary by inserting it
     relative to a known key.

@@ -1,35 +1,6 @@
-# List of Jupyter Calculation Notebooks
+# Jupyter Calculation Notebooks
 
-## [crystal_space_group](crystal_space_group.ipynb)
+This folder contains Jupyter Notebooks that document and provide demonstrations of the calculation methods currently implemented in iprPy.  There are two varieties of Notebooks for each calculation type:
 
-## [diatom_scan](diatom_scan.ipynb)
-
-## [dislocation_monopole](dislocation_monopole.ipynb)
-
-## [dislocation_periodic_array](dislocation_periodic_array.ipynb)
-
-## [dislocation_SDVPN](dislocation_SDVPN.ipynb)
-
-## [E_vs_r_scan](E_vs_r_scan.ipynb)
-
-## [elastic_constants_static](elastic_constants_static.ipynb)
-
-## [isolated_atom](isolated_atom.ipynb)
-
-## [phonon](phonon.ipynb)
-
-## [point_defect_diffusion](point_defect_diffusion.ipynb)
-
-## [point_defect_static](point_defect_static.ipynb)
-
-## [relax_box](relax_box.ipynb)
-
-## [relax_dynamic](relax_dynamic.ipynb)
-
-## [relax_static](relax_static.ipynb)
-
-## [stacking_fault_map_2D](stacking_fault_map_2D.ipynb)
-
-## [stacking_fault_static](stacking_fault_static.ipynb)
-
-## [surface_energy_static](surface_energy_static.ipynb)
+- __Methodology and code__ notebooks provide a single documentation source per calculation describing each calculation's methodology, copies of the calculation code, and a working demonstration.  These correspond to the notebooks in the older iprPy versions.
+- __Python class__ notebooks describe the calculation methodology and the iprPy Calculation class associated with each calculation.  They provide a demonstration of how to use the Calculation objects to run the calculations and process the results from within Python.

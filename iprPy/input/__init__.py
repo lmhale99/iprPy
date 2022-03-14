@@ -1,4 +1,6 @@
-# Basic imports
+# coding: utf-8
+
+# local imports
 from .boolean import boolean
 from .parse import parse
 from .termtodict import termtodict, dicttoterm

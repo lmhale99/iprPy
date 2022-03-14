@@ -11,7 +11,7 @@ from DataModelDict import DataModelDict as DM
 import atomman as am
 import atomman.unitconvert as uc
 
-from datamodelbase import query
+from yabadaba import query
 
 from . import CalculationSubset
 from ..tools import dict_insert, aslist
@@ -149,6 +149,36 @@ class AtommanSystemLoad(CalculationSubset):
             self.__composition = value
         else:
             raise TypeError('composition must be str or None')
+
+    def load(self, style, *args, **kwargs):
+        """
+        Wrapper around atomman.load() for loading files that also saves the
+        file loading options as class attributes.  Any parameters not given
+        will use the values already set to the object.
+        """
+        
+        # Load ucell
+        self.__ucell = am.load(style, *args, **kwargs)
+        self.ucell.wrap()
+
+        # Check if first variable positional argument is a file
+        try:
+            load_file = Path(args[0])
+        except:
+            self.load_file = None
+        else:
+            if load_file.is_file():
+                self.load_file = load_file
+            else:
+                self.load_file = None
+
+        # Set load style
+        if self.load_file is None:
+            self.load_style = style
+        else:
+            self.load_style = 'system_model'
+        
+
 
     def load_ucell(self, **kwargs):
         """
@@ -483,9 +513,18 @@ class AtommanSystemLoad(CalculationSubset):
 
         d = {}
         d['family'] = sub['family']
-        d['load_style'] = sub['artifact']['format']
-        d['load_file'] = sub['artifact']['file']
-        load_options = sub['artifact'].get('load_options', None)
+
+        if 'artifact' in sub:
+            if  'initial-atomic-system' in sub:
+                ValueError('found both load file and embedded content for the initial system')
+            d['load_style'] = sub['artifact']['format']
+            d['load_file'] = sub['artifact']['file']
+            load_options = sub['artifact'].get('load_options', None)
+        elif 'initial-atomic-system' in sub:
+            d['ucell'] = am.load('system_model', sub, key='initial-atomic-system')
+        else:
+            ValueError('neither load file nor embedded content found for the initial system')
+
         d['symbols'] = sub['symbol']
         d['composition'] = sub.get('composition', None)
 
@@ -518,14 +557,18 @@ class AtommanSystemLoad(CalculationSubset):
         system = DM()
 
         system['family'] = self.family
-        system['artifact'] = DM()
-        system['artifact']['file'] = self.load_file.as_posix()
-        system['artifact']['format'] = self.load_style
-        if len(self.load_options) == 0:
-            system['artifact']['load_options'] = None
-        else:
-            system['artifact']['load_options'] = dicttoterm(self.load_options)
         
+        if self.load_file is not None:
+            system['artifact'] = DM()
+            system['artifact']['file'] = self.load_file.as_posix()
+            system['artifact']['format'] = self.load_style
+            if len(self.load_options) == 0:
+                system['artifact']['load_options'] = None
+            else:
+                system['artifact']['load_options'] = dicttoterm(self.load_options)
+        else:
+            system['initial-atomic-system'] = self.ucell.model()['atomic-system']
+
         system['symbol'] = self.symbols
         if self.composition is not None:
             system['composition'] = self.composition
@@ -623,11 +666,20 @@ class AtommanSystemLoad(CalculationSubset):
         """
         # Check required parameters
         if self.load_file is None:
-            raise ValueError('load_file not set')
-
-        meta[f'{self.prefix}load_file'] = self.load_file.as_posix()
-        meta[f'{self.prefix}load_style'] = self.load_style
-        meta[f'{self.prefix}load_options'] = dicttoterm(self.load_options)
+            meta[f'{self.prefix}load_file'] = None
+            meta[f'{self.prefix}load_style'] = None
+            meta[f'{self.prefix}load_options'] = None
+            meta[f'{self.prefix}parent_key'] = None
+        else:
+            meta[f'{self.prefix}load_file'] = self.load_file.as_posix()
+            meta[f'{self.prefix}load_style'] = self.load_style
+            meta[f'{self.prefix}load_options'] = dicttoterm(self.load_options)
+            if self.load_file.parent.as_posix() == '.':
+                parent = self.load_file.stem
+            else:
+                parent = self.load_file.parent.name
+            meta[f'{self.prefix}parent_key'] = parent
+        
         meta[f'{self.prefix}family'] = self.family
         if self.symbols is None:
             symbolstr = ''
@@ -641,13 +693,6 @@ class AtommanSystemLoad(CalculationSubset):
 
         if self.composition is not None:
             meta[f'{self.prefix}composition'] = self.composition
-        
-        parent_file = Path(self.load_file)
-        if parent_file.parent.as_posix() == '.':
-            parent = parent_file.stem
-        else:
-            parent = parent_file.parent.name
-        meta[f'{self.prefix}parent_key'] = parent
 
     def pandasfilter(self, dataframe, load_file=None, family=None, symbol=None,
                      composition=None, **kwargs):

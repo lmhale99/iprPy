@@ -1,6 +1,9 @@
-#!/usr/bin/env python
+# coding: utf-8
 
 # Python script created by Lucas Hale
+
+# Standard library imports
+from typing import Optional, Union
 
 # http://www.numpy.org/
 import numpy as np
@@ -9,19 +12,31 @@ import numpy as np
 import atomman as am
 import atomman.unitconvert as uc
 
-# Define calculation metadata
-parent_module = '.'.join(__name__.split('.')[:-1])
-
-def sdvpn(ucell, C, burgers, ξ_uvw, slip_hkl, gamma,
-                   m=[0,1,0], n=[0,0,1],
-                   cutofflongrange=uc.set_in_units(1000, 'angstrom'),
-                   tau=np.zeros((3,3)), alpha=[0.0], beta=np.zeros((3,3)),
-                   cdiffelastic=False, cdiffsurface=True, cdiffstress=False,
-                   fullstress=True,
-                   halfwidth=uc.set_in_units(1, 'angstrom'),
-                   normalizedisreg=True,
-                   xnum=None, xmax=None, xstep=None, xscale=False,
-                   min_method='Powell', min_options={}, min_cycles=10):
+def sdvpn(ucell: am.System,
+          C: am.ElasticConstants,
+          burgers: Union[list, np.ndarray],
+          ξ_uvw: Union[list, np.ndarray],
+          slip_hkl: Union[list, np.ndarray],
+          gamma: am.defect.GammaSurface,
+          m: Union[list, np.ndarray] = [0,1,0],
+          n: Union[list, np.ndarray] = [0,0,1],
+          cutofflongrange: float = uc.set_in_units(1000, 'angstrom'),
+          tau: np.ndarray = np.zeros((3,3)),
+          alpha: list = [0.0],
+          beta: np.ndarray = np.zeros((3,3)),
+          cdiffelastic: bool = False,
+          cdiffsurface: bool = True,
+          cdiffstress: bool = False,
+          fullstress: bool = True,
+          halfwidth: float = uc.set_in_units(1, 'angstrom'),
+          normalizedisreg: bool = True,
+          xnum: Optional[int] = None,
+          xmax: Optional[float] = None,
+          xstep: Optional[float] = None,
+          xscale: bool = False,
+          min_method: str = 'Powell',
+          min_options: dict = {},
+          min_cycles: int = 10) -> dict:
     """
     Solves a Peierls-Nabarro dislocation model.
 
@@ -113,6 +128,18 @@ def sdvpn(ucell, C, burgers, ξ_uvw, slip_hkl, gamma,
         The number of minimization runs to perform on the system.  Restarting
         after obtaining a solution can help further refine to the best pathway.
         Default value is 10. 
+
+    Returns
+    -------
+    dict
+        Dictionary of results consisting of keys:
+        
+        - **'SDVPN_solution'** (*atomman.defect.SDVPN*) - The SDVPN solution
+          object at the end of the run.
+        - **'minimization_energies'** (*list*) - The total energy values
+          measured after each minimization cycle.
+        - **'disregistry_profiles'** (*list*) - The disregistry profiles
+          obtained after each minimization cycle.
     """
 
     # Solve Volterra dislocation

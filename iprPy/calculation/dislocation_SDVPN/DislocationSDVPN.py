@@ -7,7 +7,7 @@ import random
 
 import numpy as np
 
-from datamodelbase import query
+from yabadaba import query
 
 # https://github.com/usnistgov/atomman
 import atomman as am
@@ -45,6 +45,7 @@ class DislocationSDVPN(Calculation):
         self.xnum = None
         self.xmax = None
         self.xstep = None
+        self.xscale = False
         self.minimize_style = 'Powell'
         self.minimize_options = {}
         self.minimize_cycles = 10
@@ -139,6 +140,18 @@ class DislocationSDVPN(Calculation):
             self.__xstep = value
         else:
             self.__xstep = float(value)
+
+    @property
+    def xscale(self):
+        """bool: Flag if xstep/xmax values are absolute or scaled"""
+        return self.__xscale
+
+    @xscale.setter
+    def xscale(self, value):
+        if value is None:
+            self.__xscale = value
+        else:
+            self.__xscale = boolean(value)
 
     @property
     def minimize_style(self):
@@ -315,6 +328,9 @@ class DislocationSDVPN(Calculation):
             The maximum x coordinate to use.
         xstep : float, optional
             The step size to use between the x coordinates.
+        xscale : bool, optional
+            Flag indicating if xmax and/or xstep values are to be taken as
+            absolute or relative to ucell's a lattice parameter.
         minimize_style : str, optional
             The scipy.minimize style to use.
         minimize_options : dict, optional
@@ -347,7 +363,7 @@ class DislocationSDVPN(Calculation):
             the parent Calculation class and the subset classes.
         """
         # Call super to set universal and subset content
-        super().set_values(name=None, **kwargs)
+        super().set_values(name=name, **kwargs)
 
         # Set calculation-specific values
         if 'xnum' in kwargs:
@@ -356,6 +372,8 @@ class DislocationSDVPN(Calculation):
             self.xmax = kwargs['xmax']
         if 'xstep' in kwargs:
             self.xstep = kwargs['xstep']
+        if 'xscale' in kwargs:
+            self.xscale = kwargs['xscale']
         if 'minimize_style' in kwargs:
             self.minimize_style = kwargs['minimize_style']
         if 'minimize_options' in kwargs:
@@ -691,6 +709,7 @@ class DislocationSDVPN(Calculation):
                     'xmax',
                     'xstep',
                     'xnum',
+                    'xscale',
                     'minimize_style',
                     'minimize_options',
                     'minimize_cycles',
@@ -747,6 +766,22 @@ class DislocationSDVPN(Calculation):
         run_params['halfwidth'] = uc.model(self.halfwidth,
                                            self.units.length_unit)
         
+        # Scale xmax and xstep by alat
+        if self.xscale is True:
+            if self.system.box_parameters is not None:
+                alat = float(self.system.box_parameters[0])
+            else:
+                try:
+                    alat = self.system.ucell.box.a
+                except:
+                    pass
+                else:
+                    if self.xmax is not None:
+                        self.xmax *= alat
+                    if self.xstep is not None:
+                        self.xstep *= alat
+                    self.xscale = False
+
         x = am.defect.pn_arctan_disregistry(xmax=self.xmax,
                                             xnum=self.xnum,
                                             xstep=self.xstep)[0]
@@ -754,6 +789,7 @@ class DislocationSDVPN(Calculation):
         run_params['xmax'] = x.max()
         run_params['xnum'] = len(x)
         run_params['xstep'] = x[1]-x[0]
+        run_params['xscale'] = self.xscale
         run_params['min_cycles'] = self.minimize_cycles
 
         # Build results
@@ -819,6 +855,7 @@ class DislocationSDVPN(Calculation):
         self.xmax = run_params['xmax']
         self.xnum = run_params['xnum']
         self.xstep = run_params['xstep']
+        self.xscale = run_params.get('xscale', False)
         self.minimize_cycles = run_params['min_cycles']
 
         # Build results
@@ -906,6 +943,7 @@ class DislocationSDVPN(Calculation):
         meta['xmax'] = self.xmax
         meta['xnum'] = self.xnum
         meta['xstep'] = self.xstep
+        meta['xscale'] = self.xscale
         meta['tau'] = self.tau
         meta['alpha'] = self.alpha
         meta['beta'] = self.beta
@@ -1037,6 +1075,7 @@ class DislocationSDVPN(Calculation):
         input_dict['xnum'] = self.xnum
         input_dict['xstep'] = self.xstep
         input_dict['xmax'] = self.xmax
+        input_dict['xscale'] = self.xscale
         input_dict['min_method'] = self.minimize_style
         input_dict['min_options'] = self.minimize_options
         input_dict['min_cycles'] = self.minimize_cycles

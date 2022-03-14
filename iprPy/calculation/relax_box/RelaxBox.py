@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from datamodelbase import query
+from yabadaba import query
 
 # https://github.com/usnistgov/atomman
 import atomman as am
@@ -264,7 +264,7 @@ class RelaxBox(Calculation):
             the parent Calculation class and the subset classes.
         """
         # Call super to set universal and subset content
-        super().set_values(name=None, **kwargs)
+        super().set_values(name=name, **kwargs)
 
         # Set calculation-specific values
         if 'pressure_xx' in kwargs:
@@ -793,12 +793,12 @@ class RelaxBox(Calculation):
 
         # Add calculation-specific inputs
         input_dict['strainrange'] = self.strainrange
-        input_dict['pxx'] = self.pressure_xx
-        input_dict['pyy'] = self.pressure_yy
-        input_dict['pzz'] = self.pressure_zz
-        input_dict['pxy'] = self.pressure_xy
-        input_dict['pxz'] = self.pressure_xz
-        input_dict['pyz'] = self.pressure_yz
+        input_dict['p_xx'] = self.pressure_xx
+        input_dict['p_yy'] = self.pressure_yy
+        input_dict['p_zz'] = self.pressure_zz
+        input_dict['p_xy'] = self.pressure_xy
+        input_dict['p_xz'] = self.pressure_xz
+        input_dict['p_yz'] = self.pressure_yz
 
         # Return input_dict
         return input_dict
@@ -829,9 +829,9 @@ class RelaxBox(Calculation):
         yz = results_dict['yz'] / (self.system_mods.c_mults[1] - self.system_mods.c_mults[0])
         self.__final_box = am.Box(lx=lx, ly=ly, lz=lz, xy=xy, xz=xz, yz=yz)
         self.__potential_energy = results_dict['E_pot']
-        self.__measured_pressure_xx = results_dict['measured_pij'][0,0]
-        self.__measured_pressure_yy = results_dict['measured_pij'][1,1]
-        self.__measured_pressure_zz = results_dict['measured_pij'][2,2]
-        self.__measured_pressure_xy = results_dict['measured_pij'][0,1]
-        self.__measured_pressure_xz = results_dict['measured_pij'][0,2]
-        self.__measured_pressure_yz = results_dict['measured_pij'][1,2]
+        self.__measured_pressure_xx = results_dict['measured_pxx']
+        self.__measured_pressure_yy = results_dict['measured_pyy']
+        self.__measured_pressure_zz = results_dict['measured_pzz']
+        self.__measured_pressure_xy = results_dict['measured_pxy']
+        self.__measured_pressure_xz = results_dict['measured_pxz']
+        self.__measured_pressure_yz = results_dict['measured_pyz']

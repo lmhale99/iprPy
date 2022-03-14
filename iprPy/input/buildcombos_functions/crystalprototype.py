@@ -1,12 +1,44 @@
-import potentials
+# coding: utf-8
 
-# https://github.com/usnistgov/atomman
-import atomman.lammps as lmp
+# Standard Python libraries
+from typing import Optional, Tuple
+
+# https://github.com/usnistgov/potentials
+import potentials
 
 __all__ = ['crystalprototype']
 
-def crystalprototype(database, keys, content_dict=None, 
-                     record='crystal_prototype', **kwargs):
+def crystalprototype(database,
+                     keys: list,
+                     content_dict: Optional[dict] = None,
+                     record: Optional[str] = 'crystal_prototype',
+                     **kwargs) -> Tuple[dict, dict]:
+    """
+    Build parameter sets based on crystal prototype system records and
+    optionally LAMMPS potentials
+
+    Parameters
+    ----------
+    database : iprPy.database.Database
+        The database to use in building combos
+    keys : list
+        The calculation multikey set to build combos for
+    content_dict : dict, optional
+        Contains loaded file content.  If not given, an empty
+        dict will be created
+    record : str, optional
+        The record style to search
+    kwargs : any
+        Additional keyword arguments will be used to limit which records from
+        the database are used in building combos values.
+    
+    Returns
+    -------
+    inputs : dict
+        Contains the values generated for each key
+    content_dict : dict
+        Contains loaded file content
+    """
     
     # Initialize inputs and content dict
     inputs = {}

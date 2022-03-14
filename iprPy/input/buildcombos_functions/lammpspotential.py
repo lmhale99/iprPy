@@ -1,13 +1,38 @@
-# http://www.numpy.org/
-import numpy as np
+# coding: utf-8
+
+# Standard Python libraries
+from typing import Optional, Tuple
 
 import potentials
 
 __all__ = ['lammpspotential']
 
-def lammpspotential(database, keys, content_dict=None, **kwargs):
+def lammpspotential(database,
+                    keys: list,
+                    content_dict: Optional[dict] = None,
+                    **kwargs) -> Tuple[dict, dict]:
     """
-    Builds parameter sets related to LAMMPS potentials.
+    Build parameter sets related to LAMMPS potentials.
+
+    Parameters
+    ----------
+    database : iprPy.database.Database
+        The database to use in building combos
+    keys : list
+        The calculation multikey set to build combos for
+    content_dict : dict, optional
+        Contains loaded file content.  If not given, an empty
+        dict will be created
+    kwargs : any
+        Additional keyword arguments will be used to limit which records from
+        the database are used in building combos values.
+
+    Returns
+    -------
+    inputs : dict
+        Contains the values generated for each key
+    content_dict : dict
+        Contains loaded file content
     """
     # Initialize inputs and content dict
     inputs = {}

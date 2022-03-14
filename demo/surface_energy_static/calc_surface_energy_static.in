@@ -1,0 +1,45 @@
+# Input script for iprPy calculation surface_energy_static
+
+# Calculation Metadata
+branch                          
+
+# LAMMPS and MPI Commands
+lammps_command                  lmp_serial
+mpi_command                     
+
+# Interatomic Potential
+potential_file                  ..\0-files\1999--Mishin-Y--Ni--LAMMPS--ipr1.json
+potential_kim_id                
+potential_kim_potid             
+potential_dir                   ..\0-files\1999--Mishin-Y--Ni--LAMMPS--ipr1
+
+# Initial System Configuration
+load_file                       ..\0-files\A1--Cu--fcc.json
+load_style                      system_model
+load_options                    
+family                          
+symbols                         Ni
+box_parameters                  3.5199994375404287 3.5199994375404287 3.5199994375404287
+
+# LAMMPS Energy/Force Minimization
+energytolerance                 
+forcetolerance                  
+maxiterations                   
+maxevaluations                  
+maxatommotion                   
+
+# Free Surface
+surface_file                    ..\0-files\A1--Cu--fcc--111.json
+surface_hkl                     
+surface_cellsetting             
+surface_cutboxvector            
+surface_shiftindex              
+sizemults                       3 3 10
+surface_minwidth                
+surface_even                    
+
+# Input/Output Units
+length_unit                     
+pressure_unit                   
+energy_unit                     
+force_unit                      

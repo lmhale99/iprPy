@@ -1,0 +1,23 @@
+# Input script for iprPy calculation crystal_space_group
+
+# Calculation Metadata
+branch                          
+
+# Initial System Configuration
+load_file                       ..\0-files\A1--Cu--fcc.json
+load_style                      system_model
+load_options                    
+family                          
+symbols                         
+box_parameters                  3.5199994375404287 3.5199994375404287 3.5199994375404287
+
+# Input/Output Units
+length_unit                     
+pressure_unit                   
+energy_unit                     
+force_unit                      
+
+# Run Parameters
+symmetryprecision               
+primitivecell                   
+idealcell                       

@@ -3,9 +3,9 @@
 # Python script created by Lucas Hale and Norman Luu.
 
 # Standard library imports
-from pathlib import Path
 import shutil
 import datetime
+from typing import Optional, Union
 
 # http://www.numpy.org/
 import numpy as np 
@@ -14,19 +14,28 @@ import numpy as np
 import atomman as am
 import atomman.lammps as lmp
 import atomman.unitconvert as uc
+from atomman.tools import filltemplate
 
 # iprPy imports
-from ...tools import filltemplate, read_calc_file
+from ...tools import read_calc_file
 
-# Define calculation metadata
-parent_module = '.'.join(__name__.split('.')[:-1])
-
-def surface_energy_static(lammps_command, ucell, potential, hkl,
-                   mpi_command=None, sizemults=None, minwidth=None, even=False,
-                   conventional_setting='p', cutboxvector='c', 
-                   atomshift=None, shiftindex=None,
-                   etol=0.0, ftol=0.0, maxiter=10000,
-                   maxeval=100000, dmax=uc.set_in_units(0.01, 'angstrom')):
+def surface_energy_static(lammps_command: str,
+                          ucell: am.System,
+                          potential: lmp.Potential,
+                          hkl: Union[list, np.ndarray],
+                          mpi_command: Optional[str] = None,
+                          sizemults: Union[list, tuple, None] = None,
+                          minwidth: float = None,
+                          even: bool = False,
+                          conventional_setting: str = 'p',
+                          cutboxvector: str = 'c',
+                          atomshift: Union[list, np.ndarray, None] = None,
+                          shiftindex: Optional[int] = None,
+                          etol: float = 0.0,
+                          ftol: float = 0.0,
+                          maxiter: int = 10000,
+                          maxeval: int = 100000,
+                          dmax: float = uc.set_in_units(0.01, 'angstrom')) -> dict:
     """
     Evaluates surface formation energies by slicing along one periodic
     boundary of a bulk system.
@@ -107,7 +116,7 @@ def surface_energy_static(lammps_command, ucell, potential, hkl,
         - **'E_total_surf'** (*float*) - The total potential energy of the
           relaxed system containing the free surfaces.
         - **'A_surf'** (*float*) - The area of the free surface.
-        - **'E_coh'** (*float*) - The cohesive energy of the relaxed bulk
+        - **'E_pot'** (*float*) - The per-atom potential energy of the relaxed bulk
           system.
         - **'E_surf_f'** (*float*) - The computed surface formation energy.
     
@@ -171,15 +180,21 @@ def surface_energy_static(lammps_command, ucell, potential, hkl,
     results_dict['E_total_base'] = E_total_base
     results_dict['E_total_surf'] = E_total_surf
     results_dict['A_surf'] = A_surf
-    results_dict['E_coh'] = E_total_base / system.natoms
+    results_dict['E_pot'] = E_total_base / system.natoms
     results_dict['E_surf_f'] = E_surf_f
     
     return results_dict
 
-def relax_system(lammps_command, system, potential,
-                 mpi_command=None, etol=0.0, ftol=0.0, maxiter=10000,
-                 maxeval=100000, dmax=uc.set_in_units(0.01, 'angstrom'),
-                 lammps_date=None):
+def relax_system(lammps_command: str,
+                 system: am.System,
+                 potential: lmp.Potential,
+                 mpi_command: Optional[str] = None,
+                 etol: float = 0.0,
+                 ftol: float = 0.0,
+                 maxiter: int = 10000,
+                 maxeval: int = 100000,
+                 dmax: float = uc.set_in_units(0.01, 'angstrom'),
+                 lammps_date: Optional[datetime.date] = None) -> dict:
     """
     Sets up and runs the min.in LAMMPS script for performing an energy/force
     minimization to relax a system.
@@ -261,7 +276,8 @@ def relax_system(lammps_command, system, potential,
     # Write lammps input script
     template_file = 'min.template'
     lammps_script = 'min.in'
-    template = read_calc_file(parent_module, template_file)
+    template = read_calc_file('iprPy.calculation.surface_energy_static',
+                              'min.template')
     with open(lammps_script, 'w') as f:
         f.write(filltemplate(template, lammps_variables, '<', '>'))
     

@@ -6,7 +6,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from datamodelbase import query
+from yabadaba import query
 
 # https://github.com/usnistgov/atomman
 import atomman as am
@@ -153,7 +153,7 @@ class SurfaceEnergyStatic(Calculation):
             the parent Calculation class and the subset classes.
         """
         # Call super to set universal and subset content
-        super().set_values(name=None, **kwargs)
+        super().set_values(name=name, **kwargs)
 
         # Set calculation-specific values
 
