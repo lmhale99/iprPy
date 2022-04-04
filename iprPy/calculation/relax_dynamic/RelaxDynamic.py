@@ -1026,7 +1026,7 @@ class RelaxDynamic(Calculation):
         self.integrator = run_params['integrator']
         self.thermosteps = run_params['thermosteps']
         self.dumpsteps = run_params['dumpsteps']
-        self.restartsteps = run_params['restartsteps']
+        self.restartsteps = run_params.get('restartsteps', None)
         self.runsteps = run_params['runsteps']
         self.equilsteps = run_params['equilsteps']
         self.randomseed = run_params['randomseed']
