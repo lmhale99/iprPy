@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>stacking_fault_static calculation style &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="stacking_fault_static Input Terms" href="template.html" />
+    <link rel="prev" title="stacking_fault_static" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="template.html" title="stacking_fault_static Input Terms"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="stacking_fault_static"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">stacking_fault_static</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">stacking_fault_static calculation style</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="stacking-fault-static-calculation-style">
+<h1>stacking_fault_static calculation style<a class="headerlink" href="#stacking-fault-static-calculation-style" title="Permalink to this headline">¶</a></h1>
+<p><strong>Lucas M. Hale</strong>,
+<a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>,
+<em>Materials Science and Engineering Division, NIST</em>.</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The stacking_fault_static calculation style evaluates the energy of a
+single generalized stacking fault shift along a specified
+crystallographic plane.</p>
+<div class="section" id="version-notes">
+<h3>Version notes<a class="headerlink" href="#version-notes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>2018-07-09: Notebook added.</p></li>
+<li><p>2019-07-30: Description updated and small changes due to iprPy
+version.</p></li>
+<li><p>2020-05-22: Version 0.10 update - potentials now loaded from
+database.</p></li>
+<li><p>2020-09-22: Calculation updated to use atomman.defect.StackingFault
+class. Setup and parameter definition streamlined.</p></li>
+<li><p>2022-03-11: Notebook updated to reflect version 0.11.</p></li>
+</ul>
+</div>
+<div class="section" id="additional-dependencies">
+<h3>Additional dependencies<a class="headerlink" href="#additional-dependencies" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="disclaimers">
+<h3>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST
+disclaimers</a></p></li>
+<li><p>The system’s dimension perpendicular to the fault plane should be
+large to minimize the interaction of the free surface and the
+stacking fault.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="method-and-theory">
+<h2>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this headline">¶</a></h2>
+<p>First, an initial system is generated. This is accomplished using
+atomman.defect.StackingFault, which</p>
+<ol class="arabic simple">
+<li><p>Starts with a unit cell system.</p></li>
+<li><p>Generates a transformed system by rotating the unit cell such that
+the new system’s box vectors correspond to crystallographic
+directions, and filled in with atoms to remain a perfect bulk cell
+when the three boundaries are periodic.</p></li>
+<li><p>All atoms are shifted by a fractional amount of the box vectors if
+needed.</p></li>
+<li><p>A supercell system is constructed by combining multiple replicas of
+the transformed system.</p></li>
+<li><p>The system is then cut by making one of the box boundaries
+non-periodic. A limitation placed on the calculation is that the
+normal to the cut plane must correspond to one of the three Cartesian
+(<span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, or <span class="math notranslate nohighlight">\(z\)</span>) axes. If true, then of the
+system’s three box vectors (<span class="math notranslate nohighlight">\(\vec{a}\)</span>, <span class="math notranslate nohighlight">\(\vec{b}\)</span>, and
+<span class="math notranslate nohighlight">\(\vec{c}\)</span>), two will be parallel to the plane, and the third
+will not. The non-parallel box vector is called the cutboxvector, and
+for LAMMPS compatible systems, the following conditions can be used
+to check the system’s compatibility:</p>
+<ul class="simple">
+<li><p>cutboxvector = ‘c’: all systems allowed.</p></li>
+<li><p>cutboxvector = ‘b’: the system’s yz tilt must be zero.</p></li>
+<li><p>cutboxvector = ‘a’: the system’s xy and xz tilts must be zero.</p></li>
+</ul>
+</li>
+</ol>
+<p>A LAMMPS simulation performs an energy/force minimization on the system
+where the atoms are confined to only relax along the Cartesian direction
+normal to the cut plane.</p>
+<p>A mathematical fault plane parallel to the cut plane is defined in the
+middle of the system. A generalized stacking fault system can then be
+created by shifting all atoms on one side of the fault plane by a
+vector, <span class="math notranslate nohighlight">\(\vec{s}\)</span>. The shifted system is then relaxed using the
+same confined energy/force minimization used on the non-shifted system.
+The generalized stacking fault energy, <span class="math notranslate nohighlight">\(\gamma\)</span>, can then be
+computed by comparing the total energy of the system, <span class="math notranslate nohighlight">\(E_{total}\)</span>,
+before and after <span class="math notranslate nohighlight">\(\vec{s}\)</span> is applied</p>
+<div class="math notranslate nohighlight">
+\[\gamma(\vec{s}) = \frac{E_{total}(\vec{s}) - E_{total}(\vec{0})}{A},\]</div>
+<p>where <span class="math notranslate nohighlight">\(A\)</span> is the area of the fault plane, which can be computed
+using the two box vectors, <span class="math notranslate nohighlight">\(\vec{a_1}\)</span> and <span class="math notranslate nohighlight">\(\vec{a_2}\)</span>, that
+are not the cutboxvector.</p>
+<div class="math notranslate nohighlight">
+\[A = \left| \vec{a_1} \times \vec{a_2} \right|,\]</div>
+<p>Additionally, the relaxation normal to the glide plane is characterized
+using the center of mass of the atoms above and below the cut plane.
+Notably, the component of the center of mass normal to the glide/cut
+plane is calculated for the two halves of the the system, and the
+difference is computed</p>
+<div class="math notranslate nohighlight">
+\[\delta = \left&lt;x\right&gt;^{+} - \left&lt;x\right&gt;^{-}.\]</div>
+<p>The relaxation normal is then taken as the change in the center of mass
+difference after the shift is applied.</p>
+<div class="math notranslate nohighlight">
+\[\Delta\delta = \delta(\vec{s}) - \delta(\vec{0}).\]</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">stacking_fault_static calculation style</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#version-notes">Version notes</a></li>
+<li><a class="reference internal" href="#additional-dependencies">Additional dependencies</a></li>
+<li><a class="reference internal" href="#disclaimers">Disclaimers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#method-and-theory">Method and Theory</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">stacking_fault_static</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="template.html"
+                          title="next chapter">stacking_fault_static Input Terms</a></p>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="template.html" title="stacking_fault_static Input Terms"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="stacking_fault_static"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >stacking_fault_static</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">stacking_fault_static calculation style</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

@@ -1,20 +1,18 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>iprPy High-Throughput Computational Framework &#8212; iprPy 0.10.2 documentation</title>
-    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>iprPy High Throughput Computational Framework &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Introduction to iprPy" href="intro.html" /> 
@@ -31,7 +29,8 @@
         <li class="right" >
           <a href="intro.html" title="Introduction to iprPy"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">iprPy 0.10.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">iprPy High Throughput Computational Framework</a></li> 
       </ul>
     </div>  
 
@@ -41,29 +40,51 @@
           <div class="body" role="main">
             
   <div class="section" id="iprpy-high-throughput-computational-framework">
-<h1>iprPy High-Throughput Computational Framework<a class="headerlink" href="#iprpy-high-throughput-computational-framework" title="Permalink to this headline">¶</a></h1>
+<h1>iprPy High Throughput Computational Framework<a class="headerlink" href="#iprpy-high-throughput-computational-framework" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="description">
 <h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
-<p>The iprPy framework is a collection of tools and resources supporting the
-design of scientific calculations that</p>
+<p>The iprPy package is a computational framework supporting open source
+calculation methods.  The framework focuses on making the barriers for usage
+as low as possible for both users and developers of calculations.  In
+particular, the methods are</p>
 <ul class="simple">
-<li><p>are open source with minimum barriers for usage,</p></li>
-<li><p>have transparent methodologies supporting knowledge transfer and education,</p></li>
-<li><p>produce results that are both human and machine readable,</p></li>
-<li><p>allow investigations into method and parameter sensitivity,</p></li>
-<li><p>and can be integrated into workflows.</p></li>
+<li><p>fully documented,</p></li>
+<li><p>designed to be transparent to end users,</p></li>
+<li><p>produce results in formats that are both human and machine readable,</p></li>
+<li><p>modular in design supporting the incorporation of new methods,</p></li>
+<li><p>and can be easily integrated into workflows.</p></li>
 </ul>
-<p>The framework was originally created to support the NIST Interatomic Potential
-Repository by evaluating basic materials properties across multiple classical
-interatomic potentials.  Because of this, many of the included calculations
-and tools are designed towards molecular dynamics simulations.</p>
+<p>The framework consists of the following major components</p>
+<ol class="arabic simple">
+<li><p>Calculation methods, which exist as Python scripts and fully detail how to
+perform a single independent calculation.</p></li>
+<li><p>Calculation classes that manage metadata associated with the calculations.
+These classes integrate the calculation method scripts into the framework
+and allow for the calculations to be accessed and executed in a variety of
+ways.</p></li>
+<li><p>Calculation subsets that provide common handling of input/output parameter
+sets that are shared by multiple calculations.</p></li>
+<li><p>Built-in workflow tools that make it possible to run the implemented
+calculations in high throughput and store/access the results in databases.</p></li>
+</ol>
+<p>iprPy was originally created for the NIST Interatomic Potentials
+Repository (i.e. I.P.R. Python) for collecting and performing calculation
+methods that evaluate how different classical interatomic potentials predict A
+variety of basic materials properties.  As such, the majority of included
+methods are centered around performing classical atomistic calculations.  It
+should be noted, however, that the framework design can support any type of
+underlying calculation as long as the calculation method can be represented
+as a python function that can be executed independently from any other
+calculation method.</p>
 </div>
 <div class="section" id="documentation-sections">
 <h2>Documentation Sections<a class="headerlink" href="#documentation-sections" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="intro.html"><span class="doc">Introduction to iprPy</span></a></p>
 <p>A quick introduction describing why you would want to use the iprPy framework.</p>
 <p><a class="reference internal" href="setup.html"><span class="doc">Setup</span></a></p>
-<p>Describes the basics of iprPy for performing calculations.</p>
+<p>Gives details on how to install and set up iprPy.</p>
+<p><a class="reference internal" href="overview.html"><span class="doc">iprPy Package Components</span></a></p>
+<p>Describes the basic components of iprPy.</p>
 <p><a class="reference internal" href="run/index.html"><span class="doc">Calculations</span></a></p>
 <p>Learn about the different components of the iprPy framework and how to run
 calculations.</p>
@@ -72,10 +93,6 @@ calculations.</p>
 calculation scripts use.</p>
 <p><a class="reference internal" href="notebook_styles.html"><span class="doc">Jupyter Demonstration Notebooks</span></a></p>
 <p>Provides demonstration Jupyter Notebooks for the implemented calculations.</p>
-<p><a class="reference internal" href="record_styles.html"><span class="doc">Record Styles</span></a></p>
-<p>Describes the implemented record formats for storing calculation data.</p>
-<p><a class="reference internal" href="database_styles.html"><span class="doc">Database Styles</span></a></p>
-<p>Describes the implemented database types that can be interacted with.</p>
 <p><a class="reference internal" href="extend/index.html"><span class="doc">Extending iprPy</span></a></p>
 <p>This describes the components of iprPy in more detail for those who want to
 contribute to the package by adding content.</p>
@@ -85,110 +102,136 @@ contribute to the package by adding content.</p>
 <div class="section" id="package-tutorials">
 <h2>Package Tutorials<a class="headerlink" href="#package-tutorials" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction to iprPy</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#scientific-research-work-process">Scientific research work process</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#complications">Complications</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#its-all-in-the-design">It’s all in the design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#what-problems-does-iprpy-attempt-to-address">What problems does iprPy attempt to address?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#it-s-all-in-the-design">It’s all in the design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#how-much-extra-work">How much extra work?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#installing-python">Installing Python</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup.html#installing-iprpy">Installing iprPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#testing-the-install">Testing the install</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup.html#updating-iprpy">Updating iprPy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#uninstalling-iprpy">Uninstalling iprPy</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">iprPy Package Components</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="overview.html#calculations">Calculations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="overview.html#records">Records</a></li>
 <li class="toctree-l2"><a class="reference internal" href="overview.html#databases">Databases</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview.html#reference-library">Reference library</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview.html#subsets">Subsets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview.html#buildcombos">buildcombos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#calculation-subsets">Calculation subsets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="overview.html#workflow-scripts">Workflow scripts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview.html#other-supporting-code">Other supporting code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#buildcombos-functions">buildcombos functions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="run/index.html">Calculations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="run/single.html">Running a single calculation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="run/single.html#calculation-script">Calculation script</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="run/single.html#calculation-input-file-rules">Calculation input file rules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="run/single.html#check-available-calculations">1. Check available calculations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="run/single.html#command-line">1.1. Command line</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/single.html#python">1.2. Python</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="run/single.html#call-from-python">Call from Python</a></li>
+<li class="toctree-l3"><a class="reference internal" href="run/single.html#create-new-directory">2. Create new directory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="run/single.html#check-a-calculation-s-documentation">3. Check a calculation’s documentation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="run/single.html#online">3.1. Online</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/single.html#id1">3.2. Command line</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/single.html#id2">3.3. Python</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/single.html#source-files">3.4 Source files</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="run/single.html#calculation-input-parameters">4. Calculation input parameters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="run/single.html#id3">4.1. Command line</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/single.html#id4">4.2. Python</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="run/single.html#running-the-calculation">5. Running the calculation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="run/single.html#id5">5.1. Command line</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/single.html#id6">5.2. Python</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="run/notebook.html">Run a Jupyter Calculation Notebook</a></li>
-<li class="toctree-l2"><a class="reference internal" href="run/htp.html">High-Throughput Calculation Execution</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="run/htp.html#define-databases-and-run-directories">Define databases and run directories</a></li>
-<li class="toctree-l3"><a class="reference internal" href="run/htp.html#copy-references-to-a-database">Copy references to a database</a></li>
-<li class="toctree-l3"><a class="reference internal" href="run/htp.html#prepare-calculations">Prepare calculations</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="run/htp.html#prepare-input-file-rules">Prepare input file rules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="run/htp.html#passing-inputs-as-keyword-arguments">Passing inputs as keyword arguments</a></li>
-<li class="toctree-l4"><a class="reference internal" href="run/htp.html#recognized-input-keys">Recognized input keys</a></li>
-<li class="toctree-l4"><a class="reference internal" href="run/htp.html#using-buildcombos-functions">Using buildcombos functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="run/database_setup.html">Database Setup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="run/database_setup.html#basic-settings">1. Basic Settings</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="run/database_setup.html#command-line">1.1. Command line</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/database_setup.html#python">1.2. Python</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="run/htp.html#executing-calculations-with-runners">Executing calculations with runners</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="run/htp.html#runner-process">Runner process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="run/database_setup.html#define-databases">2. Define databases</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="run/database_setup.html#database-styles">2.1. Database styles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/database_setup.html#id1">2.2. Command line</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/database_setup.html#id2">2.3. Python</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/database_setup.html#other-database-information">2.4. Other Database information</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="run/htp.html#additional-tools-for-database-access-and-manipulation">Additional tools for database access and manipulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="run/database_setup.html#define-run-directories">3. Define run directories</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="run/database_setup.html#id3">3.1. Command line</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/database_setup.html#id4">3.2. Python</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="run/inline.html">Command Line Actions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="run/inline.html#define">Define</a></li>
-<li class="toctree-l3"><a class="reference internal" href="run/inline.html#build">Build</a></li>
-<li class="toctree-l3"><a class="reference internal" href="run/inline.html#prepare">Prepare</a></li>
-<li class="toctree-l3"><a class="reference internal" href="run/inline.html#runner">Runner</a></li>
-<li class="toctree-l3"><a class="reference internal" href="run/inline.html#other">Other</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="run/htp.html">High Throughput Operations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="run/htp.html#database-methods">1. Database methods</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="run/htp.html#record-query-operations">1.1. Record query operations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/htp.html#copying-records">1.2. Copying records</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/htp.html#prepare-and-run">1.3. Prepare and run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/htp.html#utility-methods">1.4. Utility methods</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="run/htp.html#prepare-calculations">2. Prepare calculations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="run/htp.html#the-prepare-process">2.1. The prepare process</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/htp.html#prepare-input-script-rules">2.2. Prepare input script rules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/htp.html#recognized-input-keys">2.3. Recognized input keys</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/htp.html#using-buildcombos-functions">2.4. Using buildcombos functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="run/htp.html#executing-calculations-with-runners">3. Executing calculations with runners</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="run/htp.html#the-runner-process">3.1. The runner process</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/htp.html#additional-options">3.2. Additional options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/htp.html#runners-as-cluster-jobs">3.3. Runners as cluster jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run/htp.html#runmanager">3.4. RunManager</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="extend/index.html">Extending iprPy</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="extend/addreference.html">Reference Library</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extend/addcalculation.html">Adding new calculation styles</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="extend/addcalculation.html#files-in-the-calculation-style-directories">Files in the calculation style directories</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="extend/addcalculation.html#calc-style-py">calc_[style].py</a></li>
-<li class="toctree-l4"><a class="reference internal" href="extend/addcalculation.html#calc-style-in">calc_[style].in</a></li>
-<li class="toctree-l4"><a class="reference internal" href="extend/addcalculation.html#style-py">[Style].py</a></li>
-<li class="toctree-l4"><a class="reference internal" href="extend/addcalculation.html#init-py">__init__.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="extend/addcalculation.html#create-a-directory-for-the-calculation-style-files">1. Create a directory for the calculation style files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="extend/addcalculation.html#define-a-calculation-function">2. Define a calculation function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="extend/addcalculation.html#create-documentation-files">3. Create documentation files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="extend/addcalculation.html#define-the-calculation-class">4. Define the Calculation class</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="extend/addcalculation.html#core-components">4.1. Core components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="extend/addcalculation.html#parameter-file-interactions">4.2. Parameter file interactions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="extend/addcalculation.html#data-model-interactions">4.3. Data model interactions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="extend/addcalculation.html#metadata-interactions">4.4. Metadata interactions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="extend/addcalculation.html#calculation-interactions">4.5. Calculation interactions</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="extend/addrecord.html">Adding new record styles</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="extend/addrecord.html#files-in-the-record-style-directories">Files in the record style directories</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="extend/addrecord.html#style-py">[Style].py</a></li>
-<li class="toctree-l4"><a class="reference internal" href="extend/addrecord.html#init-py">__init__.py</a></li>
-<li class="toctree-l4"><a class="reference internal" href="extend/addrecord.html#record-style-xsd">record-[style].xsd</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="extend/addrecord.html#record-format">Record format</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="extend/addrecord.html#record-format-limitations">Record format limitations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="extend/addcalculation.html#link-the-calculation-to-the-calculation-manager">5. Link the calculation to the calculation manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="extend/addcalculation.html#make-a-jupyter-notebook-and-demo-script">6. Make a Jupyter Notebook and demo script</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="extend/addcalculation.html#jupyter-notebook">6.1. Jupyter Notebook</a></li>
+<li class="toctree-l4"><a class="reference internal" href="extend/addcalculation.html#demo-script">6.2. Demo script</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="extend/addsubset.html">Adding new subset styles</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="extend/addsubset.html#files-in-the-subset-style-directories">Files in the subset style directories</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="extend/addsubset.html#style-py">[Style].py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="extend/addsubset.html#class-definition">1. Class definition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="extend/addsubset.html#calculation-like-methods-and-attributes">2. Calculation-like methods and attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="extend/addsubset.html#additional-subset-methods-and-attributes">3. Additional subset methods and attributes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="extend/addsubset.html#template-init">3.1. _template_init</a></li>
+<li class="toctree-l4"><a class="reference internal" href="extend/addsubset.html#preparekeys-and-interpretkeys">3.2. preparekeys and interpretkeys</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="extend/addbuildcombos.html">Adding new buildcombos styles</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extend/adddatabase.html">Adding new database styles</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="extend/adddatabase.html#files-in-the-calculation-style-directories">Files in the calculation style directories</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="extend/adddatabase.html#style-py">[Style].py</a></li>
-<li class="toctree-l4"><a class="reference internal" href="extend/adddatabase.html#init-py">__init__.py</a></li>
-</ul>
-</li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -197,7 +240,7 @@ contribute to the package by adding content.</p>
 <div class="section" id="implemented-content">
 <h2>Implemented Content<a class="headerlink" href="#implemented-content" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="calculation_styles.html">Calculation Styles</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="calculation/E_vs_r_scan/index.html">E_vs_r_scan</a></li>
@@ -208,6 +251,9 @@ contribute to the package by adding content.</p>
 <li class="toctree-l2"><a class="reference internal" href="calculation/dislocation_periodic_array/index.html">dislocation_periodic_array</a></li>
 <li class="toctree-l2"><a class="reference internal" href="calculation/elastic_constants_static/index.html">elastic_constants_static</a></li>
 <li class="toctree-l2"><a class="reference internal" href="calculation/isolated_atom/index.html">isolated_atom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="calculation/phonon/index.html">phonon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="calculation/point_defect_diffusion/index.html">point_defect_diffusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="calculation/point_defect_static/index.html">point_defect_static</a></li>
 <li class="toctree-l2"><a class="reference internal" href="calculation/relax_box/index.html">relax_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="calculation/relax_dynamic/index.html">relax_dynamic</a></li>
 <li class="toctree-l2"><a class="reference internal" href="calculation/relax_static/index.html">relax_static</a></li>
@@ -217,59 +263,21 @@ contribute to the package by adding content.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="notebook_styles.html">Jupyter Demonstration Notebooks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="notebook/E_vs_r_scan.html">E_vs_r_scan calculation style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebook/crystal_space_group.html">crystal_space_group calculation style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebook/diatom_scan.html">diatom_scan calculation style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebook/dislocation_SDVPN.html">dislocation_SDVPN calculation style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebook/dislocation_monopole.html">dislocation_monopole calculation style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebook/dislocation_periodic_array.html">dislocation_periodic_array calculation style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebook/elastic_constants_static.html">elastic_constants_static calculation style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebook/isolated_atom.html">isolated_atom calculation style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebook/phonon.html">phonon calculation style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebook/point_defect_diffusion.html">point_defect_diffusion calculation style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebook/point_defect_static.html">point_defect_static calculation style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebook/relax_box.html">relax_box calculation style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebook/relax_dynamic.html">relax_dynamic calculation style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebook/relax_static.html">relax_static calculation style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebook/stacking_fault_map_2D.html">stacking_fault_map_2D calculation style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebook/stacking_fault_static.html">stacking_fault_static calculation style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebook/surface_energy_static.html">surface_energy_static calculation style</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="record_styles.html">Record Styles</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="record/PotentialProperties/index.html">PotentialProperties</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/calculation_E_vs_r_scan/index.html">calculation_E_vs_r_scan</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/calculation_crystal_space_group/index.html">calculation_crystal_space_group</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/calculation_diatom_scan/index.html">calculation_diatom_scan</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/calculation_dislocation_SDVPN/index.html">calculation_dislocation_SDVPN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/calculation_dislocation_monopole/index.html">calculation_dislocation_monopole</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/calculation_dislocation_periodic_array/index.html">calculation_dislocation_periodic_array</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/calculation_elastic_constants_static/index.html">calculation_elastic_constants_static</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/calculation_isolated_atom/index.html">calculation_isolated_atom</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/calculation_relax_box/index.html">calculation_relax_box</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/calculation_relax_dynamic/index.html">calculation_relax_dynamic</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/calculation_relax_static/index.html">calculation_relax_static</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/calculation_stacking_fault_map_2D/index.html">calculation_stacking_fault_map_2D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/calculation_stacking_fault_static/index.html">calculation_stacking_fault_static</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/calculation_surface_energy_static/index.html">calculation_surface_energy_static</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/crystal_prototype/index.html">crystal_prototype</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/dislocation/index.html">dislocation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/free_surface/index.html">free_surface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/point_defect/index.html">point_defect</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/potential_LAMMPS/index.html">potential_LAMMPS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/potential_openKIM_LAMMPS/index.html">potential_openKIM_LAMMPS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/potential_users_LAMMPS/index.html">potential_users_LAMMPS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/reference_crystal/index.html">reference_crystal</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/relaxed_crystal/index.html">relaxed_crystal</a></li>
-<li class="toctree-l2"><a class="reference internal" href="record/stacking_fault/index.html">stacking_fault</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="database_styles.html">Database Styles</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="database/cdcs/index.html">cdcs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="database/json/index.html">json</a></li>
-<li class="toctree-l2"><a class="reference internal" href="database/local/index.html">local</a></li>
-<li class="toctree-l2"><a class="reference internal" href="database/mdcs/index.html">mdcs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="database/mongo/index.html">mongo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebook/E_vs_r_scan.html">isolated_atom - Methodology and code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebook/crystal_space_group.html">crystal_space_group - Methodology and code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebook/diatom_scan.html">diatom_scan - Methodology and code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebook/dislocation_SDVPN.html">dislocation_monopole - Methodology and code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebook/dislocation_monopole.html">dislocation_monopole - Methodology and code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebook/dislocation_periodic_array.html">dislocation_monopole - Methodology and code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebook/elastic_constants_static.html">elastic_constants_static - Methodology and code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebook/isolated_atom.html">isolated_atom - Methodology and code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebook/point_defect_static.html">point_defect_static - Methodology and code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebook/relax_box.html">relax_box - Methodology and code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebook/relax_dynamic.html">relax_dynamic - Methodology and code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebook/relax_static.html">relax_static - Methodology and code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebook/stacking_fault_map_2D.html">stacking_fault_map_2D - Methodology and code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebook/stacking_fault_static.html">stacking_fault_static - Methodology and code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebook/surface_energy_static.html">surface_energy_static - Methodology and code</a></li>
 </ul>
 </li>
 </ul>
@@ -305,14 +313,16 @@ contribute to the package by adding content.</p>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">iprPy High-Throughput Computational Framework</a><ul>
+  <div>
+    <h3><a href="#">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">iprPy High Throughput Computational Framework</a><ul>
 <li><a class="reference internal" href="#description">Description</a></li>
 <li><a class="reference internal" href="#documentation-sections">Documentation Sections</a></li>
 <li><a class="reference internal" href="#package-tutorials">Package Tutorials</a></li>
@@ -323,9 +333,12 @@ contribute to the package by adding content.</p>
 </li>
 </ul>
 
-  <h4>Next topic</h4>
-  <p class="topless"><a href="intro.html"
-                        title="next chapter">Introduction to iprPy</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="intro.html"
+                          title="next chapter">Introduction to iprPy</a></p>
+  </div>
         </div>
       </div>
       <div class="clearer"></div>
@@ -342,11 +355,12 @@ contribute to the package by adding content.</p>
         <li class="right" >
           <a href="intro.html" title="Introduction to iprPy"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">iprPy 0.10.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">iprPy High Throughput Computational Framework</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

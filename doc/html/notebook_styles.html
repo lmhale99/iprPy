@@ -1,24 +1,22 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>Jupyter Demonstration Notebooks &#8212; iprPy 0.10.2 documentation</title>
-    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jupyter Demonstration Notebooks &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="E_vs_r_scan calculation style" href="notebook/E_vs_r_scan.html" />
-    <link rel="prev" title="calc_surface_energy_static.py" href="calculation/surface_energy_static/calc.html" /> 
+    <link rel="next" title="isolated_atom - Methodology and code" href="notebook/E_vs_r_scan.html" />
+    <link rel="prev" title="SurfaceEnergyStatic" href="calculation/surface_energy_static/class.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -30,12 +28,13 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="notebook/E_vs_r_scan.html" title="E_vs_r_scan calculation style"
+          <a href="notebook/E_vs_r_scan.html" title="isolated_atom - Methodology and code"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="calculation/surface_energy_static/calc.html" title="calc_surface_energy_static.py"
+          <a href="calculation/surface_energy_static/class.html" title="SurfaceEnergyStatic"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.10.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Jupyter Demonstration Notebooks</a></li> 
       </ul>
     </div>  
 
@@ -48,39 +47,42 @@
 <h1>Jupyter Demonstration Notebooks<a class="headerlink" href="#jupyter-demonstration-notebooks" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="notebook/E_vs_r_scan.html">E_vs_r_scan calculation style</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebook/crystal_space_group.html">crystal_space_group calculation style</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebook/diatom_scan.html">diatom_scan calculation style</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebook/dislocation_SDVPN.html">dislocation_SDVPN calculation style</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebook/dislocation_monopole.html">dislocation_monopole calculation style</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebook/dislocation_periodic_array.html">dislocation_periodic_array calculation style</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebook/elastic_constants_static.html">elastic_constants_static calculation style</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebook/isolated_atom.html">isolated_atom calculation style</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebook/phonon.html">phonon calculation style</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebook/point_defect_diffusion.html">point_defect_diffusion calculation style</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebook/point_defect_static.html">point_defect_static calculation style</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebook/relax_box.html">relax_box calculation style</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebook/relax_dynamic.html">relax_dynamic calculation style</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebook/relax_static.html">relax_static calculation style</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebook/stacking_fault_map_2D.html">stacking_fault_map_2D calculation style</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebook/stacking_fault_static.html">stacking_fault_static calculation style</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebook/surface_energy_static.html">surface_energy_static calculation style</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebook/E_vs_r_scan.html">isolated_atom - Methodology and code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebook/crystal_space_group.html">crystal_space_group - Methodology and code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebook/diatom_scan.html">diatom_scan - Methodology and code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebook/dislocation_SDVPN.html">dislocation_monopole - Methodology and code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebook/dislocation_monopole.html">dislocation_monopole - Methodology and code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebook/dislocation_periodic_array.html">dislocation_monopole - Methodology and code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebook/elastic_constants_static.html">elastic_constants_static - Methodology and code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebook/isolated_atom.html">isolated_atom - Methodology and code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebook/point_defect_static.html">point_defect_static - Methodology and code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebook/relax_box.html">relax_box - Methodology and code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebook/relax_dynamic.html">relax_dynamic - Methodology and code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebook/relax_static.html">relax_static - Methodology and code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebook/stacking_fault_map_2D.html">stacking_fault_map_2D - Methodology and code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebook/stacking_fault_static.html">stacking_fault_static - Methodology and code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebook/surface_energy_static.html">surface_energy_static - Methodology and code</a></li>
 </ul>
 </div>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="calculation/surface_energy_static/calc.html"
-                        title="previous chapter">calc_surface_energy_static.py</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="notebook/E_vs_r_scan.html"
-                        title="next chapter">E_vs_r_scan calculation style</a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="calculation/surface_energy_static/class.html"
+                          title="previous chapter">SurfaceEnergyStatic</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="notebook/E_vs_r_scan.html"
+                          title="next chapter">isolated_atom - Methodology and code</a></p>
+  </div>
         </div>
       </div>
       <div class="clearer"></div>
@@ -95,16 +97,17 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="notebook/E_vs_r_scan.html" title="E_vs_r_scan calculation style"
+          <a href="notebook/E_vs_r_scan.html" title="isolated_atom - Methodology and code"
              >next</a> |</li>
         <li class="right" >
-          <a href="calculation/surface_energy_static/calc.html" title="calc_surface_energy_static.py"
+          <a href="calculation/surface_energy_static/class.html" title="SurfaceEnergyStatic"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.10.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Jupyter Demonstration Notebooks</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

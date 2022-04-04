@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>point_defect_diffusion calculation style &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="point_defect_diffusion Input Terms" href="template.html" />
+    <link rel="prev" title="point_defect_diffusion" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="template.html" title="point_defect_diffusion Input Terms"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="point_defect_diffusion"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">point_defect_diffusion</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">point_defect_diffusion calculation style</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="point-defect-diffusion-calculation-style">
+<h1>point_defect_diffusion calculation style<a class="headerlink" href="#point-defect-diffusion-calculation-style" title="Permalink to this headline">¶</a></h1>
+<p><strong>Lucas M. Hale</strong>,
+<a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>,
+<em>Materials Science and Engineering Division, NIST</em>.</p>
+<p>Description updated: 2019-07-26</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The point_defect_diffusion calculation style estimates the diffusion
+rate of a point defect at a specified temperature. A system is created
+with a single point defect, and subjected to a long time molecular
+dynamics simulation. The mean square displacement for the defect is
+computed, and used to estimate the diffusion constant.</p>
+<div class="section" id="version-notes">
+<h3>Version notes<a class="headerlink" href="#version-notes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>2022-03-11: Notebook updated to reflect version 0.11.</p></li>
+</ul>
+</div>
+<div class="section" id="additional-dependencies">
+<h3>Additional dependencies<a class="headerlink" href="#additional-dependencies" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="disclaimers">
+<h3>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST
+disclaimers</a></p></li>
+<li><p>The calculation estimates the defect’s diffusion by computing the
+mean square displacement of all atoms in the system. This is useful
+for estimating rates associated with vacancies and self-interstitials
+as the process is not confined to a single atom’s motion. However,
+this makes the calculation ill-suited to measuring diffusion of
+substitutional impurities as it does not individually track each
+atom’s position throughout.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="method-and-theory">
+<h2>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this headline">¶</a></h2>
+<p>First, a defect system is constructed by adding a single point defect
+(or defect cluster) to an initially bulk system using the
+atomman.defect.point() function.</p>
+<p>A LAMMPS simulation is then performed on the defect system. The
+simulation consists of two separate runs</p>
+<ol class="arabic simple">
+<li><p>NVT equilibrium run: The system is allowed to equilibrate at the
+given temperature using nvt integration.</p></li>
+<li><p>NVE measurement run: The system is then evolved using nve
+integration, and the total mean square displacement of all atoms is
+measured as a function of time.</p></li>
+</ol>
+<p>Between the two runs, the atomic velocities are scaled such that the
+average temperature of the nve run is closer to the target temperature.</p>
+<p>The mean square displacement of the defect,
+<span class="math notranslate nohighlight">\(\left&lt; \Delta r_{ptd}^2 \right&gt;\)</span> is then estimated using the mean
+square displacement of the atoms <span class="math notranslate nohighlight">\(\left&lt; \Delta r_{i}^2 \right&gt;\)</span>.
+Under the assumption that all diffusion is associated with the single
+point defect, the defect’s mean square displacement can be taken as the
+summed square displacement of the atoms</p>
+<div class="math notranslate nohighlight">
+\[\left&lt; \Delta r_{ptd}^2 \right&gt; \approx \sum_i^N \Delta r_{i}^2 = N \left&lt; \Delta r_{i}^2 \right&gt;,\]</div>
+<p>where <span class="math notranslate nohighlight">\(N\)</span> is the number of atoms in the system. The diffusion
+constant is then estimated by linearly fitting the change in mean square
+displacement with time</p>
+<div class="math notranslate nohighlight">
+\[\left&lt; \Delta r_{ptd}^2 \right&gt; = 2 d D_{ptd} \Delta t,\]</div>
+<p>where d is the number of dimensions included.</p>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">point_defect_diffusion calculation style</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#version-notes">Version notes</a></li>
+<li><a class="reference internal" href="#additional-dependencies">Additional dependencies</a></li>
+<li><a class="reference internal" href="#disclaimers">Disclaimers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#method-and-theory">Method and Theory</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">point_defect_diffusion</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="template.html"
+                          title="next chapter">point_defect_diffusion Input Terms</a></p>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="template.html" title="point_defect_diffusion Input Terms"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="point_defect_diffusion"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >point_defect_diffusion</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">point_defect_diffusion calculation style</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

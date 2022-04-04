@@ -1,24 +1,22 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>Extending iprPy &#8212; iprPy 0.10.2 documentation</title>
-    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Extending iprPy &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Reference Library" href="addreference.html" />
-    <link rel="prev" title="Command Line Actions" href="../run/inline.html" /> 
+    <link rel="next" title="Adding new calculation styles" href="addcalculation.html" />
+    <link rel="prev" title="High Throughput Operations" href="../run/htp.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -30,12 +28,13 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="addreference.html" title="Reference Library"
+          <a href="addcalculation.html" title="Adding new calculation styles"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="../run/inline.html" title="Command Line Actions"
+          <a href="../run/htp.html" title="High Throughput Operations"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Extending iprPy</a></li> 
       </ul>
     </div>  
 
@@ -46,44 +45,48 @@
             
   <div class="section" id="extending-iprpy">
 <h1>Extending iprPy<a class="headerlink" href="#extending-iprpy" title="Permalink to this headline">¶</a></h1>
-<p>This section gives details for anyone wishing to extend the iprPy package.</p>
+<p>This section gives details for anyone wishing to extend the iprPy package by
+adding new calculation methods and possibly supporting calculation subsets or
+buildcombos functions.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="addreference.html">Reference Library</a></li>
 <li class="toctree-l1"><a class="reference internal" href="addcalculation.html">Adding new calculation styles</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="addcalculation.html#files-in-the-calculation-style-directories">Files in the calculation style directories</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="addrecord.html">Adding new record styles</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="addrecord.html#files-in-the-record-style-directories">Files in the record style directories</a></li>
-<li class="toctree-l2"><a class="reference internal" href="addrecord.html#record-format">Record format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="addcalculation.html#create-a-directory-for-the-calculation-style-files">1. Create a directory for the calculation style files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="addcalculation.html#define-a-calculation-function">2. Define a calculation function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="addcalculation.html#create-documentation-files">3. Create documentation files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="addcalculation.html#define-the-calculation-class">4. Define the Calculation class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="addcalculation.html#link-the-calculation-to-the-calculation-manager">5. Link the calculation to the calculation manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="addcalculation.html#make-a-jupyter-notebook-and-demo-script">6. Make a Jupyter Notebook and demo script</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="addsubset.html">Adding new subset styles</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="addsubset.html#files-in-the-subset-style-directories">Files in the subset style directories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="addsubset.html#class-definition">1. Class definition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="addsubset.html#calculation-like-methods-and-attributes">2. Calculation-like methods and attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="addsubset.html#additional-subset-methods-and-attributes">3. Additional subset methods and attributes</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="addbuildcombos.html">Adding new buildcombos styles</a></li>
-<li class="toctree-l1"><a class="reference internal" href="adddatabase.html">Adding new database styles</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="adddatabase.html#files-in-the-calculation-style-directories">Files in the calculation style directories</a></li>
-</ul>
-</li>
 </ul>
 </div>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="../run/inline.html"
-                        title="previous chapter">Command Line Actions</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="addreference.html"
-                        title="next chapter">Reference Library</a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="../run/htp.html"
+                          title="previous chapter">High Throughput Operations</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="addcalculation.html"
+                          title="next chapter">Adding new calculation styles</a></p>
+  </div>
         </div>
       </div>
       <div class="clearer"></div>
@@ -98,16 +101,17 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="addreference.html" title="Reference Library"
+          <a href="addcalculation.html" title="Adding new calculation styles"
              >next</a> |</li>
         <li class="right" >
-          <a href="../run/inline.html" title="Command Line Actions"
+          <a href="../run/htp.html" title="High Throughput Operations"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Extending iprPy</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

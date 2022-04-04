@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E_vs_r_scan calculation style &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="E_vs_r_scan Input Terms" href="template.html" />
+    <link rel="prev" title="E_vs_r_scan" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="template.html" title="E_vs_r_scan Input Terms"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="E_vs_r_scan"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">E_vs_r_scan</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">E_vs_r_scan calculation style</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="e-vs-r-scan-calculation-style">
+<h1>E_vs_r_scan calculation style<a class="headerlink" href="#e-vs-r-scan-calculation-style" title="Permalink to this headline">¶</a></h1>
+<p><strong>Lucas M. Hale</strong>,
+<a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>,
+<em>Materials Science and Engineering Division, NIST</em>.</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The E_vs_r_scan calculation style calculation creates a plot of the
+cohesive energy vs interatomic spacing, <span class="math notranslate nohighlight">\(r\)</span>, for a given atomic
+system. The system size is uniformly scaled (<span class="math notranslate nohighlight">\(b/a\)</span> and <span class="math notranslate nohighlight">\(c/a\)</span>
+ratios held fixed) and the energy is calculated at a number of sizes
+without relaxing the system. All box sizes corresponding to energy
+minima are identified.</p>
+<p>This calculation was created as a quick method for scanning the phase
+space of a crystal structure with a given potential in order to identify
+starting guesses for further structure refinement calculations.</p>
+<div class="section" id="version-notes">
+<h3>Version notes<a class="headerlink" href="#version-notes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>2018-07-09: Notebook added.</p></li>
+<li><p>2019-07-30: Description updated and small changes due to iprPy
+version.</p></li>
+<li><p>2020-05-22: Version 0.10 update - potentials now loaded from
+database.</p></li>
+<li><p>2020-09-22: Setup and parameter definitions streamlined.</p></li>
+<li><p>2022-03-11: Notebook updated to reflect version 0.11. r_a() function
+replaced by the atomman.System.r0() method.</p></li>
+</ul>
+</div>
+<div class="section" id="additional-dependencies">
+<h3>Additional dependencies<a class="headerlink" href="#additional-dependencies" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="disclaimers">
+<h3>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST
+disclaimers</a></p></li>
+<li><p>The minima identified by this calculation do not guarantee that the
+associated crystal structure will be stable as no relaxation is
+performed by this calculation. Upon relaxation, the atomic positions
+and box dimensions may transform the system to a different structure.</p></li>
+<li><p>It is possible that the calculation may miss an existing minima for a
+crystal structure if it is outside the range of <span class="math notranslate nohighlight">\(r\)</span> values
+scanned, or has <span class="math notranslate nohighlight">\(b/a\)</span>, <span class="math notranslate nohighlight">\(c/a\)</span> values far from the ideal.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="method-and-theory">
+<h2>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this headline">¶</a></h2>
+<p>An initial system (and corresponding unit cell system) is supplied. The
+<span class="math notranslate nohighlight">\(r/a\)</span> ratio is identified from the unit cell. The system is then
+uniformly scaled to all <span class="math notranslate nohighlight">\(r_i\)</span> values in the range to be explored
+and the energy for each is evaluated using LAMMPS and “run 0” command,
+i.e. no relaxations are performed.</p>
+<p>In identifying energy minima along the curve, only the explored values
+are used without interpolation. In this way, the possible energy minima
+structures are identified for <span class="math notranslate nohighlight">\(r_i\)</span> where
+<span class="math notranslate nohighlight">\(E(r_i) &lt; E(r_{i-1})\)</span> and <span class="math notranslate nohighlight">\(E(r_i) &lt; E(r_{i+1})\)</span>.</p>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">E_vs_r_scan calculation style</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#version-notes">Version notes</a></li>
+<li><a class="reference internal" href="#additional-dependencies">Additional dependencies</a></li>
+<li><a class="reference internal" href="#disclaimers">Disclaimers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#method-and-theory">Method and Theory</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">E_vs_r_scan</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="template.html"
+                          title="next chapter">E_vs_r_scan Input Terms</a></p>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="template.html" title="E_vs_r_scan Input Terms"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="E_vs_r_scan"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >E_vs_r_scan</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">E_vs_r_scan calculation style</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

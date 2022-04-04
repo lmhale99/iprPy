@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>crystal_space_group Input Terms &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="crystal_space_group.py" href="function.html" />
+    <link rel="prev" title="crystal_space_group calculation style" href="doc.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="function.html" title="crystal_space_group.py"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="doc.html" title="crystal_space_group calculation style"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">crystal_space_group</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">crystal_space_group Input Terms</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="crystal-space-group-input-terms">
+<h1>crystal_space_group Input Terms<a class="headerlink" href="#crystal-space-group-input-terms" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="calculation-metadata">
+<h2>Calculation Metadata<a class="headerlink" href="#calculation-metadata" title="Permalink to this headline">¶</a></h2>
+<p>Specifies metadata descriptors common to all calculation styles.</p>
+<ul class="simple">
+<li><p><strong>branch</strong>: A metadata group name that the calculation can be parsed
+by. Primarily meant for differentiating runs with different settings
+parameters.</p></li>
+</ul>
+</div>
+<div class="section" id="initial-system-configuration">
+<h2>Initial System Configuration<a class="headerlink" href="#initial-system-configuration" title="Permalink to this headline">¶</a></h2>
+<p>Specifies the file and options to load for the initial atomic
+configuration.</p>
+<ul class="simple">
+<li><p><strong>load_file</strong>: The path to the initial configuration file to load.</p></li>
+<li><p><strong>load_style</strong>: The atomman.load() style indicating the format of the
+load_file.</p></li>
+<li><p><strong>load_options</strong>: A space-delimited list of key-value pairs for
+optional style-specific arguments used by atomman.load().</p></li>
+<li><p><strong>family</strong>: A metadata descriptor for relating the load_file back to
+the original crystal structure or prototype that the load_file was
+based on. If not given, will use the family field in load_file if
+load_style is ‘system_model’, or the file’s name otherwise.</p></li>
+<li><p><strong>symbols</strong>: A space-delimited list of the potential’s atom-model
+symbols to associate with the loaded system’s atom types. Required if
+load_file does not contain symbol/species information.</p></li>
+<li><p><strong>box_parameters</strong>: Specifies new box parameters to scale the loaded
+configuration by. Can be given either as a list of three or six
+numbers: ‘a b c’ for orthogonal boxes, or ‘a b c alpha beta gamma’
+for triclinic boxes. The a, b, c parameters are in units of length
+and the alpha, beta, gamma angles are in degrees.</p></li>
+</ul>
+</div>
+<div class="section" id="input-output-units">
+<h2>Input/Output Units<a class="headerlink" href="#input-output-units" title="Permalink to this headline">¶</a></h2>
+<p>Specifies the default units to use for the other input keys and to use
+for saving to the results file.</p>
+<ul class="simple">
+<li><p><strong>length_unit</strong>: The unit of length to use. Default value is
+‘angstrom’.</p></li>
+<li><p><strong>pressure_unit</strong>: The unit of pressure to use. Default value is
+‘GPa’.</p></li>
+<li><p><strong>energy_unit</strong>: The unit of energy to use. Default value is ‘eV’.</p></li>
+<li><p><strong>force_unit</strong>: The unit of force to use. Default value is
+‘eV/angstrom’.</p></li>
+</ul>
+</div>
+<div class="section" id="run-parameters">
+<h2>Run Parameters<a class="headerlink" href="#run-parameters" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><strong>symmetryprecision</strong>: The precision tolerance used for the atomic
+positions and box dimensions for determining symmetry elements.
+Default value is ‘0.01 angstrom’.</p></li>
+<li><p><strong>primitivecell</strong>: A boolean flag indicating if the returned unit
+cell is to be primitive (True) or conventional (False). Default value
+is False.</p></li>
+<li><p><strong>idealcell</strong>: A boolean flag indicating if the box dimensions and
+atomic positions are to be idealized based on the space group (True)
+or averaged based on their actual values (False). Default value is
+True.</p></li>
+</ul>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">crystal_space_group Input Terms</a><ul>
+<li><a class="reference internal" href="#calculation-metadata">Calculation Metadata</a></li>
+<li><a class="reference internal" href="#initial-system-configuration">Initial System Configuration</a></li>
+<li><a class="reference internal" href="#input-output-units">Input/Output Units</a></li>
+<li><a class="reference internal" href="#run-parameters">Run Parameters</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="doc.html"
+                          title="previous chapter">crystal_space_group calculation style</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="function.html"
+                          title="next chapter">crystal_space_group.py</a></p>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="function.html" title="crystal_space_group.py"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="doc.html" title="crystal_space_group calculation style"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >crystal_space_group</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">crystal_space_group Input Terms</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

@@ -1,24 +1,24 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>point_defect_static calculation style &#8212; iprPy 0.10.2 documentation</title>
-    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>point_defect_static - Methodology and code &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="relax_box calculation style" href="relax_box.html" />
-    <link rel="prev" title="point_defect_diffusion calculation style" href="point_defect_diffusion.html" /> 
+    <link rel="next" title="relax_box - Methodology and code" href="relax_box.html" />
+    <link rel="prev" title="isolated_atom - Methodology and code" href="isolated_atom.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -30,13 +30,14 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="relax_box.html" title="relax_box calculation style"
+          <a href="relax_box.html" title="relax_box - Methodology and code"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="point_defect_diffusion.html" title="point_defect_diffusion calculation style"
+          <a href="isolated_atom.html" title="isolated_atom - Methodology and code"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">point_defect_static - Methodology and code</a></li> 
       </ul>
     </div>  
 
@@ -50,21 +51,35 @@
 /* CSS for nbsphinx extension */
 
 /* remove conflicting styling from Sphinx themes */
-div.nbinput.container,
-div.nbinput.container div.prompt,
-div.nbinput.container div.input_area,
-div.nbinput.container div[class*=highlight],
-div.nbinput.container div[class*=highlight] pre,
-div.nboutput.container,
-div.nboutput.container div.prompt,
-div.nboutput.container div.output_area,
-div.nboutput.container div[class*=highlight],
-div.nboutput.container div[class*=highlight] pre {
-    background: none;
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
     border: none;
-    padding: 0 0;
+    padding: 0;
     margin: 0;
     box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
 }
 
 /* avoid gaps between output lines */
@@ -165,7 +180,7 @@ div.nboutput.container div.output_area {
 div.nbinput.container div.input_area {
     border: 1px solid #e0e0e0;
     border-radius: 2px;
-    background: #f5f5f5;
+    /*background: #f5f5f5;*/
 }
 
 /* override MathJax center alignment in output cells */
@@ -231,6 +246,7 @@ div.nboutput.container div.output_area.rendered_html,
 div.nboutput.container div.output_area > div.output_javascript,
 div.nboutput.container div.output_area:not(.rendered_html) > img{
     padding: 5px;
+    margin: 0;
 }
 
 /* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
@@ -278,21 +294,106 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
+<div class="section" id="point_defect_static---Methodology-and-code">
+<h1>point_defect_static - Methodology and code<a class="headerlink" href="#point_defect_static---Methodology-and-code" title="Permalink to this headline">¶</a></h1>
+<p><strong>Python imports</strong></p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.numpy.org/">numpy</a></p></li>
+<li><p><a class="reference external" href="https://ipython.org">IPython</a></p></li>
+<li><p><a class="reference external" href="https://github.com/usnistgov/atomman">atomman</a></p></li>
+<li><p><a class="reference external" href="https://github.com/usnistgov/iprPy">iprPy</a></p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Standard library imports</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">floor</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="c1"># http://www.numpy.org/</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># https://ipython.org/</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">Markdown</span>
+
+<span class="c1"># https://github.com/usnistgov/atomman</span>
+<span class="kn">import</span> <span class="nn">atomman</span> <span class="k">as</span> <span class="nn">am</span>
+<span class="kn">import</span> <span class="nn">atomman.lammps</span> <span class="k">as</span> <span class="nn">lmp</span>
+<span class="kn">import</span> <span class="nn">atomman.unitconvert</span> <span class="k">as</span> <span class="nn">uc</span>
+<span class="kn">from</span> <span class="nn">atomman.tools</span> <span class="kn">import</span> <span class="n">filltemplate</span>
+
+<span class="c1"># https://github.com/usnistgov/iprPy</span>
+<span class="kn">import</span> <span class="nn">iprPy</span>
+<span class="kn">from</span> <span class="nn">iprPy.tools</span> <span class="kn">import</span> <span class="n">read_calc_file</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Notebook last executed on&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">(),</span> <span class="s1">&#39;using iprPy version&#39;</span><span class="p">,</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Notebook last executed on 2022-03-10 using iprPy version 0.11.2
+</pre></div></div>
+</div>
+<div class="section" id="1.-Load-calculation-and-view-description">
+<h2>1. Load calculation and view description<a class="headerlink" href="#1.-Load-calculation-and-view-description" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="1.1.-Load-the-calculation">
+<h3>1.1. Load the calculation<a class="headerlink" href="#1.1.-Load-the-calculation" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Load the calculation being demoed</span>
+<span class="n">calculation</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">load_calculation</span><span class="p">(</span><span class="s1">&#39;point_defect_static&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="1.2.-Display-calculation-description-and-theory">
+<h3>1.2. Display calculation description and theory<a class="headerlink" href="#1.2.-Display-calculation-description-and-theory" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Display main docs and theory</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">calculation</span><span class="o">.</span><span class="n">maindoc</span><span class="p">))</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">calculation</span><span class="o">.</span><span class="n">theorydoc</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
 <div class="section" id="point_defect_static-calculation-style">
-<h1>point_defect_static calculation style<a class="headerlink" href="#point_defect_static-calculation-style" title="Permalink to this headline">¶</a></h1>
+<h4>point_defect_static calculation style<a class="headerlink" href="#point_defect_static-calculation-style" title="Permalink to this headline">¶</a></h4>
 <p><strong>Lucas M. Hale</strong>, <a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>, <em>Materials Science and Engineering Division, NIST</em>.</p>
-<p>Description updated: 2019-07-26</p>
 <div class="section" id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
+<h5>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h5>
 <p>The point_defect_static calculation style computes the formation energy of a point defect by comparing the energies of a system before and after a point defect is inserted. The resulting defect system is analyzed using a few different metrics to help characterize if the defect reconfigures to a different structure upon relaxation.</p>
 <div class="section" id="Version-notes">
-<h3>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this headline">¶</a></h3>
+<h6>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this headline">¶</a></h6>
+<ul class="simple">
+<li><p>2020-12-30 Version 0.10+ update</p></li>
+<li><p>2022-03-11: Notebook updated to reflect version 0.11.</p></li>
+</ul>
 </div>
 <div class="section" id="Additional-dependencies">
-<h3>Additional dependencies<a class="headerlink" href="#Additional-dependencies" title="Permalink to this headline">¶</a></h3>
+<h6>Additional dependencies<a class="headerlink" href="#Additional-dependencies" title="Permalink to this headline">¶</a></h6>
 </div>
 <div class="section" id="Disclaimers">
-<h3>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this headline">¶</a></h3>
+<h6>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this headline">¶</a></h6>
 <ul class="simple">
 <li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST disclaimers</a></p></li>
 <li><p>The computed values of the point defect formation energies and elastic dipole tensors are sensitive to the size of the system. Larger systems minimize the interaction between the defects, and the affect that the defects have on the system’s pressure. Infinite system formation energies can be estimated by measuring the formation energy for multiple system sizes, and extrapolating to 1/natoms = 0.</p></li>
@@ -302,8 +403,15 @@ div.rendered_html tbody tr:hover {
 </ul>
 </div>
 </div>
+</div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
 <div class="section" id="Method-and-Theory">
-<h2>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this headline">¶</a></h2>
+<h4>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this headline">¶</a></h4>
 <p>The method starts with a bulk initial system, and relaxes the atomic positions with a LAMMPS simulation that performs an energy/force minimization. The cohesive energy, <span class="math notranslate nohighlight">\(E_{coh}\)</span>, is taken by dividing the system’s total energy by the number of atoms in the system.</p>
 <p>A corresponding defect system is then constructed using the atomman.defect.point() function. The defect system is relaxed using the same energy/force minimization as was done with the bulk system. The formation energy of the defect, <span class="math notranslate nohighlight">\(E_{f}^{ptd}\)</span>, is obtained as</p>
 <div class="math notranslate nohighlight">
@@ -342,356 +450,150 @@ div.rendered_html tbody tr:hover {
 <p>If any of the metrics have values not close to (0,0,0), then there was likely an atomic configuration relaxation.</p>
 <p>The final defect system and the associated perfect base system are retained in the calculation’s archive. The calculation’s record reports the base system’s cohesive energy, the point defect’s formation energy, and the values of any of the reconfiguration metrics used.</p>
 </div>
-<div class="section" id="Demonstration">
-<h2>Demonstration<a class="headerlink" href="#Demonstration" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="1.-Setup">
-<h3>1. Setup<a class="headerlink" href="#1.-Setup" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="1.1.-Library-imports">
-<h4>1.1. Library imports<a class="headerlink" href="#1.1.-Library-imports" title="Permalink to this headline">¶</a></h4>
-<p>Import libraries needed by the calculation. The external libraries used are:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="http://www.numpy.org/">numpy</a></p></li>
-<li><p><a class="reference external" href="https://github.com/usnistgov/DataModelDict">DataModelDict</a></p></li>
-<li><p><a class="reference external" href="https://github.com/usnistgov/atomman">atomman</a></p></li>
-<li><p><a class="reference external" href="https://github.com/usnistgov/iprPy">iprPy</a></p></li>
-</ul>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Standard library imports</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
-
-<span class="c1"># http://www.numpy.org/</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-<span class="c1"># https://github.com/usnistgov/DataModelDict</span>
-<span class="kn">from</span> <span class="nn">DataModelDict</span> <span class="k">import</span> <span class="n">DataModelDict</span> <span class="k">as</span> <span class="n">DM</span>
-
-<span class="c1"># https://github.com/usnistgov/atomman</span>
-<span class="kn">import</span> <span class="nn">atomman</span> <span class="k">as</span> <span class="nn">am</span>
-<span class="kn">import</span> <span class="nn">atomman.lammps</span> <span class="k">as</span> <span class="nn">lmp</span>
-<span class="kn">import</span> <span class="nn">atomman.unitconvert</span> <span class="k">as</span> <span class="nn">uc</span>
-
-<span class="c1"># https://github.com/usnistgov/iprPy</span>
-<span class="kn">import</span> <span class="nn">iprPy</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Notebook last executed on&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">(),</span> <span class="s1">&#39;using iprPy version&#39;</span><span class="p">,</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
-</pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Notebook last executed on 2019-07-29 using iprPy version 0.9.0
-</pre></div></div>
 </div>
 </div>
-<div class="section" id="1.2.-Default-calculation-setup">
-<h4>1.2. Default calculation setup<a class="headerlink" href="#1.2.-Default-calculation-setup" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="2.-Define-calculation-functions-and-generate-files">
+<h2>2. Define calculation functions and generate files<a class="headerlink" href="#2.-Define-calculation-functions-and-generate-files" title="Permalink to this headline">¶</a></h2>
+<p>This section defines the calculation functions and associated resource files exactly as they exist inside the iprPy package. This allows for the code used to be directly visible and modifiable by anyone looking to see how it works.</p>
+<div class="section" id="2.1.-calc()">
+<h3>2.1. calc()<a class="headerlink" href="#2.1.-calc()" title="Permalink to this headline">¶</a></h3>
+<p>This is the primary function for the calculation. The version of this function built in iprPy can be accessed by calling the calc() method of an object of the associated calculation class.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Specify calculation style</span>
-<span class="n">calc_style</span> <span class="o">=</span> <span class="s1">&#39;point_defect_static&#39;</span>
-
-<span class="c1"># If workingdir is already set, then do nothing (already in correct folder)</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">workingdir</span> <span class="o">=</span> <span class="n">workingdir</span>
-
-<span class="c1"># Change to workingdir if not already there</span>
-<span class="k">except</span><span class="p">:</span>
-    <span class="n">workingdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;calculationfiles&#39;</span><span class="p">,</span> <span class="n">calc_style</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">workingdir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
-        <span class="n">workingdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">workingdir</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="section" id="2.-Assign-values-for-the-calculation’s-run-parameters">
-<h3>2. Assign values for the calculation’s run parameters<a class="headerlink" href="#2.-Assign-values-for-the-calculation’s-run-parameters" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="2.1.-Specify-system-specific-paths">
-<h4>2.1. Specify system-specific paths<a class="headerlink" href="#2.1.-Specify-system-specific-paths" title="Permalink to this headline">¶</a></h4>
-<ul class="simple">
-<li><p><strong>lammps_command</strong> (required) is the LAMMPS command to use.</p></li>
-<li><p><strong>mpi_command</strong> MPI command for running LAMMPS in parallel. A value of None will run simulations serially.</p></li>
-</ul>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lammps_command</span> <span class="o">=</span> <span class="s1">&#39;lmp_serial&#39;</span>
-<span class="n">mpi_command</span> <span class="o">=</span> <span class="kc">None</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="2.2.-Load-interatomic-potential">
-<h4>2.2. Load interatomic potential<a class="headerlink" href="#2.2.-Load-interatomic-potential" title="Permalink to this headline">¶</a></h4>
-<ul class="simple">
-<li><p><strong>potential_name</strong> gives the name of the potential_LAMMPS reference record in the iprPy library to use for the calculation.</p></li>
-<li><p><strong>potential_file</strong> gives the path to the potential_LAMMPS reference record to use. Here, this parameter is automatically generated using potential_name and librarydir.</p></li>
-<li><p><strong>potential_dir</strong> gives the path for the folder containing the artifacts associated with the potential (i.e. eam.alloy file). Here, this parameter is automatically generated using potential_name and librarydir.</p></li>
-<li><p><strong>potential</strong> is an atomman.lammps.Potential object (required). Here, this parameter is automatically generated from potential_file and potential_dir.</p></li>
-</ul>
-<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">potential_name</span> <span class="o">=</span> <span class="s1">&#39;1999--Mishin-Y--Ni--LAMMPS--ipr1&#39;</span>
+<span></span><span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+         <span class="n">system</span><span class="p">:</span> <span class="n">am</span><span class="o">.</span><span class="n">System</span><span class="p">,</span>
+         <span class="n">potential</span><span class="p">:</span> <span class="n">lmp</span><span class="o">.</span><span class="n">Potential</span><span class="p">,</span>
+         <span class="n">point_kwargs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span>
+         <span class="n">cutoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+         <span class="n">mpi_command</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+         <span class="n">etol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+         <span class="n">ftol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+         <span class="n">maxiter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span>
+         <span class="n">maxeval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100000</span><span class="p">,</span>
+         <span class="n">dmax</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">),</span>
+         <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">1e-5</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds one or more point defects to a system and evaluates the defect</span>
+<span class="sd">    formation energy. Evaluates a relaxed system containing a point defect</span>
+<span class="sd">    to determine if the defect structure has transformed to a different</span>
+<span class="sd">    configuration.</span>
 
-<span class="c1"># Define potential_file and potential_dir using librarydir and potential_name</span>
-<span class="n">potential_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;potential_LAMMPS&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{potential_name}</span><span class="s1">.json&#39;</span><span class="p">)</span>
-<span class="n">potential_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;potential_LAMMPS&#39;</span><span class="p">,</span> <span class="n">potential_name</span><span class="p">)</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lammps_command :str</span>
+<span class="sd">        Command for running LAMMPS.</span>
+<span class="sd">    system : atomman.System</span>
+<span class="sd">        The system to perform the calculation on.</span>
+<span class="sd">    potential : atomman.lammps.Potential</span>
+<span class="sd">        The LAMMPS implemented potential to use.</span>
+<span class="sd">    point_kwargs : dict or list of dict</span>
+<span class="sd">        One or more dictionaries containing the keyword arguments for</span>
+<span class="sd">        the atomman.defect.point() function to generate specific point</span>
+<span class="sd">        defect configuration(s).</span>
+<span class="sd">    cutoff : float</span>
+<span class="sd">        Cutoff distance to use in identifying neighbor atoms.</span>
+<span class="sd">    mpi_command : str, optional</span>
+<span class="sd">        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS</span>
+<span class="sd">        will run serially.</span>
+<span class="sd">    sim_directory : str, optional</span>
+<span class="sd">        The path to the directory to perform the simulation in.  If not</span>
+<span class="sd">        given, will use the current working directory.</span>
+<span class="sd">    etol : float, optional</span>
+<span class="sd">        The energy tolerance for the structure minimization. This value is</span>
+<span class="sd">        unitless. (Default is 0.0).</span>
+<span class="sd">    ftol : float, optional</span>
+<span class="sd">        The force tolerance for the structure minimization. This value is in</span>
+<span class="sd">        units of force. (Default is 0.0).</span>
+<span class="sd">    maxiter : int, optional</span>
+<span class="sd">        The maximum number of minimization iterations to use (default is</span>
+<span class="sd">        10000).</span>
+<span class="sd">    maxeval : int, optional</span>
+<span class="sd">        The maximum number of minimization evaluations to use (default is</span>
+<span class="sd">        100000).</span>
+<span class="sd">    dmax : float, optional</span>
+<span class="sd">        The maximum distance in length units that any atom is allowed to relax</span>
+<span class="sd">        in any direction during a single minimization iteration (default is</span>
+<span class="sd">        0.01 Angstroms).</span>
+<span class="sd">    tol : float, optional</span>
+<span class="sd">        Absolute tolerance to use for identifying if a defect has</span>
+<span class="sd">        reconfigured (default is 1e-5 Angstoms).</span>
 
-<span class="c1"># Initialize Potential object using potential_file and potential_dir.</span>
-<span class="n">potential</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">Potential</span><span class="p">(</span><span class="n">potential_file</span><span class="p">,</span> <span class="n">potential_dir</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Successfully loaded potential&#39;</span><span class="p">,</span> <span class="n">potential</span><span class="p">)</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Dictionary of results consisting of keys:</span>
+
+<span class="sd">        - **&#39;E_pot&#39;** (*float*) - The per-atom potential energy of the bulk system.</span>
+<span class="sd">        - **&#39;E_ptd_f&#39;** (*float*) - The point defect formation energy.</span>
+<span class="sd">        - **&#39;E_total_base&#39;** (*float*) - The total potential energy of the</span>
+<span class="sd">          relaxed bulk system.</span>
+<span class="sd">        - **&#39;E_total_ptd&#39;** (*float*) - The total potential energy of the</span>
+<span class="sd">          relaxed defect system.</span>
+<span class="sd">        - **&#39;pij_tensor&#39;** (*numpy.ndarray of float*) - The elastic dipole</span>
+<span class="sd">          tensor associated with the defect.</span>
+<span class="sd">        - **&#39;system_base&#39;** (*atomman.System*) - The relaxed bulk system.</span>
+<span class="sd">        - **&#39;system_ptd&#39;** (*atomman.System*) - The relaxed defect system.</span>
+<span class="sd">        - **&#39;dumpfile_base&#39;** (*str*) - The filename of the LAMMPS dump file</span>
+<span class="sd">          for the relaxed bulk system.</span>
+<span class="sd">        - **&#39;dumpfile_ptd&#39;** (*str*) - The filename of the LAMMPS dump file</span>
+<span class="sd">          for the relaxed defect system.</span>
+<span class="sd">        - **&#39;has_reconfigured&#39;** (*bool*) - Flag indicating if the structure</span>
+<span class="sd">          has been identified as relaxing to a different defect configuration.</span>
+<span class="sd">        - **&#39;centrosummation&#39;** (*numpy.ndarray of float*) - The centrosummation</span>
+<span class="sd">          parameter used for evaluating if the configuration has relaxed.</span>
+<span class="sd">        - **&#39;position_shift&#39;** (*numpy.ndarray of float*) - The position_shift</span>
+<span class="sd">          parameter used for evaluating if the configuration has relaxed.</span>
+<span class="sd">          Only given for interstitial and substitutional-style defects.</span>
+<span class="sd">        - **&#39;db_vect_shift&#39;** (*numpy.ndarray of float*) - The db_vect_shift</span>
+<span class="sd">          parameter used for evaluating if the configuration has relaxed.</span>
+<span class="sd">          Only given for dumbbell-style defects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Run ptd_energy to refine values</span>
+    <span class="n">results_dict</span> <span class="o">=</span> <span class="n">pointdefect</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span>
+                               <span class="n">system</span><span class="p">,</span>
+                               <span class="n">potential</span><span class="p">,</span>
+                               <span class="n">point_kwargs</span><span class="p">,</span>
+                               <span class="n">mpi_command</span> <span class="o">=</span> <span class="n">mpi_command</span><span class="p">,</span>
+                               <span class="n">etol</span> <span class="o">=</span> <span class="n">etol</span><span class="p">,</span>
+                               <span class="n">ftol</span> <span class="o">=</span> <span class="n">ftol</span><span class="p">,</span>
+                               <span class="n">maxiter</span> <span class="o">=</span> <span class="n">maxiter</span><span class="p">,</span>
+                               <span class="n">maxeval</span> <span class="o">=</span> <span class="n">maxeval</span><span class="p">,</span>
+                               <span class="n">dmax</span> <span class="o">=</span> <span class="n">dmax</span><span class="p">)</span>
+
+    <span class="c1"># Run check_ptd_config</span>
+    <span class="n">results_dict2</span> <span class="o">=</span> <span class="n">check_ptd_config</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;system_ptd&#39;</span><span class="p">],</span>
+                                     <span class="n">point_kwargs</span><span class="p">,</span>
+                                     <span class="n">cutoff</span><span class="p">,</span> <span class="n">tol</span><span class="p">)</span>
+    <span class="n">results_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">results_dict2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">results_dict</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
 </div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Successfully loaded potential 1999--Mishin-Y--Ni--LAMMPS--ipr1
-</pre></div></div>
-</div>
-</div>
-<div class="section" id="2.3.-Load-initial-unit-cell-system">
-<h4>2.3. Load initial unit cell system<a class="headerlink" href="#2.3.-Load-initial-unit-cell-system" title="Permalink to this headline">¶</a></h4>
-<ul class="simple">
-<li><p><strong>prototype_name</strong> gives the name of the crystal_prototype reference record in the iprPy library to load.</p></li>
-<li><p><strong>symbols</strong> is a list of the potential’s elemental model symbols to associate with the unique atom types of the loaded system.</p></li>
-<li><p><strong>box_parameters</strong> is a list of the a, b, c lattice constants to assign to the loaded file.</p></li>
-<li><p><strong>load_file</strong> gives the path to the atomic configuration file to load for the ucell system. Here, this is generated automatically using prototype_name and librarydir.</p></li>
-<li><p><strong>load_style</strong> specifies the format of load_file. Here, this is automatically set for crystal_prototype records.</p></li>
-<li><p><strong>load_options</strong> specifies any other keyword options for properly loading the load_file. Here, this is automatically set for crystal_prototype records.</p></li>
-<li><p><strong>ucell</strong> is an atomman.System representing a fundamental unit cell of the system (required). Here, this is generated using the load parameters and symbols.</p></li>
-</ul>
-<div class="nbinput docutils container">
+<div class="section" id="2.2.-pointdefect">
+<h3>2.2. pointdefect<a class="headerlink" href="#2.2.-pointdefect" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">prototype_name</span> <span class="o">=</span> <span class="s1">&#39;A1--Cu--fcc&#39;</span>
-<span class="n">symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ni&#39;</span><span class="p">]</span>
-<span class="n">box_parameters</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">([</span><span class="mf">3.52</span><span class="p">,</span> <span class="mf">3.52</span><span class="p">,</span> <span class="mf">3.52</span><span class="p">],</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
-
-<span class="c1"># Define load_file using librarydir and prototype_name</span>
-<span class="n">load_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;crystal_prototype&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{prototype_name}</span><span class="s1">.json&#39;</span><span class="p">)</span>
-
-<span class="c1"># Define load_style and load_options for crystal_prototype records</span>
-<span class="n">load_style</span> <span class="o">=</span> <span class="s1">&#39;system_model&#39;</span>
-<span class="n">load_options</span> <span class="o">=</span> <span class="p">{}</span>
-
-<span class="c1"># Create ucell by loading prototype record</span>
-<span class="n">ucell</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">load_style</span><span class="p">,</span> <span class="n">load_file</span><span class="p">,</span> <span class="n">symbols</span><span class="o">=</span><span class="n">symbols</span><span class="p">,</span> <span class="o">**</span><span class="n">load_options</span><span class="p">)</span>
-
-<span class="c1"># Rescale ucell using box_parameters</span>
-<span class="n">ucell</span><span class="o">.</span><span class="n">box_set</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">b</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">box_parameters</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">ucell</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-avect =  [ 3.520,  0.000,  0.000]
-bvect =  [ 0.000,  3.520,  0.000]
-cvect =  [ 0.000,  0.000,  3.520]
-origin = [ 0.000,  0.000,  0.000]
-natoms = 4
-natypes = 1
-symbols = (&#39;Ni&#39;,)
-pbc = [ True  True  True]
-per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
-     id |   atype |  pos[0] |  pos[1] |  pos[2]
-      0 |       1 |   0.000 |   0.000 |   0.000
-      1 |       1 |   0.000 |   1.760 |   1.760
-      2 |       1 |   1.760 |   0.000 |   1.760
-      3 |       1 |   1.760 |   1.760 |   0.000
-</pre></div></div>
-</div>
-</div>
-<div class="section" id="2.4.-Specify-the-defect-parameters">
-<h4>2.4. Specify the defect parameters<a class="headerlink" href="#2.4.-Specify-the-defect-parameters" title="Permalink to this headline">¶</a></h4>
-<ul class="simple">
-<li><p><strong>pointdefect_name</strong> gives the name of a point-defect reference record in the iprPy library containing point defect input parameters.</p></li>
-<li><p><strong>pointdefect_file</strong> gives the path to a point_defect reference containing point defect input parameters. Here, this is built automatically using pointdefect_name and librarydir.</p></li>
-<li><p><strong>point_kwargs</strong> (required) is a dictionary or list of dictonaries containing parameters for generating the defect. Here, values are extracted from pointdefect_file. Allowed keywords are:</p>
-<ul>
-<li><p><strong>ptd_type</strong> indicates which defect type to generate: ‘v’ for vacancy, ‘i’ for interstitial, ‘s’ for substitutional, or ‘db’ for dumbbell.</p></li>
-<li><p><strong>atype</strong> is the atom type to assign to the defect atom (‘i’, ‘s’, ‘db’ ptd_types).</p></li>
-<li><p><strong>pos</strong> specifies the position for adding the defect atom (all ptd_types).</p></li>
-<li><p><strong>ptd_id</strong> specifies the id of an atom in the initial system where the defect is to be added. Alternative to using pos (‘v’, ‘s’, ‘db’ ptd_types).</p></li>
-<li><p><strong>db_vect</strong> gives the vector associated with the dumbbell interstitial to generate (‘db’ ptd_type).</p></li>
-<li><p><strong>scale</strong> indicates if pos and db_vect are in absolute (False) or box-relative (True) coordinates. Default is False.</p></li>
-<li><p><strong>atol</strong> is the absolute tolerance for position-based searching. Default is 1e-3 angstroms.</p></li>
-</ul>
-</li>
-</ul>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pointdefect_name</span> <span class="o">=</span> <span class="s1">&#39;A1--Cu--fcc--vacancy&#39;</span>
-<span class="c1">#pointdefect_name = &#39;A1--Cu--fcc--1nn-divacancy&#39;</span>
-<span class="c1">#pointdefect_name = &#39;A1--Cu--fcc--2nn-divacancy&#39;</span>
-<span class="c1">#pointdefect_name = &#39;A1--Cu--fcc--100-dumbbell&#39;</span>
-<span class="c1">#pointdefect_name = &#39;A1--Cu--fcc--110-dumbbell&#39;</span>
-<span class="c1">#pointdefect_name = &#39;A1--Cu--fcc--111-dumbbell&#39;</span>
-<span class="c1">#pointdefect_name = &#39;A1--Cu--fcc--octahedral-interstitial&#39;</span>
-<span class="c1">#pointdefect_name = &#39;A1--Cu--fcc--tetrahedral-interstitial&#39;</span>
-<span class="c1">#pointdefect_name = &#39;A1--Cu--fcc--crowdion-interstitial&#39;</span>
-
-<span class="c1"># Define pointdefect_file using librarydir and pointdefect_name</span>
-<span class="n">pointdefect_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;point_defect&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{pointdefect_name}</span><span class="s1">.json&#39;</span><span class="p">)</span>
-
-<span class="c1"># Parse pointdefect_file using iprPy.input.interpret()</span>
-<span class="n">defectinputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ucell&#39;</span><span class="p">:</span><span class="n">ucell</span><span class="p">,</span> <span class="s1">&#39;pointdefect_file&#39;</span><span class="p">:</span><span class="n">pointdefect_file</span><span class="p">}</span>
-<span class="n">iprPy</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">subset</span><span class="p">(</span><span class="s1">&#39;pointdefect&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">interpret</span><span class="p">(</span><span class="n">defectinputs</span><span class="p">)</span>
-
-<span class="c1"># Extract point_kwargs</span>
-<span class="n">point_kwargs</span> <span class="o">=</span> <span class="n">defectinputs</span><span class="p">[</span><span class="s1">&#39;point_kwargs&#39;</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;point_kwargs =&#39;</span><span class="p">)</span>
-<span class="n">point_kwargs</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-point_kwargs =
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-[{&#39;ptd_type&#39;: &#39;v&#39;, &#39;pos&#39;: array([0., 0., 0.]), &#39;scale&#39;: False}]
-</pre></div></div>
-</div>
-</div>
-<div class="section" id="2.5.-Modify-system">
-<h4>2.5. Modify system<a class="headerlink" href="#2.5.-Modify-system" title="Permalink to this headline">¶</a></h4>
-<ul class="simple">
-<li><p><strong>sizemults</strong> list of three integers specifying how many times the ucell vectors of <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span> and <span class="math notranslate nohighlight">\(c\)</span> are replicated in creating system.</p></li>
-<li><p><strong>system</strong> is an atomman.System to perform the scan on (required).</p></li>
-</ul>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">sizemults</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
-
-<span class="c1"># Generate system by supersizing ucell</span>
-<span class="n">system</span> <span class="o">=</span> <span class="n">ucell</span><span class="o">.</span><span class="n">supersize</span><span class="p">(</span><span class="o">*</span><span class="n">sizemults</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;# of atoms in system =&#39;</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">natoms</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-# of atoms in system = 4000
-</pre></div></div>
-</div>
-</div>
-<div class="section" id="2.6.-Specify-calculation-specific-run-parameters">
-<h4>2.6. Specify calculation-specific run parameters<a class="headerlink" href="#2.6.-Specify-calculation-specific-run-parameters" title="Permalink to this headline">¶</a></h4>
-<ul class="simple">
-<li><p><strong>energytolerance</strong> is the energy tolerance to use during the minimizations. This is unitless.</p></li>
-<li><p><strong>forcetolerance</strong> is the force tolerance to use during the minimizations. This is in energy/length units.</p></li>
-<li><p><strong>maxiterations</strong> is the maximum number of minimization iterations to use.</p></li>
-<li><p><strong>maxevaluations</strong> is the maximum number of minimization evaluations to use.</p></li>
-<li><p><strong>maxatommotion</strong> is the largest distance that an atom is allowed to move during a minimization iteration. This is in length units.</p></li>
-</ul>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">energytolerance</span> <span class="o">=</span> <span class="mf">1e-8</span>
-<span class="n">forcetolerance</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;eV/angstrom&#39;</span><span class="p">)</span>
-<span class="n">maxiterations</span> <span class="o">=</span> <span class="mi">10000</span>
-<span class="n">maxevaluations</span> <span class="o">=</span> <span class="mi">100000</span>
-<span class="n">maxatommotion</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="section" id="3.-Define-calculation-function(s)-and-generate-template-LAMMPS-script(s)">
-<h3>3. Define calculation function(s) and generate template LAMMPS script(s)<a class="headerlink" href="#3.-Define-calculation-function(s)-and-generate-template-LAMMPS-script(s)" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="3.1.-min.template">
-<h4>3.1. min.template<a class="headerlink" href="#3.1.-min.template" title="Permalink to this headline">¶</a></h4>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;min.template&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;# LAMMPS input script that performs a simple energy minimization</span>
-
-<span class="s2">box tilt large</span>
-
-<span class="s2">&lt;atomman_system_info&gt;</span>
-
-<span class="s2">&lt;atomman_pair_info&gt;</span>
-
-<span class="s2">thermo_style custom step lx ly lz pxx pyy pzz pxy pxz pyz pe</span>
-<span class="s2">thermo_modify format float </span><span class="si">%.13e</span><span class="s2"></span>
-
-<span class="s2">compute peatom all pe/atom</span>
-
-<span class="s2">dump dumpit all custom &lt;maxeval&gt; atom.* id type x y z c_peatom</span>
-<span class="s2">dump_modify dumpit format &lt;dump_modify_format&gt;</span>
-
-<span class="s2">min_modify dmax &lt;dmax&gt;</span>
-
-<span class="s2">minimize &lt;etol&gt; &lt;ftol&gt; &lt;maxiter&gt; &lt;maxeval&gt;&quot;&quot;&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="3.2.-pointdefect()">
-<h4>3.2. pointdefect()<a class="headerlink" href="#3.2.-pointdefect()" title="Permalink to this headline">¶</a></h4>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="k">def</span> <span class="nf">pointdefect</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">point_kwargs</span><span class="p">,</span>
-                <span class="n">mpi_command</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">etol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
-                <span class="n">maxeval</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">dmax</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)):</span>
+<span></span><span class="k">def</span> <span class="nf">pointdefect</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                <span class="n">system</span><span class="p">:</span> <span class="n">am</span><span class="o">.</span><span class="n">System</span><span class="p">,</span>
+                <span class="n">potential</span><span class="p">:</span> <span class="n">lmp</span><span class="o">.</span><span class="n">Potential</span><span class="p">,</span>
+                <span class="n">point_kwargs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span>
+                <span class="n">mpi_command</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">etol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="n">ftol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="n">maxiter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span>
+                <span class="n">maxeval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100000</span><span class="p">,</span>
+                <span class="n">dmax</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adds one or more point defects to a system and evaluates the defect</span>
 <span class="sd">    formation energy.</span>
@@ -712,7 +614,7 @@ point_kwargs =
 <span class="sd">        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS</span>
 <span class="sd">        will run serially.</span>
 <span class="sd">    sim_directory : str, optional</span>
-<span class="sd">        The path to the directory to perform the simuation in.  If not</span>
+<span class="sd">        The path to the directory to perform the simulation in.  If not</span>
 <span class="sd">        given, will use the current working directory.</span>
 <span class="sd">    etol : float, optional</span>
 <span class="sd">        The energy tolerance for the structure minimization. This value is</span>
@@ -736,12 +638,14 @@ point_kwargs =
 <span class="sd">    dict</span>
 <span class="sd">        Dictionary of results consisting of keys:</span>
 
-<span class="sd">        - **&#39;E_coh&#39;** (*float*) - The cohesive energy of the bulk system.</span>
-<span class="sd">        - **&#39;E_ptd_f&#39;** (*float*) - The point.defect formation energy.</span>
+<span class="sd">        - **&#39;E_pot&#39;** (*float*) - The per-atom potential energy of the bulk system.</span>
+<span class="sd">        - **&#39;E_ptd_f&#39;** (*float*) - The point defect formation energy.</span>
 <span class="sd">        - **&#39;E_total_base&#39;** (*float*) - The total potential energy of the</span>
 <span class="sd">          relaxed bulk system.</span>
 <span class="sd">        - **&#39;E_total_ptd&#39;** (*float*) - The total potential energy of the</span>
 <span class="sd">          relaxed defect system.</span>
+<span class="sd">        - **&#39;pij_tensor&#39;** (*numpy.ndarray of float*) - The elastic dipole</span>
+<span class="sd">          tensor associated with the defect.</span>
 <span class="sd">        - **&#39;system_base&#39;** (*atomman.System*) - The relaxed bulk system.</span>
 <span class="sd">        - **&#39;system_ptd&#39;** (*atomman.System*) - The relaxed defect system.</span>
 <span class="sd">        - **&#39;dumpfile_base&#39;** (*str*) - The filename of the LAMMPS dump file</span>
@@ -749,13 +653,6 @@ point_kwargs =
 <span class="sd">        - **&#39;dumpfile_ptd&#39;** (*str*) - The filename of the LAMMPS dump file</span>
 <span class="sd">          for the relaxed defect system.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="c1"># Get script&#39;s location if __file__ exists</span>
-        <span class="n">script_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
-    <span class="k">except</span><span class="p">:</span>
-        <span class="c1"># Use cwd otherwise</span>
-        <span class="n">script_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
-
     <span class="c1"># Get lammps units</span>
     <span class="n">lammps_units</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
 
@@ -765,10 +662,8 @@ point_kwargs =
     <span class="c1"># Define lammps variables</span>
     <span class="n">lammps_variables</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">system_info</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;atom_data&#39;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="s1">&#39;perfect.dat&#39;</span><span class="p">,</span>
-                              <span class="n">units</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">,</span>
-                              <span class="n">atom_style</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">atom_style</span><span class="p">)</span>
-    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_system_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_info</span>
-    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_pair_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">potential</span><span class="o">.</span><span class="n">pair_info</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">symbols</span><span class="p">)</span>
+                              <span class="n">potential</span><span class="o">=</span><span class="n">potential</span><span class="p">)</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_system_pair_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_info</span>
     <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;etol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">etol</span>
     <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;ftol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">ftol</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;force&#39;</span><span class="p">])</span>
     <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxiter</span>
@@ -782,21 +677,21 @@ point_kwargs =
         <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;float </span><span class="si">%.13e</span><span class="s1">&#39;</span>
 
     <span class="c1"># Write lammps input script</span>
-    <span class="n">template_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span> <span class="s1">&#39;min.template&#39;</span><span class="p">)</span>
     <span class="n">lammps_script</span> <span class="o">=</span> <span class="s1">&#39;min.in&#39;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">template_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">template</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">read_calc_file</span><span class="p">(</span><span class="s1">&#39;iprPy.calculation.point_defect_static&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;min.template&#39;</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lammps_script</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">filltemplate</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">lammps_variables</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filltemplate</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">lammps_variables</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
 
     <span class="c1"># Run lammps to relax perfect.dat</span>
-    <span class="n">output</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">lammps_script</span><span class="p">,</span> <span class="n">mpi_command</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">script_name</span><span class="o">=</span><span class="n">lammps_script</span><span class="p">,</span>
+                     <span class="n">mpi_command</span><span class="o">=</span><span class="n">mpi_command</span><span class="p">)</span>
 
     <span class="c1"># Extract LAMMPS thermo data.</span>
     <span class="n">thermo</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">simulations</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;thermo&#39;</span><span class="p">]</span>
     <span class="n">E_total_base</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">PotEng</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
                                    <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;energy&#39;</span><span class="p">])</span>
-    <span class="n">E_coh</span> <span class="o">=</span> <span class="n">E_total_base</span> <span class="o">/</span> <span class="n">system</span><span class="o">.</span><span class="n">natoms</span>
+    <span class="n">E_pot</span> <span class="o">=</span> <span class="n">E_total_base</span> <span class="o">/</span> <span class="n">system</span><span class="o">.</span><span class="n">natoms</span>
 
     <span class="n">pxx</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">Pxx</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">])</span>
     <span class="n">pyy</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">Pyy</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">])</span>
@@ -825,17 +720,16 @@ point_kwargs =
 
     <span class="c1"># Update lammps variables</span>
     <span class="n">system_info</span> <span class="o">=</span> <span class="n">system_ptd</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;atom_data&#39;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="s1">&#39;defect.dat&#39;</span><span class="p">,</span>
-                                  <span class="n">units</span> <span class="o">=</span> <span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">,</span>
-                                  <span class="n">atom_style</span> <span class="o">=</span> <span class="n">potential</span><span class="o">.</span><span class="n">atom_style</span><span class="p">)</span>
-    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_system_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_info</span>
+                                  <span class="n">potential</span><span class="o">=</span><span class="n">potential</span><span class="p">)</span>
+    <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_system_pair_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_info</span>
 
     <span class="c1"># Write lammps input script</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lammps_script</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">iprPy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">filltemplate</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">lammps_variables</span><span class="p">,</span>
-                                         <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filltemplate</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">lammps_variables</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
 
     <span class="c1"># Run lammps</span>
-    <span class="n">output</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">lammps_script</span><span class="p">,</span> <span class="n">mpi_command</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">script_name</span><span class="o">=</span><span class="n">lammps_script</span><span class="p">,</span>
+                     <span class="n">mpi_command</span><span class="o">=</span><span class="n">mpi_command</span><span class="p">)</span>
 
     <span class="c1"># Extract lammps thermo data</span>
     <span class="n">thermo</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">simulations</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;thermo&#39;</span><span class="p">]</span>
@@ -860,20 +754,20 @@ point_kwargs =
     <span class="n">system_ptd</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;atom_dump&#39;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="s1">&#39;defect.dump&#39;</span><span class="p">)</span>
 
     <span class="c1"># Compute defect formation energy</span>
-    <span class="n">E_ptd_f</span> <span class="o">=</span> <span class="n">E_total_ptd</span> <span class="o">-</span> <span class="n">E_coh</span> <span class="o">*</span> <span class="n">system_ptd</span><span class="o">.</span><span class="n">natoms</span>
+    <span class="n">E_ptd_f</span> <span class="o">=</span> <span class="n">E_total_ptd</span> <span class="o">-</span> <span class="n">E_pot</span> <span class="o">*</span> <span class="n">system_ptd</span><span class="o">.</span><span class="n">natoms</span>
 
     <span class="c1"># Compute strain tensor</span>
     <span class="n">pij</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">pressure_base</span> <span class="o">-</span> <span class="n">pressure_ptd</span><span class="p">)</span> <span class="o">*</span> <span class="n">system_base</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">volume</span>
 
     <span class="c1"># Cleanup files</span>
-    <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">script_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;atom.*&#39;</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;atom.*&#39;</span><span class="p">):</span>
         <span class="n">fname</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">dumpjsonfile</span> <span class="ow">in</span> <span class="n">script_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;*.dump.json&#39;</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">dumpjsonfile</span> <span class="ow">in</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;*.dump.json&#39;</span><span class="p">):</span>
         <span class="n">dumpjsonfile</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
 
     <span class="c1"># Return results</span>
     <span class="n">results_dict</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_coh&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_coh</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_pot&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_pot</span>
     <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_ptd_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_ptd_f</span>
     <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_total_base&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_total_base</span>
     <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_total_ptd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_total_ptd</span>
@@ -884,21 +778,21 @@ point_kwargs =
     <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;dumpfile_ptd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;defect.dump&#39;</span>
 
     <span class="k">return</span> <span class="n">results_dict</span>
-
-
 </pre></div>
 </div>
 </div>
 </div>
-<div class="section" id="3.3.-check_ptd_config()">
-<h4>3.3. check_ptd_config()<a class="headerlink" href="#3.3.-check_ptd_config()" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="2.3.-check_ptd_config()">
+<h3>2.3. check_ptd_config()<a class="headerlink" href="#2.3.-check_ptd_config()" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="k">def</span> <span class="nf">check_ptd_config</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">point_kwargs</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span>
-                     <span class="n">tol</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">1e-5</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)):</span>
+<span></span><span class="k">def</span> <span class="nf">check_ptd_config</span><span class="p">(</span><span class="n">system</span><span class="p">:</span> <span class="n">am</span><span class="o">.</span><span class="n">System</span><span class="p">,</span>
+                     <span class="n">point_kwargs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span>
+                     <span class="n">cutoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                     <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">1e-5</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluates a relaxed system containing a point defect to determine if the</span>
 <span class="sd">    defect structure has transformed to a different configuration.</span>
@@ -924,12 +818,12 @@ point_kwargs =
 
 <span class="sd">        - **&#39;has_reconfigured&#39;** (*bool*) - Flag indicating if the structure</span>
 <span class="sd">          has been identified as relaxing to a different defect configuration.</span>
-<span class="sd">        - **&#39;centrosummation&#39;** (*numpy.array of float*) - The centrosummation</span>
+<span class="sd">        - **&#39;centrosummation&#39;** (*numpy.ndarray of float*) - The centrosummation</span>
 <span class="sd">          parameter used for evaluating if the configuration has relaxed.</span>
-<span class="sd">        - **&#39;position_shift&#39;** (*numpy.array of float*) - The position_shift</span>
+<span class="sd">        - **&#39;position_shift&#39;** (*numpy.ndarray of float*) - The position_shift</span>
 <span class="sd">          parameter used for evaluating if the configuration has relaxed.</span>
 <span class="sd">          Only given for interstitial and substitutional-style defects.</span>
-<span class="sd">        - **&#39;db_vect_shift&#39;** (*numpy.array of float*) - The db_vect_shift</span>
+<span class="sd">        - **&#39;db_vect_shift&#39;** (*numpy.ndarray of float*) - The db_vect_shift</span>
 <span class="sd">          parameter used for evaluating if the configuration has relaxed.</span>
 <span class="sd">          Only given for dumbbell-style defects.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -994,113 +888,92 @@ point_kwargs =
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;has_reconfigured&#39;</span><span class="p">:</span> <span class="n">has_reconfigured</span><span class="p">,</span>
                 <span class="s1">&#39;centrosummation&#39;</span><span class="p">:</span> <span class="n">centrosummation</span><span class="p">}</span>
-
-
 </pre></div>
 </div>
 </div>
 </div>
-</div>
-<div class="section" id="4.-Run-calculation-function(s)">
-<h3>4. Run calculation function(s)<a class="headerlink" href="#4.-Run-calculation-function(s)" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="4.1.-Generate-point-defect-system-and-evaluate-the-energy">
-<h4>4.1. Generate point defect system and evaluate the energy<a class="headerlink" href="#4.1.-Generate-point-defect-system-and-evaluate-the-energy" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="2.4.-min.template-file">
+<h3>2.4. min.template file<a class="headerlink" href="#2.4.-min.template-file" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">results_dict</span> <span class="o">=</span> <span class="n">pointdefect</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">point_kwargs</span><span class="p">,</span>
-                           <span class="n">mpi_command</span> <span class="o">=</span> <span class="n">mpi_command</span><span class="p">,</span>
-                           <span class="n">etol</span> <span class="o">=</span> <span class="n">energytolerance</span><span class="p">,</span>
-                           <span class="n">ftol</span> <span class="o">=</span> <span class="n">forcetolerance</span><span class="p">,</span>
-                           <span class="n">maxiter</span> <span class="o">=</span> <span class="n">maxiterations</span><span class="p">,</span>
-                           <span class="n">maxeval</span> <span class="o">=</span> <span class="n">maxevaluations</span><span class="p">,</span>
-                           <span class="n">dmax</span> <span class="o">=</span> <span class="n">maxatommotion</span><span class="p">)</span>
+<span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;min.template&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;# LAMMPS input script that performs a simple energy minimization</span>
+
+<span class="s2">box tilt large</span>
+
+<span class="s2">&lt;atomman_system_pair_info&gt;</span>
+
+<span class="s2">thermo_style custom step lx ly lz pxx pyy pzz pxy pxz pyz pe</span>
+<span class="s2">thermo_modify format float </span><span class="si">%.13e</span><span class="s2"></span>
+
+<span class="s2">compute peatom all pe/atom</span>
+
+<span class="s2">dump dumpit all custom &lt;maxeval&gt; atom.* id type x y z c_peatom</span>
+<span class="s2">dump_modify dumpit format &lt;dump_modify_format&gt;</span>
+
+<span class="s2">min_modify dmax &lt;dmax&gt;</span>
+
+<span class="s2">minimize &lt;etol&gt; &lt;ftol&gt; &lt;maxiter&gt; &lt;maxeval&gt;&quot;&quot;&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">results_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-</pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-dict_keys([&#39;E_coh&#39;, &#39;E_ptd_f&#39;, &#39;E_total_base&#39;, &#39;E_total_ptd&#39;, &#39;pij_tensor&#39;, &#39;system_base&#39;, &#39;system_ptd&#39;, &#39;dumpfile_base&#39;, &#39;dumpfile_ptd&#39;])
-</pre></div></div>
-</div>
-</div>
-<div class="section" id="4.2.-Characterize-if-the-defect-has-reconfigured">
-<h4>4.2. Characterize if the defect has reconfigured<a class="headerlink" href="#4.2.-Characterize-if-the-defect-has-reconfigured" title="Permalink to this headline">¶</a></h4>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">cutoff</span> <span class="o">=</span> <span class="mf">1.05</span><span class="o">*</span><span class="n">ucell</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">a</span>
-<span class="n">results_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">check_ptd_config</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;system_ptd&#39;</span><span class="p">],</span>
-                                     <span class="n">point_kwargs</span><span class="p">,</span>
-                                     <span class="n">cutoff</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">results_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-dict_keys([&#39;E_coh&#39;, &#39;E_ptd_f&#39;, &#39;E_total_base&#39;, &#39;E_total_ptd&#39;, &#39;pij_tensor&#39;, &#39;system_base&#39;, &#39;system_ptd&#39;, &#39;dumpfile_base&#39;, &#39;dumpfile_ptd&#39;, &#39;has_reconfigured&#39;, &#39;centrosummation&#39;])
-</pre></div></div>
-</div>
-</div>
-</div>
-<div class="section" id="5.-Report-results">
-<h3>5. Report results<a class="headerlink" href="#5.-Report-results" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="5.1.-Define-units-for-outputting-values">
-<h4>5.1. Define units for outputting values<a class="headerlink" href="#5.1.-Define-units-for-outputting-values" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="3.-Specify-input-parameters">
+<h2>3. Specify input parameters<a class="headerlink" href="#3.-Specify-input-parameters" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="3.1.-System-specific-paths">
+<h3>3.1. System-specific paths<a class="headerlink" href="#3.1.-System-specific-paths" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p><strong>length_unit</strong> is the unit of length to display relaxed lattice constants in.</p></li>
-<li><p><strong>energy_unit</strong> is the unit of energy to display cohesive energies in.</p></li>
+<li><p><strong>lammps_command</strong> is the LAMMPS command to use (required).</p></li>
+<li><p><strong>mpi_command</strong> MPI command for running LAMMPS in parallel. A value of None will run simulations serially.</p></li>
 </ul>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">length_unit</span> <span class="o">=</span> <span class="s1">&#39;angstrom&#39;</span>
-<span class="n">energy_unit</span> <span class="o">=</span> <span class="s1">&#39;eV&#39;</span>
+<span></span><span class="n">lammps_command</span> <span class="o">=</span> <span class="s1">&#39;lmp_serial&#39;</span>
+<span class="n">mpi_command</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="section" id="5.2.-Print-E_{coh}-and-E_{ptd}^f">
-<h4>5.2. Print <span class="math notranslate nohighlight">\(E_{coh}\)</span> and <span class="math notranslate nohighlight">\(E_{ptd}^f\)</span><a class="headerlink" href="#5.2.-Print-E_{coh}-and-E_{ptd}^f" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="3.2.-Interatomic-potential">
+<h3>3.2. Interatomic potential<a class="headerlink" href="#3.2.-Interatomic-potential" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>potential_name</strong> gives the name of the potential_LAMMPS reference record in the iprPy library to use for the calculation.</p></li>
+<li><p><strong>potential</strong> is an atomman.lammps.Potential object (required).</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">potential_name</span> <span class="o">=</span> <span class="s1">&#39;1999--Mishin-Y--Ni--LAMMPS--ipr1&#39;</span>
+
+<span class="c1"># Retrieve potential and parameter file(s) using atomman</span>
+<span class="n">potential</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load_lammps_potential</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">potential_name</span><span class="p">,</span> <span class="n">getfiles</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="3.3.-Initial-unit-cell-system">
+<h3>3.3. Initial unit cell system<a class="headerlink" href="#3.3.-Initial-unit-cell-system" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>ucell</strong> is an atomman.System representing a fundamental unit cell of the system (required). Here, this is generated using the load parameters and symbols.</p></li>
+</ul>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Ecoh =  &#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_coh&#39;</span><span class="p">],</span> <span class="n">energy_unit</span><span class="p">),</span> <span class="n">energy_unit</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Eptd_f =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_ptd_f&#39;</span><span class="p">],</span> <span class="n">energy_unit</span><span class="p">),</span> <span class="n">energy_unit</span><span class="p">)</span>
+<span></span><span class="c1"># Create ucell by loading prototype record</span>
+<span class="n">ucell</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;crystal&#39;</span><span class="p">,</span> <span class="n">potential</span><span class="o">=</span><span class="n">potential</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;A1--Cu--fcc&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">ucell</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1109,19 +982,261 @@ dict_keys([&#39;E_coh&#39;, &#39;E_ptd_f&#39;, &#39;E_total_base&#39;, &#39;E_to
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Ecoh =   -4.449999998346 eV
-Eptd_f = 1.5999212636525046 eV
+avect =  [ 3.520,  0.000,  0.000]
+bvect =  [ 0.000,  3.520,  0.000]
+cvect =  [ 0.000,  0.000,  3.520]
+origin = [ 0.000,  0.000,  0.000]
+natoms = 4
+natypes = 1
+symbols = (&#39;Ni&#39;,)
+pbc = [ True  True  True]
+per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
+     id |   atype |  pos[0] |  pos[1] |  pos[2]
+      0 |       1 |   0.000 |   0.000 |   0.000
+      1 |       1 |   0.000 |   1.760 |   1.760
+      2 |       1 |   1.760 |   0.000 |   1.760
+      3 |       1 |   1.760 |   1.760 |   0.000
 </pre></div></div>
 </div>
 </div>
-<div class="section" id="5.3.-Check-configuration-parameters">
-<h4>5.3. Check configuration parameters<a class="headerlink" href="#5.3.-Check-configuration-parameters" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="3.4-Defect-parameters">
+<h3>3.4 Defect parameters<a class="headerlink" href="#3.4-Defect-parameters" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>point_kwargs</strong> (required) is a dictionary or list of dictonaries containing parameters for generating the defect. Here, values are extracted from pointdefect_file. Allowed keywords are:</p>
+<ul>
+<li><p><strong>ptd_type</strong> indicates which defect type to generate: ‘v’ for vacancy, ‘i’ for interstitial, ‘s’ for substitutional, or ‘db’ for dumbbell.</p></li>
+<li><p><strong>atype</strong> is the atom type to assign to the defect atom (‘i’, ‘s’, ‘db’ ptd_types).</p></li>
+<li><p><strong>pos</strong> specifies the position for adding the defect atom (all ptd_types).</p></li>
+<li><p><strong>ptd_id</strong> specifies the id of an atom in the initial system where the defect is to be added. Alternative to using pos (‘v’, ‘s’, ‘db’ ptd_types).</p></li>
+<li><p><strong>db_vect</strong> gives the vector associated with the dumbbell interstitial to generate (‘db’ ptd_type).</p></li>
+<li><p><strong>scale</strong> indicates if pos and db_vect are in absolute (False) or box-relative (True) coordinates. Default is False.</p></li>
+<li><p><strong>atol</strong> is the absolute tolerance for position-based searching. Default is 1e-3 angstroms.</p></li>
+</ul>
+</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Add a vacancy by deleting the atom at [0,0,0] - works for any crystal structure</span>
+<span class="n">point_kwargs</span> <span class="o">=</span> <span class="p">[{</span>
+    <span class="s1">&#39;ptd_type&#39;</span><span class="p">:</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;pos&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span>
+    <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">}]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="3.5.-System-modifications">
+<h3>3.5. System modifications<a class="headerlink" href="#3.5.-System-modifications" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>sizemults</strong> list of three integers specifying how many times the ucell vectors of <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span> and <span class="math notranslate nohighlight">\(c\)</span> are replicated in creating system.</p></li>
+<li><p><strong>system</strong> is an atomman.System to perform the scan on (required).</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">sizemults</span> <span class="o">=</span> <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">]</span>
+
+<span class="c1"># Generate system by supersizing ucell</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ucell</span><span class="o">.</span><span class="n">supersize</span><span class="p">(</span><span class="o">*</span><span class="n">sizemults</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;# of atoms in system =&#39;</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">natoms</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+# of atoms in system = 6912
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="3.6-Calculation-specific-parameters">
+<h3>3.6 Calculation-specific parameters<a class="headerlink" href="#3.6-Calculation-specific-parameters" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>energytolerance</strong> is the energy tolerance to use during the minimizations. This is unitless.</p></li>
+<li><p><strong>forcetolerance</strong> is the force tolerance to use during the minimizations. This is in energy/length units.</p></li>
+<li><p><strong>maxiterations</strong> is the maximum number of minimization iterations to use.</p></li>
+<li><p><strong>maxevaluations</strong> is the maximum number of minimization evaluations to use.</p></li>
+<li><p><strong>maxatommotion</strong> is the largest distance that an atom is allowed to move during a minimization iteration. This is in length units.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">energytolerance</span> <span class="o">=</span> <span class="mf">1e-8</span>
+<span class="n">forcetolerance</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;eV/angstrom&#39;</span><span class="p">)</span>
+<span class="n">maxiterations</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">maxevaluations</span> <span class="o">=</span> <span class="mi">100000</span>
+<span class="n">maxatommotion</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="4.-Run-calculation-and-view-results">
+<h2>4. Run calculation and view results<a class="headerlink" href="#4.-Run-calculation-and-view-results" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="4.1.-Run-calculation">
+<h3>4.1. Run calculation<a class="headerlink" href="#4.1.-Run-calculation" title="Permalink to this headline">¶</a></h3>
+<p>All primary calculation method functions take a series of inputs and return a dictionary of outputs.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">results_dict</span> <span class="o">=</span> <span class="n">calc</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">point_kwargs</span><span class="p">,</span>
+                    <span class="n">cutoff</span> <span class="o">=</span> <span class="n">ucell</span><span class="o">.</span><span class="n">r0</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.1</span><span class="p">,</span>
+                    <span class="n">mpi_command</span> <span class="o">=</span> <span class="n">mpi_command</span><span class="p">,</span>
+                    <span class="n">etol</span> <span class="o">=</span> <span class="n">energytolerance</span><span class="p">,</span>
+                    <span class="n">ftol</span> <span class="o">=</span> <span class="n">forcetolerance</span><span class="p">,</span>
+                    <span class="n">maxiter</span> <span class="o">=</span> <span class="n">maxiterations</span><span class="p">,</span>
+                    <span class="n">maxeval</span> <span class="o">=</span> <span class="n">maxevaluations</span><span class="p">,</span>
+                    <span class="n">dmax</span> <span class="o">=</span> <span class="n">maxatommotion</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">results_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+dict_keys([&#39;E_pot&#39;, &#39;E_ptd_f&#39;, &#39;E_total_base&#39;, &#39;E_total_ptd&#39;, &#39;pij_tensor&#39;, &#39;system_base&#39;, &#39;system_ptd&#39;, &#39;dumpfile_base&#39;, &#39;dumpfile_ptd&#39;, &#39;has_reconfigured&#39;, &#39;centrosummation&#39;])
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="4.2.-Report-results">
+<h3>4.2. Report results<a class="headerlink" href="#4.2.-Report-results" title="Permalink to this headline">¶</a></h3>
+<p>Values returned in the results_dict:</p>
+<ul class="simple">
+<li><p><strong>‘E_pot’</strong> (<em>float</em>) - The per-atom potential energy of the bulk system.</p></li>
+<li><p><strong>‘E_ptd_f’</strong> (<em>float</em>) - The point.defect formation energy.</p></li>
+<li><p><strong>‘E_total_base’</strong> (<em>float</em>) - The total potential energy of the relaxed bulk system.</p></li>
+<li><p><strong>‘E_total_ptd’</strong> (<em>float</em>) - The total potential energy of the relaxed defect system.</p></li>
+<li><p><strong>‘system_base’</strong> (<em>atomman.System</em>) - The relaxed bulk system.</p></li>
+<li><p><strong>‘system_ptd’</strong> (<em>atomman.System</em>) - The relaxed defect system.</p></li>
+<li><p><strong>‘dumpfile_base’</strong> (<em>str</em>) - The filename of the LAMMPS dump file for the relaxed bulk system.</p></li>
+<li><p><strong>‘dumpfile_ptd’</strong> (<em>str</em>) - The filename of the LAMMPS dump file for the relaxed defect system.</p></li>
+<li><p><strong>‘has_reconfigured’</strong> (<em>bool</em>) - Flag indicating if the structure has been identified as relaxing to a different defect configuration.</p></li>
+<li><p><strong>‘centrosummation’</strong> (<em>numpy.array of float</em>) - The centrosummation parameter used for evaluating if the configuration has relaxed.</p></li>
+<li><p><strong>‘position_shift’</strong> (<em>numpy.array of float</em>) - The position_shift parameter used for evaluating if the configuration has relaxed. Only given for interstitial and substitutional-style defects.</p></li>
+<li><p><strong>‘db_vect_shift’</strong> (<em>numpy.array of float</em>) - The db_vect_shift parameter used for evaluating if the configuration has relaxed. Only given for dumbbell-style defects.</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">energy_unit</span> <span class="o">=</span> <span class="s1">&#39;eV&#39;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;E_pot =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_pot&#39;</span><span class="p">],</span> <span class="n">energy_unit</span><span class="p">),</span> <span class="n">energy_unit</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;E_ptd_f =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_ptd_f&#39;</span><span class="p">],</span> <span class="n">energy_unit</span><span class="p">),</span> <span class="n">energy_unit</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+E_pot = -4.449999998376013 eV
+E_ptd_f = 1.6000474976244732 eV
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Show info for the base systems</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;system_base&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">natoms</span><span class="p">,</span> <span class="s1">&#39;atoms in base system&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;E_total_base =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_total_base&#39;</span><span class="p">],</span> <span class="n">energy_unit</span><span class="p">),</span> <span class="n">energy_unit</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Dumped to&#39;</span><span class="p">,</span> <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;dumpfile_base&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+6912 atoms in base system
+E_total_base = -30758.399988775 eV
+Dumped to perfect.dump
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Show info for the ptd systems</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;system_ptd&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">natoms</span><span class="p">,</span> <span class="s1">&#39;atoms in ptd system&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;E_total_ptd =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_total_ptd&#39;</span><span class="p">],</span> <span class="n">energy_unit</span><span class="p">),</span> <span class="n">energy_unit</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Dumped to&#39;</span><span class="p">,</span> <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;dumpfile_ptd&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+6911 atoms in ptd system
+E_total_ptd = -30752.349941279 eV
+Dumped to defect.dump
+</pre></div></div>
+</div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Has the system (likely) reconfigured?&#39;</span><span class="p">,</span> <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;has_reconfigured&#39;</span><span class="p">])</span>
+<span></span><span class="c1"># Show the computed elastic dipole tensor</span>
+<span class="n">pij</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;pij_tensor&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;pij (</span><span class="si">{</span><span class="n">energy_unit</span><span class="si">}</span><span class="s1">)=&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">pij</span><span class="p">,</span> <span class="n">energy_unit</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="c1"># Filter out near-zero values</span>
+<span class="n">pij</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">pij</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;pij refined (</span><span class="si">{</span><span class="n">energy_unit</span><span class="si">}</span><span class="s1">)=&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">pij</span><span class="p">,</span> <span class="n">energy_unit</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pij (eV)=
+[[-2.76326923e+00 -7.30054844e-13  3.39547806e-13]
+ [-7.30054844e-13 -2.76326923e+00 -5.47256639e-13]
+ [ 3.39547806e-13 -5.47256639e-13 -2.76326923e+00]]
+
+pij refined (eV)=
+[[-2.76326923  0.          0.        ]
+ [ 0.         -2.76326923  0.        ]
+ [ 0.          0.         -2.76326923]]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">length_unit</span> <span class="o">=</span> <span class="s1">&#39;angstrom&#39;</span>
+
+<span class="c1"># Show characterization anaysis</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Has the system (likely) reconfigured?&#39;</span><span class="p">,</span> <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;has_reconfigured&#39;</span><span class="p">])</span>
 <span class="k">if</span> <span class="s1">&#39;centrosummation&#39;</span> <span class="ow">in</span> <span class="n">results_dict</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;centrosummation =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;centrosummation&#39;</span><span class="p">],</span> <span class="n">length_unit</span><span class="p">),</span> <span class="n">length_unit</span><span class="p">)</span>
 <span class="k">if</span> <span class="s1">&#39;position_shift&#39;</span> <span class="ow">in</span> <span class="n">results_dict</span><span class="p">:</span>
@@ -1137,74 +1252,65 @@ Eptd_f = 1.5999212636525046 eV
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Has the system (likely) reconfigured? False
-centrosummation = [-1.89367102e-12 -1.89381844e-12 -1.89359639e-12] angstrom
+centrosummation = [5.83799805e-14 5.83977311e-14 5.50670620e-14] angstrom
 </pre></div></div>
 </div>
 </div>
 </div>
 </div>
-</div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">point_defect_static calculation style</a><ul>
-<li><a class="reference internal" href="#Introduction">Introduction</a><ul>
-<li><a class="reference internal" href="#Version-notes">Version notes</a></li>
-<li><a class="reference internal" href="#Additional-dependencies">Additional dependencies</a></li>
-<li><a class="reference internal" href="#Disclaimers">Disclaimers</a></li>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">point_defect_static - Methodology and code</a><ul>
+<li><a class="reference internal" href="#1.-Load-calculation-and-view-description">1. Load calculation and view description</a><ul>
+<li><a class="reference internal" href="#1.1.-Load-the-calculation">1.1. Load the calculation</a></li>
+<li><a class="reference internal" href="#1.2.-Display-calculation-description-and-theory">1.2. Display calculation description and theory</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#Method-and-Theory">Method and Theory</a></li>
-<li><a class="reference internal" href="#Demonstration">Demonstration</a><ul>
-<li><a class="reference internal" href="#1.-Setup">1. Setup</a><ul>
-<li><a class="reference internal" href="#1.1.-Library-imports">1.1. Library imports</a></li>
-<li><a class="reference internal" href="#1.2.-Default-calculation-setup">1.2. Default calculation setup</a></li>
+<li><a class="reference internal" href="#2.-Define-calculation-functions-and-generate-files">2. Define calculation functions and generate files</a><ul>
+<li><a class="reference internal" href="#2.1.-calc()">2.1. calc()</a></li>
+<li><a class="reference internal" href="#2.2.-pointdefect">2.2. pointdefect</a></li>
+<li><a class="reference internal" href="#2.3.-check_ptd_config()">2.3. check_ptd_config()</a></li>
+<li><a class="reference internal" href="#2.4.-min.template-file">2.4. min.template file</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#2.-Assign-values-for-the-calculation’s-run-parameters">2. Assign values for the calculation’s run parameters</a><ul>
-<li><a class="reference internal" href="#2.1.-Specify-system-specific-paths">2.1. Specify system-specific paths</a></li>
-<li><a class="reference internal" href="#2.2.-Load-interatomic-potential">2.2. Load interatomic potential</a></li>
-<li><a class="reference internal" href="#2.3.-Load-initial-unit-cell-system">2.3. Load initial unit cell system</a></li>
-<li><a class="reference internal" href="#2.4.-Specify-the-defect-parameters">2.4. Specify the defect parameters</a></li>
-<li><a class="reference internal" href="#2.5.-Modify-system">2.5. Modify system</a></li>
-<li><a class="reference internal" href="#2.6.-Specify-calculation-specific-run-parameters">2.6. Specify calculation-specific run parameters</a></li>
+<li><a class="reference internal" href="#3.-Specify-input-parameters">3. Specify input parameters</a><ul>
+<li><a class="reference internal" href="#3.1.-System-specific-paths">3.1. System-specific paths</a></li>
+<li><a class="reference internal" href="#3.2.-Interatomic-potential">3.2. Interatomic potential</a></li>
+<li><a class="reference internal" href="#3.3.-Initial-unit-cell-system">3.3. Initial unit cell system</a></li>
+<li><a class="reference internal" href="#3.4-Defect-parameters">3.4 Defect parameters</a></li>
+<li><a class="reference internal" href="#3.5.-System-modifications">3.5. System modifications</a></li>
+<li><a class="reference internal" href="#3.6-Calculation-specific-parameters">3.6 Calculation-specific parameters</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#3.-Define-calculation-function(s)-and-generate-template-LAMMPS-script(s)">3. Define calculation function(s) and generate template LAMMPS script(s)</a><ul>
-<li><a class="reference internal" href="#3.1.-min.template">3.1. min.template</a></li>
-<li><a class="reference internal" href="#3.2.-pointdefect()">3.2. pointdefect()</a></li>
-<li><a class="reference internal" href="#3.3.-check_ptd_config()">3.3. check_ptd_config()</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#4.-Run-calculation-function(s)">4. Run calculation function(s)</a><ul>
-<li><a class="reference internal" href="#4.1.-Generate-point-defect-system-and-evaluate-the-energy">4.1. Generate point defect system and evaluate the energy</a></li>
-<li><a class="reference internal" href="#4.2.-Characterize-if-the-defect-has-reconfigured">4.2. Characterize if the defect has reconfigured</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#5.-Report-results">5. Report results</a><ul>
-<li><a class="reference internal" href="#5.1.-Define-units-for-outputting-values">5.1. Define units for outputting values</a></li>
-<li><a class="reference internal" href="#5.2.-Print-E_{coh}-and-E_{ptd}^f">5.2. Print <span class="math notranslate nohighlight">\(E_{coh}\)</span> and <span class="math notranslate nohighlight">\(E_{ptd}^f\)</span></a></li>
-<li><a class="reference internal" href="#5.3.-Check-configuration-parameters">5.3. Check configuration parameters</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#4.-Run-calculation-and-view-results">4. Run calculation and view results</a><ul>
+<li><a class="reference internal" href="#4.1.-Run-calculation">4.1. Run calculation</a></li>
+<li><a class="reference internal" href="#4.2.-Report-results">4.2. Report results</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="point_defect_diffusion.html"
-                        title="previous chapter">point_defect_diffusion calculation style</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="relax_box.html"
-                        title="next chapter">relax_box calculation style</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="isolated_atom.html"
+                          title="previous chapter">isolated_atom - Methodology and code</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="relax_box.html"
+                          title="next chapter">relax_box - Methodology and code</a></p>
+  </div>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1219,17 +1325,18 @@ centrosummation = [-1.89367102e-12 -1.89381844e-12 -1.89359639e-12] angstrom
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="relax_box.html" title="relax_box calculation style"
+          <a href="relax_box.html" title="relax_box - Methodology and code"
              >next</a> |</li>
         <li class="right" >
-          <a href="point_defect_diffusion.html" title="point_defect_diffusion calculation style"
+          <a href="isolated_atom.html" title="isolated_atom - Methodology and code"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">point_defect_static - Methodology and code</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

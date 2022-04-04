@@ -2,112 +2,133 @@
 Introduction to iprPy
 =====================
 
-Why should you use iprPy?  What will you gain by doing so?  How much extra
-effort will it cost you?  Read on!
+What problems does iprPy attempt to address?
+============================================
 
-Scientific research work process
-================================
+The iprPy package is designed to provide a means for sharing both the knowledge
+and capabilities associated with calculation methods.  This is important for
+verification, validation and reproducibility of research results as anyone
+wishing to check someone else's work needs to both know how the calculations
+are done as well as being able to do it themselves.
 
-Let’s imagine a young scientist who is tasked with performing a computational
-investigation involving LAMMPS molecular dynamics simulations.  Here’s a
-simplified description of the research process for that scientist:
+Here are some examples of issues that often arise that can in part be addressed
+through the use of iprPy or similarly designed works
 
-1. Do a literature search for similar and relevant works.
-2. Select an interatomic potential based on availability and behavior.
-3. Construct atomic configurations for the investigation.
-4. Perform simulations using LAMMPS.
-5. Extract simulation results from the produced data.
-6. Perform analysis on the extracted data.
-7. Write up a publication describing the calculation methods and the processed
-   results.
-8. Move on to a new project.
+- Traditional publications are the classic way of sharing scientific knowledge.
+  However, they are static documents and any associated methodologies are
+  described in an abstract sense using the human language of the paper.  Anyone
+  wishing to use the methods either needs to create an implementation
+  themselves or obtain one from an external source.  If the description
+  contains one or more critical typos would it make reproducing the work
+  impossible?
 
-Complications
-=============
+- Research practices often focus on the traditional publication being the final
+  end product of any research work done.  To this end, the methodologies used
+  to generate the data for the paper often exist in forms that only the
+  researcher involved in the work knows how to use it.  In this situation,
+  how does the current researcher pass their work on to others in their group
+  when they move to a different job or subject area?  If the researcher leaves
+  the work alone and attempts to revisit years later, can they figure out what
+  their past selves had done?  Can they even find all of the necessary files to
+  do the work after transferring between computers and/or archiving?
 
-Now, let’s say a year or two goes by and someone decides to continue that
-scientist’s work.  It could be the original scientist, their advisor or
-boss, the next grad student or postdoc in the group, or someone from a
-completely different organization.
+- Many methodologies and tools exist as so-called "black boxes" in which
+  a compiled program accepts a set of inputs, does some hidden work, and then
+  returns processed results.  While this provides a means of sharing the
+  capability, it obscures the methodology making it difficult for users to work
+  out exactly what the method is doing.  How do external users know that the
+  black box method is doing what it claims to be doing?  If there is an issue
+  or bug with the code, is there an easy means of fixing it?
 
-- Can the original scientist locate all LAMMPS scripts, setup and analysis
-  tools, and plotting files (Excel, Matlab, etc.) that were used?
-
-- Are the located resources in a format that can easily be shared with other
-  researchers?
-
-- Are the resources clearly documented so that the methodology can be
-  learned (or relearned)?
-
-- How much content is missing and how long will it take to replace?
-
-- Does the associated publication have enough detail that any missing
-  content can be reimplemented?
-
-- Can the results of the original work be reproduced?
-
-- If not, can the source of the discrepancy be identified (implementation
-  error, statistical error, parameter sensitivity, invalid model, etc.)?
-
-- Is the original data available for validation and verification of the
-  original work?
-
-- How easily can the original process be adapted for the new study?
-
-All these complications lead to wasted time and money. If you develop a new
-capability, you should be able to reuse that capability at any time without
-having to develop it again!
-
-It’s all in the design
+It's all in the design
 ======================
 
 With iprPy, the idea is to avoid these complications beforehand through
-proper calculation design.
+proper calculation design.  In short, a little extra work now will result in
+much benefit later on as users can understand, share and revisit methods
+with ease.
 
-- Python calculation scripts are used to collect
-  specific calculation processes (steps 2-5 of the research workflow above)
-  into independent, self-contained units of work. Each self-contained
-  calculation allows for the entire calculation technique and knowledge behind
-  the technique to be contained within a single file or folder that can easily
-  be archived and/or shared.
+- All calculation methods are represented in Python.  Python is a scripting
+  language meaning that the Python scripts simultaneously represent the
+  programming code and detail the workflow associated with a specific
+  calculation.  By sharing the Python scripts as open source tools, users can
+  access and explore how the methods work.
 
-- All of a calculation script’s variable parameters are read in through a
-  simple input parameter file. This highlights the
-  important parameters of the calculation allowing parameter sensitivity
-  studies. The simple standard input also opens the calculations to being
-  implemented into high-throughput workflow managers.
+- Each calculation method exists as a Python function that serves as a
+  self-contained and independent unit of work.  It should represent the
+  workflow associated with a single run of the specific calculation method and
+  be minimally dependent on the framework in which it is contained.
+  Additionally, it should be possible to independently execute each calculation
+  function by providing only Python objects and simple data types as inputs.
+  These design considerations form the basis of making it possible for the
+  calculation functions to be individually ran or incorporated into a variety
+  of external workflows.
+  
+- The calculations are incorporated into the iprPy framework using so-called
+  Calculation classes.  Each Calculation class defines metadata
+  associated with the calculation so that the class
 
-- Upon successful completion, the calculation scripts produce XML- or
-  JSON-formatted results records. Records in these
-  formats can automatically be uploaded to databases for storing, processing,
-  and sharing of the information. Additionally, with properly named and
-  structured elements, the contents of a record should be able to be
-  visually interpreted by someone in the same field even if they are
-  unfamiliar with the calculation.
+  - Connects to the underlying calculation function.
+  
+  - Specifies data transformations and schemas allowing for the inputs and
+    results to be represented in a variety of formats.
+  
+  - Links to extra files associated with the calculation, such as
+    documentation, data files required by the calculation function, and schema
+    files for validating generated data.
+    
+- Users in a Python environment can load a Calculation class from iprPy.  The
+  class provides methods for exploring the calculation's documentation and list
+  of supported inputs, as well as a means of calling the calculation function.
+  The class can also have built-in methods for processing and interpreting the
+  generated results in a user-friendly manner, such as methods that generate
+  standard plots.
+
+- The Calculation classes also make it easy to build Jupyter Notebooks for the
+  calculations that display documentation, contain a copy of the calculation
+  function and any data files, and a working demonstration.  This provides a
+  single file that fully documents the knowledge, capabilities, and code of
+  the method that can easily be shared with others.  It also allows for curious
+  users to test modifications of the methods without any fear of breaking the
+  official versions.
+
+- Additionally, the input/output conversions specified in the Calculation
+  classes makes it possible for the calculations to be executed using only text
+  input files and terminal command lines.  This allows for trusting users to
+  execute the calculations as box methods without needing to know any Python.
+  Upon successful completion, the calculations will generate JSON results files
+  that can either be viewed in a text editor, uploaded to a database, or
+  interpreted by other programs. 
+
+- Larger workflows can be built that link and loop over multiple calculations
+  either by loading and executing the functions from a Python environment or
+  by automating the construction of the text input files.  The iprPy framework
+  contains its own workflow tools that allow for outputs from one calculation
+  to be passed into another, and for all results to be automatically added to
+  a database.
 
 How much extra work?
 ====================
 
-Honestly, using iprPy will take some extra effort on your part (at least
-initially).  But like all efforts focused on proper design, the concept is
-that a little extra work now can save you from considerably more work later
-on.
+One of the greatest challenges for any infrastructure such as iprPy is that
+any potential users need to evaluate the worth of using the framework to be
+larger than the cost associated with learning how to use it.  To this end,
+much of the improvements to iprPy over the years have focused on lowering the
+barriers for usage.
 
-Much of the effort put into creating iprPy has focused on minimizing the
-barriers for usage.  We want that initial cost as low as possible to reap
-the rewards.
+- For users who simply want to use the implemented calculations, iprPy can
+  easily be installed using pip or conda through conda-forge.
 
-- :any:`Setup <setup>` requirements are minimal. The basic framework only
-  requires Python 3.6+ and a few extra packages.
+- For individuals who want to see how the calculations are done, the
+  code is readily available on github.  This includes the Jupyter Notebook
+  versions of the calculations, which can be downloaded and executed.
+  Alternatively, the Notebook versions are also included in the online
+  documentation making it possible for users to see the code and methods
+  prior to any downloading.
 
-- All calculation scripts can be directly executed.
-
-- Demonstration Jupyter Notebooks are provided for each calculation.
-
-- The high-throughput tools can be directly executed from stand-alone
-  scripts, called as Python functions, or accessed with inline console
-  commands.
-
-- New content can be easily added in a modular fashion.
-
-- Where possible, common codebase is developed for similar calculations.
+- For method developers, they can download the code from github then add their
+  own calculation methods or modify any of the existing ones.  Each calculation
+  is treated in a modular fashion making it easy to incorporate new methods
+  into the framework.  The above design also means that people can contribute
+  just calculation functions with no specific knowledge of the iprPy framework
+  design, and then others can work with them to define the Calculation classes.

@@ -1,20 +1,18 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>iprPy.calculation package &#8212; iprPy 0.10.2 documentation</title>
-    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>iprPy.calculation package &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="iprPy.database package" href="database.html" />
@@ -35,8 +33,9 @@
         <li class="right" >
           <a href="index.html" title="iprPy package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">iprPy package</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">iprPy package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">iprPy.calculation package</a></li> 
       </ul>
     </div>  
 
@@ -49,223 +48,551 @@
 <h1>iprPy.calculation package<a class="headerlink" href="#iprpy-calculation-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-iprPy.calculation">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-iprPy.calculation" title="Permalink to this headline">¶</a></h2>
-<dl class="attribute">
-<dt id="iprPy.calculation.loaded">
-<code class="sig-name descname">loaded</code><a class="headerlink" href="#iprPy.calculation.loaded" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dictionary of the derived classes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="iprPy.calculation.databases_dict">
-<code class="sig-name descname">databases_dict</code><a class="headerlink" href="#iprPy.calculation.databases_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dictionary of the database styles that successfully loaded. The
-dictionary keys are the database style names, and the values are the
-loaded modules.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="class">
-<dt id="iprPy.calculation.Calculation">
-<em class="property">class </em><code class="sig-name descname">Calculation</code><a class="headerlink" href="#iprPy.calculation.Calculation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Class for handling different calculation styles in the same fashion.  The
-class defines the common methods and attributes, which are then uniquely
-implemented for each style.  The available styles are loaded from the
-iprPy.calculations submodule.</p>
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.allkeys">
-<em class="property">property </em><code class="sig-name descname">allkeys</code><a class="headerlink" href="#iprPy.calculation.Calculation.allkeys" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Calculation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subsets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="record.html#iprPy.record.Record" title="yabadaba.record.Record.Record"><code class="xref py py-class docutils literal notranslate"><span class="pre">yabadaba.record.Record.Record</span></code></a></p>
+<p>Base class for managing calculations</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.allkeys">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allkeys</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.allkeys" title="Permalink to this definition">¶</a></dt>
 <dd><p>All keys used by the calculation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.calc">
-<code class="sig-name descname">calc</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.calc" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.atomman_version">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">atomman_version</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.atomman_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>The version of atomman used</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.branch">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">branch</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.branch" title="Permalink to this definition">¶</a></dt>
+<dd><p>The calculation branch name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.build_model">
+<span class="sig-name descname"><span class="pre">build_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.build_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates and returns model content based on the values set to object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.calc">
+<span class="sig-name descname"><span class="pre">calc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.calc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the calculation’s primary function(s)</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.filedict">
-<em class="property">property </em><code class="sig-name descname">filedict</code><a class="headerlink" href="#iprPy.calculation.Calculation.filedict" title="Permalink to this definition">¶</a></dt>
-<dd><p>the names and contents of all required files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
-</dd>
-</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.calc_inputs">
+<span class="sig-name descname"><span class="pre">calc_inputs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.calc_inputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds calculation inputs from the class’s attributes</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.files">
-<em class="property">property </em><code class="sig-name descname">files</code><a class="headerlink" href="#iprPy.calculation.Calculation.files" title="Permalink to this definition">¶</a></dt>
-<dd><p>the names of each file required by the calculation.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.inputdoc">
-<em class="property">property </em><code class="sig-name descname">inputdoc</code><a class="headerlink" href="#iprPy.calculation.Calculation.inputdoc" title="Permalink to this definition">¶</a></dt>
-<dd><p>the documentation for the calculation-specific input keys</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.inputkeys">
-<em class="property">property </em><code class="sig-name descname">inputkeys</code><a class="headerlink" href="#iprPy.calculation.Calculation.inputkeys" title="Permalink to this definition">¶</a></dt>
-<dd><p>the calculation-specific input keys</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.inputsubsets">
-<em class="property">property </em><code class="sig-name descname">inputsubsets</code><a class="headerlink" href="#iprPy.calculation.Calculation.inputsubsets" title="Permalink to this definition">¶</a></dt>
-<dd><p>the subsets whose input key sets are used for the calculation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.maindoc">
-<em class="property">property </em><code class="sig-name descname">maindoc</code><a class="headerlink" href="#iprPy.calculation.Calculation.maindoc" title="Permalink to this definition">¶</a></dt>
-<dd><p>the overview documentation for the calculation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.multikeys">
-<em class="property">property </em><code class="sig-name descname">multikeys</code><a class="headerlink" href="#iprPy.calculation.Calculation.multikeys" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculation key sets that can have multiple values during prepare.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.parent_module">
-<em class="property">property </em><code class="sig-name descname">parent_module</code><a class="headerlink" href="#iprPy.calculation.Calculation.parent_module" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.record_style">
-<em class="property">property </em><code class="sig-name descname">record_style</code><a class="headerlink" href="#iprPy.calculation.Calculation.record_style" title="Permalink to this definition">¶</a></dt>
-<dd><p>The record style associated with the calculation.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.script">
-<em class="property">property </em><code class="sig-name descname">script</code><a class="headerlink" href="#iprPy.calculation.Calculation.script" title="Permalink to this definition">¶</a></dt>
-<dd><p>shortcut to the imported calc_*.py module</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>module</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.singularkeys">
-<em class="property">property </em><code class="sig-name descname">singularkeys</code><a class="headerlink" href="#iprPy.calculation.Calculation.singularkeys" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculation keys that can have single values during prepare.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.style">
-<em class="property">property </em><code class="sig-name descname">style</code><a class="headerlink" href="#iprPy.calculation.Calculation.style" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.calc_style">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calc_style</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.calc_style" title="Permalink to this definition">¶</a></dt>
 <dd><p>The calculation style</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.template">
-<em class="property">property </em><code class="sig-name descname">template</code><a class="headerlink" href="#iprPy.calculation.Calculation.template" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.cdcsquery">
+<span class="sig-name descname"><span class="pre">cdcsquery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iprPy_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atomman_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">script</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.cdcsquery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds a CDCS-style query based on kwargs values for the record style.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The unique record UUID4 keys to parse by.</p></li>
+<li><p><strong>iprPy_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The version(s) of iprPy to parse by.</p></li>
+<li><p><strong>atomman_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The version(s) of atomman to parse by.</p></li>
+<li><p><strong>script</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The name(s) of the calculation script to parse by.</p></li>
+<li><p><strong>branch</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The calculation branch name(s) to parse by.</p></li>
+<li><p><strong>status</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The status(es) of the calculations to parse by.</p></li>
+<li><p><strong>**kwargs</strong> (<em>any</em>) – Any extra query terms associated with one of the calculation’s
+subsets.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The CDCS-style query.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.clean">
+<span class="sig-name descname"><span class="pre">clean</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the calculation state for running again.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.commontemplatekeys">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">commontemplatekeys</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.commontemplatekeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>The input keys and their descriptions shared by all calculations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.compare_fterms">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compare_fterms</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.compare_fterms" title="Permalink to this definition">¶</a></dt>
+<dd><p>The terms to compare metadata values using a tolerance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.compare_terms">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compare_terms</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.compare_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>The terms to compare metadata values absolutely.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.database">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">database</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.database" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Database associated with the calculation record</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>iprPy.Database</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.error">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">error</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Any error message generated by the calculation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.filenames">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filenames</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.filenames" title="Permalink to this definition">¶</a></dt>
+<dd><p>the names of each file used by the calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.files">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">files</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.files" title="Permalink to this definition">¶</a></dt>
+<dd><p>the names and contents of all required files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.iprPy_version">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">iprPy_version</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.iprPy_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>The version of iprPy used</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.isvalid">
+<span class="sig-name descname"><span class="pre">isvalid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.isvalid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks at the set atttributes to determine if the associated calculation
+would be a valid one to run.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if element combinations are valid, False if not.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.key">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">key</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The UUID4 key used to identify the calculation run</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.load_model">
+<span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.load_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads record contents from a given model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>DataModelDict</em>) – The model contents of the record to load.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the record.  Often inferred from other
+attributes if not given.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.load_parameters">
+<span class="sig-name descname"><span class="pre">load_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.load_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads in and sets calculation parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>file-like object</em>) – The parameters or parameter file to read in.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – A new key value to assign to the object.  If not given, will use
+calc_key field in params if it exists, or leave the key value
+unchanged.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.maindoc">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">maindoc</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.maindoc" title="Permalink to this definition">¶</a></dt>
+<dd><p>the overview documentation for the calculation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.master_prepare_inputs">
+<span class="sig-name descname"><span class="pre">master_prepare_inputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">branch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'main'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.master_prepare_inputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility method that build input parameters for prepare according to the
+workflows used by the NIST Interatomic Potentials Repository.  In other
+words, transforms inputs from master_prepare into inputs for prepare.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>branch</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Indicates the workflow branch to prepare calculations for.  Default
+value is ‘main’.</p></li>
+<li><p><strong>**kwargs</strong> (<em>any</em>) – Any parameter modifications to make to the standard workflow
+prepare scripts.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>params</strong> – The full set of prepare parameters based on the workflow branch</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a dict of simple metadata values associated with the record.
+Useful for quickly comparing records and for building pandas.DataFrames
+for multiple records of the same style.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.mongoquery">
+<span class="sig-name descname"><span class="pre">mongoquery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iprPy_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atomman_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">script</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.mongoquery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds a Mongo-style query based on kwargs values for the record style.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The record name(s) to parse by.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The unique record UUID4 keys to parse by.</p></li>
+<li><p><strong>iprPy_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The version(s) of iprPy to parse by.</p></li>
+<li><p><strong>atomman_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The version(s) of atomman to parse by.</p></li>
+<li><p><strong>script</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The name(s) of the calculation script to parse by.</p></li>
+<li><p><strong>branch</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The calculation branch name(s) to parse by.</p></li>
+<li><p><strong>status</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The status(es) of the calculations to parse by.</p></li>
+<li><p><strong>**kwargs</strong> (<em>any</em>) – Any extra query terms associated with one of the calculation’s
+subsets.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The Mongo-style query.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.multikeys">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">multikeys</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.multikeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculation key sets that can have multiple values during prepare.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.pandasfilter">
+<span class="sig-name descname"><span class="pre">pandasfilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iprPy_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atomman_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">script</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.pandasfilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filters a pandas.DataFrame based on kwargs values for the record style.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<em>pandas.DataFrame</em>) – A table of metadata for multiple records of the record style.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The record name(s) to parse by.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The unique record UUID4 keys to parse by.</p></li>
+<li><p><strong>iprPy_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The version(s) of iprPy to parse by.</p></li>
+<li><p><strong>atomman_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The version(s) of atomman to parse by.</p></li>
+<li><p><strong>script</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The name(s) of the calculation script to parse by.</p></li>
+<li><p><strong>branch</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The calculation branch name(s) to parse by.</p></li>
+<li><p><strong>status</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The status(es) of the calculations to parse by.</p></li>
+<li><p><strong>**kwargs</strong> (<em>any</em>) – Any extra query terms associated with one of the calculation’s
+subsets.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Boolean map of matching values</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.Series, numpy.NDArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.parent_module">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parent_module</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.parent_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the module where the calculation’s code is located</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.process_results">
+<span class="sig-name descname"><span class="pre">process_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.process_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes calculation results and saves them to the object’s results
+attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>results_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – The dictionary returned by the calc() method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newkey</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results_json</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the calculation using the current object attribute values or
+supplied parameters. Status after running will be either “finished”
+or “error”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>file-like object</em><em>, </em><em>optional</em>) – The parameters or parameter file to read in.  If not given, will
+run based on the current object attribute values.</p></li>
+<li><p><strong>newkey</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, then the calculation’s key and name will be replaced with
+a new UUID4.  This allows for iterations on previous runs to be
+uniquely labeled.  Default value is False.</p></li>
+<li><p><strong>results_json</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, then a “results.json” file will be generated following
+the run.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, a message relating to the calculation’s status will be
+printed upon completion.  Default value is False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.script">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">script</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.script" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the calculation script used</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.set_values">
+<span class="sig-name descname"><span class="pre">set_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.Calculation.set_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set calculation values directly.  Any terms not given will be set
+or reset to the calculation’s default values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the calculation.  By default, this is set as
+the calculation’s key.</p></li>
+<li><p><strong>iprPy_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Identifies the version of iprPy used.  If not given, will be set to
+the currently loaded iprPy version.</p></li>
+<li><p><strong>atomman_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Identifies the version of atomman used.  If not given, will be set
+to the currently loaded atomman version.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – A UUID4 key to uniquely identify the calculation run.</p></li>
+<li><p><strong>branch</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – A branch name to differentiate sets of calculation runs based on
+input parameters.  Default value is ‘main’.</p></li>
+<li><p><strong>status</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The calculation’s status: ‘not calculated’, ‘finished’ or ‘error’.
+Default value is ‘not calculated’.</p></li>
+<li><p><strong>error</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – An error message for the calculation, if one was raised.</p></li>
+<li><p><strong>**kwargs</strong> (<em>any</em><em>, </em><em>optional</em>) – All extra keywords are passed on to the set_values() methods of
+the calculation’s subsets.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.singularkeys">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">singularkeys</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.singularkeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculation keys that can have single values during prepare.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.status">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.status" title="Permalink to this definition">¶</a></dt>
+<dd><p>The current status of the calculation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.style">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">style</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.style" title="Permalink to this definition">¶</a></dt>
+<dd><p>The record style</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.subsets">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">subsets</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.subsets" title="Permalink to this definition">¶</a></dt>
+<dd><p>The calculation’s subsets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.template">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">template</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.template" title="Permalink to this definition">¶</a></dt>
 <dd><p>The template to use for generating calc.in files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.templatedoc">
-<em class="property">property </em><code class="sig-name descname">templatedoc</code><a class="headerlink" href="#iprPy.calculation.Calculation.templatedoc" title="Permalink to this definition">¶</a></dt>
-<dd><p>The markdown doc describing the calculation’s input parameters</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.templatedoc">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">templatedoc</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.templatedoc" title="Permalink to this definition">¶</a></dt>
+<dd><p>The documentation for the template lines for this calculation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="iprPy.calculation.Calculation.theorydoc">
-<em class="property">property </em><code class="sig-name descname">theorydoc</code><a class="headerlink" href="#iprPy.calculation.Calculation.theorydoc" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.templatekeys">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">templatekeys</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.templatekeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>The calculation-specific input keys and their descriptions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.theorydoc">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">theorydoc</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.theorydoc" title="Permalink to this definition">¶</a></dt>
 <dd><p>the methods and theory documentation for the calculation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.Calculation.xsd_filename">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xsd_filename</span></span><a class="headerlink" href="#iprPy.calculation.Calculation.xsd_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>The module path and file name of the record’s xsd schema</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)">tuple</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="function">
-<dt id="iprPy.calculation.load_calculation">
-<code class="sig-name descname">load_calculation</code><span class="sig-paren">(</span><em class="sig-param">style</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.load_calculation" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="iprPy.calculation.load_calculation">
+<span class="sig-name descname"><span class="pre">load_calculation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.load_calculation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads a Calculation subclass associated with a given calculation style</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The calculation style</p>
+<dd class="field-odd"><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The calculation style</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A Calculation object for the style</p>
@@ -280,25 +607,32 @@ iprPy.calculations submodule.</p>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">iprPy.calculation package</a><ul>
 <li><a class="reference internal" href="#module-iprPy.calculation">Module contents</a></li>
 </ul>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">iprPy package</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="database.html"
-                        title="next chapter">iprPy.database package</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">iprPy package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="database.html"
+                          title="next chapter">iprPy.database package</a></p>
+  </div>
         </div>
       </div>
       <div class="clearer"></div>
@@ -318,12 +652,13 @@ iprPy.calculations submodule.</p>
         <li class="right" >
           <a href="index.html" title="iprPy package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >iprPy package</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >iprPy package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">iprPy.calculation package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

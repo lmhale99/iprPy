@@ -1,20 +1,18 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>iprPy.database package &#8212; iprPy 0.10.2 documentation</title>
-    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>iprPy.database package &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="iprPy.input package" href="input.html" />
@@ -35,8 +33,9 @@
         <li class="right" >
           <a href="calculation.html" title="iprPy.calculation package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">iprPy package</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">iprPy package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">iprPy.database package</a></li> 
       </ul>
     </div>  
 
@@ -49,458 +48,150 @@
 <h1>iprPy.database package<a class="headerlink" href="#iprpy-database-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-iprPy.database">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-iprPy.database" title="Permalink to this headline">¶</a></h2>
-<dl class="attribute">
-<dt id="iprPy.database.loaded">
-<code class="sig-name descname">loaded</code><a class="headerlink" href="#iprPy.database.loaded" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dictionary of the derived classes</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="iprPy.database.RunManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RunManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orphan_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hold_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.RunManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Manages the execution of iprPy calculations</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.database.RunManager.calclist">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calclist</span></span><a class="headerlink" href="#iprPy.database.RunManager.calclist" title="Permalink to this definition">¶</a></dt>
+<dd><p>The current list of calculation names in the run directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="iprPy.database.databases_dict">
-<code class="sig-name descname">databases_dict</code><a class="headerlink" href="#iprPy.database.databases_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dictionary of the database styles that successfully loaded. The
-dictionary keys are the database style names, and the values are the
-loaded modules.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.database.RunManager.database">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">database</span></span><a class="headerlink" href="#iprPy.database.RunManager.database" title="Permalink to this definition">¶</a></dt>
+<dd><p>The records database for the calculations to interact with.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p>iprPy.Database</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="class">
-<dt id="iprPy.database.Database">
-<em class="property">class </em><code class="sig-name descname">Database</code><span class="sig-paren">(</span><em class="sig-param">host</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Class for handling different database styles in the same fashion.  The
-class defines the common methods and attributes, which are then uniquely
-implemented for each style.  The available styles are loaded from the
-iprPy.databases submodule.</p>
-<dl class="method">
-<dt id="iprPy.database.Database.add_record">
-<code class="sig-name descname">add_record</code><span class="sig-paren">(</span><em class="sig-param">record=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">style=None</em>, <em class="sig-param">content=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.add_record" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds a new record to the database.  Will issue an error if a
-matching record already exists in the database.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>record</strong> (<em>iprPy.Record</em><em>, </em><em>optional</em>) – The new record to add to the database.  If not given, then name,
-style and content are required.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the new record.  Required if record is not
-given.</p></li>
-<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The record style for the new record.  Required if record is not
-given.</p></li>
-<li><p><strong>content</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The xml content of the new record.  Required if record is not
-given.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Either the given record or a record composed of the name, style,
-and content.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iprPy.Record</p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.8)"><strong>AttributeError</strong></a> – If add_record is not defined for database style.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.add_tar">
-<code class="sig-name descname">add_tar</code><span class="sig-paren">(</span><em class="sig-param">record=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">style=None</em>, <em class="sig-param">tar=None</em>, <em class="sig-param">root_dir=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.add_tar" title="Permalink to this definition">¶</a></dt>
-<dd><p>Archives and stores a folder associated with a record.  Issues an
-error if exactly one matching record is not found in the database, or
-the associated record already has a tar archive.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>database_info</strong> (<em>mdcs.MDCS</em>) – The MDCS class used for accessing the curator database.</p></li>
-<li><p><strong>record</strong> (<em>iprPy.Record</em><em>, </em><em>optional</em>) – The record to associate the tar archive with.  If not given, then
-name and/or style necessary to uniquely identify the record are
-needed.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – .The name to use in uniquely identifying the record.</p></li>
-<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – .The style to use in uniquely identifying the record.</p></li>
-<li><p><strong>tar</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a><em>, </em><em>optional</em>) – The bytes content of a tar file to save.  tar cannot be given
-with root_dir.</p></li>
-<li><p><strong>root_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Specifies the root directory for finding the directory to archive.
-The directory to archive is at &lt;root_dir&gt;/&lt;name&gt;.  (Default is to
-set root_dir to the current working directory.)  tar cannot be given
-with root_dir.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If style and/or name content given with record or the record already
-    has an archive.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.build_refs">
-<code class="sig-name descname">build_refs</code><span class="sig-paren">(</span><em class="sig-param">lib_directory=None</em>, <em class="sig-param">refresh=False</em>, <em class="sig-param">include=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.build_refs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds reference records from a library to a database.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>lib_directory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>path</em><em>, </em><em>optional</em>) – The directory path for the library.  If not given, then it will use
-the iprPy library directory.</p></li>
-<li><p><strong>refresh</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>optional</em>) – If False (default) only new reference records are added.  If True,
-all existing reference records are refreshed by deleting the
-current ones in the database and uploading the references in
-lib_directory.  If a list is given, then only the reference
-record styles named in the list are refreshed.</p></li>
-<li><p><strong>include</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>optional</em>) – The reference record style(s) to copy to the database.  If not
-given will upload all record styles found in lib_directory.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.check_records">
-<code class="sig-name descname">check_records</code><span class="sig-paren">(</span><em class="sig-param">record_style=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.check_records" title="Permalink to this definition">¶</a></dt>
-<dd><p>Counts and checks on the status of records in a database.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>record_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to check on.  If not given, then the available record
-styles will be listed and the user prompted to pick one.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.clean_records">
-<code class="sig-name descname">clean_records</code><span class="sig-paren">(</span><em class="sig-param">run_directory=None</em>, <em class="sig-param">record_style=None</em>, <em class="sig-param">records=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.clean_records" title="Permalink to this definition">¶</a></dt>
-<dd><p>Resets all records of a given style that issued errors. Useful if the
-errors are due to external conditions.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>run_directory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The directory where the cleaned calculation instances are to be
-returned.</p></li>
-<li><p><strong>record_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to clean.  If not given, then the available record
-styles will be listed and the user prompted to pick one.</p></li>
-<li><p><strong>records</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>optional</em>) – A list of iprPy.Record objects from the database to clean.  Allows
-the user full control on which records to reset.  Cannot be given
-with record_style.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.copy_records">
-<code class="sig-name descname">copy_records</code><span class="sig-paren">(</span><em class="sig-param">dbase2</em>, <em class="sig-param">record_style=None</em>, <em class="sig-param">records=None</em>, <em class="sig-param">includetar=True</em>, <em class="sig-param">overwrite=False</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.copy_records" title="Permalink to this definition">¶</a></dt>
-<dd><p>Copies records from one database to another.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dbase2</strong> (<em>iprPy.Database</em>) – The database to copy to.</p></li>
-<li><p><strong>record_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to copy.  If record_style and records not
-given, then the available record styles will be listed and the
-user prompted to pick one.  Cannot be given with records.</p></li>
-<li><p><strong>records</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>optional</em>) – A list of iprPy.Record obejcts from the current database to copy
-to dbase2.  Allows the user full control on which records to
-copy/update.  Cannot be given with record_style.</p></li>
-<li><p><strong>includetar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the tar archives will be copied along with the records.
-If False, only the records will be copied. (Default is True).</p></li>
-<li><p><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If False (default) only new records and tars will be copied.
-If True, all existing content will be updated.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.delete_record">
-<code class="sig-name descname">delete_record</code><span class="sig-paren">(</span><em class="sig-param">record=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">style=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.delete_record" title="Permalink to this definition">¶</a></dt>
-<dd><p>Permanently deletes a record from the database.  Will issue an error
-if exactly one matching record is not found in the database.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>record</strong> (<em>iprPy.Record</em><em>, </em><em>optional</em>) – The record to delete from the database.  If not given, name and/or
-style are needed to uniquely define the record to delete.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the record to delete.</p></li>
-<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The style of the record to delete.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.8)"><strong>AttributeError</strong></a> – If delete_record is not defined for database style.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.delete_tar">
-<code class="sig-name descname">delete_tar</code><span class="sig-paren">(</span><em class="sig-param">record=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">style=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.delete_tar" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes a tar file from the database.  Issues an error if exactly one
-matching record is not found in the database.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>record</strong> (<em>iprPy.Record</em><em>, </em><em>optional</em>) – The record associated with the tar archive to delete.  If not
-given, then name and/or style necessary to uniquely identify
-the record are needed.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – .The name to use in uniquely identifying the record.</p></li>
-<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – .The style to use in uniquely identifying the record.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.8)"><strong>AttributeError</strong></a> – If delete_tar is not defined for database style.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.destroy_records">
-<code class="sig-name descname">destroy_records</code><span class="sig-paren">(</span><em class="sig-param">record_style=None</em>, <em class="sig-param">records=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.destroy_records" title="Permalink to this definition">¶</a></dt>
-<dd><p>Permanently deletes multiple records and their associated tars all at
-once.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>record_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to delete.  If given, all records of that style
-will be deleted. If neither record_style nor records given, then
-the available record styles will be listed and the user prompted
-to pick one.</p></li>
-<li><p><strong>records</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>optional</em>) – A list of pre-selected records to delete.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.get_parent_records">
-<code class="sig-name descname">get_parent_records</code><span class="sig-paren">(</span><em class="sig-param">record=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">style=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.get_parent_records" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns all records that are parents to the given one</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.get_record">
-<code class="sig-name descname">get_record</code><span class="sig-paren">(</span><em class="sig-param">name=None</em>, <em class="sig-param">style=None</em>, <em class="sig-param">query=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.get_record" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a single matching record from the database.  Issues an error
-if multiple or no matching records are found.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The record name or id to limit the search by.</p></li>
-<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to limit the search by.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The single record from the database matching the given parameters.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iprPy.Record</p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.8)"><strong>AttributeError</strong></a> – If get_record is not defined for database style.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.get_records">
-<code class="sig-name descname">get_records</code><span class="sig-paren">(</span><em class="sig-param">name=None</em>, <em class="sig-param">style=None</em>, <em class="sig-param">query=None</em>, <em class="sig-param">return_df=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.get_records" title="Permalink to this definition">¶</a></dt>
-<dd><p>Produces a list of all matching records in the database.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The record name or id to limit the search by.</p></li>
-<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The record style to limit the search by.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>All records from the database matching the given parameters.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list of iprPy.Records</p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.8)"><strong>AttributeError</strong></a> – If get_records is not defined for database style.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.get_records_df">
-<code class="sig-name descname">get_records_df</code><span class="sig-paren">(</span><em class="sig-param">name=None</em>, <em class="sig-param">style=None</em>, <em class="sig-param">query=None</em>, <em class="sig-param">full=True</em>, <em class="sig-param">flat=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.get_records_df" title="Permalink to this definition">¶</a></dt>
-<dd><p>Produces a pandas.DataFrame of all matching records in the database.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The record style to collect records of.</p></li>
-<li><p><strong>full</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag used by the calculation records.  A True value will include
-terms for both the calculation’s input and results, while a value
-of False will only include input terms (Default is True).</p></li>
-<li><p><strong>flat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag affecting the format of the dictionary terms.  If True, the
-dictionary terms are limited to having only str, int, and float
-values, which is useful for comparisons.  If False, the term
-values can be of any data type, which is convenient for analysis.
-(Default is False).</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>All records from the database of the given record style.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>pandas.DataFrame</p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.8)"><strong>AttributeError</strong></a> – If get_record is not defined for database style.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.get_tar">
-<code class="sig-name descname">get_tar</code><span class="sig-paren">(</span><em class="sig-param">record=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">style=None</em>, <em class="sig-param">raw=False</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.get_tar" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrives the tar archive associated with a record in the database.
-Issues an error if exactly one matching record is not found in the
-database.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>record</strong> (<em>iprPy.Record</em><em>, </em><em>optional</em>) – The record to retrive the associated tar archive for.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – .The name to use in uniquely identifying the record.</p></li>
-<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – .The style to use in uniquely identifying the record.</p></li>
-<li><p><strong>raw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, return the archive as raw binary content. If
-False, return as an open tarfile. (Default is False)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The tar archive as an open tarfile if raw=False, or as a binary
-str if raw=True.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>tarfile or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.8)"><strong>AttributeError</strong></a> – If get_tar is not defined for database style.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.host">
-<em class="property">property </em><code class="sig-name descname">host</code><a class="headerlink" href="#iprPy.database.Database.host" title="Permalink to this definition">¶</a></dt>
-<dd><p>The database’s host.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.database.RunManager.hold_directory">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hold_directory</span></span><a class="headerlink" href="#iprPy.database.RunManager.hold_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>The directory where calculations are sent if uploading to the database fails.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)">pathlib.Path</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="iprPy.database.Database.prepare">
-<code class="sig-name descname">prepare</code><span class="sig-paren">(</span><em class="sig-param">run_directory</em>, <em class="sig-param">calculation</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.prepare" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.runner">
-<code class="sig-name descname">runner</code><span class="sig-paren">(</span><em class="sig-param">run_directory</em>, <em class="sig-param">orphan_directory=None</em>, <em class="sig-param">hold_directory=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.runner" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.select_record_style">
-<code class="sig-name descname">select_record_style</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.select_record_style" title="Permalink to this definition">¶</a></dt>
-<dd><p>Console prompt for selecting a record_style</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="iprPy.database.Database.style">
-<em class="property">property </em><code class="sig-name descname">style</code><a class="headerlink" href="#iprPy.database.Database.style" title="Permalink to this definition">¶</a></dt>
-<dd><p>The database style</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.database.RunManager.logfilename">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">logfilename</span></span><a class="headerlink" href="#iprPy.database.RunManager.logfilename" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name/path of the log file the runner saves info to.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)">pathlib.Path</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="iprPy.database.Database.update_record">
-<code class="sig-name descname">update_record</code><span class="sig-paren">(</span><em class="sig-param">record=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">style=None</em>, <em class="sig-param">content=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.update_record" title="Permalink to this definition">¶</a></dt>
-<dd><p>Replaces an existing record with a new record of matching name and
-style, but new content.  Will issue an error if exactly one
-matching record is not found in the databse.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.database.RunManager.orphan_directory">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">orphan_directory</span></span><a class="headerlink" href="#iprPy.database.RunManager.orphan_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>The directory where calculations missing .py or .in files, or database records are sent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)">pathlib.Path</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.database.RunManager.pid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pid</span></span><a class="headerlink" href="#iprPy.database.RunManager.pid" title="Permalink to this definition">¶</a></dt>
+<dd><p>The processor id for the runner.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.database.RunManager.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calc_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bidverbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.RunManager.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs one calculation from the run_directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>record</strong> (<em>iprPy.Record</em><em>, </em><em>optional</em>) – The record with new content to update in the database.  If not
-given, content is required along with name and/or style to
-uniquely define a record to update.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The name to uniquely identify the record to update.</p></li>
-<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The style of the record to update.</p></li>
-<li><p><strong>content</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The new xml content to use for the record.  Required if record is
-not given.</p></li>
+<li><p><strong>calc_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The name of the calculation in run_directory to run.</p></li>
+<li><p><strong>use_temp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, a new temporary directory will be created and used for this
+run.</p></li>
+<li><p><strong>temp_directory</strong> (<em>path-like object</em><em>, </em><em>optional</em>) – The path to an existing temporary directory where the calculations
+are to be performed.</p></li>
+<li><p><strong>bidverbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, info about the calculation bidding process will be printed.
+Default value is False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Either the given record or a record composed of the name, style,
-and content.</p>
+<dd class="field-even"><p><strong>status</strong> – The status of the calculation after calling run.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iprPy.Record</p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.8)"><strong>AttributeError</strong></a> – If update_record is not defined for database style.</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="iprPy.database.Database.update_tar">
-<code class="sig-name descname">update_tar</code><span class="sig-paren">(</span><em class="sig-param">record=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">style=None</em>, <em class="sig-param">tar=None</em>, <em class="sig-param">root_dir=None</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.Database.update_tar" title="Permalink to this definition">¶</a></dt>
-<dd><p>Replaces an existing tar archive for a record with a new one.  Issues
-an error if exactly one matching record is not found in the database.
-The record’s name must match the name of the directory being archived.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.database.RunManager.run_directory">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run_directory</span></span><a class="headerlink" href="#iprPy.database.RunManager.run_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>The path to the run_directory containing the calculation folders.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)">pathlib.Path</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.database.RunManager.runall">
+<span class="sig-name descname"><span class="pre">runall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bidtries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bidverbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.RunManager.runall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sequentially runs calculations within the run_directory until all
+are finished.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>record</strong> (<em>iprPy.Record</em><em>, </em><em>optional</em>) – The record to associate the tar archive with.  If not given, then
-name and/or style necessary to uniquely identify the record are
-needed.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – .The name to use in uniquely identifying the record.</p></li>
-<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – .The style to use in uniquely identifying the record.</p></li>
-<li><p><strong>tar</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a><em>, </em><em>optional</em>) – The bytes content of a tar file to save.  tar cannot be given
-with root_dir.</p></li>
-<li><p><strong>root_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Specifies the root directory for finding the directory to archive.
-The directory to archive is at &lt;root_dir&gt;/&lt;name&gt;.  (Default is to
-set root_dir to the current working directory.)  tar cannot be given
-with root_dir.</p></li>
+<li><p><strong>bidtries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – The runner will stop if it fails on bidding this many times in a
+row.  This allows for the cleanup of excess competing runners.
+Default value is 10.</p></li>
+<li><p><strong>temp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, a new temporary directory will be created and used for this
+run.</p></li>
+<li><p><strong>temp_directory</strong> (<em>path-like object</em><em>, </em><em>optional</em>) – The path to an existing temporary directory where the calculations
+are to be performed.</p></li>
+<li><p><strong>bidverbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, info about the calculation bidding process will be printed.
+Default value is False.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.8)"><strong>AttributeError</strong></a> – If update_tar is not defined for database style.</p>
 </dd>
 </dl>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="function">
-<dt id="iprPy.database.load_database">
-<code class="sig-name descname">load_database</code><span class="sig-paren">(</span><em class="sig-param">name=None</em>, <em class="sig-param">style=None</em>, <em class="sig-param">host=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.load_database" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="iprPy.database.load_database">
+<span class="sig-name descname"><span class="pre">load_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.load_database" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads a database object.  Can be either loaded from stored settings or
 by defining all needed access information.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The name assigned to a pre-defined database.  If given, can be the only
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The name assigned to a pre-defined database.  If given, can be the only
 parameter.</p></li>
-<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The database style to use.</p></li>
-<li><p><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The URL/file path where the database is hosted.</p></li>
-<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>, </em><em>optional</em>) – Any other keyword parameters defining necessary access information.
+<li><p><strong>style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The database style to use.</p></li>
+<li><p><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The URL/file path where the database is hosted.</p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>, </em><em>optional</em>) – Any other keyword parameters defining necessary access information.
 Allowed keywords are database style-specific.</p></li>
 </ul>
 </dd>
@@ -508,7 +199,111 @@ Allowed keywords are database style-specific.</p></li>
 <dd class="field-even"><p>The database object.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Subclass of iprPy.Database</p>
+<dd class="field-odd"><p>Subclass of yabadaba.Database</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iprPy.database.master_prepare">
+<span class="sig-name descname"><span class="pre">master_prepare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_script</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.master_prepare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepares one or more calculations according to the workflows used by the
+NIST Interatomic Potentials Repository.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>database</strong> (<em>iprPy.database.Database</em>) – The database that will host the records for the prepared calculations.</p></li>
+<li><p><strong>input_script</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>file-like object</em><em>, </em><em>optional</em>) – The file, path to file, or contents of an input script containing
+parameters for preparing the calculation.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If set to True, will throw errors associated with failed/invalid
+calculation builds.  Default is False.</p></li>
+<li><p><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Allows for input parameters for preparing the calculation to be
+directly specified.  Any kwargs parameters that have names matching
+input_script parameters will overwrite the input_script values.
+Values must be strings or list of strings if allowed by the
+calculation for the particular parameter.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iprPy.database.prepare">
+<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_script</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.prepare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function for preparing any iprPy calculation for high-throughput execution.
+Input parameters for preparing can either be given within an input script
+or by passing in keyword parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>database</strong> (<em>iprPy.database.Database</em>) – The database that will host the records for the prepared calculations.</p></li>
+<li><p><strong>run_directory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The path or name for the run_directory where the prepared calculations
+are to be placed.</p></li>
+<li><p><strong>calculation</strong> (<a class="reference internal" href="calculation.html#iprPy.calculation.Calculation" title="iprPy.calculation.Calculation"><em>iprPy.calculation.Calculation</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The calculation style or an instance of the calculation style to prepare.</p></li>
+<li><p><strong>input_script</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>file-like object</em><em>, </em><em>optional</em>) – The file, path to file, or contents of an input script containing
+parameters for preparing the calculation.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If set to True, will throw errors associated with failed/invalid
+calculation builds.  Default is False.</p></li>
+<li><p><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Allows for input parameters for preparing the calculation to be
+directly specified.  Any kwargs parameters that have names matching
+input_script parameters will overwrite the input_script values.
+Values must be strings or list of strings if allowed by the
+calculation for the particular parameter.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iprPy.database.reset_orphans">
+<span class="sig-name descname"><span class="pre">reset_orphans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orphan_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.reset_orphans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets calculations that were moved to an orphan directory back to a
+run directory and removes any bid files that they contain.  Can be useful
+if connection is lost to a remote database or a runner was accidentally
+started with the wrong database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>run_directory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The directory to move the orphaned calculations to.</p></li>
+<li><p><strong>orphan_directory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The orphan directory containing archived calculation folders.  The
+default value assumes that the orphan directory is a directory named
+“orphan” that is in the same parent directory as run_directory, i.e.
+is at “../orphan” relative to run_directory.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iprPy.database.runner">
+<span class="sig-name descname"><span class="pre">runner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calc_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orphan_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hold_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bidtries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bidverbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.database.runner" title="Permalink to this definition">¶</a></dt>
+<dd><p>High-throughput calculation runner.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>database</strong> (<em>iprPy.Database</em>) – The database to interact with.</p></li>
+<li><p><strong>run_directory</strong> (<em>path-like object</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The run_directory name or path to the directory where the calculations
+to run are located.</p></li>
+<li><p><strong>calc_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The name of a specific calculation to run.  If not given, all
+calculations in run_directory will be performed one at a time.</p></li>
+<li><p><strong>orphan_directory</strong> (<em>path-like object</em><em>, </em><em>optional</em>) – The path for the orphan directory where incomplete calculations are
+moved.  If None (default) then will use ‘orphan’ at the same level as
+the run_directory.</p></li>
+<li><p><strong>hold_directory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The path for the hold directory where tar archives that failed to be
+uploaded are moved to.  If None (default) then will use ‘hold’ at the
+same level as the run_directory.</p></li>
+<li><p><strong>log</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True (default), the runner will create and save a log file detailing the
+status of each calculation that it runs.</p></li>
+<li><p><strong>bidtries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – The runner will stop if it fails on bidding this many times in a
+row.  This allows for the cleanup of excess competing runners.
+Default value is 10.</p></li>
+<li><p><strong>bidverbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, info about the calculation bidding process will be printed.
+Default value is False.</p></li>
+<li><p><strong>temp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, a temporary directory will be automatically created and used
+for this run.</p></li>
+<li><p><strong>temp_directory</strong> (<em>path-like object</em><em>, </em><em>optional</em>) – The path to an existing temporary directory where the calculations
+are to be copied to and executed there instead of in the run_directory.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -517,25 +312,32 @@ Allowed keywords are database style-specific.</p></li>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">iprPy.database package</a><ul>
 <li><a class="reference internal" href="#module-iprPy.database">Module contents</a></li>
 </ul>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="calculation.html"
-                        title="previous chapter">iprPy.calculation package</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="input.html"
-                        title="next chapter">iprPy.input package</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="calculation.html"
+                          title="previous chapter">iprPy.calculation package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="input.html"
+                          title="next chapter">iprPy.input package</a></p>
+  </div>
         </div>
       </div>
       <div class="clearer"></div>
@@ -555,12 +357,13 @@ Allowed keywords are database style-specific.</p></li>
         <li class="right" >
           <a href="calculation.html" title="iprPy.calculation package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >iprPy package</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >iprPy package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">iprPy.database package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

@@ -1,0 +1,906 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RelaxDynamic &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="relax_static" href="../relax_static/index.html" />
+    <link rel="prev" title="relax_dynamic.py" href="function.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../relax_static/index.html" title="relax_static"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="function.html" title="relax_dynamic.py"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">relax_dynamic</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">RelaxDynamic</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="relaxdynamic">
+<h1>RelaxDynamic<a class="headerlink" href="#relaxdynamic" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-iprPy.calculation.relax_dynamic.RelaxDynamic">
+<span id="calculation-class"></span><h2>Calculation class<a class="headerlink" href="#module-iprPy.calculation.relax_dynamic.RelaxDynamic" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RelaxDynamic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../iprPy/calculation.html#iprPy.calculation.Calculation" title="iprPy.calculation.Calculation.Calculation"><code class="xref py py-class docutils literal notranslate"><span class="pre">iprPy.calculation.Calculation.Calculation</span></code></a></p>
+<p>Class for managing dynamic relaxations</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.build_model">
+<span class="sig-name descname"><span class="pre">build_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.build_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates and returns model content based on the values set to object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.calc_inputs">
+<span class="sig-name descname"><span class="pre">calc_inputs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.calc_inputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds calculation inputs from the class’s attributes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.cdcsquery">
+<span class="sig-name descname"><span class="pre">cdcsquery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.cdcsquery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds a CDCS-style query based on kwargs values for the record style.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>any</em>) – Any extra query terms that are universal for all calculations
+or associated with one of the calculation’s subsets.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The CDCS-style query.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.commands">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">commands</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.commands" title="Permalink to this definition">¶</a></dt>
+<dd><p>LammpsCommands subset</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.compare_fterms">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compare_fterms</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.compare_fterms" title="Permalink to this definition">¶</a></dt>
+<dd><p>The terms to compare metadata values using a tolerance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.compare_terms">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compare_terms</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.compare_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>The terms to compare metadata values absolutely.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.dumpsteps">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dumpsteps</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.dumpsteps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.equilsteps">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equilsteps</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.equilsteps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.filenames">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filenames</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.filenames" title="Permalink to this definition">¶</a></dt>
+<dd><p>the names of each file used by the calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.final_box">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">final_box</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.final_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Relaxed unit cell box</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>atomman.Box</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.final_dump">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">final_dump</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.final_dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Info about the final dump file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.initial_dump">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initial_dump</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.initial_dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Info about the initial dump file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.integrator">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">integrator</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.integrator" title="Permalink to this definition">¶</a></dt>
+<dd><p>MD integration scheme</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.load_model">
+<span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.load_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads record contents from a given model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>DataModelDict</em>) – The model contents of the record to load.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the record.  Often inferred from other
+attributes if not given.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.load_parameters">
+<span class="sig-name descname"><span class="pre">load_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.load_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads in and sets calculation parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>file-like object</em>) – The parameters or parameter file to read in.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – A new key value to assign to the object.  If not given, will use
+calc_key field in params if it exists, or leave the key value
+unchanged.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.lx_mean">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lx_mean</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.lx_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean lx length used for final_box</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.lx_std">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lx_std</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.lx_std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation for final_box’s lx length</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.ly_mean">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ly_mean</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.ly_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean ly length used for final_box</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.ly_std">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ly_std</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.ly_std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation for final_box’s ly length</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.lz_mean">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lz_mean</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.lz_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean lz length used for final_box</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.lz_std">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lz_std</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.lz_std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation for final_box’s lz length</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.master_prepare_inputs">
+<span class="sig-name descname"><span class="pre">master_prepare_inputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">branch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'main'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.master_prepare_inputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility method that build input parameters for prepare according to the
+workflows used by the NIST Interatomic Potentials Repository.  In other
+words, transforms inputs from master_prepare into inputs for prepare.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>branch</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Indicates the workflow branch to prepare calculations for.  Default
+value is ‘main’.</p></li>
+<li><p><strong>**kwargs</strong> (<em>any</em>) – Any parameter modifications to make to the standard workflow
+prepare scripts.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>params</strong> – The full set of prepare parameters based on the workflow branch</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_xx">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measured_pressure_xx</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_xx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measured relaxation pressure component xx</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_xx_std">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measured_pressure_xx_std</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_xx_std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation for measured_pressure_xx</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_xy">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measured_pressure_xy</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_xy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measured relaxation pressure component xy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_xy_std">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measured_pressure_xy_std</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_xy_std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation for measured_pressure_xy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_xz">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measured_pressure_xz</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_xz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measured relaxation pressure component xz</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_xz_std">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measured_pressure_xz_std</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_xz_std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation for measured_pressure_xz</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_yy">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measured_pressure_yy</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_yy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measured relaxation pressure component yy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_yy_std">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measured_pressure_yy_std</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_yy_std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation for measured_pressure_yy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_yz">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measured_pressure_yz</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_yz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measured relaxation pressure component yz</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_yz_std">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measured_pressure_yz_std</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_yz_std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation for measured_pressure_yz</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_zz">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measured_pressure_zz</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_zz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measured relaxation pressure component zz</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_zz_std">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measured_pressure_zz_std</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_pressure_zz_std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation for measured_pressure_zz</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_temperature">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measured_temperature</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_temperature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measured temperature for the relaxed system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_temperature_std">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measured_temperature_std</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.measured_temperature_std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation for measured_temperature</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a dict of simple metadata values associated with the record.
+Useful for quickly comparing records and for building pandas.DataFrames
+for multiple records of the same style.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.modelroot">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">modelroot</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.modelroot" title="Permalink to this definition">¶</a></dt>
+<dd><p>The root element of the content</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.mongoquery">
+<span class="sig-name descname"><span class="pre">mongoquery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.mongoquery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds a Mongo-style query based on kwargs values for the record style.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>any</em>) – Any extra query terms that are universal for all calculations
+or associated with one of the calculation’s subsets.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The Mongo-style query.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.multikeys">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">multikeys</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.multikeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculation key sets that can have multiple values during prepare.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.numsamples">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">numsamples</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.numsamples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of measurement samples used in mean, std values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.pandasfilter">
+<span class="sig-name descname"><span class="pre">pandasfilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.pandasfilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses a pandas dataframe containing the subset’s metadata to find
+entries matching the terms and values given. Ideally, this should find
+the same matches as the mongoquery and cdcsquery methods for the same
+search parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<em>pandas.DataFrame</em>) – The metadata dataframe to filter.</p></li>
+<li><p><strong>kwargs</strong> (<em>any</em>) – Any extra query terms that are universal for all calculations
+or associated with one of the calculation’s subsets.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True for each entry where all filter terms+values match, False for
+all other entries.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.Series of bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.potential">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">potential</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.potential" title="Permalink to this definition">¶</a></dt>
+<dd><p>LammpsPotential subset</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.potential_energy">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">potential_energy</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.potential_energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Potential energy per atom for the relaxed system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.potential_energy_std">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">potential_energy_std</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.potential_energy_std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation for potential_energy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.pressure_xx">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pressure_xx</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.pressure_xx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Target relaxation pressure component xx</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.pressure_xy">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pressure_xy</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.pressure_xy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Target relaxation pressure component xy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.pressure_xz">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pressure_xz</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.pressure_xz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Target relaxation pressure component xz</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.pressure_yy">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pressure_yy</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.pressure_yy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Target relaxation pressure component yy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.pressure_yz">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pressure_yz</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.pressure_yz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Target relaxation pressure component yz</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.pressure_zz">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pressure_zz</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.pressure_zz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Target relaxation pressure component zz</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.process_results">
+<span class="sig-name descname"><span class="pre">process_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.process_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes calculation results and saves them to the object’s results
+attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>results_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – The dictionary returned by the calc() method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.randomseed">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">randomseed</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.randomseed" title="Permalink to this definition">¶</a></dt>
+<dd><p>MD integration scheme</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.restartsteps">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">restartsteps</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.restartsteps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.runsteps">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">runsteps</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.runsteps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.set_values">
+<span class="sig-name descname"><span class="pre">set_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.set_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set calculation values directly.  Any terms not given will be set
+or reset to the calculation’s default values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the calculation.  By default, this is set as
+the calculation’s key.</p></li>
+<li><p><strong>pressure_xx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The target Pxx pressure component for the relaxation.</p></li>
+<li><p><strong>pressure_yy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The target Pyy pressure component for the relaxation.</p></li>
+<li><p><strong>pressure_zz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The target Pzz pressure component for the relaxation.</p></li>
+<li><p><strong>pressure_xy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The target Pxy pressure component for the relaxation.</p></li>
+<li><p><strong>pressure_xz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The target Pxz pressure component for the relaxation.</p></li>
+<li><p><strong>pressure_yz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The target Pyz pressure component for the relaxation.</p></li>
+<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The target temperature for the relaxation.</p></li>
+<li><p><strong>integrator</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The integration scheme to use.</p></li>
+<li><p><strong>thermosteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Indicates how often the thermo data is output.</p></li>
+<li><p><strong>dumpsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Indicates how often the atomic configuration is output to a LAMMPS
+dump file.</p></li>
+<li><p><strong>restartsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Indicates how often the atomic configuration is output to a LAMMPS
+restart file.</p></li>
+<li><p><strong>runsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – The total number of integration steps.</p></li>
+<li><p><strong>equilsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – The number of integration steps ignored to allow the system to get
+closer to equilibrium.</p></li>
+<li><p><strong>randomseed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – A random number generator seed to use for constructing the initial
+atomic velocities.</p></li>
+<li><p><strong>**kwargs</strong> (<em>any</em><em>, </em><em>optional</em>) – Any keyword parameters supported by the set_values() methods of
+the parent Calculation class and the subset classes.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.singularkeys">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">singularkeys</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.singularkeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculation keys that can have single values during prepare.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.system">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.system" title="Permalink to this definition">¶</a></dt>
+<dd><p>AtommanSystemLoad subset</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.system_mods">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">system_mods</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.system_mods" title="Permalink to this definition">¶</a></dt>
+<dd><p>AtommanSystemManipulate subset</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.temperature">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">temperature</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.temperature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Target relaxation temperature</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.templatekeys">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">templatekeys</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.templatekeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>The calculation-specific input keys and their descriptions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.thermosteps">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">thermosteps</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.thermosteps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.total_energy">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_energy</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.total_energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total energy per atom for the relaxed system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.total_energy_std">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_energy_std</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.total_energy_std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation for total_energy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.units">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">units</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Units subset</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.xy_mean">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xy_mean</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.xy_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean xy tilt used for final_box</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.xy_std">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xy_std</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.xy_std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation for final_box’s xy tilt</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.xz_mean">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xz_mean</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.xz_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean xz tilt used for final_box</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.xz_std">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xz_std</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.xz_std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation for final_box’s xz tilt</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.yz_mean">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">yz_mean</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.yz_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean yz tilt used for final_box</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.yz_std">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">yz_std</span></span><a class="headerlink" href="#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.yz_std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation for final_box’s yz tilt</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">RelaxDynamic</a><ul>
+<li><a class="reference internal" href="#module-iprPy.calculation.relax_dynamic.RelaxDynamic">Calculation class</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="function.html"
+                          title="previous chapter">relax_dynamic.py</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="../relax_static/index.html"
+                          title="next chapter">relax_static</a></p>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../relax_static/index.html" title="relax_static"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="function.html" title="relax_dynamic.py"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >relax_dynamic</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">RelaxDynamic</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>
