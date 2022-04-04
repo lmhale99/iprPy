@@ -2,137 +2,42 @@
 Adding new subset styles
 ========================
 
-The basic steps associated with implementing a new subset style in iprPy are
+This page outlines how to add a new calculation subset to iprPy.  Creating a subset allows for multiple calculations to share some of the same input parameters and for those terms to be managed in a consistent manner across the calculations.
 
-#. Create a new subdirectory in iprPy/input/subset_classes named for the new
-   subset style.
+1. Class definition
+===================
 
-#. Create a file that defines the Subset subclass.  Name the file
-   after the subclass name, typically by converting the style name to upper
-   camel case (each word capitalized with no separators).
+Python files that define a subset should be placed inside the iprPy/calculation_subset folder.  Currently each class definition is contained in a separate Python file named for the calculation subset class.  When defining the class, it should have an informative name and inherit from iprPy.calculation_subset.CalculationSubset.  Once the class is created, it should be imported by iprPy/calculation_subset/\_\_init\_\_.py.
 
-#. Define the Subset subclass templatekeys, preparekeys and interpretkeys
-   attributes and template, interpret, buildcontent and todict methods.
+2. Calculation-like methods and attributes
+==========================================
 
-#. Create an "\_\_init\_\_.py" file that imports the subclass.
+As a subset represents a set of inputs for Calculations, most of the method and attribute definitions in a subset correspond closely to how they are defined in the Calculation objects.  See the previous doc page for more details on the related Calculation methods and attributes.
 
-#. Create a parameters.md file that describes the templatekeys.
+- The class initializer should pass all parameters to the parent class and set default values for the class attributes.
+- Class attributes should be defined for all input terms that the subset manages, and optionally any more complicated derived objects.
+- **set_values** allows for any subset-specific terms to be set at the same time.
+- **templatekeys** provides the names and description of all input parameter terms that the subset manages.
+- **load_parameters** reads the subset templatekeys from an calculation input script and sets the subset attributes accordingly.
+- **modelroot** is the root data model element name where the subset content is collected.
+- **load_model** loads subset attributes from an existing model.
+- **build_model** builds the elements of the model associated with the subset.
+- **metadata** adds the simple metadata fields for the subset to the calculation's metadata dict.
+- **calc_inputs** generates inputs for a calculation function based on the current set values of the subset attributes.
 
-Files in the subset style directories
--------------------------------------
+3. Additional subset methods and attributes
+===========================================
 
-- **[Style].py**: Defines the Subset subclass for the subset style.
-  This defines how the iprPy codebase interacts with the subset.
+3.1. _template_init
+-------------------
 
-- **\_\_init\_\_.py**: Allows Python to identify the subset directory as
-  a sub-package and be able to import the Subset subclass into iprPy.
+The _template_init() method is used to provide additional information to the calculation's template and templatedoc.  When the template(doc) content is generated, the terms associated with each subset are listed in separate blocks.  The two terms managed by _template_init() provide default values for descriptive pieces related to this subset's block of input terms.
 
-- **parameters.md**: Descriptions of the keys in templatekeys.
+- **templateheader** is a short string that appears as a header above the subset's input terms inside the template and templatedoc files.
 
-[Style].py
-~~~~~~~~~~
+- **templatedescription** provides documentation description of the subset's terms that will appear in templatedoc above the description of the subset's template terms.  This allows for general rules related to the subset's inputs to be described.
 
-The iprPy package interacts with the subset style through the defined
-Subset subclass.  Considerable work has gone into making it easy to
-define new subclass definitions by modifying values in pre-existing subclass
-definitions.  This section describes the different components of defining a
-Subset subclass.
+3.2. preparekeys and interpretkeys
+----------------------------------
 
-Each Subset class can be initialized with an optional prefix indicating that
-all recognized keys should have the prefix added.  This allows for multiple
-subsets of the same style to be called by the same calculation if needed.  For
-the key attributes listed below, all values in the lists should be given as
-they appear without a prefix.
-
-Inheritance
-...........
-
-The class should be a child of iprPy.input.subset_classes.Subset.
-
-templatekeys
-............
-
-The templatekeys attribute is the list of calculation keys associated with the
-subset that appear in in the calculation's input file.
-
-preparekeys
-...........
-
-The preparekeys attribute is the list of calculation keys associated with the
-subset that appear in the prepare keys set, i.e. will be included in a
-calculation's singularkeys or multikeys.  This list is typically templatekeys
-plus a few extras, like \_content keys associated with \_file keys.
-
-interpretkeys
-.............
-
-The interpretkeys attribute is the list of calculation keys associated with the
-interpret() method that may have the Subset's prefix applied to them by a
-calculation.  This list is typically preparekeys plus any new keys generated by
-interpret().  Keys that are not officially part of the set but used by
-interpret() may also be included if the key could have the same prefix.
-
-template()
-..........
-
-The template method returns a string of the input file template lines
-associated with this subset.  If copying from another subset style, typically
-the only thing that needs to be changed is the default header comment for the
-input lines.
-
-interpret()
-...........
-
-The interpret() method interprets the calculation input parameter terms
-associated with the subset.
-
-- The function takes the input_dict dictionary of input parameters as the
-  first argument.
-
-- The function only operates on the parameters contained within input_dict.
-  Each function reads input parameters from pre-defined keys of input_dict and
-  saves the processed values to input_dict.  No calculation parameters are
-  returned by the function.
-
-    - Basic input parameters can be modified by the function by assigning
-      default values if needed, and simple conversion of string inputs to
-      numerical values.
-
-    - Terms generated by the functions should be saved to new input_dict keys
-      as opposed to overwriting the keys the function uses as inputs.  This is
-      so that the original format can be retained whenever possible.
-
-- The class' keymap attribute maps the default key names without prefix to the
-  key names with the prefix added.  So, input_dict[self.keymap['keyname1']]
-  will access the input_dict value for 'prefix + keyname1'.
-
-- The function may have an optional *build* keyword parameter that takes a
-  boolean value.  Giving *build* a value of False keeps the function from
-  generating complex data structures and objects based on the inputs and only
-  processes the simple terms.  This is useful in preparing calculations where
-  input terms that appear in the calculation's record need to be processed, but
-  other complex input terms are not needed.  For instance, parameters defining
-  a system (e.g. size multipliers and axis orientations) are important for
-  defining the calculation and therefore need to appear in the calculation's
-  record when it is prepared, but the actual generated atomic system is not
-  needed until the calculation is later performed.
-
-buildcontent()
-..............
-
-The buildcontent method constructs the record content associated with the
-subset input keys.  The function takes parameters record_model, the record's
-content after the root element, and adds new elements to record_model based
-on the values in the input_dict and results_dict dictionaries.  As the method
-operates on record_model, the function does not need to return anything.
-
-todict()
-........
-
-The todict method interprets record content record_model, and converts terms
-associated with the subset into key-values to add to the params dictionary.  In
-other words, this method interprets the record content generated by the
-buildcontent method and converts it into accessible values.
-The method can take the full and flat flags that the Record.todict()
-method uses which can alter which and how the params keys values are given.  As
-the method adds terms to the params dictionary, no values are returned.
+These list keys in the input_dict that are managed by the prepare and load_parameters operations related to the subset.  Typically, preparekeys extends the templatekeys.keys() to add any additional terms that are only recognized by prepare, such as "_content" terms.  Then, interpretkeys extends preparekeys by also listing any terms that load_parameters adds to the input_dict that contain processed input values.

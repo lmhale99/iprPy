@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>point_defect_static calculation style &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="point_defect_static Input Terms" href="template.html" />
+    <link rel="prev" title="point_defect_static" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="template.html" title="point_defect_static Input Terms"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="point_defect_static"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">point_defect_static</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">point_defect_static calculation style</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="point-defect-static-calculation-style">
+<h1>point_defect_static calculation style<a class="headerlink" href="#point-defect-static-calculation-style" title="Permalink to this headline">¶</a></h1>
+<p><strong>Lucas M. Hale</strong>,
+<a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>,
+<em>Materials Science and Engineering Division, NIST</em>.</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The point_defect_static calculation style computes the formation energy
+of a point defect by comparing the energies of a system before and after
+a point defect is inserted. The resulting defect system is analyzed
+using a few different metrics to help characterize if the defect
+reconfigures to a different structure upon relaxation.</p>
+<div class="section" id="version-notes">
+<h3>Version notes<a class="headerlink" href="#version-notes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>2020-12-30 Version 0.10+ update</p></li>
+<li><p>2022-03-11: Notebook updated to reflect version 0.11.</p></li>
+</ul>
+</div>
+<div class="section" id="additional-dependencies">
+<h3>Additional dependencies<a class="headerlink" href="#additional-dependencies" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="disclaimers">
+<h3>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST
+disclaimers</a></p></li>
+<li><p>The computed values of the point defect formation energies and
+elastic dipole tensors are sensitive to the size of the system.
+Larger systems minimize the interaction between the defects, and the
+affect that the defects have on the system’s pressure. Infinite
+system formation energies can be estimated by measuring the formation
+energy for multiple system sizes, and extrapolating to 1/natoms = 0.</p></li>
+<li><p>Because only a static relaxation is performed, the final
+configuration might not be the true stable configuration.
+Additionally, the stable configuration may not correspond to any of
+the standard configurations characterized by the point-defect records
+in the iprPy/library. Running multiple configurations increases the
+likelihood of finding the true stable state, but it does not
+guarantee it. Alternatively, a dynamic simulation or a genetic
+algorithm may be more thorough.</p></li>
+<li><p>The metrics used to identify reconfigurations are not guaranteed to
+work for all crystals and defects. Most notably, the metrics assume
+that the defect’s position coincides with a high symmetry site in the
+lattice.</p></li>
+<li><p>The current version assumes that the initial defect-free base system
+is an elemental crystal structure. The formation energy expression
+needs to be updated to handle multi-component crystals.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="method-and-theory">
+<h2>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this headline">¶</a></h2>
+<p>The method starts with a bulk initial system, and relaxes the atomic
+positions with a LAMMPS simulation that performs an energy/force
+minimization. The cohesive energy, <span class="math notranslate nohighlight">\(E_{coh}\)</span>, is taken by dividing
+the system’s total energy by the number of atoms in the system.</p>
+<p>A corresponding defect system is then constructed using the
+atomman.defect.point() function. The defect system is relaxed using the
+same energy/force minimization as was done with the bulk system. The
+formation energy of the defect, <span class="math notranslate nohighlight">\(E_{f}^{ptd}\)</span>, is obtained as</p>
+<div class="math notranslate nohighlight">
+\[E_{f}^{ptd} = E_{total}^{ptd} - E_{coh} * N^{ptd},\]</div>
+<p>where <span class="math notranslate nohighlight">\(E_{total}^{ptd}\)</span> is the total potential energy of the
+relaxed defect system, and <span class="math notranslate nohighlight">\(N^{ptd}\)</span> is the number of atoms in the
+defect system.</p>
+<p>The elastic dipole tensor, <span class="math notranslate nohighlight">\(P_{ij}\)</span>, is also estimated for the
+point defect. <span class="math notranslate nohighlight">\(P_{ij}\)</span> is a symmetric second rank tensor that
+characterizes the elastic nature of the defect. Here, <span class="math notranslate nohighlight">\(P_{ij}\)</span> is
+estimated using [<a class="reference external" href="https://doi.org/10.1080/01418618108239410">1</a>,
+<a class="reference external" href="https://doi.org/10.1080/01418618308244326">2</a>]</p>
+<div class="math notranslate nohighlight">
+\[P_{ij} = -V \langle \sigma_{ij} \rangle,\]</div>
+<p>where <span class="math notranslate nohighlight">\(V\)</span> is the system cell volume and
+<span class="math notranslate nohighlight">\(\langle \sigma_{ij} \rangle\)</span> is the residual stress on the system
+due to the defect, which is computed using the measured cell stresses
+(pressures) of the defect-free system, <span class="math notranslate nohighlight">\(\sigma_{ij}^{0}\)</span>, and the
+defect-containing system, <span class="math notranslate nohighlight">\(\sigma_{ij}^{ptd}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\langle \sigma_{ij} \rangle = \sigma_{ij}^{ptd} - \sigma_{ij}^{0}.\]</div>
+<p>The atomman.defect.point() method allows for the generation of four
+types of point defects:</p>
+<ul class="simple">
+<li><p><strong>vacancy</strong>, where an atom at a specified location is deleted.</p></li>
+<li><p><strong>interstitial</strong>, where an extra atom is inserted at a specified
+location (that does not correspond to an existing atom).</p></li>
+<li><p><strong>substitutional</strong>, where the atomic type of an atom at a specified
+location is changed.</p></li>
+<li><p><strong>dumbbell</strong> interstitial, where an atom at a specified location is
+replaced by a pair of atoms equidistant from the original atom’s
+position.</p></li>
+</ul>
+<p>Point defect complexes (clusters, balanced ionic defects, etc.) can also
+be constructed piecewise from these basic types.</p>
+<p>The final defect-containing system is analyzed using a few simple
+metrics to determine whether or not the point defect configuration has
+relaxed to a lower energy configuration:</p>
+<ul class="simple">
+<li><p><strong>centrosummation</strong> adds up the vector positions of atoms relative to
+the defect’s position for all atoms within a specified cutoff. In
+most simple crystals, the defect positions are associated with high
+symmetry lattice sites in which the centrosummation about that point
+in the defect-free system will be zero. If the defect only
+hydrostatically displaces neighbor atoms, then the centrosummation
+should also be zero for the defect system. This is computed for all
+defect types.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\vec{cs} = \sum_i^N{\left( \vec{r}_i - \vec{r}_{ptd} \right)}\]</div>
+<ul class="simple">
+<li><p><strong>position_shift</strong> is the change in position of an interstitial or
+substitutional atom following relaxation of the system. A non-zero
+value indicates that the defect atom has moved from its initially
+ideal position.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\Delta \vec{r} = \vec{r}_{ptd} - \vec{r}_{ptd}^{0}\]</div>
+<ul class="simple">
+<li><p><strong>db_vect_shift</strong> compares the unit vector associated with the pair
+of atoms in a dumbbell interstitial before and after relaxation. A
+non-zero value indicates that the dumbbell has rotated from its ideal
+configuration.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\Delta \vec{db} = \frac{\vec{r}_{db1} - \vec{r}_{db2}}{|\vec{r}_{db1} - \vec{r}_{db2}|} - \frac{\vec{r}_{db1}^0 - \vec{r}_{db2}^0}{|\vec{r}_{db1}^0 - \vec{r}_{db2}^0|}\]</div>
+<p>If any of the metrics have values not close to (0,0,0), then there was
+likely an atomic configuration relaxation.</p>
+<p>The final defect system and the associated perfect base system are
+retained in the calculation’s archive. The calculation’s record reports
+the base system’s cohesive energy, the point defect’s formation energy,
+and the values of any of the reconfiguration metrics used.</p>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">point_defect_static calculation style</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#version-notes">Version notes</a></li>
+<li><a class="reference internal" href="#additional-dependencies">Additional dependencies</a></li>
+<li><a class="reference internal" href="#disclaimers">Disclaimers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#method-and-theory">Method and Theory</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">point_defect_static</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="template.html"
+                          title="next chapter">point_defect_static Input Terms</a></p>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="template.html" title="point_defect_static Input Terms"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="point_defect_static"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >point_defect_static</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">point_defect_static calculation style</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

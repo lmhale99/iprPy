@@ -1,20 +1,18 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>Calculations &#8212; iprPy 0.10.2 documentation</title>
-    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculations &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Running a single calculation" href="single.html" />
@@ -35,7 +33,8 @@
         <li class="right" >
           <a href="../overview.html" title="iprPy Package Components"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Calculations</a></li> 
       </ul>
     </div>  
 
@@ -57,25 +56,24 @@ allowing numerous runs to be prepared and executed in series.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="single.html">Running a single calculation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="single.html#calculation-script">Calculation script</a></li>
-<li class="toctree-l2"><a class="reference internal" href="single.html#call-from-python">Call from Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="single.html#check-available-calculations">1. Check available calculations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="single.html#create-new-directory">2. Create new directory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="single.html#check-a-calculation-s-documentation">3. Check a calculation’s documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="single.html#calculation-input-parameters">4. Calculation input parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="single.html#running-the-calculation">5. Running the calculation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="notebook.html">Run a Jupyter Calculation Notebook</a></li>
-<li class="toctree-l1"><a class="reference internal" href="htp.html">High-Throughput Calculation Execution</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="htp.html#define-databases-and-run-directories">Define databases and run directories</a></li>
-<li class="toctree-l2"><a class="reference internal" href="htp.html#copy-references-to-a-database">Copy references to a database</a></li>
-<li class="toctree-l2"><a class="reference internal" href="htp.html#prepare-calculations">Prepare calculations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="htp.html#executing-calculations-with-runners">Executing calculations with runners</a></li>
-<li class="toctree-l2"><a class="reference internal" href="htp.html#additional-tools-for-database-access-and-manipulation">Additional tools for database access and manipulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database_setup.html">Database Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="database_setup.html#basic-settings">1. Basic Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database_setup.html#define-databases">2. Define databases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database_setup.html#define-run-directories">3. Define run directories</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="inline.html">Command Line Actions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="inline.html#define">Define</a></li>
-<li class="toctree-l2"><a class="reference internal" href="inline.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="inline.html#prepare">Prepare</a></li>
-<li class="toctree-l2"><a class="reference internal" href="inline.html#runner">Runner</a></li>
-<li class="toctree-l2"><a class="reference internal" href="inline.html#other">Other</a></li>
+<li class="toctree-l1"><a class="reference internal" href="htp.html">High Throughput Operations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="htp.html#database-methods">1. Database methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="htp.html#prepare-calculations">2. Prepare calculations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="htp.html#executing-calculations-with-runners">3. Executing calculations with runners</a></li>
 </ul>
 </li>
 </ul>
@@ -83,17 +81,22 @@ allowing numerous runs to be prepared and executed in series.</p>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="../overview.html"
-                        title="previous chapter">iprPy Package Components</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="single.html"
-                        title="next chapter">Running a single calculation</a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="../overview.html"
+                          title="previous chapter">iprPy Package Components</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="single.html"
+                          title="next chapter">Running a single calculation</a></p>
+  </div>
         </div>
       </div>
       <div class="clearer"></div>
@@ -113,11 +116,12 @@ allowing numerous runs to be prepared and executed in series.</p>
         <li class="right" >
           <a href="../overview.html" title="iprPy Package Components"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Calculations</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

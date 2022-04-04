@@ -74,11 +74,21 @@ def command_line_actions(args):
         calculation = load_calculation(args.calculation)
         database.prepare(run_directory, calculation,
                          input_script=args.input_script)
-    
+
     # Actions for subcommand master_prepare
     elif args.action == 'master_prepare':
         database = load_database(args.database)
         database.master_prepare(input_script=args.input_script)
+
+    # Actions for subcommand maindoc
+    elif args.action == 'maindoc':
+        calculation = load_calculation(args.calculation)
+        print(calculation.maindoc)
+    
+    # Actions for subcommand theorydoc
+    elif args.action == 'theorydoc':
+        calculation = load_calculation(args.calculation)
+        print(calculation.theorydoc)
 
     # Actions for subcommand template
     elif args.action == 'template':
@@ -319,6 +329,18 @@ def command_line_parser():
     # Define subparser for templatedoc
     subparser = subparsers.add_parser('templatedoc',
                         help="view the documentation for a calculation's input script")
+    subparser.add_argument('calculation',
+                        help='calculation name')
+
+    # Define subparser for maindoc
+    subparser = subparsers.add_parser('maindoc',
+                        help="view the main documentation for a calculation")
+    subparser.add_argument('calculation',
+                        help='calculation name')
+    
+    # Define subparser for theorydoc
+    subparser = subparsers.add_parser('theorydoc',
+                        help="view the documentation for a calculation's methods and theory")
     subparser.add_argument('calculation',
                         help='calculation name')
 

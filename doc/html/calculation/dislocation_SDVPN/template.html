@@ -1,0 +1,373 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dislocation_SDVPN Input Terms &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="dislocation_SDVPN.py" href="function.html" />
+    <link rel="prev" title="dislocation_SDVPN calculation style" href="doc.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="function.html" title="dislocation_SDVPN.py"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="doc.html" title="dislocation_SDVPN calculation style"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">dislocation_SDVPN</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dislocation_SDVPN Input Terms</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dislocation-sdvpn-input-terms">
+<h1>dislocation_SDVPN Input Terms<a class="headerlink" href="#dislocation-sdvpn-input-terms" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="calculation-metadata">
+<h2>Calculation Metadata<a class="headerlink" href="#calculation-metadata" title="Permalink to this headline">¶</a></h2>
+<p>Specifies metadata descriptors common to all calculation styles.</p>
+<ul class="simple">
+<li><p><strong>branch</strong>: A metadata group name that the calculation can be parsed
+by. Primarily meant for differentiating runs with different settings
+parameters.</p></li>
+</ul>
+</div>
+<div class="section" id="initial-system-configuration">
+<h2>Initial System Configuration<a class="headerlink" href="#initial-system-configuration" title="Permalink to this headline">¶</a></h2>
+<p>Specifies the file and options to load for the initial atomic
+configuration.</p>
+<ul class="simple">
+<li><p><strong>load_file</strong>: The path to the initial configuration file to load.</p></li>
+<li><p><strong>load_style</strong>: The atomman.load() style indicating the format of the
+load_file.</p></li>
+<li><p><strong>load_options</strong>: A space-delimited list of key-value pairs for
+optional style-specific arguments used by atomman.load().</p></li>
+<li><p><strong>family</strong>: A metadata descriptor for relating the load_file back to
+the original crystal structure or prototype that the load_file was
+based on. If not given, will use the family field in load_file if
+load_style is ‘system_model’, or the file’s name otherwise.</p></li>
+<li><p><strong>symbols</strong>: A space-delimited list of the potential’s atom-model
+symbols to associate with the loaded system’s atom types. Required if
+load_file does not contain symbol/species information.</p></li>
+<li><p><strong>box_parameters</strong>: Specifies new box parameters to scale the loaded
+configuration by. Can be given either as a list of three or six
+numbers: ‘a b c’ for orthogonal boxes, or ‘a b c alpha beta gamma’
+for triclinic boxes. The a, b, c parameters are in units of length
+and the alpha, beta, gamma angles are in degrees.</p></li>
+</ul>
+</div>
+<div class="section" id="elastic-constants">
+<h2>Elastic Constants<a class="headerlink" href="#elastic-constants" title="Permalink to this headline">¶</a></h2>
+<p>Specifies the computed elastic constants for the interatomic potential
+and crystal structure, relative to the loaded system’s orientation. If
+the values are specified with the Voigt Cij terms and the system is in a
+standard setting for a crystal type, then only the unique Cij values for
+that crystal type are necessary. If isotropic values are used, only two
+idependent parameters are necessary.</p>
+<ul class="simple">
+<li><p><strong>elasticconstants_file</strong>: The path to a record containing the
+elastic constants to use. If neither this or the individual Cij
+components (below) are given and load_style is ‘system_model’, this
+will be set to load_file.</p></li>
+<li><p><strong>C11</strong>: The C11 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C12</strong>: The C12 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C13</strong>: The C13 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C14</strong>: The C14 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C15</strong>: The C15 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C16</strong>: The C16 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C22</strong>: The C22 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C23</strong>: The C23 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C24</strong>: The C24 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C25</strong>: The C25 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C26</strong>: The C26 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C33</strong>: The C33 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C34</strong>: The C34 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C35</strong>: The C35 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C36</strong>: The C36 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C44</strong>: The C44 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C45</strong>: The C45 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C46</strong>: The C46 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C55</strong>: The C55 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C56</strong>: The C56 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C66</strong>: The C66 component of the 6x6 Cij Voigt Cij elastic stiffness
+tensor (units of pressure).</p></li>
+<li><p><strong>C_M</strong>: The isotropic P-wave modulus (units of pressure).</p></li>
+<li><p><strong>C_lambda</strong>: The isotropic Lame’s first parameter (units of
+pressure).</p></li>
+<li><p><strong>C_mu</strong>: The isotropic shear modulus (units of pressure).</p></li>
+<li><p><strong>C_E</strong>: The isotropic Young’s modulus (units of pressure).</p></li>
+<li><p><strong>C_nu</strong>: The isotropic Poisson’s ratio (unitless).</p></li>
+<li><p><strong>C_K</strong>: The isotropic bulk modulus (units of pressure).</p></li>
+</ul>
+</div>
+<div class="section" id="gamma-surface">
+<h2>Gamma Surface<a class="headerlink" href="#gamma-surface" title="Permalink to this headline">¶</a></h2>
+<p>Specifies the gamma surface results to load.</p>
+<ul class="simple">
+<li><p><strong>gammasurface_file</strong>: The path to a file that contains a data model
+associated with an atomman.defect.GammaSurface object. Can be a
+record for a finished stacking_fault_map_2D calculation.</p></li>
+</ul>
+</div>
+<div class="section" id="dislocation">
+<h2>Dislocation<a class="headerlink" href="#dislocation" title="Permalink to this headline">¶</a></h2>
+<p>Specifies the parameter set that defines a dislocation type and how to
+orient it relative to the atomic system.</p>
+<ul class="simple">
+<li><p><strong>dislocation_file</strong>: The path to a dislocation record file that
+collects the parameters for a specific dislocation type.</p></li>
+<li><p><strong>dislocation_slip_hkl</strong>: The Miller (hkl) slip plane for the
+dislocation given as three space-delimited integers.</p></li>
+<li><p><strong>dislocation_ξ_uvw</strong>: The Miller [uvw] line vector direction for the
+dislocation given as three space-delimited integers. The angle
+between burgers and ξ_uvw determines the dislocation’s character.</p></li>
+<li><p><strong>dislocation_burgers</strong>: The Miller Burgers vector for the
+dislocation given as three space-delimited floats.</p></li>
+<li><p><strong>dislocation_m</strong>: The Cartesian vector of the final system that the
+dislocation solution’s m vector (in-plane, perpendicular to ξ) should
+align with. Given as three space-delimited numbers. Limited to
+beingparallel to one of the three Cartesian axes.</p></li>
+<li><p><strong>dislocation_n</strong>: The Cartesian vector of the final system that the
+dislocation solution’s n vector (slip plane normal) should align
+with. Given as three space-delimited numbers. Limited to
+beingparallel to one of the three Cartesian axes.</p></li>
+<li><p><strong>dislocation_shift</strong>: A rigid body shift to apply to the atoms in
+the system after it has been rotated to the correct orientation. This
+controls where the dislocation is placed relative to the atomic
+positions as the dislocation line is always inserted at coordinates
+(0,0) for the two Cartesian axes aligned with m and n. Specified as
+three floating point numbers.</p></li>
+<li><p><strong>dislocation_shiftscale</strong>: boolean indicating if the
+dislocation_shift value is a Cartesian vector (False, default) or if
+it is scaled relative to the rotated cell’s box parameters prior to
+applying sizemults.</p></li>
+<li><p><strong>dislocation_shiftindex</strong>: An integer that if given will result in a
+shift being automatically determined and used such that the
+dislocation’s slip plane will be positioned halfway between two
+atomic planes. Changing the integer value changes which set of planes
+the slip plane is positioned between. Note that shiftindex values
+only shift atoms in the slip plane normal direction and therefore may
+not be the ideal positions for some dislocation cores.</p></li>
+<li><p><strong>sizemults</strong>: Multiplication parameters to construct a supercell
+from the rotated system. Limited to three values for dislocation
+generation. Values must be even for the two box vectors not aligned
+with the dislocation line. The system will be replicated equally in
+the positive and negative directions for those two box vectors.</p></li>
+<li><p><strong>amin</strong>: Specifies a minimum width in length units that the
+resulting system’s a box vector must have. The associated sizemult
+value will be increased if necessary to ensure this. Default value is
+0.0.</p></li>
+<li><p><strong>bmin</strong>: Specifies a minimum width in length units that the
+resulting system’s b box vector must have. The associated sizemult
+value will be increased if necessary to ensure this. Default value is
+0.0.</p></li>
+<li><p><strong>cmin</strong>: Specifies a minimum width in length units that the
+resulting system’s c box vector must have. The associated sizemult
+value will be increased if necessary to ensure this. Default value is
+0.0.</p></li>
+</ul>
+</div>
+<div class="section" id="input-output-units">
+<h2>Input/Output Units<a class="headerlink" href="#input-output-units" title="Permalink to this headline">¶</a></h2>
+<p>Specifies the default units to use for the other input keys and to use
+for saving to the results file.</p>
+<ul class="simple">
+<li><p><strong>length_unit</strong>: The unit of length to use. Default value is
+‘angstrom’.</p></li>
+<li><p><strong>pressure_unit</strong>: The unit of pressure to use. Default value is
+‘GPa’.</p></li>
+<li><p><strong>energy_unit</strong>: The unit of energy to use. Default value is ‘eV’.</p></li>
+<li><p><strong>force_unit</strong>: The unit of force to use. Default value is
+‘eV/angstrom’.</p></li>
+</ul>
+</div>
+<div class="section" id="run-parameters">
+<h2>Run Parameters<a class="headerlink" href="#run-parameters" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><strong>xmax</strong>: The maximum value of the x-coordinates to use for the
+points where the disregistry is evaluated. The solution is centered
+around x=0, therefore this also corresponds to the minimum value of x
+used. The set of x-coordinates used is fully defined by giving at
+least two of xmax, xstep and xnum.</p></li>
+<li><p><strong>xstep</strong>: The step size (delta x) value between the x-coordinates
+used to evaluate the disregistry. The set of x-coordinates used is
+fully defined by giving at least two of xmax, xstep and xnum.</p></li>
+<li><p><strong>xnum</strong>: The total number of x-coordinates at which to evaluate the
+disregistry. The set of x-coordinates used is fully defined by giving
+at least two of xmax, xstep and xnum.</p></li>
+<li><p><strong>xscale</strong>: Boolean indicating if xmax and xstep are taken in
+angstroms (False) or relative to the unit cell’s a box vector (True).
+Default value is False.</p></li>
+<li><p><strong>minimize_style</strong>: The scipy.optimize.minimize method style to use
+when solving for the disregistry. Default value is ‘Powell’, which
+seems to do decently well for this problem.</p></li>
+<li><p><strong>minimize_options</strong>: Allows for the specification of the options
+dictionary used by scipy.optimize.minimize. This is given as ‘key
+value key value…’.</p></li>
+<li><p><strong>minimize_cycles</strong>: Specifies the number of times to run the
+minimization in succession. The minimization algorithms used by the
+underlying scipy code often benefit from restarting and rerunning the
+minimized configuration to achive a better fit. Default value is 10.</p></li>
+<li><p><strong>cutofflongrange</strong>: The radial cutoff (in distance units) to use for
+the long-range elastic energy. The long-range elastic energy is
+configuration-independent, so this value changes the dislocation’s
+energy but not the computed disregistry profile. Default value is
+1000 angstroms.</p></li>
+<li><p><strong>tau_xy</strong>: Shear stress (in units of pressure) to apply to the
+system. Default value is 0 GPa.</p></li>
+<li><p><strong>tau_yy</strong>: Normal stress (in units of pressure) to apply to the
+system. Default value is 0 GPa.</p></li>
+<li><p><strong>tau_yz</strong>: Shear stress (in units of pressure) to apply to the
+system. Default value is 0 GPa.</p></li>
+<li><p><strong>alpha</strong>: Coefficient(s) (in pressure/length units) of the non-local
+energy correction term to use. Default value is 0.0, meaning this
+correction is not applied.</p></li>
+<li><p><strong>beta_xx</strong>: The xx component of the surface energy coefficient
+tensor (in units pressure-length) to use. Default value is 0.0
+GPa-Angstrom.</p></li>
+<li><p><strong>beta_yy</strong>: The yy component of the surface energy coefficient
+tensor (in units pressure-length) to use. Default value is 0.0
+GPa-Angstrom.</p></li>
+<li><p><strong>beta_zz</strong>: The zz component of the surface energy coefficient
+tensor (in units pressure-length) to use. Default value is 0.0
+GPa-Angstrom.</p></li>
+<li><p><strong>beta_xy</strong>: The xy component of the surface energy coefficient
+tensor (in units pressure-length) to use. Default value is 0.0
+GPa-Angstrom.</p></li>
+<li><p><strong>beta_xz</strong>: The xz component of the surface energy coefficient
+tensor (in units pressure-length) to use. Default value is 0.0
+GPa-Angstrom.</p></li>
+<li><p><strong>beta_yz</strong>: The yz component of the surface energy coefficient
+tensor (in units pressure-length) to use. Default value is 0.0
+GPa-Angstrom.</p></li>
+<li><p><strong>cdiffelastic</strong>: Boolean indicating if the dislocation density is
+computed using central difference for the elastic term. Default value
+is False</p></li>
+<li><p><strong>cdiffsurface</strong>: Boolean indicating if the dislocation density is
+computed using central difference for the surface term. Default value
+is True</p></li>
+<li><p><strong>cdiffstress</strong>: Boolean indicating if the dislocation density is
+computed using central difference for the stress term. Default value
+is False</p></li>
+<li><p><strong>halfwidth</strong>: The arctan disregistry halfwidth (in length units) to
+use for creating the initial disregistry guess.</p></li>
+<li><p><strong>normalizedisreg</strong>: Boolean indicating how the disregistry profile
+is handled. If True (default), the disregistry is scaled such that
+the minimum x value has a disregistry of 0 and the maximum x value
+has a disregistry equal to the dislocation’s Burgers vector. Note
+that the disregistry for these endpoints is fixed, so if you use
+False the initial disregistry should be close to the final solution.</p></li>
+<li><p><strong>fullstress</strong>: Boolean indicating which of two stress formulas to
+use. True uses the original full formulation, while False uses a
+newer, simpler representation. Default value is True.</p></li>
+</ul>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">dislocation_SDVPN Input Terms</a><ul>
+<li><a class="reference internal" href="#calculation-metadata">Calculation Metadata</a></li>
+<li><a class="reference internal" href="#initial-system-configuration">Initial System Configuration</a></li>
+<li><a class="reference internal" href="#elastic-constants">Elastic Constants</a></li>
+<li><a class="reference internal" href="#gamma-surface">Gamma Surface</a></li>
+<li><a class="reference internal" href="#dislocation">Dislocation</a></li>
+<li><a class="reference internal" href="#input-output-units">Input/Output Units</a></li>
+<li><a class="reference internal" href="#run-parameters">Run Parameters</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="doc.html"
+                          title="previous chapter">dislocation_SDVPN calculation style</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="function.html"
+                          title="next chapter">dislocation_SDVPN.py</a></p>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="function.html" title="dislocation_SDVPN.py"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="doc.html" title="dislocation_SDVPN calculation style"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >dislocation_SDVPN</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dislocation_SDVPN Input Terms</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

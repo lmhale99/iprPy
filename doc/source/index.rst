@@ -1,23 +1,43 @@
 =============================================
-iprPy High-Throughput Computational Framework
+iprPy High Throughput Computational Framework
 =============================================
 
 Description
 ===========
 
-The iprPy framework is a collection of tools and resources supporting the
-design of scientific calculations that
+The iprPy package is a computational framework supporting open source
+calculation methods.  The framework focuses on making the barriers for usage
+as low as possible for both users and developers of calculations.  In
+particular, the methods are 
 
-- are open source with minimum barriers for usage,
-- have transparent methodologies supporting knowledge transfer and education,
-- produce results that are both human and machine readable,
-- allow investigations into method and parameter sensitivity,
-- and can be integrated into workflows.
+- fully documented, 
+- designed to be transparent to end users,
+- produce results in formats that are both human and machine readable,
+- modular in design supporting the incorporation of new methods, 
+- and can be easily integrated into workflows.
 
-The framework was originally created to support the NIST Interatomic Potential
-Repository by evaluating basic materials properties across multiple classical
-interatomic potentials.  Because of this, many of the included calculations
-and tools are designed towards molecular dynamics simulations.
+The framework consists of the following major components
+
+1. Calculation methods, which exist as Python scripts and fully detail how to
+   perform a single independent calculation.
+2. Calculation classes that manage metadata associated with the calculations.
+   These classes integrate the calculation method scripts into the framework
+   and allow for the calculations to be accessed and executed in a variety of
+   ways.
+3. Calculation subsets that provide common handling of input/output parameter
+   sets that are shared by multiple calculations.
+4. Built-in workflow tools that make it possible to run the implemented
+   calculations in high throughput and store/access the results in databases.
+
+iprPy was originally created for the NIST Interatomic Potentials
+Repository (i.e. I.P.R. Python) for collecting and performing calculation
+methods that evaluate how different classical interatomic potentials predict A
+variety of basic materials properties.  As such, the majority of included
+methods are centered around performing classical atomistic calculations.  It
+should be noted, however, that the framework design can support any type of
+underlying calculation as long as the calculation method can be represented
+as a python function that can be executed independently from any other
+calculation method.
 
 Documentation Sections
 ======================
@@ -28,7 +48,11 @@ A quick introduction describing why you would want to use the iprPy framework.
 
 :any:`setup`
 
-Describes the basics of iprPy for performing calculations.
+Gives details on how to install and set up iprPy.
+
+:any:`overview`
+
+Describes the basic components of iprPy.
 
 :any:`run/index`
 
@@ -43,14 +67,6 @@ calculation scripts use.
 :any:`notebook_styles`
 
 Provides demonstration Jupyter Notebooks for the implemented calculations.
-
-:any:`record_styles`
-
-Describes the implemented record formats for storing calculation data.
-
-:any:`database_styles`
-
-Describes the implemented database types that can be interacted with.
 
 :any:`extend/index`
 
@@ -74,7 +90,6 @@ Package Tutorials
     run/index
     extend/index
 
-
 Implemented Content
 ===================
 
@@ -84,8 +99,6 @@ Implemented Content
 
     calculation_styles
     notebook_styles
-    record_styles
-    database_styles
 
 Code Documentation
 ==================
@@ -94,7 +107,6 @@ Code Documentation
     :maxdepth: 3
 
     iprPy/index
-
 
 Indices and tables
 ==================

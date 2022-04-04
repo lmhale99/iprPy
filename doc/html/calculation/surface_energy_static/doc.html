@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>surface_energy_static calculation style &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="surface_energy_static Input Terms" href="template.html" />
+    <link rel="prev" title="surface_energy_static" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="template.html" title="surface_energy_static Input Terms"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="surface_energy_static"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">surface_energy_static</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">surface_energy_static calculation style</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="surface-energy-static-calculation-style">
+<h1>surface_energy_static calculation style<a class="headerlink" href="#surface-energy-static-calculation-style" title="Permalink to this headline">¶</a></h1>
+<p><strong>Lucas M. Hale</strong>,
+<a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>,
+<em>Materials Science and Engineering Division, NIST</em>.</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The surface_energy_static calculation style evaluates the formation
+energy for a free surface by slicing an atomic system along a specific
+plane.</p>
+<div class="section" id="version-notes">
+<h3>Version notes<a class="headerlink" href="#version-notes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>2018-07-09: Notebook added.</p></li>
+<li><p>2019-07-30: Description updated and small changes due to iprPy
+version.</p></li>
+<li><p>2020-05-22: Version 0.10 update - potentials now loaded from
+database.</p></li>
+<li><p>2020-09-22: Calculation updated to use atomman.defect.FreeSurface
+class. Setup and parameter definition streamlined.</p></li>
+<li><p>2022-03-11: Notebook updated to reflect version 0.11.</p></li>
+</ul>
+</div>
+<div class="section" id="additional-dependencies">
+<h3>Additional dependencies<a class="headerlink" href="#additional-dependencies" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="disclaimers">
+<h3>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST
+disclaimers</a></p></li>
+<li><p>Other atomic configurations at the free surface for certain planar
+cuts may have lower energies. The atomic relaxation will find a local
+minimum, which may not be the global minimum. Additionally, the
+material cut is planar perfect and therefore does not explore the
+effects of atomic roughness.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="method-and-theory">
+<h2>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this headline">¶</a></h2>
+<p>First, an initial system is generated. This is accomplished by</p>
+<ol class="arabic simple">
+<li><p>Starting with a unit cell system.</p></li>
+<li><p>Generating a transformed system by rotating the unit cell such that
+the new system’s box vectors correspond to crystallographic
+directions, and filled in with atoms to remain a perfect bulk cell
+when the three boundaries are periodic.</p></li>
+<li><p>All atoms are shifted by a fractional amount of the box vectors if
+needed.</p></li>
+<li><p>A supercell system is constructed by combining multiple replicas of
+the transformed system.</p></li>
+</ol>
+<p>Two LAMMPS simulations are then performed that apply an energy/force
+minimization on the system, and the total energy of the system after
+relaxing is measured, <span class="math notranslate nohighlight">\(E_{total}\)</span>. In the first simulation, all of
+the box’s directions are kept periodic (ppp), while in the second
+simulation two are periodic and one is non-periodic (ppm). This
+effectively slices the system along the boundary plane creating two free
+surfaces, each with surface area</p>
+<div class="math notranslate nohighlight">
+\[A = \left| \vec{a_1} \times \vec{a_2} \right|,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\vec{a_1}\)</span> and <span class="math notranslate nohighlight">\(\vec{a_2}\)</span> are the two lattice
+vectors corresponding to the periodic in-plane directions.</p>
+<p>The formation energy of the free surface, <span class="math notranslate nohighlight">\(E_{f}^{surf}\)</span>, is
+computed in units of energy over area as</p>
+<div class="math notranslate nohighlight">
+\[E_{f}^{surf} = \frac{E_{total}^{surf} - E_{total}^{0}} {2 A}.\]</div>
+<p>The calculation method allows for the specification of which of the
+three box dimensions the cut is made along. If not specified, the
+default behavior is to make the <span class="math notranslate nohighlight">\(\vec{c}\)</span> vector direction
+non-periodic. This choice is due to the limitations of how LAMMPS
+defines triclinic boxes. <span class="math notranslate nohighlight">\(\vec{c}\)</span> vector is the only box vector
+that is allowed to have a component in the Cartesian z direction.
+Because of this, the other two box vectors are normal to the z-axis and
+therefore will be in the cut plane.</p>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">surface_energy_static calculation style</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#version-notes">Version notes</a></li>
+<li><a class="reference internal" href="#additional-dependencies">Additional dependencies</a></li>
+<li><a class="reference internal" href="#disclaimers">Disclaimers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#method-and-theory">Method and Theory</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">surface_energy_static</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="template.html"
+                          title="next chapter">surface_energy_static Input Terms</a></p>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="template.html" title="surface_energy_static Input Terms"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="surface_energy_static"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >surface_energy_static</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">surface_energy_static calculation style</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

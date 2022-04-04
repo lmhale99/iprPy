@@ -1,24 +1,22 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>High-Throughput Calculation Execution &#8212; iprPy 0.10.2 documentation</title>
-    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>High Throughput Operations &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Command Line Actions" href="inline.html" />
-    <link rel="prev" title="Run a Jupyter Calculation Notebook" href="notebook.html" /> 
+    <link rel="next" title="Extending iprPy" href="../extend/index.html" />
+    <link rel="prev" title="Database Setup" href="database_setup.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -30,13 +28,14 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="inline.html" title="Command Line Actions"
+          <a href="../extend/index.html" title="Extending iprPy"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="notebook.html" title="Run a Jupyter Calculation Notebook"
+          <a href="database_setup.html" title="Database Setup"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Calculations</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Calculations</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">High Throughput Operations</a></li> 
       </ul>
     </div>  
 
@@ -45,159 +44,280 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="high-throughput-calculation-execution">
-<h1>High-Throughput Calculation Execution<a class="headerlink" href="#high-throughput-calculation-execution" title="Permalink to this headline">¶</a></h1>
-<p>There are five primary steps for performing high-throughput calculations using
-iprPy</p>
-<ol class="arabic simple">
-<li><p>Define one or more databases and run directories.  A database stores
-records, while a run directory is a path to a local directory where
-calculation files are placed for execution.</p></li>
-<li><p>Upload reference records from the iprPy/library to the databases that you
-want to use.</p></li>
-<li><p>Prepare calculations for high-throughput execution.  For every instance of
-a calculation style being prepared, a calculation folder is created in a
-run directory that contains all necessary files for execution, and a
-corresponding incomplete record is added to a database.</p></li>
-<li><p>Start one or more runners to systematically execute the prepared
-calculations in a run directory and update the associated calculation
-records in the database upon completion.</p></li>
-<li><p>Access records from the database to check on the status of the calculations
-and to analyze results.</p></li>
-</ol>
-<p>These actions can be performed either in Python or by using the iprPy inline
-commands.  The basic Python functions are described below, while the inline
-commands are described on the next documentation page.</p>
-<p>Examples and supporting Jupyter Notebooks can be found in the IPR workflow
-directory.</p>
-<div class="section" id="define-databases-and-run-directories">
-<h2>Define databases and run directories<a class="headerlink" href="#define-databases-and-run-directories" title="Permalink to this headline">¶</a></h2>
-<p>A database can be defined by specifying the database style and any parameters
-necessary to interact with the database.  This can be done using
-iprPy.load_database().  For example, a local style database can be specified by
-providing the local path to where the records are to be located</p>
+  <div class="section" id="high-throughput-operations">
+<h1>High Throughput Operations<a class="headerlink" href="#high-throughput-operations" title="Permalink to this headline">¶</a></h1>
+<p>Once you have at least one database and run directory defined, you can start performing calculations in high throughput!</p>
+<div class="section" id="database-methods">
+<h2>1. Database methods<a class="headerlink" href="#database-methods" title="Permalink to this headline">¶</a></h2>
+<p>The nature of high throughput calculations involves performing numerous calculations.  This results in the need of a database to help manage the generated results.  As such, the iprPy Databases contain numerous methods for exploring and manipulating records in a database.  This section lists the supported operations both for command line and Python methods</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">iprPy</span>
-<span class="n">database</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">load_database</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;local&#39;</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">&#39;/users/me/myDB&#39;</span><span class="p">)</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">load_database</span><span class="p">(</span><span class="o">&lt;</span><span class="n">database_name</span><span class="o">&gt;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>See the documentation for the different database styles to know what parameters
-each style accepts.</p>
-<p>Rather than having to define a database every time you want to use it, you can
-save the access parameters for a database using iprPy.set_database().  The
-settings will then be saved and associated with the ‘name’ parameter that you
-give.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">iprPy</span><span class="o">.</span><span class="n">set_database</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;myDB&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;local&#39;</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">&#39;/users/me/myDB&#39;</span><span class="p">)</span>
+<div class="section" id="record-query-operations">
+<h3>1.1. Record query operations<a class="headerlink" href="#record-query-operations" title="Permalink to this headline">¶</a></h3>
+<p>Records in the database can be queried and retrieved in a number of ways.</p>
+<div class="section" id="command-line">
+<h4>1.1.1. Command line<a class="headerlink" href="#command-line" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> retrieve &lt;database_name&gt; &lt;record_style&gt; &lt;record_name&gt;
 </pre></div>
 </div>
-<p>After a database is set, it can be loaded using its name.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">database</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">load_database</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;myDB&#39;</span><span class="p">)</span>
+<p>will search the database for the indicated record and save a copy to the working directory.  This is useful for fetching any records that may be used as inputs for a calculation.</p>
+</div>
+<div class="section" id="python">
+<h4>1.1.2. Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h4>
+<p>These are the methods of the iprPy Database class associated with basic record interactions and queries</p>
+<ul class="simple">
+<li><p>get_records() retrieves all records matching given criterion.</p></li>
+<li><p>get_record() retrieves one record that uniquely matches the given criterion.
+Raises an error if no or multiple matching calculations are found.</p></li>
+<li><p>get_records_df() finds all records matching the given criterion and returns a pandas.DataFrame containing the record metadata fields</p></li>
+<li><p>retrieve_record() retrieves one record that uniquely matches the given criterion and automatically saves a copy of it.</p></li>
+<li><p>get_parent_records() looks at the fields in a calculation record and identifies any parent records that were used as inputs.  The parent records are then retrieved from the database.  This can be useful to extract important data from parent records if the information is not copied over to the child records.</p></li>
+<li><p>get_tar() retrieves the archived calculation folder for a record as a tarfile
+object.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="copying-records">
+<h3>1.2. Copying records<a class="headerlink" href="#copying-records" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id1">
+<h4>1.2.1. Command line<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> copy_records &lt;source&gt; &lt;dest&gt; &lt;record_style&gt; <span class="o">[</span>-n, --notar<span class="o">]</span> <span class="o">[</span>-o, --overwrite<span class="o">]</span>
 </pre></div>
 </div>
-<p>Warning: the settings are saved in a text configuration file in the same
-directory as the iprPy package source code.  Be cautious of saving settings
-like passwords if the directory can be accessed by other users.</p>
-<p>A run directory is simply a path to a local directory.  Most of the methods
-that require a run directory can take a directory path as the argument.  Run
-directories can also be saved by name in a fashion similar to how database
-settings are saved.  set_run_directory() saves the path, and
-load_run_directory() retrieves the path associated with that name.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">iprPy</span><span class="o">.</span><span class="n">set_run_directory</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;myDB_1&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;/users/me/rundirs/myDB/1&#39;</span><span class="p">)</span>
-<span class="n">run_directory</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">load_run_directory</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;myDB_1&#39;</span><span class="p">)</span>
+<p>Copies all records of a given style from the source database name to the dest
+database name.  The notar flag indicates that only records and not any tar
+blobs are to be copied.  The overwrite flag indicates that all records be copied
+over and updated rather than just copying over the missing records.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> copy_references &lt;source&gt; &lt;dest&gt; <span class="o">[</span>-n, --notar<span class="o">]</span> <span class="o">[</span>-o, --overwrite<span class="o">]</span>
 </pre></div>
 </div>
-<p>Databases and run directories are not inherently connected and can be
-independently mixed and swapped.  However, since the calculations that are
-prepared within a run directory are tied to records in a database, it is
-suggested that each run directory be used with only one database.  One easy way
-to do this is to name run directories based on the database name: i.e. the
-‘myDB_1’ run directory has calculations for the ‘myDB’ database.</p>
+<p>Copies all records associated with the reference styles.  This is a convenience
+operation for prepping a new database with all of the reference records.  The notar flag
+indicates that only records and not any tar blobs are to be copied.  The overwrite flag
+indicates that all records be copied over and updated rather than just copying over the
+missing records.</p>
 </div>
-<div class="section" id="copy-references-to-a-database">
-<h2>Copy references to a database<a class="headerlink" href="#copy-references-to-a-database" title="Permalink to this headline">¶</a></h2>
-<p>Reference records have to be copied to a database before that database can find
-and use the records when preparing calculations.  The records in the
-iprPy/library directory can easily be added to a database with the build_refs()
-method</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">database</span><span class="o">.</span><span class="n">build_refs</span><span class="p">()</span>
+<div class="section" id="id2">
+<h4>1.2.2. Python<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">copy_records</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">record_style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">records</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">includetar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span>
 </pre></div>
 </div>
-<p>By default, build_refs will add all records in iprPy/library that are not
-already in the database.  See the method’s documentation for more options.</p>
+<p>Copies records of a given style from the current database object to the dest database.  If record_style is given, then all records of that style are copied over.  Alternatively, a pre-selected list of records can be given to copy over.  includetar indicates if any associated tar archives are also copied over, and overwrite indicates if all records are copied over and updated or only missing records are copied over.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">copy_references</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">includetar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Copies all records associated with the reference styles.  This is a convenience operation for prepping a new database with all of the reference records.  includetar indicates if any associated tar archives are also copied over, and overwrite indicates if all records are copied over and updated or only missing records are copied over.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">merge_records</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">record_style</span><span class="p">,</span> <span class="n">includetar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dryrun</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This method compares all records of a given style between the two databases before copying.  With includetar=True, the method will search for both missing records and tar files for the record style.  With overwrite=True, the contents of all records in both databases are compared to identify only the ones that have changed.  With dryrun=True, only the comparison operations are performed and the new/different records are returned as a list.  While comparing all records can be slow, it usually saves time overall compared to trying to update all records of the given style.</p>
+</div>
+</div>
+<div class="section" id="prepare-and-run">
+<h3>1.3. Prepare and run<a class="headerlink" href="#prepare-and-run" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h4>1.3.1. Command line<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> prepare &lt;database_name&gt; &lt;run_directory_name&gt; &lt;calculation_style&gt; &lt;input_file&gt;
+</pre></div>
+</div>
+<p>Prepares a set of calculations associated with the indicated calculation style
+based on the indicated input file.  See Section #2 below for more details.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> master_prepare &lt;database_name&gt; &lt;input_file&gt;
+</pre></div>
+</div>
+<p>Prepares one or more sets of calculations based on the indicated input file.
+Multiple calculation styles can be prepared with one script based on starting
+with pre-defined settings for that calculation.  See Section #2 below for more
+details.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> runner &lt;database_name&gt; &lt;run_directory_name&gt; <span class="o">[</span>-c, --calc_name &lt;calc_name&gt;<span class="o">]</span> <span class="o">[</span>-t, --temp<span class="o">]</span> <span class="o">[</span>-b, --bidtries<span class="o">]</span> <span class="o">[</span>-v, --bidverbose<span class="o">]</span>
+</pre></div>
+</div>
+<p>Starts a runner script operating on a run directory and uploads results to a
+database.  See Section #3 below for more details.</p>
+</div>
+<div class="section" id="id4">
+<h4>1.3.2. Python<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">run_directory</span><span class="p">,</span> <span class="n">calculation</span><span class="p">,</span> <span class="n">input_script</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Prepares a set of calculations associated with the indicated calculation style
+based on the indicated input file or kwargs given.  See Section #2 below for
+more details.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">master_prepare</span><span class="p">(</span><span class="n">input_script</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Prepares one or more sets of calculations based on the indicated input file or kwargs.
+Multiple calculation styles can be prepared with one script based on starting
+with pre-defined settings for that calculation.  See Section #2 below for more
+details.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">runner</span><span class="p">(</span><span class="n">run_directory</span><span class="p">,</span> <span class="n">calc_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">orphan_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+          <span class="n">hold_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bidtries</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">bidverbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+          <span class="n">temp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">temp_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Starts a runner process operating on a run directory and uploads results to
+the database.  See Section #3 below for more details.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">runner</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">runmanager</span><span class="p">(</span><span class="n">run_directory</span><span class="p">,</span> <span class="n">orphan_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">hold_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Creates and returns a RunManager object for the database and run directory.
+This gives users more direct control over the order and settings associated
+with each calculation being performed.  See Section #3 below for more
+details.</p>
+</div>
+</div>
+<div class="section" id="utility-methods">
+<h3>1.4. Utility methods<a class="headerlink" href="#utility-methods" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h4>1.4.1. Command line<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> check_records &lt;database_name&gt; &lt;record_style&gt;
+</pre></div>
+</div>
+<p>Queries all records of the specific style and displays how many are found.  If
+the record style is associated with a calculation, then it will also display
+the number of records for each status value: “finished”, “error”, and
+“not completed”.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> clean_records &lt;database_name&gt; &lt;run_directory_name&gt; &lt;record_style&gt;
+</pre></div>
+</div>
+<p>This is a utility command that finds all of the calculation records of the
+indicated style that issued errors and resets them to a “not calculated” state.
+This involves changing the records in the database, extracting the calculation
+archives to the run directory, and cleaning out any bid files.  clean_records
+is primarily useful for debugging calculations where issues can be fixed in the
+code and then the failed runs performed again.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> finish_calculations &lt;database_name&gt; &lt;run_directory_name&gt; <span class="o">[</span>-v, --verbose<span class="o">]</span>
+</pre></div>
+</div>
+<p>Searches a run directory for calculations that have finished and and generated
+a results.json files and uploads them to the database.  Useful if the database
+is remote and the connection was lost while the calculations were finishing up.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> reset_orphans &lt;run_directory_name&gt; <span class="o">[</span>&lt;orphan_directory&gt;<span class="o">]</span>
+</pre></div>
+</div>
+<p>Runners will move any calculations that they find that lack a corresponding
+record in the database to an orphan directory.  This occurs if the wrong
+database is specified or a connection to a database is lost.  The reset_orphans
+command returns the orphaned calculations to a run directory so that they can
+be operated on by another runner.  The orphan_directory value is optional if
+the runner used the default orphan_directory setting.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> destroy_records &lt;database_name&gt; &lt;record_style&gt;
+</pre></div>
+</div>
+<p>Permanently deletes all records and any tar archives for the indicated record
+style.</p>
+</div>
+<div class="section" id="id6">
+<h4>1.4.2 Python<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">check_records</span><span class="p">(</span><span class="n">record_style</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Queries all records of the specific style and displays how many are found.  If
+the record style is associated with a calculation, then it will also display
+the number of records for each status value: “finished”, “error”, and
+“not completed”.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">clean_records</span><span class="p">(</span><span class="n">run_directory</span><span class="p">,</span> <span class="n">record_style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">records</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is a utility command that finds all of the calculation records of the
+indicated style that issued errors and resets them to a “not calculated” state.
+This involves changing the records in the database, extracting the calculation
+archives to the run directory, and cleaning out any bid files.  clean_records
+is primarily useful for debugging calculations where issues can be fixed in the
+code and then the failed runs performed again.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">finish_calculations</span><span class="p">(</span><span class="n">run_directory</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Searches a run directory for calculations that have finished and and generated
+a results.json files and uploads them to the database.  Useful if the database
+is remote and the connection was lost while the calculations were finishing up.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">reset_orphans</span><span class="p">(</span><span class="n">run_directory</span><span class="p">,</span> <span class="n">orphan_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Runners will move any calculations that they find that lack a corresponding
+record in the database to an orphan directory.  This occurs if the wrong
+database is specified or a connection to a database is lost.  The reset_orphans
+command returns the orphaned calculations to a run directory so that they can
+be operated on by another runner.  The orphan_directory value is optional if
+the runner used the default orphan_directory setting.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">destroy_records</span><span class="p">(</span><span class="n">record_style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">records</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Permanently deletes all records and any tar archives for the indicated record
+style or the list of records given.</p>
+</div>
+</div>
 </div>
 <div class="section" id="prepare-calculations">
-<h2>Prepare calculations<a class="headerlink" href="#prepare-calculations" title="Permalink to this headline">¶</a></h2>
-<p>Prepare generates multiple instances of a calculation style based on iterative
-combinations of the calculation’s input parameters.  It needs to know which
-database to place the records in, which calculation style to use, and which
-run directory to place the generated calculation instances. Also, the
-prepare method needs to know what input parameter values to iterate over, and
-which input keys are linked.  The values to iterate over can be specified by
-passing prepare either an input file or giving input parameters as keyword
-arguments.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">database</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">load_database</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;my_DB&#39;</span><span class="p">)</span>
-<span class="n">run_directory</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">load_run_directory</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;myDB_1&#39;</span><span class="p">)</span>
-<span class="n">calc</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">load_calculation</span><span class="p">(</span><span class="s1">&#39;E_vs_r_scan&#39;</span><span class="p">)</span>
-
-<span class="n">database</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">run_directory</span><span class="p">,</span> <span class="n">calculation</span><span class="p">,</span> <span class="n">input_script</span><span class="o">=</span><span class="s1">&#39;prepare.in&#39;</span><span class="p">)</span>
-</pre></div>
+<h2>2. Prepare calculations<a class="headerlink" href="#prepare-calculations" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-prepare-process">
+<h3>2.1. The prepare process<a class="headerlink" href="#the-prepare-process" title="Permalink to this headline">¶</a></h3>
+<p>Prepare sets up multiple instances of a calculation to be executed based on iterative combinations of input parameters.  The steps performed by prepare are</p>
+<ol class="arabic simple">
+<li><p>Each prepare action is associated with a database, run directory and calculation style.</p></li>
+<li><p>The calculation instances being prepared are defined by an input script/dict that is similar to the input script/dict that the calculation style uses except that some parameters can be given multiple values.</p></li>
+<li><p>The calculation style’s input parameters are grouped into defined parameter sets that indicate all terms in that group should be of the same length and iterated over together.</p></li>
+<li><p>Additionally, “buildcombos” functions can be used to build combinations of inputs based on records currently in the database.</p></li>
+<li><p>Based on the prepare script and the defined parameter sets, all meaningful combinations of input parameters are iterated over to generate a list of calculation instances.</p></li>
+<li><p>The generated list is then filtered down by removing calculations that are deemed duplicates of existing records or have combinations of inputs that are evaluated as being invalid.</p></li>
+<li><p>All new, valid calculation instances are then “prepared” by creating a folder in the run directory for the instance that contains the appropriate input script and copies of any required files.</p></li>
+<li><p>An incomplete record for each calculation instance is uploaded to the database after the corresponding calculation instance folder is prepared.</p></li>
+</ol>
+<p>These steps allow for a simple means of building numerous calculation instances to run and helps avoid invalid and duplicate calculations from being generated.</p>
 </div>
-<p>or</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">database</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">run_directory</span><span class="p">,</span> <span class="n">calculation</span><span class="p">,</span> <span class="o">**</span><span class="n">inputs</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="section" id="prepare-input-file-rules">
-<h3>Prepare input file rules<a class="headerlink" href="#prepare-input-file-rules" title="Permalink to this headline">¶</a></h3>
-<p>The input file format used by prepare follows nearly the same rules as the
-input file format used to run calculation scripts.  The only real difference is
-that keys can be assigned multiple values.</p>
+<div class="section" id="prepare-input-script-rules">
+<h3>2.2. Prepare input script rules<a class="headerlink" href="#prepare-input-script-rules" title="Permalink to this headline">¶</a></h3>
+<p>The input parameter scripts used by prepare are comparable to the input parameter scripts used by the corresponding calculation style.  The main differences being that multiple values of some terms are supported and the addition of buildcombos operations.</p>
 <ul class="simple">
-<li><p>The parameters are given in key-value format, with each line listing a
-parameter followed by its assigned value.</p></li>
-<li><p>Any parameters that are not listed or not given values will be ignored and be
-given default values, if allowed by the calculation.</p></li>
-<li><p>Any terms listed after a # will be treated as comments and ignored.</p></li>
-<li><p>Keys can be assigned multiple values by listing more than one complete
-non-comment key-value line for that key.</p></li>
+<li><p>Each line is treated independently and split into white-spaced delimited
+terms.</p></li>
+<li><p>Any terms listed after a “#” will be treated as comments and ignored.</p></li>
+<li><p>The first term on any given line corresponds to a parameter name, i.e. a key.
+Any other terms following it are interpreted as the value(s) to assign to
+that parameter.</p></li>
+<li><p>If only a parameter name appears on a line with no values (i.e. there is only
+one term) then the line is ignored.</p></li>
+<li><p>On a per-calculation basis, some parameters can be assigned multiple values.
+These terms that support multiple values are typically grouped into parameter sets.  See Section 2.2.
+for information on seeing how a calculation’s input parameters are grouped.</p></li>
+<li><p>Multiple values for parameters can be assigned by providing multiple lines
+with value term(s) that start with the same parameter name.</p></li>
+<li><p>Any parameters not assigned values will be given default values if the
+calculation allows it or will issue an error for required parameters.</p></li>
+<li><p>All terms in a parameter set are expected to have the same number of values assigned.  The only exception is if a term is to always use its default value, in which case it can be given no values and the default values will be assumed for each combination.  Alternatively, a term can be explicitly stated to use the default value by giving a value of “none”.</p></li>
+<li><p>Lines that start with buildcombos indicate that a buildcombos function is to
+be used to generate values for a parameter set based on records in a database.
+See Section 2.3. below for more details.</p></li>
 </ul>
-</div>
-<div class="section" id="passing-inputs-as-keyword-arguments">
-<h3>Passing inputs as keyword arguments<a class="headerlink" href="#passing-inputs-as-keyword-arguments" title="Permalink to this headline">¶</a></h3>
-<p>Alternatively, input values can be defined as keyword arguments of prepare.
-This option is convenient for dynamically generating input values.</p>
-<ul class="simple">
-<li><p>The keyword name corresponds to the input key.</p></li>
-<li><p>Each input value is given as a string matching how it would appear in the
-input file.  For example, myinput=‘1 angstrom’ corresponds to the input file
-line ‘myinput   1 angstrom’.</p></li>
-<li><p>Multiple values can be given for an input key by simply assigning it a list
-of string values.</p></li>
-</ul>
+<p>In a Python environment, a dict can alternatively be provided to the prepare method.  Each dict value can be a single string value or a list of string values.  Any buildcombos can be specified by adding one or more values to a “buildcombos” element in the dict.</p>
 </div>
 <div class="section" id="recognized-input-keys">
-<h3>Recognized input keys<a class="headerlink" href="#recognized-input-keys" title="Permalink to this headline">¶</a></h3>
-<p>The input parameter keys recognized by prepare, and which keys are allowed to
-have multiple values is specific to each calculation style.  The recognized
-prepare keys consist of all of the keys that the calculation itself recognizes
-along with buildcombos functions and a few special keys for handling copying of
-data files.  The full list of supported prepare keys for a calculation can be
-found by loading the calculation and checking the allkeys properties.</p>
+<h3>2.3. Recognized input keys<a class="headerlink" href="#recognized-input-keys" title="Permalink to this headline">¶</a></h3>
+<p>This section describes how users can see how a calculation’s input terms are classified and grouped for prepare operations.</p>
+<div class="section" id="id7">
+<h4>2.3.1. Command line<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<p>Nothing yet…</p>
+</div>
+<div class="section" id="id8">
+<h4>2.3.2. Python<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+<p>All input parameter keys recognized by prepare (sans buildcombos) can be viewed with allkeys</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">calc</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">load_calculation</span><span class="p">(</span><span class="s1">&#39;E_vs_r_scan&#39;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">calc</span><span class="o">.</span><span class="n">allkeys</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">calc</span><span class="o">.</span><span class="n">allkeys</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Which keys are limited to single values during prepare, and which ones can
-have multiple values can also be viewed using the singularkeys and multikeys
-properties.  For multikeys, the keys are collected as sets indicating which
-ones are paired and iterated through together.  Each key in a multikeys set
-must either have the same number of values or no values assigned to it.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">calc</span><span class="o">.</span><span class="n">singularkeys</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">keyset</span> <span class="ow">in</span> <span class="n">calc</span><span class="o">.</span><span class="n">multikeys</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">keyset</span><span class="p">)</span>
+<p>Note that allkeys can contain additional keys that are not listed in the calculation’s template input.  These extra terms provide internal capabilities beyond what can be conveyed in the text-based input scripts.  The most common example is that every “_file” term that gives a file path has a corresponding “_content” term in allkeys that is used to store the file contents after reading it once.</p>
+<p>The input keys that are limited to single values can be viewed with singularkeys.  The parameters that can have multiple values can be viewed with multikeys.  Note that multikeys are separated into different lists that indicate the parameter sets which are iterated over together meaning that all contained values should be of the same length.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">calc</span><span class="o">.</span><span class="n">singularkeys</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">calc</span><span class="o">.</span><span class="n">multikeys</span><span class="p">)</span>
 </pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="using-buildcombos-functions">
-<h3>Using buildcombos functions<a class="headerlink" href="#using-buildcombos-functions" title="Permalink to this headline">¶</a></h3>
+<h3>2.4. Using buildcombos functions<a class="headerlink" href="#using-buildcombos-functions" title="Permalink to this headline">¶</a></h3>
 <p>The buildcombos functions are special functions that can be used during prepare
 to build values for multikeys sets based on records that exist in the database.
 This allows for calculation workflows to be constructed where results for one
@@ -209,9 +329,9 @@ that the buildcombos function will operate on, and an optional name to use for
 the buildcombos call.  Additional parameters can then be passed to that
 buildcombos function by defining input keys that start with the buildcombos
 name and an underscore.</p>
-<p>For example, the prepare input lines:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">buildcombos</span>           <span class="n">atomicparent</span> <span class="n">load_file</span> <span class="n">parent</span>
-<span class="n">parent_record_style</span>   <span class="n">relaxed_crystal</span>
+<p>For example, the prepare input lines</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>buildcombos           atomicparent load_file parent
+parent_record_style   relaxed_crystal
 </pre></div>
 </div>
 <p>will build values for the keyset containing load_file based on the atomic
@@ -221,110 +341,143 @@ style does and what parameters it recognizes.</p>
 </div>
 </div>
 <div class="section" id="executing-calculations-with-runners">
-<h2>Executing calculations with runners<a class="headerlink" href="#executing-calculations-with-runners" title="Permalink to this headline">¶</a></h2>
-<p>Once calculations are prepared, they can be executed by starting one or more
-runners.  A runner systematically executes the prepared calculations within a
-specified run_directory and updates the associated record within a database
-upon completion.  Starting a runner from Python is as simple as</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">database</span><span class="o">.</span><span class="n">runner</span><span class="p">(</span><span class="n">run_directory</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The runner script has been designed to allow multiple active runners in the
-same run directory and some limited workflow support.  So that runners can
-recognize which calculations other runners are performing, .bid files are
-placed in the calculation folders.  If runners are prematurely stopped, the
-.bid files will need to be removed to keep new runners from skipping over the
-calculation folders.</p>
-<p>If submitting runners to a queue, note that each runner will be limited to a
-certain number of cores.  For this reason, it is recommended that calculations
-be divided into different run directories based on how many cores you want to
-use.</p>
-<div class="section" id="runner-process">
-<h3>Runner process<a class="headerlink" href="#runner-process" title="Permalink to this headline">¶</a></h3>
-<p>This details the specific steps that a runner performs</p>
-<ol class="arabic">
-<li><p>A calculation folder in the run directory is selected at random.</p></li>
-<li><p>The runner checks the calculation folder for the following files</p>
-<blockquote>
-<div><ol class="upperalpha simple">
-<li><p>A .bid file indicates that another runner is already operating on the
-calculation, and therefore should be left alone.</p></li>
-<li><p>Any included .xml and .json files may be results records from a parent
-calculation.  Their status is checked and updated from the database if
-needed.  If a parent record is found to be incomplete, the runner will
-try running the parent calculation.</p></li>
-<li><p>If the folder is missing either calc_[style].py or calc_[style].in, or
-there is no corresponding record in the database, then the calculation
-folder is archived to an orphan directory.</p></li>
-</ol>
-</div></blockquote>
-</li>
-<li><p>If the calculation is free and ready, then the runner will create a .bid
-file and run the calculation.</p></li>
-<li><p>Upon completion, the calculation’s record is updated, and the calculation
-folder is zipped and archived to the database.</p></li>
-<li><p>Steps 1-4 are repeated until either there are no more calculation folders
-or the runner fails to find an open calculation after a set number of
-attempts.</p></li>
+<h2>3. Executing calculations with runners<a class="headerlink" href="#executing-calculations-with-runners" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-runner-process">
+<h3>3.1. The runner process<a class="headerlink" href="#the-runner-process" title="Permalink to this headline">¶</a></h3>
+<p>A runner is tied to a database and operates on the prepared calculations that are found inside a run directory.</p>
+<p>Each active runner performs the following steps</p>
+<ol class="arabic simple">
+<li><p>A calculation folder in the run directory is selected.</p></li>
+<li><p>The runner “bids” on being able to perform the calculation, which creates a .bid file in the calculation folder to indicate to other runners that the calculation is taken.</p></li>
+<li><p>If the folder is missing a calc_[style].in input parameter file or there is no corresponding record in the database, then the calculation folder is archived to an orphan directory.</p></li>
+<li><p>If the folder contains .json or .xml files, these may be records associated with parent calculations which may not have been finished at the time the calculation folder was prepared.  The runner will check the database for updated versions of these records.  If the parent calculation has since finished successfully, the record file will be updated.  If the parent calculation is still not finished, then the runner will return to step #1 and try selecting the calculation folder for the parent calculation.</p></li>
+<li><p>The complete and ready to run calculations will then be executed by the runner.</p></li>
+<li><p>Upon completion (successful or error), the calculation’s record will be updated in the database.  The calculation folder will also be archived as a tar.gz file and stored in the database.  The copy of the calculation folder in the run directory will then be deleted.</p></li>
+<li><p>The default nature of the runners is to return to step #1 with a randomly selected calculation folder.  The runner will stop if no calculation folders remain or the bid process fails a set number of times in a row.</p></li>
 </ol>
 </div>
-</div>
-<div class="section" id="additional-tools-for-database-access-and-manipulation">
-<h2>Additional tools for database access and manipulation<a class="headerlink" href="#additional-tools-for-database-access-and-manipulation" title="Permalink to this headline">¶</a></h2>
-<p>The database object also has additional methods for accessing and manipulating
-records</p>
+<div class="section" id="additional-options">
+<h3>3.2. Additional options<a class="headerlink" href="#additional-options" title="Permalink to this headline">¶</a></h3>
+<p>There are a number of optional settings that can be specified when starting a runner.</p>
+<div class="section" id="id9">
+<h4>3.2.1. Command line<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<p>These are the options that can be specified with the iprPy runner command.</p>
 <ul class="simple">
-<li><p>get_records() retrieves all records matching given criterion.</p></li>
-<li><p>get_record() retrieves one record that uniquely matches the given criterion.
-Raises an error if no or multiple matching calculations are found.</p></li>
-<li><p>get_records_df() returns record information as a pandas DataFrame.</p></li>
-<li><p>get_tar() retrieves the archived calculation folder for a record as a tarfile
-object.</p></li>
-<li><p>check_records() will display the number of records in the database for a
-given record style, and for calculation records will count how many are
-finished, still to run, or issued errors.</p></li>
-<li><p>copy_records() allows records to be copied from one database to another.</p></li>
-<li><p>clean_records() resets any calculations that issued errors back to a
-run_directory and removes .bid files.  This is useful for debugging.</p></li>
-<li><p>destroy_records() permanently deletes all stored calculations of a given
-style.</p></li>
+<li><p><strong>-c &lt;calc_name&gt;, –calc_name &lt;calc_name&gt;</strong> Allows for a specific calculation name to be given.  Doing so will cause the runner to automatically select the indicated calculation and not search for any other calculations to run.  This provides a means of defining jobs on a per-calculation basis that target specific prepared calculations.</p></li>
+<li><p><strong>-t, –temp</strong> If given, the calculation folder will be copied to a temp directory and executed from there.  This may be more efficient for some computational resources.  The downside is that any intermediate calculation results will be lost if the runner is stopped before the calculation finishes.</p></li>
+<li><p><strong>-b &lt;bidtries&gt;, –bidtries &lt;bidtries&gt;</strong> The runner will stop if the bid process fails bidtries times in a row.  Changing this value affects the likelihood of a runner finding an open calculation when the number of available jobs is comparable to the number of active runners.  The default value is 10, which seems to work well in most cases.</p></li>
+<li><p><strong>-v or –bidverbose</strong> If given, the screen output and runner log output will include additional details related to the bidding process.</p></li>
+</ul>
+</div>
+<div class="section" id="id10">
+<h4>3.2.2. Python<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h4>
+<p>These are the optional parameters that the runner method of a database object accepts.</p>
+<ul class="simple">
+<li><p><strong>calc_name</strong> (<em>str, optional</em>)  The name of a specific calculation to run.  Doing so will cause the runner to automatically select the indicated calculation and not search for any other calculations to run.  This provides a means of defining jobs on a per-calculation basis that target specific prepared calculations.</p></li>
+<li><p><strong>orphan_directory</strong> (<em>path-like object, optional</em>) The path for the orphan directory where incomplete calculations are moved.  If None (default) then will use ‘orphan’ at the same level as the run_directory.</p></li>
+<li><p><strong>hold_directory</strong> (<em>str, optional</em>) The path for the hold directory where tar archives that failed to be uploaded are moved to.  If None (default) then will use ‘hold’ at the same level as the run_directory.</p></li>
+<li><p><strong>log</strong> (<em>bool, optional</em>) If True (default), the runner will create and save a log file detailing the status of each calculation that it runs.</p></li>
+<li><p><strong>bidtries</strong> (<em>int, optional</em>) The runner will stop if it fails on bidding this many times in a row.  This allows for the cleanup of excess competing runners. Default value is 10.</p></li>
+<li><p><strong>bidverbose</strong> (<em>bool, optional</em>) If True, info about the calculation bidding process will be printed. Default value is False.</p></li>
+<li><p><strong>temp</strong> (<em>bool, optional</em>) If True, a temporary directory will be automatically created and used for this run.</p></li>
+<li><p><strong>temp_directory</strong> (<em>path-like object, optional</em>) The path to an existing temporary directory where the calculations are to be copied to and executed there instead of in the run_directory.</p></li>
 </ul>
 </div>
 </div>
+<div class="section" id="runners-as-cluster-jobs">
+<h3>3.3. Runners as cluster jobs<a class="headerlink" href="#runners-as-cluster-jobs" title="Permalink to this headline">¶</a></h3>
+<p>The iprPy runner command makes it easy to submit runners as jobs on computing clusters.  The two primary methods of specifying runners as jobs are</p>
+<ul class="simple">
+<li><p>If your cluster allows for large wall times and the calculations you are performing are small, then you can submit jobs for runners operating normally that will iterate over any prepared calculations until finished or they are stopped.  When running in this manner, note that runner jobs that are killed prematurely may leave behind .bid files in the calculation folders that should be removed to make those calculations available to future runners.</p></li>
+<li><p>Alternatively, you can give a specific calculation name to each runner.  This then makes the jobs more traditional in that each job will be associated with a single calculation.</p></li>
+</ul>
+<p>Note that some calculations may be able to use multiple cores in their execution.  As a given cluster job is limited to a certain number of available cores, the prepared jobs should be collected in different run directories based on the number of cores to use.  That way the number of cores available to a runner job matches the number of cores you wish to run each calculation with.</p>
+</div>
+<div class="section" id="runmanager">
+<h3>3.4. RunManager<a class="headerlink" href="#runmanager" title="Permalink to this headline">¶</a></h3>
+<p>The runner method is built around a RunManager object, which can alternately be created from a database.  Doing so gives users more direct control over how the calculations are performed.</p>
+<p>The important methods and attributes of a RunManager are</p>
+<ul class="simple">
+<li><p><strong>run_directory</strong>, <strong>orphan_directory</strong>, and <strong>hold_directory</strong> can all be directly set as class attributes.  This makes it possible to change any of these options between calculations.</p></li>
+<li><p><strong>calclist</strong> returns the list of all calculation names in the run directory.</p></li>
+<li><p><strong>run(calc_name, temp=False, temp_directory=None, bidverbose=False)</strong> will select and run a single calculation indicated by name.  If temp=True, a new temp folder will be created and used.  temp_directory allows for an existing temp folder to be used.</p></li>
+<li><p><strong>runall(bidtries=10, temp=False, temp_directory=None, bidverbose=False)</strong> will iteratively run through calculations in the run directory randomly until either no calculations are left or the bid process fails bidtries times in a row.</p></li>
+</ul>
+</div>
+</div>
+</div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">High-Throughput Calculation Execution</a><ul>
-<li><a class="reference internal" href="#define-databases-and-run-directories">Define databases and run directories</a></li>
-<li><a class="reference internal" href="#copy-references-to-a-database">Copy references to a database</a></li>
-<li><a class="reference internal" href="#prepare-calculations">Prepare calculations</a><ul>
-<li><a class="reference internal" href="#prepare-input-file-rules">Prepare input file rules</a></li>
-<li><a class="reference internal" href="#passing-inputs-as-keyword-arguments">Passing inputs as keyword arguments</a></li>
-<li><a class="reference internal" href="#recognized-input-keys">Recognized input keys</a></li>
-<li><a class="reference internal" href="#using-buildcombos-functions">Using buildcombos functions</a></li>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">High Throughput Operations</a><ul>
+<li><a class="reference internal" href="#database-methods">1. Database methods</a><ul>
+<li><a class="reference internal" href="#record-query-operations">1.1. Record query operations</a><ul>
+<li><a class="reference internal" href="#command-line">1.1.1. Command line</a></li>
+<li><a class="reference internal" href="#python">1.1.2. Python</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#executing-calculations-with-runners">Executing calculations with runners</a><ul>
-<li><a class="reference internal" href="#runner-process">Runner process</a></li>
+<li><a class="reference internal" href="#copying-records">1.2. Copying records</a><ul>
+<li><a class="reference internal" href="#id1">1.2.1. Command line</a></li>
+<li><a class="reference internal" href="#id2">1.2.2. Python</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#additional-tools-for-database-access-and-manipulation">Additional tools for database access and manipulation</a></li>
+<li><a class="reference internal" href="#prepare-and-run">1.3. Prepare and run</a><ul>
+<li><a class="reference internal" href="#id3">1.3.1. Command line</a></li>
+<li><a class="reference internal" href="#id4">1.3.2. Python</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#utility-methods">1.4. Utility methods</a><ul>
+<li><a class="reference internal" href="#id5">1.4.1. Command line</a></li>
+<li><a class="reference internal" href="#id6">1.4.2 Python</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#prepare-calculations">2. Prepare calculations</a><ul>
+<li><a class="reference internal" href="#the-prepare-process">2.1. The prepare process</a></li>
+<li><a class="reference internal" href="#prepare-input-script-rules">2.2. Prepare input script rules</a></li>
+<li><a class="reference internal" href="#recognized-input-keys">2.3. Recognized input keys</a><ul>
+<li><a class="reference internal" href="#id7">2.3.1. Command line</a></li>
+<li><a class="reference internal" href="#id8">2.3.2. Python</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-buildcombos-functions">2.4. Using buildcombos functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#executing-calculations-with-runners">3. Executing calculations with runners</a><ul>
+<li><a class="reference internal" href="#the-runner-process">3.1. The runner process</a></li>
+<li><a class="reference internal" href="#additional-options">3.2. Additional options</a><ul>
+<li><a class="reference internal" href="#id9">3.2.1. Command line</a></li>
+<li><a class="reference internal" href="#id10">3.2.2. Python</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#runners-as-cluster-jobs">3.3. Runners as cluster jobs</a></li>
+<li><a class="reference internal" href="#runmanager">3.4. RunManager</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="notebook.html"
-                        title="previous chapter">Run a Jupyter Calculation Notebook</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="inline.html"
-                        title="next chapter">Command Line Actions</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="database_setup.html"
+                          title="previous chapter">Database Setup</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="../extend/index.html"
+                          title="next chapter">Extending iprPy</a></p>
+  </div>
         </div>
       </div>
       <div class="clearer"></div>
@@ -339,17 +492,18 @@ style.</p></li>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="inline.html" title="Command Line Actions"
+          <a href="../extend/index.html" title="Extending iprPy"
              >next</a> |</li>
         <li class="right" >
-          <a href="notebook.html" title="Run a Jupyter Calculation Notebook"
+          <a href="database_setup.html" title="Database Setup"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >Calculations</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Calculations</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">High Throughput Operations</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

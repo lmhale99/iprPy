@@ -17,5 +17,5 @@ allowing numerous runs to be prepared and executed in series.
 
     single
     notebook
+    database_setup
     htp
-    inline

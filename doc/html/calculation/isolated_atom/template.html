@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>isolated_atom Input Terms &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="isolated_atom.py" href="function.html" />
+    <link rel="prev" title="isolated_atom calculation style" href="doc.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="function.html" title="isolated_atom.py"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="doc.html" title="isolated_atom calculation style"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">isolated_atom</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">isolated_atom Input Terms</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="isolated-atom-input-terms">
+<h1>isolated_atom Input Terms<a class="headerlink" href="#isolated-atom-input-terms" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="calculation-metadata">
+<h2>Calculation Metadata<a class="headerlink" href="#calculation-metadata" title="Permalink to this headline">¶</a></h2>
+<p>Specifies metadata descriptors common to all calculation styles.</p>
+<ul class="simple">
+<li><p><strong>branch</strong>: A metadata group name that the calculation can be parsed
+by. Primarily meant for differentiating runs with different settings
+parameters.</p></li>
+</ul>
+</div>
+<div class="section" id="lammps-and-mpi-commands">
+<h2>LAMMPS and MPI Commands<a class="headerlink" href="#lammps-and-mpi-commands" title="Permalink to this headline">¶</a></h2>
+<p>Specifies the external commands for running LAMMPS and MPI.</p>
+<ul class="simple">
+<li><p><strong>lammps_command</strong>: The path to the executable for running LAMMPS on
+your system. Don’t include command line options.</p></li>
+<li><p><strong>mpi_command</strong>: The path to the MPI executable and any command line
+options to use for calling LAMMPS to run in parallel on your system.
+LAMMPS will run as a serial process if not given.</p></li>
+</ul>
+</div>
+<div class="section" id="interatomic-potential">
+<h2>Interatomic Potential<a class="headerlink" href="#interatomic-potential" title="Permalink to this headline">¶</a></h2>
+<p>Specifies the interatomic potential to use and the directory where any
+associated parameter files are located.</p>
+<ul class="simple">
+<li><p><strong>potential_file</strong>: The path to the potential_LAMMPS or
+potential_LAMMPS_KIM record that defines the interatomic potential to
+use for LAMMPS calculations.</p></li>
+<li><p><strong>potential_kim_id</strong>: If potential_file is a potential_LAMMPS_KIM
+record, this allows for the specification of which version of the KIM
+model to use by specifying a full kim model id. If not given, the
+newest known version of the kim model will be assumed.</p></li>
+<li><p><strong>potential_kim_potid</strong>: Some potential_LAMMPS_KIM records are
+associated with multiple potential entries. This allows for the clear
+specification of which potential (by potid) to associate with those
+kim models.This will affect the list of available symbols for the
+calculation.</p></li>
+<li><p><strong>potential_dir</strong>: The path to the directory containing any potential
+parameter files (eg. eam.alloy setfl files) that are needed for the
+potential. If not given, then any required files are expected to be
+in the working directory where the calculation is executed.</p></li>
+</ul>
+</div>
+<div class="section" id="input-output-units">
+<h2>Input/Output Units<a class="headerlink" href="#input-output-units" title="Permalink to this headline">¶</a></h2>
+<p>Specifies the default units to use for the other input keys and to use
+for saving to the results file.</p>
+<ul class="simple">
+<li><p><strong>length_unit</strong>: The unit of length to use. Default value is
+‘angstrom’.</p></li>
+<li><p><strong>pressure_unit</strong>: The unit of pressure to use. Default value is
+‘GPa’.</p></li>
+<li><p><strong>energy_unit</strong>: The unit of energy to use. Default value is ‘eV’.</p></li>
+<li><p><strong>force_unit</strong>: The unit of force to use. Default value is
+‘eV/angstrom’.</p></li>
+</ul>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">isolated_atom Input Terms</a><ul>
+<li><a class="reference internal" href="#calculation-metadata">Calculation Metadata</a></li>
+<li><a class="reference internal" href="#lammps-and-mpi-commands">LAMMPS and MPI Commands</a></li>
+<li><a class="reference internal" href="#interatomic-potential">Interatomic Potential</a></li>
+<li><a class="reference internal" href="#input-output-units">Input/Output Units</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="doc.html"
+                          title="previous chapter">isolated_atom calculation style</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="function.html"
+                          title="next chapter">isolated_atom.py</a></p>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="function.html" title="isolated_atom.py"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="doc.html" title="isolated_atom calculation style"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >isolated_atom</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">isolated_atom Input Terms</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

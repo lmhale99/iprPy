@@ -245,8 +245,8 @@ class DislocationMonopole(Calculation):
         Set calculation values directly.  Any terms not given will be set
         or reset to the calculation's default values.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         name : str, optional
             The name to assign to the calculation.  By default, this is set as
             the calculation's key.

@@ -1,24 +1,22 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>Adding new subset styles &#8212; iprPy 0.10.2 documentation</title>
-    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adding new subset styles &#8212; iprPy 0.11.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Adding new buildcombos styles" href="addbuildcombos.html" />
-    <link rel="prev" title="Adding new record styles" href="addrecord.html" /> 
+    <link rel="prev" title="Adding new calculation styles" href="addcalculation.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -33,10 +31,11 @@
           <a href="addbuildcombos.html" title="Adding new buildcombos styles"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="addrecord.html" title="Adding new record styles"
+          <a href="addcalculation.html" title="Adding new calculation styles"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Extending iprPy</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Extending iprPy</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Adding new subset styles</a></li> 
       </ul>
     </div>  
 
@@ -47,162 +46,77 @@
             
   <div class="section" id="adding-new-subset-styles">
 <h1>Adding new subset styles<a class="headerlink" href="#adding-new-subset-styles" title="Permalink to this headline">¶</a></h1>
-<p>The basic steps associated with implementing a new subset style in iprPy are</p>
-<ol class="arabic simple">
-<li><p>Create a new subdirectory in iprPy/input/subset_classes named for the new
-subset style.</p></li>
-<li><p>Create a file that defines the Subset subclass.  Name the file
-after the subclass name, typically by converting the style name to upper
-camel case (each word capitalized with no separators).</p></li>
-<li><p>Define the Subset subclass templatekeys, preparekeys and interpretkeys
-attributes and template, interpret, buildcontent and todict methods.</p></li>
-<li><p>Create an “__init__.py” file that imports the subclass.</p></li>
-<li><p>Create a parameters.md file that describes the templatekeys.</p></li>
-</ol>
-<div class="section" id="files-in-the-subset-style-directories">
-<h2>Files in the subset style directories<a class="headerlink" href="#files-in-the-subset-style-directories" title="Permalink to this headline">¶</a></h2>
+<p>This page outlines how to add a new calculation subset to iprPy.  Creating a subset allows for multiple calculations to share some of the same input parameters and for those terms to be managed in a consistent manner across the calculations.</p>
+<div class="section" id="class-definition">
+<h2>1. Class definition<a class="headerlink" href="#class-definition" title="Permalink to this headline">¶</a></h2>
+<p>Python files that define a subset should be placed inside the iprPy/calculation_subset folder.  Currently each class definition is contained in a separate Python file named for the calculation subset class.  When defining the class, it should have an informative name and inherit from iprPy.calculation_subset.CalculationSubset.  Once the class is created, it should be imported by iprPy/calculation_subset/__init__.py.</p>
+</div>
+<div class="section" id="calculation-like-methods-and-attributes">
+<h2>2. Calculation-like methods and attributes<a class="headerlink" href="#calculation-like-methods-and-attributes" title="Permalink to this headline">¶</a></h2>
+<p>As a subset represents a set of inputs for Calculations, most of the method and attribute definitions in a subset correspond closely to how they are defined in the Calculation objects.  See the previous doc page for more details on the related Calculation methods and attributes.</p>
 <ul class="simple">
-<li><p><strong>[Style].py</strong>: Defines the Subset subclass for the subset style.
-This defines how the iprPy codebase interacts with the subset.</p></li>
-<li><p><strong>__init__.py</strong>: Allows Python to identify the subset directory as
-a sub-package and be able to import the Subset subclass into iprPy.</p></li>
-<li><p><strong>parameters.md</strong>: Descriptions of the keys in templatekeys.</p></li>
-</ul>
-<div class="section" id="style-py">
-<h3>[Style].py<a class="headerlink" href="#style-py" title="Permalink to this headline">¶</a></h3>
-<p>The iprPy package interacts with the subset style through the defined
-Subset subclass.  Considerable work has gone into making it easy to
-define new subclass definitions by modifying values in pre-existing subclass
-definitions.  This section describes the different components of defining a
-Subset subclass.</p>
-<p>Each Subset class can be initialized with an optional prefix indicating that
-all recognized keys should have the prefix added.  This allows for multiple
-subsets of the same style to be called by the same calculation if needed.  For
-the key attributes listed below, all values in the lists should be given as
-they appear without a prefix.</p>
-<div class="section" id="inheritance">
-<h4>Inheritance<a class="headerlink" href="#inheritance" title="Permalink to this headline">¶</a></h4>
-<p>The class should be a child of iprPy.input.subset_classes.Subset.</p>
-</div>
-<div class="section" id="templatekeys">
-<h4>templatekeys<a class="headerlink" href="#templatekeys" title="Permalink to this headline">¶</a></h4>
-<p>The templatekeys attribute is the list of calculation keys associated with the
-subset that appear in in the calculation’s input file.</p>
-</div>
-<div class="section" id="preparekeys">
-<h4>preparekeys<a class="headerlink" href="#preparekeys" title="Permalink to this headline">¶</a></h4>
-<p>The preparekeys attribute is the list of calculation keys associated with the
-subset that appear in the prepare keys set, i.e. will be included in a
-calculation’s singularkeys or multikeys.  This list is typically templatekeys
-plus a few extras, like _content keys associated with _file keys.</p>
-</div>
-<div class="section" id="interpretkeys">
-<h4>interpretkeys<a class="headerlink" href="#interpretkeys" title="Permalink to this headline">¶</a></h4>
-<p>The interpretkeys attribute is the list of calculation keys associated with the
-interpret() method that may have the Subset’s prefix applied to them by a
-calculation.  This list is typically preparekeys plus any new keys generated by
-interpret().  Keys that are not officially part of the set but used by
-interpret() may also be included if the key could have the same prefix.</p>
-</div>
-<div class="section" id="template">
-<h4>template()<a class="headerlink" href="#template" title="Permalink to this headline">¶</a></h4>
-<p>The template method returns a string of the input file template lines
-associated with this subset.  If copying from another subset style, typically
-the only thing that needs to be changed is the default header comment for the
-input lines.</p>
-</div>
-<div class="section" id="interpret">
-<h4>interpret()<a class="headerlink" href="#interpret" title="Permalink to this headline">¶</a></h4>
-<p>The interpret() method interprets the calculation input parameter terms
-associated with the subset.</p>
-<ul>
-<li><p>The function takes the input_dict dictionary of input parameters as the
-first argument.</p></li>
-<li><p>The function only operates on the parameters contained within input_dict.
-Each function reads input parameters from pre-defined keys of input_dict and
-saves the processed values to input_dict.  No calculation parameters are
-returned by the function.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>Basic input parameters can be modified by the function by assigning
-default values if needed, and simple conversion of string inputs to
-numerical values.</p></li>
-<li><p>Terms generated by the functions should be saved to new input_dict keys
-as opposed to overwriting the keys the function uses as inputs.  This is
-so that the original format can be retained whenever possible.</p></li>
-</ul>
-</div></blockquote>
-</li>
-<li><p>The class’ keymap attribute maps the default key names without prefix to the
-key names with the prefix added.  So, input_dict[self.keymap[‘keyname1’]]
-will access the input_dict value for ‘prefix + keyname1’.</p></li>
-<li><p>The function may have an optional <em>build</em> keyword parameter that takes a
-boolean value.  Giving <em>build</em> a value of False keeps the function from
-generating complex data structures and objects based on the inputs and only
-processes the simple terms.  This is useful in preparing calculations where
-input terms that appear in the calculation’s record need to be processed, but
-other complex input terms are not needed.  For instance, parameters defining
-a system (e.g. size multipliers and axis orientations) are important for
-defining the calculation and therefore need to appear in the calculation’s
-record when it is prepared, but the actual generated atomic system is not
-needed until the calculation is later performed.</p></li>
+<li><p>The class initializer should pass all parameters to the parent class and set default values for the class attributes.</p></li>
+<li><p>Class attributes should be defined for all input terms that the subset manages, and optionally any more complicated derived objects.</p></li>
+<li><p><strong>set_values</strong> allows for any subset-specific terms to be set at the same time.</p></li>
+<li><p><strong>templatekeys</strong> provides the names and description of all input parameter terms that the subset manages.</p></li>
+<li><p><strong>load_parameters</strong> reads the subset templatekeys from an calculation input script and sets the subset attributes accordingly.</p></li>
+<li><p><strong>modelroot</strong> is the root data model element name where the subset content is collected.</p></li>
+<li><p><strong>load_model</strong> loads subset attributes from an existing model.</p></li>
+<li><p><strong>build_model</strong> builds the elements of the model associated with the subset.</p></li>
+<li><p><strong>metadata</strong> adds the simple metadata fields for the subset to the calculation’s metadata dict.</p></li>
+<li><p><strong>calc_inputs</strong> generates inputs for a calculation function based on the current set values of the subset attributes.</p></li>
 </ul>
 </div>
-<div class="section" id="buildcontent">
-<h4>buildcontent()<a class="headerlink" href="#buildcontent" title="Permalink to this headline">¶</a></h4>
-<p>The buildcontent method constructs the record content associated with the
-subset input keys.  The function takes parameters record_model, the record’s
-content after the root element, and adds new elements to record_model based
-on the values in the input_dict and results_dict dictionaries.  As the method
-operates on record_model, the function does not need to return anything.</p>
+<div class="section" id="additional-subset-methods-and-attributes">
+<h2>3. Additional subset methods and attributes<a class="headerlink" href="#additional-subset-methods-and-attributes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="template-init">
+<h3>3.1. _template_init<a class="headerlink" href="#template-init" title="Permalink to this headline">¶</a></h3>
+<p>The _template_init() method is used to provide additional information to the calculation’s template and templatedoc.  When the template(doc) content is generated, the terms associated with each subset are listed in separate blocks.  The two terms managed by _template_init() provide default values for descriptive pieces related to this subset’s block of input terms.</p>
+<ul class="simple">
+<li><p><strong>templateheader</strong> is a short string that appears as a header above the subset’s input terms inside the template and templatedoc files.</p></li>
+<li><p><strong>templatedescription</strong> provides documentation description of the subset’s terms that will appear in templatedoc above the description of the subset’s template terms.  This allows for general rules related to the subset’s inputs to be described.</p></li>
+</ul>
 </div>
-<div class="section" id="todict">
-<h4>todict()<a class="headerlink" href="#todict" title="Permalink to this headline">¶</a></h4>
-<p>The todict method interprets record content record_model, and converts terms
-associated with the subset into key-values to add to the params dictionary.  In
-other words, this method interprets the record content generated by the
-buildcontent method and converts it into accessible values.
-The method can take the full and flat flags that the Record.todict()
-method uses which can alter which and how the params keys values are given.  As
-the method adds terms to the params dictionary, no values are returned.</p>
-</div>
+<div class="section" id="preparekeys-and-interpretkeys">
+<h3>3.2. preparekeys and interpretkeys<a class="headerlink" href="#preparekeys-and-interpretkeys" title="Permalink to this headline">¶</a></h3>
+<p>These list keys in the input_dict that are managed by the prepare and load_parameters operations related to the subset.  Typically, preparekeys extends the templatekeys.keys() to add any additional terms that are only recognized by prepare, such as “_content” terms.  Then, interpretkeys extends preparekeys by also listing any terms that load_parameters adds to the input_dict that contain processed input values.</p>
 </div>
 </div>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Adding new subset styles</a><ul>
-<li><a class="reference internal" href="#files-in-the-subset-style-directories">Files in the subset style directories</a><ul>
-<li><a class="reference internal" href="#style-py">[Style].py</a><ul>
-<li><a class="reference internal" href="#inheritance">Inheritance</a></li>
-<li><a class="reference internal" href="#templatekeys">templatekeys</a></li>
-<li><a class="reference internal" href="#preparekeys">preparekeys</a></li>
-<li><a class="reference internal" href="#interpretkeys">interpretkeys</a></li>
-<li><a class="reference internal" href="#template">template()</a></li>
-<li><a class="reference internal" href="#interpret">interpret()</a></li>
-<li><a class="reference internal" href="#buildcontent">buildcontent()</a></li>
-<li><a class="reference internal" href="#todict">todict()</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#class-definition">1. Class definition</a></li>
+<li><a class="reference internal" href="#calculation-like-methods-and-attributes">2. Calculation-like methods and attributes</a></li>
+<li><a class="reference internal" href="#additional-subset-methods-and-attributes">3. Additional subset methods and attributes</a><ul>
+<li><a class="reference internal" href="#template-init">3.1. _template_init</a></li>
+<li><a class="reference internal" href="#preparekeys-and-interpretkeys">3.2. preparekeys and interpretkeys</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="addrecord.html"
-                        title="previous chapter">Adding new record styles</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="addbuildcombos.html"
-                        title="next chapter">Adding new buildcombos styles</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="addcalculation.html"
+                          title="previous chapter">Adding new calculation styles</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="addbuildcombos.html"
+                          title="next chapter">Adding new buildcombos styles</a></p>
+  </div>
         </div>
       </div>
       <div class="clearer"></div>
@@ -220,14 +134,15 @@ the method adds terms to the params dictionary, no values are returned.</p>
           <a href="addbuildcombos.html" title="Adding new buildcombos styles"
              >next</a> |</li>
         <li class="right" >
-          <a href="addrecord.html" title="Adding new record styles"
+          <a href="addcalculation.html" title="Adding new calculation styles"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.10.2 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >Extending iprPy</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Extending iprPy</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Adding new subset styles</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

@@ -3,77 +3,106 @@ Setup
 =====
 
 A key principle of iprPy is to minimize barriers for usage.  As such, the only
-requirements for running the framework are Python 3.6+, and a few extra (mostly
+requirements for running the framework are Python 3.7+, and a few extra (mostly
 standard) Python packages.  All of the required packages should be compatible
 with any operating system that Python runs on.
+
+Installing Python
+=================
+
+The iprPy framework is based on Python and therefore requires that Python be
+installed.  Luckily, Python is free and compatible with Linux, MacOS and
+Windows.  You can download Python from `python.org`_, although it is highly
+recommended to obtain a Python distribution from `Anaconda`_.  The Anaconda
+distributions support multiple Python environments, which can greatly help
+avoid possible versioning conflicts that may arise between different
+Python-based programs.  Additionally, the Anaconda distributions come with
+the `scipy`_ family of packages already installed, which iprPy heavily relies on.
 
 Installing iprPy
 ================
 
-#. Install Python 3.6+ and the `scipy`_ family of Python packages.  If you
-   don't already have Python, the easiest way to do this is to install
-   `Anaconda`_.  The standard Anaconda distribution automatically adds the
-   scipy packages.  For miniconda or a new environment of an existing anaconda
-   installation, use the conda command to install the scipy packages.
+If you wish to use iprPy simply to access and run the existing calculations,
+then you can easily install it with pip or with conda-forge if you have a
+conda distribution of Python
 
-#. Fork and clone, or download iprPy from GitHub.  The repository for the
-   stable versions is available at `https://github.com/usnistgov/iprPy`_.
+.. code-block:: console
 
-#. In a terminal, go into the local iprPy root directory and install the iprPy
-   package to Python with the command
+      pip install iprPy
 
-   .. code-block:: console
+or 
 
-        python setup.py develop
+.. code-block:: console
 
-   This should automatically install any other required Python packages.
+      conda install iprPy -c conda-forge
 
-#. To test if the framework is working, in a terminal go into the iprPy/bin
-   directory and enter the command
+Alternatively, if you have an interest in developing new calculations or
+modifying the existing ones, you can download the code from github.  The github
+repositories also contain the Jupyter Notebook versions of the calculations for
+anyone to download and use.
 
-   .. code-block:: console
+- `https://github.com/usnistgov/iprPy`_ always coincides with the latest
+  release of iprPy, i.e. it will be consistent with the pip and conda-forge
+  packaged downloads.  This allows users to download the most recent stable
+  version of iprPy.
 
-        python iprPy check_modules
+- `https://github.com/lmhale99/iprPy`_ is the development repo of iprPy.  It
+  may contain new calculation methods or other updates that are in the works
+  but not yet included in the calculation release.  Ideally, any user pull
+  requests should be submitted here.
 
-   If you see a list of included calculation, record, and database styles,
-   then it is working!
+Once you download a github repository, you can install it to your Python
+environment in editable/development mode by changing the directory to the
+repository's root directory and
 
-#. The list printed in the last step indicates the iprPy modules that were
-   successfully and unsuccessfully loaded.  If a module did not load, then
-   either the module has additional package requirements or has not yet been
-   fully implemented into iprPy.
+.. code-block:: console
+    
+    pip install -e
+ 
+Testing the install
+===================
+
+Installing iprPy *should* install an iprPy command line option to the Python
+environment.  To test if iprPy is working, enter the following command in a
+terminal
+
+.. code-block:: console
+
+      python iprPy check_modules
+
+If everything installed properly, this should print informative statements
+about the modules that make up iprPy.  In particular, there should be a list of
+modules, including calculation methods, that properly loaded or failed to load.
+Those that failed to load should display messages that either state that the
+modules are not supported by the current version of iprPy or that those modules
+require additional Python packages to be installed in order to work.  Should
+you wish to use those modules, be sure to add the necessary Python packages.
+
+If it displays an error that the iprPy command cannot be found, then the
+installer failed to add the executable script to the proper location.  The
+executable script can be found in the iprPy repository at iprPy/bin/iprPy.
+Ideally, you should then copy/download this file to the associated Python
+environment's Scripts directory.  Alternatively, you can place the script
+file in any other directory and call it directly or "install" it by adding it
+to any directory listed in your system's PATH environment variable.
+
+For any other issues, feel free to email potentials@nist.gov for support.
 
 Updating iprPy
 ==============
 
-Installing iprPy to Python in develop mode means that any changes made are
-recompiled every time the package is imported.  This makes it possible for
-users to easily make their own changes and modifications as needed.  However,
-it makes updating slightly more complicated.
+For packaged installs, ipyPy can be updated using pip or conda update options.
+This should update not only iprPy's version but also the versions of any
+required packages.
 
-#. Development of the `atomman`_ Python package is closely aligned to iprPy.
-   As such, atomman should be updated using pip whenever iprPy is updated
+For editable/development installs, the code can be updated by doing a pull
+request from the github repository.  Note, however, that this will not update
+required packages.  Check the requirements.txt file for any new version
+updates, most notably for the related packages "potentials" and "atomman".  If
+needed, updating atomman should fix any requirement issues.
 
-   .. code-block:: console
-
-        pip install -U atomman
-
-#. If you forked iprPy from github, you can pull any changes.  Note that any
-   changes you personally made would have to be committed and may lead to
-   conflicts that need to be resolved.
-
-#. If you downloaded iprPy, you can download a new version.  Then, either
-   uninstall the old version and install the new version, or overwrite the
-   files in the old version with the new.
-
-Uninstalling iprPy
-==================
-
-The iprPy code is entirely self-contained and can be completely removed simply
-by deleting it.  If you want to keep the files but uninstall the package from
-Python, move iprPy to a new directory.
-
-.. _Anaconda: https://www.continuum.io/downloads
+.. _Anaconda: https://www.anaconda.com/
+.. _python.org: https://www.python.org/
 .. _scipy: https://www.scipy.org/
-.. _atomman: https://github.com/usnistgov/atomman/
 .. _https://github.com/usnistgov/iprPy: https://github.com/usnistgov/iprPy
+.. _https://github.com/lmhale99/iprPy: https://github.com/lmhale99/iprPy
