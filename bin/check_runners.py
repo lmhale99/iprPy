@@ -8,15 +8,19 @@ import iprPy
 
 def main():
     """
-    Provides a quick survey of the status of all prepared records in the run
-    directories and the slurm-submitted runners operating in them.
+    Generates a survey of the status of all prepared records and the status
+    of slurm jobs that are operating runners.  Counts are made of the total
+    number of prepared calculations and runner bid files in each set run
+    directory.  The status of runners are determined using squeue and by
+    looking at the slurm job log files for the runner jobs.
 
-    NOTE: This was designed specifically for a system using the slurm queuing
-    system and so may not work for all users and systems
+    NOTE: This is a working script designed and tested with a single cluster
+    running slurm and is not guaranteed to work on other systems.
     """
-    
+
     # Build data
-    jobs = squeue(user='lmh1', name='iprPy_1') # personal user id - change to your own
+    jobs = squeue(user='lmh1',  # user id - change to your own
+                  name=['iprPy_1', 'iprPyBG']) # job names - change to your own
     logs = parse_runner_logs()
     rundirs, runners = check_run_directories()
 
@@ -25,14 +29,14 @@ def main():
     runlogjobs = logjobs.merge(runners, how='outer', on='pid')
 
     # Loop over all run directories
-    keys = ['jobid', 'pid', 'status', 'time', 'calcid', 'tmpdir',]# 'message']
+    keys = ['jobid', 'pid', 'status', 'time', 'calcid', 'tmpdir']
     for i in rundirs.index:
         rundir = rundirs.loc[i]
 
         # List number of prepared calculations and number of runners
         print(rundir.run_directory, rundir.numcalcs, rundir.numrunners)
         dirjobs = runlogjobs[runlogjobs.run_directory == rundir.run_directory]
-        
+
         # Print data for runners
         if len(dirjobs) > 0:
             print(dirjobs[keys])
@@ -56,7 +60,7 @@ def squeue(**kwargs):
     kwargs : str, optional
         Any keyword arguments will be used to limit the search by
         only listing rows with the matching value for the key column name.
-    
+
     Returns
     -------
     pandas.DataFrame
@@ -86,9 +90,13 @@ def squeue(**kwargs):
 
     for key in kwargs:
         if key in keys and kwargs[key] != None:
-            jobs = jobs[jobs[key] == kwargs[key]]
+            if isinstance(kwargs[key], str):
+                kwargs[key] = [kwargs[key]]
+
+            jobs = jobs[jobs[key].isin(kwargs[key])]
 
     return jobs.reset_index(drop=True)
+
 
 def parse_runner_logs(root='.', glob='runner_*.txt'):
     """
@@ -102,7 +110,7 @@ def parse_runner_logs(root='.', glob='runner_*.txt'):
     glob : str, optional
         The glob wildcard-containing filename to use for identifying the
         runner job logs.  Default value is 'runner_*.txt'.
-    
+
     Returns
     -------
     pandas.DataFrame
@@ -117,7 +125,7 @@ def parse_runner_logs(root='.', glob='runner_*.txt'):
 
 def parse_runner_log(filename):
     """
-    Parses a runner job log file for the associated job id, process id, 
+    Parses a runner job log file for the associated job id, process id,
     temporary directory, runner status, and error message.
 
     Parameters
@@ -136,7 +144,7 @@ def parse_runner_log(filename):
     data['pid'] = np.nan
     data['tmpdir'] = np.nan
     data['status'] = 'active'
-    data['message'] = np.nan
+  #  data['message'] = np.nan
 
     # Read lines from file
     with open(filename) as f:
@@ -169,10 +177,10 @@ def parse_runner_log(filename):
             data['status'] = 'finished'
 
         # Anything else is an error message from the runner crashing
-        else:
-            data['status'] = 'crashed'
-            data['message'] = ''.join(lines[i:])
-            break
+       # else:
+       #     data['status'] = 'crashed'
+       #     data['message'] = ''.join(lines[i:])
+       #     break
 
     return data
 
@@ -193,9 +201,9 @@ def check_run_directories():
     """
     dirdata = []
     biddata = []
-    
+
     # Loop over all run directories saved to iprPy's settings
-    for run_directory_name in iprPy.Settings().list_run_directories:
+    for run_directory_name in iprPy.settings.list_run_directories:
         run_directory = iprPy.load_run_directory(run_directory_name)
 
         if run_directory.is_dir():
