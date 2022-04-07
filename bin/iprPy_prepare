@@ -8,4 +8,4 @@
 #SBATCH --ntasks-per-node=1
 
 export LD_LIBRARY_PATH=/cluster/deb9/lib:$LD_LIBRARY_PATH
-python "../IPR workflow/master_prepare.py"
+python iprPy master_prepare iprhub prepare/master_prepare_ctcms.in

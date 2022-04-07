@@ -28,33 +28,42 @@ command line. For example:
 - Start a runner on current machine: ./iprPy runner master master_1
 - Submit a runner as a job: sbatch iprPy_slurm runner master master_1
 
-prepare
--------
+prepare/master_prepare.in
+-------------------------
 
-The prepare directory contains example master prepare scripts for preparing
-calculations on different computer systems, and a corresponding example slurm
-job submission script.
-
-prepare.py
-``````````
-
-The prepare.py Python scripts use the master prepare operations to prepare
-multiple calculation styles in line with the workflow used by the NIST 
-Interatomic Potentials Repository.  See the
+The prepare directory contains example master prepare input scripts for
+preparing calculations on different computer systems.  These scripts manage
+and prepare multiple calculation styles in line with the workflow used by the
+NIST Interatomic Potentials Repository.  See the
 "IPR workflow/3. Workflow Manager.ipynb" Jupyter Notebook for an interactive
-version of these scripts and a description of what the terms mean and what the
-code is doing.
+version of these scripts.
 
 One thing to note is that many of the calculation pools rely on results from
-earlier pools, so these prepare scripts may need to be executed again after
-calculations in a given pool finish.
+earlier pools. As such, a master prepare script may need to be called multiple
+times so that calculations further down the workflow can be properly prepared
+as the necessary parent calculations finish.
 
 Feel free to modify the scripts to focus only on specific potentials or to
 comment out calculation pools or any styles in a pool that you do not wish to
 use.
 
 iprPy_prepare
-`````````````
-iprPy_prepare is a slurm script that submits a job for the prepare_ctcms.py
-prepare script.  Regularly submitting this job script makes the workflow used
-by the NIST Interatomic Potentials Repository 'nearly' automatic.
+-------------
+
+The iprPy_prepare file is another slurm script in line with the iprPy_slurm
+scripts mentioned above.  The only difference is that the full command for
+calling master_prepare with one of the prepare scripts is explicitly given and
+the job name is changed to "prepare".
+
+Regularly submitting a iprPy_prepare job and keeping a number of runners active
+through iprPy_slurm jobs makes the workflow nearly automated.
+
+check_runners.py
+----------------
+
+This is a working utility Python script that collects data from the run
+directories, squeue and slurm job logs to give an overview on the status of
+prepared calculations and runners.  This script was designed specifically for
+one cluster running slurm and therefore there's no guarantee it will work well
+on other resources.  Still, it may give insight to help others design something
+similar.
