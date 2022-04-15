@@ -54,6 +54,11 @@ def fix_lammps_versions(run_directory: str,
         for pot_id in aenet_pots():
             replacementdict[pot_id] = f"{key}{kwargs['lammps_command_aenet']}"
 
+    # Fix for pinn potentials
+    if 'lammps_command_pinn' in kwargs:
+        for pot_id in pinn_pots():
+            replacementdict[pot_id] = f"{key}{kwargs['lammps_command_pinn']}"
+
     # Fix for kim potentials
     if 'lammps_command_kim' in kwargs:
         for pot_id in kim_pots():
@@ -95,6 +100,13 @@ def old_pots():
 def aenet_pots():
     """This is a list of aenet potentials (unofficial pair_style)."""
     return ['2020--Mori-H--Fe--LAMMPS--ipr1']
+
+def pinn_pots():
+    """This is a list of pinn potentials (unofficial pair_style)."""
+    return [
+        '2020--Purja-Pun-G-P--Al--LAMMPS--ipr1',
+        '2022--Lin-Y-S--Ta--LAMMPS--ipr1',
+    ]
 
 def kim_pots():
     """This is a shortcut to identify all KIM models."""
