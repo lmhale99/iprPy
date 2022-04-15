@@ -20,12 +20,13 @@ def main():
 
     # Build data
     jobs = squeue(user='lmh1',  # user id - change to your own
-                  name=['iprPy_1', 'iprPyBG']) # job names - change to your own
+                  name=['iprPy_1', 'iprPy_4']) # job names - change to your own
     logs = parse_runner_logs()
     rundirs, runners = check_run_directories()
 
     # Merge data
     logjobs = jobs.merge(logs, how='outer', on='jobid')
+    logjobs.loc[(logjobs.status=='active') & (pd.isna(logjobs.user)), 'status'] = 'crashed'
     runlogjobs = logjobs.merge(runners, how='outer', on='pid')
 
     # Loop over all run directories
@@ -157,30 +158,29 @@ def parse_runner_log(filename):
             continue
 
         # Extract pid from statement for runall runner
-        if terms[0] == 'Runner' and len(terms) == 5:
+        if terms[0] == 'Runner':
             data['pid'] = terms[4]
-
-        # Extract pid from statement for single calc runner
-        elif terms[0] == 'Runner' and len(terms) == 7:
-            data['pid'] = terms[6]
+            if len(terms) == 8:
+                single_calc = True
+            else:
+                single_calc = False
 
         # Extract tmpdir from associated statement
         elif terms[0] == 'using':
             data['tmpdir'] = terms[3]
 
-        # Change status for successfully finished runners
-        elif line.strip() == "Didn't find an open simulation":
-            data['status'] = 'finished'
+        # Set status to finished for multi-calculation runners
+        #elif line.strip() == "Didn't find an open simulation":
+        #    data['status'] = 'finished'
         elif line.strip() == "No simulations left to run":
             data['status'] = 'finished'
-        elif line.strip() == "success":
-            data['status'] = 'finished'
 
-        # Anything else is an error message from the runner crashing
-       # else:
-       #     data['status'] = 'crashed'
-       #     data['message'] = ''.join(lines[i:])
-       #     break
+        # Set status to finished for single-calculation runners
+        elif single_calc:
+            if line.strip() == 'sim calculated successfully':
+                data['status'] = 'finished'
+            elif terms[0] == 'error:':
+                data['status'] = 'finished'
 
     return data
 
