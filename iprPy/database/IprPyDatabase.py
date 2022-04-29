@@ -3,6 +3,8 @@
 from pathlib import Path
 import shutil
 
+from tqdm import tqdm
+
 import pandas as pd
 
 import atomman as am
@@ -325,10 +327,10 @@ class IprPyDatabase():
         print(len(missing), 'records missing from destination')
         
         if overwrite is True:
-            
+            print('comparing content of records')
             # Identify records that have changed
             changed = []
-            for name in self_df.name[~self_df.name.isin(missing)]:
+            for name in tqdm(self_df.name[~self_df.name.isin(missing)], desc="Comparing records", ascii=True):
                 self_record = self_records[self_df.name == name][0].model.json(ensure_ascii=False)
                 dest_record = dest_records[dest_df.name == name][0].model.json(ensure_ascii=False)
                 if self_record != dest_record:

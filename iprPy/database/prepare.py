@@ -4,6 +4,8 @@ from pathlib import Path
 from copy import deepcopy
 import shutil
 
+from tqdm import tqdm
+
 import atomman as am
 
 import numpy as np
@@ -85,7 +87,7 @@ def prepare(database, run_directory, calculation, input_script=None,
     print(len(new_calcs_df), 'new records to prepare', flush=True)
 
     # Iterate over new calculations and prepare
-    for i in new_calcs_df.index:
+    for i in tqdm(new_calcs_df.index, 'preparing', ascii=True):
         new_calc = test_calcs[i]
         inputfile = test_inputfiles[i]
         copy_content = test_contents[i]
