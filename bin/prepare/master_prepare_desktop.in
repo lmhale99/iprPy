@@ -68,7 +68,7 @@ np_per_runner               1
 num_pots                    100
 
 # Pool #4: Crystal space group analysis
-#styles                      crystal_space_group:relax # crystal_space_group:prototype crystal_space_group:reference
-#run_directory               master_4
-#np_per_runner               1
-#num_pots                    100
+styles                      crystal_space_group:relax # crystal_space_group:prototype crystal_space_group:reference
+run_directory               master_4
+np_per_runner               1
+num_pots                    100

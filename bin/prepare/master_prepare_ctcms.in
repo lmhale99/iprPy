@@ -26,17 +26,20 @@ lammps_command_old          /users/lmh1/LAMMPS/2019_06_05/src/lmp_mpi
 # LAMMPS built with an external module to run aenet potentials
 lammps_command_aenet        /users/lmh1/LAMMPS/bin/lmp_mpi_2020_03_03_aenet
 
+# LAMMPS built with an external module to run pinn potentials
+lammps_command_pinn         /users/lmh1/LAMMPS/LAMMPS-USER-PINN/src/lmp_mpi
+
 ############################ Potential limiters ###############################
 
 # Set status to active to only use current versions of potentials
 #potential_status            active
 
 # Directly specify LAMMPS potentials by id
-potential_id                2022--Xu-Y--Ni-Rh--LAMMPS--ipr1
-potential_id                2022--Xu-Y--Ni-Pd--LAMMPS--ipr1
-potential_id                2019--Plummer-G--Ti-Al-C--LAMMPS--ipr1
-potential_id                2019--Plummer-G--Ti-Si-C--LAMMPS--ipr1
-potential_id                2021--Plummer-G--Ti-Al-C--LAMMPS--ipr1
+#potential_id                2022--Xu-Y--Ni-Rh--LAMMPS--ipr1
+#potential_id                2022--Xu-Y--Ni-Pd--LAMMPS--ipr1
+#potential_id                2019--Plummer-G--Ti-Al-C--LAMMPS--ipr1
+#potential_id                2019--Plummer-G--Ti-Si-C--LAMMPS--ipr1
+#potential_id                2021--Plummer-G--Ti-Al-C--LAMMPS--ipr1
 
 # Limit by database parsing terms
 #potential_potid
@@ -71,7 +74,8 @@ np_per_runner               1
 num_pots                    100
 
 # Pool #4: Crystal space group analysis
-#styles                      crystal_space_group:relax # crystal_space_group:prototype crystal_space_group:reference
-#run_directory               iprhub_4
-#np_per_runner               1
-#num_pots                    100
+styles                      crystal_space_group:relax 
+#styles                      crystal_space_group:relax crystal_space_group:prototype crystal_space_group:reference
+run_directory               iprhub_4
+np_per_runner               1
+num_pots                    100
