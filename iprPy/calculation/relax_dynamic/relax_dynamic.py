@@ -13,6 +13,8 @@ import atomman.lammps as lmp
 import atomman.unitconvert as uc
 from atomman.tools import filltemplate
 
+import numpy as np
+
 # iprPy imports
 from ...tools import read_calc_file
 
@@ -167,7 +169,8 @@ def relax_dynamic(lammps_command: str,
                                  p_xy=p_xy, p_xz=p_xz, p_yz=p_yz,
                                  temperature=temperature,
                                  randomseed=randomseed,
-                                 units=potential.units)
+                                 units=potential.units,
+                                 lammps_date=lammps_date)
     lammps_variables['integrator_info'] = integ_info
 
     # Integrator lines for restarts
@@ -177,7 +180,8 @@ def relax_dynamic(lammps_command: str,
                                  temperature=temperature,
                                  velocity_temperature=0.0,
                                  randomseed=randomseed,
-                                 units=potential.units)
+                                 units=potential.units,
+                                 lammps_date=lammps_date)
     lammps_variables['integrator_restart_info'] = integ_info2
 
     # Other run settings
@@ -293,7 +297,8 @@ def integrator_info(integrator: Optional[str] = None,
                     temperature: float = 0.0,
                     velocity_temperature: Optional[float] = None,
                     randomseed: Optional[int] = None,
-                    units: str = 'metal') -> str:
+                    units: str = 'metal',
+                    lammps_date=None) -> str:
     """
     Generates LAMMPS commands for velocity creation and fix integrators. 
     
@@ -439,9 +444,15 @@ def integrator_info(integrator: Optional[str] = None,
             f'                xy {p_xy} {p_xy} {pressure_damp} &',
             f'                xz {p_xz} {p_xz} {pressure_damp} &',
             f'                yz {p_yz} {p_yz} {pressure_damp}',
-            f'fix langevin all langevin {temperature} {temperature} {temperature_damp} {randomseed}'
         ])
-
+        
+        # Add ptemp if LAMMPS is newer than June 2020 and temperature is zero
+        if np.isclose(temperature, 0.0) and lammps_date >= datetime.date(2020, 6, 9):
+            info_lines[-1] += ' &'
+            info_lines.extend(['                ptemp 1.0'])
+            
+        info_lines.extend([f'fix langevin all langevin {temperature} {temperature} {temperature_damp} {randomseed}'])
+    
     else:
         raise ValueError('Invalid integrator style')
     
