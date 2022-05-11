@@ -46,7 +46,8 @@ def main():
     # List jobs with no associated bid files (usually finished)
     print('Unknown/finished jobs')
     nodir = runlogjobs[pd.isna(runlogjobs.run_directory)][keys]
-    print(nodir)
+    with pd.option_context('display.max_rows', None,):
+        print(nodir)
 
     # Delete run logs for successfully finished jobs
     for jobid in nodir[nodir.status=='finished'].jobid.values:
@@ -146,6 +147,8 @@ def parse_runner_log(filename):
     data['tmpdir'] = np.nan
     data['status'] = 'active'
   #  data['message'] = np.nan
+
+    single_calc = False
 
     # Read lines from file
     with open(filename) as f:
