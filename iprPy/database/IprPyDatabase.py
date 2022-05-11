@@ -83,7 +83,9 @@ class IprPyDatabase():
 
     def check_records(self, record_style=None):
         """
-        Counts and checks on the status of records in a database.
+        Counts the number of records of a given style in the database.  If the
+        records are calculation records, then it will also list the number of
+        calculations with each status value.
         
         Parameters
         ----------
