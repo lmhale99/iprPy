@@ -33,3 +33,5 @@ from .database import load_database, databasemanager, reset_orphans
 
 from .check_modules import check_modules
 from .command_line import command_line
+
+from . import analysis
