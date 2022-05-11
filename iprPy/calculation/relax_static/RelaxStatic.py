@@ -817,9 +817,9 @@ class RelaxStatic(Calculation):
             'potential_LAMMPS_key',
             'potential_key',
             
-            'a_mult',
-            'b_mult',
-            'c_mult',
+        #    'a_mult',
+        #    'b_mult',
+        #    'c_mult',
         ]
     
     @property
