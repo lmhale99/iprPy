@@ -1,0 +1,101 @@
+{
+    "prototype_spg_info": {
+        "prototype": [
+            {
+                "name": "A1--Cu--fcc",
+                "spacegroup_number": 225,
+                "wykoff_fingerprint": ["a", "b"]
+            },
+            {
+                "name": "A2--W--bcc",
+                "spacegroup_number": 229,
+                "wykoff_fingerprint": ["a"]
+            },
+            {
+                "name": "A3'--alpha-La--double-hcp",
+                "spacegroup_number": 194,
+                "wykoff_fingerprint": ["ab", "ac", "ad"]
+            },
+            {
+                "name": "A3--Mg--hcp",
+                "spacegroup_number": 194,
+                "wykoff_fingerprint": ["b", "c", "d"]
+            },
+            {
+                "name": "A4--C--dc",
+                "spacegroup_number": 227,
+                "wykoff_fingerprint": ["a", "b"]
+            },
+            {
+                "name": "A5--beta-Sn",
+                "spacegroup_number": 141,
+                "wykoff_fingerprint": ["a", "b"]
+            },
+            {
+                "name": "A6--In--bct",
+                "spacegroup_number": 139,
+                "wykoff_fingerprint": ["a", "b"]
+            },
+            {
+                "name": "A7--alpha-As",
+                "spacegroup_number": 166,
+                "wykoff_fingerprint": ["c"]
+            },
+            {
+                "name": "A15--beta-W",
+                "spacegroup_number": 223,
+                "wykoff_fingerprint": ["ac", "ad"]
+            },
+            {
+                "name": "A15--Cr3Si",
+                "spacegroup_number": 223,
+                "wykoff_fingerprint": ["a c", "c a", "a d", "d a"]
+            },
+            {
+                "name": "Ah--alpha-Po--sc",
+                "spacegroup_number": 221,
+                "wykoff_fingerprint": ["a", "b"]
+            },
+            {
+                "name": "B1--NaCl--rock-salt",
+                "spacegroup_number": 225,
+                "wykoff_fingerprint": ["a b", "b a"]
+            },
+            {
+                "name": "B2--CsCl",
+                "spacegroup_number": 221,
+                "wykoff_fingerprint": ["a b", "b a"]
+            },
+            {
+                "name": "B3--ZnS--cubic-zinc-blende",
+                "spacegroup_number": 216,
+                "wykoff_fingerprint": ["a c", "c a", "b d", "d b", "a d", "d a", "b c", "c b"]
+            },
+            {
+                "name": "C1--CaF2--fluorite",
+                "spacegroup_number": 225,
+                "wykoff_fingerprint": ["a c", "c a", "b c", "c b"]
+            },
+            {
+                "name": "D0_3--BiF3",
+                "spacegroup_number": 225,
+                "wykoff_fingerprint": ["a bc", "bc a", "b ac", "ac b"]
+            },
+            {
+                "name": "L1_0--AuCu",
+                "spacegroup_number": 123,
+                "wykoff_fingerprint": ["a d", "d a", "b c", "c b"]
+            },
+            {
+                "name": "L1_2--AuCu3",
+                "spacegroup_number": 221,
+                "wykoff_fingerprint": ["a c", "c a", "b d", "d b"]
+            },
+            {
+                "name": "L2_1--AlCu2Mn--heusler",
+                "spacegroup_number": 225,
+                "wykoff_fingerprint": ["a b c", "b c a", "c a b", "a c b", "c b a", "b a c"]
+            }
+        ]
+    }
+}
