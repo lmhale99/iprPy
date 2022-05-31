@@ -58,6 +58,10 @@ the job name is changed to "prepare".
 Regularly submitting a iprPy_prepare job and keeping a number of runners active
 through iprPy_slurm jobs makes the workflow nearly automated.
 
+The iprPy_prepare_pool slurm scripts are designed to prepare one pool/round of
+calculations at a time.  These tend to be more manageable for preparing across
+all interatomic potentials.
+
 check_runners.py
 ----------------
 

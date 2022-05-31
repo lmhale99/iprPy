@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+#SBATCH --job-name="prepare"
+#SBATCH --time=30-00:00:00
+#SBATCH --output=prepare_%j.txt
+#SBATCH --partition=rack1,rack2,rack3,rack4,rack5,rack6
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+
+export LD_LIBRARY_PATH=/cluster/deb9/lib:$LD_LIBRARY_PATH
+python iprPy master_prepare iprhub prepare/master_prepare_ctcms_pool_3.in

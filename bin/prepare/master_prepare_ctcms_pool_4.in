@@ -1,6 +1,8 @@
 ######################## Master prepare input script ##########################
 
-# Settings here are for the CTCMS cluster
+# This script is designed specifically to prepare all missing Pool #4
+# calculations on the "CTCMS" cluster.  See the non-pool master_prepare scripts
+# for more details and options.
 
 ################## Primary LAMMPS executable and MPI command ##################
 
@@ -31,47 +33,9 @@ lammps_command_pinn         /users/lmh1/LAMMPS/LAMMPS-USER-PINN/src/lmp_mpi
 
 ############################ Potential limiters ###############################
 
-# Set status to active to only use current versions of potentials
-#potential_status            active
-
-# Directly specify LAMMPS potentials by id
-#potential_id                2022--Xu-Y--Ni-Rh--LAMMPS--ipr1
-#potential_id                2022--Xu-Y--Ni-Pd--LAMMPS--ipr1
-#potential_id                2019--Plummer-G--Ti-Al-C--LAMMPS--ipr1
-#potential_id                2019--Plummer-G--Ti-Si-C--LAMMPS--ipr1
-#potential_id                2021--Plummer-G--Ti-Al-C--LAMMPS--ipr1
-
-# Limit by database parsing terms
-#potential_potid
-#potential_pair_style
-#potential_symbols
-#potential_elements
+# None used here: this prepare is meant to check for any missing calculations.
 
 ################################ Pool Settings #################################
-
-# Each pool requires a value for:
-# - styles : Space-delimited calculation styles (and branches)
-# - run_directory : Run directory where the calculations will be prepared to
-# - np_per_runner : Number of processors the prepared calculations expect
-# - num_pots : The max number of potentials to prepare at a time
-
-# Pool #1: Basic potential evaluations and scans
-styles                      isolated_atom diatom_scan E_vs_r_scan:bop E_vs_r_scan
-run_directory               iprhub_1
-np_per_runner               1
-num_pots                    100
-
-# Pool #2: Round 1 of crystal structure relaxations
-styles                      relax_box relax_static relax_dynamic
-run_directory               iprhub_2
-np_per_runner               1
-num_pots                    100
-
-# Pool #3: Round 2 of crystal structure relaxations
-styles                      relax_static:from_dynamic
-run_directory               iprhub_3
-np_per_runner               1
-num_pots                    100
 
 # Pool #4: Crystal space group analysis
 styles                      crystal_space_group:relax 
