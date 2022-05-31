@@ -422,7 +422,7 @@ class DiatomScan(Calculation):
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
         self.minimum_r = uc.value_unit(run_params['minimum_r'])
-        self.minimum_r = uc.value_unit(run_params['maximum_r'])
+        self.maximum_r = uc.value_unit(run_params['maximum_r'])
         self.number_of_steps_r = run_params['number_of_steps_r']
 
         self.symbols = calc['system-info']['symbol']
@@ -463,7 +463,7 @@ class DiatomScan(Calculation):
         # Build calculation-specific terms
         root = f'content.{self.modelroot}'
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
+        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maximum_r', maximum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
         query.in_list.mongo(mquery, f'{root}.system-info.symbols', symbol)
 
@@ -499,7 +499,7 @@ class DiatomScan(Calculation):
         # Build calculation-specific terms
         root = self.modelroot
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
+        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maximum_r', maximum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
         query.in_list.mongo(mquery, f'{root}.system-info.symbols', symbol)
 
