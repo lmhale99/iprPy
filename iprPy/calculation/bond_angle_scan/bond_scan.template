@@ -45,8 +45,10 @@ thermo_modify format float %.13e
 # Create atom 1
 create_atoms <atype1> single 0.0 0.0 0.0 units box
 
-# Empty print to reset energies.txt if it exists
-print "" file energies.txt screen no
+# Start 3_body_scan.txt with header fields
+print "${rmin} ${rmax} ${rnum}" file 3_body_scan.txt screen no
+print "${rmin} ${rmax} ${rnum}" append 3_body_scan.txt screen no
+print "${thetamin} ${thetamax} ${thetanum}" append 3_body_scan.txt screen no
 
 # Loop i over r_ij values
 variable i loop ${rnum}
@@ -68,17 +70,17 @@ variable i loop ${rnum}
             create_atoms <atype3> single ${k_x} ${k_y} 0.0 units box
             group id3 id 3
 
-            # Compute energy and output it to energies.txt
+            # Compute energy and output it to 3_body_scan.txt
             run 0
-            print "${energy}" append energies.txt screen no
+            print "${i} ${j} ${k} ${energy}" append 3_body_scan.txt screen no
             delete_atoms group id3
 
             next k
-            jump bondscan.in loopk
+            jump bond_scan.in loopk
             
         next j
-        jump bondscan.in loopj
+        jump bond_scan.in loopj
 
     delete_atoms group id2
     next i
-    jump bondscan.in loopi
+    jump bond_scan.in loopi
