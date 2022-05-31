@@ -1,8 +1,9 @@
 # coding: utf-8
 
 # Standard Python libraries
+from pathlib import Path
 from itertools import combinations
-from typing import Optional, Tuple
+from typing import Optional
 from copy import deepcopy
 from uuid import uuid4
 
@@ -19,15 +20,117 @@ import atomman as am
 import atomman.unitconvert as uc
 from atomman.library.record.RelaxedCrystal import RelaxedCrystal
 
+
 from potentials.record.BasePotentialLAMMPS import BasePotentialLAMMPS
 
 from ..database.IprPyDatabase import IprPyDatabase
 from . import match_reference_prototype, get_isolated_atom_energies
 
+def process_all_relaxations(database: IprPyDatabase,
+                            csv_root_dir: Optional[Path] = None,
+                            verbose: bool = False):
+    """
+    Process relaxation and crystal space group results for all potentials
+    to generate relaxed_crystal records.
+    
+    Parameters
+    ----------
+    database : iprPy.database.IprPyDatabase
+        The database to access (if needed).
+    verbose : bool, optional
+        Additional informative print statements will be generated if verbose is
+        set to True.
+    """
+    
+    ############## Load all input records used to process #####################
+    
+    all_ref_df = database.get_records_df(style='reference_crystal')
+    print(len(all_ref_df), 'reference_crystal records found')
+    
+    all_evsr_records, all_evsr_df = database.get_records(style='calculation_E_vs_r_scan', return_df=True)
+    print(len(all_evsr_df), 'E_vs_r_scan results found')
+    
+    all_box_df = database.get_records_df(style='calculation_relax_box')
+    print(len(all_box_df[all_box_df.branch=='main']), 'relax_box:main results found')
+    
+    all_static_df = database.get_records_df(style='calculation_relax_static')
+    print(len(all_static_df[all_static_df.branch=='main']), 'relax_static:main results found')
+    
+    all_dynamic_df = database.get_records_df(style='calculation_relax_dynamic')
+    print(len(all_dynamic_df[all_dynamic_df.branch=='main']), 'relax_dynamic:main results found')
+    
+    print(len(all_dynamic_df[(all_dynamic_df.branch=='main') & (all_dynamic_df.status=='finished')]), 'relax_static:from_dynamic expected')
+    print(len(all_static_df[all_static_df.branch=='from_dynamic']), 'relax_static:from_dynamic results found')
+    
+    all_spg_df = database.get_records_df(style='calculation_crystal_space_group')
+    print(len(all_spg_df[all_spg_df.branch == 'relax']), 'crystal_space_group:relax results found')
+    print(len(all_spg_df[all_spg_df.branch == 'prototype']), 'crystal_space_group:prototype results found')
+    print(len(all_spg_df[all_spg_df.branch == 'reference']), 'crystal_space_group:reference results found')
+    
+    ref_proto_df = match_reference_prototype(database, all_spg_df=all_spg_df)
+    print(len(ref_proto_df), 'reference-prototype relations found')
+    
+    iso_energy_df = get_isolated_atom_energies(database)
+    print(len(iso_energy_df), 'isolated atom energies compiled')
+    
+    ############# identify all unique potentials in the results ###############
+    
+    def combine_pot_info(series):
+        return f'{series.potential_id}:{series.potential_key}:{series.potential_LAMMPS_id}:{series.potential_LAMMPS_key}'
+
+    pots = np.unique(
+        all_evsr_df.apply(combine_pot_info, axis=1).tolist() +
+        all_box_df.apply(combine_pot_info, axis=1).tolist() +
+        all_static_df.apply(combine_pot_info, axis=1).tolist() +
+        all_dynamic_df.apply(combine_pot_info, axis=1).tolist() 
+    )
+    pot_info = []
+    for pot in pots:
+        terms = pot.split(':')
+        pinfo = {}
+        pinfo['potential_id'] = terms[0]
+        pinfo['potential_key'] = terms[1]
+        pinfo['potential_LAMMPS_id'] = terms[2]
+        pinfo['potential_LAMMPS_key'] = terms[3]
+        pot_info.append(pinfo)
+    pot_info = pd.DataFrame(pot_info)
+    pot_info
+    print(len(pot_info), 'potentials to check')
+    print()
+    
+    ######################## Iterate over all potentials #####################
+    for i in pot_info.index:
+        pot = pot_info.loc[i]
+        print(pot.potential_id)
+        print(pot.potential_LAMMPS_id)
+        
+        potential_LAMMPS_key = pot.potential_LAMMPS_key
+        potential_key = pot.potential_key
+        try:
+            potential = database.potdb.get_lammps_potential(key=potential_LAMMPS_key, potkey=potential_key)
+            process_relaxations(database, potential,
+                                ref_proto_df = ref_proto_df,
+                                iso_energy_df = iso_energy_df,
+                                all_ref_df = all_ref_df,
+                                all_evsr_records = all_evsr_records,
+                                all_evsr_df = all_evsr_df,
+                                all_box_df = all_box_df,
+                                all_static_df = all_static_df,
+                                all_dynamic_df = all_dynamic_df,
+                                all_spg_df = all_spg_df,
+                                csv_root_dir = csv_root_dir,
+                                verbose = verbose)
+        except ValueError as e:
+            print('!!!!!!!!!!!!!!!   FAILED   !!!!!!!!!!!!!!!!')
+            print(e)
+        
+        print()
+        if verbose:
+            print()
+            print()
+
 def process_relaxations(database: IprPyDatabase,
-                        potential_LAMMPS_key: str,
-                        potential_key: str,
-                        potential: Optional[BasePotentialLAMMPS] = None,
+                        potential: BasePotentialLAMMPS,
                         ref_proto_df: Optional[pd.DataFrame] = None,
                         iso_energy_df: Optional[pd.DataFrame] = None, 
                         all_ref_df: Optional[pd.DataFrame] = None,
@@ -37,14 +140,64 @@ def process_relaxations(database: IprPyDatabase,
                         all_static_df: Optional[pd.DataFrame] = None,
                         all_dynamic_df: Optional[pd.DataFrame] = None,
                         all_spg_df: Optional[pd.DataFrame] = None,
+                        csv_root_dir: Optional[Path] = None,
                         verbose: bool = False):
+    """
+    Checks and processes relaxation calculations for a given interatomic
+    potential to check/generate/update the relaxed_crystal records.
+    
+    Parameters
+    ----------
+    database : iprPy.database.IprPyDatabase
+        The database to access (if needed).
+    potential : BasePotentialLAMMPS
+        The LAMMPS potential implementation for which the calculations will be
+        processed.
+    ref_proto_df : pandas.DataFrame, optional
+        A table linking reference crystal structures to known crystal
+        prototypes.  If not given, match_reference_prototype() will be called.
+    iso_energy_df : pandas.DataFrame, optional
+        A table of the isolated atom energies computed for each symbol model
+        for each element, as obtained from get_isolated_atom_energies(). If not
+        given, get_isolated_atom_energies() will be called.
+    all_ref_df : pd.DataFrame, optional
+        The metadata for all reference crystal records.  If not given, a fresh
+        query to the database will be performed.
+    all_evsr_records : Array-Like, optional
+        All E_vs_r_scan calculation records.  If not given, a fresh query to
+        the database will be performed.
+    all_evsr_df : pd.DataFrame, optional
+        The metadata for all E_vs_r_scan calculation records.  If not given, a
+        fresh query to the database will be performed.
+    all_box_df : pandas.DataFrame, optional
+        The metadata for all relax_box calculation records.  If not given, a
+        fresh query to the database will be performed.
+    all_static_df : pandas.DataFrame, optional
+        The metadata for all relax_static calculation records.  If not given, a
+        fresh query to the database will be performed.
+    all_dynamic_df : pandas.DataFrame, optional
+        The metadata for all relax_dynamic calculation records.  If not given,
+        a fresh query to the database will be performed.
+    all_spg_df : pandas.DataFrame, optional
+        The metadata for all crystal_space_group calculation records.  If not
+        given, a fresh query to the database will be performed.
+    verbose : bool, optional
+        Additional informative print statements will be generated if verbose is
+        set to True.
+    
+    Raises
+    ------
+    ValueError
+        If the checks reveal any missing or incomplete calculations that should
+        be done before processing.
+    """
 
-    # Get the associated LAMMPS potential record
-    if potential is None:
-        potential = database.potdb.get_lammps_potential(key=potential_LAMMPS_key,
-                                                        potkey=potential_key)
-        if verbose:
-            print('LAMMPS potential record retrieved')
+
+    # Extract values from potential
+    potential_LAMMPS_key = potential.key
+    potential_key = potential.potkey
+    elements = potential.elements()
+    atom_style = potential.atom_style
 
     # Get/select E_vs_r_scan results
     evsr_df = get_evsr_df(database, potential_LAMMPS_key, potential_key,
@@ -52,7 +205,7 @@ def process_relaxations(database: IprPyDatabase,
                           all_evsr_df=all_evsr_df, verbose=verbose)
     
     # Get/select reference crystals
-    ref_df = get_ref_df(database, potential.elements(),
+    ref_df = get_ref_df(database, elements,
                         all_ref_df=all_ref_df, verbose=verbose)
 
     # Get/select relax records
@@ -65,23 +218,28 @@ def process_relaxations(database: IprPyDatabase,
     relax_df = merge_spg_info(database, relax_df, all_spg_df=all_spg_df, verbose=verbose)
     
     # Identify if structures transformed
-    relax_df = identify_transformed(database, relax_df, all_spg_df=all_spg_df)
+    identify_transformed(database, relax_df, all_spg_df=all_spg_df)
 
     # Identify prototype field
-    relax_df = identify_prototype(database, relax_df,
-                                  ref_proto_df=ref_proto_df,
-                                  all_spg_df=all_spg_df)
+    identify_prototype(database, relax_df, ref_proto_df=ref_proto_df,
+                       all_spg_df=all_spg_df)
+
+    # Fetch unit cells
+    fetch_ucell(database, relax_df, atom_style=atom_style)
+
+    # Compute cohesive energy
+    calculate_cohesive_energy(database, relax_df, iso_energy_df=iso_energy_df)
+
+    # Save compiled results to csv files
+    save_csv(potential, relax_df, root_dir=csv_root_dir, verbose=verbose)
 
     # Create any missing relaxed_crystal records
     create_missing_relaxed_crystals(database, relax_df, potential_LAMMPS_key,
-                                    potential_key, atom_style=potential.atom_style,
-                                    iso_energy_df=iso_energy_df, verbose=verbose)
+                                    potential_key, verbose=verbose)
 
     # Identify duplicates and update their standing
     identify_duplicates(database, potential_LAMMPS_key, potential_key,
                         verbose=verbose)
-
-    #return relax_df
     
 def get_evsr_df(database: IprPyDatabase, 
                 potential_LAMMPS_key: str,
@@ -108,6 +266,9 @@ def get_evsr_df(database: IprPyDatabase,
     all_evsr_df : pd.DataFrame, optional
         The metadata for all E_vs_r_scan calculation records.  If not given, a
         fresh query to the database will be performed.
+    verbose : bool, optional
+        Additional informative print statements will be generated if verbose is
+        set to True.
 
     Raises
     ------
@@ -173,6 +334,9 @@ def get_ref_df(database: IprPyDatabase,
     all_ref_df : pd.DataFrame, optional
         The metadata for all reference crystal records.  If not given, a fresh
         query to the database will be performed.
+    verbose : bool, optional
+        Additional informative print statements will be generated if verbose is
+        set to True.
 
     Returns
     -------
@@ -188,6 +352,7 @@ def get_ref_df(database: IprPyDatabase,
 
     # Get matching refs based on elements/symbols
     indices = []
+    elements = np.unique(elements)
     for i in range(len(elements)):
         for symbols in combinations(elements, i+1):
             indices.extend(all_ref_df[all_ref_df.apply(compare_symbols, axis=1, args=[symbols])].index)
@@ -210,7 +375,8 @@ def get_relax_df(database: IprPyDatabase,
                  all_box_df: Optional[pd.DataFrame] = None,
                  all_static_df: Optional[pd.DataFrame] = None,
                  all_dynamic_df: Optional[pd.DataFrame] = None,
-                 verbose: bool = False):
+                 verbose: bool = False
+                 ) -> pd.DataFrame:
     """
     Constructs a combined DataFrame of all relax calculation records for a
     given LAMMPS potential.  This checks the number and status of all involved
@@ -240,6 +406,9 @@ def get_relax_df(database: IprPyDatabase,
     all_dynamic_df : pandas.DataFrame, optional
         The metadata for all relax_dynamic calculation records.  If not given,
         a fresh query to the database will be performed.
+    verbose : bool, optional
+        Additional informative print statements will be generated if verbose is
+        set to True.
 
     Raises
     ------
@@ -348,6 +517,10 @@ def get_relax_df(database: IprPyDatabase,
     relax_df = pd.concat([box_df, static_df, dynamic2_df],
                          ignore_index=True, sort=False)
 
+    # Check that some relaxed structure successfully finished
+    if len(relax_df[relax_df.status=='finished']) == 0:
+        raise ValueError('No successful crystal relaxations found!')
+
     return relax_df
     
 def check_round1_relax(df: pd.DataFrame,
@@ -364,6 +537,11 @@ def check_round1_relax(df: pd.DataFrame,
         The reference crystals with corresponding elements/symbols
     evsr_df : pandas.DataFrame
         The E_vs_r_scan records for the potential
+    
+    Raises
+    ------
+    ValueError
+        If missing calculations are identified.
     """
 
     # Check all records have identified parents
@@ -409,6 +587,11 @@ def check_round2_relax(dynamic1_df: pd.DataFrame,
         The metadata for round 1 dynamic relaxations (relax_dynamic:main).
     dynamic2_df : pandas.DataFrame 
         The metadata for round 2 dynamic relaxations (relax_static:from_dynamic).
+    
+    Raises
+    ------
+    ValueError
+        If missing calculations are identified.
     """
     round2_parent_keys = dynamic1_df[dynamic1_df.status=='finished'].key.tolist()
     
@@ -444,7 +627,10 @@ def merge_spg_info(database: IprPyDatabase,
     all_spg_df : pandas.DataFrame, optional
         The metadata for all crystal_space_group calculation records.  If not
         given, a fresh query to the database will be performed.
-    
+    verbose : bool, optional
+        Additional informative print statements will be generated if verbose is
+        set to True.
+
     Raises
     ------
     ValueError
@@ -505,7 +691,8 @@ def merge_spg_info(database: IprPyDatabase,
     
 def identify_transformed(database: IprPyDatabase,
                          relax_df: pd.DataFrame,
-                         all_spg_df: Optional[pd.DataFrame] = None):
+                         all_spg_df: Optional[pd.DataFrame] = None
+                         ) -> pd.DataFrame:
     """
     Compares space group information of the relaxed crystals to the
     corresponding information calculated for the original family structure.
@@ -522,6 +709,11 @@ def identify_transformed(database: IprPyDatabase,
     all_spg_df : pandas.DataFrame, optional
         The metadata for all crystal_space_group calculation records.  If not
         given, a fresh query to the database will be performed.
+    
+    Returns
+    -------
+    relax_df : pandas.DataFrame
+        The relax_df dataframe with 'transformed' column added in.
     """
     # Get space group details for the original prototype/reference structures
     if all_spg_df is None:
@@ -554,7 +746,8 @@ def identify_transformed(database: IprPyDatabase,
 def identify_prototype(database: IprPyDatabase,
                        relax_df: pd.DataFrame,
                        ref_proto_df: Optional[pd.DataFrame] = None,
-                       all_spg_df: Optional[pd.DataFrame] = None):
+                       all_spg_df: Optional[pd.DataFrame] = None
+                       ) -> pd.DataFrame:
     """
     Adds the "prototype" field to the relax_df based on if the family is a
     reference crystal that matches with a crystal prototype.
@@ -574,6 +767,11 @@ def identify_prototype(database: IprPyDatabase,
         The metadata for all crystal_space_group calculation records.  If not
         given and ref_proto_df is not given, a fresh query to the database will
         be performed.
+
+    Returns
+    -------
+    relax_df : pandas.DataFrame
+        The relax_df dataframe with 'prototype' column added in.
     """
     if ref_proto_df is None:
         ref_proto_df = match_reference_prototype(database, all_spg_df=all_spg_df)
@@ -599,17 +797,58 @@ def identify_prototype(database: IprPyDatabase,
     
     return relax_df
 
-def trim_ucell(ucell: am.System,
-               atom_style: str = 'atomic'):
+def fetch_ucell(database: IprPyDatabase,
+                relax_df: pd.DataFrame,
+                atom_style: str = 'atomic'):
     """
-    Fix to remove extra per-atom fields from the ucell
+    Fetch unit cells from crystal_space_group records and assigns them to
+    relax_df.  This is needed so that E_coh can be computed and missing
+    relaxed_crystal records can be built.
+
+    Parameters
+    ----------
+    database : iprPy.database.IprPyDatabase
+        The database to access (if needed).
+    relax_df : pandas.DataFrame
+        The combined metadata for all relax calculations plus associated space
+        group information and transformation diagnosis. 
+    atom_style : str
+        The LAMMPS atom_style value.  Used to determine which per-atom fields
+        are to be included in the final structure model.
+    """
+    # Fetch crystal_space_group records
+    spg_records = database.get_records('calculation_crystal_space_group',
+                                       key=relax_df.key.tolist())
+    # Initialize ucell column
+    relax_df['ucell'] = np.nan
+
+    for spg_record in spg_records:
+        
+        # Trim the record's ucell
+        ucell = trim_ucell(spg_record.spg_ucell, atom_style)
+
+        # Assign the ucell to the appropriate row
+        relax_df.loc[relax_df.key == spg_record.key, 'ucell'] = ucell
+
+
+def trim_ucell(ucell: am.System,
+               atom_style: str = 'atomic'
+               ) -> am.System:
+    """
+    Fix to remove extra per-atom fields from the ucell.
 
     Parameters
     ----------
     ucell : atomman.System
-        The unit cell system identified by a crystal_space_group calculation
-    potential : potentials.record.BasePotentialLAMMPS.BasePotentialLAMMPS
-        The potential_LAMMPS record associated with the unit cell.
+        The unit cell system identified by a crystal_space_group calculation.
+    atom_style : str
+        The LAMMPS atom_style value.  Used to determine which per-atom fields
+        are to be included in the final structure model.
+    
+    Returns
+    -------
+    atomman.System
+        A copy of ucell with all extraneous per-atom fields removed.
     """
     ucell = deepcopy(ucell)
     
@@ -623,25 +862,90 @@ def trim_ucell(ucell: am.System,
     
     return ucell
 
-def calculate_cohesive_energy(series, ucell, iso_energy_df):
+def calculate_cohesive_energy(database: IprPyDatabase,
+                              relax_df: pd.DataFrame,
+                              iso_energy_df: Optional[pd.DataFrame] = None):
     """
-    Compute the cohesive energy for a unit cell based on 
+    Compute the cohesive energy for a unit cell based on the measured per-atom
+    potential energy and the isolated energy values for the potential-symbol
+    models used.
+
+    Parameters
+    ----------
+    database : iprPy.database.IprPyDatabase
+        The database to access (if needed).
+    relax_df : pandas.DataFrame
+        The combined metadata for all relax calculations plus associated space
+        group information and transformation diagnosis. 
+    iso_energy_df : pandas.DataFrame, optional
+        A table of the isolated atom energies computed for each symbol model
+        for each element, as obtained from get_isolated_atom_energies().
+
+    Returns
+    -------
+    float
+        The computed per-atom cohesive energy value.
     """
-    # Compute base_energy
-    atypes, counts = np.unique(ucell.atoms.atype, return_counts=True)
-    base_energy = 0
-    for symbol, count in zip(ucell.symbols, counts):
-        E = iso_energy_df[(iso_energy_df.potential_LAMMPS_key == series.potential_LAMMPS_key) &
-                          (iso_energy_df.symbol == symbol)].isolated_atom_energy.values[0]
-        base_energy += E * count
-    base_energy = base_energy / ucell.natoms
-    
-    return series.E_pot - base_energy
+    # Get iso_energy_df if needed
+    if iso_energy_df is None:
+        iso_energy_df = get_isolated_atom_energies(database)
+
+
+    def ecoh(series, iso_energy_df):
+
+        # Compute base_energy
+        counts = np.unique(series.ucell.atoms.atype, return_counts=True)[1]
+        base_energy = 0
+        for symbol, count in zip(series.ucell.symbols, counts):
+            E = iso_energy_df[(iso_energy_df.potential_LAMMPS_key == series.potential_LAMMPS_key) &
+                            (iso_energy_df.symbol == symbol)].isolated_atom_energy.values[0]
+            base_energy += E * count
+        base_energy = base_energy / series.ucell.natoms
+        
+        return series.E_pot - base_energy
+
+    relax_df['E_coh'] = relax_df.apply(ecoh, axis=1, args=[iso_energy_df])
+
+def save_csv(potential: BasePotentialLAMMPS,
+             relax_df: pd.DataFrame,
+             root_dir: Optional[Path] = None,
+             verbose: bool = False):
+    """
+    Generates csv files for all relaxed crystal results for each unique
+    composition supported by the potential.
+    """
+    if root_dir is None:
+        root_dir = Path.cwd()
+
+    sort_keys = ['E_coh']
+    save_keys = ['key', 'prototype', 'family', 'method', 'transformed',
+                 'E_pot', 'E_coh', 'a', 'b', 'c', 'alpha', 'beta', 'gamma']
+
+    for composition in np.unique(relax_df.composition):
+        comp_df = relax_df[relax_df.composition == composition]
+        fname = Path(root_dir, potential.potid, potential.id, f'crystal.{composition}.csv')
+        
+        # Check if csv file exists
+        try:
+            old = pd.read_csv(fname)
+            assert 'key' in old
+        except:
+            old = pd.DataFrame(columns=['key'])
+        
+        # Check if csv file is missing results
+        if all(comp_df.key.isin(old.key)):
+            continue
+        
+        # Save results to the csv file
+        if not fname.parent.is_dir():
+            fname.parent.mkdir(parents=True)
+        comp_df.sort_values(sort_keys)[save_keys].to_csv(fname, index=False)
+        if verbose:
+            print('updated csv for', composition)
 
 def build_relaxed_crystal(series: pd.Series,
-                          ucell: am.System,
-                          E_coh: Optional[float] = None,
-                          standing: str = 'good'):
+                          standing: str = 'good'
+                          ) -> RelaxedCrystal:
     """
     Builds a new relaxed_crystal record.
 
@@ -649,14 +953,14 @@ def build_relaxed_crystal(series: pd.Series,
     ----------
     series : pd.Series
         A data series associated with combined relax and space group info.
-    ucell : am.System
-        The space group unit cell system associated with series.
-    E_coh : float, optional
-        The per-atom cohesive energy for ucell.  If not given, E_coh will be
-        set to series.E_pot.
     standing : str, optional
         The standing state to assign to the relaxed_crystal.  Default value is
         "good".
+
+    Returns
+    -------
+    RelaxedCrystal
+        The generated relaxed_crystal record.
     """
     def handle_symbols(series):
         symbols = series.symbols.split()
@@ -684,8 +988,8 @@ def build_relaxed_crystal(series: pd.Series,
     crystal['system-info']['symbol'] = handle_symbols(series)
     crystal['system-info']['composition'] = series.composition
     crystal['system-info']['cell'] = DM()
-    crystal['system-info']['cell']['crystal-family'] = ucell.box.identifyfamily()
-    crystal['system-info']['cell']['natypes'] = ucell.natypes
+    crystal['system-info']['cell']['crystal-family'] = series.ucell.box.identifyfamily()
+    crystal['system-info']['cell']['natypes'] = series.ucell.natypes
     crystal['system-info']['cell']['a'] = series.a
     crystal['system-info']['cell']['b'] = series.b
     crystal['system-info']['cell']['c'] = series.c
@@ -693,34 +997,52 @@ def build_relaxed_crystal(series: pd.Series,
     crystal['system-info']['cell']['beta'] = series.beta
     crystal['system-info']['cell']['gamma'] = series.gamma
     
-    crystal['atomic-system'] = ucell.model(box_unit='angstrom')['atomic-system']
+    crystal['atomic-system'] = series.ucell.model(box_unit='angstrom')['atomic-system']
     
     crystal['potential-energy'] = uc.model(series.E_pot, 'eV')
+    crystal['cohesive-energy'] = uc.model(series.E_coh, 'eV')
     
-    if E_coh is None:
-        crystal['cohesive-energy'] = uc.model(series.E_pot, 'eV')
-    else:
-        crystal['cohesive-energy'] = uc.model(E_coh, 'eV')
-    
-    return model
+    return RelaxedCrystal(model=model)
 
 def create_missing_relaxed_crystals(database: IprPyDatabase,
                                     relax_df: pd.DataFrame,
                                     potential_LAMMPS_key: str,
                                     potential_key: str,
-                                    atom_style: str = 'atomic',
-                                    iso_energy_df: Optional[pd.DataFrame] = None,
                                     verbose: bool = False):
+    """
+    Creates new relaxed_crystal records based on crystal_space_group
+    calculations as needed.  There should be exactly one relaxed_crystal record
+    associated with each crystal_space_group calculation that is identified as
+    having not transformed to a different crystal structure.
     
-    # Get iso_energy_df if needed
-    if iso_energy_df is None:
-        iso_energy_df = get_isolated_atom_energies(database)
+    Parameters
+    ----------
+    database : iprPy.database.IprPyDatabase
+        The database to access (if needed).
+    relax_df : pandas.DataFrame
+        The combined metadata for all relax calculations plus associated space
+        group information and transformation diagnosis. 
+    potential_LAMMPS_key : str
+        The UUID4 associated with the potential implementation.
+    potential_LAMMPS_id : str
+        The UUID4 associated with the potential model.
+    atom_style : str
+        The LAMMPS atom_style value.  Used to determine which per-atom fields
+        are to be included in the final structure model.
+    iso_energy_df : pandas.DataFrame, optional
+        A table of the isolated atom energies computed for each symbol model
+        for each element, as obtained from get_isolated_atom_energies(). If not
+        given, get_isolated_atom_energies() will be called.
+    verbose : bool, optional
+        Additional informative print statements will be generated if verbose is
+        set to True.
+    """
 
     # Filter out transformed
     relax_df = relax_df[relax_df.transformed==False]
 
     if verbose:
-        print(len(relax_df), 'did not transform')
+        print(len(relax_df), 'relaxed_crystal records expected')
 
     # Get existing relaxed_crystal records
     crystals_df = database.get_records_df(style='relaxed_crystal', 
@@ -742,25 +1064,12 @@ def create_missing_relaxed_crystals(database: IprPyDatabase,
     if verbose:
         print(len(missing_df), 'relaxed_crystal records to create')
 
-    # Fetch crystal_space_group for the missing crystals (necessary for ucell)
-    spg_records = database.get_records('calculation_crystal_space_group', key=missing_df.key.tolist()) 
-
-    for i in range(len(spg_records)):
-        
-        # Get a single record and the matching collected data
-        spg_record = spg_records[i]
-        series = missing_df[missing_df.key == spg_record.key].iloc[0]
-
-        # Trim ucell
-        ucell = trim_ucell(spg_record.spg_ucell, atom_style)
-
-        # Calculate E_coh
-        E_coh = calculate_cohesive_energy(series, ucell, iso_energy_df)
+    for i in missing_df.index:
+        series = missing_df.loc[i]
 
         # Build and add record to database
-        model = build_relaxed_crystal(series, ucell, E_coh=E_coh)
-        record = RelaxedCrystal(model=model)
-        database.add_record(record=record, verbose=verbose)
+        record = build_relaxed_crystal(series)
+        database.add_record(record=record)
 
 def identify_duplicates(database: IprPyDatabase,
                         potential_LAMMPS_key: str,
@@ -779,6 +1088,9 @@ def identify_duplicates(database: IprPyDatabase,
         The UUID4 associated with the potential implementation.
     potential_LAMMPS_id : str
         The UUID4 associated with the potential model.
+    verbose : bool, optional
+        Additional informative print statements will be generated if verbose is
+        set to True.
     """
     
     # Get relaxed_crystal records
@@ -844,12 +1156,12 @@ def identify_duplicates(database: IprPyDatabase,
                     if j not in skips:
                         record = crystals[j]
                         record.model['relaxed-crystal']['standing'] = 'bad'
-                        database.update_record(record=record, verbose=verbose)
+                        database.update_record(record=record)#, verbose=verbose)
                         skips.append(j)
     
     # Reload relaxed_crystal records from the database
     crystals = database.get_records(style='relaxed_crystal', standing='good',
                                     potential_LAMMPS_key=potential_LAMMPS_key,
                                     potential_key=potential_key)
-    
-    print(f' - {len(crystals)} retain good standing')
+    if verbose:
+        print(f' - {len(crystals)} retain good standing')
