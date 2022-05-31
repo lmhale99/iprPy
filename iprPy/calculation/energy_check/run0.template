@@ -1,0 +1,12 @@
+#LAMMPS input script that evaluates a system's energy and pressure without relaxing
+
+box tilt large
+
+<atomman_system_pair_info>
+
+variable peatom equal pe/atoms
+
+thermo_style custom step lx ly lz pxx pyy pzz pe v_peatom
+thermo_modify format float %.13e
+
+run 0
