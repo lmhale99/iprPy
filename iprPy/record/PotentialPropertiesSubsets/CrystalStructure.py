@@ -11,27 +11,37 @@ from ...tools import aslist
 class CrystalStructure(PotentialsPropertiesSubset):
     def __init__(self, parent):
         self.__data = pd.DataFrame(columns=self.datacolumns)
-        self.__protoref = pd.DataFrame()
+        self.__protoref = pd.DataFrame(columns=self.protorefcolumns)
         super().__init__(parent)
 
     @property
     def data(self):
         return self.__data
 
+    @data.setter
+    def data(self, value):
+        assert isinstance(value, pd.DataFrame)
+        self.__data = value[self.datacolumns]
+
     @property
     def protoref(self):
         return self.__protoref
 
+    @protoref.setter
+    def protoref(self, value):
+        assert isinstance(value, pd.DataFrame)
+        self.__protoref = value[self.protorefcolumns]
+
     @property
     def datacolumns(self):
         """list : The column names found in the associated dataframe"""
-        return ['composition', 'prototype', 'method', 'E_pot', 'E_coh',
-                'a', 'b', 'c', 'alpha', 'beta', 'gamma']
+        return ['composition', 'prototype', 'method', 'potential_energy',
+                'cohesive_energy', 'a', 'b', 'c', 'alpha', 'beta', 'gamma']
             
     @property
     def protorefcolumns(self):
         """list : The column names found in the associated dataframe"""
-        return ['composition', 'prototype', 'refs']
+        return ['composition', 'prototype', 'references']
 
     def csv(self, composition):
         """str : URL to the csv table of the raw structure content"""
@@ -59,8 +69,8 @@ class CrystalStructure(PotentialsPropertiesSubset):
                 crystal['composition'] = crystal_model['composition']
                 crystal['prototype'] = crystal_model['prototype']
                 crystal['method'] = crystal_model['method']
-                crystal['E_pot'] = uc.value_unit(crystal_model['potential-energy'])
-                crystal['E_coh'] = uc.value_unit(crystal_model['cohesive-energy'])
+                crystal['potential_energy'] = uc.value_unit(crystal_model['potential-energy'])
+                crystal['cohesive_energy'] = uc.value_unit(crystal_model['cohesive-energy'])
                 crystal['a'] = uc.value_unit(crystal_model['a'])
                 crystal['b'] = uc.value_unit(crystal_model['b'])
                 crystal['c'] = uc.value_unit(crystal_model['c'])
@@ -89,21 +99,21 @@ class CrystalStructure(PotentialsPropertiesSubset):
                     protoref_model['ref'] = protoref.references
                 model['crystal-structure'].append('prototype-ref-set', protoref_model)
             
-            for i in self.data.sort_values(['composition', 'E_coh']).index:
+            for i in self.data.sort_values(['composition', 'cohesive_energy']).index:
                 crystal = self.data.loc[i]
 
                 crystal_model = DM()
                 crystal_model['composition'] = crystal.composition
                 crystal_model['prototype'] = crystal.prototype
                 crystal_model['method'] = crystal.method
-                crystal_model['potential-energy'] = uc.model(crystal.E_pot, 'eV')
-                crystal_model['cohesive-energy'] = uc.model(crystal.E_coh, 'eV')
-                crystal_model['a'] = uc.model(crystal.a, 'angstrom')
-                crystal_model['b'] = uc.model(crystal.b, 'angstrom')
-                crystal_model['c'] = uc.model(crystal.c, 'angstrom')
-                crystal_model['alpha'] = DM([('value', crystal.alpha), ('unit', 'degree')])
-                crystal_model['beta'] = DM([('value', crystal.beta), ('unit',' degree')])
-                crystal_model['gamma'] = DM([('value', crystal.gamma), ('unit', 'degree')])
+                crystal_model['potential-energy'] = DM([('value', float(f"{crystal.potential_energy:.4f}")), ('unit', 'eV')])
+                crystal_model['cohesive-energy'] = DM([('value', float(f"{crystal.cohesive_energy:.4f}")), ('unit', 'eV')])
+                crystal_model['a'] = DM([('value', float(f"{crystal.a:.4f}")), ('unit', 'angstrom')])
+                crystal_model['b'] = DM([('value', float(f"{crystal.b:.4f}")), ('unit', 'angstrom')])
+                crystal_model['c'] = DM([('value', float(f"{crystal.c:.4f}")), ('unit', 'angstrom')])
+                crystal_model['alpha'] = DM([('value', float(f"{crystal.alpha:.1f}")), ('unit', 'degree')])
+                crystal_model['beta'] =  DM([('value', float(f"{crystal.beta:.1f}")),  ('unit',' degree')])
+                crystal_model['gamma'] = DM([('value', float(f"{crystal.gamma:.1f}")), ('unit', 'degree')])
 
                 model['crystal-structure'].append('crystal', crystal_model)
 

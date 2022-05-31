@@ -11,10 +11,6 @@ class EvsRScan(PotentialsPropertiesSubset):
         self.__compositions = []
         super().__init__(parent)
 
-    @property
-    def exists(self):
-        return len(self.compositions) > 0
-
     def table(self, composition):
         """str : URL to the txt table of the diatom plot"""
         assert composition in self.compositions
