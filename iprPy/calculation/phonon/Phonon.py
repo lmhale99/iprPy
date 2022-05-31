@@ -259,7 +259,7 @@ class Phonon(Calculation):
 
         # Load calculation-specific unitless floats
         self.symmetryprecision = float(input_dict.get('symmetryprecision', 1e-5))
-        self.strainrange = float(input_dict.get('strainrange', 1e-6))
+        self.strainrange = float(input_dict.get('strainrange', 0.01))
 
         # Load calculation-specific floats with units
         self.displacementdistance = value(input_dict, 'displacementdistance',
@@ -348,7 +348,7 @@ class Phonon(Calculation):
                 "calculations will be skipped.  Default value is 5."]),
             'strainrange': ' '.join([
                 "The range of strains to apply for performing the",
-                "quasiharmonic approximation.  Default value is 1e-6"]),
+                "quasiharmonic approximation.  Default value is 0.01"]),
         } 
 
     @property

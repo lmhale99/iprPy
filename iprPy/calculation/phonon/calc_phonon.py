@@ -235,29 +235,20 @@ def phonon_quasiharmonic(lammps_command: str,
         results['B0prime'] = uc.set_in_units(properties[2], 'eV/angstrom^3')
         results['V0'] = uc.set_in_units(properties[3], 'angstrom^3')
         
-        results['thermal_properties']['volume'] = uc.set_in_units(np.hstack([qha.get_volume_temperature(), np.nan]), 'angstrom^3')
-        results['thermal_properties']['thermal_expansion'] = np.hstack([qha.get_thermal_expansion(), np.nan])
-        results['thermal_properties']['Gibbs'] = uc.set_in_units(np.hstack([qha.get_gibbs_temperature(), np.nan]), 'eV')
-        results['thermal_properties']['bulk_modulus'] = uc.set_in_units(np.hstack([qha.get_bulk_modulus_temperature(), np.nan]), 'GPa')
-        results['thermal_properties']['heat_capacity_p_numerical'] = uc.set_in_units(np.hstack([qha.get_heat_capacity_P_numerical(), np.nan]), 'J/K/mol')
-        results['thermal_properties']['heat_capacity_p_polyfit'] = uc.set_in_units(np.hstack([qha.get_heat_capacity_P_polyfit(), np.nan]), 'J/K/mol')
-        results['thermal_properties']['gruneisen'] = np.hstack([qha.get_gruneisen_temperature(), np.nan])
+        results['thermal_properties']['volume'] = uc.set_in_units(np.hstack([qha.volume_temperature, np.nan]), 'angstrom^3')
+        results['thermal_properties']['thermal_expansion'] = np.hstack([qha.thermal_expansion, np.nan])
+        results['thermal_properties']['Gibbs'] = uc.set_in_units(np.hstack([qha.gibbs_temperature, np.nan]), 'eV')
+        results['thermal_properties']['bulk_modulus'] = uc.set_in_units(np.hstack([qha.bulk_modulus_temperature, np.nan]), 'GPa')
+        results['thermal_properties']['heat_capacity_p_numerical'] = uc.set_in_units(np.hstack([qha.heat_capacity_P_numerical, np.nan]), 'J/K/mol')
+        results['thermal_properties']['heat_capacity_p_polyfit'] = uc.set_in_units(np.hstack([qha.heat_capacity_P_polyfit, np.nan]), 'J/K/mol')
+        results['thermal_properties']['gruneisen'] = np.hstack([qha.gruneisen_temperature, np.nan])
     
     return results
 
 
-def phononcalc(lammps_command: str,
-               ucell: am.System,
-               potential: lmp.Potential,
-               mpi_command: Optional[str] = None,
-               a_mult: int = 3,
-               b_mult: int = 3,
-               c_mult: int = 3,
-               distance: float = 0.01,
-               symprec: float = 1e-5,
-               savefile: str = 'phonopy_params.yaml',
-               plot: bool = True,
-               lammps_date: Optional[datetime.date] = None):
+def phononcalc(lammps_command, ucell, potential, mpi_command=None,
+               a_mult=3, b_mult=3, c_mult=3, distance=0.01, symprec=1e-5, 
+               savefile='phonopy_params.yaml', plot=True, lammps_date=None):
     """
     Uses phonopy to compute the phonons for a unit cell structure using a
     LAMMPS interatomic potential.
@@ -342,8 +333,7 @@ def phononcalc(lammps_command: str,
             f.write(filltemplate(template, lammps_variables, '<', '>'))
         
         # Run LAMMPS
-        lmp.run(lammps_command, script_name='phonon.in',
-                mpi_command=mpi_command)
+        lmp.run(lammps_command, script_name=lammps_script, mpi_command=mpi_command)
         
         # Extract forces from dump file
         forcestructure = am.load('atom_dump', 'forces.dump')
@@ -353,8 +343,7 @@ def phononcalc(lammps_command: str,
     results = {}
 
     # Set computed forces
-    #phonon.set_forces(forcearrays)
-    phonon.forces = forcearrays
+    phonon.set_forces(forcearrays)
     
     # Save to yaml file    
     phonon.save(savefile)
