@@ -1,15 +1,11 @@
 # coding: utf-8
 # Standard Python libraries
-import uuid
-from copy import deepcopy
 
-import numpy as np
 
 from yabadaba import query
 
 # https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/DataModelDict
@@ -19,7 +15,7 @@ from DataModelDict import DataModelDict as DM
 from .. import Calculation
 from .bond_angle_scan import bond_angle_scan
 from ...calculation_subset import *
-from ...input import value, boolean
+from ...input import value
 from ...tools import aslist, dict_insert
 
 class BondAngleScan(Calculation):
@@ -37,7 +33,7 @@ class BondAngleScan(Calculation):
         subsets = (self.commands, self.potential, self.units)
 
         # Initialize unique calculation attributes
-        self.symbols = []
+        self.symbols = None
         self.number_of_steps_r = 100
         self.minimum_r = uc.set_in_units(0.5, 'angstrom')
         self.maximum_r = uc.set_in_units(6.0, 'angstrom')
@@ -93,12 +89,13 @@ class BondAngleScan(Calculation):
             self.__symbols = []
         else:
             value = aslist(value)
+
             # Replicate single symbol
             if len(value) == 1:
-                value += value
+                value = [value, value, value]
             
-            # Check that at most 2 symbols given for calc
-            elif len(value) > 2:
+            # Check that 3 symbols are given for calc
+            elif len(value) != 3:
                 raise ValueError('Invalid number of symbols')
             
             self.__symbols = value
@@ -192,30 +189,42 @@ class BondAngleScan(Calculation):
         """str : File name where the raw results are saved."""
         if self.__results_file is None:
             raise ValueError('No results yet!')
+        return self.__results_file
 
     @results_file.setter
     def results_file(self, value):
-        self.__results_file = value
+        if value is None:
+            self.__results_file = value
+        else:
+            self.__results_file = str(value)
 
     @property
     def results_length_unit(self):
         """str : Unit of length for the results_file."""
         if self.__results_length_unit is None:
             raise ValueError('No results yet!')
+        return self.__results_length_unit
 
     @results_length_unit.setter
     def results_length_unit(self, value):
-        self.__results_length_unit = value
+        if value is None:
+            self.__results_length_unit = value
+        else:
+            self.__results_length_unit = str(value)
 
     @property
     def results_energy_unit(self):
         """str : Unit of energy for the results_file."""
         if self.__results_energy_unit is None:
             raise ValueError('No results yet!')
+        return self.__results_energy_unit
 
     @results_energy_unit.setter
     def results_energy_unit(self, value):
-        self.__results_energy_unit = value
+        if value is None:
+            self.__results_energy_unit = value
+        else:
+            self.__results_energy_unit = str(value)
 
     def set_values(self, name=None, **kwargs):
         """
@@ -295,8 +304,8 @@ class BondAngleScan(Calculation):
         self.number_of_steps_theta = int(input_dict.get('number_of_steps_theta', 100))
 
         # Load calculation-specific unitless floats
-        self.minimum_theta = float(input_dict['minimum_theta'])
-        self.maximum_theta = float(input_dict['maximum_theta'])
+        self.minimum_theta = float(input_dict.get('minimum_theta', 1.0))
+        self.maximum_theta = float(input_dict.get('maximum_theta', 180.0))
 
         # Load calculation-specific floats with units
         self.minimum_r = value(input_dict, 'minimum_r',
@@ -373,7 +382,7 @@ class BondAngleScan(Calculation):
 
         return {
             'symbols': ' '.join([
-                "The one or two model symbols to perform the scan for."]),
+                "The one or three model symbols to perform the scan for."]),
             'minimum_r': ' '.join([
                 "The minimum interatomic spacing, r, for the scan.  Default",
                 "value is '0.5 angstrom'."]),
@@ -482,6 +491,7 @@ class BondAngleScan(Calculation):
         dict_insert(calc, 'system-info', DM(), after='potential-LAMMPS')
         calc['system-info']['symbol'] = self.symbols
         
+
         # Build results
         if self.status == 'finished':
             calc['results'] = results = DM()
@@ -616,7 +626,7 @@ class BondAngleScan(Calculation):
         # Build calculation-specific terms
         root = self.modelroot
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maxnimum_r', maximum_r)
+        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maximum_r', maximum_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_theta', minimum_theta)
         query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maximum_theta', maximum_theta)
@@ -745,7 +755,7 @@ class BondAngleScan(Calculation):
         input_dict['symbols'] = self.symbols
         input_dict['rmin'] = self.minimum_r
         input_dict['rmax'] = self.maximum_r
-        input_dict['rsteps'] = self.number_of_steps_r
+        input_dict['rnum'] = self.number_of_steps_r
         input_dict['thetamin'] = self.minimum_theta
         input_dict['thetamax'] = self.maximum_theta
         input_dict['thetanum'] = self.number_of_steps_theta

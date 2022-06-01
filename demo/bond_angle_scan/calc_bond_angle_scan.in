@@ -1,0 +1,29 @@
+# Input script for iprPy calculation bond_angle_scan
+
+# Calculation Metadata
+branch                          
+
+# LAMMPS and MPI Commands
+lammps_command                  E:/LAMMPS/2020-03-03/bin/lmp_serial.exe
+mpi_command                     
+
+# Interatomic Potential
+potential_file                  ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1.json
+potential_kim_id                
+potential_kim_potid             
+potential_dir                   ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1
+
+# Input/Output Units
+length_unit                     
+pressure_unit                   
+energy_unit                     
+force_unit                      
+
+# Run Parameters
+symbols                         Ni
+minimum_r                       
+maximum_r                       
+number_of_steps_r               10
+minimum_theta                   
+maximum_theta                   
+number_of_steps_theta           10
