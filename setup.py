@@ -42,7 +42,7 @@ setup(name = 'iprPy',
         'matplotlib',
         'scipy',
         'pandas',
-        'atomman==1.4.4',
+        'atomman==1.4.5',
         'requests',
       ],
       entry_points = {

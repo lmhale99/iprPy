@@ -11,10 +11,10 @@ This is a list of the implemented calculations and the status of the associated 
 
 ## bond_angle_scan
 
-- script: Needs updated (last update version 0.10)
-- workflow: Not implemented
-- docs: Missing
-- Notebook: Missing
+- script: Current
+- workflow: Current
+- docs: Current
+- Notebook: Current
 
 ## crystal_space_group
 
@@ -100,6 +100,13 @@ This is a list of the implemented calculations and the status of the associated 
 - docs: Current
 - Notebook: Current
 
+## energy_check
+
+- script: Current
+- workflow: Current
+- docs: Current
+- Notebook: Current
+
 ## grain_boundary_bcc
 
 - script: Needs updated (last update version 0.6-0.7?)
@@ -123,17 +130,17 @@ This is a list of the implemented calculations and the status of the associated 
 
 ## phonon
 
-- script: Current, but requires old phonopy
+- script: Current
 - workflow: Current
 - docs: Current
 - Notebook: Current
 
 ## point_defect_diffusion
 
-- script: Current
+- script: Needs updating
 - workflow: Not implemented (needs temperature relaxations)
-- docs: Current
-- Notebook: Current
+- docs: Needs updating
+- Notebook: Needs updating
 
 ## point_defect_static
 
