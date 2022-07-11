@@ -65,7 +65,11 @@ def diatom_scan(lammps_command: str,
     if len(symbols) == 1:
         atype = [1, 1]
     elif len(symbols) == 2:
-        atype = [1, 2]
+        if symbols[0] != symbols[1]:
+            atype = [1, 2]
+        else:
+            atype = [1, 1]
+            symbols = symbols[:1]
     else:
         raise ValueError('symbols must have one or two values')
     
