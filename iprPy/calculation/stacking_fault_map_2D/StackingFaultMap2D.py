@@ -117,6 +117,7 @@ class StackingFaultMap2D(Calculation):
         self.num_a2 = 10
         self.__gamma = None
         self.__paths = None
+        self.__E_isf = None
 
         # Define calc shortcut
         self.calc = stackingfaultmap
@@ -198,6 +199,10 @@ class StackingFaultMap2D(Calculation):
             raise ValueError('No path results!')
         return self.__paths
             
+    @property
+    def E_isf(self):
+        """float or None: Intrinsic stacking fault energy for the plane, if exists and found."""
+        return self.__E_isf
 
     def set_values(self, name=None, **kwargs):
         """
@@ -426,6 +431,9 @@ class StackingFaultMap2D(Calculation):
                                            energyperarea_unit=energy_per_area_unit)
             calc['stacking-fault-map'] = gamma_model['stacking-fault-map']
 
+            if self.E_isf is not None:
+                calc['intrinsic-fault-energy'] = uc.model(self.E_isf, 'mJ/m^2')
+
             try:
                 paths = self.paths
             except:
@@ -462,9 +470,11 @@ class StackingFaultMap2D(Calculation):
         if self.status == 'finished':
             self.__gamma = calc
 
+            if 'intrinsic-fault-energy' in calc:
+                self.__E_isf = uc.value_unit(calc['intrinsic-fault-energy'])
             if 'slip-path' in calc:
                 self.__paths = []
-                for sp in model.finds('slip-path'):
+                for sp in calc.iteraslist('slip-path'):
                     self.paths.append(StackingFaultPath(sp))  
 
     def mongoquery(self, **kwargs):
@@ -529,6 +539,9 @@ class StackingFaultMap2D(Calculation):
         
         # Extract results
         if self.status == 'finished':      
+            if self.E_isf is not None:
+                meta['E_isf'] = self.E_isf
+
             try:
                 paths = self.paths
             except:

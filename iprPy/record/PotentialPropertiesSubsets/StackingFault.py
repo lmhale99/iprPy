@@ -17,20 +17,30 @@ class StackingFault(PotentialsPropertiesSubset):
     @property
     def data(self):
         return self.__data
-
+    
+    @data.setter
+    def data(self, value):
+        assert isinstance(value, pd.DataFrame)
+        self.__data = value[self.datacolumns]
+    
     @property
     def plot(self):
         return self.__plot
 
+    @plot.setter
+    def plot(self, value):
+        assert isinstance(value, pd.DataFrame)
+        self.__plot = value[self.plotcolumns]
+
     @property
     def datacolumns(self):
         """list : The column names found in data"""
-        return ['composition', 'prototype', 'a', 'measurement', 'value']
+        return ['composition', 'prototype', 'a', 'plane', 'measurement', 'value']
 
     @property
     def plotcolumns(self):
         """list : The column names found in plot"""
-        return ['composition', 'prototype', 'a', 'name', 'png', 'json']
+        return ['composition', 'prototype', 'a', 'plane', 'name', 'png', 'json']
 
     def load_model(self, model):
         
@@ -45,25 +55,29 @@ class StackingFault(PotentialsPropertiesSubset):
                     prototype = proto_model['prototype']
                     for alat_model in proto_model.aslist('alats'):
                         a = alat_model['a']
-                        
-                        for p in alat_model.aslist('plot'):
-                            plot = {}
-                            plot['composition'] = composition
-                            plot['prototype'] = prototype
-                            plot['a'] = a
-                            plot['name'] = p['name']
-                            plot['png'] = f'{self.parent.webdir}/{p["file"]}'
-                            plot['json'] = f'{self.parent.webdir}/{p["json"]}'
-                            plots.append(plot)
+                        for plane_model in proto_model.aslist('planes'):
+                            plane = plane_model['plane']
 
-                        for m in alat_model.aslist('measurement'):
-                            measurement = {}
-                            measurement['composition'] = composition
-                            measurement['prototype'] = prototype
-                            measurement['a'] = a
-                            measurement['measurement'] = m['name']
-                            measurement['value'] = m['value']
-                            data.append(measurement)
+                            for p in plane_model.aslist('plot'):
+                                plot = {}
+                                plot['composition'] = composition
+                                plot['prototype'] = prototype
+                                plot['a'] = a
+                                plot['plane'] = plane
+                                plot['name'] = p['name']
+                                plot['png'] = f'{self.parent.webdir}/{p["file"]}'
+                                plot['json'] = f'{self.parent.webdir}/{plane["json"]}'
+                                plots.append(plot)
+
+                            for m in plane_model.aslist('measurement'):
+                                measurement = {}
+                                measurement['composition'] = composition
+                                measurement['prototype'] = prototype
+                                measurement['a'] = a
+                                measurement['plane'] = plane
+                                measurement['measurement'] = m['name']
+                                measurement['value'] = m['value']
+                                data.append(measurement)
             self.__data = pd.DataFrame(data)
             self.__plot = pd.DataFrame(plots)
         else:
@@ -89,25 +103,35 @@ class StackingFault(PotentialsPropertiesSubset):
                     
                     for alat in np.unique(proto_plots.a):
                         alat_plots = proto_plots[proto_plots.a == alat]
-                        alat_records = proto_results[proto_results.a == alat]
+                        alat_results = proto_results[proto_results.a == alat]
                         alat_model = DM()
                         alat_model['a'] = alat
-                        
-                        for i in alat_plots.index:
-                            series = alat_plots.loc[i]
-                            plot = DM()
-                            plot['name'] = series['name']
-                            plot['file'] = series.png.replace(f'{self.parent.webdir}/', '')
-                            plot['json'] = series.json.replace(f'{self.parent.webdir}/', '')
-                            alat_model.append('plot', plot)
-                        
-                        for i in alat_records.index:
-                            series = alat_records.loc[i]
-                            measurement = DM()
-                            measurement['name'] = series.measurement
-                            measurement['value'] = series.value
-                            alat_model.append('measurement', measurement)
 
+                        for plane in np.unique(alat_plots.plane):
+                            plane_plots = alat_plots[alat_plots.plane == plane]
+                            plane_results = alat_results[alat_results.plane == plane]
+                            plane_model = DM()
+                            plane_model['plane'] = plane
+
+                            for i in plane_plots.index:
+                                series = plane_plots.loc[i]
+
+                                if 'json' not in plane_model:
+                                    plane_model['json'] = series.json.replace(f'{self.parent.webdir}/', '')
+
+                                plot = DM()
+                                plot['name'] = series['name']
+                                plot['file'] = series.png.replace(f'{self.parent.webdir}/', '')
+                                plane_model.append('plot', plot)
+                            
+                            for i in plane_results.index:
+                                series = plane_results.loc[i]
+                                measurement = DM()
+                                measurement['name'] = series.measurement
+                                measurement['value'] = '%.2f' % series.value
+                                plane_model.append('measurement', measurement)
+
+                            alat_model.append('planes', plane_model)
                         proto_model.append('alats', alat_model)
                     comp_model.append('prototypes', proto_model)
                 ec_model.append('compositions', comp_model)

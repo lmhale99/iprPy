@@ -9,15 +9,20 @@ from ...tools import aslist
 
 class ElasticConstants(PotentialsPropertiesSubset):
     def __init__(self, parent):
-        self.__data = pd.DataFrame(columns=self.dfcolumns)
+        self.__data = pd.DataFrame(columns=self.datacolumns)
         super().__init__(parent)
 
     @property
     def data(self):
         return self.__data
 
+    @data.setter
+    def data(self, value):
+        assert isinstance(value, pd.DataFrame)
+        self.__data = value[self.datacolumns]
+
     @property
-    def dfcolumns(self):
+    def datacolumns(self):
         """list : The column names found in the associated dataframe"""
         return ['composition', 'prototype', 'a', 'strainrange', 'straindirection', 'Cij']
 
@@ -40,7 +45,7 @@ class ElasticConstants(PotentialsPropertiesSubset):
                     for alat_model in proto_model.aslist('alats'):
                         a = alat_model['a']
                         for m in alat_model.aslist('measurement'):
-                            strain = m['strain']
+                            strain = float(m['strain'])
                             Cij = np.array([[m['C11'], m['C12'], m['C13'], m['C14'], m['C15'], m['C16']],
                                             [m['C21'], m['C22'], m['C23'], m['C24'], m['C25'], m['C26']],
                                             [m['C31'], m['C32'], m['C33'], m['C34'], m['C35'], m['C36']],
@@ -96,7 +101,7 @@ class ElasticConstants(PotentialsPropertiesSubset):
 
                             for i in range(6):
                                 for j in range(6):
-                                    measurement[f'C{i+1}{j+1}'] = series.Cij[i,j]
+                                    measurement[f'C{i+1}{j+1}'] = '%.3f' % series.Cij[i,j]
                             
                             alat_model.append('measurement', measurement)
                         proto_model.append('alats', alat_model)

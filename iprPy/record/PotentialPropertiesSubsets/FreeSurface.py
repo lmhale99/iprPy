@@ -10,15 +10,20 @@ from ...tools import aslist
 
 class FreeSurface(PotentialsPropertiesSubset):
     def __init__(self, parent):
-        self.__data = pd.DataFrame(columns=self.dfcolumns)
+        self.__data = pd.DataFrame(columns=self.datacolumns)
         super().__init__(parent)
 
     @property
     def data(self):
         return self.__data
 
+    @data.setter
+    def data(self, value):
+        assert isinstance(value, pd.DataFrame)
+        self.__data = value[self.datacolumns]
+
     @property
-    def dfcolumns(self):
+    def datacolumns(self):
         """list : The column names found in the associated dataframe"""
         return ['composition', 'prototype', 'a', 'surface', 'E_f']
 
@@ -76,7 +81,7 @@ class FreeSurface(PotentialsPropertiesSubset):
                             series = alat_records.loc[i]
                             measurement = DM()
                             measurement['surface'] = series.surface
-                            measurement['energy'] = series.E_f
+                            measurement['energy'] = '%.2f' % series.E_f
                             
                             alat_model.append('measurement', measurement)
                         proto_model.append('alats', alat_model)

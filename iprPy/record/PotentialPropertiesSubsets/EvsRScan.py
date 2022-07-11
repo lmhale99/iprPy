@@ -33,6 +33,8 @@ class EvsRScan(PotentialsPropertiesSubset):
     def load_model(self, model):
         if 'cohesive-energy-scan' in model:           
             self.__compositions = aslist(model['cohesive-energy-scan'].get('composition', []))
+            if len(self.compositions) > 0:
+                self.exists = True
         else:
             self.__compositions = []
 

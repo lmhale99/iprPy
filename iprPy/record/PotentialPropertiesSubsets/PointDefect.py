@@ -10,15 +10,20 @@ from ...tools import aslist
 
 class PointDefect(PotentialsPropertiesSubset):
     def __init__(self, parent):
-        self.__data = pd.DataFrame(columns=self.dfcolumns)
+        self.__data = pd.DataFrame(columns=self.datacolumns)
         super().__init__(parent)
 
     @property
     def data(self):
         return self.__data
 
+    @data.setter
+    def data(self, value):
+        assert isinstance(value, pd.DataFrame)
+        self.__data = value[self.datacolumns]
+
     @property
-    def dfcolumns(self):
+    def datacolumns(self):
         """list : The column names found in the associated dataframe"""
         return ['composition', 'prototype', 'a', 'pointdefect', 'E_f', 'pij']
 
@@ -79,13 +84,13 @@ class PointDefect(PotentialsPropertiesSubset):
                             series = alat_records.loc[i]
                             measurement = DM()
                             measurement['pointdefect'] = series.pointdefect
-                            measurement['energy'] = series.E_f
-                            measurement['p11'] = series.pij[0,0]
-                            measurement['p22'] = series.pij[1,1]
-                            measurement['p33'] = series.pij[2,2]
-                            measurement['p12'] = series.pij[0,1]
-                            measurement['p13'] = series.pij[0,2]
-                            measurement['p23'] = series.pij[1,2]
+                            measurement['energy'] = '%.3f' % series.E_f
+                            measurement['p11'] = '%.3f' % series.pij[0,0]
+                            measurement['p22'] = '%.3f' % series.pij[1,1]
+                            measurement['p33'] = '%.3f' % series.pij[2,2]
+                            measurement['p12'] = '%.3f' % series.pij[0,1]
+                            measurement['p13'] = '%.3f' % series.pij[0,2]
+                            measurement['p23'] = '%.3f' % series.pij[1,2]
                             
                             alat_model.append('measurement', measurement)
                         proto_model.append('alats', alat_model)
