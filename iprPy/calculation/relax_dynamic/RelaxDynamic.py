@@ -746,8 +746,9 @@ class RelaxDynamic(Calculation):
             ]
             params['integrator'] = 'npt'
             params['thermosteps'] = '100'
-            params['runsteps'] = '220000'
-            params['equilsteps'] = '20000'
+            params['runsteps'] = '1000000'
+            params['restartsteps'] = '50000'
+            params['equilsteps'] = '0'
             
             # Copy kwargs to params
             for key in kwargs:
