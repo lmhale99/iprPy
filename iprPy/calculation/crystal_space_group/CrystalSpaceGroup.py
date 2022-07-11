@@ -594,10 +594,8 @@ class CrystalSpaceGroup(Calculation):
             'symmetryprecision':1e-5,
         }
 
-    def pandasfilter(self, dataframe, name=None, key=None, iprPy_version=None,
-                     atomman_version=None, script=None, branch=None,
-                     status=None, symbols=None, 
-                     symmetryprecision=None, idealcell=None, primitivecell=None,
+    def pandasfilter(self, dataframe, symmetryprecision=None, idealcell=None,
+                     primitivecell=None,
                      pearson=None, number=None, international=None, schoenflies=None,
                      **kwargs):
         """
