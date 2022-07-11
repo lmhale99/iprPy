@@ -32,9 +32,9 @@ def phonon_quasiharmonic(lammps_command: str,
                          ucell: am.System,
                          potential: lmp.Potential,
                          mpi_command: Optional[str] = None,
-                         a_mult: int = 3,
-                         b_mult: int = 3,
-                         c_mult: int = 3,
+                         a_mult: int = 2,
+                         b_mult: int = 2,
+                         c_mult: int = 2,
                          distance: float = 0.01,
                          symprec: float = 1e-5,
                          strainrange: float = 0.01,
@@ -56,13 +56,13 @@ def phonon_quasiharmonic(lammps_command: str,
         will run serially.
     a_mult : int, optional
         The a size multiplier to use on ucell before running the phonon
-        calculation.  Must be an int and not a tuple.  Default value is 3.
+        calculation.  Must be an int and not a tuple.  Default value is 2.
     b_mult : int, optional
         The b size multiplier to use on ucell before running the phonon
-        calculation.  Must be an int and not a tuple.  Default value is 3.
+        calculation.  Must be an int and not a tuple.  Default value is 2.
     c_mult : int, optional
         The c size multiplier to use on ucell before running the phonon
-        calculation.  Must be an int and not a tuple.  Default value is 3.
+        calculation.  Must be an int and not a tuple.  Default value is 2.
     distance : float, optional
         The atomic displacement distance used for computing the phonons.
         Default value is 0.01.
@@ -247,7 +247,7 @@ def phonon_quasiharmonic(lammps_command: str,
 
 
 def phononcalc(lammps_command, ucell, potential, mpi_command=None,
-               a_mult=3, b_mult=3, c_mult=3, distance=0.01, symprec=1e-5, 
+               a_mult=2, b_mult=2, c_mult=2, distance=0.01, symprec=1e-5, 
                savefile='phonopy_params.yaml', plot=True, lammps_date=None):
     """
     Uses phonopy to compute the phonons for a unit cell structure using a
@@ -266,13 +266,13 @@ def phononcalc(lammps_command, ucell, potential, mpi_command=None,
         will run serially.
     a_mult : int, optional
         The a size multiplier to use on ucell before running the phonon
-        calculation.  Must be an int and not a tuple.  Default value is 3.
+        calculation.  Must be an int and not a tuple.  Default value is 2.
     b_mult : int, optional
         The b size multiplier to use on ucell before running the phonon
-        calculation.  Must be an int and not a tuple.  Default value is 3.
+        calculation.  Must be an int and not a tuple.  Default value is 2.
     c_mult : int, optional
         The c size multiplier to use on ucell before running the phonon
-        calculation.  Must be an int and not a tuple.  Default value is 3.
+        calculation.  Must be an int and not a tuple.  Default value is 2.
     distance : float, optional
         The atomic displacement distance used for computing the phonons.
         Default value is 0.01.
@@ -343,7 +343,7 @@ def phononcalc(lammps_command, ucell, potential, mpi_command=None,
     results = {}
 
     # Set computed forces
-    phonon.set_forces(forcearrays)
+    phonon.forces = forcearrays
     
     # Save to yaml file    
     phonon.save(savefile)

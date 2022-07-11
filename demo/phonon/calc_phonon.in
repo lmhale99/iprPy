@@ -19,14 +19,7 @@ load_style                      system_model
 load_options                    
 family                          
 symbols                         Ni
-box_parameters                  3.5199994375404287 3.5199994375404287 3.5199994375404287               
-
-# System Manipulations
-a_uvw                           
-b_uvw                           
-c_uvw                           
-atomshift                       
-sizemults                       3 3 3
+box_parameters                  3.5199994375404287 3.5199994375404287 3.5199994375404287
 
 # Input/Output Units
 length_unit                     
@@ -39,3 +32,4 @@ displacementdistance
 symmetryprecision               
 numstrains                      
 strainrange                     
+sizemults                       

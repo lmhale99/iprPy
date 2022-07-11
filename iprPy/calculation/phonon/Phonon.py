@@ -3,6 +3,9 @@
 
 from yabadaba import query
 
+# http://www.numpy.org/
+import numpy as np
+
 # https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.lammps as lmp
@@ -31,15 +34,17 @@ class Phonon(Calculation):
         self.__commands = LammpsCommands(self)
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
-        self.__system_mods = AtommanSystemManipulate(self)
         subsets = (self.commands, self.potential, self.system,
-                   self.system_mods, self.units)
+                   self.units)
 
         # Initialize unique calculation attributes
         self.strainrange = 0.01
         self.displacementdistance = uc.set_in_units(0.01, 'angstrom')
         self.symmetryprecision = 1e-5         
-        self.numstrains = 5 
+        self.numstrains = 5
+        self.a_mult = 2 
+        self.b_mult = 2
+        self.c_mult = 2
         self.__bandstructure = None
         self.__dos = None
         self.__thermal = None
@@ -89,11 +94,6 @@ class Phonon(Calculation):
         return self.__system
 
     @property
-    def system_mods(self):
-        """AtommanSystemManipulate subset"""
-        return self.__system_mods
-
-    @property
     def strainrange(self):
         """float: Strain step size to use for quasiharmonic method"""
         return self.__strainrange
@@ -110,6 +110,47 @@ class Phonon(Calculation):
     @numstrains.setter
     def numstrains(self, value):
         self.__numstrains = int(value)
+
+    @property
+    def a_mult(self):
+        """int: Number of replicas along the a box vect to use"""
+        return self.__a_mult
+
+    @a_mult.setter
+    def a_mult(self, value):
+        self.__a_mult = int(value)
+
+    @property
+    def b_mult(self):
+        """int: Number of replicas along the b box vect to use"""
+        return self.__b_mult
+
+    @b_mult.setter
+    def b_mult(self, value):
+        self.__b_mult = int(value)
+
+    @property
+    def c_mult(self):
+        """int: Number of replicas along the c box vect to use"""
+        return self.__c_mult
+
+    @c_mult.setter
+    def c_mult(self, value):
+        self.__c_mult = int(value)
+
+    @property
+    def sizemults(self):
+        """tuple: All three sets of size multipliers"""
+        return (self.a_mult, self.b_mult, self.c_mult)
+
+    @sizemults.setter
+    def sizemults(self, value):
+        if len(value) == 3:
+            self.a_mult = value[0]
+            self.b_mult = value[1]
+            self.c_mult = value[2]
+        else:
+            raise ValueError('len of sizemults must be 3')
 
     @property
     def symmetryprecision(self):
@@ -234,6 +275,16 @@ class Phonon(Calculation):
             self.symmetryprecision = kwargs['symmetryprecision']
         if 'displacementdistance' in kwargs:
             self.displacementdistance = kwargs['displacementdistance']
+        if 'sizemults' in kwargs:
+            if 'a_mult' in kwargs or 'b_mult' in kwargs or 'c_mult' in kwargs:
+                raise ValueError('Cannot set sizemults and individual mults at the same time')
+            self.sizemults = kwargs['sizemults']
+        if 'a_mult' in kwargs:
+            self.a_mult = kwargs['a_mult']
+        if 'b_mult' in kwargs:
+            self.a_mult = kwargs['b_mult']
+        if 'c_mult' in kwargs:
+            self.a_mult = kwargs['c_mult']
 
 ####################### Parameter file interactions ########################### 
 
@@ -246,7 +297,7 @@ class Phonon(Calculation):
         self.units.load_parameters(input_dict)
         
         # Change default values for subset terms
-        input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
+        input_dict['sizemults'] = input_dict.get('sizemults', '2 2 2')
         input_dict['forcetolerance'] = input_dict.get('forcetolerance',
                                                   '1.0e-6 eV/angstrom')
 
@@ -275,8 +326,8 @@ class Phonon(Calculation):
         # Load initial system
         self.system.load_parameters(input_dict)
 
-        # Manipulate system
-        self.system_mods.load_parameters(input_dict)
+        # Handle sizemults
+        self.sizemults = np.array(input_dict['sizemults'].strip().split(), dtype=int)
 
     def master_prepare_inputs(self, branch='main', **kwargs):
         """
@@ -313,7 +364,7 @@ class Phonon(Calculation):
             params['parent_record'] = 'relaxed_crystal'
             params['parent_method'] = 'dynamic'
             params['parent_standing'] = 'good'
-            params['sizemults'] = '3 3 3'
+            params['sizemults'] = '2 2 2'
 
             # Copy kwargs to params
             for key in kwargs:
@@ -348,7 +399,11 @@ class Phonon(Calculation):
                 "calculations will be skipped.  Default value is 5."]),
             'strainrange': ' '.join([
                 "The range of strains to apply for performing the",
-                "quasiharmonic approximation.  Default value is 0.01"]),
+                "quasiharmonic approximation.  Default value is 0.01."]),
+            'sizemults': ' '.join([
+                "Multiplication parameters to construct a supercell system.",
+                "Limited to three values for this calculation.  Default value"
+                "is 2 2 2."]),
         } 
 
     @property
@@ -381,11 +436,6 @@ class Phonon(Calculation):
                 self.system.keyset
             ] +
 
-            # System mods keys
-            [
-                self.system_mods.keyset
-            ] +
-
             # Run parameters
             [
                 [
@@ -393,6 +443,7 @@ class Phonon(Calculation):
                     'symmetryprecision',
                     'numstrains',
                     'strainrange',
+                    'sizemults'
                 ]
             ]
         )
@@ -417,7 +468,6 @@ class Phonon(Calculation):
         self.commands.build_model(calc, after='atomman-version')
         self.potential.build_model(calc, after='calculation')
         self.system.build_model(calc, after='potential-LAMMPS')
-        self.system_mods.build_model(calc)
 
         # Build calculation-specific content
         if 'calculation' not in calc:
@@ -425,6 +475,10 @@ class Phonon(Calculation):
         if 'run-parameter' not in calc['calculation']:
             calc['calculation']['run-parameter'] = DM()
         run_params = calc['calculation']['run-parameter']
+        run_params['size-multipliers'] = DM()
+        run_params['size-multipliers']['a'] = [0, self.a_mult]
+        run_params['size-multipliers']['b'] = [0, self.b_mult]
+        run_params['size-multipliers']['c'] = [0, self.c_mult]
         run_params['displacementdistance'] = uc.model(self.displacementdistance,
                                                       self.units.length_unit)
         run_params['symmetryprecision'] = self.symmetryprecision
@@ -496,10 +550,14 @@ class Phonon(Calculation):
 
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
+        self.a_mult = run_params['size-multipliers']['a'][1]
+        self.b_mult = run_params['size-multipliers']['b'][1]
+        self.c_mult = run_params['size-multipliers']['c'][1]
         self.displacementdistance = uc.value_unit(run_params['displacementdistance'])
         self.symmetryprecision = run_params['symmetryprecision']
         self.strainrange = run_params['strainrange']
         self.numstrains = run_params['numstrains']
+
 
         # Load results
         if self.status == 'finished':
@@ -664,9 +722,6 @@ class Phonon(Calculation):
             'potential_LAMMPS_key',
             'potential_key',
             
-        #    'a_mult',
-        #    'b_mult',
-        #    'c_mult',
         ]
     
     @property
@@ -732,18 +787,14 @@ class Phonon(Calculation):
         for subset in self.subsets:
             subset.calc_inputs(input_dict)
 
-        # Remove unused subset inputs
-        del input_dict['transform']
-        del input_dict['system']
-
         # Add calculation-specific inputs
         input_dict['distance'] = self.displacementdistance
         input_dict['symprec'] = self.symmetryprecision
         input_dict['strainrange'] = self.strainrange
         input_dict['numstrains'] = self.numstrains
-        input_dict['a_mult'] = self.system_mods.a_mults[1] - self.system_mods.a_mults[0]
-        input_dict['b_mult'] = self.system_mods.b_mults[1] - self.system_mods.b_mults[0]
-        input_dict['c_mult'] = self.system_mods.c_mults[1] - self.system_mods.c_mults[0]
+        input_dict['a_mult'] = self.a_mult
+        input_dict['b_mult'] = self.b_mult
+        input_dict['c_mult'] = self.c_mult
 
         # Return input_dict
         return input_dict
