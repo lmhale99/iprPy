@@ -35,8 +35,7 @@ def match_reference_prototype(database: IprPyDatabase,
     Returns
     -------
     pandas.DataFrame
-        The table of isolated atom energies for each LAMMPS potential and
-        symbol model.
+        A table that matches DFT reference structures to known prototypes.
     """
     # Get reference crystal_space_group results
     if all_spg_df is None:
