@@ -297,7 +297,7 @@ class Phonon(Calculation):
         self.units.load_parameters(input_dict)
         
         # Change default values for subset terms
-        input_dict['sizemults'] = input_dict.get('sizemults', '2 2 2')
+        input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
         input_dict['forcetolerance'] = input_dict.get('forcetolerance',
                                                   '1.0e-6 eV/angstrom')
 
@@ -306,11 +306,11 @@ class Phonon(Calculation):
         # Load calculation-specific booleans
         
         # Load calculation-specific integers
-        self.numstrains = int(input_dict.get('numstrains', 5))
+        self.numstrains = int(input_dict.get('numstrains', 11))
 
         # Load calculation-specific unitless floats
         self.symmetryprecision = float(input_dict.get('symmetryprecision', 1e-5))
-        self.strainrange = float(input_dict.get('strainrange', 0.01))
+        self.strainrange = float(input_dict.get('strainrange', 0.05))
 
         # Load calculation-specific floats with units
         self.displacementdistance = value(input_dict, 'displacementdistance',
@@ -364,7 +364,7 @@ class Phonon(Calculation):
             params['parent_record'] = 'relaxed_crystal'
             params['parent_method'] = 'dynamic'
             params['parent_standing'] = 'good'
-            params['sizemults'] = '2 2 2'
+            params['sizemults'] = '3 3 3'
 
             # Copy kwargs to params
             for key in kwargs:
@@ -396,14 +396,14 @@ class Phonon(Calculation):
             'numstrains': ' '.join([
                 "The number of strain states to evaluate for performing the",
                 "quasiharmonic approximation.  If set to 1, then the quasiharmonic",
-                "calculations will be skipped.  Default value is 5."]),
+                "calculations will be skipped.  Default value is 11."]),
             'strainrange': ' '.join([
                 "The range of strains to apply for performing the",
-                "quasiharmonic approximation.  Default value is 0.01."]),
+                "quasiharmonic approximation.  Default value is 0.05."]),
             'sizemults': ' '.join([
                 "Multiplication parameters to construct a supercell system.",
                 "Limited to three values for this calculation.  Default value"
-                "is 2 2 2."]),
+                "is 3 3 3."]),
         } 
 
     @property
