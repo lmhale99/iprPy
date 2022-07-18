@@ -706,7 +706,7 @@ class PointDefectStatic(Calculation):
         self.__natoms_defect = results_dict['system_ptd'].natoms
         self.__potential_energy_base = results_dict['E_total_base']
         self.__potential_energy_defect = results_dict['E_total_ptd']
-        self.__potential_energy = results_dict['E_coh']
+        self.__potential_energy = results_dict['E_pot']
         self.__formation_energy = results_dict['E_ptd_f']
         self.__dipole_tensor = results_dict['pij_tensor']
         self.__has_reconfigured = results_dict['has_reconfigured']
