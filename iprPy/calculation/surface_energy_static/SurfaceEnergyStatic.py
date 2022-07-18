@@ -531,5 +531,5 @@ class SurfaceEnergyStatic(Calculation):
         self.__dumpfile_defect = results_dict['dumpfile_surf']
         self.__potential_energy_base = results_dict['E_total_base']
         self.__potential_energy_defect = results_dict['E_total_surf']
-        self.__potential_energy = results_dict['E_coh']
+        self.__potential_energy = results_dict['E_pot']
         self.__surface_energy = results_dict['E_surf_f']
