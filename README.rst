@@ -35,18 +35,12 @@ all levels.  To this end
 Documentation
 -------------
 
-**NOTE: Updated documentation is coming soon!** The current documentation is old
-and may not fully reflect the current state of iprPy (version 0.11).  This
-section will be updated as the underlying documentation is fixed. For help using
-the package, feel free to contact potentials@nist.gov. 
-
 - Documentation can be found in the doc directory or by visiting 
-  https://www.ctcms.nist.gov/potentials/iprPy/. **NOTE**: The general principles
-  of the package remain true, but specifics are likely different with respect to
-  the newest iprPy version.
+  https://www.ctcms.nist.gov/potentials/iprPy/. 
 
 - The notebook directory contains Jupyter Notebooks that outline how the
-  implemented calculation methods work and provides an example run.  **NOTE**:
-  The methods described in the Notebooks remain consistent with the current
-  version of iprPy. However, some minor lines may differ relating to how the
-  package integrates with the calculation.
+  implemented calculation methods work and provides an example run.
+
+- For help using the package, feel free to contact potentials@nist.gov or
+  submit an issue or pull request to the https://github.com/lmhale99/iprPy
+  github repository. 
