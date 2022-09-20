@@ -1,0 +1,42 @@
+# LAMMPS input script for ti/spring free energy evaluations
+
+box tilt large
+
+<atomman_system_pair_info>
+
+change_box all triclinic
+
+timestep <timestep>
+velocity all create <temperature> <randomseed> mom yes rot yes dist gaussian
+
+# NVE Integrator
+fix nve all nve
+
+variable pe equal pe
+
+# Define fix ti/spring for each atom type
+<spring_fix>
+
+# Langevin thermostat must be placed after ti/spring fixes
+fix langevin all langevin <temperature> <temperature> <temperature_damp> <randomseed> zero yes
+compute temp_com all temp/com
+fix_modify langevin temp temp_com
+
+# Compute the Hamiltonian as potential energy minus the ti/spring energies
+variable hamil equal <spring_hamil> 
+
+# Define minimal thermo
+thermo 0
+thermo_style custom step c_temp_com pe
+
+run <equilsteps>
+
+fix forward_switch all print 1 "${hamil}" screen no file forward_switch.txt
+run <switchsteps>
+unfix forward_switch
+
+run <equilsteps>
+
+fix reverse_switch all print 1 "${hamil}" screen no file reverse_switch.txt
+run <switchsteps>
+unfix reverse_switch

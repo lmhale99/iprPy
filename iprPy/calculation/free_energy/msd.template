@@ -1,0 +1,27 @@
+# LAMMPS input script that evaluates atomic mean squared displacements
+
+box tilt large
+
+<atomman_system_pair_info>
+
+change_box all triclinic
+
+<msd_compute>
+
+thermo 100
+thermo_style custom step temp pe ke etotal pxx pyy pzz pxy pxz pyz
+thermo_modify format float %.13e
+timestep <timestep>
+
+velocity all create <temperature> <randomseed> mom yes rot yes
+
+fix nvt all nvt temp <temperature> <temperature> <temperature_damp>
+
+run <equilsteps>
+
+<msd_average>
+
+thermo_style custom step temp pe ke etotal pxx pyy pzz pxy pxz pyz <msd_thermo>
+thermo_modify format float %.13e
+
+run <runsteps>
