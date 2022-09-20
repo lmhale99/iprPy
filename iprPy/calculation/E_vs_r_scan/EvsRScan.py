@@ -507,7 +507,6 @@ class EvsRScan(Calculation):
 
         return mquery
 
-    @staticmethod
     def cdcsquery(self, minimum_r=None, maximum_r=None,
                   number_of_steps_r=None, **kwargs):
         """
