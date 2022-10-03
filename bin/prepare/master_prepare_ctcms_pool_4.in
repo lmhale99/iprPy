@@ -7,29 +7,29 @@
 ################## Primary LAMMPS executable and MPI command ##################
 
 # Primary LAMMPS executable (machine-specific location)
-lammps_command              /users/lmh1/LAMMPS/2020_03_03/src/lmp_mpi
+lammps_command              /toolbox/lmh1/LAMMPS/2022_06_23/build/lmp
 
 # MPI command to use with the LAMMPS executable(s)
-mpi_command                 /cluster/deb9/bin/mpirun -n {np_per_runner}
+mpi_command                 mpirun -n {np_per_runner}
 
 ####################### Alternate LAMMPS executables ##########################
 
 # Optional and only needed if you wish to run old versions of some potentials.
 
 # SNAP version 1 needs LAMMPS between 8 Oct 2014 and 30 May 2017.
-lammps_command_snap_1       /users/lmh1/LAMMPS/2017_03_31/src/lmp_mpi
+lammps_command_snap_1       /toolbox/lmh1/LAMMPS/2017_03_31/src/lmp_mpi
 
 # SNAP version 2 needs LAMMPS between 3 Dec 2018 and 12 June 2019.
-lammps_command_snap_2       /users/lmh1/LAMMPS/2019_06_05/src/lmp_mpi
+lammps_command_snap_2       /toolbox/lmh1/LAMMPS/2019_06_05/src/lmp_mpi
 
 # Some older implementations of potentials need LAMMPS before 30 Oct 2019.
-lammps_command_old          /users/lmh1/LAMMPS/2019_06_05/src/lmp_mpi
+lammps_command_old          /toolbox/lmh1/LAMMPS/2019_06_05/src/lmp_mpi
 
 # LAMMPS built with an external module to run aenet potentials
-lammps_command_aenet        /users/lmh1/LAMMPS/bin/lmp_mpi_2020_03_03_aenet
+lammps_command_aenet        /toolbox/lmh1/LAMMPS/2022_06_23_aenet/src/lmp_mpi
 
 # LAMMPS built with an external module to run pinn potentials
-lammps_command_pinn         /users/lmh1/LAMMPS/LAMMPS-USER-PINN/src/lmp_mpi
+lammps_command_pinn         /toolbox/lmh1/LAMMPS/2020_10_29_pinn/src/lmp_mpi
 
 ############################ Potential limiters ###############################
 

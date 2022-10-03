@@ -5,29 +5,29 @@
 ################## Primary LAMMPS executable and MPI command ##################
 
 # Primary LAMMPS executable (machine-specific location)
-lammps_command              /users/lmh1/LAMMPS/2020_03_03/src/lmp_mpi
+lammps_command              /toolbox/lmh1/LAMMPS/2022_06_23/build/lmp
 
 # MPI command to use with the LAMMPS executable(s)
-mpi_command                 /cluster/deb9/bin/mpirun -n {np_per_runner}
+mpi_command                 mpirun -n {np_per_runner}
 
 ####################### Alternate LAMMPS executables ##########################
 
 # Optional and only needed if you wish to run old versions of some potentials.
 
 # SNAP version 1 needs LAMMPS between 8 Oct 2014 and 30 May 2017.
-lammps_command_snap_1       /users/lmh1/LAMMPS/2017_03_31/src/lmp_mpi
+lammps_command_snap_1       /toolbox/lmh1/LAMMPS/2017_03_31/src/lmp_mpi
 
 # SNAP version 2 needs LAMMPS between 3 Dec 2018 and 12 June 2019.
-lammps_command_snap_2       /users/lmh1/LAMMPS/2019_06_05/src/lmp_mpi
+lammps_command_snap_2       /toolbox/lmh1/LAMMPS/2019_06_05/src/lmp_mpi
 
 # Some older implementations of potentials need LAMMPS before 30 Oct 2019.
-lammps_command_old          /users/lmh1/LAMMPS/2019_06_05/src/lmp_mpi
+lammps_command_old          /toolbox/lmh1/LAMMPS/2019_06_05/src/lmp_mpi
 
 # LAMMPS built with an external module to run aenet potentials
-lammps_command_aenet        /users/lmh1/LAMMPS/bin/lmp_mpi_2020_03_03_aenet
+lammps_command_aenet        /toolbox/lmh1/LAMMPS/2022_06_23_aenet/src/lmp_mpi
 
 # LAMMPS built with an external module to run pinn potentials
-lammps_command_pinn         /users/lmh1/LAMMPS/LAMMPS-USER-PINN/src/lmp_mpi
+lammps_command_pinn         /toolbox/lmh1/LAMMPS/2020_10_29_pinn/src/lmp_mpi
 
 ############################ Potential limiters ###############################
 
@@ -35,11 +35,7 @@ lammps_command_pinn         /users/lmh1/LAMMPS/LAMMPS-USER-PINN/src/lmp_mpi
 #potential_status            active
 
 # Directly specify LAMMPS potentials by id
-#potential_id                2022--Xu-Y--Ni-Rh--LAMMPS--ipr1
-#potential_id                2022--Xu-Y--Ni-Pd--LAMMPS--ipr1
-#potential_id                2019--Plummer-G--Ti-Al-C--LAMMPS--ipr1
-#potential_id                2019--Plummer-G--Ti-Si-C--LAMMPS--ipr1
-#potential_id                2021--Plummer-G--Ti-Al-C--LAMMPS--ipr1
+potential_id                2022--Zhou-M--Zr--LAMMPS--ipr1
 
 # Limit by database parsing terms
 #potential_potid
@@ -56,22 +52,22 @@ lammps_command_pinn         /users/lmh1/LAMMPS/LAMMPS-USER-PINN/src/lmp_mpi
 # - num_pots : The max number of potentials to prepare at a time
 
 # Pool #1: Basic potential evaluations and scans
-styles                      isolated_atom diatom_scan E_vs_r_scan:bop E_vs_r_scan
-run_directory               iprhub_1
-np_per_runner               1
-num_pots                    100
+#styles                      isolated_atom diatom_scan E_vs_r_scan:bop E_vs_r_scan
+#run_directory               iprhub_1
+#np_per_runner               1
+#num_pots                    100
 
 # Pool #2: Round 1 of crystal structure relaxations
-styles                      relax_box relax_static relax_dynamic
-run_directory               iprhub_2
-np_per_runner               1
-num_pots                    100
+#styles                      relax_box relax_static relax_dynamic
+#run_directory               iprhub_2
+#np_per_runner               1
+#num_pots                    100
 
 # Pool #3: Round 2 of crystal structure relaxations
-styles                      relax_static:from_dynamic
-run_directory               iprhub_3
-np_per_runner               1
-num_pots                    100
+#styles                      relax_static:from_dynamic
+#run_directory               iprhub_3
+#np_per_runner               1
+#num_pots                    100
 
 # Pool #4: Crystal space group analysis
 styles                      crystal_space_group:relax 

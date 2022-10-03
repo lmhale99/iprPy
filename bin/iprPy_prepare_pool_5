@@ -7,5 +7,4 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 
-export LD_LIBRARY_PATH=/cluster/deb9/lib:$LD_LIBRARY_PATH
 python iprPy master_prepare iprhub prepare/master_prepare_ctcms_pool_5.in
