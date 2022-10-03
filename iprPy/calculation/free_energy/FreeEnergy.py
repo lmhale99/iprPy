@@ -463,21 +463,18 @@ class FreeEnergy(Calculation):
             # Combination of potential and system keys
             [
                 self.potential.keyset + 
-                self.system.keyset
-            ] +
-
-            # System mods keys
-            [
-                self.system_mods.keyset
-            ] +
-
-            # Phase parameters
-            [
+                self.system.keyset +
+                # Phase parameters
                 [
                     'temperature',
                     'pressure',
                     'spring_constants',
                 ]
+            ] +
+
+            # System mods keys
+            [
+                self.system_mods.keyset
             ] +
 
             # Run parameters
