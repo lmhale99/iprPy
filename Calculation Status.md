@@ -36,7 +36,7 @@ This is a list of the implemented calculations and the status of the associated 
 - workflow: Current
 - docs: Current
 - Notebook: Current
-- 
+
 ## dislocation_monopole_crss
 
 - script: Incomplete: needs updating and testing
@@ -106,6 +106,13 @@ This is a list of the implemented calculations and the status of the associated 
 - workflow: Current
 - docs: Current
 - Notebook: Current
+
+## free_energy
+
+- script: Current
+- workflow: Temporary Notebook in "IPR workflow"
+- docs: Incomplete
+- Notebook: Missing
 
 ## grain_boundary_bcc
 
