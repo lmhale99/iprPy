@@ -44,6 +44,7 @@ setup(name = 'iprPy',
         'pandas',
         'atomman==1.4.5',
         'requests',
+        'bokeh'
       ],
       entry_points = {
         'console_scripts': [
