@@ -1,6 +1,8 @@
+from io import IOBase
 import sys
 from pathlib import Path
 from importlib import import_module, resources
+from typing import Optional, Union
 
 from yabadaba.tools import ModuleManager
 
@@ -51,7 +53,10 @@ def load_calculation(style, **kwargs):
     """
     return calculationmanager.init(style, **kwargs)
 
-def run_calculation(params, calc_style=None, verbose=True):
+def run_calculation(params: Union[str, dict, IOBase, None] = None,
+                    calc_style: Optional[str] = None,
+                    raise_error: bool = False,
+                    verbose: bool = True):
     """
     Runs a calculation from a parameter file and outputs results to
     results.json.
@@ -64,6 +69,12 @@ def run_calculation(params, calc_style=None, verbose=True):
     calc_style : str, optional
         Specifies the style of calculation to run.  Optional if params is a
         path to a file where the file's name is calc_<calc_style>.in.
+    raise_error : bool, optional
+        The default behavior of run is to take any error messages from the
+        calculation and set them to class attributes and save to
+        results.json. This allows for calculations to successfully fail.
+        Setting this to True will instead raise the errors, which can
+        provide more details for debugging.
     verbose : bool, optional
         If True, a message relating to the calculation's status will be
         printed upon completion.  Default value is True.
@@ -79,5 +90,5 @@ def run_calculation(params, calc_style=None, verbose=True):
     calculation = load_calculation(calc_style, params=params)
     
     # Run and create results_json
-    calculation.run(results_json=True, verbose=verbose)
+    calculation.run(results_json=True, raise_error=raise_error, verbose=verbose)
     

@@ -144,7 +144,8 @@ def command_line_actions(args):
 
     # Actions for subcommand run
     elif args.action == 'run':
-        run_calculation(args.filename, calc_style=args.calc_style)
+        run_calculation(args.filename, calc_style=args.calc_style,
+                        raise_error=args.raise_error)
 
     # Actions for subcommand runner
     elif args.action == 'runner':
@@ -367,6 +368,8 @@ def command_line_parser():
                         help='path to a parameter file')
     subparser.add_argument('calc_style', nargs='?', default=None,
                         help='the style of the calculation to run - not needed if filename is "calc_<calc_style>.in"')
+    subparser.add_argument('-e', '--raise_error', action='store_true',
+                        help='indicates that calculation errors are to be raised')
 
     # Define subparser for runner
     subparser = subparsers.add_parser('runner',

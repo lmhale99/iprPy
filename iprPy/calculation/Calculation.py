@@ -1,8 +1,10 @@
 # coding: utf-8
 # Standard Python libraries
+from io import IOBase
 from pathlib import Path
 from copy import deepcopy
 from importlib import resources
+from typing import Optional, Union
 
 from yabadaba import query
 
@@ -688,11 +690,11 @@ class Calculation(Record):
         self.__status = 'not calculated'
         self.__error = None
 
-    def calc_inputs(self):
+    def calc_inputs(self) -> dict:
         """Builds calculation inputs from the class's attributes"""
         raise AttributeError('calc_inputs not defined for Calculation style')
 
-    def calc(self, *args, **kwargs):
+    def calc(self, *args, **kwargs) -> dict:
         """Calls the calculation's primary function(s)"""
         raise AttributeError('calc not defined for Calculation style')
 
@@ -708,8 +710,12 @@ class Calculation(Record):
         """
         raise AttributeError('process_results not defined for Calculation style')
 
-    def run(self, params=None, newkey=False, results_json=False,
-            verbose=False):
+    def run(self,
+            params: Union[str, dict, IOBase, None] = None,
+            newkey: bool = False,
+            results_json: bool = False,
+            raise_error: bool = False,
+            verbose: bool = False):
         """
         Runs the calculation using the current object attribute values or
         supplied parameters. Status after running will be either "finished"
@@ -727,6 +733,12 @@ class Calculation(Record):
         results_json : bool, optional
             If True, then a "results.json" file will be generated following
             the run.
+        raise_error : bool, optional
+            The default behavior of run is to take any error messages from the
+            calculation and set them to class attributes and save to
+            results.json. This allows for calculations to successfully fail.
+            Setting this to True will instead raise the errors, which can
+            provide more details for debugging.
         verbose : bool, optional
             If True, a message relating to the calculation's status will be
             printed upon completion.  Default value is False.
@@ -754,6 +766,8 @@ class Calculation(Record):
             results_dict = self.calc(**input_dict)
         
         except Exception as e:
+            if raise_error:
+                raise e
             # Catch any error messages
             self.__status = 'error'
             self.__error = str(e)
