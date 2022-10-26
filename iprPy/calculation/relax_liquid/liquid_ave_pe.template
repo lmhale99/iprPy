@@ -1,0 +1,90 @@
+# LAMMPS input script that performs a liquid phase relaxation and evaluation
+
+box tilt large
+
+<atomman_system_pair_info>
+
+change_box all triclinic
+
+timestep <timestep>
+
+# Define variables for box volume
+variable vol equal vol
+fix ave_vol all ave/time 100 1 100 v_vol ave window <equilvolumesamples>
+variable ave_vol equal f_ave_vol
+
+# Define thermo for relax stages
+thermo 100
+thermo_style custom step temp pe ke etotal pxx pyy pzz lx ly lz vol f_ave_vol
+thermo_modify format float %.13e
+
+<create_velocities>
+
+################################## Melt ############################
+
+fix npt all npt temp <temperature_melt> <temperature_melt> <temperature_damp> aniso <pressure> <pressure> <pressure_damp>
+run <meltsteps>
+unfix npt
+
+######################### Scale to temperature ####################
+
+fix npt all npt temp <temperature_melt> <temperature> <temperature_damp> aniso <pressure> <pressure> <pressure_damp>
+run <coolsteps>
+unfix npt
+
+####################### Equilibrate volume #######################
+
+fix npt all npt temp <temperature> <temperature> <temperature_damp> aniso <pressure> <pressure> <pressure_damp>
+run <equilvolumesteps>
+unfix npt
+
+# Scale box dimensions according to last computed average volume
+variable scale equal (${ave_vol}/${vol})^(1/3)
+variable slx equal ${scale}*lx
+variable sly equal ${scale}*ly
+variable slz equal ${scale}*lz
+variable sxy equal ${scale}*xy
+variable sxz equal ${scale}*xz
+variable syz equal ${scale}*yz
+change_box all x final 0.0 ${slx} y final 0.0 ${sly} z final 0.0 ${slz} xy final ${sxy} xz final ${sxz} yz final ${syz} remap units box
+
+####################### Equilibrate energy #######################
+
+# Compute average potential energy over the nvt run
+variable pe equal pe
+fix ave_pe all ave/time 100 1 100 v_pe ave window <equilenergysamples>
+
+# Perform an nvt run at target dimensions
+fix nvt all nvt temp <temperature> <temperature> <temperature_damp>
+run <equilenergysteps>
+unfix nvt
+
+# Compute temperature to scale velocities to achieve target etotal
+variable kB equal <boltzmann>
+variable etotal_scale equal f_ave_pe+(3/2)*atoms*v_kB*<temperature>
+variable temperature_scale equal 2*(v_etotal_scale-pe)/(3*atoms*v_kB)
+
+# Scale last velocities to temperature_scale
+print "Scaling to target etotal using temperature = ${temperature_scale}"
+velocity all scale ${temperature_scale}
+unfix ave_pe
+
+###################### NVE analysis run ########################
+
+# Set up analysis computes
+compute pe all pe/atom
+compute msd all msd com yes
+compute rdf all rdf 100
+fix 1 all ave/time 100 1 100 c_rdf[*] file rdf.txt mode vector
+
+# Dump configurations
+dump dumpit all custom <dumpsteps> *.dump <dump_keys>
+dump_modify dumpit format <dump_modify_format>
+
+# Change thermo to report msd
+thermo 100
+thermo_style custom step temp pe ke etotal pxx pyy pzz c_msd[1] c_msd[2] c_msd[3] c_msd[4]
+thermo_modify format float %.13e
+
+fix nve all nve
+run <runsteps>

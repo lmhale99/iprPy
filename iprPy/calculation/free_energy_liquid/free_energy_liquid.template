@@ -1,0 +1,48 @@
+# LAMMPS input script for liquid phase free energy evaluations
+
+box tilt large
+
+# Define lambda factors
+variable tau equal 0.0
+variable lambda equal v_tau^5*(70*v_tau^4-315*v_tau^3+540*v_tau^2-420*v_tau+126)
+variable nlambda equal 1-v_lambda
+
+<atomman_system_pair_info>
+
+change_box all triclinic
+
+timestep <timestep>
+
+<create_velocities>
+
+variable pe equal pe
+
+compute E_ufm all pair ufm
+<compute_pair>
+variable hamil equal v_E_pair-c_E_ufm
+
+fix nve all nve
+fix langevin all langevin <temperature> <temperature> <temperature_damp> <randomseed> zero yes
+compute temp_com all temp/com
+fix_modify langevin temp temp_com
+
+thermo 100
+thermo_style custom step c_temp_com pe ke etotal v_E_pair c_E_ufm v_lambda
+
+run <equilsteps>
+
+# Run forward integration
+variable tau equal ramp(0.0,1.0)
+fix forward_switch all print 1 "${hamil}" screen no file forward_switch.txt
+run <switchsteps>
+unfix forward_switch
+
+# Equilibrate for pure ufm
+variable tau equal 1.0
+run <equilsteps>
+
+# Run reverse integration
+variable tau equal ramp(1.0,0.0)
+fix reverse_switch all print 1 "${hamil}" screen no file reverse_switch.txt
+run <switchsteps>
+unfix reverse_switch
