@@ -56,6 +56,8 @@ class RelaxLiquid(Calculation):
         self.equilvolumesamples = 300
         self.equilenergysamples = 100
         self.equilenergystyle = 'pe'
+
+        self.rdfcutoff = None
         
         self.__final_dump = None
         self.__volume = None
@@ -141,6 +143,23 @@ class RelaxLiquid(Calculation):
             value = float(value)
             assert value >= 0.0
             self.__temperature = value
+
+    @property
+    def rdfcutoff(self):
+        """float: The cutoff distance for the RDF calculation."""
+        if self.__rdfcutoff is None:
+            try:
+                ucell = self.system.ucell
+            except:
+                raise ValueError('rdfcutoff not set and no ucell found to compute the default value')
+            self.__rdfcutoff = 4 * ucell.r0()
+        return self.__rdfcutoff
+
+    @rdfcutoff.setter
+    def rdfcutoff(self, value):
+        if value is not None:
+            value = float(value)
+        self.__rdfcutoff = value
 
     @property
     def dumpsteps(self):
@@ -396,6 +415,8 @@ class RelaxLiquid(Calculation):
         temperature_melt : float, optional
             The elevated temperature to first use to hopefully melt the initial
             configuration.
+        rdfcutoff : float, optional
+            The cutoff distance to use for the RDF cutoff.
         meltsteps : int, optional
             The number of npt integration steps to perform during the melting
             stage at the melt temperature to create an amorphous liquid structure.
@@ -449,6 +470,8 @@ class RelaxLiquid(Calculation):
             self.temperature = kwargs['temperature']
         if 'temperature_melt' in kwargs:
             self.temperature_melt = kwargs['temperature_melt']
+        if 'rdfcutoff' in kwargs:
+            self.rdfcutoff = kwargs['rdfcutoff']
         if 'randomseed' in kwargs:
             self.randomseed = kwargs['randomseed']
         if 'meltsteps' in kwargs:
@@ -509,6 +532,11 @@ class RelaxLiquid(Calculation):
         self.pressure = value(input_dict, 'pressure',
                               default_unit=self.units.pressure_unit,
                               default_term='0.0 GPa')
+        if 'rdfcutoff' in input_dict:
+            self.rdfcutoff = value(input_dict, 'rdfcutoff',
+                              default_unit=self.units.length_unit)
+        else:
+            self.rdfcutoff = None
         
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
@@ -590,6 +618,10 @@ class RelaxLiquid(Calculation):
             'temperature_melt': ' '.join([
                 "The elevated temperature to first use to hopefully melt the initial",
                 "configuration."]),
+            'rdfcutoff': ' '.join([
+                "The cutoff distance to use for the RDF cutoff.  If not given then",
+                "will use 4 * r0, where r0 is the shortest atomic distance found in",
+                "the given system configuration."]),
             'meltsteps': ' '.join([
                 "The number of npt integration steps to perform during the melting",
                 "stage at the melt temperature to create an amorphous liquid structure.",
@@ -663,7 +695,10 @@ class RelaxLiquid(Calculation):
             # Combination of potential and system keys
             [
                 self.potential.keyset + 
-                self.system.keyset
+                self.system.keyset + 
+                [
+                    "rdfcutoff"
+                ]
             ] +
 
             # System mods keys
@@ -733,6 +768,7 @@ class RelaxLiquid(Calculation):
         run_params = calc['calculation']['run-parameter']
         
         run_params['temperature_melt'] = self.temperature_melt
+        run_params['rdfcutoff'] = self.rdfcutoff
         run_params['meltsteps'] = self.meltsteps
         run_params['coolsteps'] = self.coolsteps
         run_params['equilvolumesteps'] = self.equilvolumesteps
@@ -805,6 +841,7 @@ class RelaxLiquid(Calculation):
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
         self.temperature_melt = run_params['temperature_melt']
+        self.rdfcutoff = run_params['rdfcutoff']
         self.meltsteps = run_params['meltsteps']
         self.coolsteps = run_params['coolsteps']
         self.equilvolumesteps = run_params['equilvolumesteps']
@@ -848,7 +885,7 @@ class RelaxLiquid(Calculation):
             self.__msd_z_values = uc.value_unit(scan['msd_z'])
             self.__msd_values = uc.value_unit(scan['msd'])
              
-    def mongoquery(self, **kwargs):
+    def mongoquery(self, temperature=None, **kwargs):
         """
         Builds a Mongo-style query based on kwargs values for the record style.
 
@@ -868,10 +905,11 @@ class RelaxLiquid(Calculation):
 
         # Build calculation-specific terms
         root = f'content.{self.modelroot}'
+        query.int_match.mongo(mquery, f'{root}.phase-state.temperature', temperature)
        
         return mquery
 
-    def cdcsquery(self, **kwargs):
+    def cdcsquery(self, temperature=None, **kwargs):
         
         """
         Builds a CDCS-style query based on kwargs values for the record style.
@@ -892,7 +930,7 @@ class RelaxLiquid(Calculation):
 
         # Build calculation-specific terms
         root = self.modelroot
-        
+        query.int_match.mongo(mquery, f'{root}.phase-state.temperature', temperature)
         return mquery
 
 ########################## Metadata interactions ##############################
@@ -909,6 +947,7 @@ class RelaxLiquid(Calculation):
         # Extract calculation-specific content
         meta['temperature'] = self.temperature
         meta['pressure'] = self.pressure
+        meta['rdfcutoff'] = self.rdfcutoff
         
         # Extract results
         if self.status == 'finished':
@@ -955,7 +994,7 @@ class RelaxLiquid(Calculation):
             'pressure':1e-2,
         }
 
-    def pandasfilter(self, dataframe, **kwargs):
+    def pandasfilter(self, dataframe, temperature=None, **kwargs):
         """
         Parses a pandas dataframe containing the subset's metadata to find 
         entries matching the terms and values given. Ideally, this should find
@@ -980,7 +1019,9 @@ class RelaxLiquid(Calculation):
         matches = super().pandasfilter(dataframe, **kwargs)
 
         # Filter by calculation-specific terms
-        
+        matches = (matches
+            &query.int_match.pandas(dataframe, 'temperature', temperature)
+        )
         return matches
 
 ########################### Calculation interactions ##########################
@@ -1003,6 +1044,7 @@ class RelaxLiquid(Calculation):
         input_dict['pressure'] = self.pressure
         input_dict['temperature'] = self.temperature
         input_dict['temperature_melt'] = self.temperature_melt
+        input_dict['rdfcutoff'] = self.rdfcutoff
         input_dict['meltsteps'] = self.meltsteps
         input_dict['coolsteps'] = self.coolsteps
         input_dict['equilvolumesteps'] = self.equilvolumesteps

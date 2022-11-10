@@ -73,8 +73,11 @@ unfix ave_etotal
 # Set up analysis computes
 compute pe all pe/atom
 compute msd all msd com yes
-compute rdf all rdf 100
+compute rdf all rdf 200 cutoff <rdfcutoff>
 fix 1 all ave/time 100 1 100 c_rdf[*] file rdf.txt mode vector
+
+variable ghostcutoff equal <rdfcutoff>+2.01
+comm_modify cutoff ${ghostcutoff}
 
 # Dump configurations
 dump dumpit all custom <dumpsteps> *.dump <dump_keys>

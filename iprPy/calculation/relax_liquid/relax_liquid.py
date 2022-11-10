@@ -27,6 +27,7 @@ def relax_liquid(lammps_command: str,
                  mpi_command: Optional[str] = None,
                  pressure: float = 0.0,
                  temperature_melt: float = 3000.0,
+                 rdfcutoff: Optional[float] = None,
                  meltsteps: int = 50000,
                  coolsteps: int = 10000,
                  equilvolumesteps: int = 50000,
@@ -61,6 +62,10 @@ def relax_liquid(lammps_command: str,
     temperature_melt : float, optional
         The elevated temperature to first use to hopefully melt the initial
         configuration.
+    rdfcutoff : float, optional
+        The cutoff distance to use for the RDF cutoff.  If not given then
+        will use 4 * r0, where r0 is the shortest atomic distance found in
+        the given system configuration.
     meltsteps : int, optional
         The number of npt integration steps to perform during the melting
         stage at the melt temperature to create an amorphous liquid structure.
@@ -172,6 +177,10 @@ def relax_liquid(lammps_command: str,
     if equilenergysamples > equilenergysteps / 100:
         raise ValueError('invalid values: equilenergysamples must be <= equilenergysteps / 100')
 
+    # Set default rdfcutoff
+    if rdfcutoff is None:
+        rdfcutoff = 4 * system.r0()
+
     # Define lammps variables
     lammps_variables = {}
     
@@ -206,10 +215,11 @@ def relax_liquid(lammps_command: str,
     lammps_variables['equilvolumesamples'] = equilvolumesamples
     lammps_variables['equilenergysamples'] = equilenergysamples
     
+    lammps_variables['rdfcutoff'] = rdfcutoff
+
     # Set randomseed
     if randomseed is None: 
         randomseed = random.randint(1, 900000000)
-    #lammps_variables['randomseed'] = randomseed
 
     # create velocities 
     if createvelocities:
