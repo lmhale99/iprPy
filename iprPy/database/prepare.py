@@ -127,7 +127,7 @@ def fill_kwargs(database, calculation, **kwargs):
                     length = len(kwargs[key])
                 else:
                     if len(kwargs[key]) != length:
-                        raise ValueError('Incompatible multikey lengths')
+                        raise ValueError(f'Incompatible multikey lengths len({key}) != {length}')
     
         # Fill in necessary blanks
         if length is None:
