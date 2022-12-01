@@ -31,6 +31,7 @@ class PotentialProperties(Record):
         self.freesurfaces = FreeSurface(self)
         self.stackingfaults = StackingFault(self)
         self.pointdefects = PointDefect(self)
+        self.phonons = Phonon(self)
 
         # Build list of all available subsets
         self.subsets = [
@@ -41,6 +42,7 @@ class PotentialProperties(Record):
             self.freesurfaces,
             self.stackingfaults,
             self.pointdefects,
+            self.phonons
         ]
 
         # Call parent init

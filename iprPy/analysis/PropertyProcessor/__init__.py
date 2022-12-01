@@ -26,6 +26,7 @@ class PropertyProcessor():
     from ._surface import surface
     from ._stacking import stacking
     from ._point import point
+    from ._phonon import phonon
 
     def __init__(self,
                  database: Union[IprPyDatabase, str],

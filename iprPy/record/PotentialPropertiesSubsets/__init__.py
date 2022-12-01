@@ -5,3 +5,4 @@ from .ElasticConstants import ElasticConstants
 from .FreeSurface import FreeSurface
 from .StackingFault import StackingFault
 from .PointDefect import PointDefect
+from .Phonon import Phonon

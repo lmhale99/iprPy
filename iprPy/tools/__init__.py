@@ -10,7 +10,9 @@ from atomman.tools import filltemplate
 from .dynamic_import import dynamic_import
 from .read_calc_file import read_calc_file
 from .dict_insert import dict_insert
+from .num_deriv_3_point import num_deriv_3_point
 
 __all__ = ['aslist', 'iaslist', 'filltemplate', 'screen_input',
-           'dynamic_import', 'dict_insert', 'read_calc_file']
+           'dynamic_import', 'dict_insert', 'read_calc_file',
+           'num_deriv_3_point']
 __all__.sort()

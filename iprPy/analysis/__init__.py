@@ -1,4 +1,5 @@
 from .match_reference_prototype import match_reference_prototype
 from .get_isolated_atom_energies import get_isolated_atom_energies
 from .process_relaxations import process_relaxations, process_all_relaxations
+from . import thermo
 from .PropertyProcessor import PropertyProcessor
