@@ -22,7 +22,7 @@ def fix_lammps_versions(run_directory: str,
         The current will be replaced by the old for the potentials where it
         is required. All other kwargs are ignored.
     """
-    # Handle run_directory 
+    # Handle run_directory
     try:
         run_directory = load_run_directory(run_directory)
     except:
@@ -33,7 +33,7 @@ def fix_lammps_versions(run_directory: str,
     oldlammps = f"{key}{kwargs['lammps_command']}"
 
     replacementdict = {}
-    
+
     # Fix for SNAP version 1
     if 'lammps_command_snap_1' in kwargs:
         for pot_id in snap1_pots():
@@ -65,18 +65,18 @@ def fix_lammps_versions(run_directory: str,
             replacementdict[pot_id] = f"{key}{kwargs['lammps_command_kim']}"
 
     if len(replacementdict) > 0:
-        
+
         # Change the lammps commands in the input files
         for inscript in run_directory.glob('*/calc_*.in'):
-            with open(inscript) as f:
+            with open(inscript, encoding='UTF-8') as f:
                 content = f.read()
-            
+
             for pot_id, lammps in replacementdict.items():
                 if pot_id in content:
                     content = content.replace(oldlammps, lammps)
                     break
-                    
-            with open(inscript, 'w') as f:
+
+            with open(inscript, 'w', encoding='UTF-8') as f:
                 f.write(content)
 
 def snap1_pots():

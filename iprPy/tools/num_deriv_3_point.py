@@ -30,28 +30,28 @@ def num_deriv_3_point(x: npt.ArrayLike,
     y = np.asarray(y)
     assert len(x) == len(y)
     dy = np.empty_like(x)
-    
-    # Split x, y into three sets 
+
+    # Split x, y into three sets
     x1 = x[:-2]
     x2 = x[1:-1]
     x3 = x[2:]
     y1 = y[:-2]
     y2 = y[1:-1]
     y3 = y[2:]
-    
+
     # Compute shared terms used by the solution
     c = (x2**2 - x1**2) / (x1 - x2)
     d = (y1 - y2) / (x1 - x2)
-    
+
     # Compute polynomial constants
     A = (y3 - y1 + d * (x1 - x3)) / (x3**2 - x1**2 + c * (x3 - x1))
     B = A * c + d
-    
+
     # Compute the derivatives for the intermediate points
     dy[1:-1] = 2 * A * x2 + B
-    
+
     # Compute the derivatives for the end points
     dy[0] = 2 * A[0] * x[0] + B[0]
     dy[-1] = 2 * A[-1] * x[-1] + B[-1]
-    
+
     return dy

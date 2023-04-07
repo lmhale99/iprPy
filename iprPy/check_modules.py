@@ -15,5 +15,3 @@ def check_modules():
     calculationmanager.check_styles()
     print()
     recordmanager.check_styles()
-    
-    

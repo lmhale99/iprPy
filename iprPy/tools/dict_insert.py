@@ -50,18 +50,18 @@ def dict_insert(d: dict,
             raise TypeError(f"dict_insert() got an unexpected keyword argument '{list(kwargs.keys())[0]}'")
     else:
         raise ValueError('Only one kwarg (before or after) can be given')
-    
+
     # Remove d if currently in d
     if key in d:
         del d[key]
-        
+
     # Pop all keys after previous
-    nd = {}
+    newdict = {}
     for k in list(d.keys())[i:]:
-        nd[k] = d.pop(k)
+        newdict[k] = d.pop(k)
 
     # Set key, value
     d[key] = value
 
     # Add popped keys back in
-    d.update(nd)
+    d.update(newdict)

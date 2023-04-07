@@ -32,7 +32,7 @@ def load_run_directory(name: Optional[str] = None):
             choice = screen_input(':')
             try:
                 choice = int(choice)
-            except:
+            except (ValueError, TypeError):
                 name = choice
             else:
                 name = run_directory_names[choice-1]
@@ -41,5 +41,5 @@ def load_run_directory(name: Optional[str] = None):
 
     try:
         return Path(settings.run_directories[name])
-    except:
-        raise ValueError(f'run_directory {name} not found')
+    except Exception as err:
+        raise ValueError(f'run_directory {name} not found') from err

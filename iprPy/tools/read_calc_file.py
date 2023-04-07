@@ -18,7 +18,7 @@ def read_calc_file(parent_module: str,
         The name of the file to read/get content for.
     """
     if Path(filename).is_file():
-        with open(filename) as f:
+        with open(filename, encoding='UTF-8') as f:
             return f.read()
     else:
         return resources.read_text(parent_module, filename)

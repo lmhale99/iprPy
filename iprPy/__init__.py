@@ -6,15 +6,6 @@ from importlib import resources
 # Read version from VERSION file
 __version__ = resources.read_text('iprPy', 'VERSION').strip()
 
-__all__ = ['__version__', 'tools', 'settings', 'input', 
-           'load_run_directory', 'fix_lammps_versions',
-           'record', 'load_record', 'recordmanager',
-           'calculation_subset',
-           'calculation', 'load_calculation', 'calculationmanager',
-           'database', 'load_database', 'databasemanager',
-           'check_modules', 'command_line', 'reset_orphans']
-__all__.sort()
-
 # iprPy imports
 from . import tools
 from .Settings import settings
@@ -35,3 +26,12 @@ from .check_modules import check_modules
 from .command_line import command_line
 
 from . import analysis
+
+__all__ = ['__version__', 'tools', 'settings', 'input',
+           'load_run_directory', 'fix_lammps_versions',
+           'record', 'load_record', 'recordmanager',
+           'calculation_subset',
+           'calculation', 'load_calculation', 'calculationmanager',
+           'database', 'load_database', 'databasemanager',
+           'check_modules', 'command_line', 'reset_orphans']
+__all__.sort()
