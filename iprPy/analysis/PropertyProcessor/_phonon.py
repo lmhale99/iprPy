@@ -12,6 +12,8 @@ import pandas as pd
 
 import plotly.graph_objects as go
 
+import matplotlib.pyplot as plt
+
 import atomman.unitconvert as uc
 
 # Local imports
@@ -114,8 +116,11 @@ def phonon(self,
             record_series = records_df.loc[record_index]
 
             # Estimate natoms in primitive cell and create analysis object
-            natoms_prim = round(record_series.E0 / record_series.potential_energy)
-            qhas.append(AnalyzeQHA(record, natoms_prim))
+            if not np.isnan(record_series.E0):
+                natoms = record.dos['projected_dos'].shape[0]
+                qhas.append(AnalyzeQHA(record, natoms))
+            else:
+                qhas.append(np.nan)
 
             # Extract plots from tar files
             extract_plots(database, record, record_series, contentpath, phononplot)
@@ -150,8 +155,6 @@ def phonon(self,
         else:
             print('created/modified')
         num_updated += 1
-        
-        break
 
     print(num_updated, 'added/updated')
     print(num_skipped, 'skipped')
@@ -166,7 +169,7 @@ def extract_plots(database, record, series, contentpath, data):
     tarnames = tar.getnames()
     
     # Set root name for extracted files
-    fileroot = f'phonon.{series.composition}.{series.family}.{series.key}'
+    fileroot = f'phonon.{series.composition}.{series.family}.{series.key.split("-")[0]}'
 
     # Extract the band images
     fname = f'{fileroot}.band.png'
@@ -183,6 +186,39 @@ def extract_plots(database, record, series, contentpath, data):
         dat['name'] = 'band structure'
         dat['png'] = fname
         data.append(dat)
+
+    # Generate DOS plot
+    fname = f'{fileroot}.dos.png'
+    plt.plot(uc.get_in_units(record.dos['frequency'], 'THz'), record.dos['total_dos'])
+    plt.xlabel('Frequency (THz)', size='x-large')
+    plt.ylabel('Density of States', size='x-large')
+    plt.ylim(0, None) 
+    plt.savefig(Path(contentpath, fname))
+    plt.close()
+    dat = {}
+    dat['composition'] = series.composition
+    dat['prototype'] = series.prototype
+    dat['a'] = series.a
+    dat['name'] = 'density of states'
+    dat['png'] = fname
+    data.append(dat)
+
+    # Generate PDOS plot
+    fname = f'{fileroot}.pdos.png'
+    for pdos in record.dos['projected_dos']:
+        plt.plot(uc.get_in_units(record.dos['frequency'], 'THz'), pdos)
+    plt.xlabel('Frequency (THz)', size='x-large')
+    plt.ylabel('Partial Density of States', size='x-large')
+    plt.ylim(0, None)
+    plt.savefig(Path(contentpath, fname))
+    plt.close()
+    dat = {}
+    dat['composition'] = series.composition
+    dat['prototype'] = series.prototype
+    dat['a'] = series.a
+    dat['name'] = 'partial density of states'
+    dat['png'] = fname
+    data.append(dat)
 
     # Extract the bulk modulus images
     fname = f'{fileroot}.bmod.png'
@@ -216,6 +252,8 @@ def extract_plots(database, record, series, contentpath, data):
         dat['png'] = fname
         data.append(dat)
 
+    tar.close()
+
 def thermo_plots(df, composition, contentpath, data):
     """
     Function to call all other plot generation functions for thermo data.
@@ -238,7 +276,19 @@ def gibbs_plot(df, composition, contentpath, data, uc_unit='eV', plot_unit='eV/a
     htmlfile = f'phonon.{composition}.G.html'
     csv_df = {}
     
-    min_series = df.sort_values('potential_energy').iloc[0]
+    sorted_df = df.sort_values('potential_energy')
+    min_series =  None
+    for index in sorted_df.index:
+        series = sorted_df.loc[index]
+        if pd.isna(series.qha):
+            continue
+        else:
+            min_series = series
+            break
+    if min_series is None:
+        fig.data = []
+        return None
+
     csv_df['temperature'] = min_series.qha.T
     ref_G = uc.get_in_units(min_series.qha.G, uc_unit)
     
@@ -247,6 +297,8 @@ def gibbs_plot(df, composition, contentpath, data, uc_unit='eV', plot_unit='eV/a
     for index in df.sort_values(['prototype', 'a']).index:
         series = df.loc[index]
         qha = series.qha
+        if pd.isna(qha):
+            continue 
         label = f'{series.prototype} a={series.a:.4f}'
     
         try:
@@ -295,13 +347,25 @@ def entropy_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit=
     csvfile = f'phonon.{composition}.S.csv'
     htmlfile = f'phonon.{composition}.S.html'
     csv_df = {}
-    csv_df['temperature'] = df.iloc[0].qha.T
+
+    for index in df.index:
+        series = df.loc[index]
+        if pd.isna(series.qha):
+            continue
+        else:
+            csv_df['temperature'] = series.qha.T
+            break
+    if 'temperature' not in csv_df:
+        fig.data = []
+        return None
     
     # Loop over results
     count = 0
     for index in df.sort_values(['prototype', 'a']).index:
         series = df.loc[index]
         qha = series.qha
+        if pd.isna(qha):
+            continue 
         label = f'{series.prototype} a={series.a:.4f}'
         
         try:
@@ -348,13 +412,25 @@ def cp_poly_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit=
     csvfile = f'phonon.{composition}.Cp-poly.csv'
     htmlfile = f'phonon.{composition}.Cp-poly.html'
     csv_df = {}
-    csv_df['temperature'] = df.iloc[0].qha.T
+    
+    for index in df.index:
+        series = df.loc[index]
+        if pd.isna(series.qha):
+            continue
+        else:
+            csv_df['temperature'] = series.qha.T
+            break
+    if 'temperature' not in csv_df:
+        fig.data = []
+        return None
     
     # Loop over results
     count = 0
     for index in df.sort_values(['prototype', 'a']).index:
         series = df.loc[index]
         qha = series.qha
+        if pd.isna(qha):
+            continue 
         label = f'{series.prototype} a={series.a:.4f}'
         
         try:
@@ -401,13 +477,25 @@ def cp_num_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='
     csvfile = f'phonon.{composition}.Cp-num.csv'
     htmlfile = f'phonon.{composition}.Cp-num.html'
     csv_df = {}
-    csv_df['temperature'] = df.iloc[0].qha.T
+    
+    for index in df.index:
+        series = df.loc[index]
+        if pd.isna(series.qha):
+            continue
+        else:
+            csv_df['temperature'] = series.qha.T
+            break
+    if 'temperature' not in csv_df:
+        fig.data = []
+        return None
     
     # Loop over results
     count = 0
     for index in df.sort_values(['prototype', 'a']).index:
         series = df.loc[index]
         qha = series.qha
+        if pd.isna(qha):
+            continue 
         label = f'{series.prototype} a={series.a:.4f}'
         
         try:
@@ -454,13 +542,25 @@ def cv_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/
     csvfile = f'phonon.{composition}.Cv.csv'
     htmlfile = f'phonon.{composition}.Cv.html'
     csv_df = {}
-    csv_df['temperature'] = df.iloc[0].qha.T
+    
+    for index in df.index:
+        series = df.loc[index]
+        if pd.isna(series.qha):
+            continue
+        else:
+            csv_df['temperature'] = series.qha.T
+            break
+    if 'temperature' not in csv_df:
+        fig.data = []
+        return None
     
     # Loop over results
     count = 0
     for index in df.sort_values(['prototype', 'a']).index:
         series = df.loc[index]
         qha = series.qha
+        if pd.isna(qha):
+            continue 
         label = f'{series.prototype} a={series.a:.4f}'
         
         try:
@@ -507,13 +607,25 @@ def volume_plot(df, composition, contentpath, data, uc_unit='angstrom^3', plot_u
     csvfile = f'phonon.{composition}.V.csv'
     htmlfile = f'phonon.{composition}.V.html'
     csv_df = {}
-    csv_df['temperature'] = df.iloc[0].qha.T
+    
+    for index in df.index:
+        series = df.loc[index]
+        if pd.isna(series.qha):
+            continue
+        else:
+            csv_df['temperature'] = series.qha.T
+            break
+    if 'temperature' not in csv_df:
+        fig.data = []
+        return None
     
     # Loop over results
     count = 0
     for index in df.sort_values(['prototype', 'a']).index:
         series = df.loc[index]
         qha = series.qha
+        if pd.isna(qha):
+            continue 
         label = f'{series.prototype} a={series.a:.4f}'
         
         try:
@@ -560,13 +672,25 @@ def expansion_plot(df, composition, contentpath, data):
     csvfile = f'phonon.{composition}.alpha.csv'
     htmlfile = f'phonon.{composition}.alpha.html'
     csv_df = {}
-    csv_df['temperature'] = df.iloc[0].qha.T
+    
+    for index in df.index:
+        series = df.loc[index]
+        if pd.isna(series.qha):
+            continue
+        else:
+            csv_df['temperature'] = series.qha.T
+            break
+    if 'temperature' not in csv_df:
+        fig.data = []
+        return None
     
     # Loop over results
     count = 0
     for index in df.sort_values(['prototype', 'a']).index:
         series = df.loc[index]
         qha = series.qha
+        if pd.isna(qha):
+            continue 
         label = f'{series.prototype} a={series.a:.4f}'
         
         try:
@@ -613,13 +737,25 @@ def bulk_plot(df, composition, contentpath, data, uc_unit='GPa', plot_unit='GPa'
     csvfile = f'phonon.{composition}.B.csv'
     htmlfile = f'phonon.{composition}.B.html'
     csv_df = {}
-    csv_df['temperature'] = df.iloc[0].qha.T
+    
+    for index in df.index:
+        series = df.loc[index]
+        if pd.isna(series.qha):
+            continue
+        else:
+            csv_df['temperature'] = series.qha.T
+            break
+    if 'temperature' not in csv_df:
+        fig.data = []
+        return None
     
     # Loop over results
     count = 0
     for index in df.sort_values(['prototype', 'a']).index:
         series = df.loc[index]
         qha = series.qha
+        if pd.isna(qha):
+            continue 
         label = f'{series.prototype} a={series.a:.4f}'
         
         try:

@@ -21,7 +21,10 @@ class Phonon(PotentialsPropertiesSubset):
     @phononplot.setter
     def phononplot(self, value):
         assert isinstance(value, pd.DataFrame)
-        self.__phononplot = value[self.phononplotcolumns]
+        if len(value) > 0:
+            self.__phononplot = value[self.phononplotcolumns]
+        else:
+            self.__phononplot = pd.DataFrame(columns=self.phononplotcolumns)
     
     @property
     def thermoplot(self):
@@ -30,7 +33,10 @@ class Phonon(PotentialsPropertiesSubset):
     @thermoplot.setter
     def thermoplot(self, value):
         assert isinstance(value, pd.DataFrame)
-        self.__thermoplot = value[self.thermoplotcolumns]
+        if len(value) > 0:
+            self.__thermoplot = value[self.thermoplotcolumns]
+        else:
+            self.__thermoplot = pd.DataFrame(columns=self.thermoplotcolumns)
 
     @property
     def phononplotcolumns(self):
