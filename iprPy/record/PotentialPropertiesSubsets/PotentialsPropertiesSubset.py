@@ -32,3 +32,8 @@ class PotentialsPropertiesSubset():
 
     def metadata(self, meta):
         raise NotImplementedError()
+    
+    @property
+    def queries(self):
+        """dict: Query objects and their associated parameter names."""
+        return {}
