@@ -2,30 +2,34 @@
 
 # Standard Python libraries
 from pathlib import Path
+from typing import Optional, Union
 
 # http://www.numpy.org/
 import numpy as np
+import numpy.typing as npt
 
 # https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
-from yabadaba import query
+from yabadaba import load_query
 
 # https://github.com/usnistgov/atomman
-import atomman as am
 import atomman.unitconvert as uc
 
+# Local imports
 from . import CalculationSubset
-from ..tools import dict_insert, aslist
 from ..input import boolean, value
 
 class FreeSurface(CalculationSubset):
     """Handles calculation terms for free surface parameters"""
 
 ############################# Core properties #################################
-     
-    def __init__(self, parent, prefix='', templateheader=None,
-                 templatedescription=None):
+
+    def __init__(self,
+                 parent,
+                 prefix: str = '',
+                 templateheader: Optional[str] = None,
+                 templatedescription: Optional[str] = None):
         """
         Initializes a calculation record subset object.
 
@@ -62,126 +66,137 @@ class FreeSurface(CalculationSubset):
         self.__model = None
 
 ############################## Class attributes ################################
-    
+
     @property
-    def param_file(self):
+    def param_file(self) -> Optional[Path]:
+        """Path or None: The path to the free surface parameter file"""
         return self.__param_file
 
     @param_file.setter
-    def param_file(self, value):
-        if value is None:
+    def param_file(self, val: Union[str, Path, None]):
+        if val is None:
             self.__param_file = None
         else:
-            self.__param_file = Path(value)
+            self.__param_file = Path(val)
 
     @property
-    def key(self):
+    def key(self) -> Optional[str]:
+        """str or None: UUID key of the free surface parameter set"""
         return self.__key
 
     @key.setter
-    def key(self, value):
-        if value is None:
+    def key(self, val: Optional[str]):
+        if val is None:
             self.__key = None
         else:
-            self.__key = str(value)
+            self.__key = str(val)
 
     @property
-    def id(self):
+    def id(self) -> Optional[str]:
+        """str or None: id of the free surface parameter set"""
         return self.__id
 
     @id.setter
-    def id(self, value):
-        if value is None:
+    def id(self, val: Optional[str]):
+        if val is None:
             self.__id = None
         else:
-            self.__id = str(value)
+            self.__id = str(val)
 
     @property
-    def hkl(self):
+    def hkl(self) -> Optional[np.ndarray]:
+        """numpy.ndarray or None: The crystallographic (hkl) or (hkil) cut plane"""
         return self.__hkl
 
     @hkl.setter
-    def hkl(self, value):
-        if value is None:
+    def hkl(self, val: Optional[npt.ArrayLike]):
+        if val is None:
             self.__hkl = None
         else:
-            if isinstance(value, str):
-                value = np.array(value.strip().split(), dtype=float)
+            if isinstance(val, str):
+                val = np.array(val.strip().split(), dtype=float)
             else:
-                value = np.asarray(value, dtype=float)
-            assert value.shape == (3,) or value.shape == (4,)
-            self.__hkl = value.tolist()
+                val = np.asarray(val, dtype=float)
+            assert val.shape == (3,) or val.shape == (4,)
+            self.__hkl = val.tolist()
 
     @property
-    def cellsetting(self):
+    def cellsetting(self) -> str:
+        """str: The reference unit cell setting"""
         return self.__cellsetting
 
     @cellsetting.setter
-    def cellsetting(self, value):
-        if value not in ['p', 'a', 'b', 'c', 'i', 'f']:
+    def cellsetting(self, val: str):
+        if val not in ['p', 'a', 'b', 'c', 'i', 'f']:
             raise ValueError('invalid surface cellsetting')
-        self.__cellsetting = str(value)
+        self.__cellsetting = str(val)
 
     @property
-    def cutboxvector(self):
+    def cutboxvector(self) -> str:
+        """str: The cell box vector that the cut occurs along"""
         return self.__cutboxvector
 
     @cutboxvector.setter
-    def cutboxvector(self, value):
-        if value not in ['a', 'b', 'c']:
+    def cutboxvector(self, val: str):
+        if val not in ['a', 'b', 'c']:
             raise ValueError('invalid surface cutboxvector')
-        self.__cutboxvector = str(value)
+        self.__cutboxvector = str(val)
 
     @property
-    def shiftindex(self):
+    def shiftindex(self) -> int:
+        """int: The index of the pre-determined shifts values to use for shift"""
         return self.__shiftindex
 
     @shiftindex.setter
-    def shiftindex(self, value):
-        self.__shiftindex = int(value)
+    def shiftindex(self, val: int):
+        self.__shiftindex = int(val)
 
     @property
-    def sizemults(self):
+    def sizemults(self) -> list:
+        """list: The three size multipliers of rcell used"""
         return self.__sizemults
 
     @sizemults.setter
-    def sizemults(self, value):
-        if isinstance(value, str):
-            value = np.array(value.strip().split(), dtype=int)
+    def sizemults(self, val: Union[str, list, tuple]):
+        if isinstance(val, str):
+            val = np.array(val.strip().split(), dtype=int)
         else:
-            value = np.asarray(value, dtype=int)
-        if value.shape != (3,):
+            val = np.asarray(val, dtype=int)
+        if val.shape != (3,):
             raise ValueError('Invalid sizemults command: exactly 3 sizemults required for this calculation')
-        self.__sizemults = value.tolist()
+        self.__sizemults = val.tolist()
 
     @property
-    def minwidth(self):
+    def minwidth(self) -> float:
+        """float: The minimum width allowed perpendicular to the cut"""
         return self.__minwidth
 
     @minwidth.setter
-    def minwidth(self, value):
-        self.__minwidth = float(value)
+    def minwidth(self, val: float):
+        self.__minwidth = float(val)
 
     @property
-    def even(self):
+    def even(self) -> bool:
+        """bool: If True, the number of replicas along the cutboxvector will be kept even"""
         return self.__even
 
     @even.setter
-    def even(self, value):
-        self.__even = boolean(value)
+    def even(self, val: bool):
+        self.__even = boolean(val)
 
     @property
-    def family(self):
+    def family(self) -> Optional[str]:
+        """str or None: The prototype or reference crystal the free surface parameter set is for"""
         return self.__family
 
     @family.setter
-    def family(self, value):
-        if value is None:
+    def family(self, val: Optional[str]):
+        if val is None:
             self.__family = None
         else:
-            self.__family = str(value)
+            self.__family = str(val)
 
-    def set_values(self, **kwargs):
+    def set_values(self, **kwargs: any):
         """
         Allows for multiple class attribute values to be updated at once.
 
@@ -239,11 +254,13 @@ class FreeSurface(CalculationSubset):
         if 'even' in kwargs:
             self.even = kwargs['even']
         if 'family' in kwargs:
-            self.family = kwargs['family']           
+            self.family = kwargs['family']
 
 ####################### Parameter file interactions ###########################
 
-    def _template_init(self, templateheader=None, templatedescription=None):
+    def _template_init(self,
+                       templateheader: Optional[str] = None,
+                       templatedescription: Optional[str] = None):
         """
         Sets the template header and description values.
 
@@ -262,13 +279,12 @@ class FreeSurface(CalculationSubset):
         if templatedescription is None:
             templatedescription = ' '.join([
                 "Specifies the parameter set that defines a free surface."])
-        
+
         super()._template_init(templateheader, templatedescription)
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The subset-specific input keys and their descriptions."""
-        
         return {
             'surface_file': ' '.join([
                 "The path to a free_surface record file that collects the",
@@ -301,9 +317,9 @@ class FreeSurface(CalculationSubset):
                 "If True, the number of replicas in the cutboxvector direction will"
                 "be even. Default value is False."]),
         }
-    
+
     @property
-    def preparekeys(self):
+    def preparekeys(self) -> list:
         """
         list : The input keys (without prefix) used when preparing a calculation.
         Typically, this is templatekeys plus *_content keys so prepare can access
@@ -313,8 +329,9 @@ class FreeSurface(CalculationSubset):
             'surface_family',
             'surface_content'
         ]
+
     @property
-    def interpretkeys(self):
+    def interpretkeys(self) -> list:
         """
         list : The input keys (without prefix) accessed when interpreting the 
         calculation input file.  Typically, this is preparekeys plus any extra
@@ -325,13 +342,13 @@ class FreeSurface(CalculationSubset):
         ]
 
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """
         list: Calculation subset key sets that can have multiple values during prepare.
-        """ 
+        """
         # Define key set for system size parameters
         sizekeys = ['sizemults', 'surface_minwidth', 'surface_even']
-        
+
         # Define key set for defect parameters as the remainder
         defectkeys = []
         for key in self.preparekeys:
@@ -344,7 +361,7 @@ class FreeSurface(CalculationSubset):
             self._pre(defectkeys)
         ]
 
-    def load_parameters(self, input_dict):
+    def load_parameters(self, input_dict: dict):
         """
         Interprets calculation parameters.
         
@@ -356,11 +373,11 @@ class FreeSurface(CalculationSubset):
 
         # Set default keynames
         keymap = self.keymap
-        
+
         # Extract input values and assign default values
         self.param_file = input_dict.get(keymap['surface_file'], None)
         self.__content = input_dict.get(keymap['surface_content'], None)
-        
+
         # Replace defect model with defect content if given
         param_file = self.param_file
         if self.__content is not None:
@@ -368,7 +385,7 @@ class FreeSurface(CalculationSubset):
 
         # Extract parameters from a file
         if param_file is not None:
-            
+
             # Verify competing parameters are not defined
             for key in ('surface_hkl',
                         'surface_shiftindex',
@@ -376,10 +393,10 @@ class FreeSurface(CalculationSubset):
                         'surface_cutboxvector'):
                 if keymap[key] in input_dict:
                     raise ValueError(f"{keymap[key]} and {keymap['surface_file']} cannot both be supplied")
-            
+
             # Load defect model
             self.__model = model = DM(param_file).find('free-surface')
-                
+
             # Extract parameter values from defect model
             self.key = model['key']
             self.id = model['id']
@@ -388,7 +405,7 @@ class FreeSurface(CalculationSubset):
             self.shiftindex = int(model['calculation-parameter'].get('shiftindex', 0))
             self.cutboxvector = model['calculation-parameter']['cutboxvector']
             self.cellsetting = model['calculation-parameter'].get('cellsetting', 'p')
-        
+
         # Set parameter values directly
         else:
             self.__model = None
@@ -399,23 +416,22 @@ class FreeSurface(CalculationSubset):
             self.shiftindex = int(input_dict.get(keymap['surface_shiftindex'], 0))
             self.cutboxvector = input_dict.get(keymap['surface_cutboxvector'], 'c')
             self.cellsetting = input_dict.get(keymap['surface_cellsetting'], 'p')
-    
+
         # Set default values for fault system manipulations
         self.sizemults = input_dict.get(keymap['sizemults'], '1 1 1')
         self.minwidth = value(input_dict, keymap['surface_minwidth'], default_term='0.0 angstrom',
                               default_unit=self.parent.units.length_unit)
         self.even = boolean(input_dict.get(keymap['surface_even'], False))
 
-
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str : The root element name for the subset terms."""
         baseroot = 'free-surface'
         return f'{self.modelprefix}{baseroot}'
 
-    def load_model(self, model):
+    def load_model(self, model: DM):
         """Loads subset attributes from an existing model."""
         surf = model[self.modelroot]
 
@@ -432,14 +448,16 @@ class FreeSurface(CalculationSubset):
         self.cellsetting = cp['cellsetting'] 
 
         run_params = model['calculation']['run-parameter']
-        
+
         a_mult = run_params[f'{self.modelprefix}size-multipliers']['a'][1]
         b_mult = run_params[f'{self.modelprefix}size-multipliers']['b'][1]
         c_mult = run_params[f'{self.modelprefix}size-multipliers']['c'][1]
         self.sizemults = [a_mult, b_mult, c_mult]
         self.minwidth = uc.value_unit(run_params[f'{self.modelprefix}minimum-width'])
 
-    def build_model(self, model, **kwargs):
+    def build_model(self,
+                    model: DM,
+                    **kwargs: any):
         """
         Adds the subset model to the parent model.
         
@@ -472,7 +490,7 @@ class FreeSurface(CalculationSubset):
             model['calculation']['run-parameter'] = DM()
 
         run_params = model['calculation']['run-parameter']
-        
+
         run_params[f'{self.modelprefix}size-multipliers'] = DM()
         run_params[f'{self.modelprefix}size-multipliers']['a'] = sorted([0, self.sizemults[0]])
         run_params[f'{self.modelprefix}size-multipliers']['b'] = sorted([0, self.sizemults[1]])
@@ -480,123 +498,64 @@ class FreeSurface(CalculationSubset):
         run_params[f'{self.modelprefix}minimum-width'] = uc.model(self.minwidth,
                                                              self.parent.units.length_unit)
 
-    def mongoquery(self, surface_key=None, surface_id=None,
-                   surface_family=None, a_mult1=None, a_mult2=None,
-                   b_mult1=None, b_mult2=None, c_mult1=None, c_mult2=None,
-                   **kwargs):
-        """
-        Generate a query to parse records with the subset from a Mongo-style
-        database.
-        
-        Parameters
-        ----------
-        surface_id : str
-            The id associated with a free surface parameter set.
-        surface_key : str
-            The key associated with a free surface parameter set.
-        surface_family : str
-            The "family" crystal structure/prototype that the free surface
-            is defined for.
-        a_mult1 : int
-            The lower size multiplier for the a box direction.
-        a_mult2 : int
-            The upper size multiplier for the a box direction.
-        b_mult1 : int
-            The lower size multiplier for the b box direction.
-        b_mult2 : int
-            The upper size multiplier for the b box direction.
-        c_mult1 : int
-            The lower size multiplier for the c box direction.
-        c_mult2 : int
-            The upper size multiplier for the c box direction.
-        kwargs : any
-            The parent query terms and values ignored by the subset.
+    @property
+    def queries(self) -> dict:
+        """dict: Query objects and their associated parameter names."""
 
-        Returns
-        -------
-        dict
-            The Mongo-style find query terms.
-        """
-        # Init query and set root paths
-        mquery = {}
-        parentroot = f'content.{self.parent.modelroot}'
-        root = f'{parentroot}.{self.modelroot}'
-        runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
+        root = f'{self.parent.modelroot}.{self.modelroot}'
+        runparampath = f'{self.parent.modelroot}.calculation.run-parameter.{self.modelprefix}'
 
-        # Build query terms
-        query.str_match.mongo(mquery, f'{root}.free-surface.key', surface_key)
-        query.str_match.mongo(mquery, f'{root}.free-surface.id', surface_id)
-        query.str_match.mongo(mquery, f'{root}.system-family', surface_family)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.0', a_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.1', a_mult2)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.0', b_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.1', b_mult2)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.0', c_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.1', c_mult2)
-
-        # Return query dict
-        return mquery
-
-    def cdcsquery(self, surface_key=None, surface_id=None,
-                  surface_family=None, a_mult1=None, a_mult2=None,
-                  b_mult1=None, b_mult2=None, c_mult1=None, c_mult2=None,
-                  **kwargs):
-        """
-        Generate a query to parse records with the subset from a CDCS-style
-        database.
-        
-        Parameters
-        ----------
-        surface_id : str
-            The id associated with a free surface parameter set.
-        surface_key : str
-            The key associated with a free surface parameter set.
-        surface_family : str
-            The "family" crystal structure/prototype that the free surface
-            is defined for.
-        a_mult1 : int
-            The lower size multiplier for the a box direction.
-        a_mult2 : int
-            The upper size multiplier for the a box direction.
-        b_mult1 : int
-            The lower size multiplier for the b box direction.
-        b_mult2 : int
-            The upper size multiplier for the b box direction.
-        c_mult1 : int
-            The lower size multiplier for the c box direction.
-        c_mult2 : int
-            The upper size multiplier for the c box direction.
-        kwargs : any
-            The parent query terms and values ignored by the subset.
-        
-        Returns
-        -------
-        dict
-            The CDCS-style find query terms.
-        """
-        # Init query and set root paths
-        mquery = {}
-        parentroot = self.parent.modelroot
-        root = f'{parentroot}.{self.modelroot}'
-        runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
-        
-        # Build query terms
-        query.str_match.mongo(mquery, f'{root}.free-surface.key', surface_key)
-        query.str_match.mongo(mquery, f'{root}.free-surface.id', surface_id)
-        query.str_match.mongo(mquery, f'{root}.system-family', surface_family)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.0', a_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.1', a_mult2)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.0', b_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.1', b_mult2)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.0', c_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.1', c_mult2)
-
-        # Return query dict
-        return mquery      
+        return {
+            'surface_id': load_query(
+                style='str_match',
+                name=f'{self.prefix}surface_id',
+                path=f'{root}.id',
+                description='search by free surface parameter set id'),
+            'surface_key': load_query(
+                style='str_match',
+                name=f'{self.prefix}surface_key',
+                path=f'{root}.key',
+                description='search by free surface parameter set UUID key'),
+            'surface_family': load_query(
+                style='str_match',
+                name=f'{self.prefix}surface_family',
+                path=f'{root}.system-family',
+                description='search by crystal prototype that the free surface parameter set is for'),
+            'a_mult1': load_query(
+                style='int_match',
+                name=f'{self.prefix}a_mult1',
+                path=f'{runparampath}size-multipliers.a.0',
+                description='search by lower a_mult value'),
+            'a_mult2': load_query(
+                style='int_match',
+                name=f'{self.prefix}a_mult2',
+                path=f'{runparampath}size-multipliers.a.1',
+                description='search by upper a_mult value'),
+            'b_mult1': load_query(
+                style='int_match',
+                name=f'{self.prefix}b_mult1',
+                path=f'{runparampath}size-multipliers.b.0',
+                description='search by lower b_mult value'),
+            'b_mult2': load_query(
+                style='int_match',
+                name=f'{self.prefix}b_mult2',
+                path=f'{runparampath}size-multipliers.b.1',
+                description='search by upper b_mult value'),
+            'c_mult1': load_query(
+                style='int_match',
+                name=f'{self.prefix}c_mult1',
+                path=f'{runparampath}size-multipliers.c.0',
+                description='search by lower c_mult value'),
+            'c_mult2': load_query(
+                style='int_match',
+                name=f'{self.prefix}c_mult2',
+                path=f'{runparampath}size-multipliers.c.1',
+                description='search by upper c_mult value'),
+        }
 
 ########################## Metadata interactions ##############################
-          
-    def metadata(self, meta):
+
+    def metadata(self, meta: dict):
         """
         Converts the structured content to a simpler dictionary.
         
@@ -619,68 +578,9 @@ class FreeSurface(CalculationSubset):
         meta[f'{prefix}c_mult1'] = 0
         meta[f'{prefix}c_mult2'] = self.sizemults[2]
 
-    def pandasfilter(self, dataframe, surface_key=None, surface_id=None,
-                     surface_family=None, a_mult1=None, a_mult2=None,
-                     b_mult1=None, b_mult2=None, c_mult1=None, c_mult2=None,
-                     **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        surface_id : str
-            The id associated with a free surface parameter set.
-        surface_key : str
-            The key associated with a free surface parameter set.
-        surface_family : str
-            The "family" crystal structure/prototype that the free surface
-            is defined for.
-        a_mult1 : int
-            The lower size multiplier for the a box direction.
-        a_mult2 : int
-            The upper size multiplier for the a box direction.
-        b_mult1 : int
-            The lower size multiplier for the b box direction.
-        b_mult2 : int
-            The upper size multiplier for the b box direction.
-        c_mult1 : int
-            The lower size multiplier for the c box direction.
-        c_mult2 : int
-            The upper size multiplier for the c box direction.
-        kwargs : any
-            The parent query terms and values ignored by the subset.
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        prefix = self.prefix
-        matches = (
-            query.str_match.pandas(dataframe, f'{prefix}surface_key',
-                                   surface_key)
-            &query.str_match.pandas(dataframe, f'{prefix}surface_id',
-                                    surface_id)
-            &query.str_match.pandas(dataframe, f'{prefix}surface_family',
-                                    surface_family)
-            &query.int_match.pandas(dataframe, f'{prefix}a_mult1', a_mult1)
-            &query.int_match.pandas(dataframe, f'{prefix}a_mult2', a_mult2)
-            &query.int_match.pandas(dataframe, f'{prefix}b_mult1', b_mult1)
-            &query.int_match.pandas(dataframe, f'{prefix}b_mult2', b_mult2)
-            &query.int_match.pandas(dataframe, f'{prefix}c_mult1', c_mult1)
-            &query.int_match.pandas(dataframe, f'{prefix}c_mult2', c_mult2) 
-        )
-        return matches
-
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self, input_dict):
+    def calc_inputs(self, input_dict: dict):
         """
         Generates calculation function input parameters based on the values
         assigned to attributes of the subset.
@@ -694,7 +594,7 @@ class FreeSurface(CalculationSubset):
             raise ValueError('hkl not set')
 
         input_dict['hkl'] = self.hkl
-        
+
         input_dict['sizemults'] = self.sizemults
         input_dict['minwidth'] = self.minwidth
         input_dict['even'] = self.even

@@ -1,5 +1,8 @@
+# coding: utf-8
+
 # Standard Python libraries
 from pathlib import Path
+from typing import Optional, Union
 
 # http://www.numpy.org/
 import numpy as np
@@ -11,7 +14,7 @@ from DataModelDict import DataModelDict as DM
 import atomman as am
 import atomman.unitconvert as uc
 
-from yabadaba import query
+from yabadaba import load_query
 
 from . import CalculationSubset
 from ..tools import dict_insert, aslist
@@ -21,9 +24,12 @@ class AtommanSystemLoad(CalculationSubset):
     """Handles calculation terms for loading atomic systems using atomman"""
 
 ############################# Core properties #################################
-     
-    def __init__(self, parent, prefix='', templateheader=None,
-                 templatedescription=None):
+
+    def __init__(self,
+                 parent,
+                 prefix: str = '',
+                 templateheader: Optional[str] = None,
+                 templatedescription: Optional[str] = None):
         """
         Initializes a calculation record subset object.
 
@@ -54,57 +60,62 @@ class AtommanSystemLoad(CalculationSubset):
         self.__ucell = None
         self.box_parameters = None
         self.composition = None
-        
+
 ############################## Class attributes ################################
-    
+
     @property
-    def load_file(self):
+    def load_file(self) -> Optional[Path]:
+        """Path or None: The path to the system load file"""
         return self.__load_file
 
     @load_file.setter
-    def load_file(self, value):
+    def load_file(self, value: Union[str, Path, None]):
         if value is None:
             self.__load_file = None
         else:
             self.__load_file = Path(value)
 
     @property
-    def load_style(self):
+    def load_style(self) -> str:
+        """str: The load style, i.e. format, of the load file"""
         return self.__load_style
 
     @load_style.setter
-    def load_style(self, value):
+    def load_style(self, value: Optional[str]):
         if value is None:
             self.__load_style = 'system_model'
         else:
             self.__load_style = str(value)
 
     @property
-    def load_options(self):
+    def load_options(self) -> dict:
+        """dict: The extra options to use when loading the file"""
         return self.__load_options
 
     @property
-    def load_content(self):
+    def load_content(self) -> Optional[str]:
+        """str or None: File contents to use instead of reading the file"""
         return self.__load_content
 
     @property
-    def family(self):
+    def family(self) -> Optional[str]:
+        """str or None: The family name for the load file, i.e. the original prototype or reference record"""
         return self.__family
 
     @family.setter
-    def family(self, value):
+    def family(self, value: Optional[str]):
         if value is None:
             self.__family = None
         else:
             self.__family = str(value)
 
     @property
-    def symbols(self):
-        """The potential symbols to use"""
+    def symbols(self) -> Optional[list]:
+        """list: The potential symbols to use"""
         return self.__symbols
 
     @symbols.setter
-    def symbols(self, value):
+    def symbols(self, value: Union[str, list, None]):
         if value is None:
             self.__symbols = None
         else:
@@ -112,11 +123,12 @@ class AtommanSystemLoad(CalculationSubset):
             self.__symbols = value
 
     @property
-    def box_parameters(self):
+    def box_parameters(self) -> Optional[list]:
+        """list or None: The 3 or 6 box lattice parameters"""
         return self.__box_parameters
 
     @box_parameters.setter
-    def box_parameters(self, value):
+    def box_parameters(self, value: Optional[list]):
         if value is None:
             self.__box_parameters = None
         else:
@@ -127,13 +139,15 @@ class AtommanSystemLoad(CalculationSubset):
             self.scale_ucell()
 
     @property
-    def ucell(self):
+    def ucell(self) -> am.System:
+        """atomman.System: The system as loaded from the file"""
         if self.__ucell is None:
             self.load_ucell()
         return self.__ucell
-    
+
     @property
-    def composition(self):
+    def composition(self) -> Optional[str]:
+        """str or None: The composition of the loaded system"""
         if self.__composition is None:
             try:
                 comp = self.ucell.composition
@@ -142,21 +156,24 @@ class AtommanSystemLoad(CalculationSubset):
             else:
                 self.composition = comp
         return self.__composition
-                
+
     @composition.setter
-    def composition(self, value):
+    def composition(self, value: Optional[str]):
         if value is None or isinstance(value, str):
             self.__composition = value
         else:
             raise TypeError('composition must be str or None')
 
-    def load(self, style, *args, **kwargs):
+    def load(self,
+             style: str,
+             *args: any,
+             **kwargs: any):
         """
         Wrapper around atomman.load() for loading files that also saves the
         file loading options as class attributes.  Any parameters not given
         will use the values already set to the object.
         """
-        
+
         # Load ucell
         self.__ucell = am.load(style, *args, **kwargs)
         self.ucell.wrap()
@@ -177,8 +194,6 @@ class AtommanSystemLoad(CalculationSubset):
             self.load_style = style
         else:
             self.load_style = 'system_model'
-        
-
 
     def load_ucell(self, **kwargs):
         """
@@ -228,7 +243,7 @@ class AtommanSystemLoad(CalculationSubset):
         self.__ucell = am.load(self.load_style, load_file,
                                symbols=symbols, **self.load_options)
         self.ucell.wrap()
-        
+
         # Update object's symbols and composition
         self.symbols = self.ucell.symbols
         self.composition
@@ -245,13 +260,13 @@ class AtommanSystemLoad(CalculationSubset):
     def scale_ucell(self):
         """Scale ucell by box_parameters"""
         if self.box_parameters is not None:
-                            
+
             # Three box_parameters means a, b, c
             if len(self.box_parameters) == 3:
                 self.ucell.box_set(a=self.box_parameters[0],
                                    b=self.box_parameters[1],
                                    c=self.box_parameters[2], scale=True)
-            
+
             # Six box_parameters means a, b, c, alpha, beta, gamma
             elif len(self.box_parameters) == 6:
                 self.ucell.box_set(a=self.box_parameters[0],
@@ -261,8 +276,7 @@ class AtommanSystemLoad(CalculationSubset):
                                    beta=self.box_parameters[4],
                                    gamma=self.box_parameters[5], scale=True) 
 
-
-    def set_values(self, **kwargs):
+    def set_values(self, **kwargs: any):
         """
         Allows for multiple class attribute values to be updated at once.
 
@@ -355,7 +369,9 @@ class AtommanSystemLoad(CalculationSubset):
 
 ####################### Parameter file interactions ###########################
 
-    def _template_init(self, templateheader=None, templatedescription=None):
+    def _template_init(self,
+                       templateheader: Optional[str] = None,
+                       templatedescription: Optional[str] = None):
         """
         Sets the template header and description values.
 
@@ -375,13 +391,12 @@ class AtommanSystemLoad(CalculationSubset):
             templatedescription = ' '.join([
                 "Specifies the file and options to load for the initial",
                 "atomic configuration."])
-        
+
         super()._template_init(templateheader, templatedescription)
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The subset-specific input keys and their descriptions."""
-        
         return  {
             'load_file': 
                 "The path to the initial configuration file to load.",
@@ -406,9 +421,9 @@ class AtommanSystemLoad(CalculationSubset):
                 "The a, b, c parameters are in units of length and the alpha, beta,",
                 "gamma angles are in degrees."]),
         }
-    
+
     @property
-    def preparekeys(self):
+    def preparekeys(self) -> list:
         """
         list : The input keys (without prefix) used when preparing a calculation.
         Typically, this is templatekeys plus *_content keys so prepare can access
@@ -417,8 +432,9 @@ class AtommanSystemLoad(CalculationSubset):
         return  list(self.templatekeys.keys()) + [
                     'load_content',
                 ]
+
     @property
-    def interpretkeys(self):
+    def interpretkeys(self) -> list:
         """
         list : The input keys (without prefix) accessed when interpreting the 
         calculation input file.  Typically, this is preparekeys plus any extra
@@ -430,7 +446,7 @@ class AtommanSystemLoad(CalculationSubset):
                     'elasticconstants_content',
                 ]
 
-    def load_parameters(self, input_dict):
+    def load_parameters(self, input_dict: dict):
         """
         Interprets calculation parameters.
         
@@ -442,7 +458,7 @@ class AtommanSystemLoad(CalculationSubset):
 
         # Set default keynames
         keymap = self.keymap
-        
+
         # Extract input values and assign default values
         load_style = input_dict.get(keymap['load_style'], 'system_model')
         load_file = input_dict[keymap['load_file']]
@@ -451,15 +467,15 @@ class AtommanSystemLoad(CalculationSubset):
         family = input_dict.get(keymap['family'], None)
         symbols = input_dict.get(keymap['symbols'], None)
         box_parameters = input_dict.get(keymap['box_parameters'], None)
-    
+
         # Build dict for set_values()
         d = {}
         d['load_style'] = load_style
         d['load_file'] = load_file
-        
+
         if load_content is not None:
             d['load_content'] = load_content
-            
+
         # Set family
         if family is not None:
             d['family'] = family
@@ -472,7 +488,7 @@ class AtommanSystemLoad(CalculationSubset):
             d['load_options'] = termtodict(load_options, load_options_keys)
             if 'index' in d['load_options']:
                 d['load_options']['index'] = int(d['load_options']['index'])
-        
+
         # Process symbols
         if symbols is not None:
             d['symbols'] = symbols.strip().split()
@@ -480,12 +496,12 @@ class AtommanSystemLoad(CalculationSubset):
         # Process box_parameters
         if box_parameters is not None:
             box_params = box_parameters.split()
-            
+
             # Pull out unit value
             if len(box_params) == 4 or len(box_params) == 7:
                 unit = box_params[-1]
                 box_params = box_params[:-1]
-            
+
             # Use calculation's length_unit if unit not given in box_parameters
             else:
                 unit = self.parent.units.length_unit
@@ -502,12 +518,12 @@ class AtommanSystemLoad(CalculationSubset):
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str : The root element name for the subset terms."""
         baseroot = 'system-info'
         return f'{self.modelprefix}{baseroot}'
 
-    def load_model(self, model):
+    def load_model(self, model: DM):
         """Loads subset attributes from an existing model."""
         sub = model[self.modelroot]
 
@@ -516,14 +532,14 @@ class AtommanSystemLoad(CalculationSubset):
 
         if 'artifact' in sub:
             if  'initial-atomic-system' in sub:
-                ValueError('found both load file and embedded content for the initial system')
+                raise ValueError('found both load file and embedded content for the initial system')
             d['load_style'] = sub['artifact']['format']
             d['load_file'] = sub['artifact']['file']
             load_options = sub['artifact'].get('load_options', None)
         elif 'initial-atomic-system' in sub:
             d['ucell'] = am.load('system_model', sub, key='initial-atomic-system')
         else:
-            ValueError('neither load file nor embedded content found for the initial system')
+            raise ValueError('neither load file nor embedded content found for the initial system')
 
         d['symbols'] = sub['symbol']
         d['composition'] = sub.get('composition', None)
@@ -538,7 +554,9 @@ class AtommanSystemLoad(CalculationSubset):
 
         self.set_values(**d)
 
-    def build_model(self, model, **kwargs):
+    def build_model(self,
+                    model: DM,
+                    **kwargs: any):
         """
         Adds the subset model to the parent model.
         
@@ -557,7 +575,7 @@ class AtommanSystemLoad(CalculationSubset):
         system = DM()
 
         system['family'] = self.family
-        
+
         if self.load_file is not None:
             system['artifact'] = DM()
             system['artifact']['file'] = self.load_file.as_posix()
@@ -575,87 +593,38 @@ class AtommanSystemLoad(CalculationSubset):
 
         dict_insert(model, self.modelroot, system, **kwargs)
 
-    def mongoquery(self, load_file=None, family=None, symbol=None,
-                   composition=None, **kwargs):
-        """
-        Generate a query to parse records with the subset from a Mongo-style
-        database.
-        
-        Parameters
-        ----------
-        load_file : str, optional
-            The name of the loaded structure file.
-        family : str, optional
-            The family crystal structure/prototype associated with the loaded
-            file.
-        symbol : str, optional
-            Element model symbols.
-        composition : str, optional
-            The reduced composition of the structure.
-        kwargs : any, optional
-            The parent query terms and values ignored by the subset.
+    @property
+    def queries(self) -> dict:
+        """dict: Query objects and their associated parameter names."""
 
-        Returns
-        -------
-        dict
-            The Mongo-style find query terms.
-        """
-        # Init query and set root paths
-        mquery = {}
-        parentroot = f'content.{self.parent.modelroot}'
-        root = f'{parentroot}.{self.modelroot}'
+        root = f'{self.parent.modelroot}.{self.modelroot}'
 
-        # Build query terms
-        query.str_match.mongo(mquery, f'{root}.artifact.file', load_file)
-        query.str_match.mongo(mquery, f'{root}.family', family)
-        query.str_match.mongo(mquery, f'{root}.symbol', symbol)
-        query.str_match.mongo(mquery, f'{root}.composition', composition)
-        
-        # Return query dict
-        return mquery
-
-    def cdcsquery(self, load_file=None, family=None, symbol=None,
-                  composition=None, **kwargs):
-        """
-        Generate a query to parse records with the subset from a CDCS-style
-        database.
-        
-        Parameters
-        ----------
-        load_file : str, optional
-            The name of the loaded structure file.
-        family : str, optional
-            The family crystal structure/prototype associated with the loaded
-            file.
-        symbol : str, optional
-            Element model symbols.
-        composition : str, optional
-            The reduced composition of the structure.
-        kwargs : any, optional
-            The parent query terms and values ignored by the subset.
-
-        Returns
-        -------
-        dict
-            The CDCS-style find query terms.
-        """
-        # Init query and set root paths
-        mquery = {}
-        parentroot = self.parent.modelroot
-        root = f'{parentroot}.{self.modelroot}'
-
-        # Build query terms
-        query.str_match.mongo(mquery, f'{root}.artifact.file', load_file)
-        query.str_match.mongo(mquery, f'{root}.family', family)
-        query.str_match.mongo(mquery, f'{root}.symbol', symbol)
-        query.str_match.mongo(mquery, f'{root}.composition', composition)
-        
-        # Return query dict
-        return mquery
+        return {
+            'load_file': load_query(
+                style='str_match',
+                name=f'{self.prefix}load_file',
+                path=f'{root}.artifact.file',
+                description='search by the filename for the initial configuration'),
+            'family': load_query(
+                style='str_match',
+                name=f'{self.prefix}family',
+                path=f'{root}.family',
+                description='search by the configuration family: original prototype or crystal'),
+            'symbol': load_query(
+                style='str_match',
+                name=f'{self.prefix}symbols',
+                path=f'{root}.symbol',
+                description='search by atomic symbols in the configuration'),
+            'composition': load_query(
+                style='str_match',
+                name=f'{self.prefix}composition',
+                path=f'{root}.composition',
+                description='search by the composition of the initial configuration'),
+        }
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self, meta):
+    def metadata(self, meta: dict):
         """
         Converts the structured content to a simpler dictionary.
         
@@ -679,7 +648,7 @@ class AtommanSystemLoad(CalculationSubset):
             else:
                 parent = self.load_file.parent.name
             meta[f'{self.prefix}parent_key'] = parent
-        
+
         meta[f'{self.prefix}family'] = self.family
         if self.symbols is None:
             symbolstr = ''
@@ -694,52 +663,9 @@ class AtommanSystemLoad(CalculationSubset):
         if self.composition is not None:
             meta[f'{self.prefix}composition'] = self.composition
 
-    def pandasfilter(self, dataframe, load_file=None, family=None, symbol=None,
-                     composition=None, **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        load_file : str, optional
-            The name of the loaded structure file.
-        family : str, optional
-            The family crystal structure/prototype associated with the loaded
-            file.
-        symbol : str, optional
-            Element model symbols.
-        composition : str, optional
-            The reduced composition of the structure.
-        kwargs : any, optional
-            The parent query terms and values ignored by the subset.
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        prefix = self.prefix
-        matches = (
-            query.str_match.pandas(dataframe, f'{prefix}load_file',
-                                   load_file)
-            &query.str_match.pandas(dataframe, f'{prefix}family',
-                                    family)
-            &query.str_contains.pandas(dataframe, f'{prefix}symbols',
-                                       symbol)
-            &query.str_match.pandas(dataframe, f'{prefix}composition',
-                                    composition)
-        )
-        return matches
-
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self, input_dict):
+    def calc_inputs(self, input_dict: dict):
         """
         Generates calculation function input parameters based on the values
         assigned to attributes of the subset.

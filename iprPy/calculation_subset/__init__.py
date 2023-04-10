@@ -1,3 +1,4 @@
+# coding: utf-8
 from .CalculationSubset import CalculationSubset
 
 from .Units import Units

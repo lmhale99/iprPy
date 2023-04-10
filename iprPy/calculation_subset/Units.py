@@ -1,12 +1,21 @@
+# coding: utf-8
+
+# Standard Python libraries
+from typing import Optional
+
+# Local imports
 from . import CalculationSubset
 
 class Units(CalculationSubset):
     """Handles calculation terms associated with input/output units settings"""
 
 ############################# Core properties ##################################
-     
-    def __init__(self, parent, prefix='', templateheader=None,
-                 templatedescription=None):
+
+    def __init__(self,
+                 parent,
+                 prefix: str = '',
+                 templateheader: Optional[str] = None,
+                 templatedescription: Optional[str] = None):
         """
         Initializes a calculation record subset object.
 
@@ -36,39 +45,56 @@ class Units(CalculationSubset):
 ############################## Class attributes ################################
 
     @property
-    def length_unit(self):
+    def length_unit(self) -> str:
+        """str: The unit of length to use for input/output values"""
         return self.__length_unit
-    
+
     @length_unit.setter
-    def length_unit(self, value):
-        self.__length_unit = str(value)
+    def length_unit(self, val: str):
+        self.__length_unit = str(val)
 
     @property
-    def pressure_unit(self):
+    def pressure_unit(self) -> str:
+        """str: The unit of pressure to use for input/output values"""
         return self.__pressure_unit
 
     @pressure_unit.setter
-    def pressure_unit(self, value):
-        self.__pressure_unit = str(value)
+    def pressure_unit(self, val: str):
+        self.__pressure_unit = str(val)
 
     @property
-    def energy_unit(self):
+    def energy_unit(self) -> str:
+        """str: The unit of energy to use for input/output values"""
         return self.__energy_unit
 
     @energy_unit.setter
-    def energy_unit(self, value):
-        self.__energy_unit = str(value)
+    def energy_unit(self, val: str):
+        self.__energy_unit = str(val)
 
     @property
-    def force_unit(self):
+    def force_unit(self) -> str:
+        """str: The unit of force to use for input/output values"""
         return self.__force_unit
 
     @force_unit.setter
-    def force_unit(self, value):
-        self.__force_unit = str(value)
+    def force_unit(self, val: str):
+        self.__force_unit = str(val)
 
-    def set_values(self, **kwargs):
-        
+    def set_values(self, **kwargs: any):
+        """
+        Allows for multiple class attribute values to be updated at once.
+
+        Parameters
+        ----------
+        length_unit: str, optional
+            The unit of length to use for input/output values
+        pressure_unit: str, optional
+            The unit of pressure to use for input/output values
+        energy_unit: str, optional
+            The unit of energy to use for input/output values
+        force_unit: str, optional
+            The unit of force to use for input/output values
+        """
         if 'length_unit' in kwargs:
             self.length_unit = kwargs['length_unit']
         if 'pressure_unit' in kwargs:
@@ -80,7 +106,9 @@ class Units(CalculationSubset):
 
 ####################### Parameter file interactions ###########################
 
-    def _template_init(self, templateheader=None, templatedescription=None):
+    def _template_init(self,
+                       templateheader: Optional[str] = None,
+                       templatedescription: Optional[str] = None):
         """
         Sets the template header and description values.
 
@@ -100,13 +128,12 @@ class Units(CalculationSubset):
             templatedescription = ' '.join([
                 "Specifies the default units to use for the other input keys",
                 "and to use for saving to the results file."])
-        
+
         super()._template_init(templateheader, templatedescription)
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The subset-specific input keys and their descriptions."""
-        
         return  {
             'length_unit': ' '.join([
                 "The unit of length to use. Default value is 'angstrom'."]),
@@ -117,9 +144,9 @@ class Units(CalculationSubset):
             'force_unit': ' '.join([
                 "The unit of force to use.  Default value is 'eV/angstrom'."]),
         }
-    
+
     @property
-    def preparekeys(self):
+    def preparekeys(self) -> list:
         """
         list : The input keys (without prefix) used when preparing a calculation.
         Typically, this is templatekeys plus *_content keys so prepare can access
@@ -128,7 +155,7 @@ class Units(CalculationSubset):
         return  list(self.templatekeys.keys()) + []
 
     @property
-    def interpretkeys(self):
+    def interpretkeys(self) -> list:
         """
         list : The input keys (without prefix) accessed when interpreting the 
         calculation input file.  Typically, this is preparekeys plus any extra
@@ -136,7 +163,7 @@ class Units(CalculationSubset):
         """
         return  self.preparekeys + []
 
-    def load_parameters(self, input_dict):
+    def load_parameters(self, input_dict: dict):
         """
         Interprets calculation parameters.
         
@@ -148,7 +175,7 @@ class Units(CalculationSubset):
 
         # Set default keynames
         keymap = self.keymap
-        
+
         # Set default unit styles to any terms not given
         self.length_unit = input_dict.get(keymap['length_unit'], 'angstrom')
         self.energy_unit = input_dict.get(keymap['energy_unit'], 'eV')

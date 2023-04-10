@@ -1,29 +1,34 @@
+# coding: utf-8
+
 # Standard Python libraries
 from pathlib import Path
+from typing import Optional, Union
 
 # http://www.numpy.org/
 import numpy as np
+import numpy.typing as npt
 
 # https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
-from yabadaba import query
+from yabadaba import load_query
 
 # https://github.com/usnistgov/atomman
-import atomman as am
 import atomman.unitconvert as uc
 
 from . import CalculationSubset
-from ..tools import dict_insert, aslist
-from ..input import termtodict, dicttoterm, boolean
+from ..input import boolean
 
 class StackingFault(CalculationSubset):
     """Handles calculation terms for stacking fault parameters"""
 
 ############################# Core properties #################################
-     
-    def __init__(self, parent, prefix='', templateheader=None,
-                 templatedescription=None):
+
+    def __init__(self,
+                 parent,
+                 prefix: str = '',
+                 templateheader: Optional[str] = None,
+                 templatedescription: Optional[str] = None):
         """
         Initializes a calculation record subset object.
 
@@ -63,166 +68,180 @@ class StackingFault(CalculationSubset):
         self.__model = None
 
 ############################## Class attributes ################################
-    
+
     @property
-    def param_file(self):
+    def param_file(self) -> Optional[Path]:
+        """Path or None: The path to the stacking fault parameter file"""
         return self.__param_file
 
     @param_file.setter
-    def param_file(self, value):
-        if value is None:
+    def param_file(self, val: Union[str, Path, None]):
+        if val is None:
             self.__param_file = None
         else:
-            self.__param_file = Path(value)
+            self.__param_file = Path(val)
 
     @property
-    def key(self):
+    def key(self) -> Optional[str]:
+        """str or None: UUID key of the stacking fault parameter set"""
         return self.__key
 
     @key.setter
-    def key(self, value):
-        if value is None:
+    def key(self, val: Optional[str]):
+        if val is None:
             self.__key = None
         else:
-            self.__key = str(value)
+            self.__key = str(val)
 
     @property
-    def id(self):
+    def id(self) -> Optional[str]:
+        """str or None: id of the stacking fault parameter set"""
         return self.__id
 
     @id.setter
-    def id(self, value):
-        if value is None:
+    def id(self, val: Optional[str]):
+        if val is None:
             self.__id = None
         else:
-            self.__id = str(value)
+            self.__id = str(val)
 
     @property
-    def hkl(self):
+    def hkl(self) -> Optional[np.ndarray]:
+        """numpy.ndarray or None: The crystallographic (hkl) or (hkil) cut plane"""
         return self.__hkl
 
     @hkl.setter
-    def hkl(self, value):
-        if value is None:
+    def hkl(self, val: Optional[npt.ArrayLike]):
+        if val is None:
             self.__hkl = None
         else:
-            if isinstance(value, str):
-                value = np.array(value.strip().split(), dtype=float)
+            if isinstance(val, str):
+                val = np.array(val.strip().split(), dtype=float)
             else:
-                value = np.asarray(value, dtype=float)
-            assert value.shape == (3,) or value.shape == (4,)
-            self.__hkl = value.tolist()
+                val = np.asarray(val, dtype=float)
+            assert val.shape == (3,) or val.shape == (4,)
+            self.__hkl = val.tolist()
 
     @property
-    def a1vect_uvw(self):
+    def a1vect_uvw(self) -> Optional[np.ndarray]:
+        """numpy.ndarray or None: The crystallographic [uvw] or [uvtw] a1 fault shift vector"""
         return self.__a1vect_uvw
 
     @a1vect_uvw.setter
-    def a1vect_uvw(self, value):
-        if value is None:
+    def a1vect_uvw(self, val: Optional[npt.ArrayLike]):
+        if val is None:
             self.__a1vect_uvw = None
         else:
-            if isinstance(value, str):
-                value = np.array(value.strip().split(), dtype=float)
+            if isinstance(val, str):
+                val = np.array(val.strip().split(), dtype=float)
             else:
-                value = np.asarray(value, dtype=float)
-            assert value.shape == (3,) or value.shape == (4,)
-            self.__a1vect_uvw = value.tolist()
+                val = np.asarray(val, dtype=float)
+            assert val.shape == (3,) or val.shape == (4,)
+            self.__a1vect_uvw = val.tolist()
 
     @property
-    def a2vect_uvw(self):
+    def a2vect_uvw(self) -> Optional[np.ndarray]:
+        """numpy.ndarray or None: The crystallographic [uvw] or [uvtw] a1 fault shift vector"""
         return self.__a2vect_uvw
 
     @a2vect_uvw.setter
-    def a2vect_uvw(self, value):
-        if value is None:
+    def a2vect_uvw(self, val: Optional[npt.ArrayLike]):
+        if val is None:
             self.__a2vect_uvw = None
         else:
-            if isinstance(value, str):
-                value = np.array(value.strip().split(), dtype=float)
+            if isinstance(val, str):
+                val = np.array(val.strip().split(), dtype=float)
             else:
-                value = np.asarray(value, dtype=float)
-            assert value.shape == (3,) or value.shape == (4,)
-            self.__a2vect_uvw = value.tolist()
+                val = np.asarray(val, dtype=float)
+            assert val.shape == (3,) or val.shape == (4,)
+            self.__a2vect_uvw = val.tolist()
 
     @property
-    def cellsetting(self):
+    def cellsetting(self) -> str:
+        """str: The reference unit cell setting"""
         return self.__cellsetting
 
     @cellsetting.setter
-    def cellsetting(self, value):
-        if value not in ['p', 'a', 'b', 'c', 'i', 'f']:
+    def cellsetting(self, val: str):
+        if val not in ['p', 'a', 'b', 'c', 'i', 'f']:
             raise ValueError('invalid surface cellsetting')
-        self.__cellsetting = str(value)
+        self.__cellsetting = str(val)
 
     @property
-    def cutboxvector(self):
+    def cutboxvector(self) -> str:
+        """str: The cell box vector that the cut occurs along"""
         return self.__cutboxvector
 
     @cutboxvector.setter
-    def cutboxvector(self, value):
-        if value not in ['a', 'b', 'c']:
+    def cutboxvector(self, val: str):
+        if val not in ['a', 'b', 'c']:
             raise ValueError('invalid surface cutboxvector')
-        self.__cutboxvector = str(value)
+        self.__cutboxvector = str(val)
 
     @property
-    def shiftindex(self):
+    def shiftindex(self) -> int:
+        """int: The index of the pre-determined shifts values to use for shift"""
         return self.__shiftindex
 
     @shiftindex.setter
-    def shiftindex(self, value):
-        self.__shiftindex = int(value)
+    def shiftindex(self, val: int):
+        self.__shiftindex = int(val)
 
     @property
-    def sizemults(self):
+    def sizemults(self) -> list:
+        """list: The three size multipliers of rcell used"""
         return self.__sizemults
 
     @sizemults.setter
-    def sizemults(self, value):
-        if isinstance(value, str):
-            value = np.array(value.strip().split(), dtype=int)
+    def sizemults(self, val: Union[str, list, tuple]):
+        if isinstance(val, str):
+            val = np.array(val.strip().split(), dtype=int)
         else:
-            value = np.asarray(value, dtype=int)
-        if value.shape != (3,):
+            val = np.asarray(val, dtype=int)
+        if val.shape != (3,):
             raise ValueError('Invalid sizemults command: exactly 3 sizemults required for this calculation')
-        self.__sizemults = value.tolist()
+        self.__sizemults = val.tolist()
 
     @property
-    def minwidth(self):
+    def minwidth(self) -> float:
+        """float: The minimum width allowed perpendicular to the cut"""
         return self.__minwidth
 
     @minwidth.setter
-    def minwidth(self, value):
-        self.__minwidth = float(value)
+    def minwidth(self, val: float):
+        self.__minwidth = float(val)
 
     @property
-    def faultpos_rel(self):
+    def faultpos_rel(self) -> float:
+        """float: The relative position along the cutboxvector where the fault plane is located"""
         return self.__faultpos_rel
 
     @faultpos_rel.setter
-    def faultpos_rel(self, value):
-        self.__faultpos_rel = float(value)
+    def faultpos_rel(self, val: float):
+        self.__faultpos_rel = float(val)
 
     @property
-    def even(self):
+    def even(self) -> bool:
+        """bool: If True, the number of replicas along the cutboxvector will be kept even"""
         return self.__even
 
     @even.setter
-    def even(self, value):
-        self.__even = boolean(value)
+    def even(self, val: bool):
+        self.__even = boolean(val)
 
     @property
-    def family(self):
+    def family(self) -> Optional[str]:
+        """str or None: The prototype or reference crystal the stacking fault parameter set is for"""
         return self.__family
 
     @family.setter
-    def family(self, value):
-        if value is None:
+    def family(self, val: Optional[str]):
+        if val is None:
             self.__family = None
         else:
-            self.__family = str(value)
+            self.__family = str(val)
 
-    def set_values(self, **kwargs):
+    def set_values(self, **kwargs: any):
         """
         Allows for multiple class attribute values to be updated at once.
 
@@ -230,7 +249,7 @@ class StackingFault(CalculationSubset):
         ----------
         param_file : str, optional
             The path to a file that fully defines the input parameters for
-            a specific defect type.
+            a specific defect type
         key : str, optional
             The UUID4 unique key associated with the defect parameter set.
         id : str, optional
@@ -291,7 +310,7 @@ class StackingFault(CalculationSubset):
         if 'even' in kwargs:
             self.even = kwargs['even']
         if 'family' in kwargs:
-            self.family = kwargs['family']         
+            self.family = kwargs['family']
         if 'a1vect_uvw' in kwargs:
             self.a1vect_uvw = kwargs['a1vect_uvw']
         if 'a2vect_uvw' in kwargs:
@@ -301,7 +320,9 @@ class StackingFault(CalculationSubset):
 
 ####################### Parameter file interactions ###########################
 
-    def _template_init(self, templateheader=None, templatedescription=None):
+    def _template_init(self,
+                       templateheader: Optional[str] = None,
+                       templatedescription: Optional[str] = None):
         """
         Sets the template header and description values.
 
@@ -320,13 +341,12 @@ class StackingFault(CalculationSubset):
         if templatedescription is None:
             templatedescription = ' '.join([
                 "Specifies the parameter set that defines a stacking fault."])
-        
+
         super()._template_init(templateheader, templatedescription)
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The subset-specific input keys and their descriptions."""
-        
         return {
             'stackingfault_file': ' '.join([
                 "The path to a stacking_fault record file that collects the",
@@ -370,9 +390,9 @@ class StackingFault(CalculationSubset):
                 "If True, the number of replicas in the cutboxvector direction will"
                 "be even. Default value is False."]),
         }
-    
+
     @property
-    def preparekeys(self):
+    def preparekeys(self) -> list:
         """
         list : The input keys (without prefix) used when preparing a calculation.
         Typically, this is templatekeys plus *_content keys so prepare can access
@@ -382,9 +402,9 @@ class StackingFault(CalculationSubset):
             'stackingfault_family',
             'stackingfault_content',
         ]
-    
+
     @property
-    def interpretkeys(self):
+    def interpretkeys(self) -> list:
         """
         list : The input keys (without prefix) accessed when interpreting the 
         calculation input file.  Typically, this is preparekeys plus any extra
@@ -395,13 +415,13 @@ class StackingFault(CalculationSubset):
         ]
 
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """
         list: Calculation subset key sets that can have multiple values during prepare.
-        """ 
+        """
         # Define key set for system size parameters
         sizekeys = ['sizemults', 'stackingfault_minwidth', 'stackingfault_even']
-        
+
         # Define key set for defect parameters as the remainder
         defectkeys = []
         for key in self.preparekeys:
@@ -414,7 +434,7 @@ class StackingFault(CalculationSubset):
             self._pre(defectkeys)
         ]
 
-    def load_parameters(self, input_dict):
+    def load_parameters(self, input_dict: dict):
         """
         Interprets calculation parameters.
         
@@ -426,11 +446,11 @@ class StackingFault(CalculationSubset):
 
         # Set default keynames
         keymap = self.keymap
-        
+
         # Extract input values and assign default values
         self.param_file = input_dict.get(keymap['stackingfault_file'], None)
         self.__content = input_dict.get(keymap['stackingfault_content'], None)
-        
+
         # Replace defect model with defect content if given
         param_file = self.param_file
         if self.__content is not None:
@@ -438,7 +458,7 @@ class StackingFault(CalculationSubset):
 
         # Extract parameters from a file
         if param_file is not None:
-            
+
             # Verify competing parameters are not defined
             for key in ('stackingfault_hkl',
                         'stackingfault_shiftindex',
@@ -449,10 +469,10 @@ class StackingFault(CalculationSubset):
                         'stackingfault_faultpos_rel'):
                 if keymap[key] in input_dict:
                     raise ValueError(f"{keymap[key]} and {keymap['stackingfault_file']} cannot both be supplied")
-            
+
             # Load defect model
             self.__model = model = DM(param_file).find('stacking-fault')
-                
+
             # Extract parameter values from defect model
             self.key = model['key']
             self.id = model['id']
@@ -464,7 +484,7 @@ class StackingFault(CalculationSubset):
             self.cutboxvector = model['calculation-parameter']['cutboxvector']
             self.faultpos_rel = float(model['calculation-parameter'].get('faultpos_rel', 0.5))
             self.cellsetting = model['calculation-parameter'].get('cellsetting', 'p')
-        
+
         # Set parameter values directly
         else:
             self.__model = None
@@ -478,7 +498,7 @@ class StackingFault(CalculationSubset):
             self.cutboxvector = input_dict.get(keymap['stackingfault_cutboxvector'], 'c')
             self.faultpos_rel = float(input_dict.get(keymap['stackingfault_faultpos_rel'], 0.5))
             self.cellsetting = input_dict.get(keymap['stackingfault_cellsetting'], 'p')
-    
+
         # Set default values for fault system manipulations
         self.sizemults = input_dict.get(keymap['sizemults'], '1 1 1')
         self.minwidth = float(input_dict.get(keymap['stackingfault_minwidth'], 0.0))
@@ -487,12 +507,12 @@ class StackingFault(CalculationSubset):
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str : The root element name for the subset terms."""
         baseroot = 'stacking-fault'
         return f'{self.modelprefix}{baseroot}'
 
-    def load_model(self, model):
+    def load_model(self, model: DM):
         """Loads subset attributes from an existing model."""
         sf = model[self.modelroot]
 
@@ -512,14 +532,16 @@ class StackingFault(CalculationSubset):
         self.cellsetting = cp['cellsetting'] 
 
         run_params = model['calculation']['run-parameter']
-        
+
         a_mult = run_params[f'{self.modelprefix}size-multipliers']['a'][1]
         b_mult = run_params[f'{self.modelprefix}size-multipliers']['b'][1]
         c_mult = run_params[f'{self.modelprefix}size-multipliers']['c'][1]
         self.sizemults = [a_mult, b_mult, c_mult]
         self.minwidth = uc.value_unit(run_params[f'{self.modelprefix}minimum-width'])
 
-    def build_model(self, model, **kwargs):
+    def build_model(self,
+                    model: DM,
+                    **kwargs: any):
         """
         Adds the subset model to the parent model.
         
@@ -561,7 +583,7 @@ class StackingFault(CalculationSubset):
             model['calculation']['run-parameter'] = DM()
 
         run_params = model['calculation']['run-parameter']
-        
+
         run_params[f'{self.modelprefix}size-multipliers'] = DM()
         run_params[f'{self.modelprefix}size-multipliers']['a'] = sorted([0, self.sizemults[0]])
         run_params[f'{self.modelprefix}size-multipliers']['b'] = sorted([0, self.sizemults[1]])
@@ -569,123 +591,64 @@ class StackingFault(CalculationSubset):
         run_params[f'{self.modelprefix}minimum-width'] = uc.model(self.minwidth,
                                                              self.parent.units.length_unit)
 
-    def mongoquery(self, stackingfault_key=None, stackingfault_id=None,
-                   stackingfault_family=None, a_mult1=None, a_mult2=None,
-                   b_mult1=None, b_mult2=None, c_mult1=None, c_mult2=None,
-                   **kwargs):
-        """
-        Generate a query to parse records with the subset from a Mongo-style
-        database.
-        
-        Parameters
-        ----------
-        stackingfault_id : str
-            The id associated with a stacking fault parameter set.
-        stackingfault_key : str
-            The key associated with a stacking fault parameter set.
-        stackingfault_family : str
-            The "family" crystal structure/prototype that the stacking fault
-            is defined for.
-        a_mult1 : int
-            The lower size multiplier for the a box direction.
-        a_mult2 : int
-            The upper size multiplier for the a box direction.
-        b_mult1 : int
-            The lower size multiplier for the b box direction.
-        b_mult2 : int
-            The upper size multiplier for the b box direction.
-        c_mult1 : int
-            The lower size multiplier for the c box direction.
-        c_mult2 : int
-            The upper size multiplier for the c box direction.
-        kwargs : any
-            The parent query terms and values ignored by the subset.
+    @property
+    def queries(self) -> dict:
+        """dict: Query objects and their associated parameter names."""
 
-        Returns
-        -------
-        dict
-            The Mongo-style find query terms.
-        """
-        # Init query and set root paths
-        mquery = {}
-        parentroot = f'content.{self.parent.modelroot}'
-        root = f'{parentroot}.{self.modelroot}'
-        runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
+        root = f'{self.parent.modelroot}.{self.modelroot}'
+        runparampath = f'{self.parent.modelroot}.calculation.run-parameter.{self.modelprefix}'
 
-        # Build query terms
-        query.str_match.mongo(mquery, f'{root}.key', stackingfault_key)
-        query.str_match.mongo(mquery, f'{root}.id', stackingfault_id)
-        query.str_match.mongo(mquery, f'{root}.system-family', stackingfault_family)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.0', a_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.1', a_mult2)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.0', b_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.1', b_mult2)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.0', c_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.1', c_mult2)
-
-        # Return query dict
-        return mquery
-
-    def cdcsquery(self, stackingfault_key=None, stackingfault_id=None,
-                  stackingfault_family=None, a_mult1=None, a_mult2=None,
-                  b_mult1=None, b_mult2=None, c_mult1=None, c_mult2=None,
-                  **kwargs):
-        """
-        Generate a query to parse records with the subset from a CDCS-style
-        database.
-        
-        Parameters
-        ----------
-        stackingfault_id : str
-            The id associated with a stacking fault parameter set.
-        stackingfault_key : str
-            The key associated with a stacking fault parameter set.
-        stackingfault_family : str
-            The "family" crystal structure/prototype that the stacking fault
-            is defined for.
-        a_mult1 : int
-            The lower size multiplier for the a box direction.
-        a_mult2 : int
-            The upper size multiplier for the a box direction.
-        b_mult1 : int
-            The lower size multiplier for the b box direction.
-        b_mult2 : int
-            The upper size multiplier for the b box direction.
-        c_mult1 : int
-            The lower size multiplier for the c box direction.
-        c_mult2 : int
-            The upper size multiplier for the c box direction.
-        kwargs : any
-            The parent query terms and values ignored by the subset.
-        
-        Returns
-        -------
-        dict
-            The CDCS-style find query terms.
-        """
-        # Init query and set root paths
-        mquery = {}
-        parentroot = self.parent.modelroot
-        root = f'{parentroot}.{self.modelroot}'
-        runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
-        
-        # Build query terms
-        query.str_match.mongo(mquery, f'{root}.stacking-fault.key', stackingfault_key)
-        query.str_match.mongo(mquery, f'{root}.stacking-fault.id', stackingfault_id)
-        query.str_match.mongo(mquery, f'{root}.system-family', stackingfault_family)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.0', a_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.1', a_mult2)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.0', b_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.1', b_mult2)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.0', c_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.1', c_mult2)
-
-        # Return query dict
-        return mquery      
+        return {
+            'stackingfault_id': load_query(
+                style='str_match',
+                name=f'{self.prefix}stackingfault_id',
+                path=f'{root}.id',
+                description='search by stacking fault parameter set id'),
+            'stackingfault_key': load_query(
+                style='str_match',
+                name=f'{self.prefix}stackingfault_key',
+                path=f'{root}.key',
+                description='search by stacking fault parameter set UUID key'),
+            'stackingfault_family': load_query(
+                style='str_match',
+                name=f'{self.prefix}dislocation_family',
+                path=f'{root}.system-family',
+                description='search by crystal prototype that the stacking fault parameter set is for'),
+            'a_mult1': load_query(
+                style='int_match',
+                name=f'{self.prefix}a_mult1',
+                path=f'{runparampath}size-multipliers.a.0',
+                description='search by lower a_mult value'),
+            'a_mult2': load_query(
+                style='int_match',
+                name=f'{self.prefix}a_mult2',
+                path=f'{runparampath}size-multipliers.a.1',
+                description='search by upper a_mult value'),
+            'b_mult1': load_query(
+                style='int_match',
+                name=f'{self.prefix}b_mult1',
+                path=f'{runparampath}size-multipliers.b.0',
+                description='search by lower b_mult value'),
+            'b_mult2': load_query(
+                style='int_match',
+                name=f'{self.prefix}b_mult2',
+                path=f'{runparampath}size-multipliers.b.1',
+                description='search by upper b_mult value'),
+            'c_mult1': load_query(
+                style='int_match',
+                name=f'{self.prefix}c_mult1',
+                path=f'{runparampath}size-multipliers.c.0',
+                description='search by lower c_mult value'),
+            'c_mult2': load_query(
+                style='int_match',
+                name=f'{self.prefix}c_mult2',
+                path=f'{runparampath}size-multipliers.c.1',
+                description='search by upper c_mult value'),
+        }
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self, meta):
+    def metadata(self, meta: dict):
         """
         Converts the structured content to a simpler dictionary.
         
@@ -710,68 +673,9 @@ class StackingFault(CalculationSubset):
         meta[f'{prefix}c_mult1'] = 0
         meta[f'{prefix}c_mult2'] = self.sizemults[2]
 
-    def pandasfilter(self, dataframe, stackingfault_key=None,
-                     stackingfault_id=None, stackingfault_family=None,
-                     a_mult1=None, a_mult2=None, b_mult1=None, b_mult2=None,
-                     c_mult1=None, c_mult2=None, **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        stackingfault_id : str
-            The id associated with a stacking fault parameter set.
-        stackingfault_key : str
-            The key associated with a stacking fault parameter set.
-        stackingfault_family : str
-            The "family" crystal structure/prototype that the stacking fault
-            is defined for.
-        a_mult1 : int
-            The lower size multiplier for the a box direction.
-        a_mult2 : int
-            The upper size multiplier for the a box direction.
-        b_mult1 : int
-            The lower size multiplier for the b box direction.
-        b_mult2 : int
-            The upper size multiplier for the b box direction.
-        c_mult1 : int
-            The lower size multiplier for the c box direction.
-        c_mult2 : int
-            The upper size multiplier for the c box direction.
-        kwargs : any
-            The parent query terms and values ignored by the subset.
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        prefix = self.prefix
-        matches = (
-            query.str_match.pandas(dataframe, f'{prefix}stackingfault_key',
-                                   stackingfault_key)
-            &query.str_match.pandas(dataframe, f'{prefix}stackingfault_id',
-                                    stackingfault_id)
-            &query.str_match.pandas(dataframe, f'{prefix}stackingfault_family',
-                                    stackingfault_family)
-            &query.int_match.pandas(dataframe, f'{prefix}a_mult1', a_mult1)
-            &query.int_match.pandas(dataframe, f'{prefix}a_mult2', a_mult2)
-            &query.int_match.pandas(dataframe, f'{prefix}b_mult1', b_mult1)
-            &query.int_match.pandas(dataframe, f'{prefix}b_mult2', b_mult2)
-            &query.int_match.pandas(dataframe, f'{prefix}c_mult1', c_mult1)
-            &query.int_match.pandas(dataframe, f'{prefix}c_mult2', c_mult2)                    
-        )
-        return matches
-
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self, input_dict):
+    def calc_inputs(self, input_dict: dict):
         """
         Generates calculation function input parameters based on the values
         assigned to attributes of the subset.
@@ -785,7 +689,7 @@ class StackingFault(CalculationSubset):
             raise ValueError('hkl not set')
 
         input_dict['hkl'] = self.hkl
-        
+
         input_dict['sizemults'] = self.sizemults
         input_dict['minwidth'] = self.minwidth
         input_dict['even'] = self.even

@@ -1,13 +1,21 @@
+# coding: utf-8
+
+# Standard Python libraries
+from typing import Optional, Union
+
+# https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.lammps as lmp
 
-from yabadaba import query
+from yabadaba import load_query
 
+from potentials.record.BasePotentialLAMMPS import BasePotentialLAMMPS
 
+# https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
+# Local imports
 from . import CalculationSubset
-
 from ..tools import dict_insert
 
 class LammpsPotential(CalculationSubset):
@@ -15,8 +23,11 @@ class LammpsPotential(CalculationSubset):
 
 ############################# Core properties #################################
 
-    def __init__(self, parent, prefix='', templateheader=None,
-                 templatedescription=None):
+    def __init__(self,
+                 parent,
+                 prefix: str = '',
+                 templateheader: Optional[str] = None,
+                 templatedescription: Optional[str] = None):
         """
         Initializes a calculation record subset object.
 
@@ -47,48 +58,48 @@ class LammpsPotential(CalculationSubset):
 ############################## Class attributes ################################
 
     @property
-    def potential_key(self):
+    def potential_key(self) -> str:
         """str: UUID4 key assigned to the potential model"""
         return self.__potential_key
-    
+
     @potential_key.setter
-    def potential_key(self, value):
-        self.__potential_key = str(value)
+    def potential_key(self, val: str):
+        self.__potential_key = str(val)
 
     @property
-    def potential_id(self):
+    def potential_id(self) -> str:
         """str: Unique id assigned to the potential model"""
         return self.__potential_id
 
     @potential_id.setter
-    def potential_id(self, value):
-        self.__potential_id = str(value)
+    def potential_id(self, val: str):
+        self.__potential_id = str(val)
 
     @property
-    def potential_LAMMPS_key(self):
+    def potential_LAMMPS_key(self) -> str:
         """str: UUID4 key assigned to the LAMMPS implementation"""
         return self.__potential_LAMMPS_key
 
     @potential_LAMMPS_key.setter
-    def potential_LAMMPS_key(self, value):
-        self.__potential_LAMMPS_key = str(value)
+    def potential_LAMMPS_key(self, val: str):
+        self.__potential_LAMMPS_key = str(val)
 
     @property
-    def potential_LAMMPS_id(self):
+    def potential_LAMMPS_id(self) -> str:
         """str: Unique id assigned to the LAMMPS implementation"""
         return self.__potential_LAMMPS_id
 
     @potential_LAMMPS_id.setter
-    def potential_LAMMPS_id(self, value):
-        self.__potential_LAMMPS_id = str(value)
+    def potential_LAMMPS_id(self, val: str):
+        self.__potential_LAMMPS_id = str(val)
 
     @property
-    def potential(self):
-        """potentials.PotentialLAMMPS: The record object for the LAMMPS implementation"""
+    def potential(self) -> BasePotentialLAMMPS:
+        """BasePotentialLAMMPS: The record object for the LAMMPS implementation"""
         if (self.__potential is None and (
                 self.potential_LAMMPS_id is not None
                 or self.potential_LAMMPS_key is not None)):
-            
+
             self.potential = am.load_lammps_potential(
                 id = self.potential_LAMMPS_id,
                 key = self.potential_LAMMPS_key,
@@ -96,17 +107,34 @@ class LammpsPotential(CalculationSubset):
                 database = self.parent.database
             )
         return self.__potential
-    
+
     @potential.setter
-    def potential(self, value):
+    def potential(self, val: BasePotentialLAMMPS):
         # Set metadata values
-        self.potential_key = value.potkey
-        self.potential_id = value.potid
-        self.potential_LAMMPS_key = value.key
-        self.potential_LAMMPS_id = value.id
-        self.__potential = value
-    
-    def set_values(self, **kwargs):
+        self.potential_key = val.potkey
+        self.potential_id = val.potid
+        self.potential_LAMMPS_key = val.key
+        self.potential_LAMMPS_id = val.id
+        self.__potential = val
+
+    def set_values(self, **kwargs: any):
+        """
+        Allows for multiple class attribute values to be updated at once.
+
+        Parameters
+        ----------
+        potential: BasePotentialLAMMPS, optional
+            A potential implementation record to associate with the calculation.
+            Cannot be given with the other potential_ kwargs.
+        potential_key: str, optional
+            The UUID key for the potential to associate with the calculation.
+        potential_id: str, optional
+            The id for the potential to associate with the calculation.
+        potential_LAMMPS_key: str, optional
+            The UUID key for the potential implementation to associate with the calculation.
+        potential_LAMMPS_id: str, optional
+            The id for the potential implementation to associate with the calculation.
+        """
         if 'potential' in kwargs:
             try:
                 assert 'potential_key' not in kwargs
@@ -128,7 +156,9 @@ class LammpsPotential(CalculationSubset):
 
 ####################### Parameter file interactions ###########################
 
-    def _template_init(self, templateheader=None, templatedescription=None):
+    def _template_init(self,
+                       templateheader: Optional[str] = None,
+                       templatedescription: Optional[str] = None):
         """
         Sets the template header and description values.
 
@@ -148,13 +178,12 @@ class LammpsPotential(CalculationSubset):
             templatedescription = ' '.join([
                 "Specifies the interatomic potential to use and the directory",
                 "where any associated parameter files are located."])
-        
+
         super()._template_init(templateheader, templatedescription)
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The subset-specific input keys and their descriptions."""
-        
         return  {
             'potential_file': ' '.join([
                 "The path to the potential_LAMMPS or potential_LAMMPS_KIM record",
@@ -177,9 +206,9 @@ class LammpsPotential(CalculationSubset):
                 "not given, then any required files are expected to be in the",
                 "working directory where the calculation is executed."]),
         }
-    
+
     @property
-    def preparekeys(self):
+    def preparekeys(self) -> list:
         """
         list : The input keys (without prefix) used when preparing a calculation.
         Typically, this is templatekeys plus *_content keys so prepare can access
@@ -191,7 +220,7 @@ class LammpsPotential(CalculationSubset):
                 ]
 
     @property
-    def interpretkeys(self):
+    def interpretkeys(self) -> list:
         """
         list : The input keys (without prefix) accessed when interpreting the 
         calculation input file.  Typically, this is preparekeys plus any extra
@@ -200,8 +229,8 @@ class LammpsPotential(CalculationSubset):
         return  self.preparekeys + [
                     'potential',
                 ]
-    
-    def load_parameters(self, input_dict):
+
+    def load_parameters(self, input_dict: dict):
         """
         Interprets calculation parameters.
         
@@ -213,7 +242,7 @@ class LammpsPotential(CalculationSubset):
 
         # Set default keynames
         keymap = self.keymap
-    
+
         # Extract input values and assign default values
         potential_file = input_dict[keymap['potential_file']]
         potential_kim_id = input_dict.get(keymap['potential_kim_id'], None)
@@ -224,7 +253,7 @@ class LammpsPotential(CalculationSubset):
         # Use potential_content instead of potential_file if given
         if potential_content is not None:
             potential_file = potential_content
-        
+
         # Read potential
         self.potential = lmp.Potential(potential_file, pot_dir=potential_dir, 
                                        kim_id=potential_kim_id, potid=potential_kim_potid)
@@ -232,12 +261,12 @@ class LammpsPotential(CalculationSubset):
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str : The root element name for the subset terms."""
         baseroot = 'potential-LAMMPS'
         return f'{self.modelprefix}{baseroot}'
 
-    def load_model(self, model):
+    def load_model(self, model: DM):
         """Loads subset attributes from an existing model."""
         sub = model[self.modelroot]
 
@@ -246,7 +275,9 @@ class LammpsPotential(CalculationSubset):
         self.potential_key = sub['potential']['key']
         self.potential_id = sub['potential']['id']
 
-    def build_model(self, model, **kwargs):
+    def build_model(self,
+                    model: DM,
+                    **kwargs: any):
         """
         Adds the subset model to the parent model.
         
@@ -276,95 +307,44 @@ class LammpsPotential(CalculationSubset):
         pot['potential'] = DM()
         pot['potential']['key'] = self.potential_key
         pot['potential']['id'] = self.potential_id
-        
+
         dict_insert(model, self.modelroot, pot, **kwargs)
 
-    def mongoquery(self, potential_LAMMPS_key=None,
-                   potential_LAMMPS_id=None, potential_key=None,
-                   potential_id=None, **kwargs):
-        """
-        Generate a query to parse records with the subset from a Mongo-style
-        database.
-        
-        Parameters
-        ----------
-        potential_LAMMPS_key : str
-            The key associated with the LAMMPS potential implementation.
-        potential_LAMMPS_id : str
-            The id associated with the LAMMPS potential implementation.
-        potential_key : str
-            The key associated with the potential model.
-        potential_id : int
-            The id associated with the potential model.
-        kwargs : any
-            The parent query terms and values ignored by the subset.
+    @property
+    def queries(self) -> dict:
+        """dict: Query objects and their associated parameter names."""
 
-        Returns
-        -------
-        dict
-            The Mongo-style find query terms.
-        """
-        # Init query and set root paths
-        mquery = {}
-        parentroot = f'content.{self.parent.modelroot}'
-        root = f'{parentroot}.{self.modelroot}'
-        runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
+        root = f'{self.parent.modelroot}.{self.modelroot}'
 
-        # Build query terms
-        query.str_match.mongo(mquery, f'{root}.key', potential_LAMMPS_key)
-        query.str_match.mongo(mquery, f'{root}.id', potential_LAMMPS_id)
-        query.str_match.mongo(mquery, f'{root}.potential.key', potential_key)
-        query.str_match.mongo(mquery, f'{root}.potential.id', potential_id)
-        
-        # Return query dict
-        return mquery
-
-    def cdcsquery(self, potential_LAMMPS_key=None,
-                  potential_LAMMPS_id=None, potential_key=None,
-                  potential_id=None, **kwargs):
-        """
-        Generate a query to parse records with the subset from a CDCS-style
-        database.
-        
-        Parameters
-        ----------
-        potential_LAMMPS_key : str
-            The key associated with the LAMMPS potential implementation.
-        potential_LAMMPS_id : str
-            The id associated with the LAMMPS potential implementation.
-        potential_key : str
-            The key associated with the potential model.
-        potential_id : int
-            The id associated with the potential model.
-        kwargs : any
-            The parent query terms and values ignored by the subset.
-        
-        Returns
-        -------
-        dict
-            The CDCS-style find query terms.
-        """
-        # Init query and set root paths
-        mquery = {}
-        parentroot = self.parent.modelroot
-        root = f'{parentroot}.{self.modelroot}'
-        runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
-        
-        # Build query terms
-        query.str_match.mongo(mquery, f'{root}.key', potential_LAMMPS_key)
-        query.str_match.mongo(mquery, f'{root}.id', potential_LAMMPS_id)
-        query.str_match.mongo(mquery, f'{root}.potential.key', potential_key)
-        query.str_match.mongo(mquery, f'{root}.potential.id', potential_id)
-        
-        # Return query dict
-        return mquery      
+        return {
+            'potential_LAMMPS_key': load_query(
+                style='str_match',
+                name=f'{self.prefix}potential_LAMMPS_key',
+                path=f'{root}.key',
+                description="search by potential implementation's UUID key"),
+            'potential_LAMMPS_id': load_query(
+                style='str_match',
+                name=f'{self.prefix}potential_LAMMPS_id',
+                path=f'{root}.id',
+                description="search by potential implementation's id"),
+            'potential_key': load_query(
+                style='str_match',
+                name=f'{self.prefix}potential_key',
+                path=f'{root}.potential.key',
+                description="search by potential's UUID key"),
+            'potential_id': load_query(
+                style='str_match',
+                name=f'{self.prefix}potential_id',
+                path=f'{root}.potential.id',
+                description="search by potential's id"),
+        }
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self, meta):
+    def metadata(self, meta: dict):
         """
         Converts the structured content to a simpler dictionary.
-        
+
         Parameters
         ----------
         meta : dict
@@ -385,52 +365,9 @@ class LammpsPotential(CalculationSubset):
         meta[f'{self.prefix}potential_key'] = self.potential_key
         meta[f'{self.prefix}potential_id'] = self.potential_id
 
-    def pandasfilter(self, dataframe, potential_LAMMPS_key=None,
-                     potential_LAMMPS_id=None, potential_key=None,
-                     potential_id=None, **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        potential_LAMMPS_key : str
-            The key associated with the LAMMPS potential implementation.
-        potential_LAMMPS_id : str
-            The id associated with the LAMMPS potential implementation.
-        potential_key : str
-            The key associated with the potential model.
-        potential_id : int
-            The id associated with the potential model.
-        kwargs : any
-            The parent query terms and values ignored by the subset.
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        prefix = self.prefix
-        matches = (
-            query.str_match.pandas(dataframe, f'{prefix}potential_LAMMPS_key',
-                                   potential_LAMMPS_key)
-            &query.str_match.pandas(dataframe, f'{prefix}potential_LAMMPS_id',
-                                    potential_LAMMPS_id)
-            &query.str_match.pandas(dataframe, f'{prefix}potential_key',
-                                    potential_key)
-            &query.str_match.pandas(dataframe, f'{prefix}potential_id',
-                                    potential_id)
-        )
-        return matches
-
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self, input_dict):
+    def calc_inputs(self, input_dict: dict):
         """
         Generates calculation function input parameters based on the values
         assigned to attributes of the subset.
@@ -442,5 +379,5 @@ class LammpsPotential(CalculationSubset):
         """
         if self.potential is None:
             raise ValueError('potential not set')
-            
+
         input_dict['potential'] = self.potential

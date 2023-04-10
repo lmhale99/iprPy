@@ -1,29 +1,29 @@
+# coding: utf-8
+
 # Standard Python libraries
 from pathlib import Path
-
-# http://www.numpy.org/
-import numpy as np
+from typing import Optional, Union
 
 # https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
-from yabadaba import query
-
 # https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.unitconvert as uc
 
+# Local imports
 from . import CalculationSubset
-from ..tools import dict_insert, aslist
-from ..input import termtodict, dicttoterm, value
+from ..input import value
 
 class AtommanElasticConstants(CalculationSubset):
     """Handles calculation terms for loading elastic constants using atomman"""
-    
+
 ############################# Core properties #################################
-     
-    def __init__(self, parent, prefix='', templateheader=None,
-                 templatedescription=None):
+
+    def __init__(self,
+                 parent,
+                 prefix: str = '',
+                 templateheader: Optional[str] = None,
+                 templatedescription: Optional[str] = None):
         """
         Initializes a calculation record subset object.
 
@@ -50,32 +50,35 @@ class AtommanElasticConstants(CalculationSubset):
         self.__C = None
 
 ############################## Class attributes ################################
-    
+
     @property
-    def elasticconstants_file(self):
+    def elasticconstants_file(self) -> Optional[Path]:
+        """Path or None: The path to the elastic constants file"""
         return self.__elasticconstants_file
 
     @elasticconstants_file.setter
-    def elasticconstants_file(self, value):
-        if value is None:
+    def elasticconstants_file(self,
+                              val: Union[str, Path, None]):
+        if val is None:
             self.__elasticconstants_file = None
         else:
-            self.__elasticconstants_file = Path(value)
+            self.__elasticconstants_file = Path(val)
 
     @property
-    def elasticconstants_content(self):
+    def elasticconstants_content(self) -> Optional[str]:
+        """str or None: File contents to use instead of reading the file"""
         return self.__elasticconstants_content
 
     @property
-    def C(self):
+    def C(self) -> Optional[am.ElasticConstants]:
+        """atomman.ElasticConstants or None: The elastic constants values"""
         return self.__C
-
-    def set_values(self, **kwargs):
-        pass
 
 ####################### Parameter file interactions ###########################
 
-    def _template_init(self, templateheader=None, templatedescription=None):
+    def _template_init(self,
+                       templateheader: Optional[str] = None,
+                       templatedescription: Optional[str] = None):
         """
         Sets the template header and description values.
 
@@ -99,13 +102,12 @@ class AtommanElasticConstants(CalculationSubset):
                 "is in a standard setting for a crystal type, then only the unique",
                 "Cij values for that crystal type are necessary.  If isotropic",
                 "values are used, only two idependent parameters are necessary."])
-        
+
         super()._template_init(templateheader, templatedescription)
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The subset-specific input keys and their descriptions."""
-                
         return  {
             'elasticconstants_file': ' '.join([
                 "The path to a record containing the elastic constants to use.  If",
@@ -168,7 +170,7 @@ class AtommanElasticConstants(CalculationSubset):
         }
 
     @property
-    def preparekeys(self):
+    def preparekeys(self) -> list:
         """
         list : The input keys (without prefix) used when preparing a calculation.
         Typically, this is templatekeys plus *_content keys so prepare can access
@@ -177,8 +179,9 @@ class AtommanElasticConstants(CalculationSubset):
         return  list(self.templatekeys.keys()) + [
                     'elasticconstants_content',
                 ]
+
     @property
-    def interpretkeys(self):
+    def interpretkeys(self) -> list:
         """
         list : The input keys (without prefix) accessed when interpreting the 
         calculation input file.  Typically, this is preparekeys plus any extra
@@ -191,7 +194,7 @@ class AtommanElasticConstants(CalculationSubset):
                     'C',
                 ]
 
-    def load_parameters(self, input_dict):
+    def load_parameters(self, input_dict: dict):
         """
         Interprets calculation parameters.
         
@@ -203,17 +206,17 @@ class AtommanElasticConstants(CalculationSubset):
 
         # Set default keynames
         keymap = self.keymap
-        
+
         # Extract input values and assign default values
         Ckey = keymap.get('Ckey', 'C')
         self.elasticconstants_file = input_dict.get(keymap['elasticconstants_file'], None)
         self.__elasticconstants_content = input_dict.get(keymap['elasticconstants_content'], None)
-        
+
         # Replace model with content if given
         cij_file = self.elasticconstants_file
         if self.elasticconstants_content is not None:
             cij_file = self.elasticconstants_content
-        
+
         # Pull out any single elastic constant terms
         Cdict = {}
         for key in input_dict:
@@ -221,38 +224,40 @@ class AtommanElasticConstants(CalculationSubset):
             keytail = key[len(Ckey):]
             if keyhead == Ckey:
                 if keytail[0] == '_':
-                    Cdict[keytail[1:]] = value(input_dict, key, default_unit=self.parent.units.pressure_unit)
+                    Cdict[keytail[1:]] = value(input_dict, key,
+                                               default_unit=self.parent.units.pressure_unit)
                 else:
-                    Cdict['C'+keytail] = value(input_dict, key, default_unit=self.parent.units.pressure_unit)
-        
+                    Cdict['C'+keytail] = value(input_dict, key,
+                                               default_unit=self.parent.units.pressure_unit)
+
         # Load from cij file
         if cij_file is not None:
             if len(Cdict) != 0:
                 raise ValueError(f"{keyhead}ij values and {keymap['elasticconstants_file']} cannot both be specified.")
-            
+
             self.__C = am.ElasticConstants(model=cij_file)
-        
+
         # Load from explicit parameters
         elif len(Cdict) > 0:
             self.__C = am.ElasticConstants(**Cdict)
-        
+
         # Check load_file for elastic constants
         else:
             load_file = self.parent.system.load_file
             if self.parent.system.load_content is not None:
                 load_file = self.parent.system.load_content
-            
+
             self.__C = am.ElasticConstants(model=load_file)
 
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str : The root element name for the subset terms."""
         baseroot = 'elastic-constants'
         return f'{self.modelprefix}{baseroot}'
 
-    def load_model(self, model):
+    def load_model(self, model: DM):
         """Loads subset attributes from an existing model."""
         try:
             c_model = DM([('elastic-constants', model[self.modelroot] )])
@@ -261,7 +266,9 @@ class AtommanElasticConstants(CalculationSubset):
         else:
             self.__C = am.ElasticConstants(model=c_model)
 
-    def build_model(self, model, **kwargs):
+    def build_model(self,
+                    model: DM,
+                    **kwargs: any):
         """
         Adds the subset model to the parent model.
         
@@ -279,7 +286,7 @@ class AtommanElasticConstants(CalculationSubset):
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self, meta):
+    def metadata(self, meta: dict):
         """
         Converts the structured content to a simpler dictionary.
         
@@ -314,7 +321,7 @@ class AtommanElasticConstants(CalculationSubset):
 
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self, input_dict):
+    def calc_inputs(self, input_dict: dict):
         """
         Generates calculation function input parameters based on the values
         assigned to attributes of the subset.

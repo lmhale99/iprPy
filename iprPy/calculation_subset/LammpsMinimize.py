@@ -1,22 +1,28 @@
+# coding: utf-8
+
+# Standard Python libraries
+from typing import Optional, Union
+
 # https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
-from yabadaba import query
-
 # https://github.com/usnistgov/atomman
-import atomman as am
 import atomman.unitconvert as uc
 
+# Local imports
 from . import CalculationSubset
 from ..input import value
 
 class LammpsMinimize(CalculationSubset):
     """Handles calculation terms for performing a LAMMPS energy/force minimization"""
-    
+
 ############################# Core properties #################################
-     
-    def __init__(self, parent, prefix='', templateheader=None,
-                 templatedescription=None):
+
+    def __init__(self,
+                 parent,
+                 prefix: str = '',
+                 templateheader: Optional[str] = None,
+                 templatedescription: Optional[str] = None):
         """
         Initializes a calculation record subset object.
 
@@ -47,56 +53,61 @@ class LammpsMinimize(CalculationSubset):
 ############################## Class attributes ################################
 
     @property
-    def energytolerance(self):
+    def energytolerance(self) -> float:
+        """float: The energy tolerance to use for minimization"""
         return self.__energytolerance
 
     @energytolerance.setter
-    def energytolerance(self, value):
-        self.__energytolerance = float(value)
+    def energytolerance(self, val: float):
+        self.__energytolerance = float(val)
 
     @property
-    def forcetolerance(self):
+    def forcetolerance(self) -> float:
+        """float: The force tolerance to use for minimization"""
         return self.__forcetolerance
 
     @forcetolerance.setter
-    def forcetolerance(self, value):
-        if isinstance(value, str):
-            self.__forcetolerance = uc.set_literal(value)
+    def forcetolerance(self, val: Union[str, float]):
+        if isinstance(val, str):
+            self.__forcetolerance = uc.set_literal(val)
         else:
-            self.__forcetolerance = float(value)
+            self.__forcetolerance = float(val)
 
     @property
-    def maxiterations(self):
+    def maxiterations(self) -> int:
+        """int: Max number of minimization iterations"""
         return self.__maxiterations
 
     @maxiterations.setter
-    def maxiterations(self, value):
-        value = int(value)
-        assert value >= 0
-        self.__maxiterations = value
-    
+    def maxiterations(self, val: int):
+        val = int(val)
+        assert val >= 0, 'maxiterations must be >= 0'
+        self.__maxiterations = val
+
     @property
-    def maxevaluations(self):
+    def maxevaluations(self) -> int:
+        """int: Max number of minimization evaluations"""
         return self.__maxevaluations
 
     @maxevaluations.setter
-    def maxevaluations(self, value):
-        value = int(value)
-        assert value >= 0
-        self.__maxevaluations = value
+    def maxevaluations(self, val: int):
+        val = int(val)
+        assert val >= 0, 'maxevaluations must be >= 0'
+        self.__maxevaluations = val
 
     @property
-    def maxatommotion(self):
+    def maxatommotion(self) -> float:
+        """float: The max distance for atomic relaxations each iteration"""
         return self.__maxatommotion
 
     @maxatommotion.setter
-    def maxatommotion(self, value):
-        if isinstance(value, str):
-            self.__maxatommotion = uc.set_literal(value)
+    def maxatommotion(self, val: Union[str, float]):
+        if isinstance(val, str):
+            self.__maxatommotion = uc.set_literal(val)
         else:
-            self.__maxatommotion = float(value)
+            self.__maxatommotion = float(val)
 
-    def set_values(self, **kwargs):
+    def set_values(self, **kwargs: any):
         """
         Allows for multiple class attribute values to be updated at once.
 
@@ -128,7 +139,9 @@ class LammpsMinimize(CalculationSubset):
 
 ####################### Parameter file interactions ###########################
 
-    def _template_init(self, templateheader=None, templatedescription=None):
+    def _template_init(self,
+                       templateheader: Optional[str] = None,
+                       templatedescription: Optional[str] = None):
         """
         Sets the template header and description values.
 
@@ -148,13 +161,12 @@ class LammpsMinimize(CalculationSubset):
             templatedescription = ' '.join([
                 "Specifies the parameters and options associated with performing",
                 "an energy and/or force minimization in LAMMPS."])
-        
+
         super()._template_init(templateheader, templatedescription)
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The subset-specific input keys and their descriptions."""
-        
         return  {
             'energytolerance': ' '.join([
                 "The energy tolerance to use for the minimization. This value is",
@@ -178,9 +190,9 @@ class LammpsMinimize(CalculationSubset):
                 "dmax term for the LAMMPS min_modify command. Default value is",
                 "'0.01 angstrom'."]),
         }
-    
+
     @property
-    def preparekeys(self):
+    def preparekeys(self) -> list:
         """
         list : The input keys (without prefix) used when preparing a calculation.
         Typically, this is templatekeys plus *_content keys so prepare can access
@@ -189,7 +201,7 @@ class LammpsMinimize(CalculationSubset):
         return  list(self.templatekeys.keys()) + []
 
     @property
-    def interpretkeys(self):
+    def interpretkeys(self) -> list:
         """
         list : The input keys (without prefix) accessed when interpreting the 
         calculation input file.  Typically, this is preparekeys plus any extra
@@ -200,7 +212,7 @@ class LammpsMinimize(CalculationSubset):
                     'length_unit',
                 ]
 
-    def load_parameters(self, input_dict, build=True):
+    def load_parameters(self, input_dict: dict):
         """
         Interprets calculation parameters.
         
@@ -212,7 +224,7 @@ class LammpsMinimize(CalculationSubset):
 
         # Set default keynames
         keymap = self.keymap
-        
+
         # Extract input values and assign default values
         self.energytolerance = input_dict.get(keymap['energytolerance'], 0.0)
         self.forcetolerance = value(input_dict, keymap['forcetolerance'],
@@ -223,14 +235,14 @@ class LammpsMinimize(CalculationSubset):
         self.maxatommotion = value(input_dict, keymap['maxatommotion'],
                                    default_unit=self.parent.units.length_unit,
                                    default_term='0.01 angstrom')
-        
+
         # Check that one of the tolerances is set
         if self.energytolerance == 0.0 and self.forcetolerance == 0.0:
             raise ValueError('energytolerance and forcetolerance cannot both be 0.0')
 
 ########################### Data model interactions ###########################
 
-    def load_model(self, model):
+    def load_model(self, model: DM):
         """Loads subset attributes from an existing model."""
         run_params = model['calculation']['run-parameter']
 
@@ -240,7 +252,9 @@ class LammpsMinimize(CalculationSubset):
         self.maxevaluations = run_params[f'{self.modelprefix}maxevaluations']
         self.maxatommotion = uc.value_unit(run_params[f'{self.modelprefix}maxatommotion'])
 
-    def build_model(self, model, **kwargs):
+    def build_model(self,
+                    model: DM,
+                    **kwargs: any):
         """
         Adds the subset model to the parent model.
         
@@ -262,7 +276,7 @@ class LammpsMinimize(CalculationSubset):
             model['calculation'] = DM()
         if 'run-parameter' not in model['calculation']:
             model['calculation']['run-parameter'] = DM()
-        
+
         # Save values
         run_params = model['calculation']['run-parameter']
         run_params[f'{self.modelprefix}energytolerance'] = self.energytolerance
@@ -275,7 +289,7 @@ class LammpsMinimize(CalculationSubset):
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self, meta):
+    def metadata(self, meta: dict):
         """
         Converts the structured content to a simpler dictionary.
         
@@ -294,10 +308,10 @@ class LammpsMinimize(CalculationSubset):
         meta[f'{prefix}maxiterations'] = self.maxiterations
         meta[f'{prefix}maxevaluations'] = self.maxevaluations
         meta[f'{prefix}maxatommotion'] = self.maxatommotion
-    
+
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self, input_dict):
+    def calc_inputs(self, input_dict: dict):
         """
         Generates calculation function input parameters based on the values
         assigned to attributes of the subset.
@@ -310,7 +324,7 @@ class LammpsMinimize(CalculationSubset):
         # Check that one of the tolerances is set
         if self.energytolerance == 0.0 and self.forcetolerance == 0.0:
             raise ValueError('energytolerance and forcetolerance cannot both be 0.0')
-        
+
         # Get ftol, dmax in LAMMPS units?
         input_dict['etol'] = self.energytolerance
         input_dict['ftol'] = self.forcetolerance

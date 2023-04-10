@@ -1,3 +1,11 @@
+# coding: utf-8
+
+# Standard Python libraries
+from typing import Optional, Union
+
+# https://github.com/usnistgov/DataModelDict
+from DataModelDict import DataModelDict as DM
+
 class CalculationSubset():
     """
     A CalcRecordSubset helps define common sets of calculation record fields
@@ -6,8 +14,11 @@ class CalculationSubset():
 
 ############################# Core properties #################################
 
-    def __init__(self, parent, prefix='', templateheader=None,
-                 templatedescription=None):
+    def __init__(self,
+                 parent,
+                 prefix: str = '',
+                 templateheader: Optional[str] = None,
+                 templatedescription: Optional[str] = None):
         """
         Initializes a calculation record subset object.
 
@@ -29,7 +40,7 @@ class CalculationSubset():
         # Get module information for current class
         if self.__module__ == __name__:
             raise TypeError("Don't use Subset itself, only use derived classes")
-        
+
         self.__parent = parent
         self.__prefix = prefix
         self._template_init(templateheader=templateheader,
@@ -37,15 +48,15 @@ class CalculationSubset():
 
     @property
     def parent(self):
-        """str: The parent calculation object for the subset."""
+        """Calculation: The parent calculation object for the subset."""
         return self.__parent
 
     @property
-    def prefix(self):
+    def prefix(self) -> str:
         """str: The prefix added before metadata field names."""
         return self.__prefix
 
-    def _pre(self, keys):
+    def _pre(self, keys: Union[str, list]) -> Union[str, list]:
         """Adds prefix to a key or list of keys"""
         if isinstance(keys, str):
             return f'{self.prefix}{keys}'
@@ -53,21 +64,35 @@ class CalculationSubset():
             return [f'{self.prefix}{key}' for key in keys]
 
     @property
-    def keyset(self):
+    def keyset(self) -> list:
         """list : The input keyset for preparing."""
         return self._pre(self.preparekeys)
 
     @property
-    def keymap(self):
+    def keymap(self) -> dict:
         """dict : Maps the keys to the basekeys"""
         km = {}
         for key in self.interpretkeys:
             km[key] = self._pre(key)
         return km
 
+############################## Class attributes ################################
+
+    def set_values(self, **kwargs: any):
+        """
+        Allows for multiple class attribute values to be updated at once.
+
+        Parameters
+        ----------
+        **kwargs : any 
+            Keyword arguments supported by the subclass
+        """
+
 ####################### Parameter file interactions ###########################
 
-    def _template_init(self, templateheader=None, templatedescription=None):
+    def _template_init(self,
+                       templateheader: Optional[str] = None,
+                       templatedescription: Optional[str] = None):
         """
         Sets the template header and description values.
 
@@ -82,27 +107,45 @@ class CalculationSubset():
         self.__templatedescription = templatedescription
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The subset-specific input keys and their descriptions."""
         return {}
 
     @property
-    def templateheader(self):
+    def preparekeys(self) -> list:
+        """
+        list : The input keys (without prefix) used when preparing a calculation.
+        Typically, this is templatekeys plus *_content keys so prepare can access
+        content before it exists in the calc folders being prepared.
+        """
+        return list(self.templatekeys.keys()) + []
+
+    @property
+    def interpretkeys(self) -> list:
+        """
+        list : The input keys (without prefix) accessed when interpreting the 
+        calculation input file.  Typically, this is preparekeys plus any extra
+        keys used or generated when processing the inputs.
+        """
+        return self.preparekeys + []
+
+    @property
+    def templateheader(self) -> str:
         """str : The header to use in the template file for the subset"""
         return self.__templateheader
-    
+
     @property
-    def templatedescription(self):
+    def templatedescription(self) -> str:
         """str : Provides a description of the subset for the templatedoc."""
         return self.__templatedescription
 
     @property
-    def template(self):
+    def template(self) -> str:
         """str : The input file template lines for the subset."""
 
         # Specify keys to include
         keys = self._pre(list(self.templatekeys.keys()))
-        
+
         # Define lines and specify content header
         lines = [f'# {self.templateheader}']
 
@@ -113,12 +156,12 @@ class CalculationSubset():
                 spacelen = 1
             space = ' ' * spacelen
             lines.append(f'{key}{space}<{key}>')
-        
+
         # Join and return lines
         return '\n'.join(lines) + '\n'
 
     @property
-    def templatedoc(self):
+    def templatedoc(self) -> str:
         """str : The documentation for the template lines for this subset."""
 
         # Define lines and specify content header and description
@@ -131,27 +174,32 @@ class CalculationSubset():
         # Join and return lines
         return '\n'.join(lines) + '\n'
 
-    def set_values(self, **kwargs):
-        pass
-
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str : The root element name for the subset terms."""
         baseroot = ''
         return f'{self.modelprefix}{baseroot}'
 
     @property
-    def modelprefix(self):
+    def modelprefix(self) -> str:
         """str: The prefix added to the model root for the subset."""
         return self.prefix.replace('_', '-')
 
-    def load_model(self, model):
-        """Loads subset attributes from an existing model."""
-        pass
+    def load_model(self, model: DM):
+        """
+        Loads subset attributes from an existing model.
+        
+        Parameters
+        ----------
+        model : DataModelDict.DataModelDict
+            The record content to extract content from.
+        """
 
-    def build_model(self, model, **kwargs):
+    def build_model(self,
+                    model: DM,
+                    **kwargs: any):
         """
         Adds the subset model to the parent model.
         
@@ -163,61 +211,15 @@ class CalculationSubset():
             Any options to pass on to dict_insert that specify where the subset
             content gets added to in the parent model.
         """
-        pass
 
-    def mongoquery(self, **kwargs):
-        """
-        Generate a query to parse records with the subset from a Mongo-style
-        database.
-        
-        Parameters
-        ----------
-        kwargs : any
-            The parent query terms and values ignored by the subset.
-
-        Returns
-        -------
-        dict
-            The Mongo-style find query terms.
-        """
-        # Init query and set root paths
-        mquery = {}
-        parentroot = f'content.{self.parent.modelroot}'
-        root = f'{parentroot}.{self.modelroot}'
-        
-        # Build query terms
-
-        # Return query dict
-        return mquery
-
-    def cdcsquery(self, **kwargs):
-        """
-        Generate a query to parse records with the subset from a CDCS-style
-        database.
-        
-        Parameters
-        ----------
-        kwargs : any
-            The parent query terms and values ignored by the subset.
-        
-        Returns
-        -------
-        dict
-            The CDCS-style find query terms.
-        """
-        # Init query and set root paths
-        mquery = {}
-        parentroot = {self.parent.modelroot}
-        root = f'{parentroot}.{self.modelroot}'
-        
-        # Build query terms
-
-        # Return query dict
-        return mquery
+    @property
+    def queries(self) -> dict:
+        """dict: Query objects and their associated parameter names."""
+        return {}
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self, meta):
+    def metadata(self, meta: dict):
         """
         Converts the structured content to a simpler dictionary.
         
@@ -226,33 +228,10 @@ class CalculationSubset():
         meta : dict
             The dictionary to add the subset content to
         """
-        pass
-
-    def pandasfilter(self, dataframe, **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        kwargs : any
-            The parent query terms and values ignored by the subset.
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        return dataframe.apply(lambda series:True, axis=1)
 
 ########################### Calculation interactions ##########################
-    
-    def calc_inputs(self, input_dict):
+
+    def calc_inputs(self, input_dict: dict):
         """
         Generates calculation function input parameters based on the values
         assigned to attributes of the subset.
@@ -262,4 +241,3 @@ class CalculationSubset():
         input_dict : dict
             The dictionary of input parameters to add subset terms to.
         """
-        pass

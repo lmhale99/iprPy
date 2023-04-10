@@ -1,29 +1,28 @@
+# coding: utf-8
+
 # Standard Python libraries
 from pathlib import Path
-
-# http://www.numpy.org/
-import numpy as np
+from typing import Optional, Union
 
 # https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
-from yabadaba import query
-
 # https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.unitconvert as uc
 
+# Local imports
 from . import CalculationSubset
-from ..tools import dict_insert, aslist
-from ..input import termtodict, dicttoterm, value, boolean
 
 class AtommanGammaSurface(CalculationSubset):
     """Handles calculation terms for loading gamma surface results using atomman"""
-    
+
 ############################# Core properties #################################
-     
-    def __init__(self, parent, prefix='', templateheader=None,
-                 templatedescription=None):
+
+    def __init__(self,
+                 parent,
+                 prefix: str = '',
+                 templateheader: Optional[str] = None,
+                 templatedescription: Optional[str] = None):
         """
         Initializes a calculation record subset object.
 
@@ -47,28 +46,32 @@ class AtommanGammaSurface(CalculationSubset):
 
         self.gammasurface_file = None
         self.__gammasurface_content = None
-        self.__gamma = None    
+        self.__gamma = None
         self.__calc_key = None
 
 ############################## Class attributes ################################
-    
+
     @property
-    def gammasurface_file(self):
+    def gammasurface_file(self) -> Optional[Path]:
+        """Path or None: The path to the gamma surface file"""
         return self.__gammasurface_file
 
     @gammasurface_file.setter
-    def gammasurface_file(self, value):
-        if value is None:
+    def gammasurface_file(self,
+                          val: Union[str, Path, None]):
+        if val is None:
             self.__gammasurface_file = None
         else:
-            self.__gammasurface_file = Path(value)
+            self.__gammasurface_file = Path(val)
 
     @property
-    def gammasurface_content(self):
+    def gammasurface_content(self) -> Optional[str]:
+        """str or None: File contents to use instead of reading the file"""
         return self.__gammasurface_content
 
     @property
-    def gamma(self):
+    def gamma(self) -> Optional[am.defect.GammaSurface]:
+        """atomman.defect.GammaSurface or None: Gamma surface values"""
         if self.__gamma is None:
             return None
         elif not isinstance(self.__gamma, am.defect.GammaSurface):
@@ -76,15 +79,15 @@ class AtommanGammaSurface(CalculationSubset):
         return self.__gamma
 
     @property
-    def calc_key(self):
+    def calc_key(self) -> Optional[str]:
+        """str or None: Calculation UUID key associated with the gamma surface values"""
         return self.__calc_key
-
-    def set_values(self, **kwargs):
-        pass
 
 ####################### Parameter file interactions ###########################
 
-    def _template_init(self, templateheader=None, templatedescription=None):
+    def _template_init(self,
+                       templateheader: Optional[str] = None,
+                       templatedescription: Optional[str] = None):
         """
         Sets the template header and description values.
 
@@ -102,22 +105,22 @@ class AtommanGammaSurface(CalculationSubset):
         # Set default template description
         if templatedescription is None:
             templatedescription = "Specifies the gamma surface results to load."
-        
+
         super()._template_init(templateheader, templatedescription)
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The subset-specific input keys and their descriptions."""
-        
+
         return {
             'gammasurface_file': ' '.join([
                 "The path to a file that contains a data model associated with",
                 "an atomman.defect.GammaSurface object.  Can be a record for a",
                 "finished stacking_fault_map_2D calculation."])
         }
-    
+
     @property
-    def preparekeys(self):
+    def preparekeys(self) -> list:
         """
         list : The input keys (without prefix) used when preparing a calculation.
         Typically, this is templatekeys plus *_content keys so prepare can access
@@ -128,7 +131,7 @@ class AtommanGammaSurface(CalculationSubset):
         ]
 
     @property
-    def interpretkeys(self):
+    def interpretkeys(self) -> list:
         """
         list : The input keys (without prefix) accessed when interpreting the 
         calculation input file.  Typically, this is preparekeys plus any extra
@@ -138,7 +141,7 @@ class AtommanGammaSurface(CalculationSubset):
             'gamma',
         ]
 
-    def load_parameters(self, input_dict):
+    def load_parameters(self, input_dict: dict):
         """
         Interprets calculation parameters.
         
@@ -149,16 +152,16 @@ class AtommanGammaSurface(CalculationSubset):
         """
         # Set default keynames
         keymap = self.keymap
-        
+
         # Extract input values and assign default values
         self.gammasurface_file = input_dict.get(keymap['gammasurface_file'], None)
         self.__gammasurface_content = input_dict.get(keymap['gammasurface_content'], None)
-        
+
         # Replace defect model with defect content if given
         gamma_file = self.gammasurface_file
         if self.gammasurface_content is not None:
             gamma_file = self.gammasurface_content
-        
+
         # If defect model is given
         if gamma_file is not None:
             g_model = DM(gamma_file)
@@ -170,18 +173,20 @@ class AtommanGammaSurface(CalculationSubset):
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str : The root element name for the subset terms."""
         baseroot = 'stacking-fault-map'
         return f'{self.modelprefix}{baseroot}'
 
-    def load_model(self, model):
+    def load_model(self, model: DM):
         """Loads subset attributes from an existing model."""
         g_model = DM([('stacking-fault-map', model.find(self.modelroot) )])
         self.__gamma = am.defect.GammaSurface(model=g_model)
         self.__calc_key = g_model['stacking-fault-map']['calc_key']
 
-    def build_model(self, model, **kwargs):
+    def build_model(self,
+                    model: DM,
+                    **kwargs: any):
         """
         Adds the subset model to the parent model.
         
@@ -200,7 +205,7 @@ class AtommanGammaSurface(CalculationSubset):
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self, meta):
+    def metadata(self, meta: dict):
         """
         Converts the structured content to a simpler dictionary.
         
@@ -214,7 +219,7 @@ class AtommanGammaSurface(CalculationSubset):
 
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self, input_dict):
+    def calc_inputs(self, input_dict: dict):
         """
         Generates calculation function input parameters based on the values
         assigned to attributes of the subset.

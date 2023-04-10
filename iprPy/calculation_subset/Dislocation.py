@@ -1,29 +1,33 @@
+# coding: utf-8
+
 # Standard Python libraries
 from pathlib import Path
+from typing import Optional, Union
 
 # http://www.numpy.org/
 import numpy as np
+import numpy.typing as npt
 
 # https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
-from yabadaba import query
+from yabadaba import load_query
 
-# https://github.com/usnistgov/atomman
-import atomman as am
-import atomman.unitconvert as uc
-
+# Local imports
 from . import CalculationSubset
-from ..tools import dict_insert, aslist
-from ..input import termtodict, dicttoterm, boolean, value
+from ..tools import aslist
+from ..input import boolean, value
 
 class Dislocation(CalculationSubset):
     """Handles calculation terms for dislocation parameters"""
 
 ############################# Core properties #################################
-     
-    def __init__(self, parent, prefix='', templateheader=None,
-                 templatedescription=None):
+
+    def __init__(self,
+                 parent,
+                 prefix: str = '',
+                 templateheader: Optional[str] = None,
+                 templatedescription: Optional[str] = None):
         """
         Initializes a calculation record subset object.
 
@@ -65,312 +69,327 @@ class Dislocation(CalculationSubset):
         self.__model = None
 
 ############################## Class attributes ################################
-    
+
     @property
-    def param_file(self):
+    def param_file(self) -> Optional[Path]:
+        """Path or None: The path to the dislocation parameter file"""
         return self.__param_file
 
     @param_file.setter
-    def param_file(self, value):
-        if value is None:
+    def param_file(self, val: Union[str, Path, None]):
+        if val is None:
             self.__param_file = None
         else:
-            self.__param_file = Path(value)
+            self.__param_file = Path(val)
 
     @property
-    def key(self):
+    def key(self) -> Optional[str]:
+        """str or None: UUID key of the dislocation parameter set"""
         return self.__key
 
     @key.setter
-    def key(self, value):
-        if value is None:
+    def key(self, val: Optional[str]):
+        if val is None:
             self.__key = None
         else:
-            self.__key = str(value)
+            self.__key = str(val)
 
     @property
-    def id(self):
+    def id(self) -> Optional[str]:
+        """str or None: id of the dislocation parameter set"""
         return self.__id
 
     @id.setter
-    def id(self, value):
-        if value is None:
+    def id(self, val: Optional[str]):
+        if val is None:
             self.__id = None
         else:
-            self.__id = str(value)
+            self.__id = str(val)
 
     @property
-    def slip_hkl(self):
+    def slip_hkl(self) -> Optional[np.ndarray]:
+        """numpy.ndarray or None: The crystallographic (hkl) or (hkil) slip plane"""
         return self.__slip_hkl
 
     @slip_hkl.setter
-    def slip_hkl(self, value):
-        if value is None:
+    def slip_hkl(self, val: Optional[npt.ArrayLike]):
+        if val is None:
             self.__slip_hkl = None
         else:
-            if isinstance(value, str):
-                value = np.array(value.strip().split(), dtype=float)
+            if isinstance(val, str):
+                val = np.array(val.strip().split(), dtype=float)
             else:
-                value = np.asarray(value, dtype=float)
-            assert value.shape == (3,) or value.shape == (4,)
-            self.__slip_hkl = value.tolist()
+                val = np.asarray(val, dtype=float)
+            assert val.shape == (3,) or val.shape == (4,)
+            self.__slip_hkl = val.tolist()
 
     @property
-    def ξ_uvw(self):
+    def ξ_uvw(self) -> Optional[np.ndarray]:
+        """numpy.ndarray or None: The crystallographic [uvw] or [uvtw] line direction"""
         return self.__ξ_uvw
 
     @ξ_uvw.setter
-    def ξ_uvw(self, value):
-        if value is None:
+    def ξ_uvw(self, val: Optional[npt.ArrayLike]):
+        if val is None:
             self.__ξ_uvw = None
         else:
-            if isinstance(value, str):
-                value = np.array(value.strip().split(), dtype=float)
+            if isinstance(val, str):
+                val = np.array(val.strip().split(), dtype=float)
             else:
-                value = np.asarray(value, dtype=float)
-            assert value.shape == (3,) or value.shape == (4,)
-            self.__ξ_uvw = value.tolist()
+                val = np.asarray(val, dtype=float)
+            assert val.shape == (3,) or val.shape == (4,)
+            self.__ξ_uvw = val.tolist()
 
     @property
-    def burgers(self):
+    def burgers(self) -> Optional[np.ndarray]:
+        """numpy.ndarray or None: The crystallographic [uvw] or [uvtw] Burgers vector"""
         return self.__burgers
 
     @burgers.setter
-    def burgers(self, value):
-        if value is None:
+    def burgers(self, val: Optional[npt.ArrayLike]):
+        if val is None:
             self.__burgers = None
         else:
-            if isinstance(value, str):
-                value = np.array(value.strip().split(), dtype=float)
+            if isinstance(val, str):
+                val = np.array(val.strip().split(), dtype=float)
             else:
-                value = np.asarray(value, dtype=float)
-            assert value.shape == (3,) or value.shape == (4,)
-            self.__burgers = value
+                val = np.asarray(val, dtype=float)
+            assert val.shape == (3,) or val.shape == (4,)
+            self.__burgers = val
 
     @property
-    def m(self):
+    def m(self) -> Optional[np.ndarray]:
+        """numpy.ndarray or None: The Cartesian vector that corresponds to the dislocation solution's m-axis"""
         return self.__m
 
     @m.setter
-    def m(self, value):
-        if value is None:
+    def m(self, val: Optional[npt.ArrayLike]):
+        if val is None:
             self.__m = None
         else:
-            if isinstance(value, str):
-                value = np.array(value.strip().split(), dtype=float)
+            if isinstance(val, str):
+                val = np.array(val.strip().split(), dtype=float)
             else:
-                value = np.asarray(value, dtype=float)
-            assert value.shape == (3,)
-            assert np.isclose(value[0], 1.0) or np.isclose(value[1], 1.0) or np.isclose(value[2], 1.0)
-            assert np.isclose(np.linalg.norm(value), 1.0)
-            self.__m = value
+                val = np.asarray(val, dtype=float)
+            assert val.shape == (3,)
+            assert np.isclose(val[0], 1.0) or np.isclose(val[1], 1.0) or np.isclose(val[2], 1.0)
+            assert np.isclose(np.linalg.norm(val), 1.0)
+            self.__m = val
 
     @property
-    def n(self):
+    def n(self) -> Optional[np.ndarray]:
+        """numpy.ndarray or None: The Cartesian vector that corresponds to the dislocation solution's n-axis"""
         return self.__n
 
     @n.setter
-    def n(self, value):
-        if value is None:
+    def n(self, val: Optional[npt.ArrayLike]):
+        if val is None:
             self.__n = None
         else:
-            if isinstance(value, str):
-                value = np.array(value.strip().split(), dtype=float)
+            if isinstance(val, str):
+                val = np.array(val.strip().split(), dtype=float)
             else:
-                value = np.asarray(value, dtype=float)
-            assert value.shape == (3,)
-            assert np.isclose(value[0], 1.0) or np.isclose(value[1], 1.0) or np.isclose(value[2], 1.0)
-            assert np.isclose(np.linalg.norm(value), 1.0)
-            self.__n = value
+                val = np.asarray(val, dtype=float)
+            assert val.shape == (3,)
+            assert np.isclose(val[0], 1.0) or np.isclose(val[1], 1.0) or np.isclose(val[2], 1.0)
+            assert np.isclose(np.linalg.norm(val), 1.0)
+            self.__n = val
 
     @property
-    def shift(self):
+    def shift(self) -> Optional[np.ndarray]:
+        """numpy.ndarray or None: The rigid body shift to position the dislocation solution relative to the atomic configuration"""
         return self.__shift
 
     @shift.setter
-    def shift(self, value):
-        if value is None:
+    def shift(self, val: Optional[npt.ArrayLike]):
+        if val is None:
             self.__shift = None
         else:
-            if isinstance(value, str):
-                value = np.array(value.strip().split(), dtype=float)
+            if isinstance(val, str):
+                val = np.array(val.strip().split(), dtype=float)
             else:
-                value = np.asarray(value, dtype=float)
-            assert value.shape[0] == 3
-            self.__shift = value
+                val = np.asarray(val, dtype=float)
+            assert val.shape[0] == 3
+            self.__shift = val
 
     @property
-    def shiftscale(self):
+    def shiftscale(self) -> bool:
+        """bool: Indicates if shift is absolute Cartesian or scaled relative to rcell"""
         return self.__shiftscale
 
     @shiftscale.setter
-    def shiftscale(self, value):
-        self.__shiftscale = boolean(value)
+    def shiftscale(self, val: bool):
+        self.__shiftscale = boolean(val)
 
     @property
-    def shiftindex(self):
+    def shiftindex(self) -> Optional[int]:
+        """int or None: The index of the pre-determined shifts values to use for shift"""
         return self.__shiftindex
 
     @shiftindex.setter
-    def shiftindex(self, value):
-        if value is None:
+    def shiftindex(self, val: Optional[int]):
+        if val is None:
             self.__shiftindex = None
         else:
-            self.__shiftindex = int(value)
+            self.__shiftindex = int(val)
 
     @property
-    def a_mults(self):
+    def a_mults(self) -> tuple:
         """tuple: Size multipliers for the rotated a box vector"""
         return self.__a_mults
 
     @a_mults.setter
-    def a_mults(self, value):
-        value = aslist(value)
-        
-        if len(value) == 1:
-            value[0] = int(value[0])
-            if value[0] > 0:
-                value = [0, value[0]]
-            
-            # Add 0 after if value is negative
-            elif value[0] < 0:
-                value = [value[0], 0]
-            
+    def a_mults(self, val: Union[int, list, tuple]):
+        val = aslist(val)
+
+        if len(val) == 1:
+            val[0] = int(val[0])
+            if val[0] > 0:
+                val = [0, val[0]]
+
+            # Add 0 after if val is negative
+            elif val[0] < 0:
+                val = [val[0], 0]
+
             else:
                 raise ValueError('a_mults values cannot both be 0')
-        
-        elif len(value) == 2:
-            value[0] = int(value[0])
-            value[1] = int(value[1])
-            if value[0] > 0:
+
+        elif len(val) == 2:
+            val[0] = int(val[0])
+            val[1] = int(val[1])
+            if val[0] > 0:
                 raise ValueError('First a_mults value must be <= 0')
-            if value[1] < 0:
+            if val[1] < 0:
                 raise ValueError('Second a_mults value must be >= 0')
-            if value[0] == value[1]:
+            if val[0] == val[1]:
                 raise ValueError('a_mults values cannot both be 0')
-        
-        self.__a_mults = tuple(value)
+
+        self.__a_mults = tuple(val)
 
     @property
-    def b_mults(self):
+    def b_mults(self) -> tuple:
         """tuple: Size multipliers for the rotated b box vector"""
         return self.__b_mults
 
     @b_mults.setter
-    def b_mults(self, value):
-        value = aslist(value)
-        
-        if len(value) == 1:
-            value[0] = int(value[0])
-            if value[0] > 0:
-                value = [0, value[0]]
-            
-            # Add 0 after if value is negative
-            elif value[0] < 0:
-                value = [value[0], 0]
-            
+    def b_mults(self, val: Union[int, list, tuple]):
+        val = aslist(val)
+
+        if len(val) == 1:
+            val[0] = int(val[0])
+            if val[0] > 0:
+                val = [0, val[0]]
+
+            # Add 0 after if val is negative
+            elif val[0] < 0:
+                val = [val[0], 0]
+
             else:
                 raise ValueError('b_mults values cannot both be 0')
-        
-        elif len(value) == 2:
-            value[0] = int(value[0])
-            value[1] = int(value[1])
-            if value[0] > 0:
+
+        elif len(val) == 2:
+            val[0] = int(val[0])
+            val[1] = int(val[1])
+            if val[0] > 0:
                 raise ValueError('First b_mults value must be <= 0')
-            if value[1] < 0:
+            if val[1] < 0:
                 raise ValueError('Second b_mults value must be >= 0')
-            if value[0] == value[1]:
+            if val[0] == val[1]:
                 raise ValueError('b_mults values cannot both be 0')
-        
-        self.__b_mults = tuple(value)
-    
+
+        self.__b_mults = tuple(val)
+
     @property
-    def c_mults(self):
+    def c_mults(self) -> tuple:
         """tuple: Size multipliers for the rotated c box vector"""
         return self.__c_mults
 
     @c_mults.setter
-    def c_mults(self, value):
-        value = aslist(value)
+    def c_mults(self, val: Union[int, list, tuple]):
+        val = aslist(val)
         
-        if len(value) == 1:
-            value[0] = int(value[0])
-            if value[0] > 0:
-                value = [0, value[0]]
-            
-            # Add 0 after if value is negative
-            elif value[0] < 0:
-                value = [value[0], 0]
-            
+        if len(val) == 1:
+            val[0] = int(val[0])
+            if val[0] > 0:
+                val = [0, val[0]]
+
+            # Add 0 after if val is negative
+            elif val[0] < 0:
+                val = [val[0], 0]
+
             else:
                 raise ValueError('c_mults values cannot both be 0')
-        
-        elif len(value) == 2:
-            value[0] = int(value[0])
-            value[1] = int(value[1])
-            if value[0] > 0:
+
+        elif len(val) == 2:
+            val[0] = int(val[0])
+            val[1] = int(val[1])
+            if val[0] > 0:
                 raise ValueError('First c_mults value must be <= 0')
-            if value[1] < 0:
+            if val[1] < 0:
                 raise ValueError('Second c_mults value must be >= 0')
-            if value[0] == value[1]:
+            if val[0] == val[1]:
                 raise ValueError('c_mults values cannot both be 0')
         
-        self.__c_mults = tuple(value)
+        self.__c_mults = tuple(val)
 
     @property
-    def sizemults(self):
+    def sizemults(self) -> tuple:
         """tuple: All three sets of size multipliers"""
         return (self.a_mults, self.b_mults, self.c_mults)
 
     @sizemults.setter
-    def sizemults(self, value):
-        if len(value) == 3:
-            self.a_mults = value[0]
-            self.b_mults = value[1]
-            self.c_mults = value[2]
-        elif len(value) == 6:
-            self.a_mults = value[0:2]
-            self.b_mults = value[2:4]
-            self.c_mults = value[4:6]
+    def sizemults(self, val: Union[list, tuple]):
+        if len(val) == 3:
+            self.a_mults = val[0]
+            self.b_mults = val[1]
+            self.c_mults = val[2]
+        elif len(val) == 6:
+            self.a_mults = val[0:2]
+            self.b_mults = val[2:4]
+            self.c_mults = val[4:6]
         else:
             raise ValueError('len of sizemults must be 3 or 6')
 
     @property
-    def amin(self):
+    def amin(self) -> float:
         return self.__amin
 
     @amin.setter
-    def amin(self, value):
-        self.__amin = float(value)
+    def amin(self, val: float):
+        """float: Minimum distance allowed along the a box vector direction"""
+        self.__amin = float(val)
 
     @property
-    def bmin(self):
+    def bmin(self) -> float:
         return self.__bmin
 
     @bmin.setter
-    def bmin(self, value):
-        self.__bmin = float(value)
-    
+    def bmin(self, val: float):
+        """float: Minimum distance allowed along the b box vector direction"""
+        self.__bmin = float(val)
+
     @property
-    def cmin(self):
+    def cmin(self) -> float:
         return self.__cmin
 
     @cmin.setter
-    def cmin(self, value):
-        self.__cmin = float(value)
+    def cmin(self, val: float):
+        """float: Minimum distance allowed along the c box vector direction"""
+        self.__cmin = float(val)
 
     @property
-    def family(self):
+    def family(self) -> Optional[str]:
+        """str or None: The prototype or reference crystal the dislocation parameter set is for"""
         return self.__family
 
     @family.setter
-    def family(self, value):
-        if value is None:
+    def family(self, val: Optional[str]):
+        if val is None:
             self.__family = None
         else:
-            self.__family = str(value)
+            self.__family = str(val)
 
-    def set_values(self, **kwargs):
+    def set_values(self, **kwargs: any):
         """
         Allows for multiple class attribute values to be updated at once.
 
@@ -447,13 +466,15 @@ class Dislocation(CalculationSubset):
         if 'bmin' in kwargs:
             self.bmin = kwargs['bmin']
         if 'cmin' in kwargs:
-            self.cmin = kwargs['cmin']        
+            self.cmin = kwargs['cmin']
         if 'family' in kwargs:
-            self.family = kwargs['family']         
-        
-####################### Parameter file interactions ###########################
+            self.family = kwargs['family']
 
-    def _template_init(self, templateheader=None, templatedescription=None):
+    ###################### Parameter file interactions ########################
+
+    def _template_init(self,
+                       templateheader: Optional[str] = None,
+                       templatedescription: Optional[str] = None):
         """
         Sets the template header and description values.
 
@@ -477,9 +498,8 @@ class Dislocation(CalculationSubset):
         super()._template_init(templateheader, templatedescription)
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The subset-specific input keys and their descriptions."""
-        
         return {
             'dislocation_file': ' '.join([
                 "The path to a dislocation record file that collects the",
@@ -544,7 +564,7 @@ class Dislocation(CalculationSubset):
         }
     
     @property
-    def preparekeys(self):
+    def preparekeys(self) -> list:
         """
         list : The input keys (without prefix) used when preparing a calculation.
         Typically, this is templatekeys plus *_content keys so prepare can access
@@ -556,7 +576,7 @@ class Dislocation(CalculationSubset):
         ]
 
     @property
-    def interpretkeys(self):
+    def interpretkeys(self) -> list:
         """
         list : The input keys (without prefix) accessed when interpreting the 
         calculation input file.  Typically, this is preparekeys plus any extra
@@ -567,13 +587,13 @@ class Dislocation(CalculationSubset):
         ]
 
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """
         list: Calculation subset key sets that can have multiple values during prepare.
-        """ 
+        """
         # Define key set for system size parameters
         sizekeys = ['sizemults', 'amin', 'bmin', 'cmin']
-        
+
         # Define key set for defect parameters as the remainder
         defectkeys = []
         for key in self.preparekeys:
@@ -586,7 +606,7 @@ class Dislocation(CalculationSubset):
             self._pre(defectkeys)
         ]
 
-    def load_parameters(self, input_dict):
+    def load_parameters(self, input_dict: dict):
         """
         Interprets calculation parameters.
         
@@ -597,19 +617,19 @@ class Dislocation(CalculationSubset):
         """
         # Set default keynames
         keymap = self.keymap
-        
+
         # Extract input values and assign default values
         self.param_file = input_dict.get(keymap['dislocation_file'], None)
         self.__content = input_dict.get(keymap['dislocation_content'], None)
-        
+
         # Replace defect model with defect content if given
         param_file = self.param_file
         if self.__content is not None:
             param_file = self.__content
-        
+
         # Extract parameters from a file
         if param_file is not None:
-            
+
             # Verify competing parameters are not defined
             for key in ('dislocation_slip_hkl',
                         'dislocation_ξ_uvw',
@@ -621,10 +641,10 @@ class Dislocation(CalculationSubset):
                         'dislocation_shiftindex'):
                 if keymap[key] in input_dict:
                     raise ValueError(f"{keymap[key]} and {keymap['dislocation_file']} cannot both be supplied")
-            
+
             # Load defect model
             self.__model = model = DM(param_file).find('dislocation')
-            
+
             # Extract parameter values from defect model
             self.key = model['key']
             self.id = model['id']
@@ -637,9 +657,9 @@ class Dislocation(CalculationSubset):
             self.shift = model['calculation-parameter'].get('shift', None)
             self.shiftindex = model['calculation-parameter'].get('shiftindex', None)
             self.shiftscale = boolean(model['calculation-parameter'].get('shiftscale', False))
-        
+
         # Set parameter values directly
-        else: 
+        else:
             self.__model = None
             self.key = None
             self.id = None
@@ -652,7 +672,7 @@ class Dislocation(CalculationSubset):
             self.shift = input_dict.get(keymap['dislocation_shift'], None)
             self.shiftscale = boolean(input_dict.get(keymap['dislocation_shiftscale'], False))
             self.shiftindex = input_dict.get(keymap['dislocation_shiftindex'], None)
-                    
+
         # Check defect parameters
         if not np.isclose(self.m.dot(self.n), 0.0):
             raise ValueError("dislocation_m and dislocation_n must be orthogonal")
@@ -660,7 +680,7 @@ class Dislocation(CalculationSubset):
         # Set default values for fault system manipulations
         sizemults = input_dict.get(keymap['sizemults'], '1 1 1')
         self.sizemults = np.array(sizemults.strip().split(), dtype=int)
-        
+
         self.amin = value(input_dict, keymap['amin'], default_term='0.0 angstrom',
                           default_unit=self.parent.units.length_unit)
         self.bmin = value(input_dict, keymap['bmin'], default_term='0.0 angstrom',
@@ -671,12 +691,12 @@ class Dislocation(CalculationSubset):
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str : The root element name for the subset terms."""
         baseroot = 'dislocation'
         return f'{self.modelprefix}{baseroot}'
 
-    def load_model(self, model):
+    def load_model(self, model: DM):
         """Loads subset attributes from an existing model."""
         disl = model[self.modelroot]
 
@@ -699,12 +719,14 @@ class Dislocation(CalculationSubset):
         self.shiftscale = cp['shiftscale']
 
         run_params = model['calculation']['run-parameter']
-        
+
         self.a_mults = run_params[f'{self.modelprefix}size-multipliers']['a']
         self.b_mults = run_params[f'{self.modelprefix}size-multipliers']['b']
         self.c_mults = run_params[f'{self.modelprefix}size-multipliers']['c']
 
-    def build_model(self, model, **kwargs):
+    def build_model(self,
+                    model: DM,
+                    **kwargs: any):
         """
         Adds the subset model to the parent model.
         
@@ -750,123 +772,64 @@ class Dislocation(CalculationSubset):
         run_params[f'{self.modelprefix}size-multipliers']['b'] = list(self.b_mults)
         run_params[f'{self.modelprefix}size-multipliers']['c'] = list(self.c_mults)
 
-    def mongoquery(self, dislocation_key=None, dislocation_id=None,
-                   dislocation_family=None, a_mult1=None, a_mult2=None,
-                   b_mult1=None, b_mult2=None, c_mult1=None, c_mult2=None,
-                   **kwargs):
-        """
-        Generate a query to parse records with the subset from a Mongo-style
-        database.
-        
-        Parameters
-        ----------
-        dislocation_id : str
-            The id associated with a dislocation parameter set.
-        dislocation_key : str
-            The key associated with a dislocation parameter set.
-        dislocation_family : str
-            The "family" crystal structure/prototype that the dislocation
-            is defined for.
-        a_mult1 : int
-            The lower size multiplier for the a box direction.
-        a_mult2 : int
-            The upper size multiplier for the a box direction.
-        b_mult1 : int
-            The lower size multiplier for the b box direction.
-        b_mult2 : int
-            The upper size multiplier for the b box direction.
-        c_mult1 : int
-            The lower size multiplier for the c box direction.
-        c_mult2 : int
-            The upper size multiplier for the c box direction.
-        kwargs : any
-            The parent query terms and values ignored by the subset.
+    @property
+    def queries(self) -> dict:
+        """dict: Query objects and their associated parameter names."""
 
-        Returns
-        -------
-        dict
-            The Mongo-style find query terms.
-        """
-        # Init query and set root paths
-        mquery = {}
-        parentroot = f'content.{self.parent.modelroot}'
-        root = f'{parentroot}.{self.modelroot}'
-        runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
+        root = f'{self.parent.modelroot}.{self.modelroot}'
+        runparampath = f'{self.parent.modelroot}.calculation.run-parameter.{self.modelprefix}'
 
-        # Build query terms
-        query.str_match.mongo(mquery, f'{root}.dislocation.key', dislocation_key)
-        query.str_match.mongo(mquery, f'{root}.dislocation.id', dislocation_id)
-        query.str_match.mongo(mquery, f'{root}.system-family', dislocation_family)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.0', a_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.1', a_mult2)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.0', b_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.1', b_mult2)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.0', c_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.1', c_mult2)
-
-        # Return query dict
-        return mquery
-
-    def cdcsquery(self, dislocation_key=None, dislocation_id=None,
-                  dislocation_family=None, a_mult1=None, a_mult2=None,
-                  b_mult1=None, b_mult2=None, c_mult1=None, c_mult2=None,
-                  **kwargs):
-        """
-        Generate a query to parse records with the subset from a CDCS-style
-        database.
-        
-        Parameters
-        ----------
-        dislocation_id : str
-            The id associated with a dislocation parameter set.
-        dislocation_key : str
-            The key associated with a dislocation parameter set.
-        dislocation_family : str
-            The "family" crystal structure/prototype that the dislocation
-            is defined for.
-        a_mult1 : int
-            The lower size multiplier for the a box direction.
-        a_mult2 : int
-            The upper size multiplier for the a box direction.
-        b_mult1 : int
-            The lower size multiplier for the b box direction.
-        b_mult2 : int
-            The upper size multiplier for the b box direction.
-        c_mult1 : int
-            The lower size multiplier for the c box direction.
-        c_mult2 : int
-            The upper size multiplier for the c box direction.
-        kwargs : any
-            The parent query terms and values ignored by the subset.
-        
-        Returns
-        -------
-        dict
-            The CDCS-style find query terms.
-        """
-        # Init query and set root paths
-        mquery = {}
-        parentroot = self.parent.modelroot
-        root = f'{parentroot}.{self.modelroot}'
-        runparam_prefix = f'{parentroot}.calculation.run-parameter.{self.modelprefix}'
-        
-        # Build query terms
-        query.str_match.mongo(mquery, f'{root}.dislocation.key', dislocation_key)
-        query.str_match.mongo(mquery, f'{root}.dislocation.id', dislocation_id)
-        query.str_match.mongo(mquery, f'{root}.system-family', dislocation_family)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.0', a_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.a.1', a_mult2)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.0', b_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.b.1', b_mult2)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.0', c_mult1)
-        query.int_match.mongo(mquery, f'{runparam_prefix}size-multipliers.c.1', c_mult2)
-
-        # Return query dict
-        return mquery      
+        return {
+            'dislocation_id': load_query(
+                style='str_match',
+                name=f'{self.prefix}dislocation_id',
+                path=f'{root}.id',
+                description='search by dislocation parameter set id'),
+            'dislocation_key': load_query(
+                style='str_match',
+                name=f'{self.prefix}dislocation_key',
+                path=f'{root}.key',
+                description='search by dislocation parameter set UUID key'),
+            'dislocation_family': load_query(
+                style='str_match',
+                name=f'{self.prefix}dislocation_family',
+                path=f'{root}.system-family',
+                description='search by crystal prototype that the dislocation parameter set is for'),
+            'a_mult1': load_query(
+                style='int_match',
+                name=f'{self.prefix}a_mult1',
+                path=f'{runparampath}size-multipliers.a.0',
+                description='search by lower a_mult value'),
+            'a_mult2': load_query(
+                style='int_match',
+                name=f'{self.prefix}a_mult2',
+                path=f'{runparampath}size-multipliers.a.1',
+                description='search by upper a_mult value'),
+            'b_mult1': load_query(
+                style='int_match',
+                name=f'{self.prefix}b_mult1',
+                path=f'{runparampath}size-multipliers.b.0',
+                description='search by lower b_mult value'),
+            'b_mult2': load_query(
+                style='int_match',
+                name=f'{self.prefix}b_mult2',
+                path=f'{runparampath}size-multipliers.b.1',
+                description='search by upper b_mult value'),
+            'c_mult1': load_query(
+                style='int_match',
+                name=f'{self.prefix}c_mult1',
+                path=f'{runparampath}size-multipliers.c.0',
+                description='search by lower c_mult value'),
+            'c_mult2': load_query(
+                style='int_match',
+                name=f'{self.prefix}c_mult2',
+                path=f'{runparampath}size-multipliers.c.1',
+                description='search by upper c_mult value'),
+        }
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self, meta):
+    def metadata(self, meta: dict):
         """
         Converts the structured content to a simpler dictionary.
         
@@ -895,68 +858,9 @@ class Dislocation(CalculationSubset):
         meta[f'{prefix}c_mult1'] = self.c_mults[0]
         meta[f'{prefix}c_mult2'] = self.c_mults[1]
 
-    def pandasfilter(self, dataframe, dislocation_key=None, dislocation_id=None,
-                     dislocation_family=None, a_mult1=None, a_mult2=None,
-                     b_mult1=None, b_mult2=None, c_mult1=None, c_mult2=None,
-                     **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        dislocation_id : str
-            The id associated with a dislocation parameter set.
-        dislocation_key : str
-            The key associated with a dislocation parameter set.
-        dislocation_family : str
-            The "family" crystal structure/prototype that the dislocation
-            is defined for.
-        a_mult1 : int
-            The lower size multiplier for the a box direction.
-        a_mult2 : int
-            The upper size multiplier for the a box direction.
-        b_mult1 : int
-            The lower size multiplier for the b box direction.
-        b_mult2 : int
-            The upper size multiplier for the b box direction.
-        c_mult1 : int
-            The lower size multiplier for the c box direction.
-        c_mult2 : int
-            The upper size multiplier for the c box direction.
-        kwargs : any
-            The parent query terms and values ignored by the subset.
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        prefix = self.prefix
-        matches = (
-            query.str_match.pandas(dataframe, f'{prefix}dislocation_key',
-                                   dislocation_key)
-            &query.str_match.pandas(dataframe, f'{prefix}dislocation_id',
-                                    dislocation_id)
-            &query.str_match.pandas(dataframe, f'{prefix}dislocation_family',
-                                    dislocation_family)
-            &query.int_match.pandas(dataframe, f'{prefix}a_mult1', a_mult1)
-            &query.int_match.pandas(dataframe, f'{prefix}a_mult2', a_mult2)
-            &query.int_match.pandas(dataframe, f'{prefix}b_mult1', b_mult1)
-            &query.int_match.pandas(dataframe, f'{prefix}b_mult2', b_mult2)
-            &query.int_match.pandas(dataframe, f'{prefix}c_mult1', c_mult1)
-            &query.int_match.pandas(dataframe, f'{prefix}c_mult2', c_mult2) 
-        )
-        return matches
-
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self, input_dict):
+    def calc_inputs(self, input_dict: dict):
         """
         Generates calculation function input parameters based on the values
         assigned to attributes of the subset.
