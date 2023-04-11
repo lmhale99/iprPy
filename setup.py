@@ -44,7 +44,9 @@ setup(name = 'iprPy',
         'pandas',
         'atomman==1.4.5',
         'requests',
-        'bokeh'
+        'bokeh',
+        'plotly',
+        'kaleido'
       ],
       entry_points = {
         'console_scripts': [

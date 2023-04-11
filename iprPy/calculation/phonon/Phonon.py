@@ -692,9 +692,9 @@ class Phonon(Calculation):
 
         # Extract results
         if self.status == 'finished':
-            meta['bandstructure'] = self.bandstructure
-            meta['thermal'] = self.thermal
-            meta['dos'] = self.dos
+            #meta['bandstructure'] = self.bandstructure
+            #meta['thermal'] = self.thermal
+            #meta['dos'] = self.dos
             if self.__volumescan is not None:
                 meta['volumescan'] = self.volumescan
                 meta['E0'] = self.E0
