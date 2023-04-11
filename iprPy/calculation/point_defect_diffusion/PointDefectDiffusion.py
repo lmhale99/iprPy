@@ -1,17 +1,12 @@
 # coding: utf-8
 
 # Standard Python libraries
-import uuid
-from copy import deepcopy
+from io import IOBase
+from pathlib import Path
+from typing import Optional, Union
 import random
 
-import numpy as np
-
-from yabadaba import query
-
 # https://github.com/usnistgov/atomman
-import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/DataModelDict
@@ -20,18 +15,37 @@ from DataModelDict import DataModelDict as DM
 # iprPy imports
 from .. import Calculation
 from .point_defect_diffusion import pointdiffusion
-from ...calculation_subset import *
-from ...input import value, boolean
-from ...tools import aslist, dict_insert
+from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
+                                   AtommanSystemLoad, AtommanSystemManipulate, PointDefect)
 
 class PointDefectDiffusion(Calculation):
     """Class for managing point defect diffusion calculations"""
 
 ############################# Core properties #################################
 
-    def __init__(self, model=None, name=None, params=None, **kwargs):
-        """Initializes a Calculation object for a given style."""
-        
+    def __init__(self,
+                 model: Union[str, Path, IOBase, DM, None]=None,
+                 name: Optional[str]=None,
+                 params: Union[str, Path, IOBase, dict] = None,
+                 **kwargs: any):
+        """
+        Initializes a Calculation object for a given style.
+
+        Parameters
+        ----------
+        model : str, file-like object or DataModelDict, optional
+            Record content in data model format to read in.  Cannot be given
+            with params.
+        name : str, optional
+            The name to use for saving the record.  By default, this should be
+            the calculation's key.
+        params : str, file-like object or dict, optional
+            Calculation input parameters or input parameter file.  Cannot be
+            given with model.
+        **kwargs : any
+            Any other core Calculation record attributes to set.  Cannot be
+            given with model.
+        """
         # Initialize subsets used by the calculation
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
@@ -42,13 +56,13 @@ class PointDefectDiffusion(Calculation):
         subsets = (self.commands, self.potential, self.system,
                    self.system_mods, self.defect, self.units)
 
-        # Initialize unique calculation attributes  
+        # Initialize unique calculation attributes
         self.temperature = 0.0
         self.thermosteps = 100
         self.dumpsteps = None
         self.runsteps = 200000
         self.equilsteps = 20000
-        self.randomseed = None     
+        self.randomseed = None
 
         self.__nsamples = None
         self.__natoms = None
@@ -68,7 +82,7 @@ class PointDefectDiffusion(Calculation):
         self.__dy = None
         self.__dz = None
         self.__d = None
-        
+
         # Define calc shortcut
         self.calc = pointdiffusion
 
@@ -77,7 +91,7 @@ class PointDefectDiffusion(Calculation):
                          subsets=subsets, **kwargs)
 
     @property
-    def filenames(self):
+    def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
             'point_defect_diffusion.py',
@@ -87,59 +101,59 @@ class PointDefectDiffusion(Calculation):
 ############################## Class attributes ###############################
 
     @property
-    def commands(self):
+    def commands(self) -> LammpsCommands:
         """LammpsCommands subset"""
         return self.__commands
 
     @property
-    def potential(self):
+    def potential(self) -> LammpsPotential:
         """LammpsPotential subset"""
         return self.__potential
 
     @property
-    def units(self):
+    def units(self) -> Units:
         """Units subset"""
         return self.__units
 
     @property
-    def system(self):
+    def system(self) -> AtommanSystemLoad:
         """AtommanSystemLoad subset"""
         return self.__system
-    
+
     @property
-    def system_mods(self):
+    def system_mods(self) -> AtommanSystemManipulate:
         """AtommanSystemManipulate subset"""
         return self.__system_mods
 
     @property
-    def defect(self):
+    def defect(self) -> PointDefect:
         """PointDefect subset"""
         return self.__defect
 
     @property
-    def temperature(self):
+    def temperature(self) -> float:
         """float: Target relaxation temperature"""
         return self.__temperature
 
     @temperature.setter
-    def temperature(self, value):
-        value = float(value)
-        assert value >= 0.0
-        self.__temperature = value
+    def temperature(self, val: float):
+        val = float(val)
+        assert val >= 0.0
+        self.__temperature = val
 
     @property
-    def thermosteps(self):
+    def thermosteps(self) -> int:
         """int : How often termo data is recorded"""
         return self.__thermosteps
 
     @thermosteps.setter
-    def thermosteps(self, value):
-        value = int(value)
-        assert value >= 0
-        self.__thermosteps = value
+    def thermosteps(self, val: int):
+        val = int(val)
+        assert val >= 0
+        self.__thermosteps = val
 
     @property
-    def dumpsteps(self):
+    def dumpsteps(self) -> int:
         """int : How often atomic configurations are dumped"""
         if self.__dumpsteps is None:
             return self.runsteps
@@ -147,177 +161,179 @@ class PointDefectDiffusion(Calculation):
             return self.__dumpsteps
 
     @dumpsteps.setter
-    def dumpsteps(self, value):
-        if value is None:
+    def dumpsteps(self, val: Optional[float]):
+        if val is None:
             self.__dumpsteps = None
         else:
-            value = int(value)
-            assert value >= 0
-            self.__dumpsteps = value
+            val = int(val)
+            assert val >= 0
+            self.__dumpsteps = val
 
     @property
-    def runsteps(self):
+    def runsteps(self) -> int:
         """int : The number of NVE MD steps where diffusion is evaluated"""
         return self.__runsteps
 
     @runsteps.setter
-    def runsteps(self, value):
-        value = int(value)
-        assert value >= 0
-        self.__runsteps = value
+    def runsteps(self, val: int):
+        val = int(val)
+        assert val >= 0
+        self.__runsteps = val
 
     @property
-    def equilsteps(self):
+    def equilsteps(self) -> int:
         """int : The number of NVT MD steps performed before the NVE runsteps"""
         return self.__equilsteps
 
     @equilsteps.setter
-    def equilsteps(self, value):
-        value = int(value)
-        assert value >= 0
-        self.__equilsteps = value
+    def equilsteps(self, val: int):
+        val = int(val)
+        assert val >= 0
+        self.__equilsteps = val
 
     @property
-    def randomseed(self):
+    def randomseed(self) -> int:
         """int: A random generator seed"""
         return self.__randomseed
 
     @randomseed.setter
-    def randomseed(self, value):
-        if value is None:
-            value = random.randint(1, 900000000)
+    def randomseed(self, val: Optional[int]):
+        if val is None:
+            val = random.randint(1, 900000000)
         else:
-            value = int(value)
-            assert value > 0 and value <= 900000000
-        self.__randomseed = value
+            val = int(val)
+            assert val > 0 and val <= 900000000
+        self.__randomseed = val
 
     @property
-    def natoms(self):
+    def natoms(self) -> int:
         """int: Number of atoms in the defect system"""
         if self.__natoms is None:
             raise ValueError('No results yet!')
         return self.__natoms
 
     @property
-    def nsamples(self):
+    def nsamples(self) -> int:
         """int: Number of measurement samples used in mean, std values"""
         if self.__nsamples is None:
             raise ValueError('No results yet!')
         return self.__nsamples
 
     @property
-    def potential_energy(self):
+    def potential_energy(self) -> float:
         """float: Potential energy for the relaxed system"""
         if self.__potential_energy is None:
             raise ValueError('No results yet!')
         return self.__potential_energy
 
     @property
-    def potential_energy_std(self):
+    def potential_energy_std(self) -> float:
         """float: Standard deviation for potential_energy"""
         if self.__potential_energy_std is None:
             raise ValueError('No results yet!')
         return self.__potential_energy_std
 
     @property
-    def total_energy(self):
+    def total_energy(self) -> float:
         """float: Total energy for the relaxed system"""
         if self.__total_energy is None:
             raise ValueError('No results yet!')
         return self.__total_energy
 
     @property
-    def total_energy_std(self):
+    def total_energy_std(self) -> float:
         """float: Standard deviation for total_energy"""
         if self.__total_energy_std is None:
             raise ValueError('No results yet!')
         return self.__total_energy_std
 
     @property
-    def measured_pressure_xx(self):
+    def measured_pressure_xx(self) -> float:
         """float: Measured relaxation pressure component xx"""
         if self.__measured_pressure_xx is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_xx
-    
+
     @property
-    def measured_pressure_xx_std(self):
+    def measured_pressure_xx_std(self) -> float:
         """float: Standard deviation for measured_pressure_xx"""
         if self.__measured_pressure_xx_std is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_xx_std
 
     @property
-    def measured_pressure_yy(self):
+    def measured_pressure_yy(self) -> float:
         """float: Measured relaxation pressure component yy"""
         if self.__measured_pressure_yy is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_yy
-    
+
     @property
-    def measured_pressure_yy_std(self):
+    def measured_pressure_yy_std(self) -> float:
         """float: Standard deviation for measured_pressure_yy"""
         if self.__measured_pressure_yy_std is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_yy_std
 
     @property
-    def measured_pressure_zz(self):
+    def measured_pressure_zz(self) -> float:
         """float: Measured relaxation pressure component zz"""
         if self.__measured_pressure_zz is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_zz
-    
+
     @property
-    def measured_pressure_zz_std(self):
+    def measured_pressure_zz_std(self) -> float:
         """float: Standard deviation for measured_pressure_zz"""
         if self.__measured_pressure_zz_std is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_zz_std
 
     @property
-    def measured_temperature(self):
+    def measured_temperature(self) -> float:
         """float: Measured temperature for the relaxed system"""
         if self.__measured_temperature is None:
             raise ValueError('No results yet!')
         return self.__measured_temperature
 
     @property
-    def measured_temperature_std(self):
+    def measured_temperature_std(self) -> float:
         """float: Standard deviation for measured_temperature"""
         if self.__measured_temperature_std is None:
             raise ValueError('No results yet!')
         return self.__measured_temperature_std
 
     @property
-    def dx(self):
+    def dx(self) -> float:
         """float: Diffusion constant in the x direction"""
         if self.__dx is None:
             raise ValueError('No results yet!')
         return self.__dx
 
     @property
-    def dy(self):
+    def dy(self) -> float:
         """float: Diffusion constant in the y direction"""
         if self.__dy is None:
             raise ValueError('No results yet!')
         return self.__dy
 
     @property
-    def dz(self):
+    def dz(self) -> float:
         """float: Diffusion constant in the z direction"""
         if self.__dz is None:
             raise ValueError('No results yet!')
         return self.__dz
 
     @property
-    def d(self):
+    def d(self) -> float:
         """float: Average diffusion constant"""
         if self.__d is None:
             raise ValueError('No results yet!')
         return self.__d
 
-    def set_values(self, name=None, **kwargs):
+    def set_values(self,
+                   name: Optional[str] = None,
+                   **kwargs: any):
         """
         Set calculation values directly.  Any terms not given will be set
         or reset to the calculation's default values.
@@ -363,23 +379,36 @@ class PointDefectDiffusion(Calculation):
         if 'randomseed' in kwargs:
             self.randomseed = kwargs['randomseed']
 
-####################### Parameter file interactions ########################### 
+####################### Parameter file interactions ###########################
 
-    def load_parameters(self, params, key=None):
-        
+    def load_parameters(self,
+                        params: Union[dict, str, IOBase],
+                        key: Optional[str] = None):
+        """
+        Reads in and sets calculation parameters.
+
+        Parameters
+        ----------
+        params : dict, str or file-like object
+            The parameters or parameter file to read in.
+        key : str, optional
+            A new key value to assign to the object.  If not given, will use
+            calc_key field in params if it exists, or leave the key value
+            unchanged.
+        """
         # Load universal content
         input_dict = super().load_parameters(params, key=key)
-        
+
         # Load input/output units
         self.units.load_parameters(input_dict)
-        
+
         # Change default values for subset terms
         input_dict['sizemults'] = input_dict.get('sizemults', '12 12 12')
 
         # Load calculation-specific strings
 
         # Load calculation-specific booleans
-        
+
         # Load calculation-specific integers
         self.runsteps = int(input_dict.get('runsteps', 200000))
         self.thermosteps = int(input_dict.get('thermosteps', 100))
@@ -391,7 +420,7 @@ class PointDefectDiffusion(Calculation):
         self.temperature = float(input_dict.get('temperature', 0.0))
 
         # Load calculation-specific floats with units
-        
+
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
 
@@ -400,14 +429,16 @@ class PointDefectDiffusion(Calculation):
 
         # Load initial system
         self.system.load_parameters(input_dict)
-        
+
         # Load defect parameters
         self.defect.load_parameters(input_dict)
 
         # Manipulate system
         self.system_mods.load_parameters(input_dict)
 
-    def master_prepare_inputs(self, branch='main', **kwargs):
+    def master_prepare_inputs(self,
+                              branch: str = 'main',
+                              **kwargs: any) -> dict:
         """
         Utility method that build input parameters for prepare according to the
         workflows used by the NIST Interatomic Potentials Repository.  In other
@@ -433,7 +464,7 @@ class PointDefectDiffusion(Calculation):
 
         # main branch
         if branch == 'main':
-            
+
             # Check for required kwargs
             assert 'lammps_command' in kwargs
 
@@ -450,11 +481,11 @@ class PointDefectDiffusion(Calculation):
 
             # Copy kwargs to params
             for key in kwargs:
-                
+
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
                     params[f'parent_{key}'] = kwargs[key]
-                
+
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
@@ -465,7 +496,7 @@ class PointDefectDiffusion(Calculation):
         return params
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The calculation-specific input keys and their descriptions."""
 
         return {
@@ -488,12 +519,12 @@ class PointDefectDiffusion(Calculation):
             'randomseed': ' '.join([
                 "An int random number seed to use for generating initial velocities.",
                 "A random int will be selected if not given."]),
-        }    
-    
+        }
+
     @property
-    def singularkeys(self):
+    def singularkeys(self) -> list:
         """list: Calculation keys that can have single values during prepare."""        
-        
+
         keys = (
             # Universal keys
             super().singularkeys
@@ -504,19 +535,19 @@ class PointDefectDiffusion(Calculation):
 
             # Calculation-specific keys
         )
-        return keys 
-    
+        return keys
+
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """list: Calculation key sets that can have multiple values during prepare."""
-        
+
         keys = (
             # Universal multikeys
             super().multikeys +
 
             # Combination of potential and system keys
             [
-                self.potential.keyset + 
+                self.potential.keyset +
                 self.system.keyset
             ] +
 
@@ -541,17 +572,17 @@ class PointDefectDiffusion(Calculation):
                     'randomseed',
                 ]
             ]
-        )                     
+        )
         return keys
 
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str: The root element of the content"""
         return 'calculation-point-defect-diffusion'
 
-    def build_model(self):
+    def build_model(self) -> DM:
         """
         Generates and returns model content based on the values set to object.
         """
@@ -572,7 +603,7 @@ class PointDefectDiffusion(Calculation):
         if 'run-parameter' not in calc['calculation']:
             calc['calculation']['run-parameter'] = DM()
         run_params = calc['calculation']['run-parameter']
-        
+
         run_params['thermosteps'] = self.thermosteps
         run_params['dumpsteps'] = self.dumpsteps
         run_params['runsteps'] = self.runsteps
@@ -585,10 +616,10 @@ class PointDefectDiffusion(Calculation):
 
         # Build results
         if self.status == 'finished':
-            
+
             calc['number-of-measurements'] = self.nsamples
             calc['number-of-atoms'] = self.natoms
-            
+
             # Save measured phase-state info
             calc['measured-phase-state'] = mps = DM()
             mps['temperature'] = uc.model(self.measured_temperature, 'K',
@@ -613,14 +644,16 @@ class PointDefectDiffusion(Calculation):
             calc['diffusion-rate'] = dr = DM()
             diffusion_unit = f'{self.units.length_unit}^2/s'
             dr['total'] = uc.model(self.d, diffusion_unit)
-            dr['x-direction'] = uc.model(self.dx, diffusion_unit) 
+            dr['x-direction'] = uc.model(self.dx, diffusion_unit)
             dr['y-direction'] = uc.model(self.dy, diffusion_unit)
             dr['z-direction'] = uc.model(self.dz, diffusion_unit)
 
         self._set_model(model)
         return model
 
-    def load_model(self, model, name=None):
+    def load_model(self,
+                   model: Union[str, DM],
+                   name: Optional[str] = None):
         """
         Loads record contents from a given model.
 
@@ -649,7 +682,7 @@ class PointDefectDiffusion(Calculation):
 
         # Load results
         if self.status == 'finished':
-            
+
             self.__nsamples = calc['number-of-measurements']
             self.__natoms = calc['number-of-atoms']
 
@@ -673,56 +706,9 @@ class PointDefectDiffusion(Calculation):
             self.__dy = uc.value_unit(dr['y-direction'])
             self.__dz = uc.value_unit(dr['z-direction'])
 
-    def mongoquery(self, **kwargs):
-        """
-        Builds a Mongo-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The Mongo-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().mongoquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = f'content.{self.modelroot}'
-
-        return mquery
-
-    def cdcsquery(self, **kwargs):
-        
-        """
-        Builds a CDCS-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The CDCS-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().cdcsquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = self.modelroot
-        
-        return mquery
-
 ########################## Metadata interactions ##############################
 
-    def metadata(self):
+    def metadata(self) -> dict:
         """
         Generates a dict of simple metadata values associated with the record.
         Useful for quickly comparing records and for building pandas.DataFrames
@@ -733,12 +719,12 @@ class PointDefectDiffusion(Calculation):
 
         # Extract calculation-specific content
         meta['temperature'] = self.temperature
-        
+
         # Extract results
         if self.status == 'finished':
             meta['nsamples'] = self.nsamples
             meta['natoms'] = self.natoms
-            
+
             meta['E_pot'] = self.potential_energy
             meta['E_pot_std'] = self.potential_energy_std
             meta['E_total'] = self.total_energy
@@ -752,7 +738,7 @@ class PointDefectDiffusion(Calculation):
             meta['measured_pressure_yy_std'] = self.measured_pressure_yy_std
             meta['measured_pressure_zz'] = self.measured_pressure_zz
             meta['measured_pressure_zz_std'] = self.measured_pressure_zz_std
-            
+
             meta['d'] = self.d
             meta['dx'] = self.dx
             meta['dy'] = self.dy
@@ -761,65 +747,37 @@ class PointDefectDiffusion(Calculation):
         return meta
 
     @property
-    def compare_terms(self):
+    def compare_terms(self) -> list:
         """list: The terms to compare metadata values absolutely."""
         return [
             'script',
-        
+
             'parent_key',
             'load_options',
             'symbols',
-            
+
             'potential_LAMMPS_key',
             'potential_key',
-            
+
             'a_mult',
             'b_mult',
             'c_mult',
 
             'pointdefect_key',
         ]
-    
+
     @property
-    def compare_fterms(self):
+    def compare_fterms(self) -> dict:
         """dict: The terms to compare metadata values using a tolerance."""
         return {
             'temperature':1,
         }
 
-    def pandasfilter(self, dataframe, **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets. 
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        # Call super to filter by universal and subset terms
-        matches = super().pandasfilter(dataframe, **kwargs)
-
-        # Filter by calculation-specific terms
-        
-        return matches
-
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self):
+    def calc_inputs(self) -> dict:
         """Builds calculation inputs from the class's attributes"""
-        
+
         # Initialize input_dict
         input_dict = {}
 
@@ -841,8 +799,8 @@ class PointDefectDiffusion(Calculation):
 
         # Return input_dict
         return input_dict
-    
-    def process_results(self, results_dict):
+
+    def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
         attributes.
@@ -852,10 +810,10 @@ class PointDefectDiffusion(Calculation):
         results_dict: dict
             The dictionary returned by the calc() method.
         """
-            
+
         self.__nsamples = results_dict['nsamples']
         self.__natoms = results_dict['natoms']
-        
+
         self.__potential_energy = results_dict['E_pot']
         self.__potential_energy_std = results_dict['E_pot_std']
         self.__total_energy = results_dict['E_total']
@@ -869,8 +827,8 @@ class PointDefectDiffusion(Calculation):
         self.__measured_pressure_zz_std = results_dict['pzz_std']
         self.__measured_temperature = results_dict['temp']
         self.__measured_temperature_std = results_dict['temp_std']
-    
-        self.__d = results_dict['d'] 
+
+        self.__d = results_dict['d']
         self.__dx = results_dict['dx']
         self.__dy = results_dict['dy']
         self.__dz = results_dict['dz']

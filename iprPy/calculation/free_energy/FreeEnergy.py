@@ -1,11 +1,15 @@
 # coding: utf-8
 # Standard Python libraries
-from typing import Optional
+from io import IOBase
+from pathlib import Path
+from copy import deepcopy
+from typing import Optional, Union
 import random
 
 import numpy as np
+import numpy.typing as npt
 
-from yabadaba import query
+from yabadaba import load_query
 
 # https://github.com/usnistgov/atomman
 import atomman.unitconvert as uc
@@ -16,7 +20,8 @@ from DataModelDict import DataModelDict as DM
 # iprPy imports
 from .. import Calculation
 from .free_energy import free_energy
-from ...calculation_subset import *
+from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
+                                   AtommanSystemLoad, AtommanSystemManipulate)
 from ...input import value
 from ...tools import aslist
 
@@ -25,9 +30,29 @@ class FreeEnergy(Calculation):
 
 ############################# Core properties #################################
 
-    def __init__(self, model=None, name=None, params=None, **kwargs):
-        """Initializes a Calculation object for a given style."""
-        
+    def __init__(self,
+                 model: Union[str, Path, IOBase, DM, None]=None,
+                 name: Optional[str]=None,
+                 params: Union[str, Path, IOBase, dict] = None,
+                 **kwargs: any):
+        """
+        Initializes a Calculation object for a given style.
+
+        Parameters
+        ----------
+        model : str, file-like object or DataModelDict, optional
+            Record content in data model format to read in.  Cannot be given
+            with params.
+        name : str, optional
+            The name to use for saving the record.  By default, this should be
+            the calculation's key.
+        params : str, file-like object or dict, optional
+            Calculation input parameters or input parameter file.  Cannot be
+            given with model.
+        **kwargs : any
+            Any other core Calculation record attributes to set.  Cannot be
+            given with model.
+        """
         # Initialize subsets used by the calculation
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
@@ -45,7 +70,7 @@ class FreeEnergy(Calculation):
         self.springsteps = 50000
         self.pressure = 0.0
         self.randomseed = None
-        
+
         self.__volume = None
         self.__natoms = None
         self.__work_forward = None
@@ -63,7 +88,7 @@ class FreeEnergy(Calculation):
                          subsets=subsets, **kwargs)
 
     @property
-    def filenames(self):
+    def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
             'free_energy.py',
@@ -74,27 +99,27 @@ class FreeEnergy(Calculation):
 ############################## Class attributes ################################
 
     @property
-    def commands(self):
+    def commands(self) -> LammpsCommands:
         """LammpsCommands subset"""
         return self.__commands
 
     @property
-    def potential(self):
+    def potential(self) -> LammpsPotential:
         """LammpsPotential subset"""
         return self.__potential
 
     @property
-    def units(self):
+    def units(self) -> Units:
         """Units subset"""
         return self.__units
 
     @property
-    def system(self):
+    def system(self) -> AtommanSystemLoad:
         """AtommanSystemLoad subset"""
         return self.__system
 
     @property
-    def system_mods(self):
+    def system_mods(self) -> AtommanSystemManipulate:
         """AtommanSystemManipulate subset"""
         return self.__system_mods
 
@@ -104,11 +129,11 @@ class FreeEnergy(Calculation):
         return self.__temperature
 
     @temperature.setter
-    def temperature(self, value):
-        if value is not None:
-            value = float(value)
-            assert value >= 0.0
-        self.__temperature = value
+    def temperature(self, val: float):
+        if val is not None:
+            val = float(val)
+            assert val >= 0.0
+        self.__temperature = val
 
     @property
     def spring_constants(self) -> Optional[np.ndarray]:
@@ -116,10 +141,10 @@ class FreeEnergy(Calculation):
         return self.__spring_constants
 
     @spring_constants.setter
-    def spring_constants(self, value):
-        if value is not None:
-            value = np.asarray(aslist(value))
-        self.__spring_constants = value
+    def spring_constants(self, val: Optional[npt.ArrayLike]):
+        if val is not None:
+            val = np.asarray(aslist(val))
+        self.__spring_constants = val
 
     @property
     def equilsteps(self) -> int:
@@ -127,10 +152,10 @@ class FreeEnergy(Calculation):
         return self.__equilsteps
 
     @equilsteps.setter
-    def equilsteps(self, value):
-        value = int(value)
-        assert value >= 0
-        self.__equilsteps = value
+    def equilsteps(self, val: int):
+        val = int(val)
+        assert val >= 0
+        self.__equilsteps = val
 
     @property
     def switchsteps(self) -> int:
@@ -138,10 +163,10 @@ class FreeEnergy(Calculation):
         return self.__switchsteps
 
     @switchsteps.setter
-    def switchsteps(self, value):
-        value = int(value)
-        assert value >= 0
-        self.__switchsteps = value
+    def switchsteps(self, val: int):
+        val = int(val)
+        assert val >= 0
+        self.__switchsteps = val
 
     @property
     def springsteps(self) -> int:
@@ -149,24 +174,24 @@ class FreeEnergy(Calculation):
         return self.__springsteps
 
     @springsteps.setter
-    def springsteps(self, value):
-        value = int(value)
-        assert value >= 0
-        self.__springsteps = value
+    def springsteps(self, val: int):
+        val = int(val)
+        assert val >= 0
+        self.__springsteps = val
 
     @property
-    def randomseed(self) -> Optional[int]:
-        """int or None: Random number seed used by LAMMPS."""
+    def randomseed(self) -> int:
+        """int: Random number seed used by LAMMPS."""
         return self.__randomseed
 
     @randomseed.setter
-    def randomseed(self, value):
-        if value is None:
-            value = random.randint(1, 900000000)
+    def randomseed(self, val: Optional[int]):
+        if val is None:
+            val = random.randint(1, 900000000)
         else:
-            value = int(value)
-            assert value > 0 and value <= 900000000
-        self.__randomseed = value
+            val = int(val)
+            assert val > 0 and val <= 900000000
+        self.__randomseed = val
 
     @property
     def volume(self) -> float:
@@ -183,7 +208,7 @@ class FreeEnergy(Calculation):
             return self.system_mods.system.natoms
         else:
             return self.__natoms
-        
+
     @property
     def work_forward(self) -> float:
         """float: The work/atom during the forward switching step."""
@@ -226,7 +251,9 @@ class FreeEnergy(Calculation):
             raise ValueError('No results yet!')
         return self.__gibbs
 
-    def set_values(self, name=None, **kwargs):
+    def set_values(self,
+                   name: Optional[str] = None,
+                   **kwargs: any):
         """
         Set calculation values directly.  Any terms not given will be set
         or reset to the calculation's default values.
@@ -280,23 +307,36 @@ class FreeEnergy(Calculation):
         if 'randomseed' in kwargs:
             self.randomseed = kwargs['randomseed']
 
-####################### Parameter file interactions ########################### 
+####################### Parameter file interactions ###########################
 
-    def load_parameters(self, params, key=None):
-        
+    def load_parameters(self,
+                        params: Union[dict, str, IOBase],
+                        key: Optional[str] = None):
+        """
+        Reads in and sets calculation parameters.
+
+        Parameters
+        ----------
+        params : dict, str or file-like object
+            The parameters or parameter file to read in.
+        key : str, optional
+            A new key value to assign to the object.  If not given, will use
+            calc_key field in params if it exists, or leave the key value
+            unchanged.
+        """
         # Load universal content
         input_dict = super().load_parameters(params, key=key)
-        
+
         # Load input/output units
         self.units.load_parameters(input_dict)
-        
+
         # Change default values for subset terms
         input_dict['sizemults'] = input_dict.get('sizemults', '10 10 10')
-        
+
         # Load calculation-specific strings
 
         # Load calculation-specific booleans
-        
+
         # Load calculation-specific integers
         self.equilsteps = int(input_dict.get('equilsteps', 25000))
         self.switchsteps = int(input_dict.get('switchsteps', 50000))
@@ -327,7 +367,7 @@ class FreeEnergy(Calculation):
 
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
-        
+
         # Load LAMMPS potential
         self.potential.load_parameters(input_dict)
 
@@ -337,7 +377,9 @@ class FreeEnergy(Calculation):
         # Manipulate system
         self.system_mods.load_parameters(input_dict)
 
-    def master_prepare_inputs(self, branch='main', **kwargs):
+    def master_prepare_inputs(self,
+                              branch: str = 'main',
+                              **kwargs: any) -> dict:
         """
         Utility method that build input parameters for prepare according to the
         workflows used by the NIST Interatomic Potentials Repository.  In other
@@ -364,7 +406,7 @@ class FreeEnergy(Calculation):
 
         # main branch
         if branch == 'main':
-            
+
             # Check for required kwargs
             assert 'lammps_command' in kwargs
 
@@ -387,12 +429,12 @@ class FreeEnergy(Calculation):
 
             # Copy kwargs to params
             for key in kwargs:
-                
+
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
                     params[f'reference_{key}'] = kwargs[key]
                     params[f'parent_{key}'] = kwargs[key]
-                
+
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
@@ -403,7 +445,7 @@ class FreeEnergy(Calculation):
         return params
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The calculation-specific input keys and their descriptions."""
 
         return {
@@ -434,12 +476,12 @@ class FreeEnergy(Calculation):
             'randomseed': ' '.join([
                 "An int random number seed to use for generating initial velocities.",
                 "A random int will be selected if not given."]),
-        }  
+        }
 
     @property
-    def singularkeys(self):
+    def singularkeys(self) -> list:
         """list: Calculation keys that can have single values during prepare."""
-        
+
         keys = (
             # Universal keys
             super().singularkeys
@@ -450,19 +492,19 @@ class FreeEnergy(Calculation):
 
             # Calculation-specific keys
         )
-        return keys 
+        return keys
 
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """list: Calculation key sets that can have multiple values during prepare."""
-        
+
         keys = (
             # Universal multikeys
             super().multikeys +
 
             # Combination of potential and system keys
             [
-                self.potential.keyset + 
+                self.potential.keyset +
                 self.system.keyset +
                 # Phase parameters
                 [
@@ -492,11 +534,11 @@ class FreeEnergy(Calculation):
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str: The root element of the content"""
         return 'calculation-free-energy'
 
-    def build_model(self):
+    def build_model(self) -> DM:
         """
         Generates and returns model content based on the values set to object.
         """
@@ -516,7 +558,7 @@ class FreeEnergy(Calculation):
         if 'run-parameter' not in calc['calculation']:
             calc['calculation']['run-parameter'] = DM()
         run_params = calc['calculation']['run-parameter']
-        
+
         run_params['equilsteps'] = self.equilsteps
         run_params['switchsteps'] = self.switchsteps
         run_params['springsteps'] = self.springsteps
@@ -530,7 +572,7 @@ class FreeEnergy(Calculation):
 
         # Build results
         if self.status == 'finished':
-            
+
             # Save the total system volume and number of atoms
             calc['volume'] = uc.model(self.volume,
                                       f'{self.units.length_unit}^3')
@@ -556,7 +598,9 @@ class FreeEnergy(Calculation):
         self._set_model(model)
         return model
 
-    def load_model(self, model, name=None):
+    def load_model(self,
+                   model: Union[str, DM],
+                   name: Optional[str] = None):
         """
         Loads record contents from a given model.
 
@@ -582,7 +626,7 @@ class FreeEnergy(Calculation):
         # Load phase-state info
         self.temperature = uc.value_unit(calc['phase-state']['temperature'])
         self.pressure = uc.value_unit(calc['phase-state']['pressure'])
-        
+
         # Load results
         if self.status == 'finished':
             self.__volume = uc.value_unit(calc['volume'])
@@ -595,56 +639,21 @@ class FreeEnergy(Calculation):
             self.__helmholtz = uc.value_unit(calc['Helmholtz-energy'])
             self.__gibbs = uc.value_unit(calc['Gibbs-energy'])
 
-    def mongoquery(self, **kwargs):
-        """
-        Builds a Mongo-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The Mongo-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().mongoquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = f'content.{self.modelroot}'
-       
-        return mquery
-
-    def cdcsquery(self, **kwargs):
-        
-        """
-        Builds a CDCS-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The CDCS-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().cdcsquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = self.modelroot
-        
-        return mquery
+    @property
+    def queries(self) -> dict:
+        queries = deepcopy(super().queries)
+        queries.update({
+            'temperature': load_query(
+                style='float_match',
+                name='temperature',
+                path=f'{self.modelroot}.phase-state.temperature.value',
+                description='search by temperature in Kelvin'),
+        })
+        return queries
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self):
+    def metadata(self) -> dict:
         """
         Generates a dict of simple metadata values associated with the record.
         Useful for quickly comparing records and for building pandas.DataFrames
@@ -656,7 +665,7 @@ class FreeEnergy(Calculation):
         # Extract calculation-specific content
         meta['temperature'] = self.temperature
         meta['pressure'] = self.pressure
-        
+
         # Extract results
         if self.status == 'finished':
             meta['spring_constants'] = self.spring_constants.tolist()
@@ -672,61 +681,32 @@ class FreeEnergy(Calculation):
         return meta
 
     @property
-    def compare_terms(self):
+    def compare_terms(self) -> list:
         """list: The terms to compare metadata values absolutely."""
         return [
             'script',
-        
+
             'parent_key',
             'load_options',
             'symbols',
-            
+
             'potential_LAMMPS_key',
             'potential_key',
-            
         ]
-    
+
     @property
-    def compare_fterms(self):
+    def compare_fterms(self) -> dict:
         """dict: The terms to compare metadata values using a tolerance."""
         return {
             'temperature':1e-2,
             'pressure':1e-2,
         }
 
-    def pandasfilter(self, dataframe, **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets. 
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        # Call super to filter by universal and subset terms
-        matches = super().pandasfilter(dataframe, **kwargs)
-
-        # Filter by calculation-specific terms
-        
-        return matches
-
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self):
+    def calc_inputs(self) -> dict:
         """Builds calculation inputs from the class's attributes"""
-        
+
         # Initialize input_dict
         input_dict = {}
 
@@ -742,7 +722,7 @@ class FreeEnergy(Calculation):
         input_dict['temperature'] = self.temperature
         input_dict['spring_constants'] = self.spring_constants
         input_dict['pressure'] = self.pressure
-        
+
         input_dict['equilsteps'] = self.equilsteps
         input_dict['switchsteps'] = self.switchsteps
         input_dict['springsteps'] = self.springsteps
@@ -750,8 +730,8 @@ class FreeEnergy(Calculation):
 
         # Return input_dict
         return input_dict
-    
-    def process_results(self, results_dict):
+
+    def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
         attributes.

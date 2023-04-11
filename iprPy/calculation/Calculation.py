@@ -6,14 +6,14 @@ from copy import deepcopy
 from importlib import resources
 from typing import Optional, Union
 
-from yabadaba import query
+from yabadaba import load_query
 
 from DataModelDict import DataModelDict as DM
 
 import atomman as am
-from atomman import __version__ as atomman_version
+from atomman import __version__ as current_atomman_version
 
-from .. import __version__ as iprPy_version
+from .. import __version__ as current_iprPy_version
 from ..input import parse
 import uuid
 
@@ -24,8 +24,13 @@ class Calculation(Record):
 
 ############################# Core properties #################################
 
-    def __init__(self, model=None, name=None, params=None, database=None,
-                 subsets=None, **kwargs):
+    def __init__(self,
+                 model: Union[str, Path, IOBase, DM, None]=None,
+                 name: Optional[str]=None,
+                 params: Union[str, Path, IOBase, dict] = None,
+                 database = None,
+                 subsets: Optional[tuple] = None,
+                 **kwargs: any):
         """
         Initializes a Calculation object for a given style.
 
@@ -57,15 +62,23 @@ class Calculation(Record):
         # Throw error for default class
         if self.__module__ == __name__:
             raise TypeError("Don't use Calculation itself, only use derived classes")
-        
+
         # Check for params
         if params is not None and model is not None:
-                raise ValueError('model and params cannot both be given')
+            raise ValueError('model and params cannot both be given')
 
         # Set style and parent_module
         module_terms = self.__module__.split('.')
         self.__parent_module = '.'.join(module_terms[:-1])
         self.__calc_style = module_terms[-2]
+
+        # Set default values (just in case)
+        self.__iprPy_version = current_iprPy_version
+        self.__atomman_version = current_atomman_version
+        self.__key = str(uuid.uuid4())
+        self.__branch = 'main'
+        self.__status = 'not calculated'
+        self.__error = None
 
         # Link to database
         self.database = database
@@ -74,7 +87,7 @@ class Calculation(Record):
         if subsets is not None:
             self.__subsets = tuple(subsets)
         else:
-            self.__subsets = () 
+            self.__subsets = ()
 
         # Call Record's init
         super().__init__(model=model, name=name, **kwargs)
@@ -84,7 +97,7 @@ class Calculation(Record):
             self.load_parameters(params, key=kwargs.get('key', None))
 
     @property
-    def maindoc(self):
+    def maindoc(self) -> str:
         """str: the overview documentation for the calculation"""
         try:
             return resources.read_text(self.parent_module, 'README.md')
@@ -92,7 +105,7 @@ class Calculation(Record):
             return ""
 
     @property
-    def theorydoc(self):
+    def theorydoc(self) -> str:
         """str: the methods and theory documentation for the calculation"""
         try:
             return resources.read_text(self.parent_module, 'theory.md')
@@ -100,12 +113,12 @@ class Calculation(Record):
             return ""
 
     @property
-    def filenames(self):
+    def filenames(self) -> list:
         """list: the names of each file used by the calculation."""        
         return []
-    
+
     @property
-    def files(self):
+    def files(self) -> dict:
         """dict: the names and contents of all required files."""
         files = {}
         for filename in self.filenames:
@@ -116,57 +129,57 @@ class Calculation(Record):
 ############################### Class attributes ##############################
 
     @property
-    def subsets(self):
+    def subsets(self) -> tuple:
         """tuple: The calculation's subsets"""
         return self.__subsets
 
     @property
-    def style(self):
+    def style(self) -> str:
         """str: The record style"""
         return f'calculation_{self.calc_style}'
 
     @property
-    def calc_style(self):
+    def calc_style(self) -> str:
         """str : The calculation style"""
         return self.__calc_style
 
     @property
-    def key(self):
+    def key(self) -> str:
         """str : The UUID4 key used to identify the calculation run"""
         return self.__key
-    
+
     @property
-    def iprPy_version(self):
+    def iprPy_version(self) -> str:
         """str : The version of iprPy used"""
         return self.__iprPy_version
 
     @property
-    def atomman_version(self):
+    def atomman_version(self) -> str:
         """str : The version of atomman used"""
         return self.__atomman_version
 
     @property
-    def script(self):
+    def script(self) -> str:
         """str : The name of the calculation script used"""
         return self.__script
 
     @property
-    def branch(self):
+    def branch(self) -> str:
         """str : The calculation branch name"""
         return self.__branch
-    
+
     @property
-    def status(self):
+    def status(self) -> str:
         """str : The current status of the calculation"""
         return self.__status
 
     @property
-    def error(self):
+    def error(self) -> Optional[str]:
         """str or None : Any error message generated by the calculation"""
         return self.__error
 
     @property
-    def parent_module(self):
+    def parent_module(self) -> str:
         """str : Name of the module where the calculation's code is located"""
         return self.__parent_module
 
@@ -181,13 +194,15 @@ class Calculation(Record):
         # Set None or atomman.library.Database values
         if value is None or isinstance(value, am.library.Database):
             self.__database = value
-        
+
         # Otherwise assume that it is a yabadaba/iprPy database
         else:
             self.__database = am.library.Database(local_database=value,
                                                   remote=False)
 
-    def set_values(self, name=None, **kwargs):
+    def set_values(self,
+                   name: Optional[str] = None,
+                   **kwargs: any):
         """
         Set calculation values directly.  Any terms not given will be set
         or reset to the calculation's default values.
@@ -218,8 +233,8 @@ class Calculation(Record):
             the calculation's subsets.
         """
         # Set universal content
-        self.__iprPy_version = kwargs.get('iprPy_version', iprPy_version)
-        self.__atomman_version = kwargs.get('atomman_version', atomman_version)
+        self.__iprPy_version = kwargs.get('iprPy_version', current_iprPy_version)
+        self.__atomman_version = kwargs.get('atomman_version', current_atomman_version)
         self.__key = kwargs.get('key', str(uuid.uuid4()))
         self.__script = f'calc_{self.calc_style}' # Obsolete....
         self.__branch = kwargs.get('branch', 'main')
@@ -236,22 +251,11 @@ class Calculation(Record):
         for subset in self.subsets:
             subset.set_values(**kwargs)
 
-    def isvalid(self):
-        """
-        Looks at the set atttributes to determine if the associated calculation
-        would be a valid one to run.
-        
-        Returns
-        -------
-        bool
-            True if element combinations are valid, False if not.
-        """
-        # Default Record.isvalid() returns True
-        return True
-
 ##################### Parameter file interactions ########################### 
 
-    def load_parameters(self, params, key=None):
+    def load_parameters(self,
+                        params: Union[dict, str, IOBase],
+                        key: Optional[str] = None):
         """
         Reads in and sets calculation parameters.
 
@@ -269,17 +273,9 @@ class Calculation(Record):
             input_dict = params
         else:
             input_dict = parse(params, allsingular=True)
-        
-        #    try:
-        #        assert Path(params).is_file()
-        #    except:
-        #        input_dict = parse(params, allsingular=True)
-        #    else:
-        #        with open(params) as f:
-        #            input_dict = parse(f, allsingular=True)
-        
+
         self.__branch = input_dict.get('branch', 'main')
-        
+
         # Set calculation UUID
         if key is not None:
             self.__key = self.name = key
@@ -288,7 +284,9 @@ class Calculation(Record):
 
         return input_dict
 
-    def master_prepare_inputs(self, branch='main', **kwargs):
+    def master_prepare_inputs(self,
+                              branch: str = 'main',
+                              **kwargs: any) -> dict:
         """
         Utility method that build input parameters for prepare according to the
         workflows used by the NIST Interatomic Potentials Repository.  In other
@@ -311,31 +309,8 @@ class Calculation(Record):
         raise NotImplementedError('Not implemented for the calculation style')
 
     @property
-    def singularkeys(self):
-        """list: Calculation keys that can have single values during prepare."""
-        return  ['branch']
-    
-    @property
-    def multikeys(self):
-        """list: Calculation key sets that can have multiple values during prepare."""
-        return []
-    
-    @property
-    def allkeys(self):
-        """
-        list: All keys used by the calculation.
-        """
-        # Build list of all keys
-        allkeys = deepcopy(self.singularkeys)
-        for keyset in self.multikeys:
-            allkeys.extend(keyset)
-        
-        return allkeys
-
-    @property
-    def commontemplatekeys(self):
+    def commontemplatekeys(self) -> dict:
         """dict : The input keys and their descriptions shared by all calculations."""
-        
         return {
             'branch': ' '.join([
                 "A metadata group name that the calculation can be parsed by.",
@@ -345,16 +320,16 @@ class Calculation(Record):
         }
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The calculation-specific input keys and their descriptions."""
         return {}
 
     @property
-    def template(self):
+    def template(self) -> str:
         """str: The template to use for generating calc.in files."""
         # Start template
         lines = [f'# Input script for iprPy calculation {self.calc_style}', '']
-        
+
         # Build common content
         lines += ['# Calculation Metadata']
         for key in self.commontemplatekeys.keys():
@@ -377,17 +352,17 @@ class Calculation(Record):
                 if spacelen < 1:
                     spacelen = 1
                 space = ' ' * spacelen
-                lines.append(f'{key}{space}<{key}>')    
-        
+                lines.append(f'{key}{space}<{key}>')
+
         # Join and return lines
         return '\n'.join(lines)
 
     @property
-    def templatedoc(self):
+    def templatedoc(self) -> str:
         """str: The documentation for the template lines for this calculation."""
-        
+
         lines = [f'# {self.calc_style} Input Terms', '']
-        
+
         # Specify common content
         lines += ['## Calculation Metadata',
                   '',
@@ -412,7 +387,9 @@ class Calculation(Record):
         # Join and return lines
         return '\n'.join(lines)
 
-    def _template_builder(self, header, keys):
+    def _template_builder(self,
+                          header: str,
+                          keys: list) -> str:
         """Builds a section of the template for a set of parameter keys"""
         if len(keys) > 0:
             template = f'# {header}\n'
@@ -424,6 +401,28 @@ class Calculation(Record):
                 template += f'{key}{space}<{key}>\n'
         return template
 
+    @property
+    def singularkeys(self) -> list:
+        """list: Calculation keys that can have single values during prepare."""
+        return  ['branch']
+
+    @property
+    def multikeys(self) -> list:
+        """list: Calculation key sets that can have multiple values during prepare."""
+        return []
+
+    @property
+    def allkeys(self) -> list:
+        """
+        list: All keys used by the calculation.
+        """
+        # Build list of all keys
+        allkeys = deepcopy(self.singularkeys)
+        for keyset in self.multikeys:
+            allkeys.extend(keyset)
+
+        return allkeys
+
 ########################### Data model interactions ###########################
 
     @property
@@ -431,7 +430,40 @@ class Calculation(Record):
         """tuple: The module path and file name of the record's xsd schema"""
         return (self.parent_module, f'{self.style}.xsd')
 
-    def load_model(self, model, name=None):
+    @property
+    def xsl_filename(self):
+        """tuple: The module path and file name of the record's xsl transform"""
+        return (self.parent_module, f'{self.style}.xsl')
+
+    def build_model(self) -> DM:
+        """
+        Generates and returns model content based on the values set to object.
+        """
+        # Create the root of the DataModelDict
+        model = DM()
+        model[self.modelroot] = calc = DM()
+
+        # Assign uuid
+        calc['key'] = self.key
+
+        # Save calculation parameters
+        calc['calculation'] = DM()
+        calc['calculation']['iprPy-version'] = self.iprPy_version
+        calc['calculation']['atomman-version'] = self.atomman_version        
+        calc['calculation']['script'] = self.script
+        calc['calculation']['branch'] = self.branch
+
+        if self.status != 'finished':
+            calc['status'] = self.status
+
+            if self.status == 'error':
+                calc['error'] = self.error
+
+        return model
+
+    def load_model(self,
+                   model: Union[str, DM],
+                   name: Optional[str] = None):
         """
         Loads record contents from a given model.
 
@@ -445,7 +477,7 @@ class Calculation(Record):
         """
         super().load_model(model, name=name)
         calc = self.model[self.modelroot]
-        
+
         # Load universal content
         self.__key = calc['key']
         self.__iprPy_version = calc['calculation']['iprPy-version']
@@ -465,138 +497,161 @@ class Calculation(Record):
         for subset in self.subsets:
             subset.load_model(calc)
 
-    def build_model(self):
-        """
-        Generates and returns model content based on the values set to object.
-        """
-        # Create the root of the DataModelDict
-        model = DM()
-        model[self.modelroot] = calc = DM()
-        
-        # Assign uuid
-        calc['key'] = self.key
-        
-        # Save calculation parameters
-        calc['calculation'] = DM()
-        calc['calculation']['iprPy-version'] = self.iprPy_version
-        calc['calculation']['atomman-version'] = self.atomman_version        
-        calc['calculation']['script'] = self.script
-        calc['calculation']['branch'] = self.branch
+    @property
+    def queries(self) -> dict:
+        """dict: Query objects and their associated parameter names."""
+        queries = {
+            'key': load_query(
+                style='str_match',
+                name='key',
+                path=f'{self.modelroot}.key',
+                description="search by calculation's UUID key"),
+            'iprPy_version': load_query(
+                style='str_match',
+                name='iprPy_version',
+                path=f'{self.modelroot}.calculation.iprPy-version',
+                description="search by iprPy version used"),
+            'atomman_version': load_query(
+                style='str_match',
+                name='atomman_version',
+                path=f'{self.modelroot}.calculation.atomman-version',
+                description="search by atomman version used"),
+            'script': load_query(
+                style='str_match',
+                name='script',
+                path=f'{self.modelroot}.calculation.script',
+                description="search by script name used"),
+            'branch': load_query(
+                style='str_match',
+                name='branch',
+                path=f'{self.modelroot}.calculation.branch',
+                description="search by calculation branch name"),
+            'status': load_query(
+                style='str_match',
+                name='status',
+                path=None,
+                description="search by calculation status"),
+        }
 
-        if self.status != 'finished':
-            calc['status'] = self.status
+        # Add subset queries
+        for subset in self.subsets:
+            queries.update(subset.queries)
 
-            if self.status == 'error':
-                calc['error'] = self.error
+        return queries
 
-        return model
-
-    def mongoquery(self, name=None, key=None, iprPy_version=None,
-                   atomman_version=None, script=None, branch=None,
-                   status=None, **kwargs):
+    def mongoquery(self,
+                   name: Union[str, list, None] = None,
+                   key: Union[str, list, None] = None,
+                   iprPy_version: Union[str, list, None] = None,
+                   atomman_version: Union[str, list, None] = None,
+                   script: Union[str, list, None] = None,
+                   branch: Union[str, list, None] = None,
+                   status: Union[str, list, None] = None,
+                   **kwargs: any) -> dict:
         """
         Builds a Mongo-style query based on kwargs values for the record style.
 
         Parameters
         ----------
-        name : str or list
+        name : str or list, optional
             The record name(s) to parse by.
-        key : str or list
+        key : str or list, optional
             The unique record UUID4 keys to parse by.
-        iprPy_version : str or list
+        iprPy_version : str or list, optional
             The version(s) of iprPy to parse by.
-        atomman_version : str or list
+        atomman_version : str or list, optional
             The version(s) of atomman to parse by.
-        script : str or list
+        script : str or list, optional
             The name(s) of the calculation script to parse by.
-        branch : str or list
+        branch : str or list, optional
             The calculation branch name(s) to parse by.
-        status : str or list
+        status : str or list, optional
             The status(es) of the calculations to parse by.
         **kwargs : any
             Any extra query terms associated with one of the calculation's
-            subsets.        
+            subsets.
         
         Returns
         -------
         dict
             The Mongo-style query.
         """
-        
-        mquery = {}
-        query.str_match.mongo(mquery, f'name', name)
-        
-        root = f'content.{self.modelroot}'
-        query.str_match.mongo(mquery, f'{root}.key', key)
-        query.str_match.mongo(mquery, f'{root}.calculation.iprPy-version', iprPy_version)
-        query.str_match.mongo(mquery, f'{root}.calculation.atomman-version', atomman_version)
-        query.str_match.mongo(mquery, f'{root}.calculation.script', script)
-        query.str_match.mongo(mquery, f'{root}.calculation.branch', branch)
-        if status is not None:            
+
+        # Pass all known and unknown kwargs except status
+        mquery = super().mongoquery(name=name, key=key, iprPy_version=iprPy_version,
+                                    atomman_version=atomman_version, script=script,
+                                    branch=branch, **kwargs)
+
+        # Add status
+        if status is not None:
             assert isinstance(status, str), 'lists of status not yet supported'
+
+            root = f'content.{self.modelroot}'
+            querylist = mquery['$and']
+
             if status == 'finished':
-                mquery[f'{root}.status'] = {'$exists': False}
+                querylist.append( {f'{root}.status': {'$exists': False} } )
             else:
-                mquery[f'{root}.status'] = status
-        
-        # Build subset terms
-        for subset in self.subsets:
-            mquery.update(subset.mongoquery(**kwargs))
+                querylist.append( {f'{root}.status': status} )
 
         return mquery
 
-    def cdcsquery(self, key=None, iprPy_version=None,
-                  atomman_version=None, script=None, branch=None,
-                  status=None, **kwargs):
+    def cdcsquery(self,
+                  key: Union[str, list, None] = None,
+                  iprPy_version: Union[str, list, None] = None,
+                  atomman_version: Union[str, list, None] = None,
+                  script: Union[str, list, None] = None,
+                  branch: Union[str, list, None] = None,
+                  status: Union[str, list, None] = None,
+                  **kwargs: any) -> dict:
         """
         Builds a CDCS-style query based on kwargs values for the record style.
 
         Parameters
         ----------
-        key : str or list
+        key : str or list, optional
             The unique record UUID4 keys to parse by.
         iprPy_version : str or list
             The version(s) of iprPy to parse by.
-        atomman_version : str or list
+        atomman_version : str or list, optional
             The version(s) of atomman to parse by.
-        script : str or list
+        script : str or list, optional
             The name(s) of the calculation script to parse by.
-        branch : str or list
+        branch : str or list, optional
             The calculation branch name(s) to parse by.
-        status : str or list
+        status : str or list, optional
             The status(es) of the calculations to parse by.
         **kwargs : any
             Any extra query terms associated with one of the calculation's
-            subsets.        
+            subsets.
         
         Returns
         -------
         dict
             The CDCS-style query.
         """
-        mquery = {}
-        root = self.modelroot
-        query.str_match.mongo(mquery, f'{root}.key', key)
-        query.str_match.mongo(mquery, f'{root}.calculation.iprPy-version', iprPy_version)
-        query.str_match.mongo(mquery, f'{root}.calculation.atomman-version', atomman_version)
-        query.str_match.mongo(mquery, f'{root}.calculation.script', script)
-        query.str_match.mongo(mquery, f'{root}.calculation.branch', branch)
-        if status is not None:            
-            assert isinstance(status, str), 'lists of status not yet supported'
-            if status == 'finished':
-                mquery[f'{root}.status'] = {'$exists': False}
-            else:
-                mquery[f'{root}.status'] = status
+        # Pass all known and unknown kwargs except status
+        mquery = super().cdcsquery(key=key, iprPy_version=iprPy_version,
+                                   atomman_version=atomman_version, script=script,
+                                   branch=branch, **kwargs)
 
-        # Build subset terms
-        for subset in self.subsets:
-            mquery.update(subset.cdcsquery(**kwargs))
+        # Add status
+        if status is not None:
+            assert isinstance(status, str), 'lists of status not yet supported'
+
+            root = self.modelroot
+            querylist = mquery['$and']
+
+            if status == 'finished':
+                querylist.append( {f'{root}.status': {'$exists': False} } )
+            else:
+                querylist.append( {f'{root}.status': status} )
 
         return mquery
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self):
+    def metadata(self) -> dict:
         """
         Generates a dict of simple metadata values associated with the record.
         Useful for quickly comparing records and for building pandas.DataFrames
@@ -604,7 +659,7 @@ class Calculation(Record):
         """
         meta = {}
         meta['name'] = self.name
-        
+
         # Set universal calculation record params
         meta['key'] = self.key
         meta['iprPy_version'] = self.iprPy_version
@@ -616,7 +671,7 @@ class Calculation(Record):
         meta['status'] = self.status
         if self.status == 'error':
             meta['error'] = self.error
-        
+
         # Extract subset content
         for subset in self.subsets:
             subset.metadata(meta)
@@ -624,64 +679,27 @@ class Calculation(Record):
         return meta
 
     @property
-    def compare_terms(self):
+    def compare_terms(self) -> list:
         """list: The terms to compare metadata values absolutely."""
         return []
-    
+
     @property
     def compare_fterms(self):
         """dict: The terms to compare metadata values using a tolerance."""
         return {}
 
-    def pandasfilter(self, dataframe, name=None, key=None, iprPy_version=None,
-                     atomman_version=None, script=None, branch=None,
-                     status=None, **kwargs):
+    def isvalid(self) -> bool:
         """
-        Filters a pandas.DataFrame based on kwargs values for the record style.
-        
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            A table of metadata for multiple records of the record style.
-        name : str or list
-            The record name(s) to parse by.
-        key : str or list
-            The unique record UUID4 keys to parse by.
-        iprPy_version : str or list
-            The version(s) of iprPy to parse by.
-        atomman_version : str or list
-            The version(s) of atomman to parse by.
-        script : str or list
-            The name(s) of the calculation script to parse by.
-        branch : str or list
-            The calculation branch name(s) to parse by.
-        status : str or list
-            The status(es) of the calculations to parse by.
-        **kwargs : any
-            Any extra query terms associated with one of the calculation's
-            subsets.
+        Looks at the set attributes to determine if the associated calculation
+        would be a valid one to run.
         
         Returns
         -------
-        pandas.Series, numpy.NDArray
-            Boolean map of matching values
+        bool
+            True if element combinations are valid, False if not.
         """
-        # Filter by universal terms
-        matches = (
-            query.str_match.pandas(dataframe, 'name', name)
-            &query.str_match.pandas(dataframe, 'key', key)
-            &query.str_match.pandas(dataframe, 'iprPy_version', iprPy_version)
-            &query.str_match.pandas(dataframe, 'atomman_version', atomman_version)
-            &query.str_match.pandas(dataframe, 'script', script)
-            &query.str_match.pandas(dataframe, 'branch', branch)
-            &query.str_match.pandas(dataframe, 'status', status)
-        )
-
-        # Filter by subset terms
-        for subset in self.subsets:
-            matches = (matches & subset.pandasfilter(dataframe, **kwargs))
-
-        return matches
+        # Default Record.isvalid() returns True
+        return True
 
 ########################### Calculation interactions ##########################
 
@@ -698,7 +716,7 @@ class Calculation(Record):
         """Calls the calculation's primary function(s)"""
         raise AttributeError('calc not defined for Calculation style')
 
-    def process_results(self, results_dict):
+    def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
         attributes.
@@ -744,11 +762,11 @@ class Calculation(Record):
             printed upon completion.  Default value is False.
         """
         # Clean record back to not calculated state
-        self.clean()        
-        
+        self.clean()
+
         # Update iprPy and atomman version info
-        self.__iprPy_version = iprPy_version
-        self.__atomman_version = atomman_version
+        self.__iprPy_version = current_iprPy_version
+        self.__atomman_version = current_atomman_version
 
         # Change the calculation's key if requested
         if newkey:
@@ -760,11 +778,11 @@ class Calculation(Record):
 
         # Build calculation inputs
         input_dict = self.calc_inputs()
-        
+
         try:
             # Pass inputs to calc function
             results_dict = self.calc(**input_dict)
-        
+
         except Exception as e:
             if raise_error:
                 raise e
@@ -772,11 +790,11 @@ class Calculation(Record):
             self.__status = 'error'
             self.__error = str(e)
             results_dict = None
-        
+
         else:
             self.__status = 'finished'
             self.process_results(results_dict)
-        
+
         if verbose:
             if self.status == 'finished':
                 print('Calculation finished successfully')
@@ -787,5 +805,3 @@ class Calculation(Record):
         if results_json is True:
             with open('results.json', 'w', encoding='UTF-8') as f:
                 self.build_model().json(fp=f, indent=4, ensure_ascii=False)
-
-    

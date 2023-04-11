@@ -1,11 +1,16 @@
 # coding: utf-8
 # Standard Python libraries
+from io import IOBase
+from pathlib import Path
+from copy import deepcopy
+from typing import Optional, Union
 
-from yabadaba import query
+from yabadaba import load_query
+
+import numpy as np
 
 # https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/DataModelDict
@@ -14,18 +19,39 @@ from DataModelDict import DataModelDict as DM
 # iprPy imports
 from .. import Calculation
 from .elastic_constants_static import elastic_constants_static
-from ...calculation_subset import *
-from ...input import value, boolean
-from ...tools import aslist, dict_insert
+from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
+                                   AtommanSystemLoad, AtommanSystemManipulate,
+                                   LammpsMinimize)
 
 class ElasticConstantsStatic(Calculation):
     """Class for managing static elastic constants calculations from small strains"""
 
 ############################# Core properties #################################
 
-    def __init__(self, model=None, name=None, params=None, **kwargs):
-        """Initializes a Calculation object for a given style."""
-        
+    def __init__(self,
+                 model: Union[str, Path, IOBase, DM, None]=None,
+                 name: Optional[str]=None,
+                 params: Union[str, Path, IOBase, dict] = None,
+                 **kwargs: any):
+        """
+        Initializes a Calculation object for a given style.
+
+        Parameters
+        ----------
+        model : str, file-like object or DataModelDict, optional
+            Record content in data model format to read in.  Cannot be given
+            with params.
+        name : str, optional
+            The name to use for saving the record.  By default, this should be
+            the calculation's key.
+        params : str, file-like object or dict, optional
+            Calculation input parameters or input parameter file.  Cannot be
+            given with model.
+        **kwargs : any
+            Any other core Calculation record attributes to set.  Cannot be
+            given with model.
+        """
+
         # Initialize subsets used by the calculation
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
@@ -41,7 +67,7 @@ class ElasticConstantsStatic(Calculation):
         self.__C = None
         self.__raw_Cij_positive = None
         self.__raw_Cij_negative = None
-        
+
         # Define calc shortcut
         self.calc = elastic_constants_static
 
@@ -50,7 +76,7 @@ class ElasticConstantsStatic(Calculation):
                          subsets=subsets, **kwargs)
 
     @property
-    def filenames(self):
+    def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
             'elastic_constants_static.py',
@@ -60,66 +86,68 @@ class ElasticConstantsStatic(Calculation):
 ############################## Class attributes ###############################
 
     @property
-    def commands(self):
+    def commands(self) -> LammpsCommands:
         """LammpsCommands subset"""
         return self.__commands
 
     @property
-    def potential(self):
+    def potential(self) -> LammpsPotential:
         """LammpsPotential subset"""
         return self.__potential
 
     @property
-    def units(self):
+    def units(self) -> Units:
         """Units subset"""
         return self.__units
 
     @property
-    def system(self):
+    def system(self) -> AtommanSystemLoad:
         """AtommanSystemLoad subset"""
         return self.__system
 
     @property
-    def system_mods(self):
+    def system_mods(self) -> AtommanSystemManipulate:
         """AtommanSystemManipulate subset"""
         return self.__system_mods
-    
+
     @property
-    def minimize(self):
+    def minimize(self) -> LammpsMinimize:
         """LammpsMinimize subset"""
         return self.__minimize
 
     @property
-    def strainrange(self):
+    def strainrange(self) -> float:
         """float: Strain step size used in estimating elastic constants"""
         return self.__strainrange
 
     @strainrange.setter
-    def strainrange(self, value):
-        self.__strainrange = float(value)
-        
+    def strainrange(self, val: float):
+        self.__strainrange = float(val)
+
     @property
-    def C(self):
+    def C(self) -> am.ElasticConstants:
         """atomman.ElasticConstants: Averaged elastic constants"""
         if self.__C is None:
             raise ValueError('No results yet!')
         return self.__C
 
     @property
-    def raw_Cij_positive(self):
+    def raw_Cij_positive(self) -> np.ndarray:
         """numpy.NDArray: Cij 6x6 array measured using positive strain steps"""
         if self.__raw_Cij_positive is None:
             raise ValueError('No results yet!')
         return self.__raw_Cij_positive
 
     @property
-    def raw_Cij_negative(self):
+    def raw_Cij_negative(self) -> np.ndarray:
         """numpy.NDArray: Cij 6x6 array measured using negative strain steps"""
         if self.__raw_Cij_negative is None:
             raise ValueError('No results yet!')
         return self.__raw_Cij_negative
 
-    def set_values(self, name=None, **kwargs):
+    def set_values(self,
+                   name: Optional[str] = None,
+                   **kwargs: any):
         """
         Set calculation values directly.  Any terms not given will be set
         or reset to the calculation's default values.
@@ -142,16 +170,29 @@ class ElasticConstantsStatic(Calculation):
         if 'strainrange' in kwargs:
             self.strainrange = kwargs['strainrange']
 
-####################### Parameter file interactions ########################### 
+####################### Parameter file interactions ###########################
 
-    def load_parameters(self, params, key=None):
-        
+    def load_parameters(self,
+                        params: Union[dict, str, IOBase],
+                        key: Optional[str] = None):
+        """
+        Reads in and sets calculation parameters.
+
+        Parameters
+        ----------
+        params : dict, str or file-like object
+            The parameters or parameter file to read in.
+        key : str, optional
+            A new key value to assign to the object.  If not given, will use
+            calc_key field in params if it exists, or leave the key value
+            unchanged.
+        """
         # Load universal content
         input_dict = super().load_parameters(params, key=key)
-        
+
         # Load input/output units
         self.units.load_parameters(input_dict)
-        
+
         # Change default values for subset terms
         input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
         input_dict['forcetolerance'] = input_dict.get('forcetolerance',
@@ -160,17 +201,17 @@ class ElasticConstantsStatic(Calculation):
         # Load calculation-specific strings
 
         # Load calculation-specific booleans
-        
+
         # Load calculation-specific integers
 
         # Load calculation-specific unitless floats
         self.strainrange = float(input_dict.get('strainrange', 1e-6))
 
         # Load calculation-specific floats with units
-        
+
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
-        
+
         # Load minimization parameters
         self.minimize.load_parameters(input_dict)
 
@@ -183,7 +224,9 @@ class ElasticConstantsStatic(Calculation):
         # Manipulate system
         self.system_mods.load_parameters(input_dict)
 
-    def master_prepare_inputs(self, branch='main', **kwargs):
+    def master_prepare_inputs(self,
+                              branch: str = 'main',
+                              **kwargs: any) -> dict:
         """
         Utility method that build input parameters for prepare according to the
         workflows used by the NIST Interatomic Potentials Repository.  In other
@@ -209,7 +252,7 @@ class ElasticConstantsStatic(Calculation):
 
         # main branch
         if branch == 'main':
-            
+
             # Check for required kwargs
             assert 'lammps_command' in kwargs
 
@@ -225,11 +268,11 @@ class ElasticConstantsStatic(Calculation):
 
             # Copy kwargs to params
             for key in kwargs:
-                
+
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
                     params[f'parent_{key}'] = kwargs[key]
-                
+
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
@@ -240,19 +283,19 @@ class ElasticConstantsStatic(Calculation):
         return params
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The calculation-specific input keys and their descriptions."""
 
         return {
             'strainrange': ' '.join([
                 "The strain range to apply to the system to evaluate the",
                 "elastic constants.  Default value is '1e-6'"]),
-        } 
+        }
 
     @property
-    def singularkeys(self):
+    def singularkeys(self) -> list:
         """list: Calculation keys that can have single values during prepare."""
-        
+
         keys = (
             # Universal keys
             super().singularkeys
@@ -264,18 +307,18 @@ class ElasticConstantsStatic(Calculation):
             # Calculation-specific keys
         )
         return keys
-    
+
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """list: Calculation key sets that can have multiple values during prepare."""
-        
+
         keys = (
             # Universal multikeys
             super().multikeys +
 
             # Combination of potential and system keys
             [
-                self.potential.keyset + 
+                self.potential.keyset +
                 self.system.keyset
             ] +
 
@@ -283,28 +326,28 @@ class ElasticConstantsStatic(Calculation):
             [
                 self.system_mods.keyset
             ] +
-            
+
             # Strainrange
             [
                 [
                     'strainrange',
                 ]
             ] +
-            
+
             [
                 self.minimize.keyset
             ]
-        )    
+        )
         return keys
 
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str: The root element of the content"""
         return 'calculation-elastic-constants-static'
 
-    def build_model(self):
+    def build_model(self) -> DM:
         """
         Generates and returns model content based on the values set to object.
         """
@@ -337,7 +380,7 @@ class ElasticConstantsStatic(Calculation):
             cij['Cij'] = uc.model(self.raw_Cij_positive,
                                   self.units.pressure_unit)
             calc.append('raw-elastic-constants', cij)
-            
+
             calc['elastic-constants'] = DM()
             calc['elastic-constants']['Cij'] = uc.model(self.C.Cij,
                                                         self.units.pressure_unit)
@@ -345,7 +388,9 @@ class ElasticConstantsStatic(Calculation):
         self._set_model(model)
         return model
 
-    def load_model(self, model, name=None):
+    def load_model(self,
+                   model: Union[str, DM],
+                   name: Optional[str] = None):
         """
         Loads record contents from a given model.
 
@@ -372,61 +417,21 @@ class ElasticConstantsStatic(Calculation):
             Cij = uc.value_unit(calc['elastic-constants']['Cij'])
             self.__C = am.ElasticConstants(Cij=Cij)
 
-    def mongoquery(self, strainrange=None, **kwargs):
-        """
-        Builds a Mongo-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        strainrange : float or list, optional
-            strainrange values to parse by.
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The Mongo-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().mongoquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = f'content.{self.modelroot}'
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.strain-range', strainrange)
-
-        return mquery
-
-    def cdcsquery(self, strainrange=None, **kwargs):
-        """
-        Builds a CDCS-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        strainrange : float or list, optional
-            strainrange values to parse by.
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The CDCS-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().cdcsquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = self.modelroot
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.strain-range', strainrange)
-        
-        return mquery
+    @property
+    def queries(self) -> dict:
+        queries = deepcopy(super().queries)
+        queries.update({
+            'strainrange': load_query(
+                style='float_match',
+                name='strainrange',
+                path=f'{self.modelroot}.calculation.run-parameter.strain-range',
+                description='search by strain range used'),
+        })
+        return queries
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self):
+    def metadata(self) -> dict:
         """
         Generates a dict of simple metadata values associated with the record.
         Useful for quickly comparing records and for building pandas.DataFrames
@@ -437,7 +442,7 @@ class ElasticConstantsStatic(Calculation):
 
         # Extract calculation-specific content
         meta['strainrange'] = self.strainrange
-        
+
         # Extract results
         if self.status == 'finished':
             meta['C'] = self.C
@@ -447,68 +452,31 @@ class ElasticConstantsStatic(Calculation):
         return meta
 
     @property
-    def compare_terms(self):
+    def compare_terms(self) -> list:
         """list: The terms to compare metadata values absolutely."""
         return [
             'script',
-        
+
             'load_file',
             'load_options',
             'symbols',
-            
+
             'potential_LAMMPS_key',
             'potential_key',
-            
-        #    'a_mult',
-        #    'b_mult',
-        #    'c_mult',
         ]
-    
+
     @property
-    def compare_fterms(self):
+    def compare_fterms(self) -> dict:
         """dict: The terms to compare metadata values using a tolerance."""
         return {
             'strainrange':1e-10,
         }
 
-    def pandasfilter(self, dataframe, strainrange=None, **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        strainrange : float or list, optional
-            strainrange values to parse by.
-        kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets. 
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        # Call super to filter by universal and subset terms
-        matches = super().pandasfilter(dataframe, **kwargs)
-
-        # Filter by calculation-specific terms
-        matches = (matches
-            &query.str_match.pandas(dataframe, 'strainrange', strainrange)
-        )
-        
-        return matches
-
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self):
+    def calc_inputs(self) -> dict:
         """Builds calculation inputs from the class's attributes"""
-        
+
         # Initialize input_dict
         input_dict = {}
 
@@ -525,8 +493,8 @@ class ElasticConstantsStatic(Calculation):
 
         # Return input_dict
         return input_dict
-    
-    def process_results(self, results_dict):
+
+    def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
         attributes.

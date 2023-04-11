@@ -1,17 +1,15 @@
 # coding: utf-8
 
 # Standard Python libraries
-import uuid
-from copy import deepcopy
-import random
+from io import IOBase
+from pathlib import Path
+from typing import Optional, Union
 
 import numpy as np
-
-from yabadaba import query
+import numpy.typing as npt
 
 # https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/DataModelDict
@@ -20,18 +18,39 @@ from DataModelDict import DataModelDict as DM
 # iprPy imports
 from .. import Calculation
 from .dislocation_SDVPN import sdvpn
-from ...calculation_subset import *
+from ...calculation_subset import (Units, AtommanSystemLoad, Dislocation,
+                                   AtommanElasticConstants, AtommanGammaSurface)
 from ...input import termtodict, value, boolean
-from ...tools import aslist, dict_insert
+from ...tools import aslist
 
 class DislocationSDVPN(Calculation):
     """Class for managing semi-discrete variational Peierls-Nabarro calcuations"""
 
 ############################# Core properties #################################
 
-    def __init__(self, model=None, name=None, params=None, **kwargs):
-        """Initializes a Calculation object for a given style."""
-        
+    def __init__(self,
+                 model: Union[str, Path, IOBase, DM, None]=None,
+                 name: Optional[str]=None,
+                 params: Union[str, Path, IOBase, dict] = None,
+                 **kwargs: any):
+        """
+        Initializes a Calculation object for a given style.
+
+        Parameters
+        ----------
+        model : str, file-like object or DataModelDict, optional
+            Record content in data model format to read in.  Cannot be given
+            with params.
+        name : str, optional
+            The name to use for saving the record.  By default, this should be
+            the calculation's key.
+        params : str, file-like object or dict, optional
+            Calculation input parameters or input parameter file.  Cannot be
+            given with model.
+        **kwargs : any
+            Any other core Calculation record attributes to set.  Cannot be
+            given with model.
+        """
         # Initialize subsets used by the calculation
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
@@ -59,7 +78,7 @@ class DislocationSDVPN(Calculation):
         self.halfwidth = uc.set_in_units(1, 'angstrom')
         self.normalizedisreg = True
         self.fullstress = True
-        
+
         self.__sdvpn_solution = None
         self.__energies = None
         self.__disregistries = None
@@ -72,7 +91,7 @@ class DislocationSDVPN(Calculation):
                          subsets=subsets, **kwargs)
 
     @property
-    def filenames(self):
+    def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
             'dislocation_SDVPN.py'
@@ -81,223 +100,226 @@ class DislocationSDVPN(Calculation):
 ############################## Class attributes ###############################
 
     @property
-    def units(self):
+    def units(self) -> Units:
         """Units subset"""
         return self.__units
 
     @property
-    def system(self):
+    def system(self) -> AtommanSystemLoad:
         """AtommanSystemLoad subset"""
         return self.__system
-    
+
     @property
-    def defect(self):
+    def defect(self) -> Dislocation:
         """Dislocation subset"""
         return self.__defect
 
     @property
-    def elastic(self):
+    def elastic(self) -> AtommanElasticConstants:
         """AtommanElasticConstants subset"""
         return self.__elastic
 
     @property
-    def gamma(self):
+    def gamma(self) -> AtommanGammaSurface:
         """AtommanGammaSurface subset"""
         return self.__gamma
 
     @property
-    def xnum(self):
+    def xnum(self) -> int:
         """int: The number of x coordinate values"""
         return self.__xnum
 
     @xnum.setter
-    def xnum(self, value):
-        if value is None:
-            self.__xnum = value
+    def xnum(self, val: int):
+        if val is None:
+            self.__xnum = val
         else:
-            self.__xnum = int(value)
+            self.__xnum = int(val)
 
     @property
-    def xmax(self):
+    def xmax(self) -> float:
         """float: The maximum x coordinate value"""
         return self.__xmax
 
     @xmax.setter
-    def xmax(self, value):
-        if value is None:
-            self.__xmax = value
+    def xmax(self, val: float):
+        if val is None:
+            self.__xmax = val
         else:
-            self.__xmax = float(value)
+            self.__xmax = float(val)
 
     @property
-    def xstep(self):
+    def xstep(self) -> float:
         """float: The step size between the x coordinate values"""
         return self.__xstep
 
     @xstep.setter
-    def xstep(self, value):
-        if value is None:
-            self.__xstep = value
+    def xstep(self, val: float):
+        if val is None:
+            self.__xstep = val
         else:
-            self.__xstep = float(value)
+            self.__xstep = float(val)
 
     @property
-    def xscale(self):
+    def xscale(self) -> Optional[bool]:
         """bool: Flag if xstep/xmax values are absolute or scaled"""
         return self.__xscale
 
     @xscale.setter
-    def xscale(self, value):
-        if value is None:
-            self.__xscale = value
+    def xscale(self, val: Optional[bool]):
+        if val is None:
+            self.__xscale = val
         else:
-            self.__xscale = boolean(value)
+            self.__xscale = boolean(val)
 
     @property
-    def minimize_style(self):
+    def minimize_style(self) -> str:
         """str: The scipy.minimize style to use"""
         return self.__minimize_style
 
     @minimize_style.setter
-    def minimize_style(self, value):
-        self.__minimize_style = str(value)
+    def minimize_style(self, val: str):
+        self.__minimize_style = str(val)
 
     @property
-    def minimize_options(self):
+    def minimize_options(self) -> dict:
         """dict: kwarg options to pass to scipy.minimize"""
         return self.__minimize_options
 
     @minimize_options.setter
-    def minimize_options(self, value):
-        assert isinstance(value, dict)
-        self.__minimize_options = value
+    def minimize_options(self, val: dict):
+        assert isinstance(val, dict)
+        self.__minimize_options = val
 
     @property
-    def minimize_cycles(self):
+    def minimize_cycles(self) -> int:
         """int: The number of minimization cycles to run"""
         return self.__minimize_cycles
 
     @minimize_cycles.setter
-    def minimize_cycles(self, value):
-        self.__minimize_cycles = int(value)
+    def minimize_cycles(self, val: int):
+        self.__minimize_cycles = int(val)
 
     @property
-    def cutofflongrange(self):
+    def cutofflongrange(self) -> float:
         """float: The cutoff to use for the long-range elastic energy term"""
         return self.__cutofflongrange
 
     @cutofflongrange.setter
-    def cutofflongrange(self, value):
-        value = float(value)
-        assert value >= 0.0
-        self.__cutofflongrange = float(value)
+    def cutofflongrange(self, val: float):
+        val = float(val)
+        assert val >= 0.0
+        self.__cutofflongrange = float(val)
 
     @property
-    def tau(self):
+    def tau(self) -> np.ndarray:
         """numpy.NDArray: External stress tensor to apply to the system"""
         return self.__tau
 
     @tau.setter
-    def tau(self, value):
-        value = np.asarray(value)
-        assert value.shape == (3,3)
-        self.__tau = value
+    def tau(self, val: npt.ArrayLike):
+        val = np.asarray(val)
+        assert val.shape == (3,3)
+        self.__tau = val
 
     @property
-    def alpha(self):
+    def alpha(self) -> list:
         """list: Non-local correction term parameters"""
         return self.__alpha
-    
+
     @alpha.setter
-    def alpha(self, value):
+    def alpha(self, val: Union[str, list]):
         if isinstance(value, str):
-            self.__alpha = [float(v) for v in value.split()]
+            self.__alpha = [float(v) for v in val.split()]
         else:
-            self.__alpha = [float(v) for v in aslist(value)]
+            self.__alpha = [float(v) for v in aslist(val)]
 
     @property
-    def beta(self):
+    def beta(self) -> np.ndarray:
         """numpy.NDArray: Surface correction term parameter tensor"""
         return self.__beta
 
     @beta.setter
-    def beta(self, value):
-        value = np.asarray(value)
-        assert value.shape == (3,3)
-        self.__beta = value
+    def beta(self, val: npt.ArrayLike):
+        val = np.asarray(val)
+        assert val.shape == (3,3)
+        self.__beta = val
 
     @property
-    def cdiffelastic(self):
+    def cdiffelastic(self) -> Optional[bool]:
         """bool: Flag if central difference is used for the elastic term"""
         return self.__cdiffelastic
 
     @cdiffelastic.setter
-    def cdiffelastic(self, value):
-        if value is None:
-            self.__cdiffelastic = value
+    def cdiffelastic(self, val: Optional[bool]):
+        if val is None:
+            self.__cdiffelastic = val
         else:
-            self.__cdiffelastic = boolean(value)
+            self.__cdiffelastic = boolean(val)
 
     @property
-    def cdiffsurface(self):
+    def cdiffsurface(self) -> Optional[bool]:
         """bool: Flag if central difference is used for the surface term"""
         return self.__cdiffsurface
 
     @cdiffsurface.setter
-    def cdiffsurface(self, value):
-        if value is None:
-            self.__cdiffsurface = value
+    def cdiffsurface(self, val: Optional[bool]):
+        if val is None:
+            self.__cdiffsurface = val
         else:
-            self.__cdiffsurface = boolean(value)
+            self.__cdiffsurface = boolean(val)
 
     @property
-    def cdiffstress(self):
+    def cdiffstress(self) -> Optional[bool]:
         """bool: Flag if central difference is used for the stress term"""
         return self.__cdiffstress
 
     @cdiffstress.setter
-    def cdiffstress(self, value):
-        if value is None:
-            self.__cdiffstress = value
+    def cdiffstress(self, val: Optional[bool]):
+        if val is None:
+            self.__cdiffstress = val
         else:
-            self.__cdiffstress = boolean(value)
-    
+            self.__cdiffstress = boolean(val)
+
     @property
-    def normalizedisreg(self):
-        """bool: Flag indicating if the total cumulative disregistry is normalized to the Burgers vector"""
+    def normalizedisreg(self) -> Optional[bool]:
+        """
+        bool: Flag indicating if the total cumulative disregistry is normalized
+        to the Burgers vector
+        """
         return self.__normalizedisreg
 
     @normalizedisreg.setter
-    def normalizedisreg(self, value):
-        if value is None:
-            self.__normalizedisreg = value
+    def normalizedisreg(self, val: Optional[bool]):
+        if val is None:
+            self.__normalizedisreg = val
         else:
-            self.__normalizedisreg = boolean(value)
+            self.__normalizedisreg = boolean(val)
 
     @property
-    def fullstress(self):
+    def fullstress(self) -> Optional[bool]:
         """bool: Flag for switching which stress term equation is used"""
         return self.__fullstress
 
     @fullstress.setter
-    def fullstress(self, value):
-        if value is None:
-            self.__fullstress = value
+    def fullstress(self, val: Optional[bool]):
+        if val is None:
+            self.__fullstress = val
         else:
-            self.__fullstress = boolean(value)
+            self.__fullstress = boolean(val)
 
     @property
-    def sdvpn_solution(self):
+    def sdvpn_solution(self) -> am.defect.SDVPN:
         """atomman.defect.SDVPN: The dislocation solution object"""
         if self.__sdvpn_solution is None:
             raise ValueError('No results yet!')
         elif not isinstance(self.__sdvpn_solution, am.defect.SDVPN):
             self.__sdvpn_solution = am.defect.SDVPN(model=self.__sdvpn_solution)
-        
+
         return self.__sdvpn_solution
 
     @property
-    def energies(self):
+    def energies(self) -> list:
         """list: The total energies for the solution after each minimization cycle"""
         if self.__energies is None:
             raise ValueError('No results yet!')
@@ -305,14 +327,16 @@ class DislocationSDVPN(Calculation):
             return self.__energies
 
     @property
-    def disregistries(self):
+    def disregistries(self) -> list:
         """list: The disregistry profiles for the solution after each minimization cycle"""
         if self.__disregistries is None:
             raise ValueError('No results yet!')
         else:
             return self.__disregistries
 
-    def set_values(self, name=None, **kwargs):
+    def set_values(self,
+                   name: Optional[str] = None,
+                   **kwargs: any):
         """
         Set calculation values directly.  Any terms not given will be set
         or reset to the calculation's default values.
@@ -401,18 +425,31 @@ class DislocationSDVPN(Calculation):
         if 'fullstress' in kwargs:
             self.fullstress = kwargs['fullstress']
 
-####################### Parameter file interactions ########################### 
+####################### Parameter file interactions ###########################
 
-    def load_parameters(self, params, key=None):
-        
+    def load_parameters(self,
+                        params: Union[dict, str, IOBase],
+                        key: Optional[str] = None):
+        """
+        Reads in and sets calculation parameters.
+
+        Parameters
+        ----------
+        params : dict, str or file-like object
+            The parameters or parameter file to read in.
+        key : str, optional
+            A new key value to assign to the object.  If not given, will use
+            calc_key field in params if it exists, or leave the key value
+            unchanged.
+        """
         # Load universal content
         input_dict = super().load_parameters(params, key=key)
-        
+
         # Load input/output units
         self.units.load_parameters(input_dict)
         pl_unit = f'{self.units.pressure_unit}*{self.units.length_unit}'
         p_per_l_unit = f'{self.units.pressure_unit}/{self.units.length_unit}'
-        
+
         # Change default values for subset terms
 
         # Load calculation-specific strings
@@ -435,7 +472,7 @@ class DislocationSDVPN(Calculation):
         # Load calculation-specific unitless floats
         self.xstep = input_dict.get('xstep', None)
         self.xmax = input_dict.get('xmax', None)
-        
+
         # Load calculation-specific floats with units
         bxx = value(input_dict, 'beta_xx', default_unit=pl_unit,
                     default_term='0.0 GPa*angstrom')
@@ -461,7 +498,7 @@ class DislocationSDVPN(Calculation):
         self.cutofflongrange = value(input_dict, 'cutofflongrange',
                                      default_unit=self.units.length_unit,
                                      default_term='1000 angstrom')
-        
+
         # Process calculation-specific terms
         alpha = alpha.split()
         if len(alpha) > 1:
@@ -515,7 +552,9 @@ class DislocationSDVPN(Calculation):
             if self.xstep is not None:
                 self.xstep *= self.system.ucell.box.a
 
-    def master_prepare_inputs(self, branch='main', **kwargs):
+    def master_prepare_inputs(self,
+                              branch: str = 'main',
+                              **kwargs: any) -> dict:
         """
         Utility method that build input parameters for prepare according to the
         workflows used by the NIST Interatomic Potentials Repository.  In other
@@ -561,7 +600,7 @@ class DislocationSDVPN(Calculation):
         return params
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The calculation-specific input keys and their descriptions."""
 
         return {
@@ -617,10 +656,6 @@ class DislocationSDVPN(Calculation):
                 "The xx component of the surface energy coefficient tensor",
                 "(in units pressure-length) to use. Default value is 0.0",
                 "GPa-Angstrom."]),
-            'beta_xx': ' '.join([
-                "The xx component of the surface energy coefficient tensor",
-                "(in units pressure-length) to use. Default value is 0.0",
-                "GPa-Angstrom."]),
             'beta_yy': ' '.join([
                 "The yy component of the surface energy coefficient tensor",
                 "(in units pressure-length) to use. Default value is 0.0",
@@ -668,10 +703,10 @@ class DislocationSDVPN(Calculation):
                 "Boolean indicating which of two stress formulas to use.",
                 "True uses the original full formulation, while False uses a",
                 "newer, simpler representation.  Default value is True."]),
-        } 
+        }
 
     @property
-    def singularkeys(self):
+    def singularkeys(self) -> list:
         """list: Calculation keys that can have single values during prepare."""
 
         keys = (
@@ -684,11 +719,11 @@ class DislocationSDVPN(Calculation):
             # Calculation-specific keys
         )
         return keys
-    
+
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """list: Calculation key sets that can have multiple values during prepare."""
-        
+
         keys = (
             # Universal multikeys
             super().multikeys +
@@ -699,7 +734,7 @@ class DislocationSDVPN(Calculation):
                 self.elastic.keyset + 
                 self.gamma.keyset
             ] +
-        
+
             # Defect multikeys
             self.defect.multikeys +
 
@@ -732,17 +767,17 @@ class DislocationSDVPN(Calculation):
                     'fullstress',
                 ]
             ]
-        )    
+        )
         return keys
 
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str: The root element of the content"""
         return 'calculation-dislocation-SDVPN'
 
-    def build_model(self):
+    def build_model(self) -> DM:
         """
         Generates and returns model content based on the values set to object.
         """
@@ -765,7 +800,7 @@ class DislocationSDVPN(Calculation):
 
         run_params['halfwidth'] = uc.model(self.halfwidth,
                                            self.units.length_unit)
-        
+
         # Scale xmax and xstep by alat
         if self.xscale is True:
             if self.system.box_parameters is not None:
@@ -785,7 +820,7 @@ class DislocationSDVPN(Calculation):
         x = am.defect.pn_arctan_disregistry(xmax=self.xmax,
                                             xnum=self.xnum,
                                             xstep=self.xstep)[0]
-        
+
         run_params['xmax'] = x.max()
         run_params['xnum'] = len(x)
         run_params['xstep'] = x[1]-x[0]
@@ -796,8 +831,8 @@ class DislocationSDVPN(Calculation):
         if self.status != 'finished':
             p_per_l_unit = f'{self.units.pressure_unit}/{self.units.length_unit}'
             p_l_unit = f'{self.units.pressure_unit}*{self.units.length_unit}'
-            calc['semidiscrete-variational-Peierls-Nabarro'] = sdvpn = DM()
-            sdvpn['parameter'] = params = DM()
+            calc['semidiscrete-variational-Peierls-Nabarro'] = svpn = DM()
+            svpn['parameter'] = params = DM()
             params['tau'] = uc.model(self.tau, self.units.pressure_unit)
             params['alpha'] = uc.model(self.alpha, p_per_l_unit)
             params['beta'] = uc.model(self.beta, p_l_unit)
@@ -819,7 +854,7 @@ class DislocationSDVPN(Calculation):
                                        include_gamma=False)
             key = 'semidiscrete-variational-Peierls-Nabarro'
             calc[key] = pnmodel[key]
-            
+
             e_per_l_unit = f'{self.units.energy_unit}/{self.units.length_unit}'
             calc['misfit-energy'] = uc.model(pnsolution.misfit_energy(), e_per_l_unit)
             calc['elastic-energy'] = uc.model(pnsolution.elastic_energy(), e_per_l_unit)
@@ -833,7 +868,9 @@ class DislocationSDVPN(Calculation):
         self._set_model(model)
         return model
 
-    def load_model(self, model, name=None):
+    def load_model(self,
+                   model: Union[str, DM],
+                   name: Optional[str] = None):
         """
         Loads record contents from a given model.
 
@@ -860,10 +897,10 @@ class DislocationSDVPN(Calculation):
 
         # Build results
         if self.status != 'finished':
-            p_per_l_unit = f'{self.units.pressure_unit}/{self.units.length_unit}'
-            p_l_unit = f'{self.units.pressure_unit}*{self.units.length_unit}'
+            #p_per_l_unit = f'{self.units.pressure_unit}/{self.units.length_unit}'
+            #p_l_unit = f'{self.units.pressure_unit}*{self.units.length_unit}'
             params = calc['semidiscrete-variational-Peierls-Nabarro']['parameter']
-            
+
             self.tau = uc.value_unit(params['tau'])
             self.alpha = uc.value_unit(params['alpha'])
             self.beta = uc.value_unit(params['beta'])
@@ -879,57 +916,10 @@ class DislocationSDVPN(Calculation):
         if self.status == 'finished':
             self.__sdvpn_solution = calc
             self.__energies = uc.value_unit(calc['total-energy-per-cycle'])
-         
-    def mongoquery(self, **kwargs):
-        """
-        Builds a Mongo-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The Mongo-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().mongoquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = f'content.{self.modelroot}'
-       
-        return mquery
-
-    def cdcsquery(self, **kwargs):
-        
-        """
-        Builds a CDCS-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The CDCS-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().cdcsquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = self.modelroot
-        
-        return mquery
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self):
+    def metadata(self) -> dict:
         """
         Generates a dict of simple metadata values associated with the record.
         Useful for quickly comparing records and for building pandas.DataFrames
@@ -958,31 +948,31 @@ class DislocationSDVPN(Calculation):
         return meta
 
     @property
-    def compare_terms(self):
+    def compare_terms(self) -> list:
         """list: The terms to compare metadata values absolutely."""
         return [
             'script',
-            
+
             'xnum',
-            
+
             'load_file',
             'load_options',
             'symbols',
-            
+
             'dislocation_key',
             'gammasurface_calc_key',
-            
+
             'cdiffelastic',
             'cdiffsurface',
             'cdiffstress',
-            
+
             'fullstress',
             'min_method',
             'min_options',
         ]
-    
+
     @property
-    def compare_fterms(self):
+    def compare_fterms(self) -> dict:
         """dict: The terms to compare metadata values using a tolerance."""
         return {
             'xmax':1e-2,
@@ -1009,42 +999,14 @@ class DislocationSDVPN(Calculation):
             'alpha1':1e-2,
         }
 
-    def isvalid(self):
+    def isvalid(self) -> bool:
         return self.system.family == self.defect.family
-    
-    def pandasfilter(self, dataframe, **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets. 
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        # Call super to filter by universal and subset terms
-        matches = super().pandasfilter(dataframe, **kwargs)
-
-        # Filter by calculation-specific terms
-        
-        return matches
 
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self):
+    def calc_inputs(self) -> dict:
         """Builds calculation inputs from the class's attributes"""
-        
+
         # Initialize input_dict
         input_dict = {}
 
@@ -1081,8 +1043,8 @@ class DislocationSDVPN(Calculation):
         input_dict['min_cycles'] = self.minimize_cycles
 
         return input_dict
-    
-    def process_results(self, results_dict):
+
+    def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
         attributes.

@@ -1,8 +1,11 @@
 # coding: utf-8
 # Standard Python libraries
+from io import IOBase
+from pathlib import Path
+from copy import deepcopy
+from typing import Optional, Union
 
-
-from yabadaba import query
+from yabadaba import load_query
 
 # https://github.com/usnistgov/atomman
 import atomman as am
@@ -14,7 +17,7 @@ from DataModelDict import DataModelDict as DM
 # iprPy imports
 from .. import Calculation
 from .bond_angle_scan import bond_angle_scan
-from ...calculation_subset import *
+from ...calculation_subset import LammpsPotential, LammpsCommands, Units
 from ...input import value
 from ...tools import aslist, dict_insert
 
@@ -23,9 +26,29 @@ class BondAngleScan(Calculation):
 
 ############################# Core properties #################################
 
-    def __init__(self, model=None, name=None, params=None, **kwargs):
-        """Initializes a Calculation object for a given style."""
-        
+    def __init__(self,
+                 model: Union[str, Path, IOBase, DM, None]=None,
+                 name: Optional[str]=None,
+                 params: Union[str, Path, IOBase, dict] = None,
+                 **kwargs: any):
+        """
+        Initializes a Calculation object for a given style.
+
+        Parameters
+        ----------
+        model : str, file-like object or DataModelDict, optional
+            Record content in data model format to read in.  Cannot be given
+            with params.
+        name : str, optional
+            The name to use for saving the record.  By default, this should be
+            the calculation's key.
+        params : str, file-like object or dict, optional
+            Calculation input parameters or input parameter file.  Cannot be
+            given with model.
+        **kwargs : any
+            Any other core Calculation record attributes to set.  Cannot be
+            given with model.
+        """
         # Initialize subsets used by the calculation
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
@@ -40,7 +63,7 @@ class BondAngleScan(Calculation):
         self.number_of_steps_theta = 100
         self.minimum_theta = 1.0
         self.maximum_theta = 180.0
-        
+
         self.cluster = None
         self.results_file = None
         self.results_length_unit = None
@@ -54,179 +77,181 @@ class BondAngleScan(Calculation):
                          subsets=subsets, **kwargs)
 
     @property
-    def filenames(self):
+    def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
             'bond_angle_scan.py',
             'bond_scan.template'
         ]
 
-############################## Class attributes ###############################                
+############################## Class attributes ###############################
 
     @property
-    def commands(self):
+    def commands(self) -> LammpsCommands:
         """LammpsCommands subset"""
         return self.__commands
 
     @property
-    def potential(self):
+    def potential(self) -> LammpsPotential:
         """LammpsPotential subset"""
         return self.__potential
 
     @property
-    def units(self):
+    def units(self) -> Units:
         """Units subset"""
         return self.__units
 
     @property
-    def symbols(self):
-        """The potential symbols to use"""
+    def symbols(self) -> list:
+        """list: The potential symbols to use"""
         return self.__symbols
 
     @symbols.setter
-    def symbols(self, value):
-        if value is None:
+    def symbols(self, val: Union[str, list, None]):
+        if val is None:
             self.__symbols = []
         else:
-            value = aslist(value)
+            val = aslist(val)
 
             # Replicate single symbol
-            if len(value) == 1:
-                value = [value, value, value]
-            
+            if len(val) == 1:
+                val = [val, val, val]
+
             # Check that 3 symbols are given for calc
-            elif len(value) != 3:
+            elif len(val) != 3:
                 raise ValueError('Invalid number of symbols')
-            
-            self.__symbols = value
+
+            self.__symbols = val
 
     @property
-    def number_of_steps_r(self):
+    def number_of_steps_r(self) -> int:
         """int : The number of r evaluation steps"""
         return self.__number_of_steps_r
 
     @number_of_steps_r.setter
-    def number_of_steps_r(self, value):
-        value = int(value)
-        assert value > 0
-        self.__number_of_steps_r = value
+    def number_of_steps_r(self, val: int):
+        val = int(val)
+        assert val > 0
+        self.__number_of_steps_r = val
 
     @property
-    def minimum_r(self):
+    def minimum_r(self) -> float:
         """float : The minimum value of r"""
         return self.__minimum_r
 
     @minimum_r.setter
-    def minimum_r(self, value):
-        value = float(value)
-        assert value > 0
-        self.__minimum_r = value
+    def minimum_r(self, val: float):
+        val = float(val)
+        assert val > 0
+        self.__minimum_r = val
 
     @property
-    def maximum_r(self):
+    def maximum_r(self) -> float:
         """float : The maximum value of r"""
         return self.__maximum_r
 
     @maximum_r.setter
-    def maximum_r(self, value):
-        value = float(value)
-        assert value > 0
-        self.__maximum_r = value
+    def maximum_r(self, val: float):
+        val = float(val)
+        assert val > 0
+        self.__maximum_r = val
 
     @property
-    def number_of_steps_theta(self):
+    def number_of_steps_theta(self) -> int:
         """int : The number of theta evaluation steps"""
         return self.__number_of_steps_theta
 
     @number_of_steps_theta.setter
-    def number_of_steps_theta(self, value):
-        value = int(value)
-        assert value > 0
-        self.__number_of_steps_theta = value
+    def number_of_steps_theta(self, val: int):
+        val = int(val)
+        assert val > 0
+        self.__number_of_steps_theta = val
 
     @property
-    def minimum_theta(self):
+    def minimum_theta(self) -> float:
         """float : The minimum value of theta"""
         return self.__minimum_theta
 
     @minimum_theta.setter
-    def minimum_theta(self, value):
-        value = float(value)
-        assert value > 0
-        assert value <= 180.0
-        self.__minimum_theta = value
+    def minimum_theta(self, val: float):
+        val = float(val)
+        assert val > 0
+        assert val <= 180.0
+        self.__minimum_theta = val
 
     @property
-    def maximum_theta(self):
+    def maximum_theta(self) -> float:
         """float : The maximum value of theta"""
         return self.__maximum_theta
 
     @maximum_theta.setter
-    def maximum_theta(self, value):
-        value = float(value)
-        assert value > 0
-        assert value <= 180.0
-        self.__maximum_theta = value
+    def maximum_theta(self, val: float):
+        val = float(val)
+        assert val > 0
+        assert val <= 180.0
+        self.__maximum_theta = val
 
     @property
-    def cluster(self):
+    def cluster(self) -> am.cluster.BondAngleMap:
         """atomman.cluster.BondAngleMap : Measured energies and coordinates"""
         if self.__cluster is None:
             raise ValueError('No results yet!')
         return self.__cluster
 
     @cluster.setter
-    def cluster(self, value):
-        if value is None:
-            self.__cluster = value
-        elif isinstance(value, am.cluster.BondAngleMap):
-            self.__cluster = value
+    def cluster(self, val: Optional[am.cluster.BondAngleMap]):
+        if val is None:
+            self.__cluster = val
+        elif isinstance(val, am.cluster.BondAngleMap):
+            self.__cluster = val
         else:
             raise TypeError('Must be a cluster object')
-        
+
     @property
-    def results_file(self):
+    def results_file(self) -> str:
         """str : File name where the raw results are saved."""
         if self.__results_file is None:
             raise ValueError('No results yet!')
         return self.__results_file
 
     @results_file.setter
-    def results_file(self, value):
-        if value is None:
-            self.__results_file = value
+    def results_file(self, val: Optional[str]):
+        if val is None:
+            self.__results_file = val
         else:
-            self.__results_file = str(value)
+            self.__results_file = str(val)
 
     @property
-    def results_length_unit(self):
+    def results_length_unit(self) -> str:
         """str : Unit of length for the results_file."""
         if self.__results_length_unit is None:
             raise ValueError('No results yet!')
         return self.__results_length_unit
 
     @results_length_unit.setter
-    def results_length_unit(self, value):
-        if value is None:
-            self.__results_length_unit = value
+    def results_length_unit(self, val: Optional[str]):
+        if val is None:
+            self.__results_length_unit = val
         else:
-            self.__results_length_unit = str(value)
+            self.__results_length_unit = str(val)
 
     @property
-    def results_energy_unit(self):
+    def results_energy_unit(self) -> str:
         """str : Unit of energy for the results_file."""
         if self.__results_energy_unit is None:
             raise ValueError('No results yet!')
         return self.__results_energy_unit
 
     @results_energy_unit.setter
-    def results_energy_unit(self, value):
-        if value is None:
-            self.__results_energy_unit = value
+    def results_energy_unit(self, val: Optional[str]):
+        if val is None:
+            self.__results_energy_unit = val
         else:
-            self.__results_energy_unit = str(value)
+            self.__results_energy_unit = str(val)
 
-    def set_values(self, name=None, **kwargs):
+    def set_values(self,
+                   name: Optional[str] = None,
+                   **kwargs: any):
         """
         Set calculation values directly.  Any terms not given will be set
         or reset to the calculation's default values.
@@ -255,7 +280,7 @@ class BondAngleScan(Calculation):
             the parent Calculation class and the subset classes.
         """
         # Call super to set universal and subset content
-        super().set_values(name=None, **kwargs)
+        super().set_values(name=name, **kwargs)
 
         # Set calculation-specific values
         if 'symbols' in kwargs:
@@ -273,9 +298,11 @@ class BondAngleScan(Calculation):
         if 'maximum_theta' in kwargs:
             self.maximum_theta = kwargs['maximum_theta']
 
-####################### Parameter file interactions ########################### 
+####################### Parameter file interactions ###########################
 
-    def load_parameters(self, params, key=None):
+    def load_parameters(self,
+                        params: Union[dict, str, IOBase],
+                        key: Optional[str] = None):
         """
         Reads in and sets calculation parameters.
 
@@ -290,15 +317,15 @@ class BondAngleScan(Calculation):
         """
         # Load universal content
         input_dict = super().load_parameters(params, key=key)
-        
+
         # Load input/output units
         self.units.load_parameters(input_dict)
-        
+
         # Load calculation-specific strings
         self.symbols = input_dict['symbols'].split()
 
         # Load calculation-specific booleans
-        
+
         # Load calculation-specific integers
         self.number_of_steps_r = int(input_dict.get('number_of_steps_r', 100))
         self.number_of_steps_theta = int(input_dict.get('number_of_steps_theta', 100))
@@ -314,14 +341,16 @@ class BondAngleScan(Calculation):
         self.maximum_r = value(input_dict, 'maximum_r',
                                default_unit=self.units.length_unit,
                                default_term='6.0 angstrom')
-        
+
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
-        
+
         # Load LAMMPS potential
         self.potential.load_parameters(input_dict)
 
-    def master_prepare_inputs(self, branch='main', **kwargs):
+    def master_prepare_inputs(self,
+                              branch: str = 'main',
+                              **kwargs: any) -> dict:
         """
         Utility method that build input parameters for prepare according to the
         workflows used by the NIST Interatomic Potentials Repository.  In other
@@ -347,7 +376,7 @@ class BondAngleScan(Calculation):
 
         # main branch
         if branch == 'main':
-            
+
             # Check for required kwargs
             assert 'lammps_command' in kwargs
 
@@ -362,22 +391,22 @@ class BondAngleScan(Calculation):
 
             # Copy kwargs to params
             for key in kwargs:
-                
+
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
                     params[f'intpot_{key}'] = kwargs[key]
-                
+
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
-        
+
         else:
             raise ValueError(f'Unknown branch {branch}')
 
         return params
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The calculation-specific input keys and their descriptions."""
 
         return {
@@ -401,12 +430,12 @@ class BondAngleScan(Calculation):
             'number_of_steps_theta': ' '.join([
                 "The number of bond angle, theta, to use.  Default"
                 "value is 100."]),
-        } 
+        }
 
     @property
-    def singularkeys(self):
+    def singularkeys(self) -> list:
         """list: Calculation keys that can have single values during prepare."""        
-        
+
         keys = (
             # Universal keys
             super().singularkeys
@@ -418,18 +447,18 @@ class BondAngleScan(Calculation):
             # Calculation-specific keys
         )
         return keys
-    
+
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """list: Calculation key sets that can have multiple values during prepare."""
-        
+
         keys = (
             # Universal multikeys
-            super().multikeys + 
+            super().multikeys +
 
             # Potential keys plus symbols
             [
-                self.potential.keyset + 
+                self.potential.keyset +
                 [
                     'symbols'
                 ]
@@ -447,18 +476,18 @@ class BondAngleScan(Calculation):
                     'maximum_theta', 
                     'number_of_steps_theta',
                 ]
-            ]  
+            ]
         )
         return keys
 
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str: The root element of the content"""
         return 'calculation-bond-angle-scan'
 
-    def build_model(self):
+    def build_model(self) -> DM:
         """
         Generates and returns model content based on the values set to object.
         """
@@ -490,7 +519,6 @@ class BondAngleScan(Calculation):
 
         dict_insert(calc, 'system-info', DM(), after='potential-LAMMPS')
         calc['system-info']['symbol'] = self.symbols
-        
 
         # Build results
         if self.status == 'finished':
@@ -498,11 +526,13 @@ class BondAngleScan(Calculation):
             results['file'] = self.results_file
             results['length_unit'] = self.results_length_unit
             results['energy_unit'] = self.results_energy_unit
-        
+
         self._set_model(model)
         return model
 
-    def load_model(self, model, name=None):
+    def load_model(self,
+                   model: Union[str, DM],
+                   name: Optional[str] = None):
         """
         Loads record contents from a given model.
 
@@ -531,113 +561,65 @@ class BondAngleScan(Calculation):
 
         # Load results
         if self.status == 'finished':
-           self.cluster = am.cluster.BondAngleMap(rmin=self.minimum_r,
-                                                  rmax=self.maximum_r,
-                                                  rnum=self.number_of_steps_r,
-                                                  thetamin=self.minimum_theta,
-                                                  thetamax=self.maximum_theta,
-                                                  thetanum=self.number_of_steps_theta,
-                                                  symbols=self.symbols)
-           self.results_file = calc['calculation']['results']['file']
-           self.results_length_unit = calc['calculation']['results']['length_unit']
-           self.results_energy_unit = calc['calculation']['results']['energy_unit']
+            self.cluster = am.cluster.BondAngleMap(rmin=self.minimum_r,
+                                                    rmax=self.maximum_r,
+                                                    rnum=self.number_of_steps_r,
+                                                    thetamin=self.minimum_theta,
+                                                    thetamax=self.maximum_theta,
+                                                    thetanum=self.number_of_steps_theta,
+                                                    symbols=self.symbols)
+            self.results_file = calc['calculation']['results']['file']
+            self.results_length_unit = calc['calculation']['results']['length_unit']
+            self.results_energy_unit = calc['calculation']['results']['energy_unit']
 
-    def mongoquery(self, minimum_r=None, maximum_r=None,
-                   number_of_steps_r=None, minimum_theta=None,
-                   maximum_theta=None, number_of_steps_theta=None, symbol=None,
-                   **kwargs):
-        """
-        Builds a Mongo-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        minimum_r : float
-            The minimum interatomic spacing to use for the scan.
-        maximum_r : float
-            The maximum interatomic spacing to use for the scan.
-        number_of_steps_r : int
-            The number of interatomic spacings to use for the scan.
-        minimum_theta : float
-            The minimum bond angle to use for the scan.
-        maximum_theta : float
-            The maximum bond angle to use for the scan.
-        number_of_steps_theta : int
-            The number of bond angles to use for the scan.
-        symbol : str
-            Element model symbol(s) assigned to the two atoms.
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The Mongo-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().mongoquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = f'content.{self.modelroot}'
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maximum_r', maximum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_theta', minimum_theta)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maximum_theta', maximum_theta)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_theta', number_of_steps_theta)
-        query.in_list.mongo(mquery, f'{root}.system-info.symbols', symbol)
-
-        return mquery
-
-    def cdcsquery(self, minimum_r=None, maximum_r=None, number_of_steps_r=None,
-                  minimum_theta=None, maximum_theta=None,
-                  number_of_steps_theta=None, symbol=None, **kwargs):
-        """
-        Builds a CDCS-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        minimum_r : float
-            The minimum interatomic spacing to use for the scan.
-        maximum_r : float
-            The maximum interatomic spacing to use for the scan.
-        number_of_steps_r : int
-            The number of evaluation points to use for the scan.
-        minimum_theta : float
-            The minimum bond angle to use for the scan.
-        maximum_theta : float
-            The maximum bond angle to use for the scan.
-        number_of_steps_theta : int
-            The number of bond angles to use for the scan.
-        symbol : str
-            Element model symbol(s) assigned to the two atoms.
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The CDCS-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().cdcsquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = self.modelroot
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maximum_r', maximum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_theta', minimum_theta)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maximum_theta', maximum_theta)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_theta', number_of_steps_theta)
-        query.in_list.mongo(mquery, f'{root}.system-info.symbols', symbol)
-
-        return mquery
+    @property
+    def queries(self) -> dict:
+        """dict: Query objects and their associated parameter names."""
+        queries = deepcopy(super().queries)
+        queries.update({
+            'minimum_r': load_query(
+                style='float_match',
+                name='minimum_r',
+                path=f'{self.modelroot}.calculation.run-parameter.minimum_r.value',
+                description='search by the minimum r value used in angstroms',
+                unit='angstrom'),
+            'maximum_r': load_query(
+                style='float_match',
+                name='maximum_r',
+                path=f'{self.modelroot}.calculation.run-parameter.maximum_r.value',
+                description='search by the maximum r value used in Angstroms',
+                unit='angstrom'),
+            'number_of_steps_r': load_query(
+                style='int_match',
+                name='number_of_steps_r',
+                path=f'{self.modelroot}.calculation.run-parameter.number_of_steps_r',
+                description='search by the number of r steps used'),
+            'minimum_theta': load_query(
+                style='float_match',
+                name='minimum_theta',
+                path=f'{self.modelroot}.calculation.run-parameter.minimum_theta.value',
+                description='search by the minimum theta value used in degrees'),
+            'maximum_theta': load_query(
+                style='float_match',
+                name='maximum_theta',
+                path=f'{self.modelroot}.calculation.run-parameter.maximum_theta.value',
+                description='search by the maximum theta value used in degrees'),
+            'number_of_steps_theta': load_query(
+                style='int_match',
+                name='number_of_steps_theta',
+                path=f'{self.modelroot}.calculation.run-parameter.number_of_steps_theta',
+                description='search by the number of theta steps used'),
+            'symbol': load_query(
+                style='list_contains',
+                name='symbols',
+                path=f'{self.modelroot}.system-info.symbols',
+                description='search by element symbols used'),
+        })
+        return queries
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self):
+    def metadata(self) -> dict:
         """
         Generates a dict of simple metadata values associated with the record.
         Useful for quickly comparing records and for building pandas.DataFrames
@@ -649,7 +631,7 @@ class BondAngleScan(Calculation):
 
         # Call super to extract universal and subset content
         meta = super().metadata()
-        
+
         # Extract calculation-specific content
         meta['minimum_r'] = self.minimum_r
         meta['maximum_r'] = self.maximum_r
@@ -658,7 +640,7 @@ class BondAngleScan(Calculation):
         meta['maximum_theta'] = self.maximum_theta
         meta['number_of_steps_theta'] = self.number_of_steps_theta
         meta['symbols'] = ' '.join(sorted(self.symbols))
-        
+
         # Extract results
         if self.status == 'finished':
             meta['results_file'] = self.results_file
@@ -667,7 +649,7 @@ class BondAngleScan(Calculation):
         return meta
 
     @property
-    def compare_terms(self):
+    def compare_terms(self) -> list:
         """list: The terms to compare metadata values absolutely."""
         return [
             'script',
@@ -675,71 +657,17 @@ class BondAngleScan(Calculation):
             'potential_LAMMPS_key',
             'potential_key',
         ]
-    
+
     @property
-    def compare_fterms(self):
+    def compare_fterms(self) -> dict:
         """dict: The terms to compare metadata values using a tolerance."""
         return {}
 
-    def pandasfilter(self, dataframe, minimum_r=None, maximum_r=None,
-                     number_of_steps_r=None, minimum_theta=None,
-                     maximum_theta=None, number_of_steps_theta=None,
-                     symbol=None, **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        minimum_r : float
-            The minimum interatomic spacing to use for the scan.
-        maximum_r : float
-            The maximum interatomic spacing to use for the scan.
-        number_of_steps_r : int
-            The number of evaluation points to use for the scan.
-        minimum_theta : float
-            The minimum bond angle to use for the scan.
-        maximum_theta : float
-            The maximum bond angle to use for the scan.
-        number_of_steps_theta : int
-            The number of bond angles to use for the scan.
-        symbol : str
-            Element model symbol(s) assigned to the two atoms.
-        kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets. 
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        # Call super to filter by universal and subset terms
-        matches = super().pandasfilter(dataframe, **kwargs)
-
-        # Filter by calculation-specific terms
-        matches = (matches
-            &query.str_match.pandas(dataframe, 'minimum_r', minimum_r)
-            &query.str_match.pandas(dataframe, 'maximum_r', maximum_r)
-            &query.str_match.pandas(dataframe, 'number_of_steps_r', number_of_steps_r)
-            &query.str_match.pandas(dataframe, 'minimum_theta', minimum_theta)
-            &query.str_match.pandas(dataframe, 'maximum_theta', maximum_theta)
-            &query.str_match.pandas(dataframe, 'number_of_steps_theta', number_of_steps_theta)
-            &query.in_list.pandas(dataframe, 'symbols', symbol)
-        )
-        
-        return matches
-
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self):
+    def calc_inputs(self) -> dict:
         """Builds calculation inputs from the class's attributes"""
-        
+
         # Check required parameters
         if len(self.symbols) is None:
             raise ValueError('symbols not set')
@@ -762,8 +690,8 @@ class BondAngleScan(Calculation):
 
         # Return input_dict
         return input_dict
-    
-    def process_results(self, results_dict):
+
+    def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
         attributes.

@@ -1,14 +1,16 @@
 # coding: utf-8
 # Standard Python libraries
+from io import IOBase
+from pathlib import Path
+from copy import deepcopy
+from typing import Optional, Union
 
-from yabadaba import query
+from yabadaba import load_query
 
 # http://www.numpy.org/
 import numpy as np
 
 # https://github.com/usnistgov/atomman
-import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/DataModelDict
@@ -17,18 +19,38 @@ from DataModelDict import DataModelDict as DM
 # iprPy imports
 from .. import Calculation
 from .calc_phonon import phonon_quasiharmonic
-from ...calculation_subset import *
-from ...input import value, boolean
-from ...tools import aslist, dict_insert
+from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
+                                   AtommanSystemLoad)
+from ...input import value
 
 class Phonon(Calculation):
     """Class for managing phonon and quasiharmonic calculations using phonopy"""
 
 ############################# Core properties #################################
 
-    def __init__(self, model=None, name=None, params=None, **kwargs):
-        """Initializes a Calculation object for a given style."""
-        
+    def __init__(self,
+                 model: Union[str, Path, IOBase, DM, None]=None,
+                 name: Optional[str]=None,
+                 params: Union[str, Path, IOBase, dict] = None,
+                 **kwargs: any):
+        """
+        Initializes a Calculation object for a given style.
+
+        Parameters
+        ----------
+        model : str, file-like object or DataModelDict, optional
+            Record content in data model format to read in.  Cannot be given
+            with params.
+        name : str, optional
+            The name to use for saving the record.  By default, this should be
+            the calculation's key.
+        params : str, file-like object or dict, optional
+            Calculation input parameters or input parameter file.  Cannot be
+            given with model.
+        **kwargs : any
+            Any other core Calculation record attributes to set.  Cannot be
+            given with model.
+        """
         # Initialize subsets used by the calculation
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
@@ -40,9 +62,9 @@ class Phonon(Calculation):
         # Initialize unique calculation attributes
         self.strainrange = 0.01
         self.displacementdistance = uc.set_in_units(0.01, 'angstrom')
-        self.symmetryprecision = 1e-5         
+        self.symmetryprecision = 1e-5
         self.numstrains = 5
-        self.a_mult = 2 
+        self.a_mult = 2
         self.b_mult = 2
         self.c_mult = 2
         self.__bandstructure = None
@@ -55,7 +77,7 @@ class Phonon(Calculation):
         self.__V0 = None
         self.__phonons = None
         self.__qha = None
-        
+
         # Define calc shortcut
         self.calc = phonon_quasiharmonic
 
@@ -64,7 +86,7 @@ class Phonon(Calculation):
                          subsets=subsets, **kwargs)
 
     @property
-    def filenames(self):
+    def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
             'calc_phonon.py',
@@ -74,125 +96,125 @@ class Phonon(Calculation):
 ############################## Class attributes ###############################
 
     @property
-    def commands(self):
+    def commands(self) -> LammpsCommands:
         """LammpsCommands subset"""
         return self.__commands
 
     @property
-    def potential(self):
+    def potential(self) -> LammpsPotential:
         """LammpsPotential subset"""
         return self.__potential
 
     @property
-    def units(self):
+    def units(self) -> Units:
         """Units subset"""
         return self.__units
 
     @property
-    def system(self):
+    def system(self) -> AtommanSystemLoad:
         """AtommanSystemLoad subset"""
         return self.__system
 
     @property
-    def strainrange(self):
+    def strainrange(self) -> float:
         """float: Strain step size to use for quasiharmonic method"""
         return self.__strainrange
 
     @strainrange.setter
-    def strainrange(self, value):
-        self.__strainrange = float(value)
+    def strainrange(self, val: float):
+        self.__strainrange = float(val)
 
     @property
-    def numstrains(self):
+    def numstrains(self) -> int:
         """int: Number of strain states to use for quasiharmonic method"""
         return self.__numstrains
 
     @numstrains.setter
-    def numstrains(self, value):
-        self.__numstrains = int(value)
+    def numstrains(self, val: int):
+        self.__numstrains = int(val)
 
     @property
-    def a_mult(self):
+    def a_mult(self) -> int:
         """int: Number of replicas along the a box vect to use"""
         return self.__a_mult
 
     @a_mult.setter
-    def a_mult(self, value):
-        self.__a_mult = int(value)
+    def a_mult(self, val: int):
+        self.__a_mult = int(val)
 
     @property
-    def b_mult(self):
+    def b_mult(self) -> int:
         """int: Number of replicas along the b box vect to use"""
         return self.__b_mult
 
     @b_mult.setter
-    def b_mult(self, value):
-        self.__b_mult = int(value)
+    def b_mult(self, val: int):
+        self.__b_mult = int(val)
 
     @property
-    def c_mult(self):
+    def c_mult(self) -> int:
         """int: Number of replicas along the c box vect to use"""
         return self.__c_mult
 
     @c_mult.setter
-    def c_mult(self, value):
-        self.__c_mult = int(value)
+    def c_mult(self, val: int):
+        self.__c_mult = int(val)
 
     @property
-    def sizemults(self):
+    def sizemults(self) -> tuple:
         """tuple: All three sets of size multipliers"""
         return (self.a_mult, self.b_mult, self.c_mult)
 
     @sizemults.setter
-    def sizemults(self, value):
+    def sizemults(self, val: Union[list, tuple]):
         if len(value) == 3:
-            self.a_mult = value[0]
-            self.b_mult = value[1]
-            self.c_mult = value[2]
+            self.a_mult = val[0]
+            self.b_mult = val[1]
+            self.c_mult = val[2]
         else:
             raise ValueError('len of sizemults must be 3')
 
     @property
-    def symmetryprecision(self):
+    def symmetryprecision(self) -> float:
         """float: Precision tolerance to use to identify symmetry elements"""
         return self.__symmetryprecision
 
     @symmetryprecision.setter
-    def symmetryprecision(self, value):
-        self.__symmetryprecision = float(value)
+    def symmetryprecision(self, val: float):
+        self.__symmetryprecision = float(val)
 
     @property
-    def displacementdistance(self):
+    def displacementdistance(self) -> float:
         """float: Random max atomic displacement to use for phonon calculations"""
         return self.__displacementdistance
 
     @displacementdistance.setter
-    def displacementdistance(self, value):
-        self.__displacementdistance = float(value)
-        
+    def displacementdistance(self, val: float):
+        self.__displacementdistance = float(val)
+
     @property
-    def bandstructure(self):
+    def bandstructure(self) -> dict:
         """dict: band structure information"""
         if self.__bandstructure is None:
             raise ValueError('No results yet!')
         return self.__bandstructure
 
     @property
-    def dos(self):
+    def dos(self) -> dict:
         """dict: density of states information"""
         if self.__dos is None:
             raise ValueError('No results yet!')
         return self.__dos
 
     @property
-    def thermal(self):
+    def thermal(self) -> dict:
         """dict: estimated properties vs temperature"""
         if self.__thermal is None:
             raise ValueError('No results yet!')
         return self.__thermal
 
     @property
-    def phonons(self):
+    def phonons(self) -> list:
         """list: phonopy.Phonopy objects for each strain"""
         if self.__phonons is None:
             raise ValueError('phonon objects not set...')
@@ -206,41 +228,43 @@ class Phonon(Calculation):
         return self.__qha
 
     @property
-    def volumescan(self):
+    def volumescan(self) -> dict:
         """dict: volume-energy scan used for quasiharmonic"""
         if self.__volumescan is None:
             raise ValueError('No quasiharmonic results!')
         return self.__volumescan
 
     @property
-    def E0(self):
+    def E0(self) -> float:
         """float: energy estimated for the equilibrium structure from the volume scan"""
         if self.__E0 is None:
             raise ValueError('No quasiharmonic results!')
         return self.__E0
-    
+
     @property
-    def B0(self):
+    def B0(self) -> float:
         """float: bulk modulus estimated at the equilibrium structure from the volume scan"""
         if self.__B0 is None:
             raise ValueError('No quasiharmonic results!')
         return self.__B0
-    
+
     @property
-    def B0prime(self):
+    def B0prime(self) -> float:
         """float: bulk prime modulus estimated at the equilibrium structure from the volume scan"""
         if self.__B0prime is None:
             raise ValueError('No quasiharmonic results!')
         return self.__B0prime
 
     @property
-    def V0(self):
+    def V0(self) -> float:
         """float: volume estimated for the equilibrium structure from the volume scan"""
         if self.__V0 is None:
             raise ValueError('No quasiharmonic results!')
         return self.__V0
 
-    def set_values(self, name=None, **kwargs):
+    def set_values(self,
+                   name: Optional[str] = None,
+                   **kwargs: any):
         """
         Set calculation values directly.  Any terms not given will be set
         or reset to the calculation's default values.
@@ -286,16 +310,29 @@ class Phonon(Calculation):
         if 'c_mult' in kwargs:
             self.a_mult = kwargs['c_mult']
 
-####################### Parameter file interactions ########################### 
+####################### Parameter file interactions ###########################
 
-    def load_parameters(self, params, key=None):
-        
+    def load_parameters(self,
+                        params: Union[dict, str, IOBase],
+                        key: Optional[str] = None):
+        """
+        Reads in and sets calculation parameters.
+
+        Parameters
+        ----------
+        params : dict, str or file-like object
+            The parameters or parameter file to read in.
+        key : str, optional
+            A new key value to assign to the object.  If not given, will use
+            calc_key field in params if it exists, or leave the key value
+            unchanged.
+        """
         # Load universal content
         input_dict = super().load_parameters(params, key=key)
-        
+
         # Load input/output units
         self.units.load_parameters(input_dict)
-        
+
         # Change default values for subset terms
         input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
         input_dict['forcetolerance'] = input_dict.get('forcetolerance',
@@ -304,7 +341,7 @@ class Phonon(Calculation):
         # Load calculation-specific strings
 
         # Load calculation-specific booleans
-        
+
         # Load calculation-specific integers
         self.numstrains = int(input_dict.get('numstrains', 11))
 
@@ -329,7 +366,9 @@ class Phonon(Calculation):
         # Handle sizemults
         self.sizemults = np.array(input_dict['sizemults'].strip().split(), dtype=int)
 
-    def master_prepare_inputs(self, branch='main', **kwargs):
+    def master_prepare_inputs(self,
+                              branch: str = 'main',
+                              **kwargs: any) -> dict:
         """
         Utility method that build input parameters for prepare according to the
         workflows used by the NIST Interatomic Potentials Repository.  In other
@@ -355,7 +394,7 @@ class Phonon(Calculation):
 
         # main branch
         if branch == 'main':
-            
+
             # Check for required kwargs
             assert 'lammps_command' in kwargs
 
@@ -368,11 +407,11 @@ class Phonon(Calculation):
 
             # Copy kwargs to params
             for key in kwargs:
-                
+
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
                     params[f'parent_{key}'] = kwargs[key]
-                
+
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
@@ -383,7 +422,7 @@ class Phonon(Calculation):
         return params
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The calculation-specific input keys and their descriptions."""
 
         return {
@@ -404,12 +443,12 @@ class Phonon(Calculation):
                 "Multiplication parameters to construct a supercell system.",
                 "Limited to three values for this calculation.  Default value"
                 "is 3 3 3."]),
-        } 
+        }
 
     @property
-    def singularkeys(self):
+    def singularkeys(self) -> list:
         """list: Calculation keys that can have single values during prepare."""
-        
+
         keys = (
             # Universal keys
             super().singularkeys
@@ -423,7 +462,7 @@ class Phonon(Calculation):
         return keys
 
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """list: Calculation key sets that can have multiple values during prepare."""
 
         keys = (
@@ -432,7 +471,7 @@ class Phonon(Calculation):
 
             # Combination of potential and system keys
             [
-                self.potential.keyset + 
+                self.potential.keyset +
                 self.system.keyset
             ] +
 
@@ -452,11 +491,11 @@ class Phonon(Calculation):
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str: The root element of the content"""
         return 'calculation-phonon'
 
-    def build_model(self):
+    def build_model(self) -> DM:
         """
         Generates and returns model content based on the values set to object.
         """
@@ -491,10 +530,10 @@ class Phonon(Calculation):
 
             for qpoints in self.bandstructure['qpoints']:
                 calc['band-structure'].append('qpoints', uc.model(qpoints))
-                
+
             for distances in self.bandstructure['distances']:
                 calc['band-structure'].append('distances', uc.model(distances))
-                
+
             for frequencies in self.bandstructure['frequencies']:
                 calc['band-structure'].append('frequencies', uc.model(frequencies))
 
@@ -518,7 +557,7 @@ class Phonon(Calculation):
                 calc['thermal-properties']['heat_capacity_p_numerical'] = uc.model(self.thermal['heat_capacity_p_numerical'], 'J/K/mol')
                 calc['thermal-properties']['heat_capacity_p_polyfit'] = uc.model(self.thermal['heat_capacity_p_polyfit'], 'J/K/mol')
                 calc['thermal-properties']['gruneisen'] = uc.model(self.thermal['gruneisen'])
-                
+
                 calc['volume-scan'] = DM()
                 calc['volume-scan']['volume'] = uc.model(self.volumescan['volume'], 'angstrom^3')
                 calc['volume-scan']['strain'] = uc.model(self.volumescan['strain'])
@@ -532,7 +571,9 @@ class Phonon(Calculation):
         self._set_model(model)
         return model
 
-    def load_model(self, model, name=None):
+    def load_model(self,
+                   model: Union[str, DM],
+                   name: Optional[str] = None):
         """
         Loads record contents from a given model.
 
@@ -558,19 +599,18 @@ class Phonon(Calculation):
         self.strainrange = run_params['strainrange']
         self.numstrains = run_params['numstrains']
 
-
         # Load results
         if self.status == 'finished':
-            
+
             self.__bandstructure = {}
             self.bandstructure['qpoints'] = []
             for qpoints in calc['band-structure']['qpoints']:
                 self.bandstructure['qpoints'].append(uc.value_unit(qpoints))
-            
+
             self.bandstructure['distances'] = []
             for distances in calc['band-structure']['distances']:
                 self.bandstructure['distances'].append(uc.value_unit(distances))
-            
+
             self.bandstructure['frequencies'] = []
             for frequencies in calc['band-structure']['frequencies']:
                 self.bandstructure['frequencies'].append(uc.value_unit(frequencies))
@@ -595,7 +635,7 @@ class Phonon(Calculation):
                 self.thermal['heat_capacity_p_numerical'] = uc.value_unit(calc['thermal-properties']['heat_capacity_p_numerical'])
                 self.thermal['heat_capacity_p_polyfit'] = uc.value_unit(calc['thermal-properties']['heat_capacity_p_polyfit'])
                 self.thermal['gruneisen'] = uc.value_unit(calc['thermal-properties']['gruneisen'])
-                
+
                 self.__volumescan = {}
                 self.volumescan['volume'] = uc.value_unit(calc['volume-scan']['volume'])
                 self.volumescan['strain'] = uc.value_unit(calc['volume-scan']['strain'])
@@ -606,81 +646,36 @@ class Phonon(Calculation):
                 self.__B0prime = uc.value_unit(calc['B0prime'])
                 self.__V0 = uc.value_unit(calc['V0'])
 
-    def mongoquery(self, strainrange=None, numstrains=None,
-                   symmetryprecision=None, displacementdistance=None, **kwargs):
-        """
-        Builds a Mongo-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        strainrange : float or list, optional
-            strainrange values to parse by.
-        numstrains : int or list, optional
-            numstrains values to parse by.
-        symmetryprecision : float or list, optional
-            symmetryprecision values to parse by.
-        displacementdistance : float or list, optional
-            displacementdistance values to parse by.
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The Mongo-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().mongoquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = f'content.{self.modelroot}'
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.strainrange', strainrange)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.numstrains', numstrains)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.symmetryprecision', symmetryprecision)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.displacementdistance', displacementdistance)
-
-        return mquery
-
-    def cdcsquery(self, strainrange=None, numstrains=None,
-                  symmetryprecision=None, displacementdistance=None, **kwargs):
-        """
-        Builds a CDCS-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        strainrange : float or list, optional
-            strainrange values to parse by.
-        numstrains : int or list, optional
-            numstrains values to parse by.
-        symmetryprecision : float or list, optional
-            symmetryprecision values to parse by.
-        displacementdistance : float or list, optional
-            displacementdistance values to parse by.
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.       
-        
-        Returns
-        -------
-        dict
-            The CDCS-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().cdcsquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = self.modelroot
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.strainrange', strainrange)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.numstrains', numstrains)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.symmetryprecision', symmetryprecision)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.displacementdistance', displacementdistance)
-
-        return mquery
+    @property
+    def queries(self) -> dict:
+        queries = deepcopy(super().queries)
+        queries.update({
+            'strainrange': load_query(
+                style='float_match',
+                name='strainrange',
+                path=f'{self.modelroot}.calculation.run-parameter.strainrange',
+                description='search by strain range used'),
+            'numstrains': load_query(
+                style='int_match',
+                name='numstrains',
+                path=f'{self.modelroot}.calculation.run-parameter.numstrains',
+                description='search by number of strain states used'),
+            'symmetryprecision': load_query(
+                style='float_match',
+                name='symmetryprecision',
+                path=f'{self.modelroot}.calculation.run-parameter.symmetryprecision',
+                description='search by symmetry precision tolerance used'),
+            'displacementdistance': load_query(
+                style='float_match',
+                name='displacementdistance',
+                path=f'{self.modelroot}.calculation.run-parameter.displacementdistance',
+                description='search by max displacement allowed'),
+        })
+        return queries
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self):
+    def metadata(self) -> dict:
         """
         Generates a dict of simple metadata values associated with the record.
         Useful for quickly comparing records and for building pandas.DataFrames
@@ -706,80 +701,35 @@ class Phonon(Calculation):
                 meta['B0'] = self.B0
                 meta['B0prime'] = self.B0prime
                 meta['V0'] = self.V0
-        
+
         return meta
 
     @property
-    def compare_terms(self):
+    def compare_terms(self) -> list:
         """list: The terms to compare metadata values absolutely."""
         return [
             'script',
-        
+
             'load_file',
             'load_options',
             'symbols',
-            
+
             'potential_LAMMPS_key',
             'potential_key',
-            
         ]
-    
+
     @property
-    def compare_fterms(self):
+    def compare_fterms(self) -> dict:
         """dict: The terms to compare metadata values using a tolerance."""
         return {
             'symmetryprecision':1e-7,
         }
 
-    def pandasfilter(self, dataframe, strainrange=None, numstrains=None,
-                     symmetryprecision=None, displacementdistance=None,
-                     **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        strainrange : float or list, optional
-            strainrange values to parse by.
-        numstrains : int or list, optional
-            numstrains values to parse by.
-        symmetryprecision : float or list, optional
-            symmetryprecision values to parse by.
-        displacementdistance : float or list, optional
-            displacementdistance values to parse by.
-        kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets. 
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        # Call super to filter by universal and subset terms
-        matches = super().pandasfilter(dataframe, **kwargs)
-
-        # Filter by calculation-specific terms
-        matches = (matches
-            &query.str_match.pandas(dataframe, 'strainrange', strainrange)
-            &query.str_match.pandas(dataframe, 'numstrains', numstrains)
-            &query.str_match.pandas(dataframe, 'symmetryprecision', symmetryprecision)
-            &query.str_match.pandas(dataframe, 'displacementdistance', displacementdistance)
-        )
-        
-        return matches
-
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self):
+    def calc_inputs(self) -> dict:
         """Builds calculation inputs from the class's attributes"""
-        
+
         # Initialize input_dict
         input_dict = {}
 
@@ -798,8 +748,8 @@ class Phonon(Calculation):
 
         # Return input_dict
         return input_dict
-    
-    def process_results(self, results_dict):
+
+    def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
         attributes.

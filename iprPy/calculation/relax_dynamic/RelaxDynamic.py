@@ -1,16 +1,17 @@
 # coding: utf-8
 # Standard Python libraries
-import uuid
+from io import IOBase
+from pathlib import Path
 from copy import deepcopy
+from typing import Optional, Union
 import random
 
 import numpy as np
 
-from yabadaba import query
+from yabadaba import load_query
 
 # https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/DataModelDict
@@ -19,18 +20,38 @@ from DataModelDict import DataModelDict as DM
 # iprPy imports
 from .. import Calculation
 from .relax_dynamic import relax_dynamic
-from ...calculation_subset import *
-from ...input import value, boolean
-from ...tools import aslist, dict_insert
+from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
+                                   AtommanSystemLoad, AtommanSystemManipulate)
+from ...input import value
 
 class RelaxDynamic(Calculation):
     """Class for managing dynamic relaxations"""
 
 ############################# Core properties #################################
 
-    def __init__(self, model=None, name=None, params=None, **kwargs):
-        """Initializes a Calculation object for a given style."""
-        
+    def __init__(self,
+                 model: Union[str, Path, IOBase, DM, None]=None,
+                 name: Optional[str]=None,
+                 params: Union[str, Path, IOBase, dict] = None,
+                 **kwargs: any):
+        """
+        Initializes a Calculation object for a given style.
+
+        Parameters
+        ----------
+        model : str, file-like object or DataModelDict, optional
+            Record content in data model format to read in.  Cannot be given
+            with params.
+        name : str, optional
+            The name to use for saving the record.  By default, this should be
+            the calculation's key.
+        params : str, file-like object or dict, optional
+            Calculation input parameters or input parameter file.  Cannot be
+            given with model.
+        **kwargs : any
+            Any other core Calculation record attributes to set.  Cannot be
+            given with model.
+        """
         # Initialize subsets used by the calculation
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
@@ -55,7 +76,7 @@ class RelaxDynamic(Calculation):
         self.runsteps = 220000
         self.equilsteps = 20000
         self.randomseed = None
-        
+
         self.__initial_dump = None
         self.__final_dump = None
         self.__final_box = None
@@ -99,7 +120,7 @@ class RelaxDynamic(Calculation):
                          subsets=subsets, **kwargs)
 
     @property
-    def filenames(self):
+    def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
             'relax_dynamic.py',
@@ -109,424 +130,431 @@ class RelaxDynamic(Calculation):
 ############################## Class attributes ################################
 
     @property
-    def commands(self):
+    def commands(self) -> LammpsCommands:
         """LammpsCommands subset"""
         return self.__commands
 
     @property
-    def potential(self):
+    def potential(self) -> LammpsPotential:
         """LammpsPotential subset"""
         return self.__potential
 
     @property
-    def units(self):
+    def units(self) -> Units:
         """Units subset"""
         return self.__units
 
     @property
-    def system(self):
+    def system(self) -> AtommanSystemLoad:
         """AtommanSystemLoad subset"""
         return self.__system
 
     @property
-    def system_mods(self):
+    def system_mods(self) -> AtommanSystemManipulate:
         """AtommanSystemManipulate subset"""
         return self.__system_mods
 
     @property
-    def pressure_xx(self):
+    def pressure_xx(self) -> float:
         """float: Target relaxation pressure component xx"""
         return self.__pressure_xx
 
     @pressure_xx.setter
-    def pressure_xx(self, value):
-        self.__pressure_xx = float(value)
+    def pressure_xx(self, val: float):
+        self.__pressure_xx = float(val)
 
     @property
-    def pressure_yy(self):
+    def pressure_yy(self) -> float:
         """float: Target relaxation pressure component yy"""
         return self.__pressure_yy
 
     @pressure_yy.setter
-    def pressure_yy(self, value):
-        self.__pressure_yy = float(value)
-    
+    def pressure_yy(self, val: float):
+        self.__pressure_yy = float(val)
+
     @property
-    def pressure_zz(self):
+    def pressure_zz(self) -> float:
         """float: Target relaxation pressure component zz"""
         return self.__pressure_zz
 
     @pressure_zz.setter
-    def pressure_zz(self, value):
-        self.__pressure_zz = float(value)
+    def pressure_zz(self, val: float):
+        self.__pressure_zz = float(val)
 
     @property
-    def pressure_xy(self):
+    def pressure_xy(self) -> float:
         """float: Target relaxation pressure component xy"""
         return self.__pressure_xy
 
     @pressure_xy.setter
-    def pressure_xy(self, value):
-        self.__pressure_xy = float(value)
+    def pressure_xy(self, val: float):
+        self.__pressure_xy = float(val)
 
     @property
-    def pressure_xz(self):
+    def pressure_xz(self) -> float:
         """float: Target relaxation pressure component xz"""
         return self.__pressure_xz
 
     @pressure_xz.setter
-    def pressure_xz(self, value):
-        self.__pressure_xz = float(value)
-    
+    def pressure_xz(self, val: float):
+        self.__pressure_xz = float(val)
+
     @property
-    def pressure_yz(self):
+    def pressure_yz(self) -> float:
         """float: Target relaxation pressure component yz"""
         return self.__pressure_yz
 
     @pressure_yz.setter
-    def pressure_yz(self, value):
-        self.__pressure_yz = float(value)
+    def pressure_yz(self, val: float):
+        self.__pressure_yz = float(val)
 
     @property
-    def temperature(self):
+    def temperature(self) -> float:
         """float: Target relaxation temperature"""
         return self.__temperature
 
     @temperature.setter
-    def temperature(self, value):
-        value = float(value)
-        assert value >= 0.0
-        self.__temperature = value
+    def temperature(self, val: float):
+        val = float(val)
+        assert val >= 0.0
+        self.__temperature = val
 
     @property
-    def integrator(self):
+    def integrator(self) -> str:
         """str: MD integration scheme"""
         return self.__integrator
 
     @integrator.setter
-    def integrator(self, value):
-        if value is None:
+    def integrator(self, val: Optional[str]):
+        if val is None:
             if self.temperature == 0.0:
-                value = 'nph+l'
+                val = 'nph+l'
             else:
-                value = 'npt'
-        self.__integrator = str(value)
+                val = 'npt'
+        self.__integrator = str(val)
 
     @property
-    def thermosteps(self):
+    def thermosteps(self) -> int:
+        """int : How often termo data is recorded"""
         return self.__thermosteps
 
     @thermosteps.setter
-    def thermosteps(self, value):
-        value = int(value)
-        assert value >= 0
-        self.__thermosteps = value
+    def thermosteps(self, val: int):
+        val = int(val)
+        assert val >= 0
+        self.__thermosteps = val
 
     @property
-    def dumpsteps(self):
+    def dumpsteps(self) -> int:
+        """int : How often atomic configurations are dumped"""
         if self.__dumpsteps is None:
             return self.runsteps
         else:
             return self.__dumpsteps
 
     @dumpsteps.setter
-    def dumpsteps(self, value):
-        if value is None:
+    def dumpsteps(self, val: int):
+        if val is None:
             self.__dumpsteps = None
         else:
-            value = int(value)
-            assert value >= 0
-            self.__dumpsteps = value
+            val = int(val)
+            assert val >= 0
+            self.__dumpsteps = val
 
     @property
-    def restartsteps(self):
+    def restartsteps(self) -> int:
+        """int : How often restart files are dumped"""
         if self.__restartsteps is None:
             return self.runsteps
         else:
             return self.__restartsteps
 
     @restartsteps.setter
-    def restartsteps(self, value):
-        if value is None:
+    def restartsteps(self, val: int):
+        if val is None:
             self.__restartsteps = None
         else:
-            value = int(value)
-            assert value >= 0
-            self.__restartsteps = value
+            val = int(val)
+            assert val >= 0
+            self.__restartsteps = val
 
     @property
-    def runsteps(self):
+    def runsteps(self) -> int:
+        """int : The number of MD steps where properties are evaluated"""
         return self.__runsteps
 
     @runsteps.setter
-    def runsteps(self, value):
-        value = int(value)
-        assert value >= 0
-        self.__runsteps = value
+    def runsteps(self, val: int):
+        val = int(val)
+        assert val >= 0
+        self.__runsteps = val
 
     @property
-    def equilsteps(self):
+    def equilsteps(self) -> int:
+        """int : The number of MD steps to perform prior to runsteps"""
         return self.__equilsteps
 
     @equilsteps.setter
-    def equilsteps(self, value):
-        value = int(value)
-        assert value >= 0
-        self.__equilsteps = value
+    def equilsteps(self, val: int):
+        val = int(val)
+        assert val >= 0
+        self.__equilsteps = val
 
     @property
-    def randomseed(self):
-        """str: MD integration scheme"""
+    def randomseed(self) -> int:
+        """int: Random number generator seed"""
         return self.__randomseed
 
     @randomseed.setter
-    def randomseed(self, value):
-        if value is None:
-            value = random.randint(1, 900000000)
+    def randomseed(self, val: int):
+        if val is None:
+            val = random.randint(1, 900000000)
         else:
-            value = int(value)
-            assert value > 0 and value <= 900000000
-        self.__randomseed = value
+            val = int(val)
+            assert val > 0 and val <= 900000000
+        self.__randomseed = val
 
     @property
-    def initial_dump(self):
+    def initial_dump(self) -> dict:
         """dict: Info about the initial dump file"""
         if self.__initial_dump is None:
             raise ValueError('No results yet!')
         return self.__initial_dump
 
     @property
-    def final_dump(self):
+    def final_dump(self) -> dict:
         """dict: Info about the final dump file"""
         if self.__final_dump is None:
             raise ValueError('No results yet!')
         return self.__final_dump
-    
+
     @property
-    def final_box(self):
+    def final_box(self) -> am.Box:
         """atomman.Box: Relaxed unit cell box"""
         if self.__final_box is None:
             raise ValueError('No results yet!')
         return self.__final_box
 
     @property
-    def lx_mean(self):
+    def lx_mean(self) -> float:
         """float: Mean lx length used for final_box"""
         if self.__lx_mean is None:
             raise ValueError('No results yet!')
         return self.__lx_mean
 
     @property
-    def lx_std(self):
+    def lx_std(self) -> float:
         """float: Standard deviation for final_box's lx length"""
         if self.__lx_std is None:
             raise ValueError('No results yet!')
         return self.__lx_std
 
     @property
-    def ly_mean(self):
+    def ly_mean(self) -> float:
         """float: Mean ly length used for final_box"""
         if self.__ly_mean is None:
             raise ValueError('No results yet!')
         return self.__ly_mean
 
     @property
-    def ly_std(self):
+    def ly_std(self) -> float:
         """float: Standard deviation for final_box's ly length"""
         if self.__ly_std is None:
             raise ValueError('No results yet!')
         return self.__ly_std
-    
+
     @property
-    def lz_mean(self):
+    def lz_mean(self) -> float:
         """float: Mean lz length used for final_box"""
         if self.__lz_mean is None:
             raise ValueError('No results yet!')
         return self.__lz_mean
 
     @property
-    def lz_std(self):
+    def lz_std(self) -> float:
         """float: Standard deviation for final_box's lz length"""
         if self.__lz_std is None:
             raise ValueError('No results yet!')
         return self.__lz_std
 
     @property
-    def xy_mean(self):
+    def xy_mean(self) -> float:
         """float: Mean xy tilt used for final_box"""
         if self.__xy_mean is None:
             raise ValueError('No results yet!')
         return self.__xy_mean
 
     @property
-    def xy_std(self):
+    def xy_std(self) -> float:
         """float: Standard deviation for final_box's xy tilt"""
         if self.__xy_std is None:
             raise ValueError('No results yet!')
         return self.__xy_std
 
     @property
-    def xz_mean(self):
+    def xz_mean(self) -> float:
         """float: Mean xz tilt used for final_box"""
         if self.__xz_mean is None:
             raise ValueError('No results yet!')
         return self.__xz_mean
 
     @property
-    def xz_std(self):
+    def xz_std(self) -> float:
         """float: Standard deviation for final_box's xz tilt"""
         if self.__xz_std is None:
             raise ValueError('No results yet!')
         return self.__xz_std
 
     @property
-    def yz_mean(self):
+    def yz_mean(self) -> float:
         """float: Mean yz tilt used for final_box"""
         if self.__yz_mean is None:
             raise ValueError('No results yet!')
         return self.__yz_mean
 
     @property
-    def yz_std(self):
+    def yz_std(self) -> float:
         """float: Standard deviation for final_box's yz tilt"""
         if self.__yz_std is None:
             raise ValueError('No results yet!')
         return self.__yz_std
 
     @property
-    def numsamples(self):
+    def numsamples(self) -> int:
         """int: Number of measurement samples used in mean, std values"""
         if self.__numsamples is None:
             raise ValueError('No results yet!')
         return self.__numsamples
 
     @property
-    def potential_energy(self):
+    def potential_energy(self) -> float:
         """float: Potential energy per atom for the relaxed system"""
         if self.__potential_energy is None:
             raise ValueError('No results yet!')
         return self.__potential_energy
 
     @property
-    def potential_energy_std(self):
+    def potential_energy_std(self) -> float:
         """float: Standard deviation for potential_energy"""
         if self.__potential_energy_std is None:
             raise ValueError('No results yet!')
         return self.__potential_energy_std
 
     @property
-    def total_energy(self):
+    def total_energy(self) -> float:
         """float: Total energy per atom for the relaxed system"""
         if self.__total_energy is None:
             raise ValueError('No results yet!')
         return self.__total_energy
 
     @property
-    def total_energy_std(self):
+    def total_energy_std(self) -> float:
         """float: Standard deviation for total_energy"""
         if self.__total_energy_std is None:
             raise ValueError('No results yet!')
         return self.__total_energy_std
 
     @property
-    def measured_pressure_xx(self):
+    def measured_pressure_xx(self) -> float:
         """float: Measured relaxation pressure component xx"""
         if self.__measured_pressure_xx is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_xx
-    
+
     @property
-    def measured_pressure_xx_std(self):
+    def measured_pressure_xx_std(self) -> float:
         """float: Standard deviation for measured_pressure_xx"""
         if self.__measured_pressure_xx_std is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_xx_std
 
     @property
-    def measured_pressure_yy(self):
+    def measured_pressure_yy(self) -> float:
         """float: Measured relaxation pressure component yy"""
         if self.__measured_pressure_yy is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_yy
-    
+
     @property
-    def measured_pressure_yy_std(self):
+    def measured_pressure_yy_std(self) -> float:
         """float: Standard deviation for measured_pressure_yy"""
         if self.__measured_pressure_yy_std is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_yy_std
 
     @property
-    def measured_pressure_zz(self):
+    def measured_pressure_zz(self) -> float:
         """float: Measured relaxation pressure component zz"""
         if self.__measured_pressure_zz is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_zz
-    
+
     @property
-    def measured_pressure_zz_std(self):
+    def measured_pressure_zz_std(self) -> float:
         """float: Standard deviation for measured_pressure_zz"""
         if self.__measured_pressure_zz_std is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_zz_std
 
     @property
-    def measured_pressure_xy(self):
+    def measured_pressure_xy(self) -> float:
         """float: Measured relaxation pressure component xy"""
         if self.__measured_pressure_xy is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_xy
-    
+
     @property
-    def measured_pressure_xy_std(self):
+    def measured_pressure_xy_std(self) -> float:
         """float: Standard deviation for measured_pressure_xy"""
         if self.__measured_pressure_xy_std is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_xy_std
 
     @property
-    def measured_pressure_xz(self):
+    def measured_pressure_xz(self) -> float:
         """float: Measured relaxation pressure component xz"""
         if self.__measured_pressure_xz is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_xz
-    
+
     @property
-    def measured_pressure_xz_std(self):
+    def measured_pressure_xz_std(self) -> float:
         """float: Standard deviation for measured_pressure_xz"""
         if self.__measured_pressure_xz_std is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_xz_std
 
     @property
-    def measured_pressure_yz(self):
+    def measured_pressure_yz(self) -> float:
         """float: Measured relaxation pressure component yz"""
         if self.__measured_pressure_yz is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_yz
 
     @property
-    def measured_pressure_yz_std(self):
+    def measured_pressure_yz_std(self) -> float:
         """float: Standard deviation for measured_pressure_yz"""
         if self.__measured_pressure_yz_std is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_yz_std
 
     @property
-    def measured_temperature(self):
+    def measured_temperature(self) -> float:
         """float: Measured temperature for the relaxed system"""
         if self.__measured_temperature is None:
             raise ValueError('No results yet!')
         return self.__measured_temperature
 
     @property
-    def measured_temperature_std(self):
+    def measured_temperature_std(self) -> float:
         """float: Standard deviation for measured_temperature"""
         if self.__measured_temperature_std is None:
             raise ValueError('No results yet!')
         return self.__measured_temperature_std
 
-    def set_values(self, name=None, **kwargs):
+    def set_values(self,
+                   name: Optional[str] = None,
+                   **kwargs: any):
         """
         Set calculation values directly.  Any terms not given will be set
         or reset to the calculation's default values.
@@ -605,24 +633,37 @@ class RelaxDynamic(Calculation):
         if 'randomseed' in kwargs:
             self.randomseed = kwargs['randomseed']
 
-####################### Parameter file interactions ########################### 
+####################### Parameter file interactions ###########################
 
-    def load_parameters(self, params, key=None):
-        
+    def load_parameters(self,
+                        params: Union[dict, str, IOBase],
+                        key: Optional[str] = None):
+        """
+        Reads in and sets calculation parameters.
+
+        Parameters
+        ----------
+        params : dict, str or file-like object
+            The parameters or parameter file to read in.
+        key : str, optional
+            A new key value to assign to the object.  If not given, will use
+            calc_key field in params if it exists, or leave the key value
+            unchanged.
+        """
         # Load universal content
         input_dict = super().load_parameters(params, key=key)
-        
+
         # Load input/output units
         self.units.load_parameters(input_dict)
-        
+
         # Change default values for subset terms
         input_dict['sizemults'] = input_dict.get('sizemults', '10 10 10')
-        
+
         # Load calculation-specific strings
         self.integrator = input_dict.get('integrator', None)
 
         # Load calculation-specific booleans
-        
+
         # Load calculation-specific integers
         self.runsteps = int(input_dict.get('runsteps', 220000))
         self.thermosteps = int(input_dict.get('thermosteps', 100))
@@ -655,10 +696,10 @@ class RelaxDynamic(Calculation):
         self.pressure_yz = value(input_dict, 'pressure_yz',
                                  default_unit=self.units.pressure_unit,
                                  default_term='0.0 GPa')
-        
+
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
-        
+
         # Load LAMMPS potential
         self.potential.load_parameters(input_dict)
 
@@ -668,7 +709,9 @@ class RelaxDynamic(Calculation):
         # Manipulate system
         self.system_mods.load_parameters(input_dict)
 
-    def master_prepare_inputs(self, branch='main', **kwargs):
+    def master_prepare_inputs(self,
+                              branch: str = 'main',
+                              **kwargs: any) -> dict:
         """
         Utility method that build input parameters for prepare according to the
         workflows used by the NIST Interatomic Potentials Repository.  In other
@@ -694,7 +737,7 @@ class RelaxDynamic(Calculation):
 
         # main branch
         if branch == 'main':
-            
+
             # Check for required kwargs
             assert 'lammps_command' in kwargs
 
@@ -717,18 +760,18 @@ class RelaxDynamic(Calculation):
 
             # Copy kwargs to params
             for key in kwargs:
-                
+
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
                     params[f'reference_{key}'] = kwargs[key]
                     params[f'parent_{key}'] = kwargs[key]
-                
+
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
-        
+
         elif branch == 'at_temp':
-            
+
             # Check for required kwargs
             assert 'lammps_command' in kwargs
 
@@ -749,15 +792,15 @@ class RelaxDynamic(Calculation):
             params['runsteps'] = '1000000'
             params['restartsteps'] = '50000'
             params['equilsteps'] = '0'
-            
+
             # Copy kwargs to params
             for key in kwargs:
-                
+
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
                     if key != 'potential_pair_style':
                         params[f'parent_{key}'] = kwargs[key]
-                
+
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
@@ -768,7 +811,7 @@ class RelaxDynamic(Calculation):
         return params
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The calculation-specific input keys and their descriptions."""
 
         return {
@@ -816,12 +859,12 @@ class RelaxDynamic(Calculation):
                 "An int random number seed to use for generating initial velocities.",
                 "A random int will be selected if not given."]),
 
-        }  
+        }
 
     @property
-    def singularkeys(self):
+    def singularkeys(self) -> list:
         """list: Calculation keys that can have single values during prepare."""
-        
+
         keys = (
             # Universal keys
             super().singularkeys
@@ -832,19 +875,19 @@ class RelaxDynamic(Calculation):
 
             # Calculation-specific keys
         )
-        return keys 
+        return keys
 
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """list: Calculation key sets that can have multiple values during prepare."""
-        
+
         keys = (
             # Universal multikeys
             super().multikeys +
 
             # Combination of potential and system keys
             [
-                self.potential.keyset + 
+                self.potential.keyset +
                 self.system.keyset
             ] +
 
@@ -890,11 +933,11 @@ class RelaxDynamic(Calculation):
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str: The root element of the content"""
         return 'calculation-relax-dynamic'
 
-    def build_model(self):
+    def build_model(self) -> DM:
         """
         Generates and returns model content based on the values set to object.
         """
@@ -914,7 +957,7 @@ class RelaxDynamic(Calculation):
         if 'run-parameter' not in calc['calculation']:
             calc['calculation']['run-parameter'] = DM()
         run_params = calc['calculation']['run-parameter']
-        
+
         run_params['integrator'] = self.integrator
         run_params['thermosteps'] = self.thermosteps
         run_params['dumpsteps'] = self.dumpsteps
@@ -947,13 +990,13 @@ class RelaxDynamic(Calculation):
             calc['initial-system']['artifact']['file'] = self.initial_dump['filename']
             calc['initial-system']['artifact']['format'] = 'atom_dump'
             calc['initial-system']['symbols'] = self.initial_dump['symbols']
-            
+
             calc['final-system'] = DM()
             calc['final-system']['artifact'] = DM()
             calc['final-system']['artifact']['file'] = self.final_dump['filename']
             calc['final-system']['artifact']['format'] = 'atom_dump'
             calc['final-system']['symbols'] = self.final_dump['symbols']
-            
+
             calc['number-of-measurements'] = self.numsamples
 
             # Save measured box parameter info
@@ -970,7 +1013,7 @@ class RelaxDynamic(Calculation):
                                  self.xz_std)
             mbp['yz'] = uc.model(self.yz_mean, self.units.length_unit,
                                  self.yz_std)
-            
+
             # Save measured phase-state info
             calc['measured-phase-state'] = mps = DM()
             mps['temperature'] = uc.model(self.measured_temperature, 'K',
@@ -993,7 +1036,7 @@ class RelaxDynamic(Calculation):
             mps['pressure-yz'] = uc.model(self.measured_pressure_yz,
                                           self.units.pressure_unit,
                                           self.measured_pressure_yz_std)
-            
+
             # Save the final cohesive and total energies
             calc['cohesive-energy'] = uc.model(self.potential_energy,
                                                self.units.energy_unit,
@@ -1006,7 +1049,9 @@ class RelaxDynamic(Calculation):
         self._set_model(model)
         return model
 
-    def load_model(self, model, name=None):
+    def load_model(self,
+                   model: Union[str, DM],
+                   name: Optional[str] = None):
         """
         Loads record contents from a given model.
 
@@ -1047,7 +1092,6 @@ class RelaxDynamic(Calculation):
                 'filename': calc['initial-system']['artifact']['file'],
                 'symbols': calc['initial-system']['symbols']
             }
-            
 
             self.__final_dump = {
                 'filename': calc['final-system']['artifact']['file'],
@@ -1082,7 +1126,7 @@ class RelaxDynamic(Calculation):
             else:
                 self.__total_energy = np.nan
                 self.__total_energy_std = np.nan
-            
+
             mps = calc['measured-phase-state']
             self.__measured_temperature = uc.value_unit(mps['temperature'])
             self.__measured_temperature_std = uc.error_unit(mps['temperature'])
@@ -1099,56 +1143,21 @@ class RelaxDynamic(Calculation):
             self.__measured_pressure_yz = uc.value_unit(mps['pressure-yz'])
             self.__measured_pressure_yz_std = uc.error_unit(mps['pressure-yz'])
 
-    def mongoquery(self, **kwargs):
-        """
-        Builds a Mongo-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The Mongo-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().mongoquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = f'content.{self.modelroot}'
-       
-        return mquery
-
-    def cdcsquery(self, **kwargs):
-        
-        """
-        Builds a CDCS-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The CDCS-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().cdcsquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = self.modelroot
-        
-        return mquery
+    @property
+    def queries(self) -> dict:
+        queries = deepcopy(super().queries)
+        queries.update({
+            'temperature': load_query(
+                style='float_match',
+                name='temperature',
+                path=f'{self.modelroot}.phase-state.temperature.value',
+                description='search by temperature in Kelvin'),
+        })
+        return queries
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self):
+    def metadata(self) -> dict:
         """
         Generates a dict of simple metadata values associated with the record.
         Useful for quickly comparing records and for building pandas.DataFrames
@@ -1165,11 +1174,11 @@ class RelaxDynamic(Calculation):
         meta['pressure_xy'] = self.pressure_xy
         meta['pressure_xz'] = self.pressure_xz
         meta['pressure_yz'] = self.pressure_yz
-        
+
         # Extract results
         if self.status == 'finished':
             meta['numsamples'] = self.numsamples
-            
+
             meta['lx'] = self.lx_mean
             meta['lx_std'] = self.lx_std
             meta['ly'] = self.ly_mean
@@ -1182,7 +1191,7 @@ class RelaxDynamic(Calculation):
             meta['xz_std'] = self.xz_std
             meta['yz'] = self.yz_mean
             meta['yz_std'] = self.yz_std
-            
+
             meta['E_pot'] = self.potential_energy
             meta['E_pot_std'] = self.potential_energy_std
             meta['E_total'] = self.total_energy
@@ -1205,25 +1214,21 @@ class RelaxDynamic(Calculation):
         return meta
 
     @property
-    def compare_terms(self):
+    def compare_terms(self) -> list:
         """list: The terms to compare metadata values absolutely."""
         return [
             'script',
-        
+
             'parent_key',
             'load_options',
             'symbols',
-            
+
             'potential_LAMMPS_key',
             'potential_key',
-            
-        #    'a_mult',
-        #    'b_mult',
-        #    'c_mult',
         ]
-    
+
     @property
-    def compare_fterms(self):
+    def compare_fterms(self) -> dict:
         """dict: The terms to compare metadata values using a tolerance."""
         return {
             'temperature':1e-2,
@@ -1235,39 +1240,11 @@ class RelaxDynamic(Calculation):
             'pressure_yz':1e-2,
         }
 
-    def pandasfilter(self, dataframe, **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets. 
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        # Call super to filter by universal and subset terms
-        matches = super().pandasfilter(dataframe, **kwargs)
-
-        # Filter by calculation-specific terms
-        
-        return matches
-
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self):
+    def calc_inputs(self) -> dict:
         """Builds calculation inputs from the class's attributes"""
-        
+
         # Initialize input_dict
         input_dict = {}
 
@@ -1297,8 +1274,8 @@ class RelaxDynamic(Calculation):
 
         # Return input_dict
         return input_dict
-    
-    def process_results(self, results_dict):
+
+    def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
         attributes.
@@ -1325,14 +1302,14 @@ class RelaxDynamic(Calculation):
         self.__yz_mean = results_dict['yz'] / (self.system_mods.c_mults[1] - self.system_mods.c_mults[0])
         self.__final_box = am.Box(lx=self.lx_mean, ly=self.ly_mean, lz=self.lz_mean,
                                   xy=self.xy_mean, xz=self.xz_mean, yz=self.yz_mean)
-        
+
         self.__lx_std = results_dict['lx_std']
         self.__ly_std = results_dict['ly_std']
         self.__lz_std = results_dict['lz_std']
         self.__xy_std = results_dict['xy_std']
         self.__xz_std = results_dict['xz_std']
         self.__yz_std = results_dict['yz_std']
-        
+
         self.__potential_energy = results_dict['E_pot']
         self.__potential_energy_std = results_dict['E_pot_std']
         self.__total_energy = results_dict['E_total']

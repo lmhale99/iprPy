@@ -1,15 +1,17 @@
 # coding: utf-8
 # Standard Python libraries
-import uuid
+from io import IOBase
+from pathlib import Path
 from copy import deepcopy
+from typing import Optional, Union
 
 import numpy as np
+import numpy.typing as npt
 
-from yabadaba import query
+from yabadaba import load_query
 
 # https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/DataModelDict
@@ -18,17 +20,39 @@ from DataModelDict import DataModelDict as DM
 # iprPy imports
 from .. import Calculation
 from .e_vs_r_scan import e_vs_r_scan
-from ...calculation_subset import *
-from ...input import value, boolean
-from ...tools import aslist, dict_insert
+from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
+                                   AtommanSystemLoad, AtommanSystemManipulate)
+from ...input import value
+from ...tools import aslist
 
 class EvsRScan(Calculation):
     """Class for managing energy versus r volumetric scans for crystals"""
 
 ############################# Core properties #################################
 
-    def __init__(self, model=None, name=None, params=None, **kwargs):
-        """Initializes a Calculation object for a given style."""
+    def __init__(self,
+                 model: Union[str, Path, IOBase, DM, None]=None,
+                 name: Optional[str]=None,
+                 params: Union[str, Path, IOBase, dict] = None,
+                 **kwargs: any):
+        """
+        Initializes a Calculation object for a given style.
+
+        Parameters
+        ----------
+        model : str, file-like object or DataModelDict, optional
+            Record content in data model format to read in.  Cannot be given
+            with params.
+        name : str, optional
+            The name to use for saving the record.  By default, this should be
+            the calculation's key.
+        params : str, file-like object or dict, optional
+            Calculation input parameters or input parameter file.  Cannot be
+            given with model.
+        **kwargs : any
+            Any other core Calculation record attributes to set.  Cannot be
+            given with model.
+        """
 
         # Initialize subsets used by the calculation
         self.__potential = LammpsPotential(self)
@@ -56,7 +80,7 @@ class EvsRScan(Calculation):
                          subsets=subsets, **kwargs)
 
     @property
-    def filenames(self):
+    def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
             'e_vs_r_scan.py',
@@ -66,110 +90,113 @@ class EvsRScan(Calculation):
 ############################## Class attributes ###############################
 
     @property
-    def commands(self):
+    def commands(self) -> LammpsCommands:
         """LammpsCommands subset"""
         return self.__commands
 
     @property
-    def potential(self):
+    def potential(self) -> LammpsPotential:
         """LammpsPotential subset"""
         return self.__potential
 
     @property
-    def units(self):
+    def units(self) -> Units:
         """Units subset"""
         return self.__units
 
     @property
-    def system(self):
+    def system(self) -> AtommanSystemLoad:
         """AtommanSystemLoad subset"""
         return self.__system
 
     @property
-    def system_mods(self):
+    def system_mods(self) -> AtommanSystemManipulate:
         """AtommanSystemManipulate subset"""
         return self.__system_mods
 
     @property
-    def number_of_steps_r(self):
+    def number_of_steps_r(self) -> int:
+        """int: The number of r values where the energy is evaluated"""
         return self.__number_of_steps_r
 
     @number_of_steps_r.setter
-    def number_of_steps_r(self, value):
-        value = int(value)
-        assert value > 0
-        self.__number_of_steps_r = value
+    def number_of_steps_r(self, val: int):
+        val = int(val)
+        assert val > 0
+        self.__number_of_steps_r = val
 
     @property
-    def minimum_r(self):
+    def minimum_r(self) -> float:
+        """float: The minimum r value to evaluate"""
         return self.__minimum_r
 
     @minimum_r.setter
-    def minimum_r(self, value):
-        value = float(value)
-        assert value > 0
-        self.__minimum_r = value
+    def minimum_r(self, val: float):
+        val = float(val)
+        assert val > 0
+        self.__minimum_r = val
 
     @property
-    def maximum_r(self):
+    def maximum_r(self) -> float:
+        """float: The maximum r value to evaluate"""
         return self.__maximum_r
 
     @maximum_r.setter
-    def maximum_r(self, value):
-        value = float(value)
-        assert value > 0
-        self.__maximum_r = value
+    def maximum_r(self, val: float):
+        val = float(val)
+        assert val > 0
+        self.__maximum_r = val
 
     @property
-    def r_values(self):
+    def r_values(self) -> np.ndarray:
         """numpy.NDArray : Interatomic distances used for the scan."""
         if self.__r_values is None:
             raise ValueError('No results yet!')
         return self.__r_values
 
     @r_values.setter
-    def r_values(self, value):
-        if value is None:
-            self.__r_values = value
+    def r_values(self, val: npt.ArrayLike):
+        if val is None:
+            self.__r_values = val
         else:
-            value = np.asarray(value, dtype=float)
-            self.__r_values = value
-            self.number_of_steps_r = len(value)
-            self.minimum_r = value[0]
-            self.maximum_r = value[-1]
+            val = np.asarray(val, dtype=float)
+            self.__r_values = val
+            self.number_of_steps_r = len(val)
+            self.minimum_r = val[0]
+            self.maximum_r = val[-1]
 
     @property
-    def a_values(self):
+    def a_values(self) -> np.ndarray:
         """numpy.NDArray : Unit cell a lattice parameters associated with the scan."""
         if self.__a_values is None:
             raise ValueError('No results yet!')
         return self.__a_values
 
     @a_values.setter
-    def a_values(self, value):
-        if value is None:
-            self.__a_values = value
+    def a_values(self, val: npt.ArrayLike):
+        if val is None:
+            self.__a_values = val
         else:
-            value = np.asarray(value, dtype=float)
-            self.__a_values = value
+            val = np.asarray(val, dtype=float)
+            self.__a_values = val
 
     @property
-    def energy_values(self):
+    def energy_values(self) -> np.ndarray:
         """numpy.NDArray : Measured potential energy for each r value."""
         if self.__energy_values is None:
             raise ValueError('No results yet!')
         return self.__energy_values
 
     @energy_values.setter
-    def energy_values(self, value):
-        if value is None:
-            self.__energy_values = value
+    def energy_values(self, val: npt.ArrayLike):
+        if val is None:
+            self.__energy_values = val
         else:
-            value = np.asarray(value, dtype=float)
-            self.__energy_values = value
+            val = np.asarray(val, dtype=float)
+            self.__energy_values = val
 
     @property
-    def min_cells(self):
+    def min_cells(self) -> list:
         """list : atomman.Systems for the dimensions scanned with local energy minima."""
         if self.__min_cells is None:
             raise ValueError('No results yet!')
@@ -179,13 +206,15 @@ class EvsRScan(Calculation):
         return self.__min_cells
 
     @min_cells.setter
-    def min_cells(self, value):
-        if value is None:
-            self.__min_cells = value
+    def min_cells(self, val: Union[am.System, list, None]):
+        if val is None:
+            self.__min_cells = val
         else:
-            self.__min_cells = aslist(value)
+            self.__min_cells = aslist(val)
 
-    def set_values(self, name=None, **kwargs):
+    def set_values(self,
+                   name: Optional[str] = None,
+                   **kwargs: any):
         """
         Set calculation values directly.  Any terms not given will be set
         or reset to the calculation's default values.
@@ -216,10 +245,23 @@ class EvsRScan(Calculation):
         if 'maximum_r' in kwargs:
             self.maximum_r = kwargs['maximum_r']
 
-####################### Parameter file interactions ########################### 
+####################### Parameter file interactions ###########################
 
-    def load_parameters(self, params, key=None):
-        
+    def load_parameters(self,
+                        params: Union[dict, str, IOBase],
+                        key: Optional[str] = None):
+        """
+        Reads in and sets calculation parameters.
+
+        Parameters
+        ----------
+        params : dict, str or file-like object
+            The parameters or parameter file to read in.
+        key : str, optional
+            A new key value to assign to the object.  If not given, will use
+            calc_key field in params if it exists, or leave the key value
+            unchanged.
+        """
         # Load universal content
         input_dict = super().load_parameters(params, key=key)
 
@@ -227,12 +269,12 @@ class EvsRScan(Calculation):
         self.units.load_parameters(input_dict)
 
         # Load calculation-specific booleans
-        
+
         # Load calculation-specific integers
         self.number_of_steps_r = int(input_dict.get('number_of_steps_r', 201))
 
         # Load calculation-specific unitless floats
-        
+
         # Load calculation-specific floats with units
         self.minimum_r = value(input_dict, 'minimum_r',
                                default_unit=self.units.length_unit,
@@ -240,10 +282,10 @@ class EvsRScan(Calculation):
         self.maximum_r = value(input_dict, 'maximum_r',
                                default_unit=self.units.length_unit,
                                default_term='6.0 angstrom')
-        
+
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
-        
+
         # Load LAMMPS potential
         self.potential.load_parameters(input_dict)
 
@@ -253,7 +295,9 @@ class EvsRScan(Calculation):
         # Manipulate system
         self.system_mods.load_parameters(input_dict)
 
-    def master_prepare_inputs(self, branch='main', **kwargs):
+    def master_prepare_inputs(self,
+                              branch: str = 'main',
+                              **kwargs: any) -> dict:
         """
         Utility method that build input parameters for prepare according to the
         workflows used by the NIST Interatomic Potentials Repository.  In other
@@ -279,7 +323,7 @@ class EvsRScan(Calculation):
 
         # main branch
         if branch == 'main':
-            
+
             # Check for required kwargs
             assert 'lammps_command' in kwargs
 
@@ -292,17 +336,17 @@ class EvsRScan(Calculation):
 
             # Copy kwargs to params
             for key in kwargs:
-                
+
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
                     params[f'prototype_{key}'] = kwargs[key]
-                
+
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
-        
+
         elif branch == 'bop':
-            
+
             # Check for required kwargs
             assert 'lammps_command' in kwargs
 
@@ -316,12 +360,12 @@ class EvsRScan(Calculation):
 
             # Copy kwargs to params
             for key in kwargs:
-                
+
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
                     if key != 'potential_pair_style':
                         params[f'prototype_{key}'] = kwargs[key]
-                
+
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
@@ -332,7 +376,7 @@ class EvsRScan(Calculation):
         return params
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The calculation-specific input keys and their descriptions."""
 
         return {
@@ -345,12 +389,12 @@ class EvsRScan(Calculation):
             'number_of_steps_r': ' '.join([
                 "The number of interatomic spacing values, r, to use.  Default"
                 "value is 201."]),
-        } 
+        }
 
     @property
-    def singularkeys(self):
+    def singularkeys(self) -> list:
         """list: Calculation keys that can have single values during prepare."""
-        
+
         keys = (
             # Universal keys
             super().singularkeys
@@ -361,12 +405,12 @@ class EvsRScan(Calculation):
 
             # Calculation-specific keys
         )
-        return keys 
+        return keys
 
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """list: Calculation key sets that can have multiple values during prepare."""
-        
+
         keys = (
             # Universal multikeys
             super().multikeys +
@@ -381,7 +425,7 @@ class EvsRScan(Calculation):
             [
                 self.system_mods.keyset
             ] +
-            
+
             # Run parameters
             [
                 [
@@ -390,17 +434,17 @@ class EvsRScan(Calculation):
                     'number_of_steps_r',
                 ]
             ]
-        )   
+        )
         return keys
 
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str: The root element of the content"""
         return 'calculation-E-vs-r-scan'
 
-    def build_model(self):
+    def build_model(self) -> DM:
         """
         Generates and returns model content based on the values set to object.
         """
@@ -435,13 +479,15 @@ class EvsRScan(Calculation):
                                                 self.units.energy_unit)
 
             for cell in self.min_cells:
-               system_model = cell.dump('system_model', box_unit=self.units.length_unit)
-               calc.append('minimum-atomic-system', system_model['atomic-system'])
+                system_model = cell.dump('system_model', box_unit=self.units.length_unit)
+                calc.append('minimum-atomic-system', system_model['atomic-system'])
 
         self._set_model(model)
         return model
 
-    def load_model(self, model, name=None):
+    def load_model(self,
+                   model: Union[str, DM],
+                   name: Optional[str] = None):
         """
         Loads record contents from a given model.
 
@@ -472,77 +518,35 @@ class EvsRScan(Calculation):
 
             self.min_cells = []
             for cell in calc.aslist('minimum-atomic-system'):
-               self.min_cells.append(DM([('atomic-system', cell)]))
+                self.min_cells.append(DM([('atomic-system', cell)]))
 
-    def mongoquery(self, minimum_r=None, maximum_r=None,
-                   number_of_steps_r=None, **kwargs):
-        """
-        Builds a Mongo-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        minimum_r : float or list, optional
-            The minimum_r run parameter value(s) to parse by.
-        maximum_r : float or list, optional
-            The maximum_r run parameter value(s) to parse by.
-        number_of_steps_r : int or list, optional
-            The number_of_steps_r run parameter value(s) to parse by.
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The Mongo-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().mongoquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = f'content.{self.modelroot}'
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maximum_r', maximum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
-
-        return mquery
-
-    def cdcsquery(self, minimum_r=None, maximum_r=None,
-                  number_of_steps_r=None, **kwargs):
-        """
-        Builds a CDCS-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        minimum_r : float or list, optional
-            The minimum_r run parameter value(s) to parse by.
-        maximum_r : float or list, optional
-            The maximum_r run parameter value(s) to parse by.
-        number_of_steps_r : int or list, optional
-            The number_of_steps_r run parameter value(s) to parse by.
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The CDCS-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().cdcsquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = self.modelroot
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.minimum_r', minimum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.maximum_r', maximum_r)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.number_of_steps_r', number_of_steps_r)
-
-        return mquery
+    @property
+    def queries(self) -> dict:
+        queries = deepcopy(super().queries)
+        queries.update({
+            'minimum_r': load_query(
+                style='float_match',
+                name='minimum_r',
+                path=f'{self.modelroot}.calculation.run-parameter.minimum_r.value',
+                description='search by the minimum r value used in angstroms',
+                unit='angstrom'),
+            'maximum_r': load_query(
+                style='float_match',
+                name='maximum_r',
+                path=f'{self.modelroot}.calculation.run-parameter.maximum_r.value',
+                description='search by the maximum r value used in Angstroms',
+                unit='angstrom'),
+            'number_of_steps_r': load_query(
+                style='int_match',
+                name='number_of_steps_r',
+                path=f'{self.modelroot}.calculation.run-parameter.number_of_steps_r',
+                description='search by number of r steps used'),
+        })
+        return queries
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self):
+    def metadata(self) -> dict:
         """
         Generates a dict of simple metadata values associated with the record.
         Useful for quickly comparing records and for building pandas.DataFrames
@@ -555,7 +559,7 @@ class EvsRScan(Calculation):
         meta['minimum_r'] = self.minimum_r
         meta['maximum_r'] = self.maximum_r
         meta['number_of_steps_r'] = self.number_of_steps_r
-        
+
         # Extract results
         if self.status == 'finished':
             meta['r_values'] = self.r_values.tolist()
@@ -565,80 +569,36 @@ class EvsRScan(Calculation):
         return meta
 
     @property
-    def compare_terms(self):
+    def compare_terms(self) -> list:
         """list: The terms to compare metadata values absolutely."""
         return [
             'script',
-            
+
             'load_file',
             'load_options',
             'symbols',
-            
+
             'potential_LAMMPS_key',
             'potential_key',
-            
-        #    'a_mult',
-        #    'b_mult',
-        #    'c_mult',
         ]
-    
+
     @property
-    def compare_fterms(self):
+    def compare_fterms(self) -> dict:
         """dict: The terms to compare metadata values using a tolerance."""
         return {}
 
-    def pandasfilter(self, dataframe, minimum_r=None, maximum_r=None,
-                     number_of_steps_r=None, **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        minimum_r : float or list, optional
-            The minimum_r run parameter value(s) to parse by.
-        maximum_r : float or list, optional
-            The maximum_r run parameter value(s) to parse by.
-        number_of_steps_r : int or list, optional
-            The number_of_steps_r run parameter value(s) to parse by.
-        kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets. 
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        # Call super to filter by universal and subset terms
-        matches = super().pandasfilter(dataframe, **kwargs)
-
-        # Filter by calculation-specific terms
-        matches = (matches
-            &query.str_match.pandas(dataframe, 'minimum_r', minimum_r)
-            &query.str_match.pandas(dataframe, 'maximum_r', maximum_r)
-            &query.str_match.pandas(dataframe, 'number_of_steps_r', number_of_steps_r)
-        )
-        
-        return matches
-
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self):
+    def calc_inputs(self) -> dict:
         """Builds calculation inputs from the class's attributes"""
-        
+
         # Initialize input_dict
         input_dict = {}
 
         # Add subset inputs
         for subset in self.subsets:
             subset.calc_inputs(input_dict)
-        
+
         # Remove unused subset inputs
         del input_dict['transform']
 
@@ -649,8 +609,8 @@ class EvsRScan(Calculation):
 
         # Return input_dict
         return input_dict
-    
-    def process_results(self, results_dict):
+
+    def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
         attributes.
@@ -664,4 +624,3 @@ class EvsRScan(Calculation):
         self.a_values = results_dict['a_values']
         self.energy_values = results_dict['Ecoh_values']
         self.min_cells = results_dict['min_cell']
-        

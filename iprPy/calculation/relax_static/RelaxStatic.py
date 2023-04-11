@@ -1,15 +1,11 @@
 # coding: utf-8
 # Standard Python libraries
-import uuid
-from copy import deepcopy
-
-import numpy as np
-
-from yabadaba import query
+from io import IOBase
+from pathlib import Path
+from typing import Optional, Union
 
 # https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/DataModelDict
@@ -18,18 +14,40 @@ from DataModelDict import DataModelDict as DM
 # iprPy imports
 from .. import Calculation
 from .relax_static import relax_static
-from ...calculation_subset import *
-from ...input import value, boolean
-from ...tools import aslist, dict_insert
+from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
+                                   AtommanSystemLoad, AtommanSystemManipulate,
+                                   LammpsMinimize)
+from ...input import value
 
 class RelaxStatic(Calculation):
     """Class for managing static relaxations"""
 
 ############################# Core properties #################################
 
-    def __init__(self, model=None, name=None, params=None, **kwargs):
-        """Initializes a Calculation object for a given style."""
-        
+    def __init__(self,
+                 model: Union[str, Path, IOBase, DM, None]=None,
+                 name: Optional[str]=None,
+                 params: Union[str, Path, IOBase, dict] = None,
+                 **kwargs: any):
+        """
+        Initializes a Calculation object for a given style.
+
+        Parameters
+        ----------
+        model : str, file-like object or DataModelDict, optional
+            Record content in data model format to read in.  Cannot be given
+            with params.
+        name : str, optional
+            The name to use for saving the record.  By default, this should be
+            the calculation's key.
+        params : str, file-like object or dict, optional
+            Calculation input parameters or input parameter file.  Cannot be
+            given with model.
+        **kwargs : any
+            Any other core Calculation record attributes to set.  Cannot be
+            given with model.
+        """
+
         # Initialize subsets used by the calculation
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
@@ -48,7 +66,7 @@ class RelaxStatic(Calculation):
         self.pressure_xz = 0.0
         self.pressure_yz = 0.0
         self.displacementkick = 0.0
-        self.maxcycles = 100     
+        self.maxcycles = 100
         self.cycletolerance = 1e-10
 
         self.__initial_dump = None
@@ -61,7 +79,7 @@ class RelaxStatic(Calculation):
         self.__measured_pressure_xy = None
         self.__measured_pressure_xz = None
         self.__measured_pressure_yz = None
-        
+
         # Define calc shortcut
         self.calc = relax_static
 
@@ -70,7 +88,7 @@ class RelaxStatic(Calculation):
                          subsets=subsets, **kwargs)
 
     @property
-    def filenames(self):
+    def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
             'relax_static.py',
@@ -80,190 +98,192 @@ class RelaxStatic(Calculation):
 ############################## Class attributes ###############################
 
     @property
-    def commands(self):
+    def commands(self) -> LammpsCommands:
         """LammpsCommands subset"""
         return self.__commands
 
     @property
-    def potential(self):
+    def potential(self) -> LammpsPotential:
         """LammpsPotential subset"""
         return self.__potential
 
     @property
-    def units(self):
+    def units(self) -> Units:
         """Units subset"""
         return self.__units
 
     @property
-    def system(self):
+    def system(self) -> AtommanSystemLoad:
         """AtommanSystemLoad subset"""
         return self.__system
 
     @property
-    def system_mods(self):
+    def system_mods(self) -> AtommanSystemManipulate:
         """AtommanSystemManipulate subset"""
         return self.__system_mods
-    
+
     @property
-    def minimize(self):
+    def minimize(self) -> LammpsMinimize:
         """LammpsMinimize subset"""
         return self.__minimize
 
     @property
-    def pressure_xx(self):
+    def pressure_xx(self) -> float:
         """float: Target relaxation pressure component xx"""
         return self.__pressure_xx
 
     @pressure_xx.setter
-    def pressure_xx(self, value):
-        self.__pressure_xx = float(value)
+    def pressure_xx(self, val: float):
+        self.__pressure_xx = float(val)
 
     @property
-    def pressure_yy(self):
+    def pressure_yy(self) -> float:
         """float: Target relaxation pressure component yy"""
         return self.__pressure_yy
 
     @pressure_yy.setter
-    def pressure_yy(self, value):
-        self.__pressure_yy = float(value)
-    
+    def pressure_yy(self, val: float):
+        self.__pressure_yy = float(val)
+
     @property
-    def pressure_zz(self):
+    def pressure_zz(self) -> float:
         """float: Target relaxation pressure component zz"""
         return self.__pressure_zz
 
     @pressure_zz.setter
-    def pressure_zz(self, value):
-        self.__pressure_zz = float(value)
+    def pressure_zz(self, val: float):
+        self.__pressure_zz = float(val)
 
     @property
-    def pressure_xy(self):
+    def pressure_xy(self) -> float:
         """float: Target relaxation pressure component xy"""
         return self.__pressure_xy
 
     @pressure_xy.setter
-    def pressure_xy(self, value):
-        self.__pressure_xy = float(value)
+    def pressure_xy(self, val: float):
+        self.__pressure_xy = float(val)
 
     @property
-    def pressure_xz(self):
+    def pressure_xz(self) -> float:
         """float: Target relaxation pressure component xz"""
         return self.__pressure_xz
 
     @pressure_xz.setter
-    def pressure_xz(self, value):
-        self.__pressure_xz = float(value)
-    
+    def pressure_xz(self, val: float):
+        self.__pressure_xz = float(val)
+
     @property
-    def pressure_yz(self):
+    def pressure_yz(self) -> float:
         """float: Target relaxation pressure component yz"""
         return self.__pressure_yz
 
     @pressure_yz.setter
-    def pressure_yz(self, value):
-        self.__pressure_yz = float(value)
+    def pressure_yz(self, val: float):
+        self.__pressure_yz = float(val)
 
     @property
-    def displacementkick(self):
+    def displacementkick(self) -> float:
         """float: Magnitude of random displacements to use"""
         return self.__displacementkick
 
     @displacementkick.setter
-    def displacementkick(self, value):
-        if isinstance(value, str):
-            self.__displacementkick = uc.set_literal(value)
+    def displacementkick(self, val: Union[float, str]):
+        if isinstance(val, str):
+            self.__displacementkick = uc.set_literal(val)
         else:
-            self.__displacementkick = float(value)
-    
+            self.__displacementkick = float(val)
+
     @property
-    def maxcycles(self):
+    def maxcycles(self) -> int:
         """int: Maximum number of relaxation cycles"""
         return self.__maxcycles
 
     @maxcycles.setter
-    def maxcycles(self, value):
-        self.__maxcycles = int(value)
+    def maxcycles(self, val: int):
+        self.__maxcycles = int(val)
 
     @property
-    def cycletolerance(self):
+    def cycletolerance(self) -> float:
         """float: Stopping tolerance associated with the relaxation cycles"""
         return self.__cycletolerance
 
     @cycletolerance.setter
-    def cycletolerance(self, value):
-        self.__cycletolerance = float(value)
+    def cycletolerance(self, val: float):
+        self.__cycletolerance = float(val)
 
     @property
-    def initial_dump(self):
+    def initial_dump(self) -> dict:
         """dict: Info about the initial dump file"""
         if self.__initial_dump is None:
             raise ValueError('No results yet!')
         return self.__initial_dump
 
     @property
-    def final_dump(self):
+    def final_dump(self) -> dict:
         """dict: Info about the final dump file"""
         if self.__final_dump is None:
             raise ValueError('No results yet!')
         return self.__final_dump
-    
+
     @property
-    def final_box(self):
+    def final_box(self) -> am.Box:
         """atomman.Box: Relaxed unit cell box"""
         if self.__final_box is None:
             raise ValueError('No results yet!')
         return self.__final_box
 
     @property
-    def potential_energy(self):
+    def potential_energy(self) -> float:
         """float: Potential energy per atom for the relaxed system"""
         if self.__potential_energy is None:
             raise ValueError('No results yet!')
         return self.__potential_energy
 
     @property
-    def measured_pressure_xx(self):
+    def measured_pressure_xx(self) -> float:
         """float: Measured relaxation pressure component xx"""
         if self.__measured_pressure_xx is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_xx
-    
+
     @property
-    def measured_pressure_yy(self):
+    def measured_pressure_yy(self) -> float:
         """float: Measured relaxation pressure component yy"""
         if self.__measured_pressure_yy is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_yy
-    
+
     @property
-    def measured_pressure_zz(self):
+    def measured_pressure_zz(self) -> float:
         """float: Measured relaxation pressure component zz"""
         if self.__measured_pressure_zz is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_zz
-    
+
     @property
-    def measured_pressure_xy(self):
+    def measured_pressure_xy(self) -> float:
         """float: Measured relaxation pressure component xy"""
         if self.__measured_pressure_xy is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_xy
-    
+
     @property
-    def measured_pressure_xz(self):
+    def measured_pressure_xz(self) -> float:
         """float: Measured relaxation pressure component xz"""
         if self.__measured_pressure_xz is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_xz
-    
+
     @property
-    def measured_pressure_yz(self):
+    def measured_pressure_yz(self) -> float:
         """float: Measured relaxation pressure component yz"""
         if self.__measured_pressure_yz is None:
             raise ValueError('No results yet!')
         return self.__measured_pressure_yz
 
-    def set_values(self, name=None, **kwargs):
+    def set_values(self,
+                   name: Optional[str] = None,
+                   **kwargs: any):
         """
         Set calculation values directly.  Any terms not given will be set
         or reset to the calculation's default values.
@@ -319,16 +339,29 @@ class RelaxStatic(Calculation):
         if 'cycletolerance' in kwargs:
             self.cycletolerance = kwargs['cycletolerance']
 
-####################### Parameter file interactions ########################### 
+####################### Parameter file interactions ###########################
 
-    def load_parameters(self, params, key=None):
-        
+    def load_parameters(self,
+                        params: Union[dict, str, IOBase],
+                        key: Optional[str] = None):
+        """
+        Reads in and sets calculation parameters.
+
+        Parameters
+        ----------
+        params : dict, str or file-like object
+            The parameters or parameter file to read in.
+        key : str, optional
+            A new key value to assign to the object.  If not given, will use
+            calc_key field in params if it exists, or leave the key value
+            unchanged.
+        """
         # Load universal content
         input_dict = super().load_parameters(params, key=key)
-        
+
         # Load input/output units
         self.units.load_parameters(input_dict)
-        
+
         # Change default values for subset terms
         input_dict['sizemults'] = input_dict.get('sizemults', '1 1 1')
         input_dict['forcetolerance'] = input_dict.get('forcetolerance',
@@ -337,7 +370,7 @@ class RelaxStatic(Calculation):
         # Load calculation-specific strings
 
         # Load calculation-specific booleans
-        
+
         # Load calculation-specific integers
         self.maxcycles = int(input_dict.get('maxcycles', 100))
 
@@ -366,10 +399,10 @@ class RelaxStatic(Calculation):
         self.displacementkick = value(input_dict, 'displacementkick',
                                  default_unit=self.units.length_unit,
                                  default_term='0.0 angstrom')
-        
+
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
-        
+
         # Load minimization parameters
         self.minimize.load_parameters(input_dict)
 
@@ -382,7 +415,9 @@ class RelaxStatic(Calculation):
         # Manipulate system
         self.system_mods.load_parameters(input_dict)
 
-    def master_prepare_inputs(self, branch='main', **kwargs):
+    def master_prepare_inputs(self,
+                              branch: str = 'main',
+                              **kwargs: any) -> dict:
         """
         Utility method that build input parameters for prepare according to the
         workflows used by the NIST Interatomic Potentials Repository.  In other
@@ -408,7 +443,7 @@ class RelaxStatic(Calculation):
 
         # main branch
         if branch == 'main':
-            
+
             # Check for required kwargs
             assert 'lammps_command' in kwargs
 
@@ -432,12 +467,12 @@ class RelaxStatic(Calculation):
 
             # Copy kwargs to params
             for key in kwargs:
-                
+
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
                     params[f'reference_{key}'] = kwargs[key]
                     params[f'parent_{key}'] = kwargs[key]
-                
+
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
@@ -449,7 +484,7 @@ class RelaxStatic(Calculation):
 
             # Set default workflow settings
             params['buildcombos'] = 'atomicarchive load_file archive'
-            
+
             params['archive_record'] = 'calculation_relax_dynamic'
             params['archive_branch'] = 'main'
             params['archive_load_key'] = 'final-system'
@@ -465,11 +500,11 @@ class RelaxStatic(Calculation):
 
             # Copy kwargs to params
             for key in kwargs:
-                
+
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
                     params[f'archive_{key}'] = kwargs[key]
-                
+
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
@@ -480,7 +515,7 @@ class RelaxStatic(Calculation):
         return params
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The calculation-specific input keys and their descriptions."""
 
         return {
@@ -516,12 +551,12 @@ class RelaxStatic(Calculation):
                 "The tolerance to use in determining if the lattice constants",
                 "have converged between two minimization runs (cycles).  Default",
                 "value is '1e-10 angstrom'."]),
-        }     
+        }
 
     @property
-    def singularkeys(self):
+    def singularkeys(self) -> list:
         """list: Calculation keys that can have single values during prepare."""
-        
+
         keys = (
             # Universal keys
             super().singularkeys
@@ -532,10 +567,10 @@ class RelaxStatic(Calculation):
 
             # Calculation-specific keys
         )
-        return keys 
+        return keys
 
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """list: Calculation key sets that can have multiple values during prepare."""
 
         keys = (
@@ -544,7 +579,7 @@ class RelaxStatic(Calculation):
 
             # Combination of potential and system keys
             [
-                self.potential.keyset + 
+                self.potential.keyset +
                 self.system.keyset
             ] +
 
@@ -573,17 +608,17 @@ class RelaxStatic(Calculation):
                     'cycletolerance',
                 ]
             ]
-        )       
+        )
         return keys
 
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str: The root element of the content"""
         return 'calculation-relax-static'
 
-    def build_model(self):
+    def build_model(self) -> DM:
         """
         Generates and returns model content based on the values set to object.
         """
@@ -622,22 +657,22 @@ class RelaxStatic(Calculation):
             calc['initial-system']['artifact']['file'] = self.initial_dump['filename']
             calc['initial-system']['artifact']['format'] = 'atom_dump'
             calc['initial-system']['symbols'] = self.initial_dump['symbols']
-            
+
             calc['final-system'] = DM()
             calc['final-system']['artifact'] = DM()
             calc['final-system']['artifact']['file'] = self.final_dump['filename']
             calc['final-system']['artifact']['format'] = 'atom_dump'
             calc['final-system']['symbols'] = self.final_dump['symbols']
-            
+
             # Save measured box parameter info
-            calc['measured-box-parameter'] = mbp = DM()            
+            calc['measured-box-parameter'] = mbp = DM()
             mbp['lx'] = uc.model(self.final_box.lx, self.units.length_unit)
             mbp['ly'] = uc.model(self.final_box.ly, self.units.length_unit)
             mbp['lz'] = uc.model(self.final_box.lz, self.units.length_unit)
             mbp['xy'] = uc.model(self.final_box.xy, self.units.length_unit)
             mbp['xz'] = uc.model(self.final_box.xz, self.units.length_unit)
             mbp['yz'] = uc.model(self.final_box.yz, self.units.length_unit)
-            
+
             # Save measured phase-state info
             calc['measured-phase-state'] = mps = DM()
             mps['temperature'] = uc.model(0.0, 'K')
@@ -653,7 +688,7 @@ class RelaxStatic(Calculation):
                                           self.units.pressure_unit)
             mps['pressure-yz'] = uc.model(self.measured_pressure_yz,
                                           self.units.pressure_unit)
-            
+
             # Save the final cohesive energy
             calc['cohesive-energy'] = uc.model(self.potential_energy,
                                                self.units.energy_unit,
@@ -662,7 +697,9 @@ class RelaxStatic(Calculation):
         self._set_model(model)
         return model
 
-    def load_model(self, model, name=None):
+    def load_model(self,
+                   model: Union[str, DM],
+                   name: Optional[str] = None):
         """
         Loads record contents from a given model.
 
@@ -692,7 +729,6 @@ class RelaxStatic(Calculation):
                 'filename': calc['initial-system']['artifact']['file'],
                 'symbols': calc['initial-system']['symbols']
             }
-            
 
             self.__final_dump = {
                 'filename': calc['final-system']['artifact']['file'],
@@ -708,7 +744,7 @@ class RelaxStatic(Calculation):
             self.__final_box = am.Box(lx=lx, ly=ly, lz=lz, xy=xy, xz=xz, yz=yz)
 
             self.__potential_energy = uc.value_unit(calc['cohesive-energy'])
-            
+
             mps = calc['measured-phase-state']
             self.__measured_pressure_xx = uc.value_unit(mps['pressure-xx'])
             self.__measured_pressure_yy = uc.value_unit(mps['pressure-yy'])
@@ -717,56 +753,9 @@ class RelaxStatic(Calculation):
             self.__measured_pressure_xz = uc.value_unit(mps['pressure-xz'])
             self.__measured_pressure_yz = uc.value_unit(mps['pressure-yz'])
 
-    def mongoquery(self, **kwargs):
-        """
-        Builds a Mongo-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The Mongo-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().mongoquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = f'content.{self.modelroot}'
-       
-        return mquery
-
-    def cdcsquery(self, **kwargs):
-        
-        """
-        Builds a CDCS-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The CDCS-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().cdcsquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = self.modelroot
-        
-        return mquery
-
 ########################## Metadata interactions ##############################
 
-    def metadata(self):
+    def metadata(self) -> dict:
         """
         Generates a dict of simple metadata values associated with the record.
         Useful for quickly comparing records and for building pandas.DataFrames
@@ -783,7 +772,7 @@ class RelaxStatic(Calculation):
         meta['pressure_xy'] = self.pressure_xy
         meta['pressure_xz'] = self.pressure_xz
         meta['pressure_yz'] = self.pressure_yz
-        
+
         # Extract results
         if self.status == 'finished':
             meta['lx'] = self.final_box.lx
@@ -792,7 +781,7 @@ class RelaxStatic(Calculation):
             meta['xy'] = self.final_box.xy
             meta['xz'] = self.final_box.xz
             meta['yz'] = self.final_box.yz
-            
+
             meta['E_pot'] = self.potential_energy
             meta['measured_temperature'] = 0.0
             meta['measured_pressure_xx'] = self.measured_pressure_xx
@@ -805,25 +794,21 @@ class RelaxStatic(Calculation):
         return meta
 
     @property
-    def compare_terms(self):
+    def compare_terms(self) -> list:
         """list: The terms to compare metadata values absolutely."""
         return [
             'script',
-        
+
             'parent_key',
             'load_options',
             'symbols',
-            
+
             'potential_LAMMPS_key',
             'potential_key',
-            
-        #    'a_mult',
-        #    'b_mult',
-        #    'c_mult',
         ]
-    
+
     @property
-    def compare_fterms(self):
+    def compare_fterms(self) -> dict:
         """dict: The terms to compare metadata values using a tolerance."""
         return {
             'temperature':1e-2,
@@ -835,39 +820,11 @@ class RelaxStatic(Calculation):
             'pressure_yz':1e-2,
         }
 
-    def pandasfilter(self, dataframe, **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets. 
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        # Call super to filter by universal and subset terms
-        matches = super().pandasfilter(dataframe, **kwargs)
-
-        # Filter by calculation-specific terms
-        
-        return matches
-
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self):
+    def calc_inputs(self) -> dict:
         """Builds calculation inputs from the class's attributes"""
-        
+
         # Initialize input_dict
         input_dict = {}
 
@@ -892,8 +849,8 @@ class RelaxStatic(Calculation):
 
         # Return input_dict
         return input_dict
-    
-    def process_results(self, results_dict):
+
+    def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
         attributes.

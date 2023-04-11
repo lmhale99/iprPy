@@ -1,14 +1,16 @@
 # coding: utf-8
 # Standard Python libraries
+from io import IOBase
+from pathlib import Path
 from copy import deepcopy
+from typing import Optional, Union
 
 import numpy as np
 
-from yabadaba import query
+from yabadaba import load_query
 
 # https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/DataModelDict
@@ -17,18 +19,37 @@ from DataModelDict import DataModelDict as DM
 # iprPy imports
 from .. import Calculation
 from .crystal_space_group import crystal_space_group
-from ...calculation_subset import *
+from ...calculation_subset import Units, AtommanSystemLoad
 from ...input import value, boolean
-from ...tools import aslist, dict_insert
 
 class CrystalSpaceGroup(Calculation):
     """Class for managing space group analysis of crystals"""
 
 ############################# Core properties #################################
 
-    def __init__(self, model=None, name=None, params=None, **kwargs):
-        """Initializes a Calculation object for a given style."""
-        
+    def __init__(self,
+                 model: Union[str, Path, IOBase, DM, None]=None,
+                 name: Optional[str]=None,
+                 params: Union[str, Path, IOBase, dict] = None,
+                 **kwargs: any):
+        """
+        Initializes a Calculation object for a given style.
+
+        Parameters
+        ----------
+        model : str, file-like object or DataModelDict, optional
+            Record content in data model format to read in.  Cannot be given
+            with params.
+        name : str, optional
+            The name to use for saving the record.  By default, this should be
+            the calculation's key.
+        params : str, file-like object or dict, optional
+            Calculation input parameters or input parameter file.  Cannot be
+            given with model.
+        **kwargs : any
+            Any other core Calculation record attributes to set.  Cannot be
+            given with model.
+        """
         # Initialize subsets used by the calculation
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
@@ -54,7 +75,7 @@ class CrystalSpaceGroup(Calculation):
                          subsets=subsets, **kwargs)
 
     @property
-    def filenames(self):
+    def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
             'crystal_space_group.py'
@@ -63,86 +84,89 @@ class CrystalSpaceGroup(Calculation):
 ############################## Class attributes ###############################
 
     @property
-    def units(self):
+    def units(self) -> Units:
         """Units subset"""
         return self.__units
 
     @property
-    def system(self):
+    def system(self) -> AtommanSystemLoad:
         """AtommanSystemLoad subset"""
         return self.__system
 
     @property
-    def primitivecell(self):
+    def primitivecell(self) -> bool:
         """bool : Indicates if spg_ucell is conventional (False) or primitive (True)."""
         return self.__primitivecell
 
     @primitivecell.setter
-    def primitivecell(self, value):
-        self.__primitivecell = boolean(value)
+    def primitivecell(self, val: bool):
+        self.__primitivecell = boolean(val)
 
     @property
-    def idealcell(self):
+    def idealcell(self) -> bool:
         """bool : Indicates if spg_ucell atoms are averaged (False) or idealized (True)."""
         return self.__idealcell
 
     @idealcell.setter
-    def idealcell(self, value):
-        self.__idealcell = boolean(value)
+    def idealcell(self, val: bool):
+        self.__idealcell = boolean(val)
 
     @property
-    def symmetryprecision(self):
-        """float : Length tolerance used in identifying symmetry of atomic sites and system dimensions"""
+    def symmetryprecision(self) -> float:
+        """
+        float : Length tolerance used in identifying symmetry of atomic sites
+        and system dimensions
+        """
         return self.__symmetryprecision
 
     @symmetryprecision.setter
-    def symmetryprecision(self, value):
-        self.__symmetryprecision = float(value)
+    def symmetryprecision(self, val: float):
+        self.__symmetryprecision = float(val)
 
     @property
-    def pearson(self):
+    def pearson(self) -> str:
         """str: Pearson symbol."""
         if self.__pearson is None:
             raise ValueError('No results yet!')
         return self.__pearson
 
     @property
-    def number(self):
+    def number(self) -> int:
         """int: Space group number."""
         if self.__number is None:
             raise ValueError('No results yet!')
         return self.__number
-    
+
     @property
-    def international(self):
+    def international(self) -> str:
         """str: Space group International symbol."""
         if self.__international is None:
             raise ValueError('No results yet!')
         return self.__international
 
     @property
-    def schoenflies(self):
+    def schoenflies(self) -> str:
         """str: Space group Schoenflies symbol."""
         if self.__schoenflies is None:
             raise ValueError('No results yet!')
         return self.__schoenflies
 
     @property
-    def wyckoffs(self):
+    def wyckoffs(self) -> list:
         """list: Wykoff site letter for each atom."""
         if self.__wyckoffs is None:
             raise ValueError('No results yet!')
         return self.__wyckoffs
 
     @property
-    def wyckoff_fingerprint(self):
+    def wyckoff_fingerprint(self) -> str:
         """str: Combines all Wyckoff letters."""
         if self.__wyckoff_fingerprint is None:
             raise ValueError('No results yet!')
         return self.__wyckoff_fingerprint
 
     @property
-    def spg_ucell(self):
+    def spg_ucell(self) -> am.System:
         """atomman.System: The unit cell identified following the space-group analysis"""
         if self.__spg_ucell is None:
             raise ValueError('No results yet!')
@@ -150,7 +174,9 @@ class CrystalSpaceGroup(Calculation):
             self.__spg_ucell = am.load('system_model', self.__spg_ucell)
         return self.__spg_ucell
 
-    def set_values(self, name=None, **kwargs):
+    def set_values(self,
+                   name: Optional[str] = None,
+                   **kwargs: any):
         """
         Set calculation values directly.  Any terms not given will be set
         or reset to the calculation's default values.
@@ -183,19 +209,32 @@ class CrystalSpaceGroup(Calculation):
         if 'symmetryprecision' in kwargs:
             self.symmetryprecision = kwargs['symmetryprecision']
 
-####################### Parameter file interactions ########################### 
+####################### Parameter file interactions ###########################
 
-    def load_parameters(self, params, key=None):
-        
+    def load_parameters(self,
+                        params: Union[dict, str, IOBase],
+                        key: Optional[str] = None):
+        """
+        Reads in and sets calculation parameters.
+
+        Parameters
+        ----------
+        params : dict, str or file-like object
+            The parameters or parameter file to read in.
+        key : str, optional
+            A new key value to assign to the object.  If not given, will use
+            calc_key field in params if it exists, or leave the key value
+            unchanged.
+        """
         # Load universal content
         input_dict = super().load_parameters(params, key=key)
-        
+
         # Load input/output units
         self.units.load_parameters(input_dict)
-        
+
         # Change default values for subset terms
 
-        # Load calculation-specific strings       
+        # Load calculation-specific strings
 
         # Load calculation-specific booleans
         self.primitivecell = boolean(input_dict.get('primitivecell', False))
@@ -204,16 +243,18 @@ class CrystalSpaceGroup(Calculation):
         # Load calculation-specific integers
 
         # Load calculation-specific unitless floats
-        
+
         # Load calculation-specific floats with units
         self.symmetryprecision = value(input_dict, 'symmetryprecision',
                                        default_unit=self.units.length_unit,
                                        default_term='0.01 angstrom')
-        
+
         # Load initial system
         self.system.load_parameters(input_dict)
 
-    def master_prepare_inputs(self, branch='main', **kwargs):
+    def master_prepare_inputs(self,
+                              branch: str = 'main',
+                              **kwargs: any) -> dict:
         """
         Utility method that build input parameters for prepare according to the
         workflows used by the NIST Interatomic Potentials Repository.  In other
@@ -239,12 +280,12 @@ class CrystalSpaceGroup(Calculation):
 
         # main branch
         if branch == 'main':
-            raise ValueError(f'No main branch: use relax, prototype or reference')
+            raise ValueError('No main branch: use relax, prototype or reference')
 
         elif branch == 'relax':
-            
+
             # Check for required kwargs
-            
+
             # Set default workflow settings
             params['buildcombos'] = [
                 'atomicarchive load_file archive1',
@@ -259,7 +300,7 @@ class CrystalSpaceGroup(Calculation):
 
             # Copy kwargs to params
             for key in kwargs:
-                
+
                 # Rename potential-related terms for buildcombos
                 if key == 'potential_id':
                     params['archive1_potential_LAMMPS_id'] = kwargs[key]
@@ -274,15 +315,15 @@ class CrystalSpaceGroup(Calculation):
                     params['archive1_potential_key'] = kwargs[key]
                     params['archive2_potential_key'] = kwargs[key]
 
-                
+
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
 
         elif branch == 'prototype':
-            
+
             # Check for required kwargs
-            
+
             # Set default workflow settings
             params['buildcombos'] = 'crystalprototype load_file proto'
 
@@ -291,23 +332,23 @@ class CrystalSpaceGroup(Calculation):
                 params[key] = kwargs[key]
 
         elif branch == 'reference':
-            
+
             # Check for required kwargs
-            
+
             # Set default workflow settings
             params['buildcombos'] = 'atomicreference load_file ref'
 
             # Copy kwargs to params
             for key in kwargs:
                 params[key] = kwargs[key]
-        
+
         else:
             raise ValueError(f'Unknown branch {branch}')
 
         return params
 
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The calculation-specific input keys and their descriptions."""
 
         return {
@@ -322,12 +363,12 @@ class CrystalSpaceGroup(Calculation):
                 "A boolean flag indicating if the box dimensions and atomic positions",
                 "are to be idealized based on the space group (True) or averaged based",
                 "on their actual values (False).  Default value is True."]),
-        } 
+        }
 
     @property
-    def singularkeys(self):
+    def singularkeys(self) -> list:
         """list: Calculation keys that can have single values during prepare."""
-        
+
         keys = (
             # Universal keys
             super().singularkeys
@@ -337,12 +378,12 @@ class CrystalSpaceGroup(Calculation):
 
             # Calculation-specific keys
         )
-        return keys 
-    
+        return keys
+
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """list: Calculation key sets that can have multiple values during prepare."""
-        
+
         keys = (
             # Universal multikeys
             super().multikeys +
@@ -351,7 +392,7 @@ class CrystalSpaceGroup(Calculation):
             [
                 self.system.keyset
             ] +
-            
+
             # Run parameter keys
             [
                 [
@@ -366,11 +407,11 @@ class CrystalSpaceGroup(Calculation):
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str: The root element of the content"""
         return 'calculation-crystal-space-group'
 
-    def build_model(self):
+    def build_model(self) -> DM:
         """
         Generates and returns model content based on the values set to object.
         """
@@ -398,7 +439,7 @@ class CrystalSpaceGroup(Calculation):
             calc['space-group']['number'] = self.number
             calc['space-group']['Hermann-Maguin'] = self.international
             calc['space-group']['Schoenflies'] = self.schoenflies
-            
+
             wykoffletters, wykoffmults = np.unique(self.wyckoffs, return_counts=True)
             for letter, mult in zip(wykoffletters, wykoffmults):
                 wykoff = DM()
@@ -413,7 +454,9 @@ class CrystalSpaceGroup(Calculation):
         self._set_model(model)
         return model
 
-    def load_model(self, model, name=None):
+    def load_model(self,
+                   model: Union[str, DM],
+                   name: Optional[str] = None):
         """
         Loads record contents from a given model.
 
@@ -448,101 +491,52 @@ class CrystalSpaceGroup(Calculation):
 
             self.__spg_ucell = DM([('atomic-system', calc['unit-cell-atomic-system'])])
 
-    def mongoquery(self, symmetryprecision=None, idealcell=None,
-                   primitivecell=None, pearson=None, number=None,
-                   international=None, schoenflies=None, **kwargs):
-        """
-        Builds a Mongo-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        symmetryprecision : float or list, optional
-            symmetryprecision parameter value(s) to parse by.
-        idealcell : bool or list, optional
-            idealcell parameter value(s) to parse by.
-        primitivecell : bool or list, optional
-            primitivecell parameter value(s) to parse by.
-        pearson : str or list, optional
-            Pearson symbol(s) to parse by.
-        number : int or list, optional
-            Space group numbers to parse by.
-        international : str or list, optional
-            International space group symbols to parse by.
-        schoenflies : str or list, optional
-            Schoenflies space group symbol(s) to parse by.
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The Mongo-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().mongoquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = f'content.{self.modelroot}'
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.symmetryprecision', symmetryprecision)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.idealcell', idealcell)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.primitivecell', primitivecell)
-        query.str_match.mongo(mquery, f'{root}.Pearson-symbol', pearson)
-        query.str_match.mongo(mquery, f'{root}.space-group.number', number)
-        query.str_match.mongo(mquery, f'{root}.space-group.Hermann-Maguin', international)
-        query.str_match.mongo(mquery, f'{root}.space-group.Schoenflies', schoenflies)
-
-        return mquery
-
-    def cdcsquery(self, symmetryprecision=None, idealcell=None,
-                  primitivecell=None, pearson=None, number=None,
-                  international=None, schoenflies=None, **kwargs):
-        """
-        Builds a CDCS-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        symmetryprecision : float or list, optional
-            symmetryprecision parameter value(s) to parse by.
-        idealcell : bool or list, optional
-            idealcell parameter value(s) to parse by.
-        primitivecell : bool or list, optional
-            primitivecell parameter value(s) to parse by.
-        pearson : str or list, optional
-            Pearson symbol(s) to parse by.
-        number : int or list, optional
-            Space group numbers to parse by.
-        international : str or list, optional
-            International space group symbols to parse by.
-        schoenflies : str or list, optional
-            Schoenflies space group symbol(s) to parse by.
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The CDCS-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().cdcsquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = self.modelroot
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.symmetryprecision', symmetryprecision)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.idealcell', idealcell)
-        query.str_match.mongo(mquery, f'{root}.calculation.run-parameter.primitivecell', primitivecell)
-        query.str_match.mongo(mquery, f'{root}.Pearson-symbol', pearson)
-        query.str_match.mongo(mquery, f'{root}.space-group.number', pearson)
-        query.str_match.mongo(mquery, f'{root}.space-group.Hermann-Maguin', international)
-        query.str_match.mongo(mquery, f'{root}.space-group.Schoenflies', schoenflies)
-
-        return mquery
+    @property
+    def queries(self) -> dict:
+        """dict: Query objects and their associated parameter names."""
+        queries = deepcopy(super().queries)
+        queries.update({
+            'symmetryprecision': load_query(
+                style='float_match',
+                name='symmetryprecision',
+                path=f'{self.modelroot}.calculation.run-parameter.symmetryprecision',
+                description='search by the symmetry precision tolerance used'),
+            'idealcell': load_query(
+                style='str_match',
+                name='idealcell',
+                path=f'{self.modelroot}.calculation.run-parameter.idealcell',
+                description='search by the ideal cell setting'),
+            'primitivecell': load_query(
+                style='str_match',
+                name='primitivecell',
+                path=f'{self.modelroot}.calculation.run-parameter.primitivecell',
+                description='search by the primitive cell setting'),
+            'pearson': load_query(
+                style='str_match',
+                name='pearson',
+                path=f'{self.modelroot}.Pearson-symbol',
+                description='search by the Pearson symbol'),
+            'number': load_query(
+                style='int_match',
+                name='number',
+                path=f'{self.modelroot}.space-group.number',
+                description='search by the space group number'),
+            'international': load_query(
+                style='str_match',
+                name='international',
+                path=f'{self.modelroot}.space-group.Hermann-Maguin',
+                description='search by the space group international Hermann-Maguin symbol'),
+            'schoenflies': load_query(
+                style='str_contains',
+                name='schoenflies',
+                path=f'{self.modelroot}.space-group.Schoenflies',
+                description='search by the space group Schoenflies symbol'),
+        })
+        return queries
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self):
+    def metadata(self) -> dict:
         """
         Generates a dict of simple metadata values associated with the record.
         Useful for quickly comparing records and for building pandas.DataFrames
@@ -555,7 +549,7 @@ class CrystalSpaceGroup(Calculation):
         meta['symmetryprecision'] = self.symmetryprecision
         meta['idealcell'] = self.idealcell
         meta['primitivecell'] = self.primitivecell
-        
+
         # Extract results
         if self.status == 'finished':
             meta['pearson_symbol'] = self.pearson
@@ -575,91 +569,37 @@ class CrystalSpaceGroup(Calculation):
         return meta
 
     @property
-    def compare_terms(self):
+    def compare_terms(self) -> list:
         """list: The terms to compare metadata values absolutely."""
         return [
             'script',
-            
+
             'parent_key',
             'load_options',
-            
+
             'primitivecell',
             'idealcell',
         ]
-    
+
     @property
-    def compare_fterms(self):
+    def compare_fterms(self) -> dict:
         """dict: The terms to compare metadata values using a tolerance."""
         return {
             'symmetryprecision':1e-5,
         }
 
-    def pandasfilter(self, dataframe, symmetryprecision=None, idealcell=None,
-                     primitivecell=None,
-                     pearson=None, number=None, international=None, schoenflies=None,
-                     **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        symmetryprecision : float or list, optional
-            symmetryprecision parameter value(s) to parse by.
-        idealcell : bool or list, optional
-            idealcell parameter value(s) to parse by.
-        primitivecell : bool or list, optional
-            primitivecell parameter value(s) to parse by.
-        pearson : str or list, optional
-            Pearson symbol(s) to parse by.
-        number : int or list, optional
-            Space group numbers to parse by.
-        international : str or list, optional
-            International space group symbols to parse by.
-        schoenflies : str or list, optional
-            Schoenflies space group symbol(s) to parse by.
-        kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets. 
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        # Call super to filter by universal and subset terms
-        matches = super().pandasfilter(dataframe, **kwargs)
-
-        # Filter by calculation-specific terms
-        matches = (matches
-            &query.str_match.pandas(dataframe, 'symmetryprecision', symmetryprecision)
-            &query.str_match.pandas(dataframe, 'idealcell', idealcell)
-            &query.str_match.pandas(dataframe, 'primitivecell', primitivecell)
-            &query.str_match.pandas(dataframe, 'pearson', pearson)
-            &query.str_match.pandas(dataframe, 'number', number)
-            &query.str_match.pandas(dataframe, 'international', international)
-            &query.str_match.pandas(dataframe, 'schoenflies', schoenflies) 
-        )
-        
-        return matches
-
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self):
+    def calc_inputs(self) -> dict:
         """Builds calculation inputs from the class's attributes"""
-        
+
         # Initialize input_dict
         input_dict = {}
 
         # Add subset inputs
         for subset in self.subsets:
             subset.calc_inputs(input_dict)
-        
+
         # Modify subset inputs
         input_dict['system'] = input_dict.pop('ucell')
 
@@ -670,8 +610,8 @@ class CrystalSpaceGroup(Calculation):
 
         # Return input_dict
         return input_dict
-    
-    def process_results(self, results_dict):
+
+    def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
         attributes.

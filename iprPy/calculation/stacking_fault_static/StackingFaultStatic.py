@@ -1,16 +1,11 @@
 # coding: utf-8
 
 # Standard Python libraries
-import uuid
-from copy import deepcopy
-
-import numpy as np
-
-from yabadaba import query
+from io import IOBase
+from pathlib import Path
+from typing import Optional, Union
 
 # https://github.com/usnistgov/atomman
-import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/DataModelDict
@@ -19,18 +14,38 @@ from DataModelDict import DataModelDict as DM
 # iprPy imports
 from .. import Calculation
 from .stacking_fault_static import stackingfault
-from ...calculation_subset import *
-from ...input import value, boolean
-from ...tools import aslist, dict_insert
+from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
+                                   AtommanSystemLoad, LammpsMinimize,
+                                   StackingFault)
 
 class StackingFaultStatic(Calculation):
     """Class for managing stacking fault energy calculations"""
 
 ############################# Core properties #################################
 
-    def __init__(self, model=None, name=None, params=None, **kwargs):
-        """Initializes a Calculation object for a given style."""
-        
+    def __init__(self,
+                 model: Union[str, Path, IOBase, DM, None]=None,
+                 name: Optional[str]=None,
+                 params: Union[str, Path, IOBase, dict] = None,
+                 **kwargs: any):
+        """
+        Initializes a Calculation object for a given style.
+
+        Parameters
+        ----------
+        model : str, file-like object or DataModelDict, optional
+            Record content in data model format to read in.  Cannot be given
+            with params.
+        name : str, optional
+            The name to use for saving the record.  By default, this should be
+            the calculation's key.
+        params : str, file-like object or dict, optional
+            Calculation input parameters or input parameter file.  Cannot be
+            given with model.
+        **kwargs : any
+            Any other core Calculation record attributes to set.  Cannot be
+            given with model.
+        """
         # Initialize subsets used by the calculation
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
@@ -50,7 +65,7 @@ class StackingFaultStatic(Calculation):
         self.__potential_energy_defect = None
         self.__gsf_energy = None
         self.__gsf_displacement = None
-        
+
         # Define calc shortcut
         self.calc = stackingfault
 
@@ -59,7 +74,7 @@ class StackingFaultStatic(Calculation):
                          subsets=subsets, **kwargs)
 
     @property
-    def filenames(self):
+    def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
             'stacking_fault_static.py',
@@ -69,96 +84,98 @@ class StackingFaultStatic(Calculation):
 ############################## Class attributes ###############################
 
     @property
-    def commands(self):
+    def commands(self) -> LammpsCommands:
         """LammpsCommands subset"""
         return self.__commands
 
     @property
-    def potential(self):
+    def potential(self) -> LammpsPotential:
         """LammpsPotential subset"""
         return self.__potential
 
     @property
-    def units(self):
+    def units(self) -> Units:
         """Units subset"""
         return self.__units
 
     @property
-    def system(self):
+    def system(self) -> AtommanSystemLoad:
         """AtommanSystemLoad subset"""
         return self.__system
-    
+
     @property
-    def minimize(self):
+    def minimize(self) -> LammpsMinimize:
         """LammpsMinimize subset"""
         return self.__minimize
 
     @property
-    def defect(self):
+    def defect(self) -> StackingFault:
         """StackingFault subset"""
         return self.__defect
 
     @property
-    def a1(self):
+    def a1(self) -> float:
         """float: Fractional shift along the a1vect direction to apply"""
         return self.__a1
 
     @a1.setter
-    def a1(self, value):
-        self.__a1 = float(value)
+    def a1(self, val: float):
+        self.__a1 = float(val)
 
     @property
-    def a2(self):
+    def a2(self)-> float:
         """float: Fractional shift along the a2vect direction to apply"""
         return self.__a2
 
     @a2.setter
-    def a2(self, value):
-        self.__a2 = float(value)
+    def a2(self, val: float):
+        self.__a2 = float(val)
 
     @property
-    def dumpfile_base(self):
+    def dumpfile_base(self) -> str:
         """str: Name of the LAMMPS dump file of the 0 shift reference system"""
         if self.__dumpfile_base is None:
             raise ValueError('No results yet!')
         return self.__dumpfile_base
-    
+
     @property
-    def dumpfile_defect(self):
+    def dumpfile_defect(self) -> str:
         """str: Name of the LAMMPS dump file of the defect system"""
         if self.__dumpfile_defect is None:
             raise ValueError('No results yet!')
         return self.__dumpfile_defect
 
     @property
-    def potential_energy_base(self):
+    def potential_energy_base(self)-> float:
         """float: Potential energy of the 0 shift reference system"""
         if self.__potential_energy_base is None:
             raise ValueError('No results yet!')
         return self.__potential_energy_base
 
     @property
-    def potential_energy_defect(self):
+    def potential_energy_defect(self)-> float:
         """float: Potential energy of the defect system"""
         if self.__potential_energy_defect is None:
             raise ValueError('No results yet!')
         return self.__potential_energy_defect
 
     @property
-    def gsf_displacement(self):
+    def gsf_displacement(self)-> float:
         """float: Difference in planar displacement between reference and defect systems"""
         if self.__gsf_displacement is None:
             raise ValueError('No results yet!')
         return self.__gsf_displacement
 
     @property
-    def gsf_energy(self):
+    def gsf_energy(self)-> float:
         """float: Generalized stacking fault energy associated with the defect system"""
         if self.__gsf_energy is None:
             raise ValueError('No results yet!')
         return self.__gsf_energy
 
-    def set_values(self, name=None, **kwargs):
+    def set_values(self,
+                   name: Optional[str] = None,
+                   **kwargs: any):
         """
         Set calculation values directly.  Any terms not given will be set
         or reset to the calculation's default values.
@@ -185,10 +202,23 @@ class StackingFaultStatic(Calculation):
         if 'a2' in kwargs:
             self.a2 = kwargs['a2']
 
-####################### Parameter file interactions ########################### 
+####################### Parameter file interactions ###########################
 
-    def load_parameters(self, params, key=None):
-        
+    def load_parameters(self,
+                        params: Union[dict, str, IOBase],
+                        key: Optional[str] = None):
+        """
+        Reads in and sets calculation parameters.
+
+        Parameters
+        ----------
+        params : dict, str or file-like object
+            The parameters or parameter file to read in.
+        key : str, optional
+            A new key value to assign to the object.  If not given, will use
+            calc_key field in params if it exists, or leave the key value
+            unchanged.
+        """
         # Load universal content
         input_dict = super().load_parameters(params, key=key)
         
@@ -227,7 +257,9 @@ class StackingFaultStatic(Calculation):
         # Load defect parameters
         self.defect.load_parameters(input_dict)
 
-    def master_prepare_inputs(self, branch='main', **kwargs):
+    def master_prepare_inputs(self,
+                              branch: str = 'main',
+                              **kwargs: any) -> dict:
         """
         Utility method that build input parameters for prepare according to the
         workflows used by the NIST Interatomic Potentials Repository.  In other
@@ -248,9 +280,9 @@ class StackingFaultStatic(Calculation):
             The full set of prepare parameters based on the workflow branch
         """
         raise NotImplementedError('Not implemented for this calculation style')
-    
+
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The calculation-specific input keys and their descriptions."""
 
         return {
@@ -258,12 +290,12 @@ class StackingFaultStatic(Calculation):
                 "The fractional shift to apply along the a1 direction."]),
             'stackingfault_a2': ' '.join([
                 "The fractional shift to apply along the a2 direction."]),
-        } 
+        }
 
     @property
-    def singularkeys(self):
+    def singularkeys(self) -> list:
         """list: Calculation keys that can have single values during prepare."""
-        
+
         keys = (
             # Universal keys
             super().singularkeys
@@ -274,10 +306,10 @@ class StackingFaultStatic(Calculation):
 
             # Calculation-specific keys
         )
-        return keys 
+        return keys
 
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """list: Calculation key sets that can have multiple values during prepare."""
 
         keys = (
@@ -286,36 +318,36 @@ class StackingFaultStatic(Calculation):
 
             # Combination of potential and system keys
             [
-                self.potential.keyset + 
+                self.potential.keyset +
                 self.system.keyset
             ] +
 
             # Defect multikeys
-            self.defect.multikeys + 
-                
+            self.defect.multikeys +
+
             # Run parameter keys
-            [    
+            [
                 [
                     'stackingfault_a1',
                     'stackingfault_a2',
                 ]
-            ] +   
-                
+            ] +
+
             # Minimize keys
             [
                 self.minimize.keyset
             ]
-        ) 
+        )
         return keys
 
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str: The root element of the content"""
         return 'calculation-stacking-fault-static'
 
-    def build_model(self):
+    def build_model(self) -> DM:
         """
         Generates and returns model content based on the values set to object.
         """
@@ -336,10 +368,10 @@ class StackingFaultStatic(Calculation):
         if 'run-parameter' not in calc['calculation']:
             calc['calculation']['run-parameter'] = DM()
         run_params = calc['calculation']['run-parameter']
-        
+
         run_params['stackingfault_a1'] = self.a1
         run_params['stackingfault_a2'] = self.a2
-        
+
         # Build results
         if self.status == 'finished':
             calc['defect-free-system'] = DM()
@@ -347,9 +379,9 @@ class StackingFaultStatic(Calculation):
             calc['defect-free-system']['artifact']['file'] = self.dumpfile_base
             calc['defect-free-system']['artifact']['format'] = 'atom_dump'
             calc['defect-free-system']['symbols'] = self.system.ucell.symbols
-            calc['defect-free-system']['potential-energy'] = uc.model(self.potential_energy_base, 
+            calc['defect-free-system']['potential-energy'] = uc.model(self.potential_energy_base,
                                                                       self.units.energy_unit)
-            
+
             calc['defect-system'] = DM()
             calc['defect-system']['artifact'] = DM()
             calc['defect-system']['artifact']['file'] = self.dumpfile_defect
@@ -357,12 +389,12 @@ class StackingFaultStatic(Calculation):
             calc['defect-system']['symbols'] = self.system.ucell.symbols
             calc['defect-system']['potential-energy'] = uc.model(self.potential_energy_defect,
                                                                  self.units.energy_unit)
-            
+
             # Save the stacking fault energy
             energy_per_area_unit = f'{self.units.energy_unit}/{self.units.length_unit}^2'
             calc['stacking-fault-energy'] = uc.model(self.gsf_energy,
                                                      energy_per_area_unit)
-            
+
             # Save the plane separation
             calc['plane-separation'] = uc.model(self.gsf_displacement,
                                                 self.units.length_unit)
@@ -370,7 +402,9 @@ class StackingFaultStatic(Calculation):
         self._set_model(model)
         return model
 
-    def load_model(self, model, name=None):
+    def load_model(self,
+                   model: Union[str, DM],
+                   name: Optional[str] = None):
         """
         Loads record contents from a given model.
 
@@ -395,63 +429,16 @@ class StackingFaultStatic(Calculation):
         if self.status == 'finished':
             self.__dumpfile_base = calc['defect-free-system']['artifact']['file']
             self.__potential_energy_base = uc.value_unit(calc['defect-free-system']['potential-energy'])
-            
+
             self.__dumpfile_defect= calc['defect-system']['artifact']['file']
             self.__potential_energy_defect = uc.value_unit(calc['defect-system']['potential-energy'])
 
             self.__gsf_energy = uc.value_unit(calc['stacking-fault-energy'])
             self.__gsf_displacement = uc.value_unit(calc['plane-separation'])
-            
-    def mongoquery(self, **kwargs):
-        """
-        Builds a Mongo-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The Mongo-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().mongoquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = f'content.{self.modelroot}'
-       
-        return mquery
-
-    def cdcsquery(self, **kwargs):
-        
-        """
-        Builds a CDCS-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The CDCS-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().cdcsquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = self.modelroot
-        
-        return mquery
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self):
+    def metadata(self) -> dict:
         """
         Generates a dict of simple metadata values associated with the record.
         Useful for quickly comparing records and for building pandas.DataFrames
@@ -461,7 +448,7 @@ class StackingFaultStatic(Calculation):
         meta = super().metadata()
 
         # Extract calculation-specific content
-        
+
         # Extract results
         if self.status == 'finished':            
             meta['dumpfile_base'] = self.dumpfile_base
@@ -474,69 +461,41 @@ class StackingFaultStatic(Calculation):
         return meta
 
     @property
-    def compare_terms(self):
+    def compare_terms(self) -> list:
         """list: The terms to compare metadata values absolutely."""
         return [
             'script',
-            
+
             'load_file',
             'load_options',
             'symbols',
-            
+
             'potential_LAMMPS_key',
             'potential_key',
-            
+
             'a_mult',
             'b_mult',
             'c_mult',
-            
+
             'stackingfault_key',
         ]
-    
+
     @property
-    def compare_fterms(self):
+    def compare_fterms(self) -> dict:
         """dict: The terms to compare metadata values using a tolerance."""
         return {
             'a1':1e-5,
             'a2':1e-5,
         }
 
-    def isvalid(self):
+    def isvalid(self) -> bool:
         return self.system.family == self.defect.family
-    
-    def pandasfilter(self, dataframe, **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets. 
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        # Call super to filter by universal and subset terms
-        matches = super().pandasfilter(dataframe, **kwargs)
-
-        # Filter by calculation-specific terms
-        
-        return matches
 
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self):
+    def calc_inputs(self) -> dict:
         """Builds calculation inputs from the class's attributes"""
-        
+
         # Initialize input_dict
         input_dict = {}
 
@@ -550,8 +509,8 @@ class StackingFaultStatic(Calculation):
 
         # Return input_dict
         return input_dict
-    
-    def process_results(self, results_dict):
+
+    def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
         attributes.

@@ -1,16 +1,14 @@
 # coding: utf-8
 
 # Standard Python libraries
-import uuid
-from copy import deepcopy
+from io import IOBase
+from pathlib import Path
+from typing import Optional, Union
 
 import numpy as np
 
-from yabadaba import query
-
 # https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/DataModelDict
@@ -19,18 +17,38 @@ from DataModelDict import DataModelDict as DM
 # iprPy imports
 from .. import Calculation
 from .point_defect_static import calc
-from ...calculation_subset import *
-from ...input import value, boolean
-from ...tools import aslist, dict_insert
+from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
+                                   AtommanSystemLoad, AtommanSystemManipulate,
+                                   LammpsMinimize, PointDefect)
 
 class PointDefectStatic(Calculation):
     """Class for managing point defect formation calculations"""
 
 ############################# Core properties #################################
 
-    def __init__(self, model=None, name=None, params=None, **kwargs):
-        """Initializes a Calculation object for a given style."""
-        
+    def __init__(self,
+                 model: Union[str, Path, IOBase, DM, None]=None,
+                 name: Optional[str]=None,
+                 params: Union[str, Path, IOBase, dict] = None,
+                 **kwargs: any):
+        """
+        Initializes a Calculation object for a given style.
+
+        Parameters
+        ----------
+        model : str, file-like object or DataModelDict, optional
+            Record content in data model format to read in.  Cannot be given
+            with params.
+        name : str, optional
+            The name to use for saving the record.  By default, this should be
+            the calculation's key.
+        params : str, file-like object or dict, optional
+            Calculation input parameters or input parameter file.  Cannot be
+            given with model.
+        **kwargs : any
+            Any other core Calculation record attributes to set.  Cannot be
+            given with model.
+        """
         # Initialize subsets used by the calculation
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
@@ -42,7 +60,7 @@ class PointDefectStatic(Calculation):
         subsets = (self.commands, self.potential, self.system,
                    self.system_mods, self.minimize, self.defect, self.units)
 
-        # Initialize unique calculation attributes        
+        # Initialize unique calculation attributes
         self.__system_base = None
         self.__system_defect = None
         self.__dumpfile_base = None
@@ -60,7 +78,7 @@ class PointDefectStatic(Calculation):
         self.__centrosummation = None
         self.__position_shift = None
         self.__db_vect_shift = None
-        
+
         # Define calc shortcut
         self.calc = calc
 
@@ -69,7 +87,7 @@ class PointDefectStatic(Calculation):
                          subsets=subsets, **kwargs)
 
     @property
-    def filenames(self):
+    def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
             'point_defect_static.py',
@@ -79,167 +97,168 @@ class PointDefectStatic(Calculation):
 ############################## Class attributes ################################
 
     @property
-    def commands(self):
+    def commands(self) -> LammpsCommands:
         """LammpsCommands subset"""
         return self.__commands
 
     @property
-    def potential(self):
+    def potential(self) -> LammpsPotential:
         """LammpsPotential subset"""
         return self.__potential
 
     @property
-    def units(self):
+    def units(self) -> Units:
         """Units subset"""
         return self.__units
 
     @property
-    def system(self):
+    def system(self) -> AtommanSystemLoad:
         """AtommanSystemLoad subset"""
         return self.__system
-    
+
     @property
-    def system_mods(self):
+    def system_mods(self) -> AtommanSystemManipulate:
         """AtommanSystemManipulate subset"""
         return self.__system_mods
 
     @property
-    def minimize(self):
+    def minimize(self) -> LammpsMinimize:
         """LammpsMinimize subset"""
         return self.__minimize
 
     @property
-    def defect(self):
+    def defect(self) -> PointDefect:
         """PointDefect subset"""
         return self.__defect
 
     @property
-    def dumpfile_base(self):
+    def dumpfile_base(self) -> str:
         """str: Name of the LAMMPS dump file of the base system"""
         if self.__dumpfile_base is None:
             raise ValueError('No results yet!')
         return self.__dumpfile_base
-    
+
     @property
-    def dumpfile_defect(self):
+    def dumpfile_defect(self) -> str:
         """str: Name of the LAMMPS dump file of the defect system"""
         if self.__dumpfile_defect is None:
             raise ValueError('No results yet!')
         return self.__dumpfile_defect
 
     @property
-    def symbols_base(self):
+    def symbols_base(self) -> list:
         """list: Model symbols for the base system"""
         if self.__symbols_base is None:
             raise ValueError('No results yet!')
         return self.__symbols_base
-    
+
     @property
-    def symbols_defect(self):
+    def symbols_defect(self) -> list:
         """list: Model symbols for the defect system"""
         if self.__symbols_defect is None:
             raise ValueError('No results yet!')
         return self.__symbols_defect
 
     @property
-    def natoms_base(self):
+    def natoms_base(self) -> int:
         """int: Number of atoms in the base system"""
         if self.__natoms_base is None:
             raise ValueError('No results yet!')
         return self.__natoms_base
-    
+
     @property
-    def natoms_defect(self):
+    def natoms_defect(self) -> int:
         """int: Number of atoms in the defect system"""
         if self.__natoms_defect is None:
             raise ValueError('No results yet!')
         return self.__natoms_defect
 
     @property
-    def system_base(self):
+    def system_base(self) -> am.System:
         """atomman.System: The base system"""
         if self.__system_base is None:
             raise ValueError('System not set/loaded!')
         return self.__system_base
-            
+
     @property
-    def system_defect(self):
+    def system_defect(self) -> am.System:
         """atomman.System: The defect system"""
         if self.__system_defect is None:
             raise ValueError('System not set/loaded!')
         return self.__system_defect
 
     @system_defect.setter
-    def system_defect(self, value):
-        if isinstance(value, am.System) or value is None:
-            self.__system_defect = value
+    def system_defect(self, val: Optional[am.System]):
+        if isinstance(val, am.System) or val is None:
+            self.__system_defect = val
         else:
             raise ValueError('system_defect must be a System or None')
 
     @property
-    def potential_energy_base(self):
+    def potential_energy_base(self) -> float:
         """float: Potential energy of the base system"""
         if self.__potential_energy_base is None:
             raise ValueError('No results yet!')
         return self.__potential_energy_base
 
     @property
-    def potential_energy_defect(self):
+    def potential_energy_defect(self) -> float:
         """float: Potential energy of the defect system"""
         if self.__potential_energy_defect is None:
             raise ValueError('No results yet!')
         return self.__potential_energy_defect
 
     @property
-    def potential_energy(self):
+    def potential_energy(self) -> float:
         """float: Potential energy per atom for the base system"""
         if self.__potential_energy is None:
             raise ValueError('No results yet!')
         return self.__potential_energy
 
     @property
-    def formation_energy(self):
+    def formation_energy(self) -> float:
         """float: Point defect formation energy"""
         if self.__formation_energy is None:
             raise ValueError('No results yet!')
         return self.__formation_energy
 
     @property
-    def dipole_tensor(self):
+    def dipole_tensor(self) -> np.ndarray:
         """numpy.NDArray: The elastic dipole tensor for the point defect"""
         if self.__dipole_tensor is None:
             raise ValueError('No results yet!')
         return self.__dipole_tensor
 
     @property
-    def has_reconfigured(self):
+    def has_reconfigured(self) -> bool:
         """bool: Flag for if checks indicate the defect has reconfigured"""
         if self.__has_reconfigured is None:
             raise ValueError('No results yet!')
         return self.__has_reconfigured
-        
+
     @property
-    def centrosummation(self):
+    def centrosummation(self) -> np.ndarray:
         """numpy.NDArray: sum of relative neighbor coordinates after relaxing"""
         if self.__centrosummation is None:
             raise ValueError('No results yet!')
         return self.__centrosummation
-        
+
     @property
-    def position_shift(self):
+    def position_shift(self) -> np.ndarray:
         """numpy.NDArray: shift in defect's position after relaxing"""
         if self.__position_shift is None:
             raise ValueError('Value not set!')
         return self.__position_shift
-    
+
     @property
-    def db_vect_shift(self):
+    def db_vect_shift(self) -> np.ndarray:
         """numpy.NDArray: Change in dumbbell vector after relaxing"""
         if self.__db_vect_shift is None:
             raise ValueError('Value not set!')
         return self.__db_vect_shift
 
     def load_system_base(self):
+        """Load the base system from the database"""
         if self.__system_base is None:
             fname = self.dumpfile_base
             tar = self.database.get_tar(record=self)
@@ -247,13 +266,16 @@ class PointDefectStatic(Calculation):
             self.__system_base = am.load('atom_dump', f, symbols=self.symbols_base)
 
     def load_system_defect(self):
+        """Load the defect system from the database"""
         if self.__system_defect is None:
             fname = self.dumpfile_defect
             tar = self.database.get_tar(record=self)
             f = tar.extractfile(fname)
             self.__system_defect = am.load('atom_dump', f, symbols=self.symbols_defect)
 
-    def set_values(self, name=None, **kwargs):
+    def set_values(self,
+                   name: Optional[str] = None,
+                   **kwargs: any):
         """
         Set calculation values directly.  Any terms not given will be set
         or reset to the calculation's default values.
@@ -272,16 +294,29 @@ class PointDefectStatic(Calculation):
 
         # Set calculation-specific values
 
-####################### Parameter file interactions ########################### 
+####################### Parameter file interactions ###########################
 
-    def load_parameters(self, params, key=None):
-        
+    def load_parameters(self,
+                        params: Union[dict, str, IOBase],
+                        key: Optional[str] = None):
+        """
+        Reads in and sets calculation parameters.
+
+        Parameters
+        ----------
+        params : dict, str or file-like object
+            The parameters or parameter file to read in.
+        key : str, optional
+            A new key value to assign to the object.  If not given, will use
+            calc_key field in params if it exists, or leave the key value
+            unchanged.
+        """
         # Load universal content
         input_dict = super().load_parameters(params, key=key)
-        
+
         # Load input/output units
         self.units.load_parameters(input_dict)
-        
+
         # Change default values for subset terms
         input_dict['sizemults'] = input_dict.get('sizemults', '5 5 5')
         input_dict['forcetolerance'] = input_dict.get('forcetolerance',
@@ -290,16 +325,16 @@ class PointDefectStatic(Calculation):
         # Load calculation-specific strings
 
         # Load calculation-specific booleans
-        
+
         # Load calculation-specific integers
 
         # Load calculation-specific unitless floats
 
         # Load calculation-specific floats with units
-        
+
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
-        
+
         # Load minimization parameters
         self.minimize.load_parameters(input_dict)
 
@@ -308,7 +343,7 @@ class PointDefectStatic(Calculation):
 
         # Load initial system
         self.system.load_parameters(input_dict)
-        
+
         # Load defect parameters
         self.defect.load_parameters(input_dict)
 
@@ -316,7 +351,9 @@ class PointDefectStatic(Calculation):
         self.system_mods.load_parameters(input_dict)
 
 
-    def master_prepare_inputs(self, branch='main', **kwargs):
+    def master_prepare_inputs(self,
+                              branch: str = 'main',
+                              **kwargs: any) -> dict:
         """
         Utility method that build input parameters for prepare according to the
         workflows used by the NIST Interatomic Potentials Repository.  In other
@@ -342,7 +379,7 @@ class PointDefectStatic(Calculation):
 
         # main branch
         if branch == 'main':
-            
+
             # Check for required kwargs
             assert 'lammps_command' in kwargs
 
@@ -360,11 +397,11 @@ class PointDefectStatic(Calculation):
 
             # Copy kwargs to params
             for key in kwargs:
-                
+
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
                     params[f'parent_{key}'] = kwargs[key]
-                
+
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
@@ -373,11 +410,11 @@ class PointDefectStatic(Calculation):
             raise ValueError(f'Unknown branch {branch}')
 
         return params
- 
+
     @property
-    def singularkeys(self):
+    def singularkeys(self) -> list:
         """list: Calculation keys that can have single values during prepare."""
-        
+
         keys = (
             # Universal keys
             super().singularkeys
@@ -388,10 +425,10 @@ class PointDefectStatic(Calculation):
 
             # Calculation-specific keys
         )
-        return keys 
+        return keys
 
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """list: Calculation key sets that can have multiple values during prepare."""
 
         keys = (
@@ -400,7 +437,7 @@ class PointDefectStatic(Calculation):
 
             # Combination of potential and system keys
             [
-                self.potential.keyset + 
+                self.potential.keyset +
                 self.system.keyset
             ] +
 
@@ -418,17 +455,17 @@ class PointDefectStatic(Calculation):
             [
                 self.minimize.keyset
             ]
-        )                     
+        )
         return keys
 
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str: The root element of the content"""
         return 'calculation-point-defect-static'
 
-    def build_model(self):
+    def build_model(self) -> DM:
         """
         Generates and returns model content based on the values set to object.
         """
@@ -451,9 +488,9 @@ class PointDefectStatic(Calculation):
             calc['defect-free-system']['artifact']['file'] = self.dumpfile_base
             calc['defect-free-system']['artifact']['format'] = 'atom_dump'
             calc['defect-free-system']['symbols'] = self.symbols_base
-            calc['defect-free-system']['potential-energy'] = uc.model(self.potential_energy_base, 
+            calc['defect-free-system']['potential-energy'] = uc.model(self.potential_energy_base,
                                                                       self.units.energy_unit)
-            
+
             calc['defect-system'] = DM()
             calc['defect-system']['artifact'] = DM()
             calc['defect-system']['artifact']['file'] = self.dumpfile_defect
@@ -461,7 +498,7 @@ class PointDefectStatic(Calculation):
             calc['defect-system']['symbols'] = self.symbols_defect
             calc['defect-system']['potential-energy'] = uc.model(self.potential_energy_defect,
                                                                  self.units.energy_unit)
-            
+
             # Save the calculation results
             calc['cohesive-energy'] = uc.model(self.potential_energy,
                                                self.units.energy_unit)
@@ -470,7 +507,7 @@ class PointDefectStatic(Calculation):
                                                        self.units.energy_unit)
             calc['defect-elastic-dipole-tensor'] = uc.model(self.dipole_tensor,
                                                             self.units.energy_unit)
-            
+
             # Save the reconfiguration checks
             calc['reconfiguration-check'] = r_c = DM()
             r_c['has_reconfigured'] = self.has_reconfigured
@@ -483,7 +520,9 @@ class PointDefectStatic(Calculation):
         self._set_model(model)
         return model
 
-    def load_model(self, model, name=None):
+    def load_model(self,
+                   model: Union[str, DM],
+                   name: Optional[str] = None):
         """
         Loads record contents from a given model.
 
@@ -505,16 +544,16 @@ class PointDefectStatic(Calculation):
             self.__symbols_base = calc['defect-free-system']['symbols']
             self.__potential_energy_base = uc.value_unit(calc['defect-free-system']['potential-energy'])
             self.__natoms_base = None
-            
+
             self.__dumpfile_defect= calc['defect-system']['artifact']['file']
             self.__symbols_defect = calc['defect-system']['symbols']
             self.__potential_energy_defect = uc.value_unit(calc['defect-system']['potential-energy'])
             self.__natoms_defect = calc['number-of-atoms']
-            
+
             self.__potential_energy = uc.value_unit(calc['cohesive-energy'])
             self.__formation_energy = uc.value_unit(calc['defect-formation-energy'])
             self.__dipole_tensor = uc.value_unit(calc['defect-elastic-dipole-tensor'])
-            
+
             # Save the reconfiguration checks
             r_c = calc['reconfiguration-check']
             self.__has_reconfigured = r_c['has_reconfigured']
@@ -527,57 +566,10 @@ class PointDefectStatic(Calculation):
                 self.__db_vect_shift = np.array(r_c['db_vect_shift'])
             else:
                 self.__db_vect_shift = None
-            
-    def mongoquery(self, **kwargs):
-        """
-        Builds a Mongo-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The Mongo-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().mongoquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = f'content.{self.modelroot}'
-       
-        return mquery
-
-    def cdcsquery(self, **kwargs):
-        
-        """
-        Builds a CDCS-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The CDCS-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().cdcsquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = self.modelroot
-        
-        return mquery
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self):
+    def metadata(self) -> dict:
         """
         Generates a dict of simple metadata values associated with the record.
         Useful for quickly comparing records and for building pandas.DataFrames
@@ -587,7 +579,7 @@ class PointDefectStatic(Calculation):
         meta = super().metadata()
 
         # Extract calculation-specific content
-        
+
         # Extract results
         if self.status == 'finished':            
             meta['dumpfile_base'] = self.dumpfile_base
@@ -601,76 +593,48 @@ class PointDefectStatic(Calculation):
             meta['centrosummation'] = self.centrosummation
             try:
                 meta['position_shift'] = self.position_shift
-            except:
+            except ValueError:
                 pass
             try:
                 meta['db_vect_shift'] = self.db_vect_shift
-            except:
+            except ValueError:
                 pass
 
         return meta
 
     @property
-    def compare_terms(self):
+    def compare_terms(self) -> list:
         """list: The terms to compare metadata values absolutely."""
         return [
             'script',
-            
+
             'load_file',
             'load_options',
             'symbols',
-            
+
             'potential_LAMMPS_key',
             'potential_key',
-            
+
             'a_mult',
             'b_mult',
             'c_mult',
-            
+
             'pointdefect_key',
         ]
-    
+
     @property
-    def compare_fterms(self):
+    def compare_fterms(self) -> dict:
         """dict: The terms to compare metadata values using a tolerance."""
         return {}
 
-    def isvalid(self):
+    def isvalid(self) -> bool:
         return self.system.family == self.defect.family
-    
-    def pandasfilter(self, dataframe, **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets. 
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        # Call super to filter by universal and subset terms
-        matches = super().pandasfilter(dataframe, **kwargs)
-
-        # Filter by calculation-specific terms
-        
-        return matches
 
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self):
+    def calc_inputs(self) -> dict:
         """Builds calculation inputs from the class's attributes"""
-        
+
         # Initialize input_dict
         input_dict = {}
 
@@ -685,8 +649,8 @@ class PointDefectStatic(Calculation):
 
         # Return input_dict
         return input_dict
-    
-    def process_results(self, results_dict):
+
+    def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
         attributes.

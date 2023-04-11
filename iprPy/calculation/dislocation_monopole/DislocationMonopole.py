@@ -1,17 +1,15 @@
 # coding: utf-8
 
 # Standard Python libraries
-import uuid
-from copy import deepcopy
+from io import IOBase
+from pathlib import Path
+from typing import Optional, Union
 import random
 
 import numpy as np
 
-from yabadaba import query
-
 # https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/DataModelDict
@@ -20,18 +18,39 @@ from DataModelDict import DataModelDict as DM
 # iprPy imports
 from .. import Calculation
 from .dislocation_monopole import dislocation_monopole
-from ...calculation_subset import *
+from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
+                                   AtommanSystemLoad, LammpsMinimize, Dislocation,
+                                   AtommanElasticConstants)
 from ...input import value, boolean
-from ...tools import aslist, dict_insert
 
 class DislocationMonopole(Calculation):
     """Class for managing dislocation monopole constructions and relaxation"""
 
 ############################# Core properties #################################
 
-    def __init__(self, model=None, name=None, params=None, **kwargs):
-        """Initializes a Calculation object for a given style."""
-        
+    def __init__(self,
+                 model: Union[str, Path, IOBase, DM, None]=None,
+                 name: Optional[str]=None,
+                 params: Union[str, Path, IOBase, dict] = None,
+                 **kwargs: any):
+        """
+        Initializes a Calculation object for a given style.
+
+        Parameters
+        ----------
+        model : str, file-like object or DataModelDict, optional
+            Record content in data model format to read in.  Cannot be given
+            with params.
+        name : str, optional
+            The name to use for saving the record.  By default, this should be
+            the calculation's key.
+        params : str, file-like object or dict, optional
+            Calculation input parameters or input parameter file.  Cannot be
+            given with model.
+        **kwargs : any
+            Any other core Calculation record attributes to set.  Cannot be
+            given with model.
+        """
         # Initialize subsets used by the calculation
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
@@ -58,7 +77,7 @@ class DislocationMonopole(Calculation):
         self.__dislocation = None
         self.__preln = None
         self.__K_tensor = None
-        
+
         # Define calc shortcut
         self.calc = dislocation_monopole
 
@@ -67,7 +86,7 @@ class DislocationMonopole(Calculation):
                          subsets=subsets, **kwargs)
 
     @property
-    def filenames(self):
+    def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
             'dislocation_monopole.py',
@@ -77,53 +96,53 @@ class DislocationMonopole(Calculation):
 ############################## Class attributes ###############################
 
     @property
-    def commands(self):
+    def commands(self) -> LammpsCommands:
         """LammpsCommands subset"""
         return self.__commands
 
     @property
-    def potential(self):
+    def potential(self) -> LammpsPotential:
         """LammpsPotential subset"""
         return self.__potential
 
     @property
-    def units(self):
+    def units(self) -> Units:
         """Units subset"""
         return self.__units
 
     @property
-    def system(self):
+    def system(self) -> AtommanSystemLoad:
         """AtommanSystemLoad subset"""
         return self.__system
-    
+
     @property
-    def minimize(self):
+    def minimize(self) -> LammpsMinimize:
         """LammpsMinimize subset"""
         return self.__minimize
 
     @property
-    def defect(self):
+    def defect(self) -> Dislocation:
         """Dislocation subset"""
         return self.__defect
 
     @property
-    def elastic(self):
+    def elastic(self) -> AtommanElasticConstants:
         """AtommanElasticConstants subset"""
         return self.__elastic
 
     @property
-    def annealtemperature(self):
+    def annealtemperature(self) -> float:
         """float: Temperature to use for annealing the system"""
         return self.__annealtemperature
 
     @annealtemperature.setter
-    def annealtemperature(self, value):
-        value = float(value)
-        assert value >= 0.0
-        self.__annealtemperature = float(value)
+    def annealtemperature(self, val: float):
+        val = float(val)
+        assert val >= 0.0
+        self.__annealtemperature = float(val)
 
     @property
-    def annealsteps(self):
+    def annealsteps(self) -> int:
         """int: Number of time steps to use for annealing the system"""
         if self.__annealsteps is None:
             if self.annealtemperature == 0.0:
@@ -134,113 +153,117 @@ class DislocationMonopole(Calculation):
             return self.__annealsteps
 
     @annealsteps.setter
-    def annealsteps(self, value):
-        if value is None:
+    def annealsteps(self, val: int):
+        if val is None:
             self.__annealsteps = None
         else:
-            self.__annealsteps = int(value)
+            self.__annealsteps = int(val)
 
     @property
-    def randomseed(self):
-        """str: MD integration scheme"""
+    def randomseed(self) -> int:
+        """int: random number generator seed to use"""
         return self.__randomseed
 
     @randomseed.setter
-    def randomseed(self, value):
-        if value is None:
-            value = random.randint(1, 900000000)
+    def randomseed(self, val: int):
+        if val is None:
+            val = random.randint(1, 900000000)
         else:
-            value = int(value)
-            assert value > 0 and value <= 900000000
-        self.__randomseed = value
+            val = int(val)
+            assert val > 0 and val <= 900000000
+        self.__randomseed = val
 
     @property
-    def boundaryshape(self):
+    def boundaryshape(self) -> str:
         """str: The shape of the boundary region"""
         return self.__boundaryshape
 
     @boundaryshape.setter
-    def boundaryshape(self, value):
-        assert value in ['cylinder', 'box']
-        self.__boundaryshape = value
+    def boundaryshape(self, val: str):
+        assert val in ['cylinder', 'box']
+        self.__boundaryshape = val
 
     @property
-    def boundarywidth(self):
+    def boundarywidth(self) -> float:
         """float: The minimum width of the boundary region"""
         return self.__boundarywidth
 
     @boundarywidth.setter
-    def boundarywidth(self, value):
-        value = float(value)
-        assert value >= 0.0
-        self.__boundarywidth = float(value)
+    def boundarywidth(self, val: float):
+        val = float(val)
+        assert val >= 0.0
+        self.__boundarywidth = float(val)
 
     @property
-    def boundaryscale(self):
+    def boundaryscale(self) -> bool:
         """bool: Flag indicating if boundarywidth is scaled versus the system or absolute"""
         return self.__boundaryscale
 
     @boundaryscale.setter
-    def boundaryscale(self, value):
-        self.__boundaryscale = boolean(value)
+    def boundaryscale(self, val: bool):
+        self.__boundaryscale = boolean(val)
 
     @property
-    def dumpfile_base(self):
+    def dumpfile_base(self) -> str:
         """str: Name of the LAMMPS dump file of the 0 shift reference system"""
         if self.__dumpfile_base is None:
             raise ValueError('No results yet!')
         return self.__dumpfile_base
-    
+
     @property
-    def dumpfile_defect(self):
+    def dumpfile_defect(self) -> str:
         """str: Name of the LAMMPS dump file of the defect system"""
         if self.__dumpfile_defect is None:
             raise ValueError('No results yet!')
         return self.__dumpfile_defect
 
     @property
-    def symbols_base(self):
+    def symbols_base(self) -> list:
         """list: Model symbols for the base system"""
         if self.__symbols_base is None:
             raise ValueError('No results yet!')
         return self.__symbols_base
-    
+
     @property
-    def symbols_defect(self):
+    def symbols_defect(self) -> list:
         """list: Model symbols for the defect system"""
         if self.__symbols_defect is None:
             raise ValueError('No results yet!')
         return self.__symbols_defect
 
     @property
-    def potential_energy_defect(self):
+    def potential_energy_defect(self) -> float:
         """float: Potential energy of the defect system"""
         if self.__potential_energy_defect is None:
             raise ValueError('No results yet!')
         return self.__potential_energy_defect
 
     @property
-    def dislocation(self):
+    def dislocation(self) -> am.defect.Dislocation:
         """atomman.defect.Dislocation: Volterra dislocation solution"""
         if self.__dislocation is None:
             raise ValueError('No results yet!')
         return self.__dislocation
 
     @property
-    def preln(self):
+    def preln(self) -> float:
+        """float: The dislocation's elastic pre-ln energy factor"""
         if self.__preln is None:
             return self.dislocation.dislsol.preln
         else:
             return self.__preln
 
     @property
-    def K_tensor(self):
+    def K_tensor(self) -> np.ndarray:
+        """numpy.ndarray: The dislocation's elastic K tensor"""
         if self.__K_tensor is None:
             return self.dislocation.dislsol.K_tensor
         else:
             return self.__K_tensor
 
-    def set_values(self, name=None, **kwargs):
+    def set_values(self,
+                   name: Optional[str] = None,
+                   **kwargs: any):
         """
         Set calculation values directly.  Any terms not given will be set
         or reset to the calculation's default values.
@@ -285,16 +308,29 @@ class DislocationMonopole(Calculation):
         if 'boundaryscale' in kwargs:
             self.boundaryscale = kwargs['boundaryscale']
 
-####################### Parameter file interactions ########################### 
+####################### Parameter file interactions ###########################
 
-    def load_parameters(self, params, key=None):
-        
+    def load_parameters(self,
+                        params: Union[dict, str, IOBase],
+                        key: Optional[str] = None):
+        """
+        Reads in and sets calculation parameters.
+
+        Parameters
+        ----------
+        params : dict, str or file-like object
+            The parameters or parameter file to read in.
+        key : str, optional
+            A new key value to assign to the object.  If not given, will use
+            calc_key field in params if it exists, or leave the key value
+            unchanged.
+        """
         # Load universal content
         input_dict = super().load_parameters(params, key=key)
-        
+
         # Load input/output units
         self.units.load_parameters(input_dict)
-        
+
         # Change default values for subset terms
         input_dict['forcetolerance'] = input_dict.get('forcetolerance',
                                                   '1.0e-6 eV/angstrom')
@@ -313,15 +349,15 @@ class DislocationMonopole(Calculation):
 
         # Load calculation-specific unitless floats
         self.annealtemperature = float(input_dict.get('annealtemperature', 0.0))
-        
+
         # Load calculation-specific floats with units
         self.boundarywidth = value(input_dict, 'dislocation_boundarywidth',
                                    default_unit=self.units.length_unit,
                                    default_term='0 angstrom')
-        
+
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
-        
+
         # Load minimization parameters
         self.minimize.load_parameters(input_dict)
 
@@ -337,7 +373,9 @@ class DislocationMonopole(Calculation):
         # Load elastic constants
         self.elastic.load_parameters(input_dict)
 
-    def master_prepare_inputs(self, branch='main', **kwargs):
+    def master_prepare_inputs(self,
+                              branch: str = 'main',
+                              **kwargs: any) -> dict:
         """
         Utility method that build input parameters for prepare according to the
         workflows used by the NIST Interatomic Potentials Repository.  In other
@@ -408,19 +446,19 @@ class DislocationMonopole(Calculation):
 
         # Copy kwargs to params
         for key in kwargs:
-            
+
             # Rename potential-related terms for buildcombos
             if key[:10] == 'potential_':
                 params[f'parent_{key}'] = kwargs[key]
-            
+
             # Copy/overwrite other terms
             else:
                 params[key] = kwargs[key]
 
         return params
-    
+
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The calculation-specific input keys and their descriptions."""
 
         return {
@@ -445,10 +483,10 @@ class DislocationMonopole(Calculation):
             'dislocation_boundaryscale': ' '.join([
                 "Boolean indicating if boundarywidth is taken as Cartesian (False)",
                 "or scaled by the loaded unit cell's a lattice parameter."]),
-        } 
-    
+        }
+
     @property
-    def singularkeys(self):
+    def singularkeys(self) -> list:
         """list: Calculation keys that can have single values during prepare."""
 
         keys = (
@@ -467,24 +505,24 @@ class DislocationMonopole(Calculation):
             ]
         )
         return keys
-    
+
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """list: Calculation key sets that can have multiple values during prepare."""
         keys = (
             # Universal multikeys
             super().multikeys +
-            
+
             # Combination of potential, system and elastic keys
             [
                 self.potential.keyset +
                 self.system.keyset +
                 self.elastic.keyset
             ] +
-            
+
             # Defect multikeys
             self.defect.multikeys + 
-            
+
             # Combination of minimize and run parameter keys
             [
                 self.minimize.keyset + [
@@ -493,17 +531,17 @@ class DislocationMonopole(Calculation):
                     'annealsteps',
                 ]
             ]
-        )       
+        )
         return keys
 
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str: The root element of the content"""
         return 'calculation-dislocation-monopole'
 
-    def build_model(self):
+    def build_model(self) -> DM:
         """
         Generates and returns model content based on the values set to object.
         """
@@ -525,7 +563,7 @@ class DislocationMonopole(Calculation):
         if 'run-parameter' not in calc['calculation']:
             calc['calculation']['run-parameter'] = DM()
         run_params = calc['calculation']['run-parameter']
-        
+
         run_params['dislocation_boundaryshape'] = self.boundaryshape
         run_params['dislocation_boundarywidth'] = self.boundarywidth
         run_params['dislocation_boundaryscale'] = self.boundaryscale
@@ -539,7 +577,7 @@ class DislocationMonopole(Calculation):
             calc['base-system']['artifact']['file'] = self.dumpfile_base
             calc['base-system']['artifact']['format'] = 'atom_dump'
             calc['base-system']['symbols'] = self.symbols_base
-            
+
             calc['defect-system'] = DM()
             calc['defect-system']['artifact'] = DM()
             calc['defect-system']['artifact']['file'] = self.dumpfile_defect
@@ -547,18 +585,20 @@ class DislocationMonopole(Calculation):
             calc['defect-system']['symbols'] = self.symbols_defect
             calc['defect-system']['potential-energy'] = uc.model(self.potential_energy_defect,
                                                                  self.units.energy_unit)
-            
+
             calc['elastic-solution'] = elsol = DM()
             elsol['pre-ln-factor'] = uc.model(self.preln,
                                              f"{self.units.energy_unit}/{self.units.length_unit}")
-            
+
             elsol['K-tensor'] = uc.model(self.K_tensor,
                                          self.units.pressure_unit)
 
         self._set_model(model)
         return model
 
-    def load_model(self, model, name=None):
+    def load_model(self,
+                   model: Union[str, DM],
+                   name: Optional[str] = None):
         """
         Loads record contents from a given model.
 
@@ -586,65 +626,18 @@ class DislocationMonopole(Calculation):
         if self.status == 'finished':
             self.__dumpfile_base = calc['base-system']['artifact']['file']
             self.__symbols_base = calc['base-system']['symbols']
-                        
+
             self.__dumpfile_defect = calc['defect-system']['artifact']['file']
             self.__symbols_defect = calc['defect-system']['symbols']
             self.__potential_energy_defect = uc.value_unit(calc['defect-system']['potential-energy'])
-            
-            elsol = calc['elastic-solution'] 
+
+            elsol = calc['elastic-solution']
             self.__preln = uc.value_unit(elsol['pre-ln-factor'])
             self.__K_tensor = uc.value_unit(elsol['K-tensor'])
 
-    def mongoquery(self, **kwargs):
-        """
-        Builds a Mongo-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The Mongo-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().mongoquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = f'content.{self.modelroot}'
-       
-        return mquery
-
-    def cdcsquery(self, **kwargs):
-        
-        """
-        Builds a CDCS-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The CDCS-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().cdcsquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = self.modelroot
-        
-        return mquery
-
 ########################## Metadata interactions ##############################
 
-    def metadata(self):
+    def metadata(self) -> dict:
         """
         Generates a dict of simple metadata values associated with the record.
         Useful for quickly comparing records and for building pandas.DataFrames
@@ -673,70 +666,42 @@ class DislocationMonopole(Calculation):
         return meta
 
     @property
-    def compare_terms(self):
+    def compare_terms(self) -> list:
         """list: The terms to compare metadata values absolutely."""
         return [
             'script',
-            
+
             'load_file',
             'load_options',
             'symbols',
-            
+
             'potential_LAMMPS_key',
             'potential_key',
-            
+
             'a_mult',
             'b_mult',
             'c_mult',
-            
+
             'dislocation_key',
 
             'annealsteps',
         ]
-    
+
     @property
-    def compare_fterms(self):
+    def compare_fterms(self) -> dict:
         """dict: The terms to compare metadata values using a tolerance."""
         return {
             'annealtemperature':1,
         }
 
-    def isvalid(self):
+    def isvalid(self) -> bool:
         return self.system.family == self.defect.family
-    
-    def pandasfilter(self, dataframe, **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets. 
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        # Call super to filter by universal and subset terms
-        matches = super().pandasfilter(dataframe, **kwargs)
-
-        # Filter by calculation-specific terms
-        
-        return matches
 
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self):
+    def calc_inputs(self) -> dict:
         """Builds calculation inputs from the class's attributes"""
-        
+
         # Initialize input_dict
         input_dict = {}
 
@@ -754,8 +719,8 @@ class DislocationMonopole(Calculation):
 
         # Return input_dict
         return input_dict
-    
-    def process_results(self, results_dict):
+
+    def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
         attributes.

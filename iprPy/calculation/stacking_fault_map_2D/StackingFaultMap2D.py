@@ -1,16 +1,14 @@
 # coding: utf-8
 
 # Standard Python libraries
-import uuid
-from copy import deepcopy
+from io import IOBase
+from pathlib import Path
+from typing import Optional, Union
 
 import numpy as np
 
-from yabadaba import query
-
 # https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/DataModelDict
@@ -19,20 +17,19 @@ from DataModelDict import DataModelDict as DM
 # iprPy imports
 from .. import Calculation
 from .stacking_fault_map_2D import stackingfaultmap
-from ...calculation_subset import *
-from ...input import value, boolean
-from ...tools import aslist, dict_insert
+from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
+                                   AtommanSystemLoad, LammpsMinimize,
+                                   StackingFault)
 
 class StackingFaultPath():
     """Class for managing a path along a stacking fault map"""
 
-    def __init__(self, sp):
+    def __init__(self, sp: DM):
         self.__direction = sp['direction']
         self.__error = sp.get('error', None)
 
         if self.__error is None:
             self.__coord = uc.value_unit(sp['minimum-energy-path'])
-            #self.__path = self.gamma.path(self.coord)
             self.__usf_mep = uc.value_unit(sp['unstable-fault-energy-mep'])
             self.__usf_urp = uc.value_unit(sp['unstable-fault-energy-unrelaxed-path'])
             self.__shear_mep = uc.value_unit(sp['ideal-shear-stress-mep'])
@@ -40,45 +37,64 @@ class StackingFaultPath():
 
         else:
             self.__coord = None
-            #self.__path = None
+
             self.__usf_mep = None
             self.__usf_urp = None
             self.__shear_mep = None
             self.__shear_urp = None
 
     @property
-    def direction(self):
+    def direction(self) -> str:
+        """str: The direction of slip"""
         return self.__direction
 
     @property
-    def coord(self):
+    def coord(self) -> np.ndarray:
+        """numpy.ndarray: Coordinates along the path"""
         return self.__coord
 
-    #@property
-    #def path(self):
-    #    return self.__path
-
     @property
-    def usf_mep(self):
+    def usf_mep(self) -> float:
+        """float: The USF energy found along the minimum energy path"""
         return self.__usf_mep
 
     @property
-    def usf_urp(self):
+    def usf_urp(self) -> float:
+        """float: The USF energy found along the unrelaxed (ideal) path"""
         return self.__usf_urp
 
     @property
-    def shear_mep(self):
+    def shear_mep(self) -> float:
+        """float: The ideal shear stress found along the minimum energy path"""
         return self.__shear_mep
 
     @property
-    def shear_urp(self):
+    def shear_urp(self) -> float:
+        """float: The ideal shear stress found along the unrelaxed (ideal) path"""
         return self.__shear_urp
 
     @property
-    def error(self):
+    def error(self) -> Optional[str]:
+        """str or None: Any error that may have been issued during the MEP calculation"""
         return self.__error
 
-    def build_model(self, length_unit='angstrom', energyperarea_unit='mJ/m^2', stress_unit='GPa'):
+    def build_model(self,
+                    length_unit: str = 'angstrom',
+                    energyperarea_unit: str = 'mJ/m^2',
+                    stress_unit: str = 'GPa') -> DM:
+        """
+        Constructs the model contents associated with the path.
+
+        Parameters
+        ----------
+        length_unit : str, optional
+            The unit of length to use when outputting the path coordinates.
+        energyperarea_unit : str, optional
+            The unit of energy per area to use when outputting the unstable fault
+            energies.
+        stress_unit : str, optional
+            The unit of stress to use when outputting the ideal shear stresses.
+        """
         sp = DM()
         sp['direction'] = self.direction
 
@@ -99,9 +115,30 @@ class StackingFaultMap2D(Calculation):
 
 ############################# Core properties #################################
 
-    def __init__(self, model=None, name=None, params=None, **kwargs):
-        """Initializes a Calculation object for a given style."""
-        
+    def __init__(self,
+                 model: Union[str, Path, IOBase, DM, None]=None,
+                 name: Optional[str]=None,
+                 params: Union[str, Path, IOBase, dict] = None,
+                 **kwargs: any):
+        """
+        Initializes a Calculation object for a given style.
+
+        Parameters
+        ----------
+        model : str, file-like object or DataModelDict, optional
+            Record content in data model format to read in.  Cannot be given
+            with params.
+        name : str, optional
+            The name to use for saving the record.  By default, this should be
+            the calculation's key.
+        params : str, file-like object or dict, optional
+            Calculation input parameters or input parameter file.  Cannot be
+            given with model.
+        **kwargs : any
+            Any other core Calculation record attributes to set.  Cannot be
+            given with model.
+        """
+
         # Initialize subsets used by the calculation
         self.__potential = LammpsPotential(self)
         self.__commands = LammpsCommands(self)
@@ -127,7 +164,7 @@ class StackingFaultMap2D(Calculation):
                          subsets=subsets, **kwargs)
 
     @property
-    def filenames(self):
+    def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
             'stacking_fault_map_2D.py',
@@ -137,55 +174,55 @@ class StackingFaultMap2D(Calculation):
 ############################## Class attributes ###############################
 
     @property
-    def commands(self):
+    def commands(self) -> LammpsCommands:
         """LammpsCommands subset"""
         return self.__commands
 
     @property
-    def potential(self):
+    def potential(self) -> LammpsPotential:
         """LammpsPotential subset"""
         return self.__potential
 
     @property
-    def units(self):
+    def units(self) -> Units:
         """Units subset"""
         return self.__units
 
     @property
-    def system(self):
+    def system(self) -> AtommanSystemLoad:
         """AtommanSystemLoad subset"""
         return self.__system
-    
+
     @property
-    def minimize(self):
+    def minimize(self) -> LammpsMinimize:
         """LammpsMinimize subset"""
         return self.__minimize
 
     @property
-    def defect(self):
+    def defect(self) -> StackingFault:
         """StackingFault subset"""
         return self.__defect
 
     @property
-    def num_a1(self):
+    def num_a1(self) -> int:
         """int: Number of fractional shifts along the a1vect direction to evaluate"""
         return self.__num_a1
 
     @num_a1.setter
-    def num_a1(self, value):
-        self.__num_a1 = int(value)
+    def num_a1(self, val: int):
+        self.__num_a1 = int(val)
 
     @property
-    def num_a2(self):
+    def num_a2(self) -> int:
         """int: Number of fractional shifts along the a2vect direction to evaluate"""
         return self.__num_a2
 
     @num_a2.setter
-    def num_a2(self, value):
-        self.__num_a2 = int(value)
+    def num_a2(self, val: int):
+        self.__num_a2 = int(val)
 
     @property
-    def gamma(self):
+    def gamma(self) -> am.defect.GammaSurface:
         """atomman.defect.GammaSurface: GSF results"""
         if self.__gamma is None:
             raise ValueError('No results yet!')
@@ -194,17 +231,20 @@ class StackingFaultMap2D(Calculation):
         return self.__gamma
 
     @property
-    def paths(self):
+    def paths(self) -> list:
+        """list: Any StackingFaultPath results"""
         if self.__paths is None:
             raise ValueError('No path results!')
         return self.__paths
-            
+
     @property
-    def E_isf(self):
+    def E_isf(self) -> Optional[float]:
         """float or None: Intrinsic stacking fault energy for the plane, if exists and found."""
         return self.__E_isf
 
-    def set_values(self, name=None, **kwargs):
+    def set_values(self,
+                   name: Optional[str] = None,
+                   **kwargs: any):
         """
         Set calculation values directly.  Any terms not given will be set
         or reset to the calculation's default values.
@@ -231,16 +271,29 @@ class StackingFaultMap2D(Calculation):
         if 'num_a2' in kwargs:
             self.num_a2 = kwargs['num_a2']
 
-####################### Parameter file interactions ########################### 
+####################### Parameter file interactions ###########################
 
-    def load_parameters(self, params, key=None):
-        
+    def load_parameters(self,
+                        params: Union[dict, str, IOBase],
+                        key: Optional[str] = None):
+        """
+        Reads in and sets calculation parameters.
+
+        Parameters
+        ----------
+        params : dict, str or file-like object
+            The parameters or parameter file to read in.
+        key : str, optional
+            A new key value to assign to the object.  If not given, will use
+            calc_key field in params if it exists, or leave the key value
+            unchanged.
+        """
         # Load universal content
         input_dict = super().load_parameters(params, key=key)
-        
+
         # Load input/output units
         self.units.load_parameters(input_dict)
-        
+
         # Change default values for subset terms
         input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
         input_dict['forcetolerance'] = input_dict.get('forcetolerance',
@@ -249,18 +302,18 @@ class StackingFaultMap2D(Calculation):
         # Load calculation-specific strings
 
         # Load calculation-specific booleans
-        
+
         # Load calculation-specific integers
         self.num_a1 = int(input_dict.get('stackingfault_num_a1', 10))
         self.num_a2 = int(input_dict.get('stackingfault_num_a2', 10))
 
         # Load calculation-specific unitless floats
-        
+
         # Load calculation-specific floats with units
-        
+
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
-        
+
         # Load minimization parameters
         self.minimize.load_parameters(input_dict)
 
@@ -273,7 +326,9 @@ class StackingFaultMap2D(Calculation):
         # Load defect parameters
         self.defect.load_parameters(input_dict)
 
-    def master_prepare_inputs(self, branch='main', **kwargs):
+    def master_prepare_inputs(self,
+                              branch: str = 'main',
+                              **kwargs: any) -> dict:
         """
         Utility method that build input parameters for prepare according to the
         workflows used by the NIST Interatomic Potentials Repository.  In other
@@ -299,7 +354,7 @@ class StackingFaultMap2D(Calculation):
 
         # main branch
         if branch == 'main':
-            
+
             # Check for required kwargs
             assert 'lammps_command' in kwargs
 
@@ -315,14 +370,14 @@ class StackingFaultMap2D(Calculation):
             params['sizemults'] = '5 5 10'
             params['stackingfault_num_a1'] = '30'
             params['stackingfault_num_a2'] = '30'
-            
+
             # Copy kwargs to params
             for key in kwargs:
-                
+
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
                     params[f'parent_{key}'] = kwargs[key]
-                
+
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
@@ -331,9 +386,9 @@ class StackingFaultMap2D(Calculation):
             raise ValueError(f'Unknown branch {branch}')
 
         return params
-    
+
     @property
-    def templatekeys(self):
+    def templatekeys(self) -> dict:
         """dict : The calculation-specific input keys and their descriptions."""
 
         return {
@@ -343,12 +398,12 @@ class StackingFaultMap2D(Calculation):
             'stackingfault_num_a2': ' '.join([
                 "The number of fractional shift steps to measure along the a2",
                 "shift vector. Default value is 10."]),
-        }  
+        }
 
     @property
-    def singularkeys(self):
+    def singularkeys(self) -> list:
         """list: Calculation keys that can have single values during prepare."""
-        
+
         keys = (
             # Universal keys
             super().singularkeys
@@ -359,10 +414,10 @@ class StackingFaultMap2D(Calculation):
 
             # Calculation-specific keys
         )
-        return keys 
+        return keys
 
     @property
-    def multikeys(self):
+    def multikeys(self) -> list:
         """list: Calculation key sets that can have multiple values during prepare."""
 
         keys = (
@@ -371,36 +426,36 @@ class StackingFaultMap2D(Calculation):
 
             # Combination of potential and system keys
             [
-                self.potential.keyset + 
+                self.potential.keyset +
                 self.system.keyset
             ] +
 
             # Defect multikeys
-            self.defect.multikeys + 
-                
+            self.defect.multikeys +
+
             # Run parameter keys
-            [    
+            [
                 [
                     'stackingfault_num_a1',
                     'stackingfault_num_a2',
                 ]
-            ] +   
-                
+            ] +
+
             # Minimize keys
             [
                 self.minimize.keyset
             ]
-        ) 
+        )
         return keys
 
 ########################### Data model interactions ###########################
 
     @property
-    def modelroot(self):
+    def modelroot(self) -> str:
         """str: The root element of the content"""
         return 'calculation-stacking-fault-map-2D'
 
-    def build_model(self):
+    def build_model(self) -> DM:
         """
         Generates and returns model content based on the values set to object.
         """
@@ -423,7 +478,7 @@ class StackingFaultMap2D(Calculation):
         run_params = calc['calculation']['run-parameter']
         run_params['stackingfault_num_a1'] = self.num_a1
         run_params['stackingfault_num_a2'] = self.num_a2
-        
+
         # Build results
         if self.status == 'finished':
             energy_per_area_unit = f'{self.units.energy_unit}/{self.units.length_unit}^2'
@@ -445,7 +500,9 @@ class StackingFaultMap2D(Calculation):
         self._set_model(model)
         return model
 
-    def load_model(self, model, name=None):
+    def load_model(self,
+                   model: Union[str, DM],
+                   name: Optional[str] = None):
         """
         Loads record contents from a given model.
 
@@ -475,58 +532,11 @@ class StackingFaultMap2D(Calculation):
             if 'slip-path' in calc:
                 self.__paths = []
                 for sp in calc.iteraslist('slip-path'):
-                    self.paths.append(StackingFaultPath(sp))  
-
-    def mongoquery(self, **kwargs):
-        """
-        Builds a Mongo-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The Mongo-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().mongoquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = f'content.{self.modelroot}'
-       
-        return mquery
-
-    def cdcsquery(self, **kwargs):
-        
-        """
-        Builds a CDCS-style query based on kwargs values for the record style.
-
-        Parameters
-        ----------
-        **kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets.        
-        
-        Returns
-        -------
-        dict
-            The CDCS-style query.
-        """
-        # Call super to build universal and subset terms
-        mquery = super().cdcsquery(**kwargs)
-
-        # Build calculation-specific terms
-        root = self.modelroot
-        
-        return mquery
+                    self.paths.append(StackingFaultPath(sp))
 
 ########################## Metadata interactions ##############################
 
-    def metadata(self):
+    def metadata(self) -> dict:
         """
         Generates a dict of simple metadata values associated with the record.
         Useful for quickly comparing records and for building pandas.DataFrames
@@ -536,9 +546,9 @@ class StackingFaultMap2D(Calculation):
         meta = super().metadata()
 
         # Extract calculation-specific content
-        
+
         # Extract results
-        if self.status == 'finished':      
+        if self.status == 'finished':
             if self.E_isf is not None:
                 meta['E_isf'] = self.E_isf
 
@@ -561,69 +571,41 @@ class StackingFaultMap2D(Calculation):
         return meta
 
     @property
-    def compare_terms(self):
+    def compare_terms(self) -> list:
         """list: The terms to compare metadata values absolutely."""
         return [
             'script',
-            
+
             'load_file',
             'load_options',
             'symbols',
-            
+
             'potential_LAMMPS_key',
             'potential_key',
-            
+
             'a_mult',
             'b_mult',
             'c_mult',
-            
+
             'stackingfault_key',
 
             'num_a1',
             'num_a2'
         ]
-    
+
     @property
-    def compare_fterms(self):
+    def compare_fterms(self) -> dict:
         """dict: The terms to compare metadata values using a tolerance."""
         return {}
 
-    def isvalid(self):
+    def isvalid(self) -> bool:
         return self.system.family == self.defect.family
-    
-    def pandasfilter(self, dataframe, **kwargs):
-        """
-        Parses a pandas dataframe containing the subset's metadata to find 
-        entries matching the terms and values given. Ideally, this should find
-        the same matches as the mongoquery and cdcsquery methods for the same
-        search parameters.
-
-        Parameters
-        ----------
-        dataframe : pandas.DataFrame
-            The metadata dataframe to filter.
-        kwargs : any
-            Any extra query terms that are universal for all calculations
-            or associated with one of the calculation's subsets. 
-
-        Returns
-        -------
-        pandas.Series of bool
-            True for each entry where all filter terms+values match, False for
-            all other entries.
-        """
-        # Call super to filter by universal and subset terms
-        matches = super().pandasfilter(dataframe, **kwargs)
-
-        # Filter by calculation-specific terms
-        
-        return matches
 
 ########################### Calculation interactions ##########################
 
-    def calc_inputs(self):
+    def calc_inputs(self) -> dict:
         """Builds calculation inputs from the class's attributes"""
-        
+
         # Initialize input_dict
         input_dict = {}
 
@@ -637,8 +619,8 @@ class StackingFaultMap2D(Calculation):
 
         # Return input_dict
         return input_dict
-    
-    def process_results(self, results_dict):
+
+    def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
         attributes.
