@@ -264,9 +264,18 @@ def phonon_quasiharmonic(lammps_command: str,
     return results
 
 
-def phononcalc(lammps_command, ucell, potential, mpi_command=None,
-               a_mult=2, b_mult=2, c_mult=2, distance=0.01, symprec=1e-5, 
-               istrain='', plot=True, lammps_date=None):
+def phononcalc(lammps_command: str,
+               ucell: am.System,
+               potential: lmp.Potential,
+               mpi_command: Optional[str] = None,
+               a_mult: int = 2,
+               b_mult: int = 2,
+               c_mult: int = 2,
+               distance: float = 0.01,
+               symprec: float = 1e-5,
+               istrain: str = '',
+               plot: bool = True,
+               lammps_date: Optional[datetime.date] = None) -> dict:
     """
     Uses phonopy to compute the phonons for a unit cell structure using a
     LAMMPS interatomic potential.
