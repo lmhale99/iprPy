@@ -1,17 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>relax_box - Methodology and code &#8212; iprPy 0.11.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>relax_box - Methodology and code &#8212; iprPy 0.11.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -35,7 +38,7 @@
         <li class="right" >
           <a href="point_defect_static.html" title="point_defect_static - Methodology and code"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">relax_box - Methodology and code</a></li> 
       </ul>
@@ -51,35 +54,21 @@
 /* CSS for nbsphinx extension */
 
 /* remove conflicting styling from Sphinx themes */
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt *,
-div.nbinput.container div.input_area pre,
-div.nboutput.container div.output_area pre,
-div.nbinput.container div.input_area .highlight,
-div.nboutput.container div.output_area .highlight {
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
     border: none;
-    padding: 0;
+    padding: 0 0;
     margin: 0;
     box-shadow: none;
-}
-
-div.nbinput.container > div[class*=highlight],
-div.nboutput.container > div[class*=highlight] {
-    margin: 0;
-}
-
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt * {
-    background: none;
-}
-
-div.nboutput.container div.output_area .highlight,
-div.nboutput.container div.output_area pre {
-    background: unset;
-}
-
-div.nboutput.container div.output_area div.highlight {
-    color: unset;  /* override Pygments text color */
 }
 
 /* avoid gaps between output lines */
@@ -180,7 +169,7 @@ div.nboutput.container div.output_area {
 div.nbinput.container div.input_area {
     border: 1px solid #e0e0e0;
     border-radius: 2px;
-    /*background: #f5f5f5;*/
+    background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
@@ -246,7 +235,6 @@ div.nboutput.container div.output_area.rendered_html,
 div.nboutput.container div.output_area > div.output_javascript,
 div.nboutput.container div.output_area:not(.rendered_html) > img{
     padding: 5px;
-    margin: 0;
 }
 
 /* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
@@ -294,8 +282,8 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="section" id="relax_box---Methodology-and-code">
-<h1>relax_box - Methodology and code<a class="headerlink" href="#relax_box---Methodology-and-code" title="Permalink to this headline">¶</a></h1>
+<section id="relax_box---Methodology-and-code">
+<h1>relax_box - Methodology and code<a class="headerlink" href="#relax_box---Methodology-and-code" title="Permalink to this heading">¶</a></h1>
 <p><strong>Python imports</strong></p>
 <ul class="simple">
 <li><p><a class="reference external" href="http://www.numpy.org/">numpy</a></p></li>
@@ -343,10 +331,10 @@ div.rendered_html tbody tr:hover {
 Notebook last executed on 2022-03-07 using iprPy version 0.11.2
 </pre></div></div>
 </div>
-<div class="section" id="1.-Load-calculation-and-view-description">
-<h2>1. Load calculation and view description<a class="headerlink" href="#1.-Load-calculation-and-view-description" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="1.1.-Load-the-calculation">
-<h3>1.1. Load the calculation<a class="headerlink" href="#1.1.-Load-the-calculation" title="Permalink to this headline">¶</a></h3>
+<section id="1.-Load-calculation-and-view-description">
+<h2>1. Load calculation and view description<a class="headerlink" href="#1.-Load-calculation-and-view-description" title="Permalink to this heading">¶</a></h2>
+<section id="1.1.-Load-the-calculation">
+<h3>1.1. Load the calculation<a class="headerlink" href="#1.1.-Load-the-calculation" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -357,9 +345,9 @@ Notebook last executed on 2022-03-07 using iprPy version 0.11.2
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="1.2.-Display-calculation-description-and-theory">
-<h3>1.2. Display calculation description and theory<a class="headerlink" href="#1.2.-Display-calculation-description-and-theory" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="1.2.-Display-calculation-description-and-theory">
+<h3>1.2. Display calculation description and theory<a class="headerlink" href="#1.2.-Display-calculation-description-and-theory" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -375,42 +363,42 @@ Notebook last executed on 2022-03-07 using iprPy version 0.11.2
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<div class="section" id="relax_box-calculation-style">
-<h4>relax_box calculation style<a class="headerlink" href="#relax_box-calculation-style" title="Permalink to this headline">¶</a></h4>
+<section id="relax_box-calculation-style">
+<h4>relax_box calculation style<a class="headerlink" href="#relax_box-calculation-style" title="Permalink to this heading">¶</a></h4>
 <p><strong>Lucas M. Hale</strong>, <a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>, <em>Materials Science and Engineering Division, NIST</em>.</p>
-<div class="section" id="Introduction">
-<h5>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h5>
+<section id="Introduction">
+<h5>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this heading">¶</a></h5>
 <p>The relax_box calculation style refines the lattice parameters of an orthogonal system (crystal structure) by relaxing the box dimensions towards a given pressure. In refining the lattice parameter values, the box dimensions are allowed to relax, but the relative positions of the atoms within the box are held fixed.</p>
 <p>This calculations provides a quick tool for obtaining lattice parameters for ideal crystal structures.</p>
-<div class="section" id="Version-notes">
-<h6>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this headline">¶</a></h6>
+<section id="Version-notes">
+<h6>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this heading">¶</a></h6>
 <ul class="simple">
 <li><p>2018-07-09: Notebook added.</p></li>
 <li><p>2019-07-30: Description updated and small changes due to iprPy version.</p></li>
 <li><p>2020-05-22: Version 0.10 update - potentials now loaded from database.</p></li>
 <li><p>2020-09-22: Setup and parameter definition streamlined.</p></li>
 </ul>
-</div>
-<div class="section" id="Additional-dependencies">
-<h6>Additional dependencies<a class="headerlink" href="#Additional-dependencies" title="Permalink to this headline">¶</a></h6>
-</div>
-<div class="section" id="Disclaimers">
-<h6>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this headline">¶</a></h6>
+</section>
+<section id="Additional-dependencies">
+<h6>Additional dependencies<a class="headerlink" href="#Additional-dependencies" title="Permalink to this heading">¶</a></h6>
+</section>
+<section id="Disclaimers">
+<h6>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this heading">¶</a></h6>
 <ul class="simple">
 <li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST disclaimers</a></p></li>
 <li><p>With this method there is no guarantee that the resulting parameters are for a stable structure. Allowing internal relaxations may result in different values for some structures. Additionally, some transformation paths may be restricted from occurring due to symmetry, i.e. initially cubic structures may remain cubic instead of relaxing to a non-cubic structure.</p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<div class="section" id="Method-and-Theory">
-<h4>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this headline">¶</a></h4>
+<section id="Method-and-Theory">
+<h4>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this heading">¶</a></h4>
 <p>The math in this section uses Voigt notation, where indicies i,j correspond to 1=xx, 2=yy, 3=zz, 4=yz, 5=xz, and 6=xy, and x, y and z are orthogonal box vectors.</p>
 <p>An initial system (and corresponding unit cell system) is supplied with box dimensions, <span class="math notranslate nohighlight">\(a_i^0\)</span>, close to the equilibrium values. A LAMMPS simulation is performed that evaluates the system’s pressures, <span class="math notranslate nohighlight">\(P_{i}\)</span>, for the initial system as given, and subjected to twelve different strain states corresponding to one of <span class="math notranslate nohighlight">\(\epsilon_{i}\)</span> being given a value of <span class="math notranslate nohighlight">\(\frac{\Delta \epsilon}{2}\)</span>, where <span class="math notranslate nohighlight">\(\Delta \epsilon\)</span> is the strain range parameter. Using the <span class="math notranslate nohighlight">\(P_{i}\)</span> values
 obtained from the strained states, the <span class="math notranslate nohighlight">\(C_{ij}\)</span> matrix for the system is estimated as</p>
@@ -420,16 +408,16 @@ obtained from the strained states, the <span class="math notranslate nohighlight
 <div class="math notranslate nohighlight">
 \[a_i = \frac{a_i^0}{1 - (\sum_{j=1}^3{S_{ij} P_j})}.\]</div>
 <p>The system is updated using the new box dimensions. The process is repeated until either <span class="math notranslate nohighlight">\(a_i\)</span> converge less than a specified tolerance, <span class="math notranslate nohighlight">\(a_i\)</span> diverge from <span class="math notranslate nohighlight">\(a_i^0\)</span> greater than some limit, or convergence is not reached after 100 iterations. If the calculation is successful, the final <span class="math notranslate nohighlight">\(a_i\)</span> dimensions are reported.</p>
+</section>
 </div>
 </div>
-</div>
-</div>
-</div>
-<div class="section" id="2.-Define-calculation-functions-and-generate-files">
-<h2>2. Define calculation functions and generate files<a class="headerlink" href="#2.-Define-calculation-functions-and-generate-files" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="2.-Define-calculation-functions-and-generate-files">
+<h2>2. Define calculation functions and generate files<a class="headerlink" href="#2.-Define-calculation-functions-and-generate-files" title="Permalink to this heading">¶</a></h2>
 <p>This section defines the calculation functions and associated resource files exactly as they exist inside the iprPy package. This allows for the code used to be directly visible and modifiable by anyone looking to see how it works.</p>
-<div class="section" id="2.1.-relax_box()">
-<h3>2.1. relax_box()<a class="headerlink" href="#2.1.-relax_box()" title="Permalink to this headline">¶</a></h3>
+<section id="2.1.-relax_box()">
+<h3>2.1. relax_box()<a class="headerlink" href="#2.1.-relax_box()" title="Permalink to this heading">¶</a></h3>
 <p>This is the primary function for the calculation. The version of this function built in iprPy can be accessed by calling the calc() method of an object of the associated calculation class.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -634,9 +622,9 @@ obtained from the strained states, the <span class="math notranslate nohighlight
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="2.2.-cij_run0()">
-<h3>2.2. cij_run0()<a class="headerlink" href="#2.2.-cij_run0()" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="2.2.-cij_run0()">
+<h3>2.2. cij_run0()<a class="headerlink" href="#2.2.-cij_run0()" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -765,9 +753,9 @@ obtained from the strained states, the <span class="math notranslate nohighlight
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="2.3.-update_box()">
-<h3>2.3. update_box()<a class="headerlink" href="#2.3.-update_box()" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="2.3.-update_box()">
+<h3>2.3. update_box()<a class="headerlink" href="#2.3.-update_box()" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -858,9 +846,9 @@ obtained from the strained states, the <span class="math notranslate nohighlight
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="2.4.-cij_run0.template-file">
-<h3>2.4. cij_run0.template file<a class="headerlink" href="#2.4.-cij_run0.template-file" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="2.4.-cij_run0.template-file">
+<h3>2.4. cij_run0.template file<a class="headerlink" href="#2.4.-cij_run0.template-file" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -1053,12 +1041,12 @@ obtained from the strained states, the <span class="math notranslate nohighlight
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="3.-Specify-input-parameters">
-<h2>3. Specify input parameters<a class="headerlink" href="#3.-Specify-input-parameters" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="3.1.-System-specific-paths">
-<h3>3.1. System-specific paths<a class="headerlink" href="#3.1.-System-specific-paths" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="3.-Specify-input-parameters">
+<h2>3. Specify input parameters<a class="headerlink" href="#3.-Specify-input-parameters" title="Permalink to this heading">¶</a></h2>
+<section id="3.1.-System-specific-paths">
+<h3>3.1. System-specific paths<a class="headerlink" href="#3.1.-System-specific-paths" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>lammps_command</strong> is the LAMMPS command to use (required).</p></li>
 <li><p><strong>mpi_command</strong> MPI command for running LAMMPS in parallel. A value of None will run simulations serially.</p></li>
@@ -1073,9 +1061,9 @@ obtained from the strained states, the <span class="math notranslate nohighlight
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="3.2.-Interatomic-potential">
-<h3>3.2. Interatomic potential<a class="headerlink" href="#3.2.-Interatomic-potential" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.2.-Interatomic-potential">
+<h3>3.2. Interatomic potential<a class="headerlink" href="#3.2.-Interatomic-potential" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>potential_name</strong> gives the name of the potential_LAMMPS reference record in the iprPy library to use for the calculation.</p></li>
 <li><p><strong>potential</strong> is an atomman.lammps.Potential object (required).</p></li>
@@ -1092,9 +1080,9 @@ obtained from the strained states, the <span class="math notranslate nohighlight
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="3.3.-Initial-unit-cell-system">
-<h3>3.3. Initial unit cell system<a class="headerlink" href="#3.3.-Initial-unit-cell-system" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.3.-Initial-unit-cell-system">
+<h3>3.3. Initial unit cell system<a class="headerlink" href="#3.3.-Initial-unit-cell-system" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>ucell</strong> is an atomman.System representing a fundamental unit cell of the system (required). Here, this is generated using the load parameters and symbols.</p></li>
 </ul>
@@ -1131,9 +1119,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
       3 |       1 |   1.750 |   1.750 |   0.000
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="3.4.-System-modifications">
-<h3>3.4. System modifications<a class="headerlink" href="#3.4.-System-modifications" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.4.-System-modifications">
+<h3>3.4. System modifications<a class="headerlink" href="#3.4.-System-modifications" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>sizemults</strong> list of three integers specifying how many times the ucell vectors of <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span> and <span class="math notranslate nohighlight">\(c\)</span> are replicated in creating system.</p></li>
 <li><p><strong>system</strong> is an atomman.System to perform the scan on (required).</p></li>
@@ -1159,9 +1147,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 # of atoms in system = 108
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="3.5.-Calculation-specific-parameters">
-<h3>3.5. Calculation-specific parameters<a class="headerlink" href="#3.5.-Calculation-specific-parameters" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.5.-Calculation-specific-parameters">
+<h3>3.5. Calculation-specific parameters<a class="headerlink" href="#3.5.-Calculation-specific-parameters" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>strainrange</strong> specifies the <span class="math notranslate nohighlight">\(\Delta \epsilon\)</span> strain range to use in estimating <span class="math notranslate nohighlight">\(C_{ij}\)</span>.</p></li>
 <li><p><strong>pressure_xx</strong> gives the xx component of the pressure to equilibriate the system to.</p></li>
@@ -1190,12 +1178,12 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="4.-Run-calculation-and-view-results">
-<h2>4. Run calculation and view results<a class="headerlink" href="#4.-Run-calculation-and-view-results" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="4.1.-Run-calculation">
-<h3>4.1. Run calculation<a class="headerlink" href="#4.1.-Run-calculation" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="4.-Run-calculation-and-view-results">
+<h2>4. Run calculation and view results<a class="headerlink" href="#4.-Run-calculation-and-view-results" title="Permalink to this heading">¶</a></h2>
+<section id="4.1.-Run-calculation">
+<h3>4.1. Run calculation<a class="headerlink" href="#4.1.-Run-calculation" title="Permalink to this heading">¶</a></h3>
 <p>All primary calculation method functions take a series of inputs and return a dictionary of outputs.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
@@ -1225,9 +1213,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 dict_keys([&#39;dumpfile_initial&#39;, &#39;symbols_initial&#39;, &#39;dumpfile_final&#39;, &#39;symbols_final&#39;, &#39;lx&#39;, &#39;ly&#39;, &#39;lz&#39;, &#39;xy&#39;, &#39;xz&#39;, &#39;yz&#39;, &#39;E_pot&#39;, &#39;measured_pxx&#39;, &#39;measured_pyy&#39;, &#39;measured_pzz&#39;, &#39;measured_pxy&#39;, &#39;measured_pxz&#39;, &#39;measured_pyz&#39;])
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="4.2.-Report-results">
-<h3>4.2. Report results<a class="headerlink" href="#4.2.-Report-results" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="4.2.-Report-results">
+<h3>4.2. Report results<a class="headerlink" href="#4.2.-Report-results" title="Permalink to this heading">¶</a></h3>
 <p>Values returned in the results_dict:</p>
 <ul class="simple">
 <li><p><strong>‘dumpfile_initial’</strong> (<em>str</em>) - The name of the initial dump file created.</p></li>
@@ -1341,9 +1329,9 @@ Pxz = 1.7654306601807003e-15 GPa
 Pxy = 4.8148108914018e-16 GPa
 </pre></div></div>
 </div>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -1415,13 +1403,13 @@ Pxy = 4.8148108914018e-16 GPa
         <li class="right" >
           <a href="point_defect_static.html" title="point_defect_static - Methodology and code"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">relax_box - Methodology and code</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

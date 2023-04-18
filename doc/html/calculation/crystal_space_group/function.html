@@ -1,17 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>crystal_space_group.py &#8212; iprPy 0.11.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>crystal_space_group.py &#8212; iprPy 0.11.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -33,7 +36,7 @@
         <li class="right" >
           <a href="template.html" title="crystal_space_group Input Terms"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">crystal_space_group</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">crystal_space_group.py</a></li> 
@@ -45,28 +48,28 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="crystal-space-group-py">
-<h1>crystal_space_group.py<a class="headerlink" href="#crystal-space-group-py" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-iprPy.calculation.crystal_space_group.crystal_space_group">
-<span id="calculation-functions"></span><h2>Calculation functions<a class="headerlink" href="#module-iprPy.calculation.crystal_space_group.crystal_space_group" title="Permalink to this headline">¶</a></h2>
+  <section id="crystal-space-group-py">
+<h1>crystal_space_group.py<a class="headerlink" href="#crystal-space-group-py" title="Permalink to this heading">¶</a></h1>
+<section id="module-iprPy.calculation.crystal_space_group.crystal_space_group">
+<span id="calculation-functions"></span><h2>Calculation functions<a class="headerlink" href="#module-iprPy.calculation.crystal_space_group.crystal_space_group" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="iprPy.calculation.crystal_space_group.crystal_space_group.crystal_space_group">
-<span class="sig-name descname"><span class="pre">crystal_space_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">atomman.core.System.System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symprec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_primitive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_idealize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><span class="pre">dict</span></a></span></span><a class="headerlink" href="#iprPy.calculation.crystal_space_group.crystal_space_group.crystal_space_group" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">crystal_space_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symprec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_primitive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_idealize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></span></span><a class="headerlink" href="#iprPy.calculation.crystal_space_group.crystal_space_group.crystal_space_group" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses spglib to evaluate space group information for a given system.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>system</strong> (<em>atomman.System</em>) – The system to analyze.</p></li>
-<li><p><strong>symprec</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Absolute length tolerance to use in identifying symmetry of atomic
+<li><p><strong>symprec</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Absolute length tolerance to use in identifying symmetry of atomic
 sites and system boundaries. Default value is 1e-5</p></li>
-<li><p><strong>to_primitive</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if the returned unit cell is conventional (False) or
+<li><p><strong>to_primitive</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if the returned unit cell is conventional (False) or
 primitive (True). Default value is False.</p></li>
-<li><p><strong>no_idealize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if the atom positions in the returned unit cell are averaged
+<li><p><strong>no_idealize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if the atom positions in the returned unit cell are averaged
 (True) or idealized based on the structure (False).  Default value is
 False.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><p>Dictionary of results consisting of keys:</p>
 <ul class="simple">
 <li><p><strong>’number’</strong> (<em>int</em>) The spacegroup number.</p></li>
@@ -98,14 +101,14 @@ together.</p></li>
 </ul>
 </p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -118,7 +121,10 @@ together.</p></li>
     <h3><a href="../../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">crystal_space_group.py</a><ul>
-<li><a class="reference internal" href="#module-iprPy.calculation.crystal_space_group.crystal_space_group">Calculation functions</a></li>
+<li><a class="reference internal" href="#module-iprPy.calculation.crystal_space_group.crystal_space_group">Calculation functions</a><ul>
+<li><a class="reference internal" href="#iprPy.calculation.crystal_space_group.crystal_space_group.crystal_space_group"><code class="docutils literal notranslate"><span class="pre">crystal_space_group()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -153,14 +159,14 @@ together.</p></li>
         <li class="right" >
           <a href="template.html" title="crystal_space_group Input Terms"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >crystal_space_group</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">crystal_space_group.py</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

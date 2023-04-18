@@ -1,17 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Calculation Styles &#8212; iprPy 0.11.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Calculation Styles &#8212; iprPy 0.11.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/basic.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -33,7 +36,7 @@
         <li class="right" >
           <a href="extend/addbuildcombos.html" title="Adding new buildcombos styles"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.11.4 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Calculation Styles</a></li> 
       </ul>
     </div>  
@@ -43,30 +46,35 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="calculation-styles">
-<h1>Calculation Styles<a class="headerlink" href="#calculation-styles" title="Permalink to this headline">¶</a></h1>
+  <section id="calculation-styles">
+<h1>Calculation Styles<a class="headerlink" href="#calculation-styles" title="Permalink to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="calculation/E_vs_r_scan/index.html">E_vs_r_scan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calculation/bond_angle_scan/index.html">bond_angle_scan</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calculation/crystal_space_group/index.html">crystal_space_group</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calculation/diatom_scan/index.html">diatom_scan</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calculation/dislocation_SDVPN/index.html">dislocation_SDVPN</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calculation/dislocation_monopole/index.html">dislocation_monopole</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calculation/dislocation_periodic_array/index.html">dislocation_periodic_array</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calculation/elastic_constants_static/index.html">elastic_constants_static</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calculation/energy_check/index.html">energy_check</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calculation/free_energy/index.html">free_energy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calculation/free_energy_liquid/index.html">free_energy_liquid</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calculation/isolated_atom/index.html">isolated_atom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calculation/phonon/index.html">phonon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calculation/point_defect_diffusion/index.html">point_defect_diffusion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calculation/point_defect_static/index.html">point_defect_static</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calculation/relax_box/index.html">relax_box</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calculation/relax_dynamic/index.html">relax_dynamic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calculation/relax_liquid/index.html">relax_liquid</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calculation/relax_static/index.html">relax_static</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calculation/stacking_fault_map_2D/index.html">stacking_fault_map_2D</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calculation/stacking_fault_static/index.html">stacking_fault_static</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calculation/surface_energy_static/index.html">surface_energy_static</a></li>
 </ul>
 </div>
-</div>
+</section>
 
 
             <div class="clearer"></div>
@@ -104,12 +112,12 @@
         <li class="right" >
           <a href="extend/addbuildcombos.html" title="Adding new buildcombos styles"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.11.4 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Calculation Styles</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>relax_liquid.py &#8212; iprPy 0.11.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="RelaxLiquid" href="class.html" />
+    <link rel="prev" title="relax_liquid Input Terms" href="template.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="class.html" title="RelaxLiquid"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="template.html" title="relax_liquid Input Terms"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">relax_liquid</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">relax_liquid.py</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="relax-liquid-py">
+<h1>relax_liquid.py<a class="headerlink" href="#relax-liquid-py" title="Permalink to this heading">¶</a></h1>
+<section id="module-iprPy.calculation.relax_liquid.relax_liquid">
+<span id="calculation-functions"></span><h2>Calculation functions<a class="headerlink" href="#module-iprPy.calculation.relax_liquid.relax_liquid" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="iprPy.calculation.relax_liquid.relax_liquid.relax_liquid">
+<span class="sig-name descname"><span class="pre">relax_liquid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lammps_command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Potential</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpi_command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pressure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature_melt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rdfcutoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meltsteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coolsteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equilvolumesteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equilvolumesamples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equilenergysteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equilenergysamples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equilenergystyle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'pe'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runsteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dumpsteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">createvelocities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">randomseed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></span></span><a class="headerlink" href="#iprPy.calculation.relax_liquid.relax_liquid.relax_liquid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a multi-stage simulation to obtain a liquid phase configuration
+at a given temperature. Radial displacement functions and mean squared
+displacements are automatically computed for the system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lammps_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Command for running LAMMPS.</p></li>
+<li><p><strong>system</strong> (<em>atomman.System</em>) – The system to perform the calculation on.</p></li>
+<li><p><strong>potential</strong> (<em>atomman.lammps.Potential</em>) – The LAMMPS implemented potential to use.</p></li>
+<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The target temperature to relax to.</p></li>
+<li><p><strong>mpi_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+will run serially.</p></li>
+<li><p><strong>pressure</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – The target hydrostatic pressure to relax to. Default value is 0. GPa.</p></li>
+<li><p><strong>temperature_melt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – The elevated temperature to first use to hopefully melt the initial
+configuration.</p></li>
+<li><p><strong>rdfcutoff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – The cutoff distance to use for the RDF cutoff.  If not given then
+will use 4 * r0, where r0 is the shortest atomic distance found in
+the given system configuration.</p></li>
+<li><p><strong>meltsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – The number of npt integration steps to perform during the melting
+stage at the melt temperature to create an amorphous liquid structure.
+Default value is 50000.</p></li>
+<li><p><strong>coolsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – The number of npt integration steps to perform during the cooling
+stage where the temperature is reduced from the melt temperature
+to the target temperature.  Default value is 10000.</p></li>
+<li><p><strong>equilvolumesteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – The number of npt integration steps to perform during the volume
+equilibration stage where the system is held at the target temperature
+and pressure to obtain an estimate for the relaxed volume.  Default
+value is 50000.</p></li>
+<li><p><strong>equilvolumesamples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – The number of thermo samples from the end of the volume equilibration
+stage to use in computing the average volume.  Cannot be larger than
+equilvolumesteps / 100.  It is recommended to set smaller than the max
+to allow for some convergence time.  Default value is 300.</p></li>
+<li><p><strong>equilenergysteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – The number of nvt integration steps to perform during the energy
+equilibration stage where the system is held at the target temperature
+to obtain an estimate for the total energy.  Default value is 10000.</p></li>
+<li><p><strong>equilenergysamples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – The number of thermo samples from the end of the energy equilibrium
+stage to use in computing the target total energy.  Cannot be
+larger than equilenergysteps / 100.  Default value is 100.</p></li>
+<li><p><strong>equilenergystyle</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Indicates which scheme to use for computing the target total energy.
+Allowed values are ‘pe’ or ‘te’.  For ‘te’, the average total energy
+from the equilenergysamples is used as the target energy.  For ‘pe’,
+the average potential energy plus 3/2 N kB T is used as the target
+energy.  Default value is ‘pe’.</p></li>
+<li><p><strong>runsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The number of nve integration steps to perform on the system to
+obtain measurements of MSD and RDF of the liquid. Default value is
+50000.</p></li>
+<li><p><strong>dumpsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Dump files will be saved every this many steps during the runsteps
+simulation. Default is None, which sets dumpsteps equal to the sum of
+all “steps” terms above so that only the final configuration is saved.</p></li>
+<li><p><strong>createvelocities</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True (default), velocities will be created for the atoms prior to
+running the simulations.  Setting this to False can be useful if the
+initial system already has velocity information.</p></li>
+<li><p><strong>randomseed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Random number seed used by LAMMPS in creating velocities and with
+the Langevin thermostat.  Default is None which will select a
+random int between 1 and 900000000.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>Dictionary of results consisting of keys:</p>
+<ul class="simple">
+<li><p><strong>’dumpfile_final’</strong> (<em>str</em>) - The name of the final dump file
+created.</p></li>
+<li><p><strong>’symbols_final’</strong> (<em>list</em>) - The symbols associated with the final
+dump file.</p></li>
+<li><p><strong>’volume’</strong> (<em>float</em>) - The volume per atom identified after the volume
+equilibration stage.</p></li>
+<li><p><strong>’volume_stderr’</strong> (<em>float</em>) - The standard error in the volume per atom
+measured during the volume equilibration stage.</p></li>
+<li><p><strong>’E_total’</strong> (<em>float</em>) - The total energy of the system used during the nve
+stage.</p></li>
+<li><p><strong>’E_total_stderr’</strong> (<em>float</em>) - The standard error in the mean total energy
+computed during the energy equilibration stage.</p></li>
+<li><p><strong>’E_pot’</strong> (<em>float</em>) - The mean measured potential energy during the energy
+equilibration stage.</p></li>
+<li><p><strong>’E_pot_stderr’</strong> (<em>float</em>) - The standard error in the mean potential energy
+during the energy equilibration stage.</p></li>
+<li><p><strong>’measured_temp’</strong> (<em>float</em>) - The mean measured temperature during the nve
+stage.</p></li>
+<li><p><strong>’measured_temp_stderr’</strong> (<em>float</em>) - The standard error in the measured
+temperature values of the nve stage.</p></li>
+<li><p><strong>’measured_press’</strong> (<em>float</em>) - The mean measured pressure during the nve
+stage.</p></li>
+<li><p><strong>’measured_press_stderr’</strong> (<em>float</em>) - The standard error in the measured
+pressure values of the nve stage.</p></li>
+<li><p><strong>’time_values’</strong> (<em>numpy.array of float</em>) - The values of time that
+correspond to the mean squared displacement values.</p></li>
+<li><p><strong>’msd_x_values’</strong> (<em>numpy.array of float</em>) - The mean squared displacement
+values only in the x direction.</p></li>
+<li><p><strong>’msd_y_values’</strong> (<em>numpy.array of float</em>) - The mean squared displacement</p></li>
+</ul>
+<blockquote>
+<div><p>values only in the y direction.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p><strong>’msd_z_values’</strong> (<em>numpy.array of float</em>) - The mean squared displacement</p></li>
+</ul>
+<blockquote>
+<div><p>values only in the z direction.</p>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>’msd_values’</strong> (<em>numpy.array of float</em>) - The total mean squared</dt><dd><p>displacement values.</p>
+</dd>
+</dl>
+</li>
+<li><p><strong>’lammps_output’</strong> (<em>atomman.lammps.Log</em>) - The LAMMPS logfile output.
+Can be useful for checking the thermo data at each simulation stage.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">relax_liquid.py</a><ul>
+<li><a class="reference internal" href="#module-iprPy.calculation.relax_liquid.relax_liquid">Calculation functions</a><ul>
+<li><a class="reference internal" href="#iprPy.calculation.relax_liquid.relax_liquid.relax_liquid"><code class="docutils literal notranslate"><span class="pre">relax_liquid()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="template.html"
+                          title="previous chapter">relax_liquid Input Terms</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="class.html"
+                          title="next chapter">RelaxLiquid</a></p>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="class.html" title="RelaxLiquid"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="template.html" title="relax_liquid Input Terms"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >relax_liquid</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">relax_liquid.py</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
+    </div>
+  </body>
+</html>

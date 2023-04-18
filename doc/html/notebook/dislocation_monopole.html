@@ -1,17 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dislocation_monopole - Methodology and code &#8212; iprPy 0.11.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>dislocation_monopole - Methodology and code &#8212; iprPy 0.11.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -35,7 +38,7 @@
         <li class="right" >
           <a href="dislocation_SDVPN.html" title="dislocation_monopole - Methodology and code"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dislocation_monopole - Methodology and code</a></li> 
       </ul>
@@ -51,35 +54,21 @@
 /* CSS for nbsphinx extension */
 
 /* remove conflicting styling from Sphinx themes */
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt *,
-div.nbinput.container div.input_area pre,
-div.nboutput.container div.output_area pre,
-div.nbinput.container div.input_area .highlight,
-div.nboutput.container div.output_area .highlight {
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
     border: none;
-    padding: 0;
+    padding: 0 0;
     margin: 0;
     box-shadow: none;
-}
-
-div.nbinput.container > div[class*=highlight],
-div.nboutput.container > div[class*=highlight] {
-    margin: 0;
-}
-
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt * {
-    background: none;
-}
-
-div.nboutput.container div.output_area .highlight,
-div.nboutput.container div.output_area pre {
-    background: unset;
-}
-
-div.nboutput.container div.output_area div.highlight {
-    color: unset;  /* override Pygments text color */
 }
 
 /* avoid gaps between output lines */
@@ -180,7 +169,7 @@ div.nboutput.container div.output_area {
 div.nbinput.container div.input_area {
     border: 1px solid #e0e0e0;
     border-radius: 2px;
-    /*background: #f5f5f5;*/
+    background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
@@ -246,7 +235,6 @@ div.nboutput.container div.output_area.rendered_html,
 div.nboutput.container div.output_area > div.output_javascript,
 div.nboutput.container div.output_area:not(.rendered_html) > img{
     padding: 5px;
-    margin: 0;
 }
 
 /* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
@@ -294,8 +282,8 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="section" id="dislocation_monopole---Methodology-and-code">
-<h1>dislocation_monopole - Methodology and code<a class="headerlink" href="#dislocation_monopole---Methodology-and-code" title="Permalink to this headline">¶</a></h1>
+<section id="dislocation_monopole---Methodology-and-code">
+<h1>dislocation_monopole - Methodology and code<a class="headerlink" href="#dislocation_monopole---Methodology-and-code" title="Permalink to this heading">¶</a></h1>
 <p><strong>Python imports</strong></p>
 <ul class="simple">
 <li><p><a class="reference external" href="http://www.numpy.org/">numpy</a></p></li>
@@ -345,10 +333,10 @@ div.rendered_html tbody tr:hover {
 Notebook last executed on 2022-03-11 using iprPy version 0.11.2
 </pre></div></div>
 </div>
-<div class="section" id="1.-Load-calculation-and-view-description">
-<h2>1. Load calculation and view description<a class="headerlink" href="#1.-Load-calculation-and-view-description" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="1.1.-Load-the-calculation">
-<h3>1.1. Load the calculation<a class="headerlink" href="#1.1.-Load-the-calculation" title="Permalink to this headline">¶</a></h3>
+<section id="1.-Load-calculation-and-view-description">
+<h2>1. Load calculation and view description<a class="headerlink" href="#1.-Load-calculation-and-view-description" title="Permalink to this heading">¶</a></h2>
+<section id="1.1.-Load-the-calculation">
+<h3>1.1. Load the calculation<a class="headerlink" href="#1.1.-Load-the-calculation" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -359,9 +347,9 @@ Notebook last executed on 2022-03-11 using iprPy version 0.11.2
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="1.2.-Display-calculation-description-and-theory">
-<h3>1.2. Display calculation description and theory<a class="headerlink" href="#1.2.-Display-calculation-description-and-theory" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="1.2.-Display-calculation-description-and-theory">
+<h3>1.2. Display calculation description and theory<a class="headerlink" href="#1.2.-Display-calculation-description-and-theory" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -377,50 +365,50 @@ Notebook last executed on 2022-03-11 using iprPy version 0.11.2
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<div class="section" id="dislocation_monopole-calculation-style">
-<h4>dislocation_monopole calculation style<a class="headerlink" href="#dislocation_monopole-calculation-style" title="Permalink to this headline">¶</a></h4>
+<section id="dislocation_monopole-calculation-style">
+<h4>dislocation_monopole calculation style<a class="headerlink" href="#dislocation_monopole-calculation-style" title="Permalink to this heading">¶</a></h4>
 <p><strong>Lucas M. Hale</strong>, <a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>, <em>Materials Science and Engineering Division, NIST</em>.</p>
-<div class="section" id="Introduction">
-<h5>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h5>
+<section id="Introduction">
+<h5>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this heading">¶</a></h5>
 <p>The dislocation_monopole calculation style calculation inserts a dislocation monopole into an atomic system using the anisotropic elasticity solution for a perfectly straight dislocation. The system is divided into two regions: a boundary region at the system’s edges perpendicular to the dislocation line, and an active region around the dislocation. After inserting the dislocation, the atoms within the active region of the system are relaxed while the positions of the atoms in the boundary
 region are held fixed at the elasticity solution. The relaxed dislocation system and corresponding dislocation-free base systems are retained in the calculation’s archived record. Various properties associated with the dislocation’s elasticity solution are recorded in the calculation’s results record.</p>
-<div class="section" id="Version-notes">
-<h6>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this headline">¶</a></h6>
+<section id="Version-notes">
+<h6>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this heading">¶</a></h6>
 <ul class="simple">
 <li><p>2018-09-25: Notebook added</p></li>
 <li><p>2019-07-30: Method and Notebook updated for iprPy version 0.9.</p></li>
 <li><p>2020-09-22: Notebook updated to reflect that calculation method has changed to now use atomman.defect.Dislocation.</p></li>
 <li><p>2022-03-11: Notebook updated to reflect version 0.11.</p></li>
 </ul>
-</div>
-<div class="section" id="Additional-dependencies">
-<h6>Additional dependencies<a class="headerlink" href="#Additional-dependencies" title="Permalink to this headline">¶</a></h6>
-</div>
-<div class="section" id="Disclaimers">
-<h6>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this headline">¶</a></h6>
+</section>
+<section id="Additional-dependencies">
+<h6>Additional dependencies<a class="headerlink" href="#Additional-dependencies" title="Permalink to this heading">¶</a></h6>
+</section>
+<section id="Disclaimers">
+<h6>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this heading">¶</a></h6>
 <ul class="simple">
 <li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST disclaimers</a></p></li>
 <li><p>This calculation method holds the boundary atoms fixed during the relaxation process which results in a mismatch stress at the border between the active and fixed regions that interacts with the dislocation. Increasing the distance between the dislocation and the boundary region, i.e. increasing the system size, will reduce the influence of the mismatch stresses.</p></li>
 <li><p>The boundary atoms are fixed at the elasticity solution, which assumes the dislocation to be compact (not spread out, dissociated into partials) and to remain at the center of the system. An alternate simulation design or boundary region method should be used if you want accurate simulations of dislocations with wide cores and/or in which the dislocation moves long distances.</p></li>
 <li><p>The calculation allows for the system to be relaxed either using only static energy/force minimizations or with molecular dynamic steps followed by a minimization. Only performing a static relaxation is considerably faster than performing a dynamic relaxation, but the dynamic relaxation is more likely to result in a better final dislocation structure.</p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<div class="section" id="Method-and-Theory">
-<h4>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this headline">¶</a></h4>
-<div class="section" id="Stroh-theory">
-<h5>Stroh theory<a class="headerlink" href="#Stroh-theory" title="Permalink to this headline">¶</a></h5>
+<section id="Method-and-Theory">
+<h4>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this heading">¶</a></h4>
+<section id="Stroh-theory">
+<h5>Stroh theory<a class="headerlink" href="#Stroh-theory" title="Permalink to this heading">¶</a></h5>
 <p>A detailed description of the Stroh method to solve the Eshelby solution for an anisotropic straight dislocation can be found in the <a class="reference external" href="https://www.ctcms.nist.gov/potentials/atomman/">atomman documentation</a>.</p>
-</div>
-<div class="section" id="Orientation">
-<h5>Orientation<a class="headerlink" href="#Orientation" title="Permalink to this headline">¶</a></h5>
+</section>
+<section id="Orientation">
+<h5>Orientation<a class="headerlink" href="#Orientation" title="Permalink to this heading">¶</a></h5>
 <p>One of the most important considerations in defining an atomistic system containing a dislocation monopole system is the system’s orientation. In particular, care is needed to properly align the system’s Cartesian axes, <span class="math notranslate nohighlight">\(x, y, z\)</span>, the system’s box vectors, <span class="math notranslate nohighlight">\(a, b, c\)</span>, and the Stroh solution’s axes, <span class="math notranslate nohighlight">\(u, m, n\)</span>.</p>
 <ul class="simple">
 <li><p>In order for the dislocation to remain perfectly straight in the atomic system, the dislocation line, <span class="math notranslate nohighlight">\(u\)</span>, must correspond to one of the system’s box vectors. The resulting dislocation monopole system will be periodic along the box direction corresponding to <span class="math notranslate nohighlight">\(u\)</span>, and non-periodic in the other two box directions.</p></li>
@@ -433,9 +421,9 @@ region are held fixed at the elasticity solution. The relaxed dislocation system
 </ul>
 </li>
 </ul>
-</div>
-<div class="section" id="Calculation-methodology">
-<h5>Calculation methodology<a class="headerlink" href="#Calculation-methodology" title="Permalink to this headline">¶</a></h5>
+</section>
+<section id="Calculation-methodology">
+<h5>Calculation methodology<a class="headerlink" href="#Calculation-methodology" title="Permalink to this heading">¶</a></h5>
 <ol class="arabic simple">
 <li><p>An initial system is generated based on the loaded system and <em>uvw</em>, <em>atomshift</em>, and <em>sizemults</em> input parameters. This initial system is saved as base.dump.</p></li>
 <li><p>The atomman.defect.Stroh class is used to obtain the dislocation solution based on the defined <span class="math notranslate nohighlight">\(m\)</span> and <span class="math notranslate nohighlight">\(n\)</span> vectors, <span class="math notranslate nohighlight">\(C_{ij}\)</span>, and the dislocation’s Burgers vector, <span class="math notranslate nohighlight">\(b_i\)</span>.</p></li>
@@ -444,17 +432,17 @@ region are held fixed at the elasticity solution. The relaxed dislocation system
 <li><p>The dislocation is relaxed by performing a LAMMPS simulation. The atoms in the active region are allowed to relax either with nvt integration followed by an energy/force minimization, or with just an energy/force minimization. The atoms in the boundary region are held fixed at the elastic solution. The resulting relaxed system is saved as disl.dump.</p></li>
 <li><p>Parameters associated with the Stroh solution are saved to the results record.</p></li>
 </ol>
+</section>
+</section>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="section" id="2.-Define-calculation-functions-and-generate-files">
-<h2>2. Define calculation functions and generate files<a class="headerlink" href="#2.-Define-calculation-functions-and-generate-files" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="2.-Define-calculation-functions-and-generate-files">
+<h2>2. Define calculation functions and generate files<a class="headerlink" href="#2.-Define-calculation-functions-and-generate-files" title="Permalink to this heading">¶</a></h2>
 <p>This section defines the calculation functions and associated resource files exactly as they exist inside the iprPy package. This allows for the code used to be directly visible and modifiable by anyone looking to see how it works.</p>
-<div class="section" id="2.1.-dislocation_monopole()">
-<h3>2.1. dislocation_monopole()<a class="headerlink" href="#2.1.-dislocation_monopole()" title="Permalink to this headline">¶</a></h3>
+<section id="2.1.-dislocation_monopole()">
+<h3>2.1. dislocation_monopole()<a class="headerlink" href="#2.1.-dislocation_monopole()" title="Permalink to this heading">¶</a></h3>
 <p>This is the primary function for the calculation. The version of this function built in iprPy can be accessed by calling the calc() method of an object of the associated calculation class.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -688,9 +676,9 @@ region are held fixed at the elasticity solution. The relaxed dislocation system
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="2.2.-disl_relax()">
-<h3>2.2. disl_relax()<a class="headerlink" href="#2.2.-disl_relax()" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="2.2.-disl_relax()">
+<h3>2.2. disl_relax()<a class="headerlink" href="#2.2.-disl_relax()" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -811,9 +799,9 @@ region are held fixed at the elasticity solution. The relaxed dislocation system
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="2.3.-anneal_info()">
-<h3>2.3. anneal_info()<a class="headerlink" href="#2.3.-anneal_info()" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="2.3.-anneal_info()">
+<h3>2.3. anneal_info()<a class="headerlink" href="#2.3.-anneal_info()" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -870,9 +858,9 @@ region are held fixed at the elasticity solution. The relaxed dislocation system
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="2.4.-disl_relax.template-file">
-<h3>2.4. disl_relax.template file<a class="headerlink" href="#2.4.-disl_relax.template-file" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="2.4.-disl_relax.template-file">
+<h3>2.4. disl_relax.template file<a class="headerlink" href="#2.4.-disl_relax.template-file" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -902,12 +890,12 @@ region are held fixed at the elasticity solution. The relaxed dislocation system
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="3.-Specify-input-parameters">
-<h2>3. Specify input parameters<a class="headerlink" href="#3.-Specify-input-parameters" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="3.1.-System-specific-paths">
-<h3>3.1. System-specific paths<a class="headerlink" href="#3.1.-System-specific-paths" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="3.-Specify-input-parameters">
+<h2>3. Specify input parameters<a class="headerlink" href="#3.-Specify-input-parameters" title="Permalink to this heading">¶</a></h2>
+<section id="3.1.-System-specific-paths">
+<h3>3.1. System-specific paths<a class="headerlink" href="#3.1.-System-specific-paths" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>lammps_command</strong> is the LAMMPS command to use (required).</p></li>
 <li><p><strong>mpi_command</strong> MPI command for running LAMMPS in parallel. A value of None will run simulations serially.</p></li>
@@ -922,9 +910,9 @@ region are held fixed at the elasticity solution. The relaxed dislocation system
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="3.2.-Interatomic-potential">
-<h3>3.2. Interatomic potential<a class="headerlink" href="#3.2.-Interatomic-potential" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.2.-Interatomic-potential">
+<h3>3.2. Interatomic potential<a class="headerlink" href="#3.2.-Interatomic-potential" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>potential_name</strong> gives the name of the potential_LAMMPS reference record in the iprPy library to use for the calculation.</p></li>
 <li><p><strong>potential</strong> is an atomman.lammps.Potential object (required).</p></li>
@@ -941,9 +929,9 @@ region are held fixed at the elasticity solution. The relaxed dislocation system
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="3.3.-Initial-unit-cell-system">
-<h3>3.3. Initial unit cell system<a class="headerlink" href="#3.3.-Initial-unit-cell-system" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.3.-Initial-unit-cell-system">
+<h3>3.3. Initial unit cell system<a class="headerlink" href="#3.3.-Initial-unit-cell-system" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>ucell</strong> is an atomman.System representing a fundamental unit cell of the system (required). Here, this is generated using the load parameters and symbols.</p></li>
 </ul>
@@ -980,9 +968,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
       3 |       1 |   1.760 |   1.760 |   0.000
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="3.4.-Elastic-constants">
-<h3>3.4. Elastic constants<a class="headerlink" href="#3.4.-Elastic-constants" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.4.-Elastic-constants">
+<h3>3.4. Elastic constants<a class="headerlink" href="#3.4.-Elastic-constants" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>C_dict</strong> is a dictionary containing the unique elastic constants for the potential and crystal structure defined above.</p></li>
 <li><p><strong>C</strong> is an atomman.ElasticConstants object built from C_dict.</p></li>
@@ -1003,9 +991,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="3.5.-Defect-parameters">
-<h3>3.5. Defect parameters<a class="headerlink" href="#3.5.-Defect-parameters" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.5.-Defect-parameters">
+<h3>3.5. Defect parameters<a class="headerlink" href="#3.5.-Defect-parameters" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>burgers</strong> is the crystallographic Miller Burgers vector for the dislocation.</p></li>
 <li><p><strong>ξ_uvw</strong> is the Miller [uvw] line vector direction for the dislocation. The angle between burgers and ξ_uvw determines the dislocation’s character</p></li>
@@ -1042,9 +1030,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="3.6.-Calculation-specific-parameters">
-<h3>3.6. Calculation-specific parameters<a class="headerlink" href="#3.6.-Calculation-specific-parameters" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.6.-Calculation-specific-parameters">
+<h3>3.6. Calculation-specific parameters<a class="headerlink" href="#3.6.-Calculation-specific-parameters" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>boundarywidth</strong> sets the minimum width of the fixed-atom boundary region.</p></li>
 <li><p><strong>boundaryscale</strong> flag indicating if boundarywidth is absolute (False) or scaled relative to ucell’s a lattice parameter (True).</p></li>
@@ -1087,9 +1075,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="3.7.-System-modifications">
-<h3>3.7. System modifications<a class="headerlink" href="#3.7.-System-modifications" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.7.-System-modifications">
+<h3>3.7. System modifications<a class="headerlink" href="#3.7.-System-modifications" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>sizemults</strong> list of three sets of two integers specifying how many times the ucell vectors of <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span> and <span class="math notranslate nohighlight">\(c\)</span> are replicated in positive and negative directions when creating system.</p></li>
 <li><p><strong>amin, bmin, cmin</strong> specifies minimum widths in the three directions. The corresponding sizemults will be increased to ensure these widths if needed.</p></li>
@@ -1106,12 +1094,12 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="4.-Run-calculation-and-view-results">
-<h2>4. Run calculation and view results<a class="headerlink" href="#4.-Run-calculation-and-view-results" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="4.1.-Run-calculation">
-<h3>4.1. Run calculation<a class="headerlink" href="#4.1.-Run-calculation" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="4.-Run-calculation-and-view-results">
+<h2>4. Run calculation and view results<a class="headerlink" href="#4.-Run-calculation-and-view-results" title="Permalink to this heading">¶</a></h2>
+<section id="4.1.-Run-calculation">
+<h3>4.1. Run calculation<a class="headerlink" href="#4.1.-Run-calculation" title="Permalink to this heading">¶</a></h3>
 <p>All primary calculation method functions take a series of inputs and return a dictionary of outputs.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
@@ -1153,9 +1141,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 dict_keys([&#39;dumpfile_base&#39;, &#39;symbols_base&#39;, &#39;dislocation&#39;, &#39;dumpfile_disl&#39;, &#39;symbols_disl&#39;, &#39;E_total_disl&#39;])
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="4.2.-Report-results">
-<h3>4.2. Report results<a class="headerlink" href="#4.2.-Report-results" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="4.2.-Report-results">
+<h3>4.2. Report results<a class="headerlink" href="#4.2.-Report-results" title="Permalink to this heading">¶</a></h3>
 <p>Values returned in the results_dict:</p>
 <ul class="simple">
 <li><p><strong>‘dumpfile_base’</strong> (<em>str</em>) - The filename of the LAMMPS dump file for the relaxed base system.</p></li>
@@ -1223,9 +1211,9 @@ Defect system is saved as disl.dump
 with symbols (&#39;Ni&#39;, &#39;Ni&#39;)
 </pre></div></div>
 </div>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -1299,13 +1287,13 @@ with symbols (&#39;Ni&#39;, &#39;Ni&#39;)
         <li class="right" >
           <a href="dislocation_SDVPN.html" title="dislocation_monopole - Methodology and code"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dislocation_monopole - Methodology and code</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

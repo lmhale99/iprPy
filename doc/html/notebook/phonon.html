@@ -1,0 +1,1425 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>phonon - Methodology and code &#8212; iprPy 0.11.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="point_defect_static - Methodology and code" href="point_defect_static.html" />
+    <link rel="prev" title="isolated_atom - Methodology and code" href="isolated_atom.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="point_defect_static.html" title="point_defect_static - Methodology and code"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="isolated_atom.html" title="isolated_atom - Methodology and code"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">phonon - Methodology and code</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="phonon---Methodology-and-code">
+<h1>phonon - Methodology and code<a class="headerlink" href="#phonon---Methodology-and-code" title="Permalink to this heading">¶</a></h1>
+<p><strong>Python imports</strong></p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.numpy.org/">numpy</a></p></li>
+<li><p><a class="reference external" href="https://github.com/usnistgov/DataModelDict">DataModelDict</a></p></li>
+<li><p><a class="reference external" href="https://github.com/usnistgov/atomman">atomman</a></p></li>
+<li><p><a class="reference external" href="https://github.com/usnistgov/iprPy">iprPy</a></p></li>
+<li><p><a class="reference external" href="https://atztogo.github.io/spglib/python-spglib.html">spglib</a></p></li>
+<li><p><a class="reference external" href="https://atztogo.github.io/phonopy/">phonopy</a></p></li>
+<li><p><a class="reference external" href="https://pypi.org/project/seekpath/">seekpath</a></p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Standard library imports</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">floor</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="c1"># http://www.numpy.org/</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># https://ipython.org/</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">Markdown</span><span class="p">,</span> <span class="n">Image</span>
+
+<span class="c1"># https://matplotlib.org/</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># https://atztogo.github.io/spglib/python-spglib.html</span>
+<span class="kn">import</span> <span class="nn">spglib</span>
+
+<span class="c1"># https://atztogo.github.io/phonopy/phonopy-module.html</span>
+<span class="kn">import</span> <span class="nn">phonopy</span>
+
+<span class="c1"># https://github.com/usnistgov/DataModelDict</span>
+<span class="kn">from</span> <span class="nn">DataModelDict</span> <span class="kn">import</span> <span class="n">DataModelDict</span> <span class="k">as</span> <span class="n">DM</span>
+
+<span class="c1"># https://github.com/usnistgov/atomman</span>
+<span class="kn">import</span> <span class="nn">atomman</span> <span class="k">as</span> <span class="nn">am</span>
+<span class="kn">import</span> <span class="nn">atomman.lammps</span> <span class="k">as</span> <span class="nn">lmp</span>
+<span class="kn">import</span> <span class="nn">atomman.unitconvert</span> <span class="k">as</span> <span class="nn">uc</span>
+<span class="kn">from</span> <span class="nn">atomman.tools</span> <span class="kn">import</span> <span class="n">filltemplate</span>
+
+<span class="c1"># https://github.com/usnistgov/iprPy</span>
+<span class="kn">import</span> <span class="nn">iprPy</span>
+<span class="kn">from</span> <span class="nn">iprPy.tools</span> <span class="kn">import</span> <span class="n">read_calc_file</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Notebook last executed on&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">(),</span> <span class="s1">&#39;using iprPy version&#39;</span><span class="p">,</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Notebook last executed on 2023-04-18 using iprPy version 0.11.4
+</pre></div></div>
+</div>
+<section id="1.-Load-calculation-and-view-description">
+<h2>1. Load calculation and view description<a class="headerlink" href="#1.-Load-calculation-and-view-description" title="Permalink to this heading">¶</a></h2>
+<section id="1.1.-Load-the-calculation">
+<h3>1.1. Load the calculation<a class="headerlink" href="#1.1.-Load-the-calculation" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Load the calculation being demoed</span>
+<span class="n">calculation</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">load_calculation</span><span class="p">(</span><span class="s1">&#39;phonon&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="1.2.-Display-calculation-description-and-theory">
+<h3>1.2. Display calculation description and theory<a class="headerlink" href="#1.2.-Display-calculation-description-and-theory" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Display main docs and theory</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">calculation</span><span class="o">.</span><span class="n">maindoc</span><span class="p">))</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">calculation</span><span class="o">.</span><span class="n">theorydoc</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<section id="phonon-calculation-style">
+<h4>phonon calculation style<a class="headerlink" href="#phonon-calculation-style" title="Permalink to this heading">¶</a></h4>
+<p><strong>Lucas M. Hale</strong>, <a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>, <em>Materials Science and Engineering Division, NIST</em>.</p>
+<section id="Introduction">
+<h5>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this heading">¶</a></h5>
+<p>The phonon calculation style applies small atomic displacements to a unit cell system and evaluates the forces on the atoms to evaluate phonon-based properties.</p>
+<section id="Version-notes">
+<h6>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this heading">¶</a></h6>
+<ul class="simple">
+<li><p>2020-12-21: Script extended to include quasiharmonic calculations.</p></li>
+<li><p>2022-03-11: Notebook updated to reflect version 0.11.</p></li>
+</ul>
+</section>
+<section id="Additional-dependencies">
+<h6>Additional dependencies<a class="headerlink" href="#Additional-dependencies" title="Permalink to this heading">¶</a></h6>
+<ul class="simple">
+<li><p><a class="reference external" href="https://atztogo.github.io/spglib/python-spglib.html">spglib</a></p></li>
+<li><p><a class="reference external" href="https://atztogo.github.io/phonopy/">phonopy</a></p></li>
+<li><p><a class="reference external" href="https://pypi.org/project/seekpath/">seekpath</a></p></li>
+</ul>
+</section>
+<section id="Disclaimers">
+<h6>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this heading">¶</a></h6>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST disclaimers</a></p></li>
+</ul>
+</section>
+</section>
+</section>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<section id="Method-and-Theory">
+<h4>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this heading">¶</a></h4>
+<p>Starting with an initial system, <a class="reference external" href="https://atztogo.github.io/spglib/python-spglib.html">spglib</a> is used to identify the associated primitive unit cell. The primitive cell is passed to <a class="reference external" href="https://atztogo.github.io/phonopy/">phonopy</a>, which constructs super cell systems with small atomic displacements. A LAMMPS calculation is performed on the displaced systems to evaluate the atomic forces on each atom without relaxing. The measured atomic forces are then passed back to phonopy, which computes
+force constants for the system. Plots are then created for the band structure, density of states, and other thermal properties.</p>
+<p>See <a class="reference external" href="https://atztogo.github.io/phonopy/">phonopy</a> documentation for more details about the package and the associated theory.</p>
+</section>
+</div>
+</div>
+</section>
+</section>
+<section id="2.-Define-calculation-functions-and-generate-files">
+<h2>2. Define calculation functions and generate files<a class="headerlink" href="#2.-Define-calculation-functions-and-generate-files" title="Permalink to this heading">¶</a></h2>
+<p>This section defines the calculation functions and associated resource files exactly as they exist inside the iprPy package. This allows for the code used to be directly visible and modifiable by anyone looking to see how it works.</p>
+<section id="2.1.-phonon_quasiharmonic()">
+<h3>2.1. phonon_quasiharmonic()<a class="headerlink" href="#2.1.-phonon_quasiharmonic()" title="Permalink to this heading">¶</a></h3>
+<p>This is the primary function for the calculation. The version of this function built in iprPy can be accessed by calling the calc() method of an object of the associated calculation class.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">phonon_quasiharmonic</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                         <span class="n">ucell</span><span class="p">:</span> <span class="n">am</span><span class="o">.</span><span class="n">System</span><span class="p">,</span>
+                         <span class="n">potential</span><span class="p">:</span> <span class="n">lmp</span><span class="o">.</span><span class="n">Potential</span><span class="p">,</span>
+                         <span class="n">mpi_command</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">a_mult</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+                         <span class="n">b_mult</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+                         <span class="n">c_mult</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+                         <span class="n">distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+                         <span class="n">symprec</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span>
+                         <span class="n">strainrange</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+                         <span class="n">numstrains</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function that performs phonon and quasiharmonic approximation calculations</span>
+<span class="sd">    using phonopy and LAMMPS.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lammps_command :str</span>
+<span class="sd">        Command for running LAMMPS.</span>
+<span class="sd">    ucell : atomman.System</span>
+<span class="sd">        The unit cell system to perform the calculation on.</span>
+<span class="sd">    potential : atomman.lammps.Potential</span>
+<span class="sd">        The LAMMPS implemented potential to use.</span>
+<span class="sd">    mpi_command : str, optional</span>
+<span class="sd">        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS</span>
+<span class="sd">        will run serially.</span>
+<span class="sd">    a_mult : int, optional</span>
+<span class="sd">        The a size multiplier to use on ucell before running the phonon</span>
+<span class="sd">        calculation.  Must be an int and not a tuple.  Default value is 2.</span>
+<span class="sd">    b_mult : int, optional</span>
+<span class="sd">        The b size multiplier to use on ucell before running the phonon</span>
+<span class="sd">        calculation.  Must be an int and not a tuple.  Default value is 2.</span>
+<span class="sd">    c_mult : int, optional</span>
+<span class="sd">        The c size multiplier to use on ucell before running the phonon</span>
+<span class="sd">        calculation.  Must be an int and not a tuple.  Default value is 2.</span>
+<span class="sd">    distance : float, optional</span>
+<span class="sd">        The atomic displacement distance used for computing the phonons.</span>
+<span class="sd">        Default value is 0.01.</span>
+<span class="sd">    symprec : float, optional</span>
+<span class="sd">        Absolute length tolerance to use in identifying symmetry of atomic</span>
+<span class="sd">        sites and system boundaries. Default value is 1e-5.</span>
+<span class="sd">    strainrange : float, optional</span>
+<span class="sd">        The range of strains to apply to the unit cell to use with the</span>
+<span class="sd">        quasiharmonic calculations.  Default value is 0.01.</span>
+<span class="sd">    numstrains : int, optional</span>
+<span class="sd">        The number of strains to use for the quasiharmonic calculations.</span>
+<span class="sd">        Must be an odd integer.  If 1, then the quasiharmonic calculations</span>
+<span class="sd">        will not be performed.  Default value is 5.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get lammps units</span>
+    <span class="n">lammps_units</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+
+    <span class="c1"># Get lammps version date</span>
+    <span class="n">lammps_date</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">checkversion</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">)[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Convert ucell to a primitive cell</span>
+    <span class="n">ucell</span> <span class="o">=</span> <span class="n">ucell</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;primitive_cell&#39;</span><span class="p">,</span> <span class="n">symprec</span><span class="o">=</span><span class="n">symprec</span><span class="p">)</span>
+
+    <span class="c1"># Get unstrained box vectors</span>
+    <span class="n">vects</span> <span class="o">=</span> <span class="n">ucell</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">vects</span>
+
+    <span class="c1"># Generate the range of strains</span>
+    <span class="k">if</span> <span class="n">numstrains</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">zerostrain</span> <span class="o">=</span> <span class="n">phononcalc</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">ucell</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span>
+                                <span class="n">mpi_command</span><span class="o">=</span><span class="n">mpi_command</span><span class="p">,</span>
+                                <span class="n">a_mult</span><span class="o">=</span><span class="n">a_mult</span><span class="p">,</span> <span class="n">b_mult</span><span class="o">=</span><span class="n">b_mult</span><span class="p">,</span> <span class="n">c_mult</span><span class="o">=</span><span class="n">c_mult</span><span class="p">,</span>
+                                <span class="n">distance</span><span class="o">=</span><span class="n">distance</span><span class="p">,</span> <span class="n">symprec</span><span class="o">=</span><span class="n">symprec</span><span class="p">,</span>
+                                <span class="n">lammps_date</span><span class="o">=</span><span class="n">lammps_date</span><span class="p">)</span>
+        <span class="n">phonons</span> <span class="o">=</span> <span class="p">[</span><span class="n">zerostrain</span><span class="p">[</span><span class="s1">&#39;phonon&#39;</span><span class="p">]]</span>
+        <span class="n">qha</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">elif</span> <span class="n">numstrains</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">numstrains</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid number of strains: must be odd and 1 or &gt;= 5&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">strains</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">strainrange</span><span class="p">,</span> <span class="n">strainrange</span><span class="p">,</span> <span class="n">numstrains</span><span class="p">)</span>
+        <span class="n">istrains</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">numstrains</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">numstrains</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">numstrains</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="n">volumes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">energies</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">phonons</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">temperatures</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">free_energy</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">heat_capacity</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">entropy</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Loop over all strains</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numstrains</span><span class="p">):</span>
+            <span class="n">strain</span> <span class="o">=</span> <span class="n">strains</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">numstrains</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">istrain</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">istrains</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">istrain</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+            <span class="c1"># Identify the zero strain run</span>
+            <span class="k">if</span> <span class="n">istrains</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">zerostrainrun</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">zerostrainrun</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># Generate system at the strain</span>
+            <span class="n">newvects</span> <span class="o">=</span> <span class="n">vects</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">strain</span><span class="p">)</span>
+            <span class="n">ucell</span><span class="o">.</span><span class="n">box_set</span><span class="p">(</span><span class="n">vects</span><span class="o">=</span><span class="n">newvects</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">volumes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ucell</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">volume</span><span class="p">)</span>
+            <span class="n">system</span> <span class="o">=</span> <span class="n">ucell</span><span class="o">.</span><span class="n">supersize</span><span class="p">(</span><span class="n">a_mult</span><span class="p">,</span> <span class="n">b_mult</span><span class="p">,</span> <span class="n">c_mult</span><span class="p">)</span>
+
+            <span class="c1"># Define lammps variables</span>
+            <span class="n">lammps_variables</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">system_info</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;atom_data&#39;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="s1">&#39;disp.dat&#39;</span><span class="p">,</span>
+                                    <span class="n">potential</span><span class="o">=</span><span class="n">potential</span><span class="p">)</span>
+            <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_system_pair_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_info</span>
+
+            <span class="c1"># Set dump_modify_format based on lammps_date</span>
+            <span class="k">if</span> <span class="n">lammps_date</span> <span class="o">&lt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+                <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&quot;</span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1">&quot;&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;float </span><span class="si">%.13e</span><span class="s1">&#39;</span>
+
+            <span class="c1"># Write lammps input script</span>
+            <span class="n">lammps_script</span> <span class="o">=</span> <span class="s1">&#39;phonon.in&#39;</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">read_calc_file</span><span class="p">(</span><span class="s1">&#39;iprPy.calculation.phonon&#39;</span><span class="p">,</span> <span class="s1">&#39;phonon.template&#39;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lammps_script</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filltemplate</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">lammps_variables</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
+
+            <span class="c1"># Run LAMMPS</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">script_name</span><span class="o">=</span><span class="s1">&#39;phonon.in&#39;</span><span class="p">,</span>
+                             <span class="n">mpi_command</span><span class="o">=</span><span class="n">mpi_command</span><span class="p">)</span>
+
+            <span class="c1"># Extract system energy</span>
+            <span class="n">thermo</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">simulations</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;thermo&#39;</span><span class="p">]</span>
+            <span class="n">energy</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">thermo</span><span class="o">.</span><span class="n">PotEng</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;energy&#39;</span><span class="p">])</span>
+
+            <span class="c1"># Scale energy by sizemults and append to list</span>
+            <span class="n">energies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">energy</span> <span class="o">/</span> <span class="p">(</span><span class="n">a_mult</span> <span class="o">*</span> <span class="n">b_mult</span> <span class="o">*</span> <span class="n">c_mult</span><span class="p">))</span>
+
+            <span class="c1"># Compute phonon info for ucell</span>
+            <span class="n">phononinfo</span> <span class="o">=</span> <span class="n">phononcalc</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">ucell</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">mpi_command</span><span class="o">=</span><span class="n">mpi_command</span><span class="p">,</span>
+                                    <span class="n">a_mult</span><span class="o">=</span><span class="n">a_mult</span><span class="p">,</span> <span class="n">b_mult</span><span class="o">=</span><span class="n">b_mult</span><span class="p">,</span> <span class="n">c_mult</span><span class="o">=</span><span class="n">c_mult</span><span class="p">,</span>
+                                    <span class="n">distance</span><span class="o">=</span><span class="n">distance</span><span class="p">,</span> <span class="n">symprec</span><span class="o">=</span><span class="n">symprec</span><span class="p">,</span> <span class="n">istrain</span><span class="o">=</span><span class="n">istrain</span><span class="p">,</span>
+                                    <span class="n">plot</span><span class="o">=</span><span class="n">zerostrainrun</span><span class="p">,</span> <span class="n">lammps_date</span><span class="o">=</span><span class="n">lammps_date</span><span class="p">)</span>
+            <span class="n">phonons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">phononinfo</span><span class="p">[</span><span class="s1">&#39;phonon&#39;</span><span class="p">])</span>
+
+            <span class="c1"># Extract temperature values from the first run</span>
+            <span class="k">if</span> <span class="n">temperatures</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">temperatures</span> <span class="o">=</span> <span class="n">phononinfo</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">][</span><span class="s1">&#39;temperatures&#39;</span><span class="p">]</span>
+
+                <span class="c1"># Initialize QHA input arrays</span>
+                <span class="n">free_energy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">temperatures</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">strains</span><span class="p">)))</span>
+                <span class="n">heat_capacity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">temperatures</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">strains</span><span class="p">)))</span>
+                <span class="n">entropy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">temperatures</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">strains</span><span class="p">)))</span>
+
+            <span class="c1"># Get values for zerostrainrun</span>
+            <span class="k">if</span> <span class="n">zerostrainrun</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">zerostrain</span> <span class="o">=</span> <span class="n">phononinfo</span>
+
+            <span class="c1"># Copy values to qha input arrays</span>
+            <span class="n">free_energy</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">phononinfo</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">][</span><span class="s1">&#39;free_energy&#39;</span><span class="p">]</span>
+            <span class="n">entropy</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">phononinfo</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">][</span><span class="s1">&#39;entropy&#39;</span><span class="p">]</span>
+            <span class="n">heat_capacity</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">phononinfo</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">][</span><span class="s1">&#39;heat_capacity&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Try to compute qha</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">eos</span> <span class="o">=</span> <span class="s1">&#39;vinet&#39;</span>
+            <span class="n">qha</span> <span class="o">=</span> <span class="n">phonopy</span><span class="o">.</span><span class="n">PhonopyQHA</span><span class="p">(</span><span class="n">volumes</span><span class="o">=</span><span class="n">volumes</span><span class="p">,</span>
+                        <span class="n">electronic_energies</span><span class="o">=</span><span class="n">energies</span><span class="p">,</span>
+                        <span class="n">temperatures</span><span class="o">=</span><span class="n">temperatures</span><span class="p">,</span>
+                        <span class="n">free_energy</span><span class="o">=</span><span class="n">free_energy</span><span class="p">,</span>
+                        <span class="n">cv</span><span class="o">=</span><span class="n">heat_capacity</span><span class="p">,</span> <span class="n">eos</span><span class="o">=</span><span class="n">eos</span><span class="p">,</span>
+                        <span class="n">entropy</span><span class="o">=</span><span class="n">entropy</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">eos</span> <span class="o">=</span> <span class="s1">&#39;birch_murnaghan&#39;</span>
+                <span class="n">qha</span> <span class="o">=</span> <span class="n">phonopy</span><span class="o">.</span><span class="n">PhonopyQHA</span><span class="p">(</span><span class="n">volumes</span><span class="o">=</span><span class="n">volumes</span><span class="p">,</span>
+                        <span class="n">electronic_energies</span><span class="o">=</span><span class="n">energies</span><span class="p">,</span>
+                        <span class="n">temperatures</span><span class="o">=</span><span class="n">temperatures</span><span class="p">,</span>
+                        <span class="n">free_energy</span><span class="o">=</span><span class="n">free_energy</span><span class="p">,</span>
+                        <span class="n">cv</span><span class="o">=</span><span class="n">heat_capacity</span><span class="p">,</span> <span class="n">eos</span><span class="o">=</span><span class="n">eos</span><span class="p">,</span>
+                        <span class="n">entropy</span><span class="o">=</span><span class="n">entropy</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">qha</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Add phonopy objects</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;phonon_objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">phonons</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;qha_object&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qha</span>
+
+    <span class="c1"># Extract zerostrain properties</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;band_structure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zerostrain</span><span class="p">[</span><span class="s1">&#39;band_structure&#39;</span><span class="p">]</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;density_of_states&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zerostrain</span><span class="p">[</span><span class="s1">&#39;dos&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Convert units on thermal properties</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zerostrain</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">]</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">][</span><span class="s1">&#39;temperature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;temperatures&#39;</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">][</span><span class="s1">&#39;Helmholtz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;free_energy&#39;</span><span class="p">),</span> <span class="s1">&#39;kJ/mol&#39;</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">][</span><span class="s1">&#39;entropy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;entropy&#39;</span><span class="p">),</span> <span class="s1">&#39;J/K/mol&#39;</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">][</span><span class="s1">&#39;heat_capacity_v&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;heat_capacity&#39;</span><span class="p">),</span> <span class="s1">&#39;J/K/mol&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">qha</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;qha_eos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eos</span>
+
+        <span class="c1"># Create QHA plots</span>
+        <span class="n">qha</span><span class="o">.</span><span class="n">plot_bulk_modulus</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Volume ($Å^3$)&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;large&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Energy ($eV$)&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;large&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;bulk_modulus.png&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="n">qha</span><span class="o">.</span><span class="n">plot_helmholtz_volume</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;helmholtz_volume.png&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="c1"># Package volume vs energy scans</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;volume_scan&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;volume_scan&#39;</span><span class="p">][</span><span class="s1">&#39;volume&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">volumes</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;volume_scan&#39;</span><span class="p">][</span><span class="s1">&#39;strain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">strains</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;volume_scan&#39;</span><span class="p">][</span><span class="s1">&#39;energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">energies</span><span class="p">)</span>
+
+        <span class="c1"># Compute and add QHA properties</span>
+        <span class="n">properties</span> <span class="o">=</span> <span class="n">qha</span><span class="o">.</span><span class="n">get_bulk_modulus_parameters</span><span class="p">()</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;E0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">properties</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;eV&#39;</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;B0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">properties</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;eV/angstrom^3&#39;</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;B0prime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">properties</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;eV/angstrom^3&#39;</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;V0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">properties</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;angstrom^3&#39;</span><span class="p">)</span>
+
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">][</span><span class="s1">&#39;volume&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">qha</span><span class="o">.</span><span class="n">volume_temperature</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]),</span> <span class="s1">&#39;angstrom^3&#39;</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">][</span><span class="s1">&#39;thermal_expansion&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">qha</span><span class="o">.</span><span class="n">thermal_expansion</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">])</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">][</span><span class="s1">&#39;Gibbs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">qha</span><span class="o">.</span><span class="n">gibbs_temperature</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]),</span> <span class="s1">&#39;eV&#39;</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">][</span><span class="s1">&#39;bulk_modulus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">qha</span><span class="o">.</span><span class="n">bulk_modulus_temperature</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]),</span> <span class="s1">&#39;GPa&#39;</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">][</span><span class="s1">&#39;heat_capacity_p_numerical&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">qha</span><span class="o">.</span><span class="n">heat_capacity_P_numerical</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]),</span> <span class="s1">&#39;J/K/mol&#39;</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">][</span><span class="s1">&#39;heat_capacity_p_polyfit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">qha</span><span class="o">.</span><span class="n">heat_capacity_P_polyfit</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]),</span> <span class="s1">&#39;J/K/mol&#39;</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">][</span><span class="s1">&#39;gruneisen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">qha</span><span class="o">.</span><span class="n">gruneisen_temperature</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">results</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="2.2.-phononcalc()">
+<h3>2.2. phononcalc()<a class="headerlink" href="#2.2.-phononcalc()" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">phononcalc</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+               <span class="n">ucell</span><span class="p">:</span> <span class="n">am</span><span class="o">.</span><span class="n">System</span><span class="p">,</span>
+               <span class="n">potential</span><span class="p">:</span> <span class="n">lmp</span><span class="o">.</span><span class="n">Potential</span><span class="p">,</span>
+               <span class="n">mpi_command</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">a_mult</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+               <span class="n">b_mult</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+               <span class="n">c_mult</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+               <span class="n">distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+               <span class="n">symprec</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span>
+               <span class="n">istrain</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+               <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+               <span class="n">lammps_date</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Uses phonopy to compute the phonons for a unit cell structure using a</span>
+<span class="sd">    LAMMPS interatomic potential.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lammps_command :str</span>
+<span class="sd">        Command for running LAMMPS.</span>
+<span class="sd">    ucell : atomman.System</span>
+<span class="sd">        The unit cell system to perform the calculation on.</span>
+<span class="sd">    potential : atomman.lammps.Potential</span>
+<span class="sd">        The LAMMPS implemented potential to use.</span>
+<span class="sd">    mpi_command : str, optional</span>
+<span class="sd">        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS</span>
+<span class="sd">        will run serially.</span>
+<span class="sd">    a_mult : int, optional</span>
+<span class="sd">        The a size multiplier to use on ucell before running the phonon</span>
+<span class="sd">        calculation.  Must be an int and not a tuple.  Default value is 2.</span>
+<span class="sd">    b_mult : int, optional</span>
+<span class="sd">        The b size multiplier to use on ucell before running the phonon</span>
+<span class="sd">        calculation.  Must be an int and not a tuple.  Default value is 2.</span>
+<span class="sd">    c_mult : int, optional</span>
+<span class="sd">        The c size multiplier to use on ucell before running the phonon</span>
+<span class="sd">        calculation.  Must be an int and not a tuple.  Default value is 2.</span>
+<span class="sd">    distance : float, optional</span>
+<span class="sd">        The atomic displacement distance used for computing the phonons.</span>
+<span class="sd">        Default value is 0.01.</span>
+<span class="sd">    symprec : float, optional</span>
+<span class="sd">        Absolute length tolerance to use in identifying symmetry of atomic</span>
+<span class="sd">        sites and system boundaries. Default value is 1e-5.</span>
+<span class="sd">    istrain: str, optional</span>
+<span class="sd">        A string to add to saved yaml files to ensure their uniqueness for the</span>
+<span class="sd">        different strains explored by QHA.  Default value is &#39;&#39;, which assumes</span>
+<span class="sd">        only one calculation is being performed.</span>
+<span class="sd">    plot : bool, optional</span>
+<span class="sd">        Flag indicating if band structure and DOS figures are to be generated.</span>
+<span class="sd">        Default value is True.</span>
+<span class="sd">    lammps_date : datetime.date, optional</span>
+<span class="sd">        The version date associated with lammps_command.  If not given, the</span>
+<span class="sd">        version will be identified.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get lammps units</span>
+    <span class="n">lammps_units</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="n">potential</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+
+    <span class="c1"># Get lammps version date</span>
+    <span class="k">if</span> <span class="n">lammps_date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">lammps_date</span> <span class="o">=</span> <span class="n">lmp</span><span class="o">.</span><span class="n">checkversion</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">)[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span>
+
+   <span class="c1"># Convert ucell to a primitive cell</span>
+    <span class="n">ucell</span> <span class="o">=</span> <span class="n">ucell</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;primitive_cell&#39;</span><span class="p">,</span> <span class="n">symprec</span><span class="o">=</span><span class="n">symprec</span><span class="p">)</span>
+
+    <span class="c1"># Initialize Phonopy object</span>
+    <span class="n">phonon</span> <span class="o">=</span> <span class="n">phonopy</span><span class="o">.</span><span class="n">Phonopy</span><span class="p">(</span><span class="n">ucell</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;phonopy_Atoms&#39;</span><span class="p">,</span> <span class="n">symbols</span><span class="o">=</span><span class="n">potential</span><span class="o">.</span><span class="n">elements</span><span class="p">(</span><span class="n">ucell</span><span class="o">.</span><span class="n">symbols</span><span class="p">)),</span>
+                             <span class="p">[[</span><span class="n">a_mult</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">b_mult</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">c_mult</span><span class="p">]],</span>
+                             <span class="n">factor</span><span class="o">=</span><span class="n">phonopy</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">VaspToTHz</span><span class="p">)</span>
+    <span class="n">phonon</span><span class="o">.</span><span class="n">generate_displacements</span><span class="p">(</span><span class="n">distance</span><span class="o">=</span><span class="n">distance</span><span class="p">)</span>
+
+    <span class="c1"># Loop over displaced supercells to compute forces</span>
+    <span class="n">forcearrays</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">supercell</span> <span class="ow">in</span> <span class="n">phonon</span><span class="o">.</span><span class="n">supercells_with_displacements</span><span class="p">:</span>
+
+        <span class="c1"># Save to LAMMPS data file</span>
+        <span class="n">system</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;phonopy_Atoms&#39;</span><span class="p">,</span> <span class="n">supercell</span><span class="p">,</span> <span class="n">symbols</span><span class="o">=</span><span class="n">ucell</span><span class="o">.</span><span class="n">symbols</span><span class="p">)</span>
+        <span class="n">system_info</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;atom_data&#39;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="s1">&#39;disp.dat&#39;</span><span class="p">,</span>
+                                  <span class="n">potential</span><span class="o">=</span><span class="n">potential</span><span class="p">)</span>
+
+        <span class="c1"># Define lammps variables</span>
+        <span class="n">lammps_variables</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;atomman_system_pair_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_info</span>
+
+        <span class="c1"># Set dump_modify_format based on lammps_date</span>
+        <span class="k">if</span> <span class="n">lammps_date</span> <span class="o">&lt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&quot;</span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1"> </span><span class="si">%.13e</span><span class="s1">&quot;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;float </span><span class="si">%.13e</span><span class="s1">&#39;</span>
+
+        <span class="c1"># Write lammps input script</span>
+        <span class="n">lammps_script</span> <span class="o">=</span> <span class="s1">&#39;phonon.in&#39;</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">read_calc_file</span><span class="p">(</span><span class="s1">&#39;iprPy.calculation.phonon&#39;</span><span class="p">,</span> <span class="s1">&#39;phonon.template&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lammps_script</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filltemplate</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">lammps_variables</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
+
+        <span class="c1"># Run LAMMPS</span>
+        <span class="n">lmp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">script_name</span><span class="o">=</span><span class="n">lammps_script</span><span class="p">,</span> <span class="n">mpi_command</span><span class="o">=</span><span class="n">mpi_command</span><span class="p">)</span>
+
+        <span class="c1"># Extract forces from dump file</span>
+        <span class="n">forcestructure</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;atom_dump&#39;</span><span class="p">,</span> <span class="s1">&#39;forces.dump&#39;</span><span class="p">)</span>
+        <span class="n">forces</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">forcestructure</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">force</span><span class="p">,</span> <span class="n">lammps_units</span><span class="p">[</span><span class="s1">&#39;force&#39;</span><span class="p">])</span>
+        <span class="n">forcearrays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">forces</span><span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Set computed forces</span>
+    <span class="n">phonon</span><span class="o">.</span><span class="n">forces</span> <span class="o">=</span> <span class="n">forcearrays</span>
+
+    <span class="c1"># Save to yaml file</span>
+    <span class="n">phonon</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;phonopy_params</span><span class="si">{</span><span class="n">istrain</span><span class="si">}</span><span class="s1">.yaml&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Compute band structure</span>
+    <span class="n">phonon</span><span class="o">.</span><span class="n">produce_force_constants</span><span class="p">()</span>
+    <span class="n">phonon</span><span class="o">.</span><span class="n">auto_band_structure</span><span class="p">(</span><span class="n">plot</span><span class="o">=</span><span class="n">plot</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;band_structure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">phonon</span><span class="o">.</span><span class="n">get_band_structure_dict</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency (THz)&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;band.png&#39;</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># Compute density of states</span>
+    <span class="n">phonon</span><span class="o">.</span><span class="n">auto_total_dos</span><span class="p">(</span><span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">phonon</span><span class="o">.</span><span class="n">auto_projected_dos</span><span class="p">(</span><span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">dos</span> <span class="o">=</span> <span class="n">phonon</span><span class="o">.</span><span class="n">get_total_dos_dict</span><span class="p">()</span>
+    <span class="n">dos</span><span class="p">[</span><span class="s1">&#39;frequency&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="n">dos</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;frequency_points&#39;</span><span class="p">),</span> <span class="s1">&#39;THz&#39;</span><span class="p">)</span>
+    <span class="n">dos</span><span class="p">[</span><span class="s1">&#39;projected_dos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">phonon</span><span class="o">.</span><span class="n">get_projected_dos_dict</span><span class="p">()[</span><span class="s1">&#39;projected_dos&#39;</span><span class="p">]</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;dos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dos</span>
+
+    <span class="c1"># Compute thermal properties</span>
+    <span class="n">phonon</span><span class="o">.</span><span class="n">run_thermal_properties</span><span class="p">()</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">phonon</span><span class="o">.</span><span class="n">get_thermal_properties_dict</span><span class="p">()</span>
+    <span class="n">phonon</span><span class="o">.</span><span class="n">write_yaml_thermal_properties</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;thermal_properties</span><span class="si">{</span><span class="n">istrain</span><span class="si">}</span><span class="s2">.yaml&quot;</span><span class="p">)</span>
+
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;phonon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">phonon</span>
+    <span class="k">return</span> <span class="n">results</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="2.3.-phonon.template-file">
+<h3>2.3. phonon.template file<a class="headerlink" href="#2.3.-phonon.template-file" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;phonon.template&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;# LAMMPS input script that evaluates atomic forces without relaxing</span>
+
+<span class="s2">box tilt large</span>
+
+<span class="s2">&lt;atomman_system_pair_info&gt;</span>
+
+<span class="s2">thermo_style custom step pe</span>
+<span class="s2">thermo_modify format float </span><span class="si">%.13e</span><span class="s2"></span>
+
+<span class="s2">dump dumpy all custom 1 forces.dump id type x y z fx fy fz</span>
+<span class="s2">dump_modify dumpy format &lt;dump_modify_format&gt;</span>
+
+<span class="s2">run 0&quot;&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="3.-Specify-input-parameters">
+<h2>3. Specify input parameters<a class="headerlink" href="#3.-Specify-input-parameters" title="Permalink to this heading">¶</a></h2>
+<section id="3.1.-System-specific-paths">
+<h3>3.1. System-specific paths<a class="headerlink" href="#3.1.-System-specific-paths" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>lammps_command</strong> is the LAMMPS command to use (required).</p></li>
+<li><p><strong>mpi_command</strong> MPI command for running LAMMPS in parallel. A value of None will run simulations serially.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lammps_command</span> <span class="o">=</span> <span class="s1">&#39;f:/LAMMPS/2020-03-03/bin/lmp_serial.exe&#39;</span>
+<span class="n">mpi_command</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="3.2.-Interatomic-potential">
+<h3>3.2. Interatomic potential<a class="headerlink" href="#3.2.-Interatomic-potential" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>potential_name</strong> gives the name of the potential_LAMMPS reference record in the iprPy library to use for the calculation.</p></li>
+<li><p><strong>potential</strong> is an atomman.lammps.Potential object (required).</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">potential_name</span> <span class="o">=</span> <span class="s1">&#39;1999--Mishin-Y--Ni--LAMMPS--ipr1&#39;</span>
+
+<span class="c1"># Retrieve potential and parameter file(s)</span>
+<span class="n">potential</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load_lammps_potential</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">potential_name</span><span class="p">,</span> <span class="n">getfiles</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="3.3.-Initial-unit-cell-system">
+<h3>3.3. Initial unit cell system<a class="headerlink" href="#3.3.-Initial-unit-cell-system" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>ucell</strong> is an atomman.System representing a fundamental unit cell of the system (required). Here, this is generated using the load parameters and symbols.</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Create ucell by loading prototype record</span>
+<span class="n">ucell</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;crystal&#39;</span><span class="p">,</span> <span class="n">potential</span><span class="o">=</span><span class="n">potential</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;A1--Cu--fcc&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">ucell</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Multiple matching record retrieved from local
+#  family               symbols  alat    Ecoh    method  standing
+ 1 A1--Cu--fcc          Ni        3.5200 -4.4500 dynamic good
+ 2 A1--Cu--fcc          Ni        7.3760  0.0119 dynamic good
+Please select one:1
+avect =  [ 3.520,  0.000,  0.000]
+bvect =  [ 0.000,  3.520,  0.000]
+cvect =  [ 0.000,  0.000,  3.520]
+origin = [ 0.000,  0.000,  0.000]
+natoms = 4
+natypes = 1
+symbols = (&#39;Ni&#39;,)
+pbc = [ True  True  True]
+per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
+     id |   atype |  pos[0] |  pos[1] |  pos[2]
+      0 |       1 |   0.000 |   0.000 |   0.000
+      1 |       1 |   0.000 |   1.760 |   1.760
+      2 |       1 |   1.760 |   0.000 |   1.760
+      3 |       1 |   1.760 |   1.760 |   0.000
+</pre></div></div>
+</div>
+</section>
+<section id="3.4.-System-modifications">
+<h3>3.4. System modifications<a class="headerlink" href="#3.4.-System-modifications" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>sizemults</strong> list of three integers specifying how many times the ucell vectors of <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span> and <span class="math notranslate nohighlight">\(c\)</span> are replicated in creating system.</p></li>
+<li><p><strong>system</strong> is an atomman.System to perform the scan on (required).</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">sizemults</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+
+<span class="c1"># Generate system by supersizing ucell</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ucell</span><span class="o">.</span><span class="n">supersize</span><span class="p">(</span><span class="o">*</span><span class="n">sizemults</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;# of atoms in system =&#39;</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">natoms</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+# of atoms in system = 32
+</pre></div></div>
+</div>
+</section>
+<section id="3.5.-Calculation-specific-parameters">
+<h3>3.5. Calculation-specific parameters<a class="headerlink" href="#3.5.-Calculation-specific-parameters" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>displacementdistance</strong> is the displacement distance scalar to use when applying random displacements to the atoms to compute the force constants.</p></li>
+<li><p><strong>symmetryprecision</strong> is the absolute precision tolerance to use in determining crystal symmetry elements for identifying the primitive unit cell.</p></li>
+<li><p><strong>strainrange</strong> is the size of the largest strain used for the quasiharmonic calculations.</p></li>
+<li><p><strong>numstrains</strong> is the number of strain states to use for the quasiharmonic calculation. Needs to be odd and either 1 or greater than or equal to 5. If set to 1, then the quasiharmonic calculations will not be performed.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">displacementdistance</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;angstrom&#39;</span><span class="p">)</span>
+<span class="n">symmetryprecision</span> <span class="o">=</span> <span class="mf">1e-5</span>
+<span class="n">strainrange</span> <span class="o">=</span> <span class="mf">0.01</span>
+<span class="n">numstrains</span> <span class="o">=</span> <span class="mi">5</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="3.-Define-calculation-function(s)-and-generate-template-LAMMPS-script(s)">
+<h3>3. Define calculation function(s) and generate template LAMMPS script(s)<a class="headerlink" href="#3.-Define-calculation-function(s)-and-generate-template-LAMMPS-script(s)" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="4.-Run-calculation-function(s)">
+<h3>4. Run calculation function(s)<a class="headerlink" href="#4.-Run-calculation-function(s)" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">results_dict</span> <span class="o">=</span> <span class="n">phonon_quasiharmonic</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">ucell</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span>
+                                    <span class="n">mpi_command</span> <span class="o">=</span> <span class="n">mpi_command</span><span class="p">,</span>
+                                    <span class="n">a_mult</span> <span class="o">=</span> <span class="n">sizemults</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                    <span class="n">b_mult</span> <span class="o">=</span> <span class="n">sizemults</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                    <span class="n">c_mult</span> <span class="o">=</span> <span class="n">sizemults</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                                    <span class="n">distance</span> <span class="o">=</span> <span class="n">displacementdistance</span><span class="p">,</span>
+                                    <span class="n">symprec</span> <span class="o">=</span> <span class="n">symmetryprecision</span><span class="p">,</span>
+                                    <span class="n">strainrange</span> <span class="o">=</span> <span class="n">strainrange</span><span class="p">,</span>
+                                    <span class="n">numstrains</span> <span class="o">=</span> <span class="n">numstrains</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">results_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+dict_keys([&#39;phonon_objects&#39;, &#39;qha_object&#39;, &#39;band_structure&#39;, &#39;density_of_states&#39;, &#39;thermal_properties&#39;, &#39;qha_eos&#39;, &#39;volume_scan&#39;, &#39;E0&#39;, &#39;B0&#39;, &#39;B0prime&#39;, &#39;V0&#39;])
+</pre></div></div>
+</div>
+</section>
+<section id="5.-Report-results">
+<h3>5. Report results<a class="headerlink" href="#5.-Report-results" title="Permalink to this heading">¶</a></h3>
+<p>The calculation both returns results_dict containing phonon information and generates files.</p>
+<section id="5.1.-Phonon-properties">
+<h4>5.1. Phonon properties<a class="headerlink" href="#5.1.-Phonon-properties" title="Permalink to this heading">¶</a></h4>
+<p>In results_dict:</p>
+<ul class="simple">
+<li><p><strong>phonon_objects</strong> is a list containing all of the Phonopy objects at all of the strains evaluated.</p></li>
+<li><p><strong>band_structure</strong> contains the evaluated band structure points for the zero strain structure.</p></li>
+<li><p><strong>density_of_states</strong> contains the evaluated density of states (both total and projected) for the zero strain structure.</p></li>
+<li><p><strong>thermal_properties</strong> contains the temperature-dependent Helmholtz free energy, entropy, and constant volume heat capacity.</p></li>
+</ul>
+<p>Generated files:</p>
+<ul class="simple">
+<li><p><strong>band.png</strong> plots the band structure for the zero strain structure.</p></li>
+<li><p><strong>phonopy_params.yaml</strong> is the YAML-formatted Phonopy data that can be read back in to generate a Phonopy object later.</p></li>
+</ul>
+</section>
+<section id="5.2.-Quasiharmonic-properties">
+<h4>5.2. Quasiharmonic properties<a class="headerlink" href="#5.2.-Quasiharmonic-properties" title="Permalink to this heading">¶</a></h4>
+<p>These are only generated if numstrains is greater than 1.</p>
+<p>In results_dict:</p>
+<ul class="simple">
+<li><p><strong>qha_object</strong> is the PhonopyQHA object.</p></li>
+<li><p><strong>volume_scan</strong> contains the energy versus volume evaluations taken from the different strain states.</p></li>
+<li><p><strong>E0, B0, B0prime, V0</strong> are the energy, Bulk modulus, B’ modulus, and volume associated with the interpolated equilibrium state from the volume scan.</p></li>
+<li><p><strong>thermal_properties</strong> is expanded to also include the temperature-dependent volume, thermal expansion, Gibbs free energy, bulk modulus, constant pressure heat capacity, and Grüneisen parameter.</p></li>
+</ul>
+<p>Generated files:</p>
+<ul class="simple">
+<li><p><strong>bulk_modulus.png</strong> plots the volume scan data as it is used to estimate the bulk modulus. This plot provides a quick visual means of telling if the quasiharmonic analysis is likely good for the strains explored.</p></li>
+<li><p><strong>helmholtz.png</strong> plots the helmholtz free energy versus volume.</p></li>
+<li><p><strong>phonopy_params_*.yaml</strong> are the YAML-formatted Phonopy data for the non-zero strains that can be read back in to generate Phonopy objects later.</p></li>
+</ul>
+<p>Band structure plot and values</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;keys of &quot;band_structure&quot;:&#39;</span><span class="p">,</span> <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;band_structure&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="n">Image</span><span class="p">(</span><span class="s2">&quot;band.png&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+keys of &#34;band_structure&#34;: dict_keys([&#39;qpoints&#39;, &#39;distances&#39;, &#39;frequencies&#39;, &#39;eigenvectors&#39;, &#39;group_velocities&#39;])
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebook_phonon_31_1.png" class="no-scaled-link" src="../_images/notebook_phonon_31_1.png" style="width: 600px;" />
+</div>
+</div>
+<p>Volume versus energy scan plot and values</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;keys of &quot;volume_scan&quot;:&#39;</span><span class="p">,</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;volume_scan&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;E0 =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E0&#39;</span><span class="p">],</span> <span class="s1">&#39;eV&#39;</span><span class="p">),</span> <span class="s1">&#39;eV&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;B0 =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;B0&#39;</span><span class="p">],</span> <span class="s1">&#39;GPa&#39;</span><span class="p">),</span> <span class="s1">&#39;GPa&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;B0`=&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;B0prime&#39;</span><span class="p">],</span> <span class="s1">&#39;GPa&#39;</span><span class="p">),</span> <span class="s1">&#39;GPa&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;V0 =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;V0&#39;</span><span class="p">],</span> <span class="s1">&#39;Å^3&#39;</span><span class="p">),</span> <span class="s1">&#39;Å^3&#39;</span><span class="p">)</span>
+
+<span class="n">Image</span><span class="p">(</span><span class="s2">&quot;bulk_modulus.png&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+keys of &#34;volume_scan&#34;: dict_keys([&#39;volume&#39;, &#39;strain&#39;, &#39;energy&#39;])
+E0 = -4.450015536334153 eV
+B0 = 187.29046746992995 GPa
+B0`= 137.80052380494982 GPa
+V0 = 10.90348147775658 Å^3
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebook_phonon_33_1.png" class="no-scaled-link" src="../_images/notebook_phonon_33_1.png" style="width: 600px;" />
+</div>
+</div>
+<p>Helmholtz free energy versus volume plot</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">Image</span><span class="p">(</span><span class="s2">&quot;helmholtz_volume.png&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebook_phonon_35_0.png" class="no-scaled-link" src="../_images/notebook_phonon_35_0.png" style="width: 600px;" />
+</div>
+</div>
+<p>Density of states</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dos</span> <span class="o">=</span> <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;density_of_states&#39;</span><span class="p">]</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+
+<span class="n">frequency</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">dos</span><span class="p">[</span><span class="s1">&#39;frequency&#39;</span><span class="p">],</span> <span class="s1">&#39;THz&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">frequency</span><span class="p">,</span> <span class="n">dos</span><span class="p">[</span><span class="s1">&#39;total_dos&#39;</span><span class="p">],</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;total&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">projected</span> <span class="ow">in</span> <span class="n">dos</span><span class="p">[</span><span class="s1">&#39;projected_dos&#39;</span><span class="p">]:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">frequency</span><span class="p">,</span> <span class="n">projected</span><span class="p">,</span> <span class="s1">&#39;r:&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;projected&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency (THz)&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Density of states&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebook_phonon_37_0.png" src="../_images/notebook_phonon_37_0.png" />
+</div>
+</div>
+<p>Thermal properties - pull out temperature</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+<span class="n">thermal</span> <span class="o">=</span> <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;thermal_properties&#39;</span><span class="p">]</span>
+<span class="n">temperature</span> <span class="o">=</span> <span class="n">thermal</span><span class="p">[</span><span class="s1">&#39;temperature&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>Helmholtz and Gibbs free energies versus temperature</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">energy_unit</span> <span class="o">=</span> <span class="s1">&#39;eV&#39;</span>
+<span class="c1">#energy_unit = &#39;kJ/mol&#39;</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">helmholtz</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">thermal</span><span class="p">[</span><span class="s1">&#39;Helmholtz&#39;</span><span class="p">],</span> <span class="n">energy_unit</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">helmholtz</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Temperature ($K$)&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Helmholtz free energy ($</span><span class="si">{</span><span class="n">energy_unit</span><span class="si">}</span><span class="s1">$)&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">gibbs</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">thermal</span><span class="p">[</span><span class="s1">&#39;Gibbs&#39;</span><span class="p">],</span> <span class="n">energy_unit</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">gibbs</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Temperature ($K$)&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Gibbs free energy ($</span><span class="si">{</span><span class="n">energy_unit</span><span class="si">}</span><span class="s1">$)&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebook_phonon_41_0.png" src="../_images/notebook_phonon_41_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebook_phonon_41_1.png" src="../_images/notebook_phonon_41_1.png" />
+</div>
+</div>
+<p>Entropy and heat capacity versus temperature</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#entropy_unit = &#39;eV/K&#39;</span>
+<span class="n">entropy_unit</span> <span class="o">=</span> <span class="s1">&#39;J/K/mol&#39;</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">entropy</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">thermal</span><span class="p">[</span><span class="s1">&#39;entropy&#39;</span><span class="p">],</span> <span class="n">entropy_unit</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">entropy</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Temperature ($K$)&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Entropy ($</span><span class="si">{</span><span class="n">entropy_unit</span><span class="si">}</span><span class="s1">$)&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">heat_capacity_v</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">thermal</span><span class="p">[</span><span class="s1">&#39;heat_capacity_v&#39;</span><span class="p">],</span> <span class="n">entropy_unit</span><span class="p">)</span>
+<span class="n">heat_capacity_p_numerical</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">thermal</span><span class="p">[</span><span class="s1">&#39;heat_capacity_p_numerical&#39;</span><span class="p">],</span> <span class="n">entropy_unit</span><span class="p">)</span>
+<span class="n">heat_capacity_p_polyfit</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">thermal</span><span class="p">[</span><span class="s1">&#39;heat_capacity_p_polyfit&#39;</span><span class="p">],</span> <span class="n">entropy_unit</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">heat_capacity_v</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Cv&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">heat_capacity_p_numerical</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Cp (numerical)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">heat_capacity_p_polyfit</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Cp (polyfit)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Temperature ($K$)&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Heat capacity ($</span><span class="si">{</span><span class="n">entropy_unit</span><span class="si">}</span><span class="s1">$)&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebook_phonon_43_0.png" src="../_images/notebook_phonon_43_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebook_phonon_43_1.png" src="../_images/notebook_phonon_43_1.png" />
+</div>
+</div>
+<p>Volume versus temperature</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">volume_unit</span> <span class="o">=</span> <span class="s1">&#39;Å^3&#39;</span>
+<span class="c1">#volume_unit = &#39;nm^3&#39;</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">volume</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">thermal</span><span class="p">[</span><span class="s1">&#39;volume&#39;</span><span class="p">],</span> <span class="n">volume_unit</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Temperature ($K$)&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Volume ($</span><span class="si">{</span><span class="n">volume_unit</span><span class="si">}</span><span class="s1">$)&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebook_phonon_45_0.png" src="../_images/notebook_phonon_45_0.png" />
+</div>
+</div>
+<p>Thermal expansion versus temperature</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">expansion</span> <span class="o">=</span> <span class="n">thermal</span><span class="p">[</span><span class="s1">&#39;thermal_expansion&#39;</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">expansion</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Temperature ($K$)&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Thermal expansion&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebook_phonon_47_0.png" src="../_images/notebook_phonon_47_0.png" />
+</div>
+</div>
+<p>Grüneisen parameter versus temperature</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">gruneisen</span> <span class="o">=</span> <span class="n">thermal</span><span class="p">[</span><span class="s1">&#39;gruneisen&#39;</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">gruneisen</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Temperature ($K$)&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Grüneisen parameter&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebook_phonon_49_0.png" src="../_images/notebook_phonon_49_0.png" />
+</div>
+</div>
+</section>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">phonon - Methodology and code</a><ul>
+<li><a class="reference internal" href="#1.-Load-calculation-and-view-description">1. Load calculation and view description</a><ul>
+<li><a class="reference internal" href="#1.1.-Load-the-calculation">1.1. Load the calculation</a></li>
+<li><a class="reference internal" href="#1.2.-Display-calculation-description-and-theory">1.2. Display calculation description and theory</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#2.-Define-calculation-functions-and-generate-files">2. Define calculation functions and generate files</a><ul>
+<li><a class="reference internal" href="#2.1.-phonon_quasiharmonic()">2.1. phonon_quasiharmonic()</a></li>
+<li><a class="reference internal" href="#2.2.-phononcalc()">2.2. phononcalc()</a></li>
+<li><a class="reference internal" href="#2.3.-phonon.template-file">2.3. phonon.template file</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#3.-Specify-input-parameters">3. Specify input parameters</a><ul>
+<li><a class="reference internal" href="#3.1.-System-specific-paths">3.1. System-specific paths</a></li>
+<li><a class="reference internal" href="#3.2.-Interatomic-potential">3.2. Interatomic potential</a></li>
+<li><a class="reference internal" href="#3.3.-Initial-unit-cell-system">3.3. Initial unit cell system</a></li>
+<li><a class="reference internal" href="#3.4.-System-modifications">3.4. System modifications</a></li>
+<li><a class="reference internal" href="#3.5.-Calculation-specific-parameters">3.5. Calculation-specific parameters</a></li>
+<li><a class="reference internal" href="#3.-Define-calculation-function(s)-and-generate-template-LAMMPS-script(s)">3. Define calculation function(s) and generate template LAMMPS script(s)</a></li>
+<li><a class="reference internal" href="#4.-Run-calculation-function(s)">4. Run calculation function(s)</a></li>
+<li><a class="reference internal" href="#5.-Report-results">5. Report results</a><ul>
+<li><a class="reference internal" href="#5.1.-Phonon-properties">5.1. Phonon properties</a></li>
+<li><a class="reference internal" href="#5.2.-Quasiharmonic-properties">5.2. Quasiharmonic properties</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="isolated_atom.html"
+                          title="previous chapter">isolated_atom - Methodology and code</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="point_defect_static.html"
+                          title="next chapter">point_defect_static - Methodology and code</a></p>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="point_defect_static.html" title="point_defect_static - Methodology and code"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="isolated_atom.html" title="isolated_atom - Methodology and code"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">phonon - Methodology and code</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
+    </div>
+  </body>
+</html>

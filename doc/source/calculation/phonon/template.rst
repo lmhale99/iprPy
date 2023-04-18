@@ -68,38 +68,6 @@ configuration.
    for triclinic boxes. The a, b, c parameters are in units of length
    and the alpha, beta, gamma angles are in degrees.
 
-System Manipulations
---------------------
-
-Performs simple manipulations on the loaded initial system.
-
--  **a_uvw**: The Miller(-Bravais) crystal vector relative to the loaded
-   system to orient with the a box vector of a resulting rotated system.
-   Specified as three or four space-delimited numbers. Either all or
-   none of the uvw parameters must be given.
--  **b_uvw**: The Miller(-Bravais) crystal vector relative to the loaded
-   system to orient with the b box vector of a resulting rotated system.
-   Specified as three or four space-delimited numbers. Either all or
-   none of the uvw parameters must be given.
--  **c_uvw**: The Miller(-Bravais) crystal vector relative to the loaded
-   system to orient with the c box vector of a resulting rotated system.
-   Specified as three or four space-delimited numbers. Either all or
-   none of the uvw parameters must be given.
--  **atomshift**: A rigid-body shift vector to apply to all atoms in the
-   rotated configuration. Specified as three space-delimited numbers
-   that are relative to the size of the system after rotating, but
-   before sizemults have been applied. This allows for the same relative
-   shift of similar systems regardless of box_parameters and sizemults.
-   Default value is ‘0.0 0.0 0.0’ (i.e. no shift).
--  **sizemults**: Multiplication parameters to construct a supercell
-   from the rotated system. Given as either three or six space-delimited
-   integers. For three integers, each value indicates the number of
-   replicas to make along the corresponding a, b, c box vector with
-   negative values replicating in the negative Cartesian space. For six
-   integers, the values are divided into three pairs with each pair
-   indicating the number of ‘negative’ and ‘positive’ replications to
-   make for a given a, b, c box vector.
-
 Input/Output Units
 ------------------
 
@@ -123,6 +91,9 @@ Run Parameters
    symmetry elements. Default value is 1e-5.
 -  **numstrains**: The number of strain states to evaluate for
    performing the quasiharmonic approximation. If set to 1, then the
-   quasiharmonic calculations will be skipped. Default value is 5.
+   quasiharmonic calculations will be skipped. Default value is 11.
 -  **strainrange**: The range of strains to apply for performing the
-   quasiharmonic approximation. Default value is 1e-6
+   quasiharmonic approximation. Default value is 0.05.
+-  **sizemults**: Multiplication parameters to construct a supercell
+   system. Limited to three values for this calculation. Default valueis
+   3 3 3.

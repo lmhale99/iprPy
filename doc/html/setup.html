@@ -1,17 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Setup &#8212; iprPy 0.11.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Setup &#8212; iprPy 0.11.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/basic.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -33,7 +36,7 @@
         <li class="right" >
           <a href="intro.html" title="Introduction to iprPy"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.11.4 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Setup</a></li> 
       </ul>
     </div>  
@@ -43,14 +46,14 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="setup">
-<h1>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h1>
+  <section id="setup">
+<h1>Setup<a class="headerlink" href="#setup" title="Permalink to this heading">¶</a></h1>
 <p>A key principle of iprPy is to minimize barriers for usage.  As such, the only
 requirements for running the framework are Python 3.7+, and a few extra (mostly
 standard) Python packages.  All of the required packages should be compatible
 with any operating system that Python runs on.</p>
-<div class="section" id="installing-python">
-<h2>Installing Python<a class="headerlink" href="#installing-python" title="Permalink to this headline">¶</a></h2>
+<section id="installing-python">
+<h2>Installing Python<a class="headerlink" href="#installing-python" title="Permalink to this heading">¶</a></h2>
 <p>The iprPy framework is based on Python and therefore requires that Python be
 installed.  Luckily, Python is free and compatible with Linux, MacOS and
 Windows.  You can download Python from <a class="reference external" href="https://www.python.org/">python.org</a>, although it is highly
@@ -59,9 +62,9 @@ distributions support multiple Python environments, which can greatly help
 avoid possible versioning conflicts that may arise between different
 Python-based programs.  Additionally, the Anaconda distributions come with
 the <a class="reference external" href="https://www.scipy.org/">scipy</a> family of packages already installed, which iprPy heavily relies on.</p>
-</div>
-<div class="section" id="installing-iprpy">
-<h2>Installing iprPy<a class="headerlink" href="#installing-iprpy" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="installing-iprpy">
+<h2>Installing iprPy<a class="headerlink" href="#installing-iprpy" title="Permalink to this heading">¶</a></h2>
 <p>If you wish to use iprPy simply to access and run the existing calculations,
 then you can easily install it with pip or with conda-forge if you have a
 conda distribution of Python</p>
@@ -92,9 +95,9 @@ repository’s root directory and</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install -e</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="testing-the-install">
-<h2>Testing the install<a class="headerlink" href="#testing-the-install" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="testing-the-install">
+<h2>Testing the install<a class="headerlink" href="#testing-the-install" title="Permalink to this heading">¶</a></h2>
 <p>Installing iprPy <em>should</em> install an iprPy command line option to the Python
 environment.  To test if iprPy is working, enter the following command in a
 terminal</p>
@@ -116,9 +119,9 @@ environment’s Scripts directory.  Alternatively, you can place the script
 file in any other directory and call it directly or “install” it by adding it
 to any directory listed in your system’s PATH environment variable.</p>
 <p>For any other issues, feel free to email <a class="reference external" href="mailto:potentials&#37;&#52;&#48;nist&#46;gov">potentials<span>&#64;</span>nist<span>&#46;</span>gov</a> for support.</p>
-</div>
-<div class="section" id="updating-iprpy">
-<h2>Updating iprPy<a class="headerlink" href="#updating-iprpy" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="updating-iprpy">
+<h2>Updating iprPy<a class="headerlink" href="#updating-iprpy" title="Permalink to this heading">¶</a></h2>
 <p>For packaged installs, ipyPy can be updated using pip or conda update options.
 This should update not only iprPy’s version but also the versions of any
 required packages.</p>
@@ -127,8 +130,8 @@ request from the github repository.  Note, however, that this will not update
 required packages.  Check the requirements.txt file for any new version
 updates, most notably for the related packages “potentials” and “atomman”.  If
 needed, updating atomman should fix any requirement issues.</p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -179,12 +182,12 @@ needed, updating atomman should fix any requirement issues.</p>
         <li class="right" >
           <a href="intro.html" title="Introduction to iprPy"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.11.4 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Setup</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

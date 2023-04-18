@@ -1,17 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>diatom_scan calculation style &#8212; iprPy 0.11.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>diatom_scan calculation style &#8212; iprPy 0.11.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -33,7 +36,7 @@
         <li class="right" >
           <a href="index.html" title="diatom_scan"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">diatom_scan</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">diatom_scan calculation style</a></li> 
@@ -45,21 +48,21 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="diatom-scan-calculation-style">
-<h1>diatom_scan calculation style<a class="headerlink" href="#diatom-scan-calculation-style" title="Permalink to this headline">¶</a></h1>
+  <section id="diatom-scan-calculation-style">
+<h1>diatom_scan calculation style<a class="headerlink" href="#diatom-scan-calculation-style" title="Permalink to this heading">¶</a></h1>
 <p><strong>Lucas M. Hale</strong>,
 <a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>,
 <em>Materials Science and Engineering Division, NIST</em>.</p>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
 <p>The diatom_scan calculation style evaluates the interaction energy
 between two atoms at varying distances. This provides a measure of the
 isolated pair interaction of two atoms providing insights into the
 strengths of the attraction/repulsion and the effective range of
 interatomic spacings. This scan also gives insight into the
 computational smoothness of the potential’s functional form.</p>
-<div class="section" id="version-notes">
-<h3>Version notes<a class="headerlink" href="#version-notes" title="Permalink to this headline">¶</a></h3>
+<section id="version-notes">
+<h3>Version notes<a class="headerlink" href="#version-notes" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>2019-07-30: Notebook added.</p></li>
 <li><p>2020-05-22: Version 0.10 update - potentials now loaded from
@@ -68,22 +71,22 @@ database.</p></li>
 theory expanded.</p></li>
 <li><p>2022-02-16: Notebook updated to reflect version 0.11.</p></li>
 </ul>
-</div>
-<div class="section" id="additional-dependencies">
-<h3>Additional dependencies<a class="headerlink" href="#additional-dependencies" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="disclaimers">
-<h3>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="additional-dependencies">
+<h3>Additional dependencies<a class="headerlink" href="#additional-dependencies" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="disclaimers">
+<h3>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST
 disclaimers</a></p></li>
 <li><p>No 3+ body interactions are explored with this calculation as only
 two atoms are used.</p></li>
 </ul>
-</div>
-</div>
-<div class="section" id="method-and-theory">
-<h2>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="method-and-theory">
+<h2>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this heading">¶</a></h2>
 <p>Two atoms are placed in an otherwise empty system. The total energy of
 the system is evaluated for different interatomic spacings. This
 provides a means of evaluating the pair interaction component of an
@@ -107,8 +110,8 @@ the energy of the isolated atoms, given that the separation exceeds
 the potential’s cutoff. The isolated_atom calculation is an
 alternative method for obtaining this.</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -162,14 +165,14 @@ alternative method for obtaining this.</p></li>
         <li class="right" >
           <a href="index.html" title="diatom_scan"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >diatom_scan</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">diatom_scan calculation style</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>
