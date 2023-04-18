@@ -1,22 +1,25 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dislocation_monopole - Methodology and code &#8212; iprPy 0.11.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>dislocation_monopole - Methodology and code &#8212; iprPy 0.11.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="dislocation_monopole - Methodology and code" href="dislocation_monopole.html" />
-    <link rel="prev" title="diatom_scan - Methodology and code" href="diatom_scan.html" /> 
+    <link rel="prev" title="&lt;no title&gt;" href="diatom_scan.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -31,9 +34,9 @@
           <a href="dislocation_monopole.html" title="dislocation_monopole - Methodology and code"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="diatom_scan.html" title="diatom_scan - Methodology and code"
+          <a href="diatom_scan.html" title="&lt;no title&gt;"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dislocation_monopole - Methodology and code</a></li> 
       </ul>
@@ -49,35 +52,21 @@
 /* CSS for nbsphinx extension */
 
 /* remove conflicting styling from Sphinx themes */
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt *,
-div.nbinput.container div.input_area pre,
-div.nboutput.container div.output_area pre,
-div.nbinput.container div.input_area .highlight,
-div.nboutput.container div.output_area .highlight {
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
     border: none;
-    padding: 0;
+    padding: 0 0;
     margin: 0;
     box-shadow: none;
-}
-
-div.nbinput.container > div[class*=highlight],
-div.nboutput.container > div[class*=highlight] {
-    margin: 0;
-}
-
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt * {
-    background: none;
-}
-
-div.nboutput.container div.output_area .highlight,
-div.nboutput.container div.output_area pre {
-    background: unset;
-}
-
-div.nboutput.container div.output_area div.highlight {
-    color: unset;  /* override Pygments text color */
 }
 
 /* avoid gaps between output lines */
@@ -178,7 +167,7 @@ div.nboutput.container div.output_area {
 div.nbinput.container div.input_area {
     border: 1px solid #e0e0e0;
     border-radius: 2px;
-    /*background: #f5f5f5;*/
+    background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
@@ -244,7 +233,6 @@ div.nboutput.container div.output_area.rendered_html,
 div.nboutput.container div.output_area > div.output_javascript,
 div.nboutput.container div.output_area:not(.rendered_html) > img{
     padding: 5px;
-    margin: 0;
 }
 
 /* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
@@ -292,8 +280,8 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="section" id="dislocation_monopole---Methodology-and-code">
-<h1>dislocation_monopole - Methodology and code<a class="headerlink" href="#dislocation_monopole---Methodology-and-code" title="Permalink to this headline">¶</a></h1>
+<section id="dislocation_monopole---Methodology-and-code">
+<h1>dislocation_monopole - Methodology and code<a class="headerlink" href="#dislocation_monopole---Methodology-and-code" title="Permalink to this heading">¶</a></h1>
 <p><strong>Python imports</strong></p>
 <ul class="simple">
 <li><p><a class="reference external" href="http://www.numpy.org/">numpy</a></p></li>
@@ -345,10 +333,10 @@ div.rendered_html tbody tr:hover {
 Notebook last executed on 2022-03-11 using iprPy version 0.11.2
 </pre></div></div>
 </div>
-<div class="section" id="1.-Load-calculation-and-view-description">
-<h2>1. Load calculation and view description<a class="headerlink" href="#1.-Load-calculation-and-view-description" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="1.1.-Load-the-calculation">
-<h3>1.1. Load the calculation<a class="headerlink" href="#1.1.-Load-the-calculation" title="Permalink to this headline">¶</a></h3>
+<section id="1.-Load-calculation-and-view-description">
+<h2>1. Load calculation and view description<a class="headerlink" href="#1.-Load-calculation-and-view-description" title="Permalink to this heading">¶</a></h2>
+<section id="1.1.-Load-the-calculation">
+<h3>1.1. Load the calculation<a class="headerlink" href="#1.1.-Load-the-calculation" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -359,9 +347,9 @@ Notebook last executed on 2022-03-11 using iprPy version 0.11.2
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="1.2.-Display-calculation-description-and-theory">
-<h3>1.2. Display calculation description and theory<a class="headerlink" href="#1.2.-Display-calculation-description-and-theory" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="1.2.-Display-calculation-description-and-theory">
+<h3>1.2. Display calculation description and theory<a class="headerlink" href="#1.2.-Display-calculation-description-and-theory" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -377,55 +365,55 @@ Notebook last executed on 2022-03-11 using iprPy version 0.11.2
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<div class="section" id="dislocation_SDVPN-calculation-style">
-<h4>dislocation_SDVPN calculation style<a class="headerlink" href="#dislocation_SDVPN-calculation-style" title="Permalink to this headline">¶</a></h4>
+<section id="dislocation_SDVPN-calculation-style">
+<h4>dislocation_SDVPN calculation style<a class="headerlink" href="#dislocation_SDVPN-calculation-style" title="Permalink to this heading">¶</a></h4>
 <p><strong>Lucas M. Hale</strong>, <a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>, <em>Materials Science and Engineering Division, NIST</em>.</p>
-<div class="section" id="Introduction">
-<h5>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h5>
+<section id="Introduction">
+<h5>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this heading">¶</a></h5>
 <p>The dislocation_SDVPN calculation style predicts a dislocation’s planar spreading using the semidiscrete variational Peierls-Nabarro method. The solution finds the disregistry (difference in displacement above and below the slip plane) that minimizes the dislocation’s energy. The energy term consists of two primary components: an elastic component due to the dislocation interacting with itself, and a misfit component arising from the formation of a generalized stacking fault along the
 dislocation’s spreading.</p>
-<div class="section" id="Version-notes">
-<h6>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this headline">¶</a></h6>
+<section id="Version-notes">
+<h6>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this heading">¶</a></h6>
 <ul class="simple">
 <li><p>2018-09-25: Notebook added</p></li>
 <li><p>2019-07-30: Notebook setup and parameters changed.</p></li>
 <li><p>2020-09-22: Notebook updated to reflect changes in the calculation method due to updates in atomman’s Volterra class solution generators. Setup and parameter definitions streamlined.</p></li>
 <li><p>2022-03-11: Notebook updated to reflect version 0.11.</p></li>
 </ul>
-</div>
-<div class="section" id="Additional-dependencies">
-<h6>Additional dependencies<a class="headerlink" href="#Additional-dependencies" title="Permalink to this headline">¶</a></h6>
-</div>
-<div class="section" id="Disclaimers">
-<h6>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this headline">¶</a></h6>
+</section>
+<section id="Additional-dependencies">
+<h6>Additional dependencies<a class="headerlink" href="#Additional-dependencies" title="Permalink to this heading">¶</a></h6>
+</section>
+<section id="Disclaimers">
+<h6>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this heading">¶</a></h6>
 <ul class="simple">
 <li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST disclaimers</a></p></li>
 <li><p>The calculation method solves the problem using a 2D generalized stacking fault energy map. Better results may be possible by measuring a full 3D map, but that would require adding a new calculation for the 3D variation.</p></li>
 <li><p>The implemented method is suited for dislocations with planar spreading. It is not suited for dislocations that spread on multiple atomic planes, like the a/2&lt;111&gt; bcc screw dislocation.</p></li>
 <li><p>While the solution is taken at discrete points that (typically) correspond to atomic sites, the underlying method is still a continuum solution that does not fully account for the atomic nature of the dislocation.</p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<div class="section" id="Method-and-Theory">
-<h4>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this headline">¶</a></h4>
+<section id="Method-and-Theory">
+<h4>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this heading">¶</a></h4>
 <p>This calculation method is a wrapper around the atomman.defect.SDVPN class. More details on the method and theory can be found in the <a class="reference external" href="https://www.ctcms.nist.gov/potentials/atomman/tutorial/04.4._Semidiscrete_Variational_Peierls-Nabarro.html">associated tutorial within the atomman documentation</a>.</p>
+</section>
 </div>
 </div>
-</div>
-</div>
-</div>
-<div class="section" id="2.-Define-calculation-functions-and-generate-files">
-<h2>2. Define calculation functions and generate files<a class="headerlink" href="#2.-Define-calculation-functions-and-generate-files" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="2.-Define-calculation-functions-and-generate-files">
+<h2>2. Define calculation functions and generate files<a class="headerlink" href="#2.-Define-calculation-functions-and-generate-files" title="Permalink to this heading">¶</a></h2>
 <p>This section defines the calculation functions and associated resource files exactly as they exist inside the iprPy package. This allows for the code used to be directly visible and modifiable by anyone looking to see how it works.</p>
-<div class="section" id="2.1.-sdvpn()">
-<h3>2.1. sdvpn()<a class="headerlink" href="#2.1.-sdvpn()" title="Permalink to this headline">¶</a></h3>
+<section id="2.1.-sdvpn()">
+<h3>2.1. sdvpn()<a class="headerlink" href="#2.1.-sdvpn()" title="Permalink to this heading">¶</a></h3>
 <p>This is the primary function for the calculation. The version of this function built in iprPy can be accessed by calling the calc() method of an object of the associated calculation class.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -613,12 +601,12 @@ dislocation’s spreading.</p>
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="3.-Specify-input-parameters">
-<h2>3. Specify input parameters<a class="headerlink" href="#3.-Specify-input-parameters" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="3.1.-Initial-unit-cell-system">
-<h3>3.1. Initial unit cell system<a class="headerlink" href="#3.1.-Initial-unit-cell-system" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="3.-Specify-input-parameters">
+<h2>3. Specify input parameters<a class="headerlink" href="#3.-Specify-input-parameters" title="Permalink to this heading">¶</a></h2>
+<section id="3.1.-Initial-unit-cell-system">
+<h3>3.1. Initial unit cell system<a class="headerlink" href="#3.1.-Initial-unit-cell-system" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>ucell</strong> is an atomman.System representing a fundamental unit cell of the system (required). Here, this is generated using the load parameters and symbols.</p></li>
 </ul>
@@ -656,9 +644,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
       3 |       1 |   1.760 |   1.760 |   0.000
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="3.2.-Elastic-constants">
-<h3>3.2. Elastic constants<a class="headerlink" href="#3.2.-Elastic-constants" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.2.-Elastic-constants">
+<h3>3.2. Elastic constants<a class="headerlink" href="#3.2.-Elastic-constants" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>C_dict</strong> is a dictionary containing the unique elastic constants for the potential and crystal structure defined above.</p></li>
 <li><p><strong>C</strong> is an atomman.ElasticConstants object built from C_dict.</p></li>
@@ -679,9 +667,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="3.3.-Defect-parameters">
-<h3>3.3. Defect parameters<a class="headerlink" href="#3.3.-Defect-parameters" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.3.-Defect-parameters">
+<h3>3.3. Defect parameters<a class="headerlink" href="#3.3.-Defect-parameters" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>gammasurface_file</strong> gives the path to a data model file containing 2D gamma surface results. This can be a calc_stacking_fault_map_2D record.</p></li>
 <li><p><strong>burgers</strong> is the crystallographic Miller Burgers vector for the dislocation.</p></li>
@@ -716,9 +704,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="3.4.-Calculation-specific-parameters">
-<h3>3.4. Calculation-specific parameters<a class="headerlink" href="#3.4.-Calculation-specific-parameters" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.4.-Calculation-specific-parameters">
+<h3>3.4. Calculation-specific parameters<a class="headerlink" href="#3.4.-Calculation-specific-parameters" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>xmax</strong>: The maximum value of the x-coordinates to use for the points where the disregistry is evaluated. The solution is centered around x=0, therefore this also corresponds to the minimum value of x used. The set of x-coordinates used is fully defined by giving at least two of xmax, xstep and xnum.</p></li>
 <li><p><strong>xstep</strong>: The step size (delta x) value between the x-coordinates used to evaluate the disregistry. The set of x-coordinates used is fully defined by giving at least two of xmax, xstep and xnum.</p></li>
@@ -760,12 +748,12 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="4.-Run-calculation-and-view-results">
-<h2>4. Run calculation and view results<a class="headerlink" href="#4.-Run-calculation-and-view-results" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="4.1.-Run-calculation">
-<h3>4.1. Run calculation<a class="headerlink" href="#4.1.-Run-calculation" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="4.-Run-calculation-and-view-results">
+<h2>4. Run calculation and view results<a class="headerlink" href="#4.-Run-calculation-and-view-results" title="Permalink to this heading">¶</a></h2>
+<section id="4.1.-Run-calculation">
+<h3>4.1. Run calculation<a class="headerlink" href="#4.1.-Run-calculation" title="Permalink to this heading">¶</a></h3>
 <p>All primary calculation method functions take a series of inputs and return a dictionary of outputs.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
@@ -842,9 +830,9 @@ Optimization terminated successfully.
          Function evaluations: 8962
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="4.2.-Report-results">
-<h3>4.2. Report results<a class="headerlink" href="#4.2.-Report-results" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="4.2.-Report-results">
+<h3>4.2. Report results<a class="headerlink" href="#4.2.-Report-results" title="Permalink to this heading">¶</a></h3>
 <p>Values returned in the results_dict:</p>
 <ul class="simple">
 <li><p><strong>‘SDVPN_solution’</strong> (<em>atomman.defect.SDVPN</em>) - The SDVPN solution object at the end of the run.</p></li>
@@ -943,9 +931,9 @@ Total dislocation energy per minimization run (in eV/Å):
 10 4.905349423775493
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="4.3.-Save/load-results">
-<h3>4.3. Save/load results<a class="headerlink" href="#4.3.-Save/load-results" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="4.3.-Save/load-results">
+<h3>4.3. Save/load results<a class="headerlink" href="#4.3.-Save/load-results" title="Permalink to this heading">¶</a></h3>
 <p>The full SDVPN results can be extracted and saved to either a JSON or XML file using the model() method of the SDVPN solution class. This content can then be loaded into an SDVPN for future analysis or further runs.</p>
 <p>NOTE: The model saves all input parameters so the calculation can be restarted from any point. However, it only saves the current disregistry and not any previous disregistries before minimizations.</p>
 <div class="nbinput nblast docutils container">
@@ -983,9 +971,9 @@ Total dislocation energy per minimization run (in eV/Å):
 <img alt="../_images/notebook_dislocation_SDVPN_29_0.png" src="../_images/notebook_dislocation_SDVPN_29_0.png" />
 </div>
 </div>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -1028,7 +1016,7 @@ Total dislocation energy per minimization run (in eV/Å):
   <div>
     <h4>Previous topic</h4>
     <p class="topless"><a href="diatom_scan.html"
-                          title="previous chapter">diatom_scan - Methodology and code</a></p>
+                          title="previous chapter">&lt;no title&gt;</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -1052,15 +1040,15 @@ Total dislocation energy per minimization run (in eV/Å):
           <a href="dislocation_monopole.html" title="dislocation_monopole - Methodology and code"
              >next</a> |</li>
         <li class="right" >
-          <a href="diatom_scan.html" title="diatom_scan - Methodology and code"
+          <a href="diatom_scan.html" title="&lt;no title&gt;"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dislocation_monopole - Methodology and code</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

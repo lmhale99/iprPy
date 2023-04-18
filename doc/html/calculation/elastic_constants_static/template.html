@@ -1,17 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>elastic_constants_static Input Terms &#8212; iprPy 0.11.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>elastic_constants_static Input Terms &#8212; iprPy 0.11.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -33,7 +36,7 @@
         <li class="right" >
           <a href="doc.html" title="elastic_constants_static calculation style"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">elastic_constants_static</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">elastic_constants_static Input Terms</a></li> 
@@ -45,19 +48,19 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="elastic-constants-static-input-terms">
-<h1>elastic_constants_static Input Terms<a class="headerlink" href="#elastic-constants-static-input-terms" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="calculation-metadata">
-<h2>Calculation Metadata<a class="headerlink" href="#calculation-metadata" title="Permalink to this headline">¶</a></h2>
+  <section id="elastic-constants-static-input-terms">
+<h1>elastic_constants_static Input Terms<a class="headerlink" href="#elastic-constants-static-input-terms" title="Permalink to this heading">¶</a></h1>
+<section id="calculation-metadata">
+<h2>Calculation Metadata<a class="headerlink" href="#calculation-metadata" title="Permalink to this heading">¶</a></h2>
 <p>Specifies metadata descriptors common to all calculation styles.</p>
 <ul class="simple">
 <li><p><strong>branch</strong>: A metadata group name that the calculation can be parsed
 by. Primarily meant for differentiating runs with different settings
 parameters.</p></li>
 </ul>
-</div>
-<div class="section" id="lammps-and-mpi-commands">
-<h2>LAMMPS and MPI Commands<a class="headerlink" href="#lammps-and-mpi-commands" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="lammps-and-mpi-commands">
+<h2>LAMMPS and MPI Commands<a class="headerlink" href="#lammps-and-mpi-commands" title="Permalink to this heading">¶</a></h2>
 <p>Specifies the external commands for running LAMMPS and MPI.</p>
 <ul class="simple">
 <li><p><strong>lammps_command</strong>: The path to the executable for running LAMMPS on
@@ -66,9 +69,9 @@ your system. Don’t include command line options.</p></li>
 options to use for calling LAMMPS to run in parallel on your system.
 LAMMPS will run as a serial process if not given.</p></li>
 </ul>
-</div>
-<div class="section" id="interatomic-potential">
-<h2>Interatomic Potential<a class="headerlink" href="#interatomic-potential" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="interatomic-potential">
+<h2>Interatomic Potential<a class="headerlink" href="#interatomic-potential" title="Permalink to this heading">¶</a></h2>
 <p>Specifies the interatomic potential to use and the directory where any
 associated parameter files are located.</p>
 <ul class="simple">
@@ -89,9 +92,9 @@ parameter files (eg. eam.alloy setfl files) that are needed for the
 potential. If not given, then any required files are expected to be
 in the working directory where the calculation is executed.</p></li>
 </ul>
-</div>
-<div class="section" id="initial-system-configuration">
-<h2>Initial System Configuration<a class="headerlink" href="#initial-system-configuration" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="initial-system-configuration">
+<h2>Initial System Configuration<a class="headerlink" href="#initial-system-configuration" title="Permalink to this heading">¶</a></h2>
 <p>Specifies the file and options to load for the initial atomic
 configuration.</p>
 <ul class="simple">
@@ -113,9 +116,9 @@ numbers: ‘a b c’ for orthogonal boxes, or ‘a b c alpha beta gamma’
 for triclinic boxes. The a, b, c parameters are in units of length
 and the alpha, beta, gamma angles are in degrees.</p></li>
 </ul>
-</div>
-<div class="section" id="system-manipulations">
-<h2>System Manipulations<a class="headerlink" href="#system-manipulations" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="system-manipulations">
+<h2>System Manipulations<a class="headerlink" href="#system-manipulations" title="Permalink to this heading">¶</a></h2>
 <p>Performs simple manipulations on the loaded initial system.</p>
 <ul class="simple">
 <li><p><strong>a_uvw</strong>: The Miller(-Bravais) crystal vector relative to the loaded
@@ -145,9 +148,9 @@ integers, the values are divided into three pairs with each pair
 indicating the number of ‘negative’ and ‘positive’ replications to
 make for a given a, b, c box vector.</p></li>
 </ul>
-</div>
-<div class="section" id="lammps-energy-force-minimization">
-<h2>LAMMPS Energy/Force Minimization<a class="headerlink" href="#lammps-energy-force-minimization" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="lammps-energy-force-minimization">
+<h2>LAMMPS Energy/Force Minimization<a class="headerlink" href="#lammps-energy-force-minimization" title="Permalink to this heading">¶</a></h2>
 <p>Specifies the parameters and options associated with performing an
 energy and/or force minimization in LAMMPS.</p>
 <ul class="simple">
@@ -168,9 +171,9 @@ a minimization iteration. This value is in units length and
 corresponds to the dmax term for the LAMMPS min_modify command.
 Default value is ‘0.01 angstrom’.</p></li>
 </ul>
-</div>
-<div class="section" id="input-output-units">
-<h2>Input/Output Units<a class="headerlink" href="#input-output-units" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="input-output-units">
+<h2>Input/Output Units<a class="headerlink" href="#input-output-units" title="Permalink to this heading">¶</a></h2>
 <p>Specifies the default units to use for the other input keys and to use
 for saving to the results file.</p>
 <ul class="simple">
@@ -182,15 +185,15 @@ for saving to the results file.</p>
 <li><p><strong>force_unit</strong>: The unit of force to use. Default value is
 ‘eV/angstrom’.</p></li>
 </ul>
-</div>
-<div class="section" id="run-parameters">
-<h2>Run Parameters<a class="headerlink" href="#run-parameters" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="run-parameters">
+<h2>Run Parameters<a class="headerlink" href="#run-parameters" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>strainrange</strong>: The strain range to apply to the system to evaluate
 the elastic constants. Default value is ‘1e-6’</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -245,14 +248,14 @@ the elastic constants. Default value is ‘1e-6’</p></li>
         <li class="right" >
           <a href="doc.html" title="elastic_constants_static calculation style"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >elastic_constants_static</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">elastic_constants_static Input Terms</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

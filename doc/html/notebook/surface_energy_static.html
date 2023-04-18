@@ -1,17 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>surface_energy_static - Methodology and code &#8212; iprPy 0.11.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>surface_energy_static - Methodology and code &#8212; iprPy 0.11.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -35,7 +38,7 @@
         <li class="right" >
           <a href="stacking_fault_static.html" title="stacking_fault_static - Methodology and code"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">surface_energy_static - Methodology and code</a></li> 
       </ul>
@@ -51,35 +54,21 @@
 /* CSS for nbsphinx extension */
 
 /* remove conflicting styling from Sphinx themes */
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt *,
-div.nbinput.container div.input_area pre,
-div.nboutput.container div.output_area pre,
-div.nbinput.container div.input_area .highlight,
-div.nboutput.container div.output_area .highlight {
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
     border: none;
-    padding: 0;
+    padding: 0 0;
     margin: 0;
     box-shadow: none;
-}
-
-div.nbinput.container > div[class*=highlight],
-div.nboutput.container > div[class*=highlight] {
-    margin: 0;
-}
-
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt * {
-    background: none;
-}
-
-div.nboutput.container div.output_area .highlight,
-div.nboutput.container div.output_area pre {
-    background: unset;
-}
-
-div.nboutput.container div.output_area div.highlight {
-    color: unset;  /* override Pygments text color */
 }
 
 /* avoid gaps between output lines */
@@ -180,7 +169,7 @@ div.nboutput.container div.output_area {
 div.nbinput.container div.input_area {
     border: 1px solid #e0e0e0;
     border-radius: 2px;
-    /*background: #f5f5f5;*/
+    background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
@@ -246,7 +235,6 @@ div.nboutput.container div.output_area.rendered_html,
 div.nboutput.container div.output_area > div.output_javascript,
 div.nboutput.container div.output_area:not(.rendered_html) > img{
     padding: 5px;
-    margin: 0;
 }
 
 /* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
@@ -294,8 +282,8 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="section" id="surface_energy_static---Methodology-and-code">
-<h1>surface_energy_static - Methodology and code<a class="headerlink" href="#surface_energy_static---Methodology-and-code" title="Permalink to this headline">¶</a></h1>
+<section id="surface_energy_static---Methodology-and-code">
+<h1>surface_energy_static - Methodology and code<a class="headerlink" href="#surface_energy_static---Methodology-and-code" title="Permalink to this heading">¶</a></h1>
 <p><strong>Python imports</strong></p>
 <ul class="simple">
 <li><p><a class="reference external" href="http://www.numpy.org/">numpy</a></p></li>
@@ -344,10 +332,10 @@ div.rendered_html tbody tr:hover {
 Notebook last executed on 2022-03-10 using iprPy version 0.11.2
 </pre></div></div>
 </div>
-<div class="section" id="1.-Load-calculation-and-view-description">
-<h2>1. Load calculation and view description<a class="headerlink" href="#1.-Load-calculation-and-view-description" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="1.1.-Load-the-calculation">
-<h3>1.1. Load the calculation<a class="headerlink" href="#1.1.-Load-the-calculation" title="Permalink to this headline">¶</a></h3>
+<section id="1.-Load-calculation-and-view-description">
+<h2>1. Load calculation and view description<a class="headerlink" href="#1.-Load-calculation-and-view-description" title="Permalink to this heading">¶</a></h2>
+<section id="1.1.-Load-the-calculation">
+<h3>1.1. Load the calculation<a class="headerlink" href="#1.1.-Load-the-calculation" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -358,9 +346,9 @@ Notebook last executed on 2022-03-10 using iprPy version 0.11.2
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="1.2.-Display-calculation-description-and-theory">
-<h3>1.2. Display calculation description and theory<a class="headerlink" href="#1.2.-Display-calculation-description-and-theory" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="1.2.-Display-calculation-description-and-theory">
+<h3>1.2. Display calculation description and theory<a class="headerlink" href="#1.2.-Display-calculation-description-and-theory" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -376,14 +364,14 @@ Notebook last executed on 2022-03-10 using iprPy version 0.11.2
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<div class="section" id="surface_energy_static-calculation-style">
-<h4>surface_energy_static calculation style<a class="headerlink" href="#surface_energy_static-calculation-style" title="Permalink to this headline">¶</a></h4>
+<section id="surface_energy_static-calculation-style">
+<h4>surface_energy_static calculation style<a class="headerlink" href="#surface_energy_static-calculation-style" title="Permalink to this heading">¶</a></h4>
 <p><strong>Lucas M. Hale</strong>, <a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>, <em>Materials Science and Engineering Division, NIST</em>.</p>
-<div class="section" id="Introduction">
-<h5>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h5>
+<section id="Introduction">
+<h5>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this heading">¶</a></h5>
 <p>The surface_energy_static calculation style evaluates the formation energy for a free surface by slicing an atomic system along a specific plane.</p>
-<div class="section" id="Version-notes">
-<h6>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this headline">¶</a></h6>
+<section id="Version-notes">
+<h6>Version notes<a class="headerlink" href="#Version-notes" title="Permalink to this heading">¶</a></h6>
 <ul class="simple">
 <li><p>2018-07-09: Notebook added.</p></li>
 <li><p>2019-07-30: Description updated and small changes due to iprPy version.</p></li>
@@ -391,27 +379,27 @@ Notebook last executed on 2022-03-10 using iprPy version 0.11.2
 <li><p>2020-09-22: Calculation updated to use atomman.defect.FreeSurface class. Setup and parameter definition streamlined.</p></li>
 <li><p>2022-03-11: Notebook updated to reflect version 0.11.</p></li>
 </ul>
-</div>
-<div class="section" id="Additional-dependencies">
-<h6>Additional dependencies<a class="headerlink" href="#Additional-dependencies" title="Permalink to this headline">¶</a></h6>
-</div>
-<div class="section" id="Disclaimers">
-<h6>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this headline">¶</a></h6>
+</section>
+<section id="Additional-dependencies">
+<h6>Additional dependencies<a class="headerlink" href="#Additional-dependencies" title="Permalink to this heading">¶</a></h6>
+</section>
+<section id="Disclaimers">
+<h6>Disclaimers<a class="headerlink" href="#Disclaimers" title="Permalink to this heading">¶</a></h6>
 <ul class="simple">
 <li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST disclaimers</a></p></li>
 <li><p>Other atomic configurations at the free surface for certain planar cuts may have lower energies. The atomic relaxation will find a local minimum, which may not be the global minimum. Additionally, the material cut is planar perfect and therefore does not explore the effects of atomic roughness.</p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<div class="section" id="Method-and-Theory">
-<h4>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this headline">¶</a></h4>
+<section id="Method-and-Theory">
+<h4>Method and Theory<a class="headerlink" href="#Method-and-Theory" title="Permalink to this heading">¶</a></h4>
 <p>First, an initial system is generated. This is accomplished by</p>
 <ol class="arabic simple">
 <li><p>Starting with a unit cell system.</p></li>
@@ -428,16 +416,16 @@ Notebook last executed on 2022-03-10 using iprPy version 0.11.2
 \[E_{f}^{surf} = \frac{E_{total}^{surf} - E_{total}^{0}} {2 A}.\]</div>
 <p>The calculation method allows for the specification of which of the three box dimensions the cut is made along. If not specified, the default behavior is to make the <span class="math notranslate nohighlight">\(\vec{c}\)</span> vector direction non-periodic. This choice is due to the limitations of how LAMMPS defines triclinic boxes. <span class="math notranslate nohighlight">\(\vec{c}\)</span> vector is the only box vector that is allowed to have a component in the Cartesian z direction. Because of this, the other two box vectors are normal to the z-axis and therefore will be in the
 cut plane.</p>
+</section>
 </div>
 </div>
-</div>
-</div>
-</div>
-<div class="section" id="2.-Define-calculation-functions-and-generate-files">
-<h2>2. Define calculation functions and generate files<a class="headerlink" href="#2.-Define-calculation-functions-and-generate-files" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="2.-Define-calculation-functions-and-generate-files">
+<h2>2. Define calculation functions and generate files<a class="headerlink" href="#2.-Define-calculation-functions-and-generate-files" title="Permalink to this heading">¶</a></h2>
 <p>This section defines the calculation functions and associated resource files exactly as they exist inside the iprPy package. This allows for the code used to be directly visible and modifiable by anyone looking to see how it works.</p>
-<div class="section" id="2.1.-surface_energy_static()">
-<h3>2.1. surface_energy_static()<a class="headerlink" href="#2.1.-surface_energy_static()" title="Permalink to this headline">¶</a></h3>
+<section id="2.1.-surface_energy_static()">
+<h3>2.1. surface_energy_static()<a class="headerlink" href="#2.1.-surface_energy_static()" title="Permalink to this heading">¶</a></h3>
 <p>This is the primary function for the calculation. The version of this function built in iprPy can be accessed by calling the calc() method of an object of the associated calculation class.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -612,9 +600,9 @@ cut plane.</p>
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="2.2.-relax_system">
-<h3>2.2. relax_system<a class="headerlink" href="#2.2.-relax_system" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="2.2.-relax_system">
+<h3>2.2. relax_system<a class="headerlink" href="#2.2.-relax_system" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -734,9 +722,9 @@ cut plane.</p>
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="2.3.-min.template-file">
-<h3>2.3. min.template file<a class="headerlink" href="#2.3.-min.template-file" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="2.3.-min.template-file">
+<h3>2.3. min.template file<a class="headerlink" href="#2.3.-min.template-file" title="Permalink to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -763,12 +751,12 @@ cut plane.</p>
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="3.-Specify-input-parameters">
-<h2>3. Specify input parameters<a class="headerlink" href="#3.-Specify-input-parameters" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="3.1.-System-specific-paths">
-<h3>3.1. System-specific paths<a class="headerlink" href="#3.1.-System-specific-paths" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="3.-Specify-input-parameters">
+<h2>3. Specify input parameters<a class="headerlink" href="#3.-Specify-input-parameters" title="Permalink to this heading">¶</a></h2>
+<section id="3.1.-System-specific-paths">
+<h3>3.1. System-specific paths<a class="headerlink" href="#3.1.-System-specific-paths" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>lammps_command</strong> is the LAMMPS command to use (required).</p></li>
 <li><p><strong>mpi_command</strong> MPI command for running LAMMPS in parallel. A value of None will run simulations serially.</p></li>
@@ -783,9 +771,9 @@ cut plane.</p>
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="3.2.-Interatomic-potential">
-<h3>3.2. Interatomic potential<a class="headerlink" href="#3.2.-Interatomic-potential" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.2.-Interatomic-potential">
+<h3>3.2. Interatomic potential<a class="headerlink" href="#3.2.-Interatomic-potential" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>potential_name</strong> gives the name of the potential_LAMMPS reference record in the iprPy library to use for the calculation.</p></li>
 <li><p><strong>potential</strong> is an atomman.lammps.Potential object (required).</p></li>
@@ -802,9 +790,9 @@ cut plane.</p>
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="3.3.-Initial-unit-cell-system">
-<h3>3.3. Initial unit cell system<a class="headerlink" href="#3.3.-Initial-unit-cell-system" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.3.-Initial-unit-cell-system">
+<h3>3.3. Initial unit cell system<a class="headerlink" href="#3.3.-Initial-unit-cell-system" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>ucell</strong> is an atomman.System representing a fundamental unit cell of the system (required). Here, this is generated using the load parameters and symbols.</p></li>
 </ul>
@@ -841,9 +829,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
       3 |       1 |   1.760 |   1.760 |   0.000
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="3.4.-Defect-parameters">
-<h3>3.4. Defect parameters<a class="headerlink" href="#3.4.-Defect-parameters" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.4.-Defect-parameters">
+<h3>3.4. Defect parameters<a class="headerlink" href="#3.4.-Defect-parameters" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>hkl</strong> gives the Miller (hkl) or Miller-Bravais (hkil) plane to create the free surface on.</p></li>
 <li><p><strong>cutboxvector</strong> specifies which of the three box vectors (‘a’, ‘b’, or ‘c’) is to be made non-periodic to create the free surface.</p></li>
@@ -860,9 +848,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="3.5.-System-modifications">
-<h3>3.5. System modifications<a class="headerlink" href="#3.5.-System-modifications" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.5.-System-modifications">
+<h3>3.5. System modifications<a class="headerlink" href="#3.5.-System-modifications" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>sizemults</strong> list of three integers specifying how many times the ucell vectors of <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span> and <span class="math notranslate nohighlight">\(c\)</span> are replicated in creating system.</p></li>
 <li><p><strong>minwidth</strong> specifies a minimum width that the system should be along the cutboxvector direction. The given sizemult in that direction will be increased if needed to ensure that the system is at least this wide.</p></li>
@@ -877,9 +865,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="3.5.-Calculation-specific-parameters">
-<h3>3.5. Calculation-specific parameters<a class="headerlink" href="#3.5.-Calculation-specific-parameters" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="3.5.-Calculation-specific-parameters">
+<h3>3.5. Calculation-specific parameters<a class="headerlink" href="#3.5.-Calculation-specific-parameters" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>energytolerance</strong> is the energy tolerance to use during the minimizations. This is unitless.</p></li>
 <li><p><strong>forcetolerance</strong> is the force tolerance to use during the minimizations. This is in energy/length units.</p></li>
@@ -900,12 +888,12 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="4.-Run-calculation-and-view-results">
-<h2>4. Run calculation and view results<a class="headerlink" href="#4.-Run-calculation-and-view-results" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="4.1.-Run-calculation">
-<h3>4.1. Run calculation<a class="headerlink" href="#4.1.-Run-calculation" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="4.-Run-calculation-and-view-results">
+<h2>4. Run calculation and view results<a class="headerlink" href="#4.-Run-calculation-and-view-results" title="Permalink to this heading">¶</a></h2>
+<section id="4.1.-Run-calculation">
+<h3>4.1. Run calculation<a class="headerlink" href="#4.1.-Run-calculation" title="Permalink to this heading">¶</a></h3>
 <p>All primary calculation method functions take a series of inputs and return a dictionary of outputs.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
@@ -935,9 +923,9 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 dict_keys([&#39;dumpfile_base&#39;, &#39;dumpfile_surf&#39;, &#39;E_total_base&#39;, &#39;E_total_surf&#39;, &#39;A_surf&#39;, &#39;E_pot&#39;, &#39;E_surf_f&#39;])
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="4.2.-Report-results">
-<h3>4.2. Report results<a class="headerlink" href="#4.2.-Report-results" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="4.2.-Report-results">
+<h3>4.2. Report results<a class="headerlink" href="#4.2.-Report-results" title="Permalink to this heading">¶</a></h3>
 <p>Values returned in the results_dict:</p>
 <ul class="simple">
 <li><p><strong>‘dumpfile_base’</strong> (<em>str</em>) - The filename of the LAMMPS dump file of the relaxed bulk system.</p></li>
@@ -1013,9 +1001,9 @@ E_total_surf = -4377.384646212 eV
 Dumped to surface.dump
 </pre></div></div>
 </div>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -1087,13 +1075,13 @@ Dumped to surface.dump
         <li class="right" >
           <a href="stacking_fault_static.html" title="stacking_fault_static - Methodology and code"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">surface_energy_static - Methodology and code</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

@@ -1,17 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dislocation_monopole calculation style &#8212; iprPy 0.11.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>dislocation_monopole calculation style &#8212; iprPy 0.11.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -35,7 +38,7 @@
         <li class="right" >
           <a href="index.html" title="dislocation_monopole"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">dislocation_monopole</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dislocation_monopole calculation style</a></li> 
@@ -47,13 +50,13 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="dislocation-monopole-calculation-style">
-<h1>dislocation_monopole calculation style<a class="headerlink" href="#dislocation-monopole-calculation-style" title="Permalink to this headline">¶</a></h1>
+  <section id="dislocation-monopole-calculation-style">
+<h1>dislocation_monopole calculation style<a class="headerlink" href="#dislocation-monopole-calculation-style" title="Permalink to this heading">¶</a></h1>
 <p><strong>Lucas M. Hale</strong>,
 <a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>,
 <em>Materials Science and Engineering Division, NIST</em>.</p>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
 <p>The dislocation_monopole calculation style calculation inserts a
 dislocation monopole into an atomic system using the anisotropic
 elasticity solution for a perfectly straight dislocation. The system is
@@ -66,8 +69,8 @@ relaxed dislocation system and corresponding dislocation-free base
 systems are retained in the calculation’s archived record. Various
 properties associated with the dislocation’s elasticity solution are
 recorded in the calculation’s results record.</p>
-<div class="section" id="version-notes">
-<h3>Version notes<a class="headerlink" href="#version-notes" title="Permalink to this headline">¶</a></h3>
+<section id="version-notes">
+<h3>Version notes<a class="headerlink" href="#version-notes" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>2018-09-25: Notebook added</p></li>
 <li><p>2019-07-30: Method and Notebook updated for iprPy version 0.9.</p></li>
@@ -75,12 +78,12 @@ recorded in the calculation’s results record.</p>
 changed to now use atomman.defect.Dislocation.</p></li>
 <li><p>2022-03-11: Notebook updated to reflect version 0.11.</p></li>
 </ul>
-</div>
-<div class="section" id="additional-dependencies">
-<h3>Additional dependencies<a class="headerlink" href="#additional-dependencies" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="disclaimers">
-<h3>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="additional-dependencies">
+<h3>Additional dependencies<a class="headerlink" href="#additional-dependencies" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="disclaimers">
+<h3>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST
 disclaimers</a></p></li>
@@ -103,18 +106,18 @@ considerably faster than performing a dynamic relaxation, but the
 dynamic relaxation is more likely to result in a better final
 dislocation structure.</p></li>
 </ul>
-</div>
-</div>
-<div class="section" id="method-and-theory">
-<h2>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="stroh-theory">
-<h3>Stroh theory<a class="headerlink" href="#stroh-theory" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="method-and-theory">
+<h2>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this heading">¶</a></h2>
+<section id="stroh-theory">
+<h3>Stroh theory<a class="headerlink" href="#stroh-theory" title="Permalink to this heading">¶</a></h3>
 <p>A detailed description of the Stroh method to solve the Eshelby solution
 for an anisotropic straight dislocation can be found in the <a class="reference external" href="https://www.ctcms.nist.gov/potentials/atomman/">atomman
 documentation</a>.</p>
-</div>
-<div class="section" id="orientation">
-<h3>Orientation<a class="headerlink" href="#orientation" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="orientation">
+<h3>Orientation<a class="headerlink" href="#orientation" title="Permalink to this heading">¶</a></h3>
 <p>One of the most important considerations in defining an atomistic system
 containing a dislocation monopole system is the system’s orientation. In
 particular, care is needed to properly align the system’s Cartesian
@@ -151,9 +154,9 @@ the <span class="math notranslate nohighlight">\(z\)</span>-axis.</p></li>
 </ul>
 </li>
 </ul>
-</div>
-<div class="section" id="calculation-methodology">
-<h3>Calculation methodology<a class="headerlink" href="#calculation-methodology" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="calculation-methodology">
+<h3>Calculation methodology<a class="headerlink" href="#calculation-methodology" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>An initial system is generated based on the loaded system and <em>uvw</em>,
 <em>atomshift</em>, and <em>sizemults</em> input parameters. This initial system is
@@ -180,9 +183,9 @@ as disl.dump.</p></li>
 <li><p>Parameters associated with the Stroh solution are saved to the
 results record.</p></li>
 </ol>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -241,14 +244,14 @@ results record.</p></li>
         <li class="right" >
           <a href="index.html" title="dislocation_monopole"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >dislocation_monopole</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dislocation_monopole calculation style</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

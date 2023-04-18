@@ -172,7 +172,8 @@ class RelaxLiquid(Calculation):
             try:
                 ucell = self.system.ucell
             except:
-                raise ValueError('rdfcutoff not set and no ucell found to compute the default value')
+                #raise ValueError('rdfcutoff not set and no ucell found to compute the default value')
+                return None
             self.__rdfcutoff = 4 * ucell.r0()
         return self.__rdfcutoff
 
@@ -651,6 +652,68 @@ class RelaxLiquid(Calculation):
                 else:
                     params[key] = kwargs[key]
 
+        elif branch == 'melt':
+
+            # Check for required kwargs
+            assert 'lammps_command' in kwargs
+            assert 'temperature_melt' not in kwargs, 'temperature_melt == temperature for this branch'
+
+            # Set default workflow settings
+            params['buildcombos'] = 'atomicparent load_file parent'
+            params['parent_record'] = 'relaxed_crystal'
+            params['parent_method'] = 'dynamic'
+            params['parent_standing'] = 'good'
+            params['parent_family'] = 'A1--Cu--fcc'
+            params['sizemults'] = '10 10 10'
+            params['atomshift'] = '0.05 0.05 0.05'
+            params['runsteps'] = '1000000'
+            params['temperature'] = '3000'
+
+            # Copy kwargs to params
+            for key in kwargs:
+
+                # Rename potential-related terms for buildcombos
+                if key[:10] == 'potential_':
+                    params[f'parent_{key}'] = kwargs[key]
+
+                # Copy/overwrite other terms
+                else:
+                    params[key] = kwargs[key]
+
+            # Set temperature_melt to temperature
+            params['temperature_melt'] = params['temperature']
+
+        elif branch == 'change_temp':
+
+            # Check for required kwargs
+            assert 'lammps_command' in kwargs
+            assert 'temperature' in kwargs, 'temperature must be specified for this branch'
+            assert 'temperature_melt' in kwargs, 'temperature_melt (previous temperature) must be specified for this branch'
+
+            # Set default workflow settings
+            params['buildcombos'] = 'atomicarchive load_file archive'
+            params['archive_record'] = 'calculation_relax_liquid'
+            params['archive_load_key'] = 'final-system'
+            params['archive_status'] = 'finished'
+            params['archive_temperature'] = kwargs['temperature_melt']
+            params['sizemults'] = '1 1 1'
+            params['atomshift'] = '0.0 0.0 0.0'
+            params['runsteps'] = '1000000'
+            params['temperature'] = kwargs['temperature']
+            params['temperature_melt'] = kwargs['temperature_melt']
+            params['meltsteps'] = '0'
+
+            # Copy kwargs to params
+            for key in kwargs:
+
+                # Rename potential-related terms for buildcombos
+                if key[:10] == 'potential_':
+                    params[f'archive_{key}'] = kwargs[key]
+
+                # Copy/overwrite other terms
+                else:
+                    params[key] = kwargs[key]
+
         else:
             raise ValueError(f'Unknown branch {branch}')
 
@@ -946,6 +1009,12 @@ class RelaxLiquid(Calculation):
                 name='temperature',
                 path=f'{self.modelroot}.phase-state.temperature.value',
                 description='search by temperature in Kelvin'),
+            'pressure': load_query(
+                style='float_match',
+                name='pressure',
+                path=f'{self.modelroot}.phase-state.pressure.value',
+                description='search by pressure in GPa',
+                unit='GPa')
         })
         return queries
 
@@ -1006,7 +1075,7 @@ class RelaxLiquid(Calculation):
         """dict: The terms to compare metadata values using a tolerance."""
         return {
             'temperature':1e-2,
-            'pressure':1e-2,
+            'pressure':1e-12,
         }
 
 ########################### Calculation interactions ##########################

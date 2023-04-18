@@ -1,17 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Adding new calculation styles &#8212; iprPy 0.11.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Adding new calculation styles &#8212; iprPy 0.11.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -33,7 +36,7 @@
         <li class="right" >
           <a href="index.html" title="Extending iprPy"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Extending iprPy</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Adding new calculation styles</a></li> 
       </ul>
@@ -44,16 +47,16 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="adding-new-calculation-styles">
-<h1>Adding new calculation styles<a class="headerlink" href="#adding-new-calculation-styles" title="Permalink to this headline">¶</a></h1>
+  <section id="adding-new-calculation-styles">
+<h1>Adding new calculation styles<a class="headerlink" href="#adding-new-calculation-styles" title="Permalink to this heading">¶</a></h1>
 <p>This page outlines the general steps associated with defining a new calculation style and implementing it into iprPy.</p>
-<div class="section" id="create-a-directory-for-the-calculation-style-files">
-<h2>1. Create a directory for the calculation style files<a class="headerlink" href="#create-a-directory-for-the-calculation-style-files" title="Permalink to this headline">¶</a></h2>
+<section id="create-a-directory-for-the-calculation-style-files">
+<h2>1. Create a directory for the calculation style files<a class="headerlink" href="#create-a-directory-for-the-calculation-style-files" title="Permalink to this heading">¶</a></h2>
 <p>Each calculation style exists as a number of separate files.  So, the first step in creating a new calculation style is to create a directory to store those files.  The default location where iprPy calculations can be found is inside the iprPy/calculation directory.  This is recommended, especially if you wish that your calculation style eventually be included as part of iprPy.</p>
 <p>Alternatively, the calculation style folder could exist in a separate Python package that can be imported.</p>
-</div>
-<div class="section" id="define-a-calculation-function">
-<h2>2. Define a calculation function<a class="headerlink" href="#define-a-calculation-function" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="define-a-calculation-function">
+<h2>2. Define a calculation function<a class="headerlink" href="#define-a-calculation-function" title="Permalink to this heading">¶</a></h2>
 <p>At the core of each iprPy calculation style is a single Python function that serves as the primary entrypoint for executing the calculation method.  Note that the method itself need not be a single function or file, only that there be a sole “main” function to call it.</p>
 <p>The only other requirement is that iprPy be able to find and import the calculation function.  This typically is done by placing the calculation function and any supporting code inside a Python script that is then placed inside</p>
 <p>However, there are a few recommendations in how the code should be designed to assist with clarity</p>
@@ -64,9 +67,9 @@
 <li><p>If the new calculation method is similar to already existing ones, try to adhere to some consistency in how input/results terms are named and the order in which they are listed.  This can help avoid possible confusion for those working with multiple calculations.</p></li>
 <li><p>If the calculation relies on reading non-Python data files, it is recommended that they be read in using the iprPy.tools.read_calc_file() function.  This function will read the file from the current working directory if it exists there, or will read it from a specified Python package location otherwise.  The utility of this is it makes it possible for anyone interacting with the Notebook version of the calculation to modify the data file in the Notebook.</p></li>
 </ul>
-</div>
-<div class="section" id="create-documentation-files">
-<h2>3. Create documentation files<a class="headerlink" href="#create-documentation-files" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="create-documentation-files">
+<h2>3. Create documentation files<a class="headerlink" href="#create-documentation-files" title="Permalink to this heading">¶</a></h2>
 <p>Each calculation style has two primary documentation files associated with it.</p>
 <p><strong>README.md</strong> gives a quick overview of the calculation.  This provides simple details such as</p>
 <ul class="simple">
@@ -77,53 +80,53 @@
 <li><p>Disclaimers about usage and limitations of the method.</p></li>
 </ul>
 <p><strong>theory.md</strong> provides additional “Method and theory” content for the calculation.  This allows for more in-depth descriptions of the theory behind what the calculation is doing as well as any important specifics associated with the current implementation.  When needed, any equations should be represented in the Latex-math-style format supported by MathJax.</p>
-</div>
-<div class="section" id="define-the-calculation-class">
-<h2>4. Define the Calculation class<a class="headerlink" href="#define-the-calculation-class" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="define-the-calculation-class">
+<h2>4. Define the Calculation class<a class="headerlink" href="#define-the-calculation-class" title="Permalink to this heading">¶</a></h2>
 <p>The Calculation class provides the interface for iprPy to find the calculation function and any associated components.  This section provides some basic information for defining a new Calculation class.</p>
 <p>The class definition needs to exist in the calculation style directory as it expects that most supporting files can be found in the same folder.</p>
-<div class="section" id="core-components">
-<h3>4.1. Core components<a class="headerlink" href="#core-components" title="Permalink to this headline">¶</a></h3>
+<section id="core-components">
+<h3>4.1. Core components<a class="headerlink" href="#core-components" title="Permalink to this heading">¶</a></h3>
 <p>These are the core class definition settings and attributes.</p>
-<div class="section" id="class-definition">
-<h4>4.1.1 Class definition<a class="headerlink" href="#class-definition" title="Permalink to this headline">¶</a></h4>
+<section id="class-definition">
+<h4>4.1.1 Class definition<a class="headerlink" href="#class-definition" title="Permalink to this heading">¶</a></h4>
 <p>The Calculation class itself should be named for the calculation style and be a child of iprPy.calculation.Calculation.</p>
-</div>
-<div class="section" id="class-initializer">
-<h4>4.1.2. Class initializer<a class="headerlink" href="#class-initializer" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="class-initializer">
+<h4>4.1.2. Class initializer<a class="headerlink" href="#class-initializer" title="Permalink to this heading">¶</a></h4>
 <p>The class initializer should
 - Define a class attribute for each Calculation subset that is used.
 - Set default values for any calculation-specific attribute values (see Section 4.4).
 - Set self.calc to be the calculation function imported from wherever it was defined.
 - Call super() for the parent Calculation class’ init.  Pass the parent init all of the parameters of the current class init plus a list of the subset objects.</p>
-</div>
-<div class="section" id="filenames">
-<h4>4.1.3. filenames<a class="headerlink" href="#filenames" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="filenames">
+<h4>4.1.3. filenames<a class="headerlink" href="#filenames" title="Permalink to this heading">¶</a></h4>
 <p>Filenames provides a list of all files, both Python and non-Python, that are required by the calculation.  This lets prepare know what files to copy.</p>
-</div>
-<div class="section" id="class-attributes">
-<h4>4.1.4. Class attributes<a class="headerlink" href="#class-attributes" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="class-attributes">
+<h4>4.1.4. Class attributes<a class="headerlink" href="#class-attributes" title="Permalink to this heading">¶</a></h4>
 <p>Most of the universal class attributes are defined by the parent class leaving developers to only worry about the calculation-specific terms.  These typically fall into one of three categories</p>
 <ul class="simple">
 <li><p>subset attributes: these point to the individual subset objects created in the init.  No setter should be defined for these.</p></li>
 <li><p>unique input attributes: these are the input terms specific to the calculation that are not included in any subset.  It should be possible to directly set the values or use methods to set the values.</p></li>
 <li><p>results attributes: these interpret the results returned by the calculation.  Trying to access these terms when the calculation has not been performed should raise an error.</p></li>
 </ul>
-</div>
-<div class="section" id="set-values">
-<h4>4.1.5. set_values<a class="headerlink" href="#set-values" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="set-values">
+<h4>4.1.5. set_values<a class="headerlink" href="#set-values" title="Permalink to this heading">¶</a></h4>
 <p>The set_values method allows for any of the input attributes, both for the class and any subset, to be set at the same time.</p>
-</div>
-<div class="section" id="isvalid">
-<h4>4.1.6. isvalid<a class="headerlink" href="#isvalid" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="isvalid">
+<h4>4.1.6. isvalid<a class="headerlink" href="#isvalid" title="Permalink to this heading">¶</a></h4>
 <p>The isvalid() method returns a bool that indicates if the set input attributes have valid and non-conflicting values.  This is used by prepare to filter out any calculations that could have invalid combinations of input parameters.  The parent Calculation.isvalid() always returns True so defining the function is optional if no checks need to be performed.</p>
-</div>
-</div>
-<div class="section" id="parameter-file-interactions">
-<h3>4.2. Parameter file interactions<a class="headerlink" href="#parameter-file-interactions" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="parameter-file-interactions">
+<h3>4.2. Parameter file interactions<a class="headerlink" href="#parameter-file-interactions" title="Permalink to this heading">¶</a></h3>
 <p>These manage the input parameters that the calculation can read in from the key-value input parameter text file.</p>
-<div class="section" id="load-parameters">
-<h4>4.2.1. load_parameters<a class="headerlink" href="#load-parameters" title="Permalink to this headline">¶</a></h4>
+<section id="load-parameters">
+<h4>4.2.1. load_parameters<a class="headerlink" href="#load-parameters" title="Permalink to this heading">¶</a></h4>
 <p>The load_parameters method loads and interprets a key-value input parameter file for the calculation and updates the associated class attributes based on the values read in.  How this is done for each input parameter term depends on if the term is part of a subset and the parameter’s data types</p>
 <ul class="simple">
 <li><p>The method should start by calling super().load_parameters.  This will convert the input file into a dict (input_dict) and set any universal terms.</p></li>
@@ -133,121 +136,121 @@
 <li><p>Boolean terms can be interpreted with iprPy.input.boolean().  This will properly convert the str representation to a bool.</p></li>
 <li><p>For floating point terms with units, use iprPy.input.value().  This makes it possible to interpret strings that contain units, define default units, and define a default value with units for the term.</p></li>
 </ul>
-</div>
-<div class="section" id="templatekeys">
-<h4>4.2.2. templatekeys<a class="headerlink" href="#templatekeys" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="templatekeys">
+<h4>4.2.2. templatekeys<a class="headerlink" href="#templatekeys" title="Permalink to this heading">¶</a></h4>
 <p>templatekeys is a dict that specifies all of the terms recognized by the calculation’s input parameter file that are unique to the calculation, i.e. not universal or part of a subset.  The dict’s keys give the names of the terms and the dict’s values provide descriptions for the terms.  This is used to generate the template and templatedoc fields associated with the unfilled input file and the accompanying documentation.</p>
-</div>
-<div class="section" id="singularkeys-and-multikeys">
-<h4>4.2.3. singularkeys and multikeys<a class="headerlink" href="#singularkeys-and-multikeys" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="singularkeys-and-multikeys">
+<h4>4.2.3. singularkeys and multikeys<a class="headerlink" href="#singularkeys-and-multikeys" title="Permalink to this heading">¶</a></h4>
 <p>These categorize the recognized input keys according to how prepare should treat them if multiple values are given.  Note that each subset has a keyset attribute that lists all associated input terms.</p>
 <ul class="simple">
 <li><p>singularkeys lists all keys that are limited to a single value when preparing.  In other words, these are not looped over.</p></li>
 <li><p>multikeys lists which terms can have multiple values and how they are grouped into parameter sets.  Each parameter set indicates that the values for all included terms should be iterated over together.</p></li>
 </ul>
-</div>
-<div class="section" id="master-prepare-inputs">
-<h4>4.2.4. master_prepare_inputs<a class="headerlink" href="#master-prepare-inputs" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="master-prepare-inputs">
+<h4>4.2.4. master_prepare_inputs<a class="headerlink" href="#master-prepare-inputs" title="Permalink to this heading">¶</a></h4>
 <p>The master_prepare_inputs() method builds a dict of prepare input parameters based on a pre-defined standard.  Using a “master_prepare” can be convenient as it only requires the end users to specify modifications to the prepare terms rather than fully defining the prepare terms from scratch.</p>
 <p>Multiple different standard prepare settings can be defined for the same calculation by associating the settings with different “branch” values.  For instance, there may be different branches based on the style of input records used or to target multiple specific input parameter combinations.</p>
 <p>For each branch, a dict of prepare parameters is constructed that defines the initial default values for that master_prepare branch.  Then, any kwargs given to master_prepare_inputs() are added to the dict which either extends it or changes the default values.  Once done, the dict is returned and can immediately be passed to the prepare method of a Database.</p>
-</div>
-</div>
-<div class="section" id="data-model-interactions">
-<h3>4.3. Data model interactions<a class="headerlink" href="#data-model-interactions" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="data-model-interactions">
+<h3>4.3. Data model interactions<a class="headerlink" href="#data-model-interactions" title="Permalink to this heading">¶</a></h3>
 <p>These manage how the data is represented as a tree-like data model that can be equivalently stored as JSON or XML.</p>
-<div class="section" id="modelroot">
-<h4>4.3.1 modelroot<a class="headerlink" href="#modelroot" title="Permalink to this headline">¶</a></h4>
+<section id="modelroot">
+<h4>4.3.1 modelroot<a class="headerlink" href="#modelroot" title="Permalink to this heading">¶</a></h4>
 <p>To be XML-compatible, all calculation data models have a single root element.  The modelroot attribute specifies what the root element name is.  Defining this allows for associated content to be discoverable in a record and allows for the subset data model operations to work across all calculations.</p>
-</div>
-<div class="section" id="build-model">
-<h4>4.3.2. build_model<a class="headerlink" href="#build-model" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="build-model">
+<h4>4.3.2. build_model<a class="headerlink" href="#build-model" title="Permalink to this heading">¶</a></h4>
 <p>The build_model() method constructs a data model for the calculation instance based on the current set input and results attributes.  Subelements can be built based on the calculation subsets using their build_model() methods.  This leaves only the unique calculation parameters to need to be defined.  The generated data model will will be both returned and set to the calculation object’s model attribute.  The data model is generated as a DataModelDict which has built-in tools for converting to JSON or XML.</p>
 <p>One useful tool for constructing the data model terms is atomman.unitconvert.model.  This allows for any parameter to be output in a small DataModelDict consisting of a value and the specified units that the value is in.  The value can be a single float or an array of values of any shape.  It also has the option to specify an error associated with the value.</p>
-</div>
-<div class="section" id="load-model">
-<h4>4.3.3. load_model<a class="headerlink" href="#load-model" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="load-model">
+<h4>4.3.3. load_model<a class="headerlink" href="#load-model" title="Permalink to this heading">¶</a></h4>
 <p>The load_model() method reads in the data model contents of a record and saves the extracted values to the object’s attributes.  Any defined subsets are automatically interpreted by calling the super().load_model() method leaving only the conversions for the calculation-specific terms to be defined.</p>
 <p>Useful tools for loading the model are atomman.unitconvert.value_unit and atomman.unitconvert.error_unit.  These are the reverse of atomman.unitconvert.model in that they read in the values and convert them from the specified units into working units.  value_unit operates on the primary value of the value models, while error_unit operates on the error field.</p>
-</div>
-<div class="section" id="mongoquery-and-cdcsquery">
-<h4>4.3.4. mongoquery and cdcsquery<a class="headerlink" href="#mongoquery-and-cdcsquery" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="mongoquery-and-cdcsquery">
+<h4>4.3.4. mongoquery and cdcsquery<a class="headerlink" href="#mongoquery-and-cdcsquery" title="Permalink to this heading">¶</a></h4>
 <p>These methods construct Mongo-style queries that are designed to limit returned results according to specified values.  A specific query style is associated with each allowed parameter that then operates on an element in the record.</p>
 <p>These rely on the yabadaba.query options and can be specified in the method descriptions or defined as Query objects in a separate queries attribute.</p>
-</div>
-</div>
-<div class="section" id="metadata-interactions">
-<h3>4.4. Metadata interactions<a class="headerlink" href="#metadata-interactions" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="metadata-interactions">
+<h3>4.4. Metadata interactions<a class="headerlink" href="#metadata-interactions" title="Permalink to this heading">¶</a></h3>
 <p>These manage the terms that appear in the metadata dict that can be generated for the calculation to provide a quick means of comparing multiple instances of the same calculation.</p>
-<div class="section" id="metadata">
-<h4>4.4.1. metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h4>
+<section id="metadata">
+<h4>4.4.1. metadata<a class="headerlink" href="#metadata" title="Permalink to this heading">¶</a></h4>
 <p>The metadata method returns a dict containing terms for the calculation that can be represented as basic Python data types.  The dict should also be flat or at most one level of embedding.  These metadata dicts allow for quick comparisons between different instances of the same calculation.  The included terms and structure should be simple to minimize conversion time and allow for simple comparison operations.</p>
-</div>
-<div class="section" id="compare-terms-and-compare-fterms">
-<h4>4.4.2. compare_terms and compare_fterms<a class="headerlink" href="#compare-terms-and-compare-fterms" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="compare-terms-and-compare-fterms">
+<h4>4.4.2. compare_terms and compare_fterms<a class="headerlink" href="#compare-terms-and-compare-fterms" title="Permalink to this heading">¶</a></h4>
 <p>These are used by prepare to compare proposed calculation instances with the existing ones.  If all listed terms are deemed to match with an existing record, then it is considered a duplicate and skipped.</p>
 <ul class="simple">
 <li><p>compare_terms lists the metadata terms that must have exactly the same values to be considered a match.  These are typically str, bool or int values.</p></li>
 <li><p>compare_fterms is a dict that specifies metadata float values to compare.  The dict’s keys are the term names and the dict’s values are absolute tolerances to use when comparing the values.</p></li>
 </ul>
-</div>
-<div class="section" id="pandasfilter">
-<h4>4.4.3. pandasfilter<a class="headerlink" href="#pandasfilter" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="pandasfilter">
+<h4>4.4.3. pandasfilter<a class="headerlink" href="#pandasfilter" title="Permalink to this heading">¶</a></h4>
 <p>The pandasfilter() method defines operations that filter a pandas.DataFrame based on values given for metadata terms.</p>
 <p>These rely on the yabadaba.query options and can be specified in the method description or defined as Query objects in a separate queries attribute.</p>
-</div>
-</div>
-<div class="section" id="calculation-interactions">
-<h3>4.5. Calculation interactions<a class="headerlink" href="#calculation-interactions" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="calculation-interactions">
+<h3>4.5. Calculation interactions<a class="headerlink" href="#calculation-interactions" title="Permalink to this heading">¶</a></h3>
 <p>These provide functions that manage how to convert terms between the class attributes and the calculation function inputs/results.</p>
-<div class="section" id="calc-inputs">
-<h4>4.5.1. calc_inputs<a class="headerlink" href="#calc-inputs" title="Permalink to this headline">¶</a></h4>
+<section id="calc-inputs">
+<h4>4.5.1. calc_inputs<a class="headerlink" href="#calc-inputs" title="Permalink to this heading">¶</a></h4>
 <p>The calc_inputs method transforms the set class attribute values into the input parameter terms for the calculation function.</p>
-</div>
-<div class="section" id="process-results">
-<h4>4.5.2. process_results<a class="headerlink" href="#process-results" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="process-results">
+<h4>4.5.2. process_results<a class="headerlink" href="#process-results" title="Permalink to this heading">¶</a></h4>
 <p>The process_results method takes the dict of results returned by the calculation function and interprets them into class attributes.</p>
-</div>
-</div>
-</div>
-<div class="section" id="link-the-calculation-to-the-calculation-manager">
-<h2>5. Link the calculation to the calculation manager<a class="headerlink" href="#link-the-calculation-to-the-calculation-manager" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+</section>
+<section id="link-the-calculation-to-the-calculation-manager">
+<h2>5. Link the calculation to the calculation manager<a class="headerlink" href="#link-the-calculation-to-the-calculation-manager" title="Permalink to this heading">¶</a></h2>
 <p>Once a Calculation class has been defined, it can be incorporated into iprPy by importing it with iprPy.calculationmanager.import_style().  import_style takes the following parameters:
 - The style name to associate the calculation with.
 - The file name that contains the class definition.
 - The module where the class definition file is located.
 - Optionally, if the file name is different from the class name, the class name is given here.</p>
-</div>
-<div class="section" id="make-a-jupyter-notebook-and-demo-script">
-<h2>6. Make a Jupyter Notebook and demo script<a class="headerlink" href="#make-a-jupyter-notebook-and-demo-script" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="make-a-jupyter-notebook-and-demo-script">
+<h2>6. Make a Jupyter Notebook and demo script<a class="headerlink" href="#make-a-jupyter-notebook-and-demo-script" title="Permalink to this heading">¶</a></h2>
 <p>The final step is to create demonstrations so that users can see the calculation in operation.  This is done by creating a Jupyter Notebook for the calculation and a demonstration input script.</p>
-<div class="section" id="jupyter-notebook">
-<h3>6.1. Jupyter Notebook<a class="headerlink" href="#jupyter-notebook" title="Permalink to this headline">¶</a></h3>
+<section id="jupyter-notebook">
+<h3>6.1. Jupyter Notebook<a class="headerlink" href="#jupyter-notebook" title="Permalink to this heading">¶</a></h3>
 <p>Jupyter Notebooks for each of the calculations can be found in the notebook directory of the iprPy repository.  When creating a new one, it is highly recommended to start from an existing one.</p>
-<div class="section" id="initial-information">
-<h4>6.1.1. Initial information<a class="headerlink" href="#initial-information" title="Permalink to this headline">¶</a></h4>
+<section id="initial-information">
+<h4>6.1.1. Initial information<a class="headerlink" href="#initial-information" title="Permalink to this heading">¶</a></h4>
 <p>The first cells in the Notebook should load the calculation from iprPy and display the calculation’s maindoc and theorydoc.  This tests that the calculation was successfully imported and provides the general knowledge about what the method does.</p>
-</div>
-<div class="section" id="copy-calculation-code">
-<h4>6.1.2. Copy calculation code<a class="headerlink" href="#copy-calculation-code" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="copy-calculation-code">
+<h4>6.1.2. Copy calculation code<a class="headerlink" href="#copy-calculation-code" title="Permalink to this heading">¶</a></h4>
 <p>The next cells should contain a copy of the primary calculation function as well as any other required functions and data files.  Copying the code and data files into the Notebook not only lets users see how the calculation is implemented but also makes it possible for them to easily modify the calculation should they wish.</p>
-</div>
-<div class="section" id="define-input-parameters">
-<h4>6.1.3. Define input parameters<a class="headerlink" href="#define-input-parameters" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="define-input-parameters">
+<h4>6.1.3. Define input parameters<a class="headerlink" href="#define-input-parameters" title="Permalink to this heading">¶</a></h4>
 <p>Input parameters for the calculation function are then set up and defined.  These should be the parameters that the function itself takes and not the input parameter file terms.  BE sure to check other existing Notebooks and copy any related parameter definitions from them as appropriate for consistency.</p>
-</div>
-<div class="section" id="run-the-demo-and-display-results">
-<h4>6.1.4. Run the demo and display results<a class="headerlink" href="#run-the-demo-and-display-results" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="run-the-demo-and-display-results">
+<h4>6.1.4. Run the demo and display results<a class="headerlink" href="#run-the-demo-and-display-results" title="Permalink to this heading">¶</a></h4>
 <p>Using the defined calculation inputs, call the calculation function directly and show what terms are in the returned results dict.  Then, provide formatted interpretations of the results data.</p>
-</div>
-</div>
-<div class="section" id="demo-script">
-<h3>6.2. Demo script<a class="headerlink" href="#demo-script" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="demo-script">
+<h3>6.2. Demo script<a class="headerlink" href="#demo-script" title="Permalink to this heading">¶</a></h3>
 <p>The demo directory in the iprPy repository contains a demonstration input script for each fully implemented calculation.  Users should be able to go into any of the calculation-specific subdirectories and run the demo script for that calculation style simply by typing iprPy run &lt;calcscript&gt;.</p>
 <p>If any of the calculation inputs are separate files, put those files in the “0-files” directory.  This allows for git to identify those files and makes it easy for the same input files to be shared by multiple demo scripts.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -346,13 +349,13 @@
         <li class="right" >
           <a href="index.html" title="Extending iprPy"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Extending iprPy</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Adding new calculation styles</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

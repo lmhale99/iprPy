@@ -1,0 +1,285 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>relax_liquid calculation style &#8212; iprPy 0.11.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="relax_liquid Input Terms" href="template.html" />
+    <link rel="prev" title="relax_liquid" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="template.html" title="relax_liquid Input Terms"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="relax_liquid"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">relax_liquid</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">relax_liquid calculation style</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="relax-liquid-calculation-style">
+<h1>relax_liquid calculation style<a class="headerlink" href="#relax-liquid-calculation-style" title="Permalink to this heading">¶</a></h1>
+<p><strong>Lucas M. Hale</strong>,
+<a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>,
+<em>Materials Science and Engineering Division, NIST</em>.</p>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
+<p>The relax_liquid calculation style is designed to generate and
+characterize a liquid phase configuration for an atomic potential based
+on an initial configuration, target temperature and target pressure. The
+calculation involves multiple stages of relaxation and computes the mean
+squared displacement and radial distribution functions on the final
+liquid.</p>
+<section id="version-notes">
+<h3>Version notes<a class="headerlink" href="#version-notes" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>2022-10-??: Calculation created</p></li>
+</ul>
+</section>
+<section id="additional-dependencies">
+<h3>Additional dependencies<a class="headerlink" href="#additional-dependencies" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="disclaimers">
+<h3>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST
+disclaimers</a></p></li>
+<li><p>No active checks are performed by this calculation to ensure that the
+system is liquid. Be sure to check the final atomic configurations.
+The thermo output can also provide a rough guideline in that you
+should see convergence of volume but not of the individual lx, ly, lz
+dimensions for a liquid phase.</p></li>
+<li><p>If starting with a crystalline configuration, be sure to use an
+adequately high melt temperature and number of melt steps.</p></li>
+<li><p>The temperature and volume equilibrium stages are designed to get the
+final nve system close to the target temperature and pressure, but
+they will not be exact. Be sure to check that the measured
+temperature and pressure are close to the targets.</p></li>
+</ul>
+</section>
+</section>
+<section id="method-and-theory">
+<h2>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this heading">¶</a></h2>
+<p>This performs five stages of simulations to create and analyze a liquid
+phase at a given temperature and pressure.</p>
+<ol class="arabic simple">
+<li><p>A “melt” stage is performed using npt at the target pressure and an
+elevated melt temperature.</p></li>
+<li><p>A “cooling” stage is performed using npt in which the temperature is
+linearly reduced from the melt to the target temperature.</p></li>
+<li><p>A “volume equilibrium” stage is performed using npt at the target
+temperature and pressure. Following the run, the system’s dimensions
+are equally scaled to the average volume.</p></li>
+<li><p>A “temperature equilibrium” stage is performed using nvt at the
+target temperature. Following the run, the atomic velocities are
+scaled based on the expected total energy at the target temperature.</p></li>
+<li><p>An “nve analysis” stage is performed in which the mean squared
+displacements of the atoms and the radial distribution function are
+measured.</p></li>
+</ol>
+<section id="melt-stage">
+<h3>Melt stage<a class="headerlink" href="#melt-stage" title="Permalink to this heading">¶</a></h3>
+<p>The melt stage subjects the initial configuration to an npt simulation
+at the elevated melt temperature. This stage is meant to transform
+initially crystalline system configurations into amorphous liquid
+phases. As such, the melt temperature should be much higher than the
+melting temperature of the initial crystal, and the number of MD steps
+during this stage should be sufficiently high to allow for the phase
+transformation to occur.</p>
+<p>If the initial atomic configuration is already amorphous, this stage can
+be skipped by setting meltsteps = 0. Also, if the initial configuration
+already has velocities assigned to the atoms, you can use those
+velocities by setting createvelocities = False. These two options make
+it possible to run a single melt simulation that can be used as the
+basis for all target temperatures. Note that createvelocities = True is
+needed if you want to measure statistical error from multiple runs.</p>
+</section>
+<section id="cooling-stage">
+<h3>Cooling stage<a class="headerlink" href="#cooling-stage" title="Permalink to this heading">¶</a></h3>
+<p>The cooling stage runs npt and linearly scales the temperature from the
+melt temperature to the target temperature. The larger the number of
+coolsteps, the more gradual the change from melt to target temperatures
+will be. This can be important if the target temperature is much smaller
+than the melt temperature.</p>
+<p>Similarly to the melt stage, this stage can be skipped by setting
+coolsteps = 0. If meltsteps = coolsteps = 0 and createvelocities = True,
+the atomic velocities will be created for the system at the target
+temperature rather than the melt temperature. This allows for a generic
+amorphous state to be used as the starting configuration.</p>
+</section>
+<section id="volume-equilibration-stage">
+<h3>Volume equilibration stage<a class="headerlink" href="#volume-equilibration-stage" title="Permalink to this heading">¶</a></h3>
+<p>The volume equilibration stage runs npt at the target temperature and
+pressure. It is meant to allow for the system to equilibrate at the
+target temperature, then to obtain a time-averaged measurement of the
+system’s volume. The average volume is computed from a specified number
+of samples (volrelaxsamples) taken every 100 timesteps from the end of
+this stage. The max value allowed for volrelaxsamples is volrelaxsteps /
+100, but practically it should be noticeably smaller than this to ignore
+measurements at the beginning of the stage where the system has not yet
+equilibrated.</p>
+<p>When this stage finishes, the volume of the configuration cell is
+adjusted to the average volume computed by scaling each box length and
+tilt by the same factor, s</p>
+<div class="math notranslate nohighlight">
+\[s = \left( \frac{ \left&lt; vol \right&gt; } {vol} \right)^\frac{1}{3}\]</div>
+</section>
+<section id="temperature-equilibration-stage">
+<h3>Temperature equilibration stage<a class="headerlink" href="#temperature-equilibration-stage" title="Permalink to this heading">¶</a></h3>
+<p>The temperature equilibration stage runs nvt at the target temperature
+for the system fixed at the computed average volume. This allows for the
+system to equilibrate at the fixed volume and target temperature, and to
+compute a target total energy, <span class="math notranslate nohighlight">\(E_{target}\)</span>, that corresponds to
+the system in equilibrium at the target temperature. <span class="math notranslate nohighlight">\(E_{target}\)</span>
+is computed based on time-averaged energy values from a specified number
+of samples (temprelaxsamples) taken every 100 timesteps from the end of
+this stage. The max value allowed for temprelaxsamples is temprelaxsteps
+/ 100. Unlike the previous stage, the equilibration portion of this
+stage is likely negligible, therefore it is less important to ignore the
+initial measurements.</p>
+<p>In LAMMPS, the adjustment is made by scaling all atomic velocities to a
+temperature <span class="math notranslate nohighlight">\(T_s\)</span> such that the current potential energy,
+<span class="math notranslate nohighlight">\(E_{pot}\)</span>, plus the kinetic energy for <span class="math notranslate nohighlight">\(T_s\)</span> equals
+<span class="math notranslate nohighlight">\(E_{target}\)</span></p>
+<div class="math notranslate nohighlight">
+\[E_{target} = E_{pot} + \frac{3}{2} N k_B T_s\]</div>
+<div class="math notranslate nohighlight">
+\[T_s = \frac{2 \left( E_{target} - E_{pot} \right)}{3 N k_B}\]</div>
+<p>Two alternate methods for computing <span class="math notranslate nohighlight">\(E_{target}\)</span> are implemented
+and can be accessed with the temprelaxstyle option.</p>
+<ul class="simple">
+<li><p>For temprelaxstyle = ‘te’, the target total energy is taken as the
+computed mean total energy</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[E_{target} = \left&lt; E_{total}\right&gt;\]</div>
+<ul class="simple">
+<li><p>For temprelaxstyle = ‘pe’, the target total energy is taken as the
+computed mean potential energy plus kinetic energy for the target
+temperature, <span class="math notranslate nohighlight">\(T\)</span></p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[E_{target} = \left&lt; E_{pot} \right&gt; + \frac{3}{2} N k_B T\]</div>
+<p>Limited tests show the two methods to result in mean temperatures in the
+final stage that have roughly the same variation from the target
+temperature, with ‘pe’ style giving slightly better results. As such,
+both methods are included as options and ‘pe’ is set as the default.</p>
+</section>
+<section id="analysis-stage">
+<h3>Analysis stage<a class="headerlink" href="#analysis-stage" title="Permalink to this heading">¶</a></h3>
+<p>The analysis stage runs nve with the system that has been adjusted to
+the target volume and total energy from the last two stages. During this
+stage, mean squared displacements and radial distribution function
+calculations are performed that can be used to analyze the liquid phase
+at the target temperature and pressure.</p>
+<p>In addition to the analysis calculations, the average measured
+temperature and pressure are reported, which can be used as verification
+that the volume and temperature equilibration stages and adjustments
+worked properly.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">relax_liquid calculation style</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#version-notes">Version notes</a></li>
+<li><a class="reference internal" href="#additional-dependencies">Additional dependencies</a></li>
+<li><a class="reference internal" href="#disclaimers">Disclaimers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#method-and-theory">Method and Theory</a><ul>
+<li><a class="reference internal" href="#melt-stage">Melt stage</a></li>
+<li><a class="reference internal" href="#cooling-stage">Cooling stage</a></li>
+<li><a class="reference internal" href="#volume-equilibration-stage">Volume equilibration stage</a></li>
+<li><a class="reference internal" href="#temperature-equilibration-stage">Temperature equilibration stage</a></li>
+<li><a class="reference internal" href="#analysis-stage">Analysis stage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">relax_liquid</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="template.html"
+                          title="next chapter">relax_liquid Input Terms</a></p>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="template.html" title="relax_liquid Input Terms"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="relax_liquid"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >relax_liquid</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">relax_liquid calculation style</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
+    </div>
+  </body>
+</html>

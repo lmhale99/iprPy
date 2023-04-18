@@ -1,17 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>stacking_fault_map_2D calculation style &#8212; iprPy 0.11.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>stacking_fault_map_2D calculation style &#8212; iprPy 0.11.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -35,7 +38,7 @@
         <li class="right" >
           <a href="index.html" title="stacking_fault_map_2D"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">stacking_fault_map_2D</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">stacking_fault_map_2D calculation style</a></li> 
@@ -47,19 +50,19 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="stacking-fault-map-2d-calculation-style">
-<h1>stacking_fault_map_2D calculation style<a class="headerlink" href="#stacking-fault-map-2d-calculation-style" title="Permalink to this headline">¶</a></h1>
+  <section id="stacking-fault-map-2d-calculation-style">
+<h1>stacking_fault_map_2D calculation style<a class="headerlink" href="#stacking-fault-map-2d-calculation-style" title="Permalink to this heading">¶</a></h1>
 <p><strong>Lucas M. Hale</strong>,
 <a class="reference external" href="mailto:lucas&#46;hale&#37;&#52;&#48;nist&#46;gov?Subject=ipr-demo">lucas<span>&#46;</span>hale<span>&#64;</span>nist<span>&#46;</span>gov</a>,
 <em>Materials Science and Engineering Division, NIST</em>.</p>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
 <p>The stacking_fault_map_2D calculation style evaluates the full 2D
 generalized stacking fault map for an array of shifts along a specified
 crystallographic plane. A regular grid of points is established and the
 generalized stacking fault energy is evaluated at each.</p>
-<div class="section" id="version-notes">
-<h3>Version notes<a class="headerlink" href="#version-notes" title="Permalink to this headline">¶</a></h3>
+<section id="version-notes">
+<h3>Version notes<a class="headerlink" href="#version-notes" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>2018-07-09: Notebook added.</p></li>
 <li><p>2019-07-30: Description updated and small changes due to iprPy
@@ -70,12 +73,12 @@ database.</p></li>
 class. Setup and parameter definition streamlined.</p></li>
 <li><p>2022-03-11: Notebook updated to reflect version 0.11.</p></li>
 </ul>
-</div>
-<div class="section" id="additional-dependencies">
-<h3>Additional dependencies<a class="headerlink" href="#additional-dependencies" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="disclaimers">
-<h3>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="additional-dependencies">
+<h3>Additional dependencies<a class="headerlink" href="#additional-dependencies" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="disclaimers">
+<h3>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="http://www.nist.gov/public_affairs/disclaimer.cfm">NIST
 disclaimers</a></p></li>
@@ -83,10 +86,10 @@ disclaimers</a></p></li>
 large to minimize the interaction of the free surface and the
 stacking fault.</p></li>
 </ul>
-</div>
-</div>
-<div class="section" id="method-and-theory">
-<h2>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="method-and-theory">
+<h2>Method and Theory<a class="headerlink" href="#method-and-theory" title="Permalink to this heading">¶</a></h2>
 <p>First, an initial system is generated. This is accomplished using
 atomman.defect.StackingFault, which</p>
 <ol class="arabic simple">
@@ -148,8 +151,8 @@ difference after the shift is applied.</p>
 <span class="math notranslate nohighlight">\(\Delta\delta\)</span> for a complete 2D grid of <span class="math notranslate nohighlight">\(\vec{s}\)</span> values.
 The grid is built by taking fractional steps along two vectors parallel
 to the shift plane.</p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -203,14 +206,14 @@ to the shift plane.</p>
         <li class="right" >
           <a href="index.html" title="stacking_fault_map_2D"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >stacking_fault_map_2D</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">stacking_fault_map_2D calculation style</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

@@ -1,17 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DislocationPeriodicArray &#8212; iprPy 0.11.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>DislocationPeriodicArray &#8212; iprPy 0.11.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -33,7 +36,7 @@
         <li class="right" >
           <a href="function.html" title="dislocation_periodic_array.py"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">dislocation_periodic_array</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">DislocationPeriodicArray</a></li> 
@@ -45,134 +48,122 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="dislocationperiodicarray">
-<h1>DislocationPeriodicArray<a class="headerlink" href="#dislocationperiodicarray" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray">
-<span id="calculation-class"></span><h2>Calculation class<a class="headerlink" href="#module-iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray" title="Permalink to this headline">¶</a></h2>
+  <section id="dislocationperiodicarray">
+<h1>DislocationPeriodicArray<a class="headerlink" href="#dislocationperiodicarray" title="Permalink to this heading">¶</a></h1>
+<section id="module-iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray">
+<span id="calculation-class"></span><h2>Calculation class<a class="headerlink" href="#module-iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DislocationPeriodicArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../../iprPy/calculation.html#iprPy.calculation.Calculation" title="iprPy.calculation.Calculation.Calculation"><code class="xref py py-class docutils literal notranslate"><span class="pre">iprPy.calculation.Calculation.Calculation</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DislocationPeriodicArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">Path</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/io.html#io.IOBase" title="(in Python v3.11)"><span class="pre">IOBase</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataModelDict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">Path</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/io.html#io.IOBase" title="(in Python v3.11)"><span class="pre">IOBase</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../iprPy/calculation.html#iprPy.calculation.Calculation" title="iprPy.calculation.Calculation.Calculation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Calculation</span></code></a></p>
 <p>Class for managing periodic array of dislocations constructions and relaxations</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.K_tensor">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">K_tensor</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.K_tensor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">K_tensor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.K_tensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>The dislocation’s elastic K tensor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.annealsteps">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">annealsteps</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.annealsteps" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">annealsteps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.annealsteps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of time steps to use for annealing the system</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.annealtemperature">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">annealtemperature</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.annealtemperature" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">annealtemperature</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.annealtemperature" title="Permalink to this definition">¶</a></dt>
 <dd><p>Temperature to use for annealing the system</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.boundaryscale">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">boundaryscale</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.boundaryscale" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">boundaryscale</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.boundaryscale" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating if boundarywidth is scaled versus the system or absolute</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.boundarywidth">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">boundarywidth</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.boundarywidth" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">boundarywidth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.boundarywidth" title="Permalink to this definition">¶</a></dt>
 <dd><p>The minimum width of the boundary region</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.build_model">
-<span class="sig-name descname"><span class="pre">build_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.build_model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">build_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataModelDict</span></span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.build_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates and returns model content based on the values set to object.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.calc_inputs">
-<span class="sig-name descname"><span class="pre">calc_inputs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.calc_inputs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">calc_inputs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.calc_inputs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Builds calculation inputs from the class’s attributes</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.cdcsquery">
-<span class="sig-name descname"><span class="pre">cdcsquery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.cdcsquery" title="Permalink to this definition">¶</a></dt>
-<dd><p>Builds a CDCS-style query based on kwargs values for the record style.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> (<em>any</em>) – Any extra query terms that are universal for all calculations
-or associated with one of the calculation’s subsets.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The CDCS-style query.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.commands">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">commands</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.commands" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">commands</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">LammpsCommands</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>LammpsCommands subset</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.compare_fterms">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compare_fterms</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.compare_fterms" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compare_fterms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.compare_fterms" title="Permalink to this definition">¶</a></dt>
 <dd><p>The terms to compare metadata values using a tolerance.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.compare_terms">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compare_terms</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.compare_terms" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compare_terms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.compare_terms" title="Permalink to this definition">¶</a></dt>
 <dd><p>The terms to compare metadata values absolutely.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.defect">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">defect</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.defect" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">defect</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dislocation</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.defect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dislocation subset</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.dislocation">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dislocation</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.dislocation" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dislocation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dislocation</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.dislocation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Volterra dislocation solution</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>atomman.defect.Dislocation</p>
 </dd>
 </dl>
@@ -180,78 +171,78 @@ or associated with one of the calculation’s subsets.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.dumpfile_base">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dumpfile_base</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.dumpfile_base" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dumpfile_base</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.dumpfile_base" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of the LAMMPS dump file of the 0 shift reference system</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.dumpfile_defect">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dumpfile_defect</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.dumpfile_defect" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dumpfile_defect</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.dumpfile_defect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of the LAMMPS dump file of the defect system</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.duplicatecutoff">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">duplicatecutoff</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.duplicatecutoff" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">duplicatecutoff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.duplicatecutoff" title="Permalink to this definition">¶</a></dt>
 <dd><p>The cutoff used to identify duplicate atoms</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.elastic">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">elastic</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.elastic" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">elastic</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">AtommanElasticConstants</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.elastic" title="Permalink to this definition">¶</a></dt>
 <dd><p>AtommanElasticConstants subset</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.filenames">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filenames</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.filenames" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filenames</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.filenames" title="Permalink to this definition">¶</a></dt>
 <dd><p>the names of each file used by the calculation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.isvalid">
-<span class="sig-name descname"><span class="pre">isvalid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.isvalid" title="Permalink to this definition">¶</a></dt>
-<dd><p>Looks at the set atttributes to determine if the associated calculation
+<span class="sig-name descname"><span class="pre">isvalid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.isvalid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks at the set attributes to determine if the associated calculation
 would be a valid one to run.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>True if element combinations are valid, False if not.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.load_model">
-<span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.load_model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataModelDict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.load_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads record contents from a given model.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>DataModelDict</em>) – The model contents of the record to load.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the record.  Often inferred from other
+<li><p><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><em>DataModelDict</em>) – The model contents of the record to load.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the record.  Often inferred from other
 attributes if not given.</p></li>
 </ul>
 </dd>
@@ -260,13 +251,13 @@ attributes if not given.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.load_parameters">
-<span class="sig-name descname"><span class="pre">load_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.load_parameters" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">load_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/io.html#io.IOBase" title="(in Python v3.11)"><span class="pre">IOBase</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.load_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads in and sets calculation parameters.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>file-like object</em>) – The parameters or parameter file to read in.</p></li>
-<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – A new key value to assign to the object.  If not given, will use
+<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><em>file-like object</em>) – The parameters or parameter file to read in.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – A new key value to assign to the object.  If not given, will use
 calc_key field in params if it exists, or leave the key value
 unchanged.</p></li>
 </ul>
@@ -276,31 +267,31 @@ unchanged.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.master_prepare_inputs">
-<span class="sig-name descname"><span class="pre">master_prepare_inputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">branch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'main'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.master_prepare_inputs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">master_prepare_inputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">branch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'main'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.master_prepare_inputs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utility method that build input parameters for prepare according to the
 workflows used by the NIST Interatomic Potentials Repository.  In other
 words, transforms inputs from master_prepare into inputs for prepare.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>branch</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Indicates the workflow branch to prepare calculations for.  Default
+<li><p><strong>branch</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Indicates the workflow branch to prepare calculations for.  Default
 value is ‘main’.</p></li>
 <li><p><strong>**kwargs</strong> (<em>any</em>) – Any parameter modifications to make to the standard workflow
 prepare scripts.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>params</strong> – The full set of prepare parameters based on the workflow branch</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.metadata">
-<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.metadata" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates a dict of simple metadata values associated with the record.
 Useful for quickly comparing records and for building pandas.DataFrames
 for multiple records of the same style.</p>
@@ -308,151 +299,114 @@ for multiple records of the same style.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.minimize">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">minimize</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.minimize" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">minimize</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">LammpsMinimize</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.minimize" title="Permalink to this definition">¶</a></dt>
 <dd><p>LammpsMinimize subset</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.modelroot">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">modelroot</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.modelroot" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">modelroot</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.modelroot" title="Permalink to this definition">¶</a></dt>
 <dd><p>The root element of the content</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.mongoquery">
-<span class="sig-name descname"><span class="pre">mongoquery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.mongoquery" title="Permalink to this definition">¶</a></dt>
-<dd><p>Builds a Mongo-style query based on kwargs values for the record style.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> (<em>any</em>) – Any extra query terms that are universal for all calculations
-or associated with one of the calculation’s subsets.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The Mongo-style query.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.multikeys">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">multikeys</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.multikeys" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">multikeys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.multikeys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculation key sets that can have multiple values during prepare.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.onlylinear">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">onlylinear</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.onlylinear" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">onlylinear</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.onlylinear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating if only linear gradient displacements are used</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.pandasfilter">
-<span class="sig-name descname"><span class="pre">pandasfilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.pandasfilter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parses a pandas dataframe containing the subset’s metadata to find
-entries matching the terms and values given. Ideally, this should find
-the same matches as the mongoquery and cdcsquery methods for the same
-search parameters.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dataframe</strong> (<em>pandas.DataFrame</em>) – The metadata dataframe to filter.</p></li>
-<li><p><strong>kwargs</strong> (<em>any</em>) – Any extra query terms that are universal for all calculations
-or associated with one of the calculation’s subsets.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>True for each entry where all filter terms+values match, False for
-all other entries.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>pandas.Series of bool</p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.potential">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">potential</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.potential" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">potential</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">LammpsPotential</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.potential" title="Permalink to this definition">¶</a></dt>
 <dd><p>LammpsPotential subset</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.potential_energy_defect">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">potential_energy_defect</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.potential_energy_defect" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">potential_energy_defect</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.potential_energy_defect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Potential energy of the defect system</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.preln">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">preln</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.preln" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">preln</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.preln" title="Permalink to this definition">¶</a></dt>
+<dd><p>The dislocation’s elastic pre-ln energy factor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.process_results">
-<span class="sig-name descname"><span class="pre">process_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.process_results" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">process_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.process_results" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processes calculation results and saves them to the object’s results
 attributes.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>results_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – The dictionary returned by the calc() method.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>results_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – The dictionary returned by the calc() method.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.randomseed">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">randomseed</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.randomseed" title="Permalink to this definition">¶</a></dt>
-<dd><p>MD integration scheme</p>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">randomseed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.randomseed" title="Permalink to this definition">¶</a></dt>
+<dd><p>random number generator seed to use</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.set_values">
-<span class="sig-name descname"><span class="pre">set_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.set_values" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">set_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.set_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set calculation values directly.  Any terms not given will be set
 or reset to the calculation’s default values.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the calculation.  By default, this is set as
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the calculation.  By default, this is set as
 the calculation’s key.</p></li>
-<li><p><strong>annealtemperature</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The temperature to use for MD annealing steps.</p></li>
-<li><p><strong>annealsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – The number of MD annealing steps to perform.</p></li>
-<li><p><strong>randomseed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – A random number seed to use for generating the initial velocities
+<li><p><strong>annealtemperature</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – The temperature to use for MD annealing steps.</p></li>
+<li><p><strong>annealsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – The number of MD annealing steps to perform.</p></li>
+<li><p><strong>randomseed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – A random number seed to use for generating the initial velocities
 for the MD anneal.</p></li>
-<li><p><strong>duplicatecutoff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Distance tolerance to use for identifying duplicate atoms when the
+<li><p><strong>duplicatecutoff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Distance tolerance to use for identifying duplicate atoms when the
 dislocation has an edge component.</p></li>
-<li><p><strong>boundarywidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The minimum width of the boundary region.</p></li>
-<li><p><strong>boundaryscale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if boundarywidth is absolute (False) or relative to the
+<li><p><strong>boundarywidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – The minimum width of the boundary region.</p></li>
+<li><p><strong>boundaryscale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates if boundarywidth is absolute (False) or relative to the
 unit cell’s a lattice parameter (True).</p></li>
-<li><p><strong>onlylinear</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the dislocation solution used will only be based on a
+<li><p><strong>onlylinear</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the dislocation solution used will only be based on a
 linear gradient of displacements rather than the Volterra
 dislocation solution.</p></li>
 <li><p><strong>**kwargs</strong> (<em>any</em><em>, </em><em>optional</em>) – Any keyword parameters supported by the set_values() methods of
@@ -464,64 +418,64 @@ the parent Calculation class and the subset classes.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.singularkeys">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">singularkeys</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.singularkeys" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">singularkeys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.singularkeys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculation keys that can have single values during prepare.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.symbols_base">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">symbols_base</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.symbols_base" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">symbols_base</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.symbols_base" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model symbols for the base system</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.symbols_defect">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">symbols_defect</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.symbols_defect" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">symbols_defect</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.symbols_defect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model symbols for the defect system</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.system">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.system" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">system</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">AtommanSystemLoad</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.system" title="Permalink to this definition">¶</a></dt>
 <dd><p>AtommanSystemLoad subset</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.templatekeys">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">templatekeys</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.templatekeys" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">templatekeys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.templatekeys" title="Permalink to this definition">¶</a></dt>
 <dd><p>The calculation-specific input keys and their descriptions.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.units">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">units</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.units" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">units</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Units</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.units" title="Permalink to this definition">¶</a></dt>
 <dd><p>Units subset</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -534,7 +488,50 @@ the parent Calculation class and the subset classes.</p></li>
     <h3><a href="../../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">DislocationPeriodicArray</a><ul>
-<li><a class="reference internal" href="#module-iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray">Calculation class</a></li>
+<li><a class="reference internal" href="#module-iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray">Calculation class</a><ul>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray</span></code></a><ul>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.K_tensor"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.K_tensor</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.annealsteps"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.annealsteps</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.annealtemperature"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.annealtemperature</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.boundaryscale"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.boundaryscale</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.boundarywidth"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.boundarywidth</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.build_model"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.build_model()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.calc_inputs"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.calc_inputs()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.commands"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.commands</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.compare_fterms"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.compare_fterms</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.compare_terms"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.compare_terms</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.defect"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.defect</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.dislocation"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.dislocation</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.dumpfile_base"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.dumpfile_base</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.dumpfile_defect"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.dumpfile_defect</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.duplicatecutoff"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.duplicatecutoff</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.elastic"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.elastic</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.filenames"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.filenames</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.isvalid"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.isvalid()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.load_model"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.load_model()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.load_parameters"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.load_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.master_prepare_inputs"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.master_prepare_inputs()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.metadata"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.metadata()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.minimize"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.minimize</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.modelroot"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.modelroot</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.multikeys"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.multikeys</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.onlylinear"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.onlylinear</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.potential"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.potential</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.potential_energy_defect"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.potential_energy_defect</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.preln"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.preln</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.process_results"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.process_results()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.randomseed"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.randomseed</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.set_values"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.set_values()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.singularkeys"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.singularkeys</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.symbols_base"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.symbols_base</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.symbols_defect"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.symbols_defect</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.system"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.system</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.templatekeys"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.templatekeys</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_periodic_array.DislocationPeriodicArray.DislocationPeriodicArray.units"><code class="docutils literal notranslate"><span class="pre">DislocationPeriodicArray.units</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -569,14 +566,14 @@ the parent Calculation class and the subset classes.</p></li>
         <li class="right" >
           <a href="function.html" title="dislocation_periodic_array.py"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >dislocation_periodic_array</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">DislocationPeriodicArray</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

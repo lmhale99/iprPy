@@ -1,17 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DislocationSDVPN &#8212; iprPy 0.11.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>DislocationSDVPN &#8212; iprPy 0.11.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -33,7 +36,7 @@
         <li class="right" >
           <a href="function.html" title="dislocation_SDVPN.py"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">dislocation_SDVPN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">DislocationSDVPN</a></li> 
@@ -45,32 +48,32 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="dislocationsdvpn">
-<h1>DislocationSDVPN<a class="headerlink" href="#dislocationsdvpn" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-iprPy.calculation.dislocation_SDVPN.DislocationSDVPN">
-<span id="calculation-class"></span><h2>Calculation class<a class="headerlink" href="#module-iprPy.calculation.dislocation_SDVPN.DislocationSDVPN" title="Permalink to this headline">¶</a></h2>
+  <section id="dislocationsdvpn">
+<h1>DislocationSDVPN<a class="headerlink" href="#dislocationsdvpn" title="Permalink to this heading">¶</a></h1>
+<section id="module-iprPy.calculation.dislocation_SDVPN.DislocationSDVPN">
+<span id="calculation-class"></span><h2>Calculation class<a class="headerlink" href="#module-iprPy.calculation.dislocation_SDVPN.DislocationSDVPN" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DislocationSDVPN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../../iprPy/calculation.html#iprPy.calculation.Calculation" title="iprPy.calculation.Calculation.Calculation"><code class="xref py py-class docutils literal notranslate"><span class="pre">iprPy.calculation.Calculation.Calculation</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DislocationSDVPN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">Path</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/io.html#io.IOBase" title="(in Python v3.11)"><span class="pre">IOBase</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataModelDict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">Path</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/io.html#io.IOBase" title="(in Python v3.11)"><span class="pre">IOBase</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../iprPy/calculation.html#iprPy.calculation.Calculation" title="iprPy.calculation.Calculation.Calculation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Calculation</span></code></a></p>
 <p>Class for managing semi-discrete variational Peierls-Nabarro calcuations</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.alpha">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">alpha</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.alpha" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">alpha</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.alpha" title="Permalink to this definition">¶</a></dt>
 <dd><p>Non-local correction term parameters</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.beta">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">beta</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.beta" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">beta</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.beta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Surface correction term parameter tensor</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>numpy.NDArray</p>
 </dd>
 </dl>
@@ -78,186 +81,168 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.build_model">
-<span class="sig-name descname"><span class="pre">build_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.build_model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">build_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataModelDict</span></span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.build_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates and returns model content based on the values set to object.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.calc_inputs">
-<span class="sig-name descname"><span class="pre">calc_inputs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.calc_inputs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">calc_inputs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.calc_inputs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Builds calculation inputs from the class’s attributes</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cdcsquery">
-<span class="sig-name descname"><span class="pre">cdcsquery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cdcsquery" title="Permalink to this definition">¶</a></dt>
-<dd><p>Builds a CDCS-style query based on kwargs values for the record style.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> (<em>any</em>) – Any extra query terms that are universal for all calculations
-or associated with one of the calculation’s subsets.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The CDCS-style query.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cdiffelastic">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cdiffelastic</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cdiffelastic" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cdiffelastic</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cdiffelastic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag if central difference is used for the elastic term</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cdiffstress">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cdiffstress</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cdiffstress" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cdiffstress</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cdiffstress" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag if central difference is used for the stress term</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cdiffsurface">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cdiffsurface</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cdiffsurface" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cdiffsurface</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cdiffsurface" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag if central difference is used for the surface term</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.compare_fterms">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compare_fterms</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.compare_fterms" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compare_fterms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.compare_fterms" title="Permalink to this definition">¶</a></dt>
 <dd><p>The terms to compare metadata values using a tolerance.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.compare_terms">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compare_terms</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.compare_terms" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compare_terms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.compare_terms" title="Permalink to this definition">¶</a></dt>
 <dd><p>The terms to compare metadata values absolutely.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cutofflongrange">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cutofflongrange</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cutofflongrange" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cutofflongrange</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cutofflongrange" title="Permalink to this definition">¶</a></dt>
 <dd><p>The cutoff to use for the long-range elastic energy term</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.defect">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">defect</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.defect" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">defect</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dislocation</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.defect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dislocation subset</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.disregistries">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">disregistries</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.disregistries" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">disregistries</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.disregistries" title="Permalink to this definition">¶</a></dt>
 <dd><p>The disregistry profiles for the solution after each minimization cycle</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.elastic">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">elastic</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.elastic" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">elastic</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">AtommanElasticConstants</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.elastic" title="Permalink to this definition">¶</a></dt>
 <dd><p>AtommanElasticConstants subset</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.energies">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">energies</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.energies" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">energies</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.energies" title="Permalink to this definition">¶</a></dt>
 <dd><p>The total energies for the solution after each minimization cycle</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.filenames">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filenames</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.filenames" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filenames</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.filenames" title="Permalink to this definition">¶</a></dt>
 <dd><p>the names of each file used by the calculation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.fullstress">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fullstress</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.fullstress" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fullstress</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.fullstress" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag for switching which stress term equation is used</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.gamma">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gamma</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.gamma" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gamma</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">AtommanGammaSurface</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.gamma" title="Permalink to this definition">¶</a></dt>
 <dd><p>AtommanGammaSurface subset</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.isvalid">
-<span class="sig-name descname"><span class="pre">isvalid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.isvalid" title="Permalink to this definition">¶</a></dt>
-<dd><p>Looks at the set atttributes to determine if the associated calculation
+<span class="sig-name descname"><span class="pre">isvalid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.isvalid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks at the set attributes to determine if the associated calculation
 would be a valid one to run.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>True if element combinations are valid, False if not.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.load_model">
-<span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.load_model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataModelDict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.load_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads record contents from a given model.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>DataModelDict</em>) – The model contents of the record to load.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the record.  Often inferred from other
+<li><p><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><em>DataModelDict</em>) – The model contents of the record to load.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the record.  Often inferred from other
 attributes if not given.</p></li>
 </ul>
 </dd>
@@ -266,13 +251,13 @@ attributes if not given.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.load_parameters">
-<span class="sig-name descname"><span class="pre">load_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.load_parameters" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">load_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/io.html#io.IOBase" title="(in Python v3.11)"><span class="pre">IOBase</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.load_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads in and sets calculation parameters.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>file-like object</em>) – The parameters or parameter file to read in.</p></li>
-<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – A new key value to assign to the object.  If not given, will use
+<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><em>file-like object</em>) – The parameters or parameter file to read in.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – A new key value to assign to the object.  If not given, will use
 calc_key field in params if it exists, or leave the key value
 unchanged.</p></li>
 </ul>
@@ -282,31 +267,31 @@ unchanged.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.master_prepare_inputs">
-<span class="sig-name descname"><span class="pre">master_prepare_inputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">branch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'main'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.master_prepare_inputs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">master_prepare_inputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">branch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'main'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.master_prepare_inputs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utility method that build input parameters for prepare according to the
 workflows used by the NIST Interatomic Potentials Repository.  In other
 words, transforms inputs from master_prepare into inputs for prepare.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>branch</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Indicates the workflow branch to prepare calculations for.  Default
+<li><p><strong>branch</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Indicates the workflow branch to prepare calculations for.  Default
 value is ‘main’.</p></li>
 <li><p><strong>**kwargs</strong> (<em>any</em>) – Any parameter modifications to make to the standard workflow
 prepare scripts.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>params</strong> – The full set of prepare parameters based on the workflow branch</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.metadata">
-<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.metadata" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates a dict of simple metadata values associated with the record.
 Useful for quickly comparing records and for building pandas.DataFrames
 for multiple records of the same style.</p>
@@ -314,131 +299,89 @@ for multiple records of the same style.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.minimize_cycles">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">minimize_cycles</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.minimize_cycles" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">minimize_cycles</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.minimize_cycles" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of minimization cycles to run</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.minimize_options">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">minimize_options</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.minimize_options" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">minimize_options</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.minimize_options" title="Permalink to this definition">¶</a></dt>
 <dd><p>kwarg options to pass to scipy.minimize</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.minimize_style">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">minimize_style</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.minimize_style" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">minimize_style</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.minimize_style" title="Permalink to this definition">¶</a></dt>
 <dd><p>The scipy.minimize style to use</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.modelroot">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">modelroot</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.modelroot" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">modelroot</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.modelroot" title="Permalink to this definition">¶</a></dt>
 <dd><p>The root element of the content</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.mongoquery">
-<span class="sig-name descname"><span class="pre">mongoquery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.mongoquery" title="Permalink to this definition">¶</a></dt>
-<dd><p>Builds a Mongo-style query based on kwargs values for the record style.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> (<em>any</em>) – Any extra query terms that are universal for all calculations
-or associated with one of the calculation’s subsets.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The Mongo-style query.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.multikeys">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">multikeys</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.multikeys" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">multikeys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.multikeys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculation key sets that can have multiple values during prepare.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.normalizedisreg">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">normalizedisreg</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.normalizedisreg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Flag indicating if the total cumulative disregistry is normalized to the Burgers vector</p>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">normalizedisreg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.normalizedisreg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating if the total cumulative disregistry is normalized
+to the Burgers vector</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.pandasfilter">
-<span class="sig-name descname"><span class="pre">pandasfilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.pandasfilter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parses a pandas dataframe containing the subset’s metadata to find
-entries matching the terms and values given. Ideally, this should find
-the same matches as the mongoquery and cdcsquery methods for the same
-search parameters.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dataframe</strong> (<em>pandas.DataFrame</em>) – The metadata dataframe to filter.</p></li>
-<li><p><strong>kwargs</strong> (<em>any</em>) – Any extra query terms that are universal for all calculations
-or associated with one of the calculation’s subsets.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>True for each entry where all filter terms+values match, False for
-all other entries.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>pandas.Series of bool</p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.process_results">
-<span class="sig-name descname"><span class="pre">process_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.process_results" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">process_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.process_results" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processes calculation results and saves them to the object’s results
 attributes.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>results_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – The dictionary returned by the calc() method.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>results_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – The dictionary returned by the calc() method.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.sdvpn_solution">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sdvpn_solution</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.sdvpn_solution" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sdvpn_solution</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SDVPN</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.sdvpn_solution" title="Permalink to this definition">¶</a></dt>
 <dd><p>The dislocation solution object</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>atomman.defect.SDVPN</p>
 </dd>
 </dl>
@@ -446,33 +389,33 @@ attributes.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.set_values">
-<span class="sig-name descname"><span class="pre">set_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.set_values" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">set_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.set_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set calculation values directly.  Any terms not given will be set
 or reset to the calculation’s default values.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the calculation.  By default, this is set as
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – The name to assign to the calculation.  By default, this is set as
 the calculation’s key.</p></li>
-<li><p><strong>xnum</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – The number of x coordinates to use.</p></li>
+<li><p><strong>xnum</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – The number of x coordinates to use.</p></li>
 <li><p><strong>xmax</strong> (<em>flaot</em><em>, </em><em>optional</em>) – The maximum x coordinate to use.</p></li>
-<li><p><strong>xstep</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The step size to use between the x coordinates.</p></li>
-<li><p><strong>xscale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating if xmax and/or xstep values are to be taken as
+<li><p><strong>xstep</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – The step size to use between the x coordinates.</p></li>
+<li><p><strong>xscale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating if xmax and/or xstep values are to be taken as
 absolute or relative to ucell’s a lattice parameter.</p></li>
-<li><p><strong>minimize_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The scipy.minimize style to use.</p></li>
-<li><p><strong>minimize_options</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>, </em><em>optional</em>) – kwarg options to pass to scipy.minimize.</p></li>
-<li><p><strong>minimize_cycles</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – The number of mimimization cycles to perform.</p></li>
-<li><p><strong>cutofflongrange</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The cutoff to use for the longrange energy term.</p></li>
+<li><p><strong>minimize_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – The scipy.minimize style to use.</p></li>
+<li><p><strong>minimize_options</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – kwarg options to pass to scipy.minimize.</p></li>
+<li><p><strong>minimize_cycles</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – The number of mimimization cycles to perform.</p></li>
+<li><p><strong>cutofflongrange</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – The cutoff to use for the longrange energy term.</p></li>
 <li><p><strong>tau</strong> (<em>array-like object</em><em>, </em><em>optional</em>) – The applied stress values to use.</p></li>
-<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – The non-local correction parameters to use.</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>, </em><em>optional</em>) – The non-local correction parameters to use.</p></li>
 <li><p><strong>beta</strong> (<em>array-like object</em><em>, </em><em>optional</em>) – The surface correction parameters to use.</p></li>
-<li><p><strong>cdiffelastic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag if central difference is used for the elastic term.</p></li>
-<li><p><strong>cdiffsurface</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag if central difference is used for the surface term.</p></li>
-<li><p><strong>cdiffstress</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag if central difference is used for the stress term.</p></li>
-<li><p><strong>halfwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – An initial arctan halfwidth guess.</p></li>
-<li><p><strong>normalizedisreg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating if the disregistry is normalized to the Burgers
+<li><p><strong>cdiffelastic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag if central difference is used for the elastic term.</p></li>
+<li><p><strong>cdiffsurface</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag if central difference is used for the surface term.</p></li>
+<li><p><strong>cdiffstress</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag if central difference is used for the stress term.</p></li>
+<li><p><strong>halfwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – An initial arctan halfwidth guess.</p></li>
+<li><p><strong>normalizedisreg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating if the disregistry is normalized to the Burgers
 vector.</p></li>
-<li><p><strong>fullstress</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag that determines which stress term expression is used.</p></li>
+<li><p><strong>fullstress</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag that determines which stress term expression is used.</p></li>
 <li><p><strong>**kwargs</strong> (<em>any</em><em>, </em><em>optional</em>) – Any keyword parameters supported by the set_values() methods of
 the parent Calculation class and the subset classes.</p></li>
 </ul>
@@ -482,27 +425,27 @@ the parent Calculation class and the subset classes.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.singularkeys">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">singularkeys</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.singularkeys" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">singularkeys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.singularkeys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculation keys that can have single values during prepare.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.system">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.system" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">system</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">AtommanSystemLoad</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.system" title="Permalink to this definition">¶</a></dt>
 <dd><p>AtommanSystemLoad subset</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.tau">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.tau" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.tau" title="Permalink to this definition">¶</a></dt>
 <dd><p>External stress tensor to apply to the system</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>numpy.NDArray</p>
 </dd>
 </dl>
@@ -510,69 +453,69 @@ the parent Calculation class and the subset classes.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.templatekeys">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">templatekeys</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.templatekeys" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">templatekeys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.templatekeys" title="Permalink to this definition">¶</a></dt>
 <dd><p>The calculation-specific input keys and their descriptions.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.units">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">units</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.units" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">units</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Units</span></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.units" title="Permalink to this definition">¶</a></dt>
 <dd><p>Units subset</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.xmax">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xmax</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.xmax" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xmax</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.xmax" title="Permalink to this definition">¶</a></dt>
 <dd><p>The maximum x coordinate value</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.xnum">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xnum</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.xnum" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xnum</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.xnum" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of x coordinate values</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.xscale">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xscale</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.xscale" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xscale</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.xscale" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag if xstep/xmax values are absolute or scaled</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.xstep">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xstep</span></span><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.xstep" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xstep</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></em><a class="headerlink" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.xstep" title="Permalink to this definition">¶</a></dt>
 <dd><p>The step size between the x coordinate values</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -585,7 +528,52 @@ the parent Calculation class and the subset classes.</p></li>
     <h3><a href="../../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">DislocationSDVPN</a><ul>
-<li><a class="reference internal" href="#module-iprPy.calculation.dislocation_SDVPN.DislocationSDVPN">Calculation class</a></li>
+<li><a class="reference internal" href="#module-iprPy.calculation.dislocation_SDVPN.DislocationSDVPN">Calculation class</a><ul>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN</span></code></a><ul>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.alpha"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.alpha</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.beta"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.beta</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.build_model"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.build_model()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.calc_inputs"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.calc_inputs()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cdiffelastic"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.cdiffelastic</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cdiffstress"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.cdiffstress</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cdiffsurface"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.cdiffsurface</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.compare_fterms"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.compare_fterms</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.compare_terms"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.compare_terms</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.cutofflongrange"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.cutofflongrange</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.defect"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.defect</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.disregistries"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.disregistries</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.elastic"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.elastic</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.energies"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.energies</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.filenames"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.filenames</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.fullstress"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.fullstress</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.gamma"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.gamma</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.isvalid"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.isvalid()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.load_model"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.load_model()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.load_parameters"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.load_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.master_prepare_inputs"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.master_prepare_inputs()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.metadata"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.metadata()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.minimize_cycles"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.minimize_cycles</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.minimize_options"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.minimize_options</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.minimize_style"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.minimize_style</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.modelroot"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.modelroot</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.multikeys"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.multikeys</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.normalizedisreg"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.normalizedisreg</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.process_results"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.process_results()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.sdvpn_solution"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.sdvpn_solution</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.set_values"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.set_values()</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.singularkeys"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.singularkeys</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.system"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.system</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.tau"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.tau</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.templatekeys"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.templatekeys</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.units"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.units</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.xmax"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.xmax</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.xnum"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.xnum</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.xscale"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.xscale</span></code></a></li>
+<li><a class="reference internal" href="#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.xstep"><code class="docutils literal notranslate"><span class="pre">DislocationSDVPN.xstep</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -620,14 +608,14 @@ the parent Calculation class and the subset classes.</p></li>
         <li class="right" >
           <a href="function.html" title="dislocation_SDVPN.py"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../calculation_styles.html" >Calculation Styles</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="index.html" >dislocation_SDVPN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">DislocationSDVPN</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>
