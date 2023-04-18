@@ -3,14 +3,14 @@ from setuptools import setup, find_packages
 
 def getversion():
     """Fetches version information from VERSION file"""
-    with open(os.path.join('iprPy', 'VERSION')) as version_file:
+    with open(os.path.join('iprPy', 'VERSION'), encoding='UTF-8') as version_file:
         version = version_file.read().strip()
     return version
 
 def getreadme():
-    with open('README.rst') as readme_file:
+    with open('README.rst', encoding='UTF-8') as readme_file:
         return readme_file.read()
-   
+
 setup(name = 'iprPy',
       version = getversion(),
       description = 'Interatomic Potential Repository Python Property Calculations and Tools',
@@ -22,6 +22,8 @@ setup(name = 'iprPy',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Topic :: Scientific/Engineering :: Physics'
       ],
       keywords = [
@@ -42,7 +44,7 @@ setup(name = 'iprPy',
         'matplotlib',
         'scipy',
         'pandas',
-        'atomman==1.4.5',
+        'atomman==1.4.9',
         'requests',
         'bokeh',
         'plotly',
