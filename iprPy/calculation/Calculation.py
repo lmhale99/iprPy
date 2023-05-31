@@ -42,6 +42,11 @@ class Calculation(Record):
         name : str, optional
             The name to use for saving the record.  By default, this should be
             the calculation's key.
+        database : yabadaba.Database, optional
+            A default Database to associate with the Record, typically the
+            Database that the Record was obtained from.  Can allow for Record
+            methods to perform Database operations without needing to specify
+            which Database to use.
         params : str, file-like object or dict, optional
             Calculation input parameters or input parameter file.  Cannot be
             given with model.
@@ -90,7 +95,7 @@ class Calculation(Record):
             self.__subsets = ()
 
         # Call Record's init
-        super().__init__(model=model, name=name, **kwargs)
+        super().__init__(model=model, name=name, database=database, **kwargs)
 
         # Load parameters if given
         if params is not None:

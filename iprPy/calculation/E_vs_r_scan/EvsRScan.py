@@ -33,6 +33,7 @@ class EvsRScan(Calculation):
     def __init__(self,
                  model: Union[str, Path, IOBase, DM, None]=None,
                  name: Optional[str]=None,
+                 database = None,
                  params: Union[str, Path, IOBase, dict] = None,
                  **kwargs: any):
         """
@@ -46,6 +47,11 @@ class EvsRScan(Calculation):
         name : str, optional
             The name to use for saving the record.  By default, this should be
             the calculation's key.
+        database : yabadaba.Database, optional
+            A default Database to associate with the Record, typically the
+            Database that the Record was obtained from.  Can allow for Record
+            methods to perform Database operations without needing to specify
+            which Database to use.
         params : str, file-like object or dict, optional
             Calculation input parameters or input parameter file.  Cannot be
             given with model.
@@ -76,7 +82,7 @@ class EvsRScan(Calculation):
         self.calc = e_vs_r_scan
 
         # Call parent constructor
-        super().__init__(model=model, name=name, params=params,
+        super().__init__(model=model, name=name, database=database, params=params,
                          subsets=subsets, **kwargs)
 
     @property

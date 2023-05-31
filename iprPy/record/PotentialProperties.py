@@ -24,6 +24,7 @@ class PotentialProperties(Record):
     def __init__(self,
                  model: Union[str, io.IOBase, DM, None] = None,
                  name: Optional[str] = None,
+                 database = None,
                  **kwargs: any):
         """
         Initialize a PotentialProperties object.  Calculation-specific content
@@ -37,6 +38,11 @@ class PotentialProperties(Record):
             The unique name to assign to the record.  If model is a file
             path, then the default record name is the file name without
             extension.
+        database : yabadaba.Database, optional
+            A default Database to associate with the Record, typically the
+            Database that the Record was obtained from.  Can allow for Record
+            methods to perform Database operations without needing to specify
+            which Database to use.
         potential : BaseLAMMPSPotential, optional
             A record entry for a LAMMPS-compatible potential that the computed
             properties being compiled here are for.  Cannot be given with model
@@ -89,7 +95,7 @@ class PotentialProperties(Record):
         ]
 
         # Call parent init
-        super().__init__(model=model, name=name, **kwargs)
+        super().__init__(model=model, name=name, database=database, **kwargs)
 
     @property
     def style(self) -> str:
