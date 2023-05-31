@@ -3,7 +3,6 @@
 # Python script created by Lucas Hale
 
 # Standard library imports
-from distutils.command.config import dump_file
 from pathlib import Path
 import datetime
 import random
@@ -37,6 +36,7 @@ def relax_liquid(lammps_command: str,
                  equilenergystyle: str = 'pe',
                  runsteps: int = 50000,
                  dumpsteps: Optional[int] = None,
+                 restartsteps: Optional[int] = None,
                  createvelocities: bool = True,
                  randomseed: Optional[int] = None) -> dict:
     """
@@ -106,6 +106,10 @@ def relax_liquid(lammps_command: str,
         Dump files will be saved every this many steps during the runsteps
         simulation. Default is None, which sets dumpsteps equal to the sum of
         all "steps" terms above so that only the final configuration is saved.
+    restartsteps : int or None, optional
+        Restart files will be saved every this many steps.  Default is None,
+        which sets dumpsteps equal to the sum of all "steps" terms above so
+        that only the final configuration is saved.
     createvelocities : bool, optional
         If True (default), velocities will be created for the atoms prior to
         running the simulations.  Setting this to False can be useful if the
@@ -170,7 +174,9 @@ def relax_liquid(lammps_command: str,
     # Handle default values
     if dumpsteps is None:
         dumpsteps = meltsteps + coolsteps + equilvolumesteps + equilenergysteps + runsteps
-    
+    if restartsteps is None:
+        restartsteps = meltsteps + coolsteps + equilvolumesteps + equilenergysteps + runsteps
+
     # Check volrelax and temprelax settings
     if equilvolumesamples > equilvolumesteps / 100:
         raise ValueError('invalid values: equilvolumesamples must be <= equilvolumesteps / 100')
@@ -192,6 +198,10 @@ def relax_liquid(lammps_command: str,
                               potential=potential)
     lammps_variables['atomman_system_pair_info'] = system_info
 
+    # Generate LAMMPS inputs for restarting
+    system_info2 = potential.pair_restart_info('*.restart', system.symbols)
+    lammps_variables['atomman_pair_restart_info'] = system_info2
+
     # Phase settings
     lammps_variables['temperature'] = temperature
     lammps_variables['temperature_melt'] = temperature_melt
@@ -210,6 +220,7 @@ def relax_liquid(lammps_command: str,
     lammps_variables['equilenergysteps'] = equilenergysteps
     lammps_variables['runsteps'] = runsteps
     lammps_variables['dumpsteps'] = dumpsteps
+    lammps_variables['restartsteps'] = restartsteps
 
     # Number of samples
     lammps_variables['equilvolumesamples'] = equilvolumesamples
@@ -245,24 +256,50 @@ def relax_liquid(lammps_command: str,
             lammps_variables['dump_modify_format'] = f'"%d %d{7 * " %.13e"}"'
     else:
         lammps_variables['dump_modify_format'] = 'float %.13e'
-    
+
     # Write lammps input script
     lammps_script = 'liquid.in'
     lammps_template = f'liquid_ave_{equilenergystyle}.template'
     template = read_calc_file('iprPy.calculation.relax_liquid', lammps_template)
-    with open(lammps_script, 'w') as f:
+    with open(lammps_script, 'w', encoding='UTF-8') as f:
         f.write(filltemplate(template, lammps_variables, '<', '>'))
-    
-    # Run lammps 
+
+    # Write lammps restart input script
+    restart_script = 'liquid_restart.in'
+    lammps_template = 'liquid_restart.template'
+    template = read_calc_file('iprPy.calculation.relax_liquid', lammps_template)
+    with open(restart_script, 'w', encoding='UTF-8') as f:
+        f.write(filltemplate(template, lammps_variables, '<', '>'))
+
+    # Fix for restart runs: only use restart script if restart file(s) exist
+    if Path('log.lammps').exists() and len(list(Path('.').glob('*.restart'))) == 0:
+        Path('log.lammps').unlink()
+
+    # Uniquely rename rdf.txt on restarts to prevent overwrite
+    elif Path('rdf.txt').exists():
+        maxrdfid = 0
+        for oldrdf in Path('.').glob('rdf-*.txt'):
+            rdfid = int(oldrdf.stem.split('-')[-1])
+            if rdfid > maxrdfid:
+                maxrdfid = rdfid
+        Path('rdf.txt').rename(f'rdf-{maxrdfid+1}.txt')
+
+    # Run lammps
     output = lmp.run(lammps_command, script_name=lammps_script,
+                     restart_script_name=restart_script,
                      mpi_command=mpi_command, screen=False)
-    
-    # Extract LAMMPS thermo data. 
-    #thermo_melt = output.simulations[0].thermo
-    #thermo_cool = output.simulations[1].thermo
-    thermo_vol_equil = output.simulations[2].thermo
-    thermo_temp_equil = output.simulations[3].thermo
-    thermo_nve = output.simulations[4].thermo
+
+    # Extract LAMMPS thermo data.
+    run1steps = meltsteps
+    run2steps = run1steps + coolsteps
+    run3steps = run2steps + equilvolumesteps
+    run4steps = run3steps + equilenergysteps
+    thermo = output.flatten()['thermo']
+    #thermo_melt = thermo[thermo.Step < run1steps]
+    #thermo_cool = thermo[(thermo.Step < run2steps) & (thermo.Step >= run1steps)]
+    thermo_vol_equil = thermo[(thermo.Step < run3steps) & (thermo.Step >= run2steps)]
+    thermo_temp_equil = thermo[(thermo.Step < run4steps) & (thermo.Step >= run3steps)]
+    thermo_nve = thermo[thermo.Step >= run4steps]
 
     results = {}
     

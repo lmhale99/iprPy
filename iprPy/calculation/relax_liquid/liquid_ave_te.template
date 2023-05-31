@@ -82,6 +82,7 @@ comm_modify cutoff ${ghostcutoff}
 # Dump configurations
 dump dumpit all custom <dumpsteps> *.dump <dump_keys>
 dump_modify dumpit format <dump_modify_format>
+restart <restartsteps> *.restart
 
 # Change thermo to report msd
 thermo 100

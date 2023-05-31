@@ -73,6 +73,7 @@ class RelaxLiquid(Calculation):
         self.equilenergysteps = 10000
         self.runsteps = 50000
         self.dumpsteps = None
+        self.restartsteps = None
 
         self.equilvolumesamples = 300
         self.equilenergysamples = 100
@@ -199,6 +200,23 @@ class RelaxLiquid(Calculation):
             val = int(val)
             assert val >= 0
             self.__dumpsteps = val
+
+    @property
+    def restartsteps(self) -> int:
+        """int: How often to dump restart files during the final run."""
+        if self.__restartsteps is None:
+            return self.meltsteps + self.coolsteps + self.equilvolumesteps + self.equilenergysteps + self.runsteps
+        else:
+            return self.__restartsteps
+
+    @restartsteps.setter
+    def restartsteps(self, val: Optional[int]):
+        if val is None:
+            self.__restartsteps = None
+        else:
+            val = int(val)
+            assert val >= 0
+            self.__restartsteps = val
 
     @property
     def meltsteps(self) -> int:
@@ -489,6 +507,9 @@ class RelaxLiquid(Calculation):
         dumpsteps : int or None, optional
             Dump files will be saved every this many steps during the runsteps
             simulation.
+        restartsteps : int or None, optional
+            Dump files will be saved every this many steps during the runsteps
+            simulation.
         randomseed : int or None, optional
             Random number seed used by LAMMPS in creating velocities and with
             the Langevin thermostat.
@@ -524,6 +545,8 @@ class RelaxLiquid(Calculation):
             self.runsteps = kwargs['runsteps']
         if 'dumpsteps' in kwargs:
             self.dumpsteps = kwargs['dumpsteps']
+        if 'restartsteps' in kwargs:
+            self.restartsteps = kwargs['restartsteps']
         if 'equilvolumesamples' in kwargs:
             self.equilvolumesamples = kwargs['equilvolumesamples']
         if 'equilenergysamples' in kwargs:
@@ -571,6 +594,7 @@ class RelaxLiquid(Calculation):
         self.equilenergysamples = int(input_dict.get('equilenergysamples', 100))
         self.runsteps = int(input_dict.get('runsteps', 50000))
         self.dumpsteps = input_dict.get('dumpsteps', None)
+        self.restartsteps = input_dict.get('restartsteps', None)
         self.randomseed = input_dict.get('randomseed', None)
 
         # Load calculation-specific unitless floats
@@ -775,6 +799,10 @@ class RelaxLiquid(Calculation):
                 "Dump files will be saved every this many steps during the runsteps",
                 "simulation. Default is None, which sets dumpsteps equal to the sum",
                 "of all other steps values so only the final configuration is saved."]),
+            'restartsteps': ' '.join([
+                "Restart files will be saved every this many steps. Default is None",
+                "which sets restartsteps equal to the sum",
+                "of all other steps values so only the final configuration is saved."]),
             'randomseed': ' '.join([
                 "Random number seed used by LAMMPS in creating velocities and with",
                 "the Langevin thermostat.  Default is None which will select a",
@@ -846,6 +874,7 @@ class RelaxLiquid(Calculation):
                     'equilenergystyle',
                     'runsteps',
                     'dumpsteps',
+                    'restartsteps',
                     'randomseed',
                 ]
             ]
@@ -1108,6 +1137,7 @@ class RelaxLiquid(Calculation):
         input_dict['equilenergystyle'] = self.equilenergystyle
         input_dict['runsteps'] = self.runsteps
         input_dict['dumpsteps'] = self.dumpsteps
+        input_dict['restartsteps'] = self.restartsteps
         input_dict['randomseed'] = self.randomseed
 
         # Return input_dict
