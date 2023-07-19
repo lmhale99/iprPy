@@ -95,6 +95,20 @@ def old_pots():
         '2011--Bonny-G--Fe-Cr--LAMMPS--ipr1',
         '2013--Bonny-G--Fe-Cr-W--LAMMPS--ipr1',
         '2013--Smirnova-D-E--U-Mo-Xe--LAMMPS--ipr1',
+        '2016--Zhou-X-W--Al-Cu--LAMMPS--ipr1',
+
+        '2011--Bonny-G--Fe-Cr--LAMMPS--ipr2',
+        '2011--Bonny-G--Fe-Ni-Cr--LAMMPS--ipr1',
+        '2013--Bonny-G--Fe-Cr-W--LAMMPS--ipr2',
+        '2013--Gao-H--AgTaO3--LAMMPS--ipr2',
+        '2014--Nouranian-S--CH--ipr1',
+        '2015--Asadi-E--Fe--LAMMPS--ipr1',
+        '2015--Asadi-E--Ni--LAMMPS--ipr1',
+        '2018--Etesami-S-A--Cu--LAMMPS--ipr1',
+        '2018--Etesami-S-A--Ni--LAMMPS--ipr1',
+        '2018--Etesami-S-A--Fe--LAMMPS--ipr1',
+        '2018--Etesami-S-A--Pb-Sn--LAMMPS--ipr1',
+        '2021--Huang-X--Hf-Nb-Ta-Ti-Zr--LAMMPS--ipr1'
     ]
 
 def aenet_pots():
