@@ -4,6 +4,8 @@
 # Standard Python libraries
 import argparse
 
+import atomman as am
+
 # https://github.com/usnistgov/iprPy
 from . import (load_database, load_run_directory, load_calculation,
                check_modules, settings)
@@ -112,7 +114,10 @@ def command_line_actions(args):
 
     # Actions for subcommand retrieve
     elif args.action == 'retrieve':
-        database = load_database(args.database)
+
+        potdb = am.library.Database(remote_name=args.remote_database,
+                                    local_name=args.local_database)
+
         style = args.record_style
         if args.compact is True:
             indent = None
@@ -121,29 +126,30 @@ def command_line_actions(args):
 
         # Call style-specific retrieve for extra functionality
         if style in ['potential_LAMMPS', 'potential_LAMMPS_KIM']:
+
             if args.getfiles is True:
                 pot_dir_style = 'id'
                 getfiles = True
             else:
-                pot_dir_style = 'local'
+                pot_dir_style = 'working'
                 getfiles = False
 
-            database.potdb.retrieve_lammps_potential(name=args.record_name,
-                                                     getfiles=getfiles,
-                                                     format=args.format,
-                                                     indent=indent,
-                                                     pot_dir_style=pot_dir_style,
-                                                     verbose=True)
+            potdb.retrieve_lammps_potential(name=args.record_name,
+                                            getfiles=getfiles,
+                                            format=args.format,
+                                            indent=indent,
+                                            pot_dir_style=pot_dir_style,
+                                            verbose=True)
         elif style == 'Citation':
-            database.potdb.retrieve_citation(name=args.record_name,
-                                             format=args.format, indent=indent,
-                                             verbose=True)
+            potdb.retrieve_citation(name=args.record_name,
+                                    format=args.format, indent=indent,
+                                    verbose=True)
 
         # Call generic retrieve
         else:
-            database.potdb.retrieve_record(style=style, name=args.record_name,
-                                           format=args.format, indent=indent,
-                                           verbose=True)
+            potdb.retrieve_record(style=style, name=args.record_name,
+                                  format=args.format, indent=indent,
+                                  verbose=True)
 
     # Actions for subcommand run
     elif args.action == 'run':
@@ -351,18 +357,20 @@ def command_line_parser():
     # Define subparser for retrieve
     subparser = subparsers.add_parser('retrieve',
                         help="copy/download a record to the working directory")
-    subparser.add_argument('database',
-                        help='database name')
     subparser.add_argument('record_style',
                         help='style of the record to retrieve')
     subparser.add_argument('record_name',
                         help='the name of the record in the database to retrieve')
+    subparser.add_argument('-l', '--local_database', default=None,
+                        help='specify the local database name to search for the matching record')
+    subparser.add_argument('-r', '--remote_database', default=None,
+                        help='specify the remote database name to search for the matching record')
     subparser.add_argument('-f', '--format', default='json', type=str,
                         help='the format to save the record as')
     subparser.add_argument('-c', '--compact', action='store_true',
                         help='indicates if the record is saved in compact format')
     subparser.add_argument('-g', '--getfiles', action='store_true',
-                        help='if used, any files associated with the record will also be retrieved')
+                        help='can be used with potential_LAMMPS records to automatically download any parameter files')
 
     # Define subparser for run
     subparser = subparsers.add_parser('run',
