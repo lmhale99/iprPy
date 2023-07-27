@@ -4,7 +4,10 @@
 from importlib import resources
 
 # Read version from VERSION file
-__version__ = resources.read_text('iprPy', 'VERSION').strip()
+if hasattr(resources, 'files'):
+    __version__ = resources.files('iprPy').joinpath('VERSION').read_text(encoding='UTF-8')
+else:
+    __version__ = resources.read_text('iprPy', 'VERSION', encoding='UTF-8').strip()
 
 # iprPy imports
 from . import tools
@@ -30,7 +33,7 @@ from . import analysis
 __all__ = ['__version__', 'tools', 'settings', 'input',
            'load_run_directory', 'fix_lammps_versions',
            'record', 'load_record', 'recordmanager',
-           'calculation_subset',
+           'calculation_subset', 'analysis',
            'calculation', 'load_calculation', 'calculationmanager',
            'database', 'load_database', 'databasemanager',
            'check_modules', 'command_line', 'reset_orphans']
