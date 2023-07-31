@@ -1,5 +1,5 @@
 #!/bin/bash
 
 rm -r html
-python source/buildstyledocs.py
+python buildstyledocs.py
 sphinx-build -b html source html

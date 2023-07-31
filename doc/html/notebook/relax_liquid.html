@@ -1,23 +1,20 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>relax_liquid - Methodology and code &#8212; iprPy 0.11.4 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <title>relax_liquid - Methodology and code &#8212; iprPy 0.11.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=2a422f08" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=a2f1e6c4"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="relax_static - Methodology and code" href="relax_static.html" />
@@ -38,7 +35,7 @@
         <li class="right" >
           <a href="relax_dynamic.html" title="relax_dynamic - Methodology and code"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" accesskey="U">Jupyter Demonstration Notebooks</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">relax_liquid - Methodology and code</a></li> 
       </ul>
@@ -49,240 +46,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  
-<style>
-/* CSS for nbsphinx extension */
-
-/* remove conflicting styling from Sphinx themes */
-div.nbinput.container,
-div.nbinput.container div.prompt,
-div.nbinput.container div.input_area,
-div.nbinput.container div[class*=highlight],
-div.nbinput.container div[class*=highlight] pre,
-div.nboutput.container,
-div.nboutput.container div.prompt,
-div.nboutput.container div.output_area,
-div.nboutput.container div[class*=highlight],
-div.nboutput.container div[class*=highlight] pre {
-    background: none;
-    border: none;
-    padding: 0 0;
-    margin: 0;
-    box-shadow: none;
-}
-
-/* avoid gaps between output lines */
-div.nboutput.container div[class*=highlight] pre {
-    line-height: normal;
-}
-
-/* input/output containers */
-div.nbinput.container,
-div.nboutput.container {
-    display: -webkit-flex;
-    display: flex;
-    align-items: flex-start;
-    margin: 0;
-    width: 100%;
-}
-@media (max-width: 540px) {
-    div.nbinput.container,
-    div.nboutput.container {
-        flex-direction: column;
-    }
-}
-
-/* input container */
-div.nbinput.container {
-    padding-top: 5px;
-}
-
-/* last container */
-div.nblast.container {
-    padding-bottom: 5px;
-}
-
-/* input prompt */
-div.nbinput.container div.prompt pre {
-    color: #307FC1;
-}
-
-/* output prompt */
-div.nboutput.container div.prompt pre {
-    color: #BF5B3D;
-}
-
-/* all prompts */
-div.nbinput.container div.prompt,
-div.nboutput.container div.prompt {
-    width: 4.5ex;
-    padding-top: 5px;
-    position: relative;
-    user-select: none;
-}
-
-div.nbinput.container div.prompt > div,
-div.nboutput.container div.prompt > div {
-    position: absolute;
-    right: 0;
-    margin-right: 0.3ex;
-}
-
-@media (max-width: 540px) {
-    div.nbinput.container div.prompt,
-    div.nboutput.container div.prompt {
-        width: unset;
-        text-align: left;
-        padding: 0.4em;
-    }
-    div.nboutput.container div.prompt.empty {
-        padding: 0;
-    }
-
-    div.nbinput.container div.prompt > div,
-    div.nboutput.container div.prompt > div {
-        position: unset;
-    }
-}
-
-/* disable scrollbars on prompts */
-div.nbinput.container div.prompt pre,
-div.nboutput.container div.prompt pre {
-    overflow: hidden;
-}
-
-/* input/output area */
-div.nbinput.container div.input_area,
-div.nboutput.container div.output_area {
-    -webkit-flex: 1;
-    flex: 1;
-    overflow: auto;
-}
-@media (max-width: 540px) {
-    div.nbinput.container div.input_area,
-    div.nboutput.container div.output_area {
-        width: 100%;
-    }
-}
-
-/* input area */
-div.nbinput.container div.input_area {
-    border: 1px solid #e0e0e0;
-    border-radius: 2px;
-    background: #f5f5f5;
-}
-
-/* override MathJax center alignment in output cells */
-div.nboutput.container div[class*=MathJax] {
-    text-align: left !important;
-}
-
-/* override sphinx.ext.imgmath center alignment in output cells */
-div.nboutput.container div.math p {
-    text-align: left;
-}
-
-/* standard error */
-div.nboutput.container div.output_area.stderr {
-    background: #fdd;
-}
-
-/* ANSI colors */
-.ansi-black-fg { color: #3E424D; }
-.ansi-black-bg { background-color: #3E424D; }
-.ansi-black-intense-fg { color: #282C36; }
-.ansi-black-intense-bg { background-color: #282C36; }
-.ansi-red-fg { color: #E75C58; }
-.ansi-red-bg { background-color: #E75C58; }
-.ansi-red-intense-fg { color: #B22B31; }
-.ansi-red-intense-bg { background-color: #B22B31; }
-.ansi-green-fg { color: #00A250; }
-.ansi-green-bg { background-color: #00A250; }
-.ansi-green-intense-fg { color: #007427; }
-.ansi-green-intense-bg { background-color: #007427; }
-.ansi-yellow-fg { color: #DDB62B; }
-.ansi-yellow-bg { background-color: #DDB62B; }
-.ansi-yellow-intense-fg { color: #B27D12; }
-.ansi-yellow-intense-bg { background-color: #B27D12; }
-.ansi-blue-fg { color: #208FFB; }
-.ansi-blue-bg { background-color: #208FFB; }
-.ansi-blue-intense-fg { color: #0065CA; }
-.ansi-blue-intense-bg { background-color: #0065CA; }
-.ansi-magenta-fg { color: #D160C4; }
-.ansi-magenta-bg { background-color: #D160C4; }
-.ansi-magenta-intense-fg { color: #A03196; }
-.ansi-magenta-intense-bg { background-color: #A03196; }
-.ansi-cyan-fg { color: #60C6C8; }
-.ansi-cyan-bg { background-color: #60C6C8; }
-.ansi-cyan-intense-fg { color: #258F8F; }
-.ansi-cyan-intense-bg { background-color: #258F8F; }
-.ansi-white-fg { color: #C5C1B4; }
-.ansi-white-bg { background-color: #C5C1B4; }
-.ansi-white-intense-fg { color: #A1A6B2; }
-.ansi-white-intense-bg { background-color: #A1A6B2; }
-
-.ansi-default-inverse-fg { color: #FFFFFF; }
-.ansi-default-inverse-bg { background-color: #000000; }
-
-.ansi-bold { font-weight: bold; }
-.ansi-underline { text-decoration: underline; }
-
-
-div.nbinput.container div.input_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight].math,
-div.nboutput.container div.output_area.rendered_html,
-div.nboutput.container div.output_area > div.output_javascript,
-div.nboutput.container div.output_area:not(.rendered_html) > img{
-    padding: 5px;
-}
-
-/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
-div.nbinput.container div.input_area > div[class^='highlight'],
-div.nboutput.container div.output_area > div[class^='highlight']{
-    overflow-y: hidden;
-}
-
-/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
-    display: none;
-}
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-div.rendered_html th {
-  font-weight: bold;
-}
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
-</style>
-<section id="relax_liquid---Methodology-and-code">
+  <section id="relax_liquid---Methodology-and-code">
 <h1>relax_liquid - Methodology and code<a class="headerlink" href="#relax_liquid---Methodology-and-code" title="Permalink to this heading">¶</a></h1>
 <p><strong>Python imports</strong></p>
 <ul class="simple">
@@ -295,8 +59,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Standard library imports</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Standard library imports</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
@@ -343,8 +106,7 @@ Notebook last executed on 2022-10-17 using iprPy version 0.11.4
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Load the calculation being demoed</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the calculation being demoed</span>
 <span class="n">calculation</span> <span class="o">=</span> <span class="n">iprPy</span><span class="o">.</span><span class="n">load_calculation</span><span class="p">(</span><span class="s1">&#39;relax_liquid&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -356,8 +118,7 @@ Notebook last executed on 2022-10-17 using iprPy version 0.11.4
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Display main docs and theory</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Display main docs and theory</span>
 <span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">calculation</span><span class="o">.</span><span class="n">maindoc</span><span class="p">))</span>
 <span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">calculation</span><span class="o">.</span><span class="n">theorydoc</span><span class="p">))</span>
 </pre></div>
@@ -469,8 +230,7 @@ end of this stage. The max value allowed for temprelaxsamples is temprelaxsteps 
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="k">def</span> <span class="nf">relax_liquid</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">relax_liquid</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                  <span class="n">system</span><span class="p">:</span> <span class="n">am</span><span class="o">.</span><span class="n">System</span><span class="p">,</span>
                  <span class="n">potential</span><span class="p">:</span> <span class="n">lmp</span><span class="o">.</span><span class="n">Potential</span><span class="p">,</span>
                  <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -488,7 +248,7 @@ end of this stage. The max value allowed for temprelaxsamples is temprelaxsteps 
                  <span class="n">dumpsteps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">createvelocities</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="n">randomseed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs a multi-stage simulation to obtain a liquid phase configuration</span>
 <span class="sd">    at a given temperature. Radial displacement functions and mean squared</span>
 <span class="sd">    displacements are automatically computed for the system.</span>
@@ -677,9 +437,9 @@ end of this stage. The max value allowed for temprelaxsamples is temprelaxsteps 
     <span class="c1"># Set dump_modify_format based on lammps_date</span>
     <span class="k">if</span> <span class="n">lammps_date</span> <span class="o">&lt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">potential</span><span class="o">.</span><span class="n">atom_style</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;charge&#39;</span><span class="p">]:</span>
-            <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&quot;%d %d</span><span class="si">{</span><span class="mi">8</span> <span class="o">*</span> <span class="s2">&quot; </span><span class="si">%.13e</span><span class="s2">&quot;</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+            <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&quot;%d %d</span><span class="si">{</span><span class="mi">8</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="s2">&quot; </span><span class="si">%.13e</span><span class="s2">&quot;</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&quot;%d %d</span><span class="si">{</span><span class="mi">7</span> <span class="o">*</span> <span class="s2">&quot; </span><span class="si">%.13e</span><span class="s2">&quot;</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+            <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&quot;%d %d</span><span class="si">{</span><span class="mi">7</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="s2">&quot; </span><span class="si">%.13e</span><span class="s2">&quot;</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">lammps_variables</span><span class="p">[</span><span class="s1">&#39;dump_modify_format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;float </span><span class="si">%.13e</span><span class="s1">&#39;</span>
 
@@ -753,8 +513,7 @@ end of this stage. The max value allowed for temprelaxsamples is temprelaxsteps 
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;liquid_ave_pe.template&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;liquid_ave_pe.template&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;# LAMMPS input script that performs a liquid phase relaxation and evaluation</span>
 
 <span class="s2">box tilt large</span>
@@ -773,7 +532,7 @@ end of this stage. The max value allowed for temprelaxsamples is temprelaxsteps 
 <span class="s2"># Define thermo for relax stages</span>
 <span class="s2">thermo 100</span>
 <span class="s2">thermo_style custom step temp pe ke etotal pxx pyy pzz lx ly lz vol f_ave_vol</span>
-<span class="s2">thermo_modify format float </span><span class="si">%.13e</span><span class="s2"></span>
+<span class="s2">thermo_modify format float </span><span class="si">%.13e</span>
 
 <span class="s2">&lt;create_velocities&gt;</span>
 
@@ -823,7 +582,7 @@ end of this stage. The max value allowed for temprelaxsamples is temprelaxsteps 
 
 <span class="s2"># Scale last velocities to temperature_scale</span>
 <span class="s2">print &quot;Scaling to target etotal using temperature = $</span><span class="si">{temperature_scale}</span><span class="s2">&quot;</span>
-<span class="s2">velocity all scale $</span><span class="si">{temperature_scale}</span><span class="s2"></span>
+<span class="s2">velocity all scale $</span><span class="si">{temperature_scale}</span>
 <span class="s2">unfix ave_pe</span>
 
 <span class="s2">###################### NVE analysis run ########################</span>
@@ -841,7 +600,7 @@ end of this stage. The max value allowed for temprelaxsamples is temprelaxsteps 
 <span class="s2"># Change thermo to report msd</span>
 <span class="s2">thermo 100</span>
 <span class="s2">thermo_style custom step temp pe ke etotal pxx pyy pzz c_msd[1] c_msd[2] c_msd[3] c_msd[4]</span>
-<span class="s2">thermo_modify format float </span><span class="si">%.13e</span><span class="s2"></span>
+<span class="s2">thermo_modify format float </span><span class="si">%.13e</span>
 
 <span class="s2">fix nve all nve</span>
 <span class="s2">run &lt;runsteps&gt;&quot;&quot;&quot;</span><span class="p">)</span>
@@ -855,8 +614,7 @@ end of this stage. The max value allowed for temprelaxsamples is temprelaxsteps 
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;liquid_ave_te.template&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;liquid_ave_te.template&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;# LAMMPS input script that performs a liquid phase relaxation and evaluation</span>
 
 <span class="s2">box tilt large</span>
@@ -875,7 +633,7 @@ end of this stage. The max value allowed for temprelaxsamples is temprelaxsteps 
 <span class="s2"># Define thermo for relax stages</span>
 <span class="s2">thermo 100</span>
 <span class="s2">thermo_style custom step temp pe ke etotal pxx pyy pzz lx ly lz vol f_ave_vol</span>
-<span class="s2">thermo_modify format float </span><span class="si">%.13e</span><span class="s2"></span>
+<span class="s2">thermo_modify format float </span><span class="si">%.13e</span>
 
 <span class="s2">&lt;create_velocities&gt;</span>
 
@@ -924,7 +682,7 @@ end of this stage. The max value allowed for temprelaxsamples is temprelaxsteps 
 
 <span class="s2"># Scale last velocities to temperature_scale</span>
 <span class="s2">print &quot;Scaling to target etotal using temperature = $</span><span class="si">{temperature_scale}</span><span class="s2">&quot;</span>
-<span class="s2">velocity all scale $</span><span class="si">{temperature_scale}</span><span class="s2"></span>
+<span class="s2">velocity all scale $</span><span class="si">{temperature_scale}</span>
 <span class="s2">unfix ave_etotal</span>
 
 <span class="s2">###################### NVE analysis run ########################</span>
@@ -942,7 +700,7 @@ end of this stage. The max value allowed for temprelaxsamples is temprelaxsteps 
 <span class="s2"># Change thermo to report msd</span>
 <span class="s2">thermo 100</span>
 <span class="s2">thermo_style custom step temp pe ke etotal pxx pyy pzz c_msd[1] c_msd[2] c_msd[3] c_msd[4]</span>
-<span class="s2">thermo_modify format float </span><span class="si">%.13e</span><span class="s2"></span>
+<span class="s2">thermo_modify format float </span><span class="si">%.13e</span>
 
 <span class="s2">fix nve all nve</span>
 <span class="s2">run &lt;runsteps&gt;&quot;&quot;&quot;</span><span class="p">)</span>
@@ -963,9 +721,11 @@ end of this stage. The max value allowed for temprelaxsamples is temprelaxsteps 
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lammps_command</span> <span class="o">=</span> <span class="s1">&#39;lmp_mpi&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lammps_command</span> <span class="o">=</span> <span class="s1">&#39;lmp&#39;</span>
 <span class="n">mpi_command</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="c1"># Optional: check that LAMMPS works and show its version</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;LAMMPS version = </span><span class="si">{</span><span class="n">am</span><span class="o">.</span><span class="n">lammps</span><span class="o">.</span><span class="n">checkversion</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">)[</span><span class="s2">&quot;version&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -980,8 +740,7 @@ end of this stage. The max value allowed for temprelaxsamples is temprelaxsteps 
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">potential_name</span> <span class="o">=</span> <span class="s1">&#39;1999--Mishin-Y--Ni--LAMMPS--ipr1&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">potential_name</span> <span class="o">=</span> <span class="s1">&#39;1999--Mishin-Y--Ni--LAMMPS--ipr1&#39;</span>
 
 <span class="c1"># Retrieve potential and parameter file(s) using atomman</span>
 <span class="n">potential</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load_lammps_potential</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">potential_name</span><span class="p">,</span> <span class="n">getfiles</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -998,8 +757,7 @@ end of this stage. The max value allowed for temprelaxsamples is temprelaxsteps 
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Create ucell by loading prototype record</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create ucell by loading prototype record</span>
 <span class="n">ucell</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;prototype&#39;</span><span class="p">,</span> <span class="s1">&#39;A1--Cu--fcc&#39;</span><span class="p">,</span> <span class="n">symbols</span><span class="o">=</span><span class="s1">&#39;Ni&#39;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mf">3.5</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">ucell</span><span class="p">)</span>
@@ -1038,8 +796,7 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">sizemults</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sizemults</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
 
 <span class="c1"># Generate system by supersizing ucell</span>
 <span class="n">system</span> <span class="o">=</span> <span class="n">ucell</span><span class="o">.</span><span class="n">supersize</span><span class="p">(</span><span class="o">*</span><span class="n">sizemults</span><span class="p">)</span>
@@ -1077,8 +834,7 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pressure</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;GPa&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pressure</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">set_in_units</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;GPa&#39;</span><span class="p">)</span>
 <span class="n">temperature</span> <span class="o">=</span> <span class="mf">1500.0</span>
 <span class="n">temperature_melt</span> <span class="o">=</span> <span class="mf">3000.0</span>
 <span class="n">meltsteps</span> <span class="o">=</span> <span class="mi">50000</span>
@@ -1105,8 +861,7 @@ per-atom properties = [&#39;atype&#39;, &#39;pos&#39;]
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">results_dict</span> <span class="o">=</span> <span class="n">relax_liquid</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results_dict</span> <span class="o">=</span> <span class="n">relax_liquid</span><span class="p">(</span><span class="n">lammps_command</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span>
                             <span class="n">mpi_command</span> <span class="o">=</span> <span class="n">mpi_command</span><span class="p">,</span>
                             <span class="n">pressure</span> <span class="o">=</span> <span class="n">pressure</span><span class="p">,</span>
                             <span class="n">temperature_melt</span> <span class="o">=</span> <span class="n">temperature_melt</span><span class="p">,</span>
@@ -1158,8 +913,7 @@ dict_keys([&#39;dumpfile_final&#39;, &#39;symbols_final&#39;, &#39;volume&#39;, 
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;final dump file:&#39;</span><span class="p">,</span> <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;dumpfile_final&#39;</span><span class="p">])</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;final dump file:&#39;</span><span class="p">,</span> <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;dumpfile_final&#39;</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;use symbols:&#39;</span><span class="p">,</span> <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;symbols_final&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -1180,8 +934,7 @@ use symbols: (&#39;Ni&#39;,)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">length_unit</span> <span class="o">=</span> <span class="s1">&#39;angstrom&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">length_unit</span> <span class="o">=</span> <span class="s1">&#39;angstrom&#39;</span>
 <span class="n">pressure_unit</span> <span class="o">=</span> <span class="s1">&#39;GPa&#39;</span>
 <span class="n">volume_unit</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">length_unit</span><span class="si">}</span><span class="s1">^3&#39;</span>
 
@@ -1212,8 +965,7 @@ pressure = 0.04942618661668862 +- 0.00391230335932846 GPa
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">energy_unit</span> <span class="o">=</span> <span class="s1">&#39;eV&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">energy_unit</span> <span class="o">=</span> <span class="s1">&#39;eV&#39;</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;E_total / atom =&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_total&#39;</span><span class="p">],</span> <span class="n">energy_unit</span><span class="p">),</span>
       <span class="s1">&#39;+-&#39;</span><span class="p">,</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;E_total_stderr&#39;</span><span class="p">],</span> <span class="n">energy_unit</span><span class="p">),</span> <span class="n">energy_unit</span><span class="p">)</span>
@@ -1238,8 +990,7 @@ E_pot / atom = -4.0527141435573055 +- 0.00025333082486368806 eV
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">area_unit</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">length_unit</span><span class="si">}</span><span class="s1">^2&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">area_unit</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">length_unit</span><span class="si">}</span><span class="s1">^2&#39;</span>
 <span class="n">time_unit</span> <span class="o">=</span> <span class="s1">&#39;ps&#39;</span>
 
 <span class="n">time</span> <span class="o">=</span> <span class="n">uc</span><span class="o">.</span><span class="n">get_in_units</span><span class="p">(</span><span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;time_values&#39;</span><span class="p">],</span> <span class="n">time_unit</span><span class="p">)</span>
@@ -1290,12 +1041,11 @@ E_pot / atom = -4.0527141435573055 +- 0.00025333082486368806 eV
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">atomman.tools</span> <span class="kn">import</span> <span class="n">uber_open_rmode</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">atomman.tools</span> <span class="kn">import</span> <span class="n">uber_open_rmode</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="k">class</span> <span class="nc">RDF</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Class for interpreting LAMMPS rdf (radial distribution function) output files&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for interpreting LAMMPS rdf (radial distribution function) output files&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rdf_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
@@ -1342,8 +1092,7 @@ E_pot / atom = -4.0527141435573055 +- 0.00025333082486368806 eV
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">rdf</span> <span class="o">=</span> <span class="n">RDF</span><span class="p">(</span><span class="s1">&#39;rdf.txt&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rdf</span> <span class="o">=</span> <span class="n">RDF</span><span class="p">(</span><span class="s1">&#39;rdf.txt&#39;</span><span class="p">)</span>
 
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Radial distribution function&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
@@ -1385,8 +1134,7 @@ E_pot / atom = -4.0527141435573055 +- 0.00025333082486368806 eV
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># The log content can be directly accessed when the calculation is done in a Python environment</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The log content can be directly accessed when the calculation is done in a Python environment</span>
 <span class="n">log</span> <span class="o">=</span> <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;lammps_output&#39;</span><span class="p">]</span>
 
 <span class="c1"># Or, read the info in from the log file...</span>
@@ -1405,8 +1153,7 @@ E_pot / atom = -4.0527141435573055 +- 0.00025333082486368806 eV
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Volume per atom during melt stage&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;MD step&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;x-large&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Volume (angstroms^3)&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;x-large&#39;</span><span class="p">)</span>
@@ -1447,8 +1194,7 @@ E_pot / atom = -4.0527141435573055 +- 0.00025333082486368806 eV
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Plot volume and average volume during the volume equilibrate stage to check convergence</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot volume and average volume during the volume equilibrate stage to check convergence</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Volume per atom during volume equilibration stage&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
@@ -1554,13 +1300,13 @@ E_pot / atom = -4.0527141435573055 +- 0.00025333082486368806 eV
         <li class="right" >
           <a href="relax_dynamic.html" title="relax_dynamic - Methodology and code"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../notebook_styles.html" >Jupyter Demonstration Notebooks</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">relax_liquid - Methodology and code</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.1.
     </div>
   </body>
 </html>

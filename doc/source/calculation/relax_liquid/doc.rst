@@ -18,7 +18,7 @@ liquid.
 Version notes
 ~~~~~~~~~~~~~
 
--  2022-10-??: Calculation created
+-  2022-10-12: Calculation created
 
 Additional dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~

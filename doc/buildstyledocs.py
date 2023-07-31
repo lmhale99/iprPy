@@ -17,6 +17,8 @@ def buildcalculations():
 
     # Specify path to Python code for the iprPy.calculations submodule
     pypath = Path(rootdir, 'calculation')
+    if not pypath.exists():
+        raise ValueError(pypath.as_posix())
     
     # Specify relative path to doc/source folder for calculations
     docpath = Path(rootdir, '..', 'doc', 'source', 'calculation')

@@ -160,6 +160,9 @@ Run Parameters
    the runsteps simulation. Default is None, which sets dumpsteps equal
    to the sum of all other steps values so only the final configuration
    is saved.
+-  **restartsteps**: Restart files will be saved every this many steps.
+   Default is None which sets restartsteps equal to the sum of all other
+   steps values so only the final configuration is saved.
 -  **randomseed**: Random number seed used by LAMMPS in creating
    velocities and with the Langevin thermostat. Default is None which
    will select a random int between 1 and 900000000.

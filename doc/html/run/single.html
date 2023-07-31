@@ -1,20 +1,16 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Running a single calculation &#8212; iprPy 0.11.4 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <title>Running a single calculation &#8212; iprPy 0.11.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=2a422f08" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=a2f1e6c4"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +32,7 @@
         <li class="right" >
           <a href="index.html" title="Calculations"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Calculations</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Running a single calculation</a></li> 
       </ul>
@@ -65,7 +61,7 @@ for users to see which calculations are currently available and what additional
 packages may be required in order to use some of the calculations.</p>
 <section id="command-line">
 <h3>1.1. Command line<a class="headerlink" href="#command-line" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy check_modules
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>check_modules
 </pre></div>
 </div>
 </section>
@@ -103,8 +99,8 @@ two types of documentation.</p>
 </section>
 <section id="id1">
 <h3>3.2. Command line<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy maindoc isolated_atom
-$ iprPy theorydoc isolated_atom
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>maindoc<span class="w"> </span>isolated_atom
+$<span class="w"> </span>iprPy<span class="w"> </span>theorydoc<span class="w"> </span>isolated_atom
 </pre></div>
 </div>
 </section>
@@ -157,12 +153,12 @@ calculation allows it or will issue an error for required parameters.</p></li>
 script consisting of only the recognized parameter names and no values.  The
 generated file will be named calc_&lt;calc_style&gt;.in and can be opened using any
 text editor.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy template isolated_atom
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>template<span class="w"> </span>isolated_atom
 </pre></div>
 </div>
 <p>A description of the terms in the input parameter file can be viewed using the
 templatedoc command.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy templatedoc isolated_atom
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>templatedoc<span class="w"> </span>isolated_atom
 </pre></div>
 </div>
 </section>
@@ -202,12 +198,12 @@ object as attributes prior to running.</p>
 <p>The run command will run the calculation using the input script you filled in.
 If you used the default input script name (calc_&lt;calc_style&gt;.in) then you can
 simply pass the input file in</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy run calc_isolated_atom.in
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>run<span class="w"> </span>calc_isolated_atom.in
 </pre></div>
 </div>
 <p>If you renamed the input file to something else, then you will also need to
 specify the calculation style.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy run input_set_1.in isolated_atom
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>run<span class="w"> </span>input_set_1.in<span class="w"> </span>isolated_atom
 </pre></div>
 </div>
 <p>When the calculation finishes successfully, a <strong>record.json</strong> record file will
@@ -330,13 +326,13 @@ directly rather than using the other methods listed above.</p></li>
         <li class="right" >
           <a href="index.html" title="Calculations"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Calculations</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Running a single calculation</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.1.
     </div>
   </body>
 </html>

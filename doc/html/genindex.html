@@ -1,19 +1,15 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; iprPy 0.11.4 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/basic.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
+    <title>Index &#8212; iprPy 0.11.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=2a422f08" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=a2f1e6c4"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -27,7 +23,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.11.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.11.6 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Index</a></li> 
       </ul>
     </div>  
@@ -292,6 +288,8 @@
 </li>
       <li><a href="iprPy/calculation.html#iprPy.calculation.Calculation.clean">clean() (Calculation method)</a>
 </li>
+      <li><a href="iprPy/record.html#iprPy.record.Record.clear_tar">clear_tar() (Record method)</a>
+</li>
       <li><a href="calculation/bond_angle_scan/class.html#iprPy.calculation.bond_angle_scan.BondAngleScan.BondAngleScan.cluster">cluster (BondAngleScan property)</a>
 </li>
       <li><a href="iprPy/index.html#iprPy.command_line">command_line() (in module iprPy)</a>
@@ -459,6 +457,8 @@
       <li><a href="iprPy/calculation.html#iprPy.calculation.Calculation.database">database (Calculation property)</a>
 
       <ul>
+        <li><a href="iprPy/record.html#iprPy.record.Record.database">(Record property)</a>
+</li>
         <li><a href="iprPy/database.html#iprPy.database.RunManager.database">(RunManager property)</a>
 </li>
       </ul></li>
@@ -750,14 +750,16 @@
         <li><a href="calculation/stacking_fault_map_2D/class.html#iprPy.calculation.stacking_fault_map_2D.StackingFaultMap2D.StackingFaultMap2D.gamma">(StackingFaultMap2D property)</a>
 </li>
       </ul></li>
+      <li><a href="iprPy/record.html#iprPy.record.Record.get_file">get_file() (Record method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="calculation/free_energy/class.html#iprPy.calculation.free_energy.FreeEnergy.FreeEnergy.gibbs">gibbs (FreeEnergy property)</a>
 
       <ul>
         <li><a href="calculation/free_energy_liquid/class.html#iprPy.calculation.free_energy_liquid.FreeEnergyLiquid.FreeEnergyLiquid.gibbs">(FreeEnergyLiquid property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="calculation/stacking_fault_static/class.html#iprPy.calculation.stacking_fault_static.StackingFaultStatic.StackingFaultStatic.gsf_displacement">gsf_displacement (StackingFaultStatic property)</a>
 </li>
       <li><a href="calculation/stacking_fault_static/class.html#iprPy.calculation.stacking_fault_static.StackingFaultStatic.StackingFaultStatic.gsf_energy">gsf_energy (StackingFaultStatic property)</a>
@@ -2238,7 +2240,11 @@
       <li><a href="calculation/elastic_constants_static/function.html#iprPy.calculation.elastic_constants_static.elastic_constants_static.restart_commands">restart_commands() (in module iprPy.calculation.elastic_constants_static.elastic_constants_static)</a>
 </li>
       <li><a href="calculation/relax_dynamic/class.html#iprPy.calculation.relax_dynamic.RelaxDynamic.RelaxDynamic.restartsteps">restartsteps (RelaxDynamic property)</a>
+
+      <ul>
+        <li><a href="calculation/relax_liquid/class.html#iprPy.calculation.relax_liquid.RelaxLiquid.RelaxLiquid.restartsteps">(RelaxLiquid property)</a>
 </li>
+      </ul></li>
       <li><a href="calculation/bond_angle_scan/class.html#iprPy.calculation.bond_angle_scan.BondAngleScan.BondAngleScan.results_energy_unit">results_energy_unit (BondAngleScan property)</a>
 </li>
       <li><a href="calculation/bond_angle_scan/class.html#iprPy.calculation.bond_angle_scan.BondAngleScan.BondAngleScan.results_file">results_file (BondAngleScan property)</a>
@@ -2541,6 +2547,8 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="iprPy/record.html#iprPy.record.Record.tar">tar (Record property)</a>
+</li>
       <li><a href="calculation/dislocation_SDVPN/class.html#iprPy.calculation.dislocation_SDVPN.DislocationSDVPN.DislocationSDVPN.tau">tau (DislocationSDVPN property)</a>
 </li>
       <li><a href="calculation/free_energy/class.html#iprPy.calculation.free_energy.FreeEnergy.FreeEnergy.temperature">temperature (FreeEnergy property)</a>
@@ -2819,12 +2827,12 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.11.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">iprPy 0.11.6 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Index</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.1.
     </div>
   </body>
 </html>

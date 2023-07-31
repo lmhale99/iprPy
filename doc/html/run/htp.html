@@ -1,20 +1,16 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>High Throughput Operations &#8212; iprPy 0.11.4 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <title>High Throughput Operations &#8212; iprPy 0.11.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=2a422f08" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=a2f1e6c4"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +32,7 @@
         <li class="right" >
           <a href="database_setup.html" title="Database Setup"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Calculations</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">High Throughput Operations</a></li> 
       </ul>
@@ -62,7 +58,7 @@
 <p>Records in the database can be queried and retrieved in a number of ways.</p>
 <section id="command-line">
 <h4>1.1.1. Command line<a class="headerlink" href="#command-line" title="Permalink to this heading">¶</a></h4>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> retrieve &lt;database_name&gt; &lt;record_style&gt; &lt;record_name&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span><span class="w"> </span>retrieve<span class="w"> </span>&lt;database_name&gt;<span class="w"> </span>&lt;record_style&gt;<span class="w"> </span>&lt;record_name&gt;
 </pre></div>
 </div>
 <p>will search the database for the indicated record and save a copy to the working directory.  This is useful for fetching any records that may be used as inputs for a calculation.</p>
@@ -86,14 +82,14 @@ object.</p></li>
 <h3>1.2. Copying records<a class="headerlink" href="#copying-records" title="Permalink to this heading">¶</a></h3>
 <section id="id1">
 <h4>1.2.1. Command line<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h4>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> copy_records &lt;source&gt; &lt;dest&gt; &lt;record_style&gt; <span class="o">[</span>-n, --notar<span class="o">]</span> <span class="o">[</span>-o, --overwrite<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span><span class="w"> </span>copy_records<span class="w"> </span>&lt;source&gt;<span class="w"> </span>&lt;dest&gt;<span class="w"> </span>&lt;record_style&gt;<span class="w"> </span><span class="o">[</span>-n,<span class="w"> </span>--notar<span class="o">]</span><span class="w"> </span><span class="o">[</span>-o,<span class="w"> </span>--overwrite<span class="o">]</span>
 </pre></div>
 </div>
 <p>Copies all records of a given style from the source database name to the dest
 database name.  The notar flag indicates that only records and not any tar
 blobs are to be copied.  The overwrite flag indicates that all records be copied
 over and updated rather than just copying over the missing records.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> copy_references &lt;source&gt; &lt;dest&gt; <span class="o">[</span>-n, --notar<span class="o">]</span> <span class="o">[</span>-o, --overwrite<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span><span class="w"> </span>copy_references<span class="w"> </span>&lt;source&gt;<span class="w"> </span>&lt;dest&gt;<span class="w"> </span><span class="o">[</span>-n,<span class="w"> </span>--notar<span class="o">]</span><span class="w"> </span><span class="o">[</span>-o,<span class="w"> </span>--overwrite<span class="o">]</span>
 </pre></div>
 </div>
 <p>Copies all records associated with the reference styles.  This is a convenience
@@ -122,19 +118,19 @@ missing records.</p>
 <h3>1.3. Prepare and run<a class="headerlink" href="#prepare-and-run" title="Permalink to this heading">¶</a></h3>
 <section id="id3">
 <h4>1.3.1. Command line<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h4>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> prepare &lt;database_name&gt; &lt;run_directory_name&gt; &lt;calculation_style&gt; &lt;input_file&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span><span class="w"> </span>prepare<span class="w"> </span>&lt;database_name&gt;<span class="w"> </span>&lt;run_directory_name&gt;<span class="w"> </span>&lt;calculation_style&gt;<span class="w"> </span>&lt;input_file&gt;
 </pre></div>
 </div>
 <p>Prepares a set of calculations associated with the indicated calculation style
 based on the indicated input file.  See Section #2 below for more details.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> master_prepare &lt;database_name&gt; &lt;input_file&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span><span class="w"> </span>master_prepare<span class="w"> </span>&lt;database_name&gt;<span class="w"> </span>&lt;input_file&gt;
 </pre></div>
 </div>
 <p>Prepares one or more sets of calculations based on the indicated input file.
 Multiple calculation styles can be prepared with one script based on starting
 with pre-defined settings for that calculation.  See Section #2 below for more
 details.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> runner &lt;database_name&gt; &lt;run_directory_name&gt; <span class="o">[</span>-c, --calc_name &lt;calc_name&gt;<span class="o">]</span> <span class="o">[</span>-t, --temp<span class="o">]</span> <span class="o">[</span>-b, --bidtries<span class="o">]</span> <span class="o">[</span>-v, --bidverbose<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span><span class="w"> </span>runner<span class="w"> </span>&lt;database_name&gt;<span class="w"> </span>&lt;run_directory_name&gt;<span class="w"> </span><span class="o">[</span>-c,<span class="w"> </span>--calc_name<span class="w"> </span>&lt;calc_name&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>-t,<span class="w"> </span>--temp<span class="o">]</span><span class="w"> </span><span class="o">[</span>-b,<span class="w"> </span>--bidtries<span class="o">]</span><span class="w"> </span><span class="o">[</span>-v,<span class="w"> </span>--bidverbose<span class="o">]</span>
 </pre></div>
 </div>
 <p>Starts a runner script operating on a run directory and uploads results to a
@@ -176,14 +172,14 @@ details.</p>
 <h3>1.4. Utility methods<a class="headerlink" href="#utility-methods" title="Permalink to this heading">¶</a></h3>
 <section id="id5">
 <h4>1.4.1. Command line<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h4>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> check_records &lt;database_name&gt; &lt;record_style&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span><span class="w"> </span>check_records<span class="w"> </span>&lt;database_name&gt;<span class="w"> </span>&lt;record_style&gt;
 </pre></div>
 </div>
 <p>Queries all records of the specific style and displays how many are found.  If
 the record style is associated with a calculation, then it will also display
 the number of records for each status value: “finished”, “error”, and
 “not completed”.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> clean_records &lt;database_name&gt; &lt;run_directory_name&gt; &lt;record_style&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span><span class="w"> </span>clean_records<span class="w"> </span>&lt;database_name&gt;<span class="w"> </span>&lt;run_directory_name&gt;<span class="w"> </span>&lt;record_style&gt;
 </pre></div>
 </div>
 <p>This is a utility command that finds all of the calculation records of the
@@ -192,13 +188,13 @@ This involves changing the records in the database, extracting the calculation
 archives to the run directory, and cleaning out any bid files.  clean_records
 is primarily useful for debugging calculations where issues can be fixed in the
 code and then the failed runs performed again.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> finish_calculations &lt;database_name&gt; &lt;run_directory_name&gt; <span class="o">[</span>-v, --verbose<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span><span class="w"> </span>finish_calculations<span class="w"> </span>&lt;database_name&gt;<span class="w"> </span>&lt;run_directory_name&gt;<span class="w"> </span><span class="o">[</span>-v,<span class="w"> </span>--verbose<span class="o">]</span>
 </pre></div>
 </div>
 <p>Searches a run directory for calculations that have finished and and generated
 a results.json files and uploads them to the database.  Useful if the database
 is remote and the connection was lost while the calculations were finishing up.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> reset_orphans &lt;run_directory_name&gt; <span class="o">[</span>&lt;orphan_directory&gt;<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span><span class="w"> </span>reset_orphans<span class="w"> </span>&lt;run_directory_name&gt;<span class="w"> </span><span class="o">[</span>&lt;orphan_directory&gt;<span class="o">]</span>
 </pre></div>
 </div>
 <p>Runners will move any calculations that they find that lack a corresponding
@@ -207,7 +203,7 @@ database is specified or a connection to a database is lost.  The reset_orphans
 command returns the orphaned calculations to a run directory so that they can
 be operated on by another runner.  The orphan_directory value is optional if
 the runner used the default orphan_directory setting.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span> destroy_records &lt;database_name&gt; &lt;record_style&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$iprPy</span><span class="w"> </span>destroy_records<span class="w"> </span>&lt;database_name&gt;<span class="w"> </span>&lt;record_style&gt;
 </pre></div>
 </div>
 <p>Permanently deletes all records and any tar archives for the indicated record
@@ -500,13 +496,13 @@ style does and what parameters it recognizes.</p>
         <li class="right" >
           <a href="database_setup.html" title="Database Setup"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Calculations</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">High Throughput Operations</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.1.
     </div>
   </body>
 </html>

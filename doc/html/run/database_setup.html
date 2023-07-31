@@ -1,20 +1,16 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Database Setup &#8212; iprPy 0.11.4 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/basic.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <title>Database Setup &#8212; iprPy 0.11.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=2a422f08" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=a2f1e6c4"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +32,7 @@
         <li class="right" >
           <a href="notebook.html" title="Run a Jupyter Calculation Notebook"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Calculations</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Database Setup</a></li> 
       </ul>
@@ -60,27 +56,27 @@
 </ul>
 <section id="command-line">
 <h3>1.1. Command line<a class="headerlink" href="#command-line" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy directory
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>directory
 </pre></div>
 </div>
 <p>will print the current directory that contains the settings file.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy set_directory &lt;path&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>set_directory<span class="w"> </span>&lt;path&gt;
 </pre></div>
 </div>
 <p>will change the settings directory to the specified path.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy unset_directory
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>unset_directory
 </pre></div>
 </div>
 <p>will revert the settings directory back to its default path in the user’s home directory.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy runner_log_directory
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>runner_log_directory
 </pre></div>
 </div>
 <p>will print the current directory where runner log files will be saved.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy set_runner_log_directory &lt;path&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>set_runner_log_directory<span class="w"> </span>&lt;path&gt;
 </pre></div>
 </div>
 <p>will change the runner log directory to the specified path.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy unset_runner_log_directory
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>unset_runner_log_directory
 </pre></div>
 </div>
 <p>will revert the runner log directory back to “runner-logs” inside the settings directory.</p>
@@ -127,19 +123,19 @@
 </section>
 <section id="id1">
 <h3>2.2. Command line<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy list_databases
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>list_databases
 </pre></div>
 </div>
 <p>will display a list of the currently set database names.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy database &lt;database_name&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>database<span class="w"> </span>&lt;database_name&gt;
 </pre></div>
 </div>
 <p>will display the basic information associated with the database named.  Specifically, the database’s style and host path or url.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy set_database &lt;database_name&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>set_database<span class="w"> </span>&lt;database_name&gt;
 </pre></div>
 </div>
 <p>allows for database access parameters to be set and assigned to the given name.  Prompts will ask for the database style and host.  Following that, additional prompts allow for any other access settings to be defined one at a time by first specifying a parameter name and then the value.  The additional prompts will end when no parameter name is given.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy unset_database &lt;database_name&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>unset_database<span class="w"> </span>&lt;database_name&gt;
 </pre></div>
 </div>
 <p>will delete the saved access settings associated with the database name.  Note that this only removes the saved access settings and does not affect the database itself in any way.</p>
@@ -194,11 +190,11 @@
 <p>Multiple run directories can be used and it is encouraged allowing for separate pools of calculations that may be associated with different databases or numbers of processors to use.  While there is no inherent links between a database and a run directory, it is recommended as good practice that each run directory be used specifically for a single database.  This is because running the calculations requires that the associated database contains an incomplete record associated with every calculation being performed in the run directory.</p>
 <section id="id3">
 <h3>3.1. Command line<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy list_run_directories
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>list_run_directories
 </pre></div>
 </div>
 <p>will display a list of the currently set run directory names.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy run_directory &lt;run_directory_name&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>run_directory<span class="w"> </span>&lt;run_directory_name&gt;
 </pre></div>
 </div>
 <p>will display the path associated with the run directory named.
@@ -207,7 +203,7 @@
 <div><p>$ iprPy set_run_directory &lt;run_directory_name&gt;</p>
 </div></blockquote>
 <p>allows for a run directory to be set according to the given run directory name.  A prompt will ask for the path to associate with the name.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ iprPy unset_run_directory &lt;run_directory_name&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iprPy<span class="w"> </span>unset_run_directory<span class="w"> </span>&lt;run_directory_name&gt;
 </pre></div>
 </div>
 <p>will delete the saved settings associated with the run directory name.</p>
@@ -300,13 +296,13 @@
         <li class="right" >
           <a href="notebook.html" title="Run a Jupyter Calculation Notebook"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">iprPy 0.11.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Calculations</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Database Setup</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.1.
     </div>
   </body>
 </html>
