@@ -1,6 +1,30 @@
 Updates
 =======
 
+0.11.6
+------
+
+- **relax_liquid** now has the option to restart and continue incomplete
+  simulations.
+- All records now have a database parameter giving them a default database to
+  pull more content from, if needed.  This makes it possible to add methods
+  that retrieve information if it is not directly stored in the records
+  themselves.
+- **iprPy retrieve** command line updated to make database specification
+  optional and allow both the remote and local databases to be changed.
+- More potentials now included in the old_pots list.
+
+0.11.5
+------
+
+- **phonon** calculation: bug fixed, Notebook updated, and analysis methods
+  added.
+- **relax_liquid** master_prepare options added and updated to reflect how the
+  IPR workflow is being performed.
+- raise_error option added to calculation runs to raise any calculation error
+  rather than save the error message to the results.json file.
+- Records updated to reflect the changes to queries in yabadaba 0.2.0.
+
 0.11.4
 ------
 

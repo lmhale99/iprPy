@@ -103,11 +103,18 @@ This is a list of the implemented calculations and the status of the associated 
 ## energy_check
 
 - script: Current
-- workflow: Current
+- workflow: Not implemented - only verifies a structure's energy
 - docs: Current
 - Notebook: Current
 
 ## free_energy
+
+- script: Current
+- workflow: Temporary Notebook in "IPR workflow"
+- docs: Incomplete
+- Notebook: Missing
+
+## free_energy_liquid
 
 - script: Current
 - workflow: Temporary Notebook in "IPR workflow"
@@ -167,6 +174,13 @@ This is a list of the implemented calculations and the status of the associated 
 
 - script: Current
 - workflow: Current
+- docs: Current
+- Notebook: Current
+
+## relax_liquid
+
+- script: Current
+- workflow: In progress
 - docs: Current
 - Notebook: Current
 

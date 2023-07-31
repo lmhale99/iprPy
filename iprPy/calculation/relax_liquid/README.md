@@ -8,7 +8,7 @@ The relax_liquid calculation style is designed to generate and characterize a li
 
 ### Version notes
 
-- 2022-10-??: Calculation created
+- 2022-10-12: Calculation created
 
 ### Additional dependencies
 

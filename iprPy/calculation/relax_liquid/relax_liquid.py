@@ -153,21 +153,22 @@ def relax_liquid(lammps_command: str,
         - **'msd_x_values'** (*numpy.array of float*) - The mean squared displacement
           values only in the x direction.
         - **'msd_y_values'** (*numpy.array of float*) - The mean squared displacement
-         values only in the y direction.
+          values only in the y direction.
         - **'msd_z_values'** (*numpy.array of float*) - The mean squared displacement
-         values only in the z direction.
+          values only in the z direction.
         - **'msd_values'** (*numpy.array of float*) - The total mean squared
-           displacement values.
+          displacement values.
         - **'lammps_output'** (*atomman.lammps.Log*) - The LAMMPS logfile output.
           Can be useful for checking the thermo data at each simulation stage.
+    
     """
-  
+
     if equilenergystyle not in ['pe', 'te']:
         raise ValueError('invalid equilenergystyle option: must be "pe" or "te"')
 
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
-    
+
     #Get lammps version date
     lammps_date = lmp.checkversion(lammps_command)['date']
     
@@ -189,10 +190,10 @@ def relax_liquid(lammps_command: str,
 
     # Define lammps variables
     lammps_variables = {}
-    
+
     lammps_variables['boltzmann'] = uc.get_in_units(uc.unit['kB'],
                                                     lammps_units['energy'])
-    
+
     # Dump initial system as data and build LAMMPS inputs
     system_info = system.dump('atom_data', f='init.dat',
                               potential=potential)
@@ -302,7 +303,7 @@ def relax_liquid(lammps_command: str,
     thermo_nve = thermo[thermo.Step >= run4steps]
 
     results = {}
-    
+
     # Set final dumpfile info
     last_dump_number = 0
     for dump_file in Path('.').glob('*.dump'):
@@ -312,7 +313,7 @@ def relax_liquid(lammps_command: str,
     last_dump_file = f'{last_dump_number}.dump'
     results['dumpfile_final'] = last_dump_file
     results['symbols_final'] = system.symbols
-    
+
     natoms = system.natoms
 
     # Get equilibrated volume 
@@ -335,7 +336,7 @@ def relax_liquid(lammps_command: str,
     pressure = (thermo_nve.Pxx.values + thermo_nve.Pyy.values + thermo_nve.Pzz.values) / 3
     results['measured_press'] = uc.set_in_units(pressure.mean(), lammps_units['pressure'])
     results['measured_press_stderr'] = uc.set_in_units(pressure.std(), lammps_units['pressure']) / (nsamples)**0.5
-    
+
     # Get MSD values
     msd_unit = f"{lammps_units['length']}^2"
     time = (thermo_nve.Step.values - thermo_nve.Step.values[0]) * timestep
