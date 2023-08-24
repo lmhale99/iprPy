@@ -1,5 +1,6 @@
 # coding: utf-8
 import datetime
+from pathlib import Path
 
 # Standard Python libraries
 from typing import Optional
@@ -61,7 +62,7 @@ class LammpsCommands(CalculationSubset):
 
     @lammps_command.setter
     def lammps_command(self, val: str):
-        self.__lammps_command = str(val)
+        self.__lammps_command = Path(val).as_posix()
         if self.__lammps_version is not None:
             self.__lammps_version = None
             self.__lammps_date = None
