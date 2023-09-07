@@ -105,7 +105,10 @@ class Calculation(Record):
     def maindoc(self) -> str:
         """str: the overview documentation for the calculation"""
         try:
-            return resources.read_text(self.parent_module, 'README.md')
+            if hasattr(resources, 'files'):
+                return resources.files(self.parent_module).joinpath('README.md').read_text(encoding='UTF-8')
+            else:
+                return resources.read_text(self.parent_module, 'README.md', encoding='UTF-8')
         except:
             return ""
 
@@ -113,7 +116,10 @@ class Calculation(Record):
     def theorydoc(self) -> str:
         """str: the methods and theory documentation for the calculation"""
         try:
-            return resources.read_text(self.parent_module, 'theory.md')
+            if hasattr(resources, 'files'):
+                return resources.files(self.parent_module).joinpath('theory.md').read_text(encoding='UTF-8')
+            else:
+                return resources.read_text(self.parent_module, 'theory.md', encoding='UTF-8')
         except:
             return ""
 
@@ -188,22 +194,22 @@ class Calculation(Record):
         """str : Name of the module where the calculation's code is located"""
         return self.__parent_module
 
-    @property
-    def database(self):
-        """iprPy.Database : The Database associated with the calculation record"""
-        return self.__database
+    #@property
+    #def database(self):
+    #    """iprPy.Database : The Database associated with the calculation record"""
+    #    return self.__database
 
-    @database.setter
-    def database(self, value):
+    #@database.setter
+    #def database(self, value):
 
         # Set None or atomman.library.Database values
-        if value is None or isinstance(value, am.library.Database):
-            self.__database = value
+    #    if value is None or isinstance(value, am.library.Database):
+    #        self.__database = value
 
         # Otherwise assume that it is a yabadaba/iprPy database
-        else:
-            self.__database = am.library.Database(local_database=value,
-                                                  remote=False)
+    #    else:
+    #        self.__database = am.library.Database(local_database=value,
+    #                                              remote=False)
 
     def set_values(self,
                    name: Optional[str] = None,
@@ -240,7 +246,7 @@ class Calculation(Record):
         # Set universal content
         self.__iprPy_version = kwargs.get('iprPy_version', current_iprPy_version)
         self.__atomman_version = kwargs.get('atomman_version', current_atomman_version)
-        self.__key = kwargs.get('key', str(uuid.uuid4()))
+        self.__key = kwargs.get('key', self.key)
         self.__script = f'calc_{self.calc_style}' # Obsolete....
         self.__branch = kwargs.get('branch', 'main')
         self.__status = kwargs.get('status', 'not calculated')
@@ -454,7 +460,7 @@ class Calculation(Record):
         # Save calculation parameters
         calc['calculation'] = DM()
         calc['calculation']['iprPy-version'] = self.iprPy_version
-        calc['calculation']['atomman-version'] = self.atomman_version        
+        calc['calculation']['atomman-version'] = self.atomman_version
         calc['calculation']['script'] = self.script
         calc['calculation']['branch'] = self.branch
 
