@@ -20,5 +20,7 @@ def read_calc_file(parent_module: str,
     if Path(filename).is_file():
         with open(filename, encoding='UTF-8') as f:
             return f.read()
+    elif hasattr(resources, 'files'):
+        return resources.files(parent_module).joinpath(filename).read_text(encoding='UTF-8')
     else:
-        return resources.read_text(parent_module, filename)
+        return resources.read_text(parent_module, filename, encoding='UTF-8')
