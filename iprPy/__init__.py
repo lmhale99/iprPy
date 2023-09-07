@@ -5,7 +5,7 @@ from importlib import resources
 
 # Read version from VERSION file
 if hasattr(resources, 'files'):
-    __version__ = resources.files('iprPy').joinpath('VERSION').read_text(encoding='UTF-8')
+    __version__ = resources.files('iprPy').joinpath('VERSION').read_text(encoding='UTF-8').strip()
 else:
     __version__ = resources.read_text('iprPy', 'VERSION', encoding='UTF-8').strip()
 
