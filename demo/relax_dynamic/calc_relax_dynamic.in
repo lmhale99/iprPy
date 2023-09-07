@@ -4,7 +4,7 @@
 branch                          
 
 # LAMMPS and MPI Commands
-lammps_command                  lmp_serial
+lammps_command                  lmp
 mpi_command                     
 
 # Interatomic Potential

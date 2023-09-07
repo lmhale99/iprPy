@@ -4,7 +4,7 @@
 branch                          
 
 # LAMMPS and MPI Commands
-lammps_command                  lmp_serial
+lammps_command                  lmp
 mpi_command                     
 
 # Interatomic Potential
@@ -20,7 +20,7 @@ energy_unit
 force_unit                      
 
 # Run Parameters
-symbols                         Ni
+symbols                         Ni Ni
 minimum_r                       
 maximum_r                       
 number_of_steps_r               
