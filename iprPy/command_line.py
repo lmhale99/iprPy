@@ -3,6 +3,7 @@
 
 # Standard Python libraries
 import argparse
+from pathlib import Path
 
 import atomman as am
 
@@ -153,6 +154,8 @@ def command_line_actions(args):
 
     # Actions for subcommand run
     elif args.action == 'run':
+        if not Path(args.filename).exists():
+            raise FileNotFoundError(f'Cannot find file {args.filename}')
         run_calculation(args.filename, calc_style=args.calc_style,
                         raise_error=args.raise_error)
 
