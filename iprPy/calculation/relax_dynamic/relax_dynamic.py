@@ -48,9 +48,6 @@ def relax_dynamic(lammps_command: str,
         The system to perform the calculation on.
     potential : atomman.lammps.Potential
         The LAMMPS implemented potential to use.
-    symbols : list of str
-        The list of element-model symbols for the Potential that correspond to
-        system's atypes.
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
         will run serially.
@@ -190,19 +187,11 @@ def relax_dynamic(lammps_command: str,
     lammps_variables['dumpsteps'] = dumpsteps
     lammps_variables['restartsteps'] = restartsteps
     
-    # Set compute stress/atom based on LAMMPS version
-    if lammps_date < datetime.date(2014, 2, 12):
-        lammps_variables['stressterm'] = ''
-    else:
-        lammps_variables['stressterm'] = 'NULL'
-    
     # Set dump_keys based on atom_style
     if potential.atom_style in ['charge']:
-        lammps_variables['dump_keys'] = 'id type q xu yu zu c_pe c_ke &\n'
-        lammps_variables['dump_keys'] += 'c_stress[1] c_stress[2] c_stress[3] c_stress[4] c_stress[5] c_stress[6]'
+        lammps_variables['dump_keys'] = 'id type q xu yu zu c_pe c_ke'
     else:
-        lammps_variables['dump_keys'] = 'id type xu yu zu c_pe c_ke &\n'
-        lammps_variables['dump_keys'] += 'c_stress[1] c_stress[2] c_stress[3] c_stress[4] c_stress[5] c_stress[6]'
+        lammps_variables['dump_keys'] = 'id type xu yu zu c_pe c_ke'
 
     # Set dump_modify_format based on lammps_date
     if lammps_date < datetime.date(2016, 8, 3):
