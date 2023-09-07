@@ -11,7 +11,7 @@ thermo_modify format float %.13e
 
 compute peatom all pe/atom
 
-dump dumpit all custom <maxeval> *.dump <dump_keys>
+dump dumpit all custom <maxiter> *.dump <dump_keys>
 dump_modify dumpit format <dump_modify_format>
 
 fix boxrelax all box/relax x <p_xx> y <p_yy> z <p_zz> xy <p_xy> xz <p_xz> yz <p_yz>

@@ -9,7 +9,7 @@ thermo_modify format float %.13e
 
 compute peatom all pe/atom 
 
-dump dumpit all custom <maxeval> atom.* id type x y z c_peatom
+dump dumpit all custom <maxiter> atom.* id type x y z c_peatom
 dump_modify dumpit format <dump_modify_format>
 
 min_modify dmax <dmax>

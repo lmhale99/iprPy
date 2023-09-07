@@ -11,7 +11,7 @@ compute peatom all pe/atom
 
 min_modify dmax <dmax>
 
-dump dumpit all custom <maxeval> atom.* id type x y z c_peatom
+dump dumpit all custom <maxiter> atom.* id type x y z c_peatom
 dump_modify dumpit format <dump_modify_format>
 
 minimize <etol> <ftol> <maxiter> <maxeval>

@@ -8,7 +8,6 @@ change_box all triclinic
 
 compute pe all pe/atom
 compute ke all ke/atom
-compute stress all stress/atom <stressterm>
 
 thermo <thermosteps>
 thermo_style custom step temp pe ke etotal lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy
