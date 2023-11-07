@@ -776,7 +776,7 @@ class RelaxDynamic(Calculation):
                 else:
                     params[key] = kwargs[key]
 
-        elif branch == 'at_temp':
+        elif branch == 'at_temp_50K':
 
             # Check for required kwargs
             assert 'lammps_command' in kwargs
@@ -788,11 +788,7 @@ class RelaxDynamic(Calculation):
             params['parent_standing'] = 'good'
             params['sizemults'] = '10 10 10'
             params['atomshift'] = '0.05 0.05 0.05'
-            params['temperature'] = [
-                '100', '200', '300', '400', '500', '600', '700', '800', '900','1000',
-                '1100','1200','1300','1400','1500','1600','1700','1800','1900','2000',
-                '2100','2200','2300','2400','2500','2600','2700','2800','2900','3000',
-            ]
+            params['temperature'] = '50'
             params['integrator'] = 'npt'
             params['thermosteps'] = '100'
             params['runsteps'] = '1000000'
@@ -806,6 +802,40 @@ class RelaxDynamic(Calculation):
                 if key[:10] == 'potential_':
                     if key != 'potential_pair_style':
                         params[f'parent_{key}'] = kwargs[key]
+
+                # Copy/overwrite other terms
+                else:
+                    params[key] = kwargs[key]
+
+        elif branch == 'at_temp':
+
+            # Check for required kwargs
+            assert 'lammps_command' in kwargs
+            assert 'temperature' in kwargs
+
+            temperature = float(kwargs['temperature'])
+            archive_temperature = temperature - 50
+
+            # Set default workflow settings
+            params['buildcombos'] = 'atomicarchive load_file archive'
+
+            params['archive_record'] = 'calculation_relax_dynamic'
+            params['archive_temperature'] = str(archive_temperature)
+            params['archive_load_key'] = 'final-system'
+            params['archive_status'] = 'finished'
+            params['sizemults'] = '1 1 1'
+            params['integrator'] = 'npt'
+            params['thermosteps'] = '100'
+            params['runsteps'] = '1000000'
+            params['restartsteps'] = '50000'
+            params['equilsteps'] = '0'
+
+            # Copy kwargs to params
+            for key in kwargs:
+
+                # Rename potential-related terms for buildcombos
+                if key[:10] == 'potential_':
+                    params[f'archive_{key}'] = kwargs[key]
 
                 # Copy/overwrite other terms
                 else:
