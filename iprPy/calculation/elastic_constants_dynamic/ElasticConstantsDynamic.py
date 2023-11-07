@@ -356,10 +356,7 @@ class ElasticConstantsDynamic(Calculation):
         if 'normalized_as' in input_dict:
             self.normalized_as = input_dict['normalized_as']
         else:     
-            cfamily = self.system.ucell.box.identifyfamily()
-            if cfamily is None:
-                cfamily = 'triclinic'
-            self.normalized_as = cfamily
+            self.normalized_as = 'triclinic'
 
         # Manipulate system
         self.system_mods.load_parameters(input_dict)
@@ -392,23 +389,26 @@ class ElasticConstantsDynamic(Calculation):
 
         # main branch
         if branch == 'main':
-            raise NotImplementedError('TBD')
+            
             # Check for required kwargs
             assert 'lammps_command' in kwargs
+            assert 'temperature' in kwargs
 
             # Set default workflow settings
-            params['buildcombos'] = 'atomicparent load_file parent'
-            params['parent_record'] = 'relaxed_crystal'
-            params['sizemults'] = '5 5 5'
-            params['atomshift'] = '0.05 0.05 0.05'
-            params['temperature'] = [str(i) for i in np.arange(50, 3050, 50)]
+            params['buildcombos'] = 'atomicarchive load_file archive'
+
+            params['archive_record'] = 'calculation_relax_dynamic'
+            params['archive_temperature'] = kwargs['temperature']
+            params['archive_load_key'] = 'final-system'
+            params['archive_status'] = 'finished'
+            params['sizemults'] = '1 1 1'
 
             # Copy kwargs to params
             for key in kwargs:
 
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
-                    params[f'parent_{key}'] = kwargs[key]
+                    params[f'archive_{key}'] = kwargs[key]
 
                 # Copy/overwrite other terms
                 else:
