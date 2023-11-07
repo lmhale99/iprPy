@@ -84,6 +84,7 @@ class Calculation(Record):
         self.__branch = 'main'
         self.__status = 'not calculated'
         self.__error = None
+        self.__url = None
 
         # Link to database
         self.database = database
