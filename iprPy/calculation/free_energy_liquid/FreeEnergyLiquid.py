@@ -385,7 +385,7 @@ class FreeEnergyLiquid(Calculation):
         params : dict
             The full set of prepare parameters based on the workflow branch
         """
-        raise NotImplementedError('TBD')
+        
         # Initialize params and copy over branch
         params = {}
         params['branch'] = branch
@@ -395,27 +395,24 @@ class FreeEnergyLiquid(Calculation):
 
             # Check for required kwargs
             assert 'lammps_command' in kwargs
+            assert 'temperature' in kwargs, 'temperature must be specified for this branch'
 
             # Set default workflow settings
-            params['buildcombos'] = [
-                'atomicreference load_file reference',
-                'atomicparent load_file parent'
-            ]
-            params['parent_record'] = 'calculation_relax_liquid'
-            params['parent_status'] = 'finished'
+            params['buildcombos'] =  'atomicarchive load_file archive'
+
+            params['archive_record'] = 'calculation_relax_liquid'
+            params['archive_load_key'] = 'final-system'
+            params['archive_status'] = 'finished'
+            params['archive_temperature'] = kwargs['temperature']
             params['sizemults'] = '1 1 1'
-            params['temperature'] = '0.0'
-            params['thermosteps'] = '1000'
-            params['runsteps'] = '10000'
-            params['equilsteps'] = '0'
+            params['temperature'] = kwargs['temperature']
 
             # Copy kwargs to params
             for key in kwargs:
 
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
-                    params[f'reference_{key}'] = kwargs[key]
-                    params[f'parent_{key}'] = kwargs[key]
+                    params[f'archive_{key}'] = kwargs[key]
 
                 # Copy/overwrite other terms
                 else:
@@ -482,14 +479,7 @@ class FreeEnergyLiquid(Calculation):
             # Combination of potential and system keys
             [
                 self.potential.keyset +
-                self.system.keyset +
-                # Phase parameters
-                [
-                    'temperature',
-                    'pressure',
-                    'p',
-                    'sigma'
-                ]
+                self.system.keyset
             ] +
 
             # System mods keys
@@ -503,6 +493,10 @@ class FreeEnergyLiquid(Calculation):
                     'equilsteps',
                     'switchsteps',
                     'randomseed',
+                    'temperature',
+                    'pressure',
+                    'p',
+                    'sigma'
                 ]
             ]
         )
@@ -667,6 +661,7 @@ class FreeEnergyLiquid(Calculation):
 
             'potential_LAMMPS_key',
             'potential_key',
+            'p',
         ]
 
     @property
@@ -675,6 +670,7 @@ class FreeEnergyLiquid(Calculation):
         return {
             'temperature':1e-2,
             'pressure':1e-2,
+            'sigma':1e-2
         }
 
 ########################### Calculation interactions ##########################
