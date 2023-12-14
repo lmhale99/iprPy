@@ -98,6 +98,10 @@ def prepare_pool(database, styles, np_per_runner, run_directory,
         else:
             del kwargs['mpi_command']
 
+    dbwargs = {}
+    if database.style == 'local':
+        dbwargs['refresh_cache'] = True
+
     # Loop over styles
     for style in styles.strip().split():
 
@@ -116,8 +120,14 @@ def prepare_pool(database, styles, np_per_runner, run_directory,
             kwargs['potential_id'] = lmppot_ids
             params = calculation.master_prepare_inputs(branch=branch, **kwargs)
 
+            # Get current calculations only for the given potentials
+            calc_df = database.get_records_df(style=calculation.style,
+                                              potential_LAMMPS_id=lmppot_ids, 
+                                              **dbwargs)
+
             # Prepare the calculation
-            database.prepare(run_directory, calculation, debug=debug, **params)
+            database.prepare(run_directory, calculation, debug=debug,
+                             calc_df=calc_df, **params)
             print()
 
     # Update lammps_commands as needed

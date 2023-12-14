@@ -3,6 +3,7 @@
 from pathlib import Path
 from copy import deepcopy
 import shutil
+from typing import Optional, Union
 
 from tqdm import tqdm
 
@@ -17,8 +18,14 @@ from ..tools import aslist, filltemplate
 from .. import load_calculation, load_run_directory
 from ..input import buildcombos, parse
 
-def prepare(database, run_directory, calculation, input_script=None,
-            debug=False, **kwargs):
+def prepare(database,
+            run_directory: str,
+            calculation,
+            input_script: Optional[Union[Path, str]] = None,
+            debug: bool = False,
+            content_dict: Optional[dict] = None,
+            calc_df: Optional[pd.DataFrame] = None,
+            **kwargs):
     """
     Function for preparing any iprPy calculation for high-throughput execution.
     Input parameters for preparing can either be given within an input script
@@ -39,6 +46,26 @@ def prepare(database, run_directory, calculation, input_script=None,
     debug : bool
         If set to True, will throw errors associated with failed/invalid
         calculation builds.  Default is False.
+    content_dict : dict, optional
+        Option for advanced prepare control.  When preparing based on database
+        records, a content_dict is used to store the record contents so
+        metadata can be built from it before the file is copied into the
+        prepared calculation folders.  Prepare is designed to automatically
+        fetch the records from the database and extract the contents, but this
+        parameter allows for the contents to be manually specified instead.
+        Keys should be the record names and values the record model contents as
+        DataModelDict objects.
+    calc_df : pandas.DataFrame, optional
+        Option for advanced prepare control.  The metadata DataFrame of
+        pre-existing calculations to use for filtering out duplicates from the
+        newly proposed combinations.  If not given, database.get_records_df()
+        is called to get the metadata for all existing records of the given
+        calculation style.  Being able to manually specify calc_df can reduce
+        how long prepare takes by reducing the number of times get_records_df
+        is called or providing filtering keywords to reduce the number of
+        records returned by get_records_df.  CAUTION: Extra care is required
+        with using calc_df as it makes it easier to accidentally prepare
+        duplicate calculations!        
     **kwargs : str or list
         Allows for input parameters for preparing the calculation to be
         directly specified.  Any kwargs parameters that have names matching
@@ -70,11 +97,18 @@ def prepare(database, run_directory, calculation, input_script=None,
             kwargs[key] = temp[key]
     
     # Build dataframe of all existing records for the calculation style
-    old_calcs_df = database.get_records_df(style=calculation.style, **dbwargs)
-    print(len(old_calcs_df), 'existing calculation records found', flush=True)
+    if calc_df is None:
+        old_calcs_df = database.get_records_df(style=calculation.style, **dbwargs)
+        print(len(old_calcs_df), 'existing calculation records found', flush=True)
+    else:
+        old_calcs_df = calc_df
+        print(len(old_calcs_df), 'existing calculation records provided', flush=True)
     
+    # Build content_dict for manually defined "*_content record" fields
+    content_dict = manual_content_dict(database, content_dict, **kwargs)
+
     # Complete kwargs with default values and buildcombos actions
-    kwargs, content_dict = fill_kwargs(database, calculation, **kwargs)
+    kwargs, content_dict = fill_kwargs(database, calculation, content_dict, **kwargs)
 
     # Build all combinations
     test_calcs, test_calcs_df, test_inputfiles, test_contents, content_dict = build_test_calcs(database, calculation, content_dict, debug=debug, **kwargs)
@@ -83,7 +117,9 @@ def prepare(database, run_directory, calculation, input_script=None,
         return
 
     # Find new unique combinations
-    new_calcs_df = new_calculations(old_calcs_df, test_calcs_df, calculation.compare_terms, calculation.compare_fterms)
+    new_calcs_df = new_calculations(old_calcs_df, test_calcs_df,
+                                    calculation.compare_terms,
+                                    calculation.compare_fterms)
     print(len(new_calcs_df), 'new records to prepare', flush=True)
 
     # Iterate over new calculations and prepare
@@ -92,9 +128,65 @@ def prepare(database, run_directory, calculation, input_script=None,
         inputfile = test_inputfiles[i]
         copy_content = test_contents[i]
         
-        prepare_calc(database, run_directory, new_calc, inputfile, copy_content, content_dict)
-        
-def fill_kwargs(database, calculation, **kwargs):
+        prepare_calc(database, run_directory, new_calc, inputfile,
+                     copy_content, content_dict)
+
+def manual_content_dict(database,
+                        content_dict: Optional[dict] = None,
+                        **kwargs):
+    """
+    Checks kwargs for manually defined "*_content record" fields and retrieves
+    the associated record contents from database and stores them in
+    content_dict.
+
+    Parameters
+    ----------
+    database : iprPy.database.Database
+        The database to use for fetching record contents.
+    content_dict : dict or None, optional
+        The content_dict manually given to prepare(). If None, then a new
+        empty dict will be created.
+    **kwargs : dict
+        Input parameters for preparing the calculation.
+
+    Returns
+    -------
+    content_dict : dict
+        Keys are the file name and values are the associated loaded file
+        contents for extra input files needed for the calculations.
+    """
+    # Initialize content_dict if needed
+    if content_dict is None:
+        content_dict = {}
+
+    # Loop over all *_content record fields
+    for key in kwargs:
+        if '_content' in key:
+
+            # Loop over "*_content record" values
+            for entry in aslist(kwargs[key]):
+                terms = entry.split()
+                if terms[0] != 'record':
+                    continue
+                
+                # Check if already in content_dict
+                name = terms[1]
+                if name in content_dict:
+                    continue
+
+                # Retrieve record style if included
+                if len(terms) == 3:
+                    style = terms[2]
+                else:
+                    style = None
+
+                # Get record contents
+                record = database.get_record(style=style, name=name)
+                content_dict[name] = record.model
+
+    return content_dict
+    
+def fill_kwargs(database, calculation, content_dict, **kwargs):
     """
     Fills in kwargs with default values and buildcombos results.
     
@@ -104,6 +196,9 @@ def fill_kwargs(database, calculation, **kwargs):
         The database to use for building combos.
     calculation : iprPy.calculation.Calculation
         An instance of the calculation being prepared.
+    content_dict : dict
+        The content_dict created from the manually provided values to prepare
+        and any manually defined "*_content record" fields.
     **kwargs : dict
         Input parameters for preparing the calculation.
         
@@ -139,9 +234,6 @@ def fill_kwargs(database, calculation, **kwargs):
                 for i in range(len(kwargs[key])):
                     if kwargs[key][i].lower() == 'none':
                         kwargs[key][i] = ''
-
-    # Initialize content dict
-    content_dict = {}
                         
     # Handle prepare build special functions
     if 'buildcombos' in kwargs:
