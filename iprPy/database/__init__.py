@@ -12,9 +12,11 @@ from .master_prepare import master_prepare
 from .runner import runner, RunManager
 from .IprPyDatabase import IprPyDatabase
 from .load_database import load_database
+from .BaseEmperorPrepare import BaseEmperorPrepare
 
 __all__ = sorted(['Database', 'databasemanager', 'load_database', 'runner',
-                  'RunManager', 'reset_orphans', 'prepare', 'master_prepare'])
+                  'RunManager', 'reset_orphans', 'prepare', 'master_prepare',
+                  'BaseEmperorPrepare'])
 
 databasemanager.import_style('local', '.LocalDatabase', __name__)
 databasemanager.import_style('mongo', '.MongoDatabase', __name__)

@@ -29,12 +29,11 @@ def master_prepare(database, input_script=None, debug=False, **kwargs):
         Values must be strings or list of strings if allowed by the
         calculation for the particular parameter.
     """
-    # Parse input_script
+    # Parse input_script and join with kwargs
     if input_script is not None:
         temp = kwargs
         kwargs = parse(input_script)
-        for key in temp:
-            kwargs[key] = temp[key]
+        kwargs.update(temp)
 
     # Get pools
     styles = aslist(kwargs.pop('styles'))
