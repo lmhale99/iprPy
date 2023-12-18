@@ -405,7 +405,7 @@ class FreeEnergy(Calculation):
         params : dict
             The full set of prepare parameters based on the workflow branch
         """
-        raise NotImplementedError('TBD')
+        
         # Initialize params and copy over branch
         params = {}
         params['branch'] = branch
@@ -415,31 +415,24 @@ class FreeEnergy(Calculation):
 
             # Check for required kwargs
             assert 'lammps_command' in kwargs
+            assert 'temperature' in kwargs, 'temperature must be specified for this branch'
 
             # Set default workflow settings
-            params['buildcombos'] = [
-                'atomicreference load_file reference',
-                'atomicparent load_file parent'
-            ]
-            params['parent_record'] = 'calculation_E_vs_r_scan'
-            params['parent_load_key'] = 'minimum-atomic-system'
-            params['parent_status'] = 'finished'
-            params['sizemults'] = '10 10 10'
-            params['atomshift'] = '0.05 0.05 0.05'
-            params['temperature'] = '0.0'
-            params['integrator'] = 'nph+l'
-            params['thermosteps'] = '1000'
-            params['runsteps'] = '10000'
-            params['equilsteps'] = '0'
+            params['buildcombos'] = 'atomicarchive load_file archive'
 
+            params['archive_record'] = 'calculation_relax_dynamic'
+            params['archive_load_key'] = 'final-system'
+            params['archive_status'] = 'finished'
+            params['archive_temperature'] = kwargs['temperature']
+            params['sizemults'] = '1 1 1'
+            params['temperature'] = kwargs['temperature']
 
             # Copy kwargs to params
             for key in kwargs:
 
                 # Rename potential-related terms for buildcombos
                 if key[:10] == 'potential_':
-                    params[f'reference_{key}'] = kwargs[key]
-                    params[f'parent_{key}'] = kwargs[key]
+                    params[f'archive_{key}'] = kwargs[key]
 
                 # Copy/overwrite other terms
                 else:
@@ -511,13 +504,7 @@ class FreeEnergy(Calculation):
             # Combination of potential and system keys
             [
                 self.potential.keyset +
-                self.system.keyset +
-                # Phase parameters
-                [
-                    'temperature',
-                    'pressure',
-                    'spring_constants',
-                ]
+                self.system.keyset
             ] +
 
             # System mods keys
@@ -532,6 +519,9 @@ class FreeEnergy(Calculation):
                     'switchsteps',
                     'springsteps',
                     'randomseed',
+                    'temperature',
+                    'pressure',
+                    'spring_constants',
                 ]
             ]
         )
