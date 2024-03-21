@@ -257,6 +257,86 @@ class IprPyDatabase():
             # Delete calc folder
             shutil.rmtree(calc)
 
+    def finish_bad_calculations(self, run_directory, error_message, records=None,
+                                verbose=False):
+        """
+        Finishes calculations in a run directory by setting their status to "error",
+        and uploading both the record and calculation tar to the database.  
+
+        Parameters
+        ----------
+        run_directory : str
+            The directory to search for calculations.
+        error_message : str
+            The error message to assign to the calculations.
+        records : str, Record, list or None, optional
+            Record(s) or record name(s) to finish in this way.  If None (default)
+            then all calculations found in the run directory will be finished
+            with the error status and message.
+        verbose : bool, optional
+            If True, print statements will list the records successfully
+            added/updated to the database.  Default value is False.        
+        """
+        # Check for run_directory first by name then by path
+        try:
+            run_directory = load_run_directory(run_directory)
+        except:
+            run_directory = Path(run_directory).resolve()
+            if not run_directory.is_dir():
+                raise ValueError('run_directory not found/set')
+
+        # Get list of record names
+        names = []
+        if records is not None:
+            for record in iaslist(records):
+                if isinstance(record, str):
+                    names.append(record)
+                else:
+                    names.append(record.name)
+
+        for calc in Path(run_directory).glob('*'):
+            
+            # Check that the path is a directory
+            if not calc.is_dir():
+                continue
+
+            # Check if calculation is in the listed records to finish
+            calc_name = calc.name
+            if records is not None and calc_name not in names:
+                continue
+
+            # Check if the calc input script exists to get the style
+            infiles = [i for i in calc.glob('calc_*.in')]
+            if len(infiles) == 1:
+                infile = infiles[0]
+                style = infile.stem.replace('calc_', 'calculation_')
+            else:
+                style = None
+
+            # Load content
+            record = self.get_record(name=calc_name, style=style)
+            model = record.model
+            
+            # Update status and error fields
+            root = record.modelroot
+            model[root]['status'] = 'error'
+            model[root]['error'] = error_message
+            
+            # Save to calc directory
+            with open(Path(calc, 'results.json'), 'w', encoding='utf-8') as f:
+                model.json(fp=f, indent=4, ensure_ascii=False)
+                
+            # Update record
+            self.update_record(record=record, verbose=verbose)
+
+            try:
+                self.add_tar(record=record, root_dir=run_directory)
+            except:
+                self.update_tar(record=record, root_dir=run_directory)
+            
+            # Delete calc folder
+            shutil.rmtree(calc)
+
     def reset_orphans(self, run_directory, orphan_directory=None):
         """
         Resets calculations that were moved to an orphan directory back to a
