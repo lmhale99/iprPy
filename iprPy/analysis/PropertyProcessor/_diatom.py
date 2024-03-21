@@ -199,8 +199,8 @@ def diatom_bokeh_plot(df: pd.DataFrame,
     # Initialize plot
     title = f'Diatom Energy vs. Interatomic Spacing for {implementation}'
     p = bokeh.plotting.figure(title = title,
-                              plot_width = 800,
-                              plot_height = 600,
+                              width = 800,
+                              height = 600,
                               x_range = [1, 6],
                               y_range = [-20, 1],
                               x_axis_label = 'r (Angstrom)', 
@@ -273,8 +273,8 @@ def diatom_bokeh_short_plot(df: pd.DataFrame,
     # Initialize plot
     title = f'Diatom Energy vs. Interatomic Spacing for {implementation}'
     p = bokeh.plotting.figure(title = title,
-                              plot_width = 800,
-                              plot_height = 600,
+                              width = 800,
+                              height = 600,
                               x_range = [0, 2],
                               y_range = [-5e5, 5e5],
                               x_axis_label = 'r (Angstrom)', 

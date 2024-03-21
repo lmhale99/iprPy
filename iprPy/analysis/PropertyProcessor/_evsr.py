@@ -273,8 +273,8 @@ def evsr_bokeh_plot(df: pd.DataFrame,
     # Initialize plot
     title = f'Potential Energy vs. Interatomic Spacing for {composition} Using {implementation}'
     p = bokeh.plotting.figure(title = title,
-                              plot_width = 800,
-                              plot_height = 600,
+                              width = 800,
+                              height = 600,
                               x_range = [1, 6],
                               y_range = [-10, 1],
                               x_axis_label = 'r (Angstrom)', 
