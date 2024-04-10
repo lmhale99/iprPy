@@ -31,14 +31,13 @@ fix langevin all langevin ${temperature} ${temperature} $(100.0*dt) ${randomseed
 thermo_style custom step temp pe press
 run ${equilsteps}
 
-# Define stress tensor compute
-compute stress all pressure thermo_temp
+# Define virial contribution to the pressure compute
+compute virial all pressure NULL virial
 
 # Define born matrix compute
-compute virial all pressure NULL virial
 compute born all born/matrix numdiff ${strainrange} virial
 
-thermo_style custom step temp pe press c_stress[*] c_born[*]
+thermo_style custom step temp pe press c_virial[*] c_born[*]
 thermo_modify format float %.13e
 
 run ${runsteps}
