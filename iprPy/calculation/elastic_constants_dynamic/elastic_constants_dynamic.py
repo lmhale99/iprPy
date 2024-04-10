@@ -193,26 +193,26 @@ def build_Cij_fluc(thermo, N, T, V, lammps_units):
     Constructs the fluctuation component of the Cij calculation from the LAMMPS
     stress (i.e. pressure) outputs.
     
-        C_fluc = V / (kB T) * ( <σ_i σ_j> - <σ_i> <σ_j> )
+        C_fluc = - V / (kB T) * ( <σ_i σ_j> - <σ_i> <σ_j> )
     """
     # Switch for 0K
     if T == 0:
         return np.zeros((6,6))
     
-    # Extract all stress values 
+    # Extract the virial contributions to the stress tensor 
     σ = uc.set_in_units(np.array([
-        thermo['c_stress[1]'].values,
-        thermo['c_stress[2]'].values,
-        thermo['c_stress[3]'].values,
-        thermo['c_stress[4]'].values,
-        thermo['c_stress[5]'].values,
-        thermo['c_stress[6]'].values]), lammps_units['pressure'])
+        -thermo['c_virial[1]'].values,
+        -thermo['c_virial[2]'].values,
+        -thermo['c_virial[3]'].values,
+        -thermo['c_virial[4]'].values,
+        -thermo['c_virial[5]'].values,
+        -thermo['c_virial[6]'].values]), lammps_units['pressure'])
 
-    # Compute the stress fluctuation term
+    # Compute the virial stress fluctuation term
     fluc = np.empty((6,6))
     for i in range(6):
         for j in range(6):
-            fluc[i,j] = - (σ[i] * σ[j]).mean() - (σ[i].mean() * σ[j].mean())
+            fluc[i,j] = - ((σ[i] * σ[j]).mean() - (σ[i].mean() * σ[j].mean()))
     
     # Multipy by V / (kb T) 
     kB = uc.unit['kB']
