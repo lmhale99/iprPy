@@ -5,10 +5,10 @@
 ################## Primary LAMMPS executable and MPI command ##################
 
 # Primary LAMMPS executable (machine-specific location)
-lammps_command              /home/lmh1/LAMMPS/2022-06-23/src/lmp_mpi
+lammps_command              /home/lmh1/LAMMPS/2022-06-23/src/lmp_serial
 
 # MPI command to use with the LAMMPS executable(s)
-mpi_command                 mpirun -n {np_per_runner}
+mpi_command                 
 
 ####################### Alternate LAMMPS executables ##########################
 
