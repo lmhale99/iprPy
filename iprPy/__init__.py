@@ -30,11 +30,13 @@ from .command_line import command_line
 
 from . import analysis
 
+from . import quickcheck
+
 __all__ = ['__version__', 'tools', 'settings', 'input',
            'load_run_directory', 'fix_lammps_versions',
            'record', 'load_record', 'recordmanager',
            'calculation_subset', 'analysis',
            'calculation', 'load_calculation', 'calculationmanager',
            'database', 'load_database', 'databasemanager',
-           'check_modules', 'command_line', 'reset_orphans']
+           'check_modules', 'command_line', 'reset_orphans', 'quickcheck']
 __all__.sort()
