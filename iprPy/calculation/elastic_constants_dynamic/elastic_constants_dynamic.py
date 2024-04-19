@@ -209,14 +209,12 @@ def build_Cij_fluc(thermo, N, T, V, lammps_units):
         -thermo['c_virial[6]'].values]), lammps_units['pressure'])
 
     # Compute the virial stress fluctuation term
-    fluc = np.empty((6,6))
-    for i in range(6):
-        for j in range(6):
-            fluc[i,j] = - ((σ[i] * σ[j]).mean() - (σ[i].mean() * σ[j].mean()))
+    # cov == (<σ_i σ_j> - <σ_i> <σ_j>)
+    fluc = np.cov(σ)
     
     # Multipy by V / (kb T) 
     kB = uc.unit['kB']
-    return (V / (kB * T)) * fluc
+    return - (V / (kB * T)) * fluc
     
 def build_Cij_kin(N, T, V):
     """
