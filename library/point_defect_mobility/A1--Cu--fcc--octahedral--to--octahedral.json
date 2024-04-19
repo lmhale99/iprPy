@@ -1,0 +1,26 @@
+{
+    "point-defect-mobility": {
+        "key": "1d16a384-354a-40d5-af89-450ca3c984f2",
+        "id": "A1--Cu--fcc--octahedral--to--octahedral",
+        "system-family": "A1--Cu--fcc",
+        "initial-defect-number": "0",
+        "defect-pair-number": "1",
+        "halfway": false,
+        "start-calculation-parameters": [
+            {
+                "ptd_type": "i",
+                "atype": "1",
+                "pos": "0.5000000000000 0.0000000000000 0.0000000000000", 
+                "scale": true
+            }
+        ],
+        "end-calculation-parameters": [
+            {
+                "ptd_type": "i",
+                "atype": "1",
+                "pos": "0.0000000000000 0.5000000000000 0.0000000000000", 
+                "scale": true
+            }
+        ]
+    }
+}

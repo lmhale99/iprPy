@@ -1,0 +1,51 @@
+# LAMMPS input script for neb calculations
+
+# NEB parameters
+variable nreplicas equal <nreplicas>
+variable springconst equal <springconst>
+
+# Run parameters
+variable thermosteps equal <thermosteps>
+variable dumpsteps equal <dumpsteps>
+variable timestep equal <timestep>
+
+# Relaxation parameters
+variable minsteps equal <minsteps>
+variable climbsteps equal <climbsteps>
+variable dmax equal <dmax>
+variable etol equal <etol>
+variable ftol equal <ftol>
+
+# LAMMPS setting parameters
+box tilt large
+atom_modify map array
+
+# initial system definition
+<atomman_system_info>
+
+# potential definition
+<atomman_pair_info>
+
+# property compute definitions
+compute peatom all pe/atom
+
+# define neb
+fix neb all neb ${springconst}
+
+# dump file definition
+variable i uloop ${nreplicas}
+dump dumpy all custom ${dumpsteps} step-*.replica-${i}.dump id type x y z c_peatom
+dump_modify dumpy format float %.13e
+
+# thermo definition
+thermo ${thermosteps}
+thermo_style custom step lx ly lz pe
+thermo_modify format float %.13e
+
+# minimization definition
+timestep ${timestep}
+min_style quickmin
+min_modify dmax ${dmax}
+
+# run neb
+neb ${etol} ${ftol} ${minsteps} ${climbsteps} ${thermosteps} final <final_system>

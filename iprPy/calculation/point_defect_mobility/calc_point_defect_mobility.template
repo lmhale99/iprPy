@@ -1,0 +1,83 @@
+# Input script with settings for calcu_point_defect_mobility.py
+
+#Calculation Metadata
+branch                                          <branch>
+
+#Command Lines for LAMMPS (and MPI)
+lammps_command                                  <lammps_command>       
+mpi_command                                     <mpi_command>
+
+# Potential definition and directory containing associated files
+potential_file                                  <potential_file>
+potential_dir                                   <potential_dir>
+
+# Initial system configuration to load
+load_file                                       <load_file>
+load_style                                      <load_style>
+load_options                                    <load_options>
+family                                          <family>
+symbols                                         <symbols>
+box_parameters                                  <box_parameters>
+
+# System manipulations
+a_uvw                                           <a_uvw>
+b_uvw                                           <b_uvw>
+c_uvw                                           <c_uvw>
+atomshift                                       <atomshift>
+sizemults                                       <sizemults>
+
+# Defect parameters - use for a single defect or a defect file
+
+allSymbols                                      <allSymbols>
+
+pointdefect_mobility_file                       <pointdefect_mobility_file>    
+
+initialdefect_number                            <initialdefect_number>    
+
+initial_pointdefectmobility_type                <initial_pointdefectmobility_type>
+initial_pointdefectmobility_atype               <initial_pointdefectmobility_atype>
+initial_pointdefectmobility_pos                 <initial_pointdefectmobility_pos>
+initial_pointdefectmobility_dumbbell_vect       <initial_pointdefectmobility_dumbbell_vect>
+initial_pointdefectmobility_scale               <initial_pointdefectmobility_scale>
+
+defectpair_number                               <defectpair_number>             
+
+start_pointdefectmobility_type                  <start_pointdefectmobility_type>
+start_pointdefectmobility_atype                 <start_pointdefectmobility_atype>
+start_pointdefectmobility_pos                   <start_pointdefectmobility_pos>
+start_pointdefectmobility_dumbbell_vect         <start_pointdefectmobility_dumbbell_vect>
+start_pointdefectmobility_scale                 <start_pointdefectmobility_scale>
+
+end_pointdefectmobility_type                    <end_pointdefectmobility_type>   
+end_pointdefectmobility_atype                   <end_pointdefectmobility_atype>    
+end_pointdefectmobility_pos                     <end_pointdefectmobility_pos>
+end_pointdefectmobility_dumbbell_vect           <end_pointdefectmobility_dumbbell_vect>
+end_pointdefectmobility_scale                   <end_pointdefectmobility_scale>         
+
+
+# Defect Pair Characteristics -
+# Defect pairs are used to define changes in 
+# the system from the initial to the final state
+# The first one is used in the initial system, the second in the final
+# The number refers to the number in the eventual kwargs object
+
+
+# Units for input/output values
+length_unit                                     <length_unit>
+pressure_unit                                   <pressure_unit>
+energy_unit                                     <energy_unit>
+force_unit                                      <force_unit>
+
+# Values parsed by lammps_minimize
+energytolerance                                 <energytolerance>
+forcetolerance                                  <forcetolerance>
+maxatommotion                                   <maxatommotion>
+
+# NEB Calculation parameters
+numberreplicas                                  <numberreplicas>
+springconstant                                  <springconstant>
+thermosteps                                     <thermosteps>    
+dumpsteps                                       <dumpsteps>
+timestep                                        <timestep>
+minimumsteps                                    <minimumsteps>
+climbsteps                                      <climbsteps>
