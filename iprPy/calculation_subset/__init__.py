@@ -15,3 +15,4 @@ from .FreeSurface import FreeSurface
 from .StackingFault import StackingFault
 from .PointDefect import PointDefect
 from .Dislocation import Dislocation
+from .GrainBoundary import GrainBoundary
