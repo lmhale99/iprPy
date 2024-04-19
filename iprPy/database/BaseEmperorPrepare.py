@@ -1,7 +1,7 @@
 from typing import Union
-from iprPy.input import parse
-from iprPy import load_database
-from iprPy.database import IprPyDatabase
+from ..input import parse
+from . import load_database
+from . import IprPyDatabase
 
 class BaseEmperorPrepare():
     """
