@@ -50,6 +50,7 @@ def master_prepare(database, input_script=None, debug=False, **kwargs):
     for key in kwargs:
         if key[:10] == 'potential_':
             potkwargs[key[10:]] = kwargs[key]
+    database.build_potdb(remote=False)
     lmppots_df = database.potdb.get_lammps_potentials(return_df=True, **potkwargs)[1]
     all_lmppot_ids = np.unique(lmppots_df.id).tolist()
     print(len(all_lmppot_ids), 'potential ids found')
@@ -114,15 +115,21 @@ def prepare_pool(database, styles, np_per_runner, run_directory,
         # Load calculation
         calculation = load_calculation(style)
 
+        # Load all current calculations once if cannot parse by potential
+        if 'potential_LAMMPS_id' not in calculation.queries:
+            calc_df = database.get_records_df(style=calculation.style,
+                                              **dbwargs)
+
         # Build prepare input parameters
         for lmppot_ids in yield_lmppot_ids(all_lmppot_ids, num_pots):
             kwargs['potential_id'] = lmppot_ids
             params = calculation.master_prepare_inputs(branch=branch, **kwargs)
 
             # Get current calculations only for the given potentials
-            calc_df = database.get_records_df(style=calculation.style,
-                                              potential_LAMMPS_id=lmppot_ids, 
-                                              **dbwargs)
+            if 'potential_LAMMPS_id' in calculation.queries:
+                calc_df = database.get_records_df(style=calculation.style,
+                                                  potential_LAMMPS_id=lmppot_ids, 
+                                                  **dbwargs)
 
             # Prepare the calculation
             database.prepare(run_directory, calculation, debug=debug,
