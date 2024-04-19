@@ -37,7 +37,8 @@ def relax_static(lammps_command: str,
                  maxeval: int = 1000000,
                  dmax: float = uc.set_in_units(0.01, 'angstrom'),
                  maxcycles: int = 100,
-                 ctol: float = 1e-10) -> dict:
+                 ctol: float = 1e-10,
+                 raise_at_maxcycles: bool = False) -> dict:
     """
     Repeatedly runs the ELASTIC example distributed with LAMMPS until box
     dimensions converge within a tolerance.
@@ -98,6 +99,10 @@ def relax_static(lammps_command: str,
     ctol : float, optional
         The relative tolerance used to determine if the lattice constants have
         converged (default is 1e-10).
+    raise_at_maxcycles : bool, optional
+        Setting this to True will raise an error if maxcycles is reached before
+        achieving convergence within ctol.  When False, the final relaxed
+        configuration is retained even without achieving the ctol.
     
     Returns
     -------
@@ -216,7 +221,7 @@ def relax_static(lammps_command: str,
             old_vects = system.box.vects
     
     # Check for convergence
-    if converged is False:
+    if converged is False and raise_at_maxcycles is True:
         raise RuntimeError('Failed to converge after ' + str(maxcycles) + ' cycles')
     
     # Zero out near-zero tilt factors

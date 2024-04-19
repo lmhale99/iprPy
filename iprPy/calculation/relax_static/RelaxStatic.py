@@ -17,7 +17,7 @@ from .relax_static import relax_static
 from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
                                    AtommanSystemLoad, AtommanSystemManipulate,
                                    LammpsMinimize)
-from ...input import value
+from ...input import value, boolean
 
 class RelaxStatic(Calculation):
     """Class for managing static relaxations"""
@@ -218,6 +218,15 @@ class RelaxStatic(Calculation):
         self.__cycletolerance = float(val)
 
     @property
+    def raise_at_maxcycles(self) -> bool:
+        """bool: Indicates if an error is to be raised if maxcycles is reached before cycletolerance convergence"""
+        return self.__raise_at_maxcycles
+
+    @raise_at_maxcycles.setter
+    def raise_at_maxcycles(self, val: bool):
+        self.__raise_at_maxcycles = bool(val)
+
+    @property
     def initial_dump(self) -> dict:
         """dict: Info about the initial dump file"""
         if self.__initial_dump is None:
@@ -318,6 +327,9 @@ class RelaxStatic(Calculation):
             The maximum number of minimization cycles to use.
         cycletolerance : float, optional
             The target tolerance for stopping the mimimization cycles.
+        raise_at_maxcycles : bool, optional
+            Indicates if an error is to be thrown if maxcycles is reached
+            before cycletolerance convergence is achieved.
         **kwargs : any, optional
             Any keyword parameters supported by the set_values() methods of
             the parent Calculation class and the subset classes.
@@ -344,6 +356,8 @@ class RelaxStatic(Calculation):
             self.maxcycles = kwargs['maxcycles']
         if 'cycletolerance' in kwargs:
             self.cycletolerance = kwargs['cycletolerance']
+        if 'raise_at_maxcycles' in kwargs:
+            self.raise_at_maxcycles = kwargs['raise_at_maxcycles']
 
 ####################### Parameter file interactions ###########################
 
@@ -376,6 +390,7 @@ class RelaxStatic(Calculation):
         # Load calculation-specific strings
 
         # Load calculation-specific booleans
+        self.raise_at_maxcycles = boolean(input_dict.get('raise_at_maxcycles', False))
 
         # Load calculation-specific integers
         self.maxcycles = int(input_dict.get('maxcycles', 100))
@@ -470,6 +485,7 @@ class RelaxStatic(Calculation):
             params['maxatommotion'] = '0.01 angstrom'
             params['maxcycles'] = '100'
             params['cycletolerance'] = '1e-10'
+            params['raise_at_maxcycles'] = 'True'
 
             # Copy kwargs to params
             for key in kwargs:
@@ -503,6 +519,7 @@ class RelaxStatic(Calculation):
             params['maxatommotion'] = '0.01 angstrom'
             params['maxcycles'] = '100'
             params['cycletolerance'] = '1e-10'
+            params['raise_at_maxcycles'] = 'True'
 
             # Copy kwargs to params
             for key in kwargs:
@@ -557,6 +574,11 @@ class RelaxStatic(Calculation):
                 "The tolerance to use in determining if the lattice constants",
                 "have converged between two minimization runs (cycles).  Default",
                 "value is '1e-10 angstrom'."]),
+            'raise_at_maxcycles': ' '.join([
+                "Indicates that an error should be thrown if maxcycles is reached",
+                "prior to cycletolerance convergence is achieved.  Default value",
+                "is False, but old versions of this calculation are consistent",
+                "with a True setting."]),
         }
 
     @property
@@ -612,6 +634,7 @@ class RelaxStatic(Calculation):
                     'displacementkick',
                     'maxcycles',
                     'cycletolerance',
+                    'raise_at_maxcycles'
                 ]
             ]
         )
@@ -852,6 +875,7 @@ class RelaxStatic(Calculation):
         input_dict['dispmult'] = self.displacementkick
         input_dict['maxcycles'] = self.maxcycles
         input_dict['ctol'] = self.cycletolerance
+        input_dict['raise_at_maxcycles'] = self.raise_at_maxcycles
 
         # Return input_dict
         return input_dict
