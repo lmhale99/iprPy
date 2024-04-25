@@ -34,6 +34,11 @@ def command_line_actions(args):
     elif args.action == 'check_modules':
         check_modules()
 
+    # Actions for subcommand clean_files
+    elif args.action == 'clean_files':
+        calculation = load_calculation(args.calculation)
+        calculation.clean_files()
+
     # Actions for subcommand clean_records
     elif args.action == 'clean_records':
         database = load_database(args.database)
@@ -250,6 +255,12 @@ def command_line_parser():
     # Define subparser for check_modules
     subparser = subparsers.add_parser('check_modules',
                         help='prints load status of all modules in iprPy')
+
+    # Define subparser for clean_files
+    subparser = subparsers.add_parser('clean_files',
+                        help="remove any generated calculation files from the cwd")
+    subparser.add_argument('calculation',
+                        help='calculation name')
 
     # Define subparser for clean_records
     subparser = subparsers.add_parser('clean_records',
