@@ -1,7 +1,7 @@
 # LAMMPS input script for neb calculations
 
 # NEB parameters
-variable nreplicas equal <nreplicas>
+variable numreplicas equal <numreplicas>
 variable springconst equal <springconst>
 
 # Run parameters
@@ -20,11 +20,8 @@ variable ftol equal <ftol>
 box tilt large
 atom_modify map array
 
-# initial system definition
-<atomman_system_info>
-
-# potential definition
-<atomman_pair_info>
+# potential and initial system definition
+<atomman_system_pair_info>
 
 # property compute definitions
 compute peatom all pe/atom
@@ -33,7 +30,7 @@ compute peatom all pe/atom
 fix neb all neb ${springconst}
 
 # dump file definition
-variable i uloop ${nreplicas}
+variable i uloop ${numreplicas}
 dump dumpy all custom ${dumpsteps} step-*.replica-${i}.dump id type x y z c_peatom
 dump_modify dumpy format float %.13e
 

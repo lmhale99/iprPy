@@ -1,0 +1,24 @@
+{
+    "point-defect-neb": {
+        "key": "fcc54ab4-1c1b-4500-bcd8-21ff5a5bcddc",
+        "id": "A1--Cu--fcc--vacancy-vacancy",
+        "system-family": "A1--Cu--fcc",
+        "calculation-parameter": {
+            "neb_pos1": "1.0000000000000 0.0000000000000 0.0000000000000",
+            "neb_pos2": "1.0000000000000 0.5000000000000 0.5000000000000",
+            "neb_scale": "true",           
+            "point-defect": [
+                {
+                    "ptd_type": "v",
+                    "pos": "1.0000000000000 0.0000000000000 0.0000000000000",
+                    "scale": "true"
+                },
+                {
+                    "ptd_type": "v",
+                    "pos": "1.0000000000000 0.5000000000000 0.5000000000000",
+                    "scale": "true"
+                }
+            ]
+        }
+    }
+}

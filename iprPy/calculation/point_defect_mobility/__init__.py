@@ -1,5 +1,4 @@
-# Standard Python libraries
-from __future__ import division, absolute_import, print_function
+# coding: utf-8
 
 # iprPy imports
 from .PointDefectMobility import PointDefectMobility

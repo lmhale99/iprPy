@@ -1,0 +1,57 @@
+# Input script for iprPy calculation point_defect_mobility
+
+# Calculation Metadata
+branch                          
+
+# LAMMPS and MPI Commands
+lammps_command                  /home/lmh1/LAMMPS/2022-06-23/src/lmp_mpi
+mpi_command                     mpiexec -n 11
+
+# Interatomic Potential
+potential_file                  ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1.json
+potential_kim_id                
+potential_kim_potid             
+potential_dir                   ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1
+
+# Initial System Configuration
+load_file                       ../0-files/A1--Cu--fcc.json
+load_style                      system_model
+load_options                    
+family                          
+symbols                         Ni
+box_parameters                  3.5199994375404287 3.5199994375404287 3.5199994375404287            
+
+# System Manipulations
+a_uvw                           
+b_uvw                           
+c_uvw                           
+atomshift                       
+sizemults                       10 10 10
+
+# LAMMPS NEB
+numreplicas                     11
+springconst                     5
+energytolerance                 0.0
+forcetolerance                  1e-6
+minsteps                        
+climbsteps                      
+timestep                        
+maxatommotion                   
+
+# Point Defect NEB
+pointdefectneb_file             ../0-files/A1--Cu--fcc--vacancy-vacancy.json
+pointdefect_type                
+pointdefect_atype               
+pointdefect_pos                 
+pointdefect_dumbbell_vect       
+pointdefect_scale               
+neb_pos1                        
+neb_pos2                        
+neb_scale                       
+neb_symbol                      Ni
+
+# Input/Output Units
+length_unit                     
+pressure_unit                   
+energy_unit                     
+force_unit                      
