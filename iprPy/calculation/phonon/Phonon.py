@@ -173,7 +173,7 @@ class Phonon(Calculation):
 
     @sizemults.setter
     def sizemults(self, val: Union[list, tuple]):
-        if len(value) == 3:
+        if len(val) == 3:
             self.a_mult = val[0]
             self.b_mult = val[1]
             self.c_mult = val[2]
