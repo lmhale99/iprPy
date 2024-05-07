@@ -357,11 +357,10 @@ def neb(lammps_command: str,
     # Add the partition option to the LAMMPS command
     if partition is None:
         partition = f'{numreplicas}x1'
-    lammps_command_p = f'{lammps_command} -p {partition}' 
 
     # Run the calc_neb
-    output = lmp.run(lammps_command_p, script_name=lammps_script,
-                     mpi_command=mpi_command, screen=False)
+    output = lmp.run(lammps_command, script_name=lammps_script,
+                     partition=partition, mpi_command=mpi_command, screen=False)
     neblog = lmp.NEBLog()
 
     return neblog
