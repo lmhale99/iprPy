@@ -1,7 +1,7 @@
 # coding: utf-8
 
 # Python script created by Lucas Hale
-from datetime import date
+import datetime
 from typing import Optional
 import random
 
@@ -22,7 +22,6 @@ def elastic_constants_dynamic(lammps_command: str,
                               potential: lmp.Potential,
                               temperature: float,
                               mpi_command: Optional[str] = None,
-                              ucell: Optional[am.System] = None,
                               normalized_as: str = 'triclinic',
                               strainrange: float = 1e-6,
                               equilsteps: int = 20000,
@@ -83,8 +82,8 @@ def elastic_constants_dynamic(lammps_command: str,
           component of the Cij calculation.
         - **'Cij_kin'** (*numpy.ndarray*) - The 6x6 tensor of the kinetic
           component of the Cij calculation.
-        - **'C'** (*atomman.ElasticConstants*) - The computed elastic constants
-          obtained from averaging the negative and positive strain values.
+        - **'C'** (*atomman.ElasticConstants*) - The total elastic constants
+          normalized by the crystal symmetry specified.
     """
     # Convert hexagonal cells to orthorhombic to avoid LAMMPS tilt issues
     #if am.tools.ishexagonal(system.box):
@@ -101,7 +100,7 @@ def elastic_constants_dynamic(lammps_command: str,
     lammps_date = lmp.checkversion(lammps_command)['date']
 
     # Check for compatibility
-    if lammps_date < date(2022, 5, 4):
+    if lammps_date < datetime.date(2022, 5, 4):
         raise ValueError('LAMMPS from May 4, 2022 or newer required for the born/matrix calculation')
     
     # Define lammps variables

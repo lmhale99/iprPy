@@ -202,7 +202,7 @@ class ElasticConstantsDynamic(Calculation):
         return self.__normalized_as
 
     @normalized_as.setter
-    def normalized_as(self, val: int):
+    def normalized_as(self, val: str):
         allowed = ['isotropic', 'cubic', 'hexagonal', 'tetragonal',
                    'rhombohedral', 'orthorhombic', 'monoclinic', 'triclinic']
         val = str(val).lower()
@@ -264,7 +264,7 @@ class ElasticConstantsDynamic(Calculation):
             approximations for the exact virial stress.  Picking a good value may
             be dependent on the crystal structure and it is recommended to try
             multiple different values.  Default value is 1e-6.
-        nomrmalized_as : str, optional
+        normalized_as : str, optional
             Crystal family to use to normalize elastic constants.
         equilsteps : int, optional
             Number of integration steps to perform prior to performing the
@@ -291,8 +291,8 @@ class ElasticConstantsDynamic(Calculation):
             self.temperature = kwargs['temperature']
         if 'strainrange' in kwargs:
             self.strainrange = kwargs['strainrange']
-        if 'nomrmalized_as' in kwargs:
-            self.nomrmalized_as = kwargs['nomrmalized_as']
+        if 'normalized_as' in kwargs:
+            self.normalized_as = kwargs['normalized_as']
         if 'equilsteps' in kwargs:
             self.equilsteps = kwargs['equilsteps']
         if 'runsteps' in kwargs:
@@ -431,7 +431,7 @@ class ElasticConstantsDynamic(Calculation):
                 "approximations for the exact virial stress.  Picking a good value may",
                 "be dependent on the crystal structure and it is recommended to try",
                 "multiple different values.  Default value is 1e-6."]),
-            'nomrmalized_as': ' '.join([
+            'normalized_as': ' '.join([
                 "Crystal family to use to normalize elastic constants.  If not given",
                 "will try to identify the crystal family of the unit cell."]),
             'equilsteps': ' '.join([
@@ -480,7 +480,7 @@ class ElasticConstantsDynamic(Calculation):
                 self.potential.keyset +
                 self.system.keyset +
                 [
-                    'nomrmalized_as'
+                    'normalized_as'
                 ]
             ] +
 
