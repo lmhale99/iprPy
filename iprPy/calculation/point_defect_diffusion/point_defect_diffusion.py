@@ -133,7 +133,7 @@ def pointdiffusion(lammps_command: str,
     
     # Define lammps variables
     lammps_variables = {}
-    system_info = system.dump('atom_data', f='perfect.dat',
+    system_info = system.dump('atom_data', f='initial.dat',
                               potential=potential)
     lammps_variables['atomman_system_pair_info'] = system_info
     lammps_variables['temperature'] = temperature
@@ -233,6 +233,10 @@ def pointdiffusion(lammps_command: str,
     mz = np.polyfit(times, system.natoms * msd_z, 1)[0]
     m = np.polyfit(times, system.natoms * msd, 1)[0]
     
+    results['msd_x_values'] = msd_x
+    results['msd_y_values'] = msd_y
+    results['msd_z_values'] = msd_z
+    results['msd_values'] = msd
     results['dx'] = mx / 2
     results['dy'] = my / 2
     results['dz'] = mz / 2
