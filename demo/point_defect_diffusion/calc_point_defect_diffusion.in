@@ -1,11 +1,11 @@
-# Input script for iprPy calculation E_vs_r_scan
+# Input script for iprPy calculation point_defect_diffusion
 
 # Calculation Metadata
 branch                          
 
 # LAMMPS and MPI Commands
 lammps_command                  /home/lmh1/LAMMPS/2022-06-23/src/lmp_mpi
-mpi_command                     
+mpi_command                     mpiexec -n 8
 
 # Interatomic Potential
 potential_file                  ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1.json
@@ -19,14 +19,22 @@ load_style                      system_model
 load_options                    
 family                          
 symbols                         Ni
-box_parameters                  
+box_parameters                  3.61 3.61 3.61
 
 # System Manipulations
 a_uvw                           
 b_uvw                           
 c_uvw                           
 atomshift                       
-sizemults                       5 5 5
+sizemults                       10 10 10
+
+# Point Defect
+pointdefect_file                ../0-files/A1--Cu--fcc--vacancy.json
+pointdefect_type                
+pointdefect_atype               
+pointdefect_pos                 
+pointdefect_dumbbell_vect       
+pointdefect_scale               
 
 # Input/Output Units
 length_unit                     
@@ -35,6 +43,9 @@ energy_unit
 force_unit                      
 
 # Run Parameters
-minimum_r                       
-maximum_r                       
-number_of_steps_r               
+temperature                     1900
+thermosteps                     
+dumpsteps                       
+runsteps                        
+equilsteps                      
+randomseed                      

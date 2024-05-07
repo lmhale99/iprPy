@@ -88,10 +88,10 @@ This is a list of the implemented calculations and the status of the associated 
 
 ## elastic_constants_dynamic
 
-- script: Unfinished, maybe multiple methods?
-- workflow: Not implemented
-- docs: Missing
-- Notebook: Missing
+- script: Current
+- workflow: Not implemented - needs relaxations at T
+- docs: Current
+- Notebook: Current
 
 ## elastic_constants_static
 
@@ -151,10 +151,17 @@ This is a list of the implemented calculations and the status of the associated 
 
 ## point_defect_diffusion
 
-- script: Needs updating
+- script: Current
 - workflow: Not implemented (needs temperature relaxations)
-- docs: Needs updating
-- Notebook: Needs updating
+- docs: Current
+- Notebook: Current
+
+## point_defect_mobility
+
+- script: Current
+- workflow: Current
+- docs: Current
+- Notebook: Current
 
 ## point_defect_static
 

@@ -4,7 +4,7 @@
 branch                          
 
 # Initial System Configuration
-load_file                       ..\0-files\A1--Cu--fcc.json
+load_file                       ../0-files/A1--Cu--fcc.json
 load_style                      system_model
 load_options                    
 family                          
