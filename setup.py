@@ -47,7 +47,9 @@ setup(name = 'iprPy',
         'requests',
         'bokeh',
         'plotly',
-        'kaleido'
+        'kaleido',
+        'phonopy',
+        'spglib',
       ],
       entry_points = {
         'console_scripts': [
