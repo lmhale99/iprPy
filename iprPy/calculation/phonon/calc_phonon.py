@@ -14,10 +14,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # https://atztogo.github.io/phonopy/phonopy-module.html
-import phonopy
-
-# https://atztogo.github.io/spglib/python-spglib.html
-import spglib
+try:
+    import phonopy
+except ImportError:
+    raise ImportError("The package, phonopy, is not installed by default. Please install with pip or conda.")
 
 # https://github.com/usnistgov/atomman
 import atomman as am
