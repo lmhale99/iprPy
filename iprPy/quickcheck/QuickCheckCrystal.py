@@ -64,7 +64,8 @@ class QuickCheckCrystal():
             elastic_constants_static: Union[dict, bool] = False,
             phonon: Union[dict, bool] = False,
             point_defect_static: Union[dict, bool] = False,
-            surface_energy_static: Union[dict, bool] = False):
+            surface_energy_static: Union[dict, bool] = False,
+            **kwargs):
         """
         Run the calculations in the workflow.
 
@@ -292,15 +293,24 @@ class QuickCheckCrystal():
             r = {}
 
             for name, point_defect in point_defects.items():
+
                 
-                # Extract point_defect kwargs from a record
+                # Load point_defect file
+                if isinstance(point_defect, dict) and 'file' in point_defect:
+                    if len(point_defect) > 1:
+                        raise ValueError('point defect file cannot be given with anything else!')
+                    point_defect = am.library.load_record('point_defect', point_defect['file'])
+
+                # Extract point_kwargs from a PointDefect record
                 if isinstance(point_defect, am.library.record.PointDefect.PointDefect):
                     point_kwargs = []
                     for params in point_defect.parameters:
                         point_kwargs.append(PointDefectParams(**params).calc_inputs(ucell))
+                
+                # Assume inputs are the point_kwargs
                 else:
                     point_kwargs = point_defect
-                  
+
                 cutoff = 1.05 * ucell.box.a
                 system = ucell.supersize(sizemult, sizemult, sizemult)
 
@@ -330,10 +340,18 @@ class QuickCheckCrystal():
 
             for name, surface in surfaces.items():
                 
+                # Load free_surface file
+                if isinstance(surface, dict) and 'file' in surface:
+                    if len(surface) > 1:
+                        raise ValueError('free_surface file cannot be given with anything else!')
+                    surface = am.library.load_record('free_surface', surface['file'])
+
                 # Extract surface definition parameters
                 if isinstance(surface, am.library.record.FreeSurface.FreeSurface):
                     hkl = np.array(surface.parameters['hkl'].strip().split(), dtype=float)
                     shiftindex = int(surface.parameters.get('shiftindex', 0))
+                
+                # Directly get surface parameters from the inputs
                 else:
                     hkl = surface['hkl']
                     shiftindex = surface.get('shiftindex', 0)
