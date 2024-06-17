@@ -11,24 +11,25 @@ from atomman.tools import filltemplate
 
 import numpy as np 
 
+from ...tools import read_calc_file
+
 # Note - the system fed in needs to be relaxed to a liquid phase 
 # otherwise the calculation doesn't make much sense and it needs to run for 
 # significantly longer 
 
-def calculate_diffusion_vacf(lammps_command:str,
+def diffusion_vacf(lammps_command:str,
               potential: lmp.Potential,
               system: am.System,
               mpi_command: Optional[str] = None,
+              randomseed: int = None,
               temperature: float = 300,
               timestep: float = .5,
-              run_steps: int = 10000,
-              Equilibration_Thermo_steps: int = 100,
-              Equilibration_Run_steps: int = 1000,
-              Simulation_runs: int = 5,
-              Degrees_freedom: int = 3,
-              eq_Thermo_steps: int = 0,
-              eq_Run_steps: int = 0,
-              eq_Equibilibrium: bool = False,
+              runsteps: int = 10000,
+              simruns: int = 5,
+              degrees_freedom: int = 3,
+              eq_thermosteps: int = 0,
+              eq_runsteps: int = 0,
+              eq_equilibrium: bool = False,
               ) -> dict:
     
     #Get the Units from Potential
@@ -44,27 +45,29 @@ def calculate_diffusion_vacf(lammps_command:str,
     #Initialize the rest of the inputs to the Lammps Scripts 
     lammps_variables['Temperature'] = temperature
     lammps_variables['Time_Step'] = timestep
-    lammps_variables['Run_length'] = run_steps
-    lammps_variables['Equilibration_thermo'] = Equilibration_Thermo_steps
-    lammps_variables['Equilibration_steps'] = Equilibration_Run_steps
-    lammps_variables['num_simulations'] = Simulation_runs
-    lammps_variables['Degrees_freedom'] = Degrees_freedom
+    lammps_variables['Run_length'] = runsteps
+    lammps_variables['Equilibration_thermo'] = eq_thermosteps
+    lammps_variables['Equilibration_steps'] = eq_runsteps
+    lammps_variables['num_simulations'] = simruns
+    lammps_variables['Degrees_freedom'] = degrees_freedom
     #Fill in the template 
 
     #Setting up equilbrium
-    if eq_Equibilibrium:
-        instruct = f"""fix NVE all nve \n fix LANGEVIN all langevin $T $T {10*timestep} 498094 \n
-                        thermo {eq_Thermo_steps} \n run {eq_Run_steps} \n unfix NVE \n unfix LANGEVIN \n
+    if eq_equilibrium:
+        instruct = f"""fix NVE all nve \n fix LANGEVIN all langevin $T $T {10*timestep} {randomseed} \n
+                        thermo {eq_thermosteps} \n run {eq_runsteps} \n unfix NVE \n unfix LANGEVIN \n
                         reset_timestep 0"""
         lammps_variables['Equilibration_instructions'] = instruct
-    elif not eq_Equibilibrium or eq_Run_steps == 0:
+    elif not eq_equilibrium or eq_runsteps == 0:
         lammps_variables['Equilibration_instructions'] = ""
 
 
     lammps_script = 'in.diffusion.in'
-    with open("in.diffusion_vacf.template",'r') as template_f:
-        with open(lammps_script,'w') as f:
-            f.write(filltemplate(template_f,lammps_variables,'<','>'))
+    template = read_calc_file('iprPy.calculation.diffusion_vacf',
+                              'in.diffusion_vacf.template')
+    #with open("in.diffusion_msd.template",'r') as template_f:
+    with open(lammps_script,'w') as f:
+        f.write(filltemplate(template,lammps_variables,'<','>'))
     
     #Run lamps
     output = lmp.run(lammps_command,script_name=lammps_script,
@@ -73,27 +76,51 @@ def calculate_diffusion_vacf(lammps_command:str,
     results = {}
 
     indexOffset = 0
-    if eq_Equibilibrium: 
+    if eq_equilibrium: 
         indexOffset += 1
 
     log = lmp.Log('diffusion_vacf.log.lammps')
-    D = np.ndarray((Simulation_runs,run_steps+1))
-    T = np.ndarray((Simulation_runs,run_steps+1))
-    for i in range(indexOffset,Simulation_runs+indexOffset):
-        D[i-indexOffset] = log.simulations[i].thermo['v_vacf']
+    D = np.ndarray((simruns,runsteps+1))
+    T = np.ndarray((simruns,runsteps+1))
+    v1 = np.ndarray((simruns,runsteps+1))
+    v2 = np.ndarray((simruns,runsteps+1))
+    v3 = np.ndarray((simruns,runsteps+1))
+    v = np.ndarray((simruns,runsteps+1))
+    for i in range(indexOffset,simruns+indexOffset):
+        D[i-indexOffset] = log.simulations[i].thermo['v_eta'] #This is the integrated value - dumb name
         T[i-indexOffset] = log.simulations[i].thermo['Temp']
+        v1[i-indexOffset] = log.simulations[i].thermo['c_vacf[1]']
+        v2[i-indexOffset] = log.simulations[i].thermo['c_vacf[2]']
+        v3[i-indexOffset] = log.simulations[i].thermo['c_vacf[3]']
+        v[i-indexOffset] = log.simulations[i].thermo['c_vacf[4]']
+
     runningDiffusion = np.average(D,axis=1)
     runningTemperature = np.average(D,axis=1)
+    runningv1 = np.average(v1,axis=1)
+    runningv2 = np.average(v2,axis=1)
+    runningv3 = np.average(v3,axis=1)
+    runningv = np.average(v,axis=1)
 
     Diffusion_coeff = np.average(runningDiffusion)
+    Diffusion_coeff_err = np.std(runningDiffusion)
     AveTemp = np.average(runningTemperature)
+    AveTemp_err = np.std(runningTemperature)
     
     #unit conversions 
-    unitString1 = f"({lamps_units['length']}^2)/({lamps_units['time']})"
-    Diff_coeff = uc.set_in_units(Diffusion_coeff,unitString1)
-    results['diffusion'] = Diff_coeff
-    results['temperature'] = AveTemp
-    print(uc.get_in_units(Diff_coeff,'cm^2/s'))
+    # unitString1 = f"({lamps_units['length']}^2)/({lamps_units['time']})"
+
+
+
+
+    results['vacf_x_values'] = runningv1
+    results['vacf_y_values'] = runningv2
+    results['vacf_z_values'] = runningv3
+    results['vacf_values'] = runningv
+    results['diffusion'] = Diffusion_coeff
+    results['diffusion_stderr'] = Diffusion_coeff_err
+    results['measured_temperature'] = AveTemp
+    results['measured_temperature_stderr'] = AveTemp_err
+    results['lammps_output'] = output 
     return results
     
 
