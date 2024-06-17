@@ -15,21 +15,21 @@ from ...tools import read_calc_file
 # otherwise the calculation doesn't make much sense and it needs to run for 
 # significantly longer 
 
-def diffusion_msd(lammps_command:str, #
-              potential: lmp.Potential,         #
-              system: am.System,                #
+def diffusion_msd(lammps_command:str, 
+              potential: lmp.Potential,         
+              system: am.System,                
               randomseed: int = 490329,
               mpi_command: Optional[str] = None,
-              temperature: float = 200,         #
-              timestep: float = .5,             #
-              dumpsteps: int = 1000,           #
-              runsteps: int = 100000,          #
-              thermosteps: int = 1000,          #
-              dataoffset: int = 500,             #
-              degrees_freedom: int = 3,         #
-              eq_thermosteps: int = 0,         #
-              eq_runsteps: int = 0,            #
-              eq_equilibrium: bool = False,   #
+              temperature: float = 200,         
+              timestep: float = .5,             
+              dumpsteps: int = 1000,           
+              runsteps: int = 100000,         
+              thermosteps: int = 1000,        
+              dataoffset: int = 500,          
+              degrees_freedom: int = 3,       
+              eq_thermosteps: int = 0,        
+              eq_runsteps: int = 0,           
+              eq_equilibrium: bool = False,   
               ) -> dict:
     
     #Get the Units from Potential
@@ -90,28 +90,27 @@ def diffusion_msd(lammps_command:str, #
 
 
     Diffusion_coeff = np.average(runningDiffusion[dataoffset:])
-    # print(len(runningDiffusion))
+
     AveTemp = np.average(runningTemperature[dataoffset:])
     AveMSD = np.average(runningMSD[dataoffset:])
     #unit conversions 
     unitString1 = f"({lamps_units['length']}^2)/({lamps_units['time']})"
-    # print(unitString1)
+
     unitString2 = f"({lamps_units['length']}^2)"
     D = uc.set_in_units(Diffusion_coeff,unitString1)
     
     MSD = uc.set_in_units(AveMSD,unitString2)
 
-    results['msd_x_values'] = runningMSD_x #
-    results['msd_y_values'] = runningMSD_y #
-    results['msd_z_values'] = runningMSD_z #
-    results['msd_values'] = MSD # 
+    results['msd_x_values'] = runningMSD_x 
+    results['msd_y_values'] = runningMSD_y 
+    results['msd_z_values'] = runningMSD_z 
+    results['msd_values'] = MSD 
     results['measured_temperature'] = AveTemp
     results['measured_temperature_stderror'] = np.std(runningTemperature[dataoffset:])
     results['diffusion'] = D
     results['diffusion_stderror'] = np.std(runningDiffusion[dataoffset:])
     results['lammps_output'] = output 
 
-    # print(uc.get_in_units(D,'cm^2/s'))
     return results
     
 

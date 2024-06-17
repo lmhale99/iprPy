@@ -19,12 +19,12 @@ from DataModelDict import DataModelDict as DM
 
 # iprPy imports
 from .. import Calculation
-from .diffusion_msd import diffusion_msd
+from .viscosity_driving import viscosity_driving
 from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
                                    AtommanSystemLoad, AtommanSystemManipulate)
 from ...input import value
 
-class DiffusionMSD(Calculation):
+class viscosityDRIVING(Calculation):
     """Class for managing dynamic relaxations"""
 
 ############################# Core properties #################################
@@ -63,39 +63,33 @@ class DiffusionMSD(Calculation):
         self.__commands = LammpsCommands(self)
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
-        self.__system_mods = AtommanSystemManipulate(self)
+        # self.__system_mods = AtommanSystemManipulate(self)
         subsets = (self.commands, self.potential, self.system, self.units)
 
         # Initialize unique calculation attributes
 
-        self.degrees_freedom = 3
         self.temperature = 300
-        
+        self.randomseed = 84951
+
+        self.timestep = .01
         self.runsteps = 50000
-        self.dumpsteps = None
         self.thermosteps = 2000
         self.dataoffset = 10
-        self.randomseed = 84951
-        
-        self.eq_equilibrium = False
+        self.drivingforce = .1
+
         self.eq_thermosteps = None
         self.eq_runsteps = None
+        self.eq_equilibrium = False
+
 
         self.__measured_temperature = None
         self.__measured_temperature_stderr = None
- 
-        self.__diffusion_value = None
-        self.__diffusion_value_stderr = None
-
-        self.__msd_x_values = None
-        self.__msd_y_values = None
-        self.__msd_z_values = None
-        self.__msd_values = None
-        
+        self.__viscosity_value = None
+        self.__viscosity_value_stderr = None
         self.__lammps_output = None
 
         # Define calc shortcut
-        self.calc = diffusion_msd
+        self.calc = viscosity_driving
 
         # Call parent constructor
         super().__init__(model=model, name=name, database=database, params=params,
@@ -105,8 +99,8 @@ class DiffusionMSD(Calculation):
     def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
-            'diffusion_msd.py',
-            'in.diffusion_msd.template'
+            'viscosity_driving.py',
+            'in.viscosity_driving.template'
         ]
 
 ############################## Class attributes ################################
@@ -161,24 +155,6 @@ class DiffusionMSD(Calculation):
             assert val >= 0.0
             self.__temperature = val
 
-
-    @property
-    def dumpsteps(self) -> int:
-        """int: How often to dump configuration during the final run."""
-        if self.__dumpsteps is None:
-            return 2000
-        else:
-            return self.__dumpsteps
-
-    @dumpsteps.setter
-    def dumpsteps(self, val: Optional[int]):
-        if val is None:
-            self.__dumpsteps = None
-        else:
-            val = int(val)
-            assert val >= 0
-            self.__dumpsteps = val
-
     @property
     def runsteps(self) -> int:
         """int: Number of MD steps during the nve analysis stage"""
@@ -229,21 +205,6 @@ class DiffusionMSD(Calculation):
         self.__randomseed = val
 
     @property
-    def degrees_freedom(self) -> int:
-        """int: Degrees of freedom for molecules, i.e water -> 9"""
-        return self.__degrees_freedom
-    
-    @degrees_freedom.setter
-    def degrees_freedom(self, val: Optional[int]):
-        if val is None:
-            self.__degrees_freedom = None
-        else:
-            val = int(val)
-            assert val >= 3
-            self.__degrees_freedom = val
-
-
-    @property
     def eq_thermosteps(self) -> int:
         """int: Number of MD steps during the energy equilibration stage"""
         return self.__eq_thermosteps
@@ -274,38 +235,22 @@ class DiffusionMSD(Calculation):
     def eq_equilbirium(self, val:bool):
         self.__eq_equilibrium = val
 
+    @property
+    def drivingforce(self) -> float:
+        """The driving force for viscosity calculation"""
+        return self.__drivingforce 
+    
+    @drivingforce.setter
+    def drivingforce(self, val: float):
+        if val is None:
+            self.__drivingforce = .1
+        else:
+            self.__drivingforce = val
+
 
 ###################################################################################################################
     ################# Calculated results #########################
 
-
-    @property
-    def msd_x_values(self) -> np.ndarray:
-        """numpy.array: Mean squared displacements along the x direction"""
-        if self.__msd_x_values is None:
-            raise ValueError('No results yet!')
-        return self.__msd_x_values
-
-    @property
-    def msd_y_values(self) -> np.ndarray:
-        """numpy.array: Mean squared displacements along the y direction"""
-        if self.__msd_y_values is None:
-            raise ValueError('No results yet!')
-        return self.__msd_y_values
-
-    @property
-    def msd_z_values(self) -> np.ndarray:
-        """numpy.array: Mean squared displacements along the z direction"""
-        if self.__msd_z_values is None:
-            raise ValueError('No results yet!')
-        return self.__msd_z_values
-
-    @property
-    def msd_values(self) -> np.ndarray:
-        """numpy.array: Total mean squared displacements"""
-        if self.__msd_values is None:
-            raise ValueError('No results yet!')
-        return self.__msd_values
 
     @property
     def lammps_output(self) -> am.lammps.Log:
@@ -329,19 +274,19 @@ class DiffusionMSD(Calculation):
         return self.__measured_temperature_stderr
     
     @property
-    def diffusion_value(self) -> float:
-        """Calculated diffusion coeffecient averaged over the run 
+    def viscosity_value(self) -> float:
+        """Calculated viscosity coeffecient averaged over the run 
             starting at the data offset value"""
-        if self.__diffusion_value is None:
+        if self.__viscosity_value is None:
             raise ValueError("No results! Does not get loaded from records")
-        return self.__diffusion_value
+        return self.__viscosity_value
     
     @property
-    def diffusion_value_stderror(self) -> float:
-        """Error in the diffusion measurements"""
-        if self.__diffusion_value_stderr is None:
+    def viscosity_value_stderror(self) -> float:
+        """Error in the viscosity measurements"""
+        if self.__viscosity_value_stderr is None:
             raise ValueError("No results! Does not get loaded from records")
-        return self.__diffusion_value_stderr
+        return self.__viscosity_value_stderr
     
     def set_values(self,
                    name: Optional[str] = None,
@@ -359,10 +304,7 @@ class DiffusionMSD(Calculation):
             The target temperature to perform calculation on
         runsteps : int or None, optional
             The number of nve integration steps to perform on the system to
-            obtain measurements of diffusion
-        dumpsteps : int or None, optional
-            Dump files will be saved every this many steps during the runsteps
-            simulation.
+            obtain measurements of viscosity
         timestep: float or None
             the difference in time between each step of the calculation
         thermosteps: int or None
@@ -398,8 +340,6 @@ class DiffusionMSD(Calculation):
             self.temperature = kwargs['temperature']
         if 'timestep' in kwargs:
             self.timestep = kwargs['timestep']
-        if 'dumpsteps' in kwargs:
-            self.dumpsteps = kwargs['dumpsteps']
         if 'runsteps' in kwargs:
             self.runsteps = kwargs['runsteps']
         if 'thermosteps' in kwargs:
@@ -414,6 +354,8 @@ class DiffusionMSD(Calculation):
             self.eq_runsteps = kwargs['eq_runsteps']
         if 'eq_equilbirium' in kwargs:
             self.eq_equilibrium = kwargs['eq_equilibrium']
+        if 'drivingforce' in kwargs:
+            self.drivingforce = kwargs['drivingforce']
 
 ####################### Parameter file interactions ###########################
 
@@ -449,16 +391,16 @@ class DiffusionMSD(Calculation):
 
         # Load calculation-specific its
         self.runsteps = int(input_dict.get('runsteps', 50000))
-        self.dumpsteps = int(input_dict.get('dumpsteps', 2000))
         self.randomseed = int(input_dict.get('randomseed', 89415))
-        self.degrees_freedom = int(input_dict.get('degrees_freedom',3))
         self.sample_interval = int(input_dict.get('sample_interval',5))
         self.thermosteps = int(input_dict.get('thermosteps',100))
         self.eq_thermosteps = int(input_dict.get('eq_termosteps',0))
         self.eq_runsteps = int(input_dict.get('eq_runsteps',0))
+        self.dataoffset = int(input_dict.get('dataoffset',5))
 
 
         # Load calculation-specific unitless floats
+        self.drivingforce = float(input_dict.get('drivingforce',.1))
         self.temperature = float(input_dict.get('temperature',300))
         self.timestep = float(input_dict.get('timestep',.01))
 
@@ -514,7 +456,7 @@ class DiffusionMSD(Calculation):
             # Set default workflow settings
             params['buildcombos'] =  'atomicarchive load_file archive'
 
-            params['archive_record'] = 'calculation_diffusion_msd'
+            params['archive_record'] = 'calculation_viscosity_msd'
             params['archive_load_key'] = 'final-system'
             params['archive_status'] = 'finished'
             params['archive_temperature'] = kwargs['temperature']
@@ -543,22 +485,19 @@ class DiffusionMSD(Calculation):
         return {
             'temperature': ' '.join(["Target temperature for the simulation - Default value of 300 K"]),
             'timestep': ' '.join(["How much to increase the time at each step - Default value of .001"]),
-            'dumpsteps': ' '.join(["How often to write to the dump file for this calculation - Default value of 1000"]),
             'runsteps':' '.join(["How many time steps to run simulation - Default value is 100000"]),
             'thermosteps':' '.join(["How often to write calculated value to log file/ouput - Default value is 1000"]),
             'dataoffset':' '.join(["Specifies how much of the initial data to ignore",
                                   "For these calculations it takes a while for the system",
                                   "orient so the initial calculated data is not reasonable",
                                   "- Default value is 500"]),
-            'Degrees_freedom':' '.join(["The degrees of freedom for the molecule or atom",
-                                        "being simulated. Default for point particles is 3 but for example",
-                                        "waters would be 9. - Default value of 3"]),
             'eq_thermosteps':' '.join(["How often to write calculated value to log file/ouput for",
                                          "equilibriation run- Default value is 1000"]),
             'eq_runsteps':' '.join(["How many time steps to run simulation for equilibration",
                                      "run - Default value is 0"]),
             'eq_equilibrium':' '.join(["Specifies whether or not to do an equilibration default is false",
-                                       "Set to yet if the input is not a relaxed liquid already"])
+                                       "Set to yet if the input is not a relaxed liquid already"]),
+            'drivingforce':' '.join(["The force needed for the calculation method - this method perturbs the system"])
         }
 
     @property
@@ -601,15 +540,14 @@ class DiffusionMSD(Calculation):
                 [
                     'temperature',
                     'timestep',
-                    'dumpsteps',
+                    'drivingforce',
                     'runsteps',
                     'thermosteps',
                     'dataoffset',
-                    'Degrees_freedom',
                     'eq_thermosteps',
                     'eq_runsteps',
                     'eq_equilibrium',
-                    'randomseed'
+                    'dataoffset'
                 ]
             ]
         )
@@ -623,7 +561,7 @@ class DiffusionMSD(Calculation):
     @property
     def modelroot(self) -> str:
         """str: The root element of the content"""
-        return 'calculation_diffusion_msd'
+        return 'calculation_viscosity_driving'
 
     def build_model(self) -> DM:
         """
@@ -649,11 +587,10 @@ class DiffusionMSD(Calculation):
         run_params['temperature'] = self.temperature
         run_params['timestep'] = self.timestep
         run_params['runsteps'] = self.runsteps
-        run_params['dumpsteps'] = self.dumpsteps
         run_params['randomseed'] = self.randomseed
         run_params['thermosteps'] = self.thermosteps
         run_params['dataoffset'] = self.dataoffset
-        run_params['degrees_freedom'] = self.degrees_freedom
+        run_params['drivingforce'] = self.drivingforce
         run_params['eq_thermosteps'] = self.eq_thermosteps
         run_params['eq_runsteps'] = self.eq_runsteps
         run_params['eq_equilibrium'] = self.eq_equilibrium
@@ -661,14 +598,10 @@ class DiffusionMSD(Calculation):
         # Build results
         if self.status == 'finished':
 
-            calc['msd_x'] = self.msd_x_values.tolist()
-            calc['msd_y'] = self.msd_y_values.tolist()
-            calc['msd_z'] = self.msd_z_values.tolist()
-            calc['msd'] = self.msd_values.tolist()
             calc['measured_temperature'] = self.measured_temperature
             calc['measured_temperature_stderr'] = self.measured_temperature_stderr
-            calc['diffusion'] = self.diffusion_value
-            calc['diffusion_stderr'] = self.diffusion_value_stderror
+            calc['viscosity'] = self.viscosity_value
+            calc['viscosity_stderr'] = self.viscosity_value_stderror
 
         self._set_model(model)
         return model
@@ -695,26 +628,20 @@ class DiffusionMSD(Calculation):
         run_params = calc['calculation']['run-parameter']
         self.runsteps = run_params['runsteps']
         self.timestep = run_params['timestep']
-        self.dumpsteps = run_params['dumpsteps']
         self.randomseed = run_params['randomseed']
         self.temperature = run_params['temperature']
 
         self.thermosteps = run_params['thermosteps']
         self.dataoffset = run_params['dataoffset']
-        self.degrees_freedom = run_params['degrees_freedom']
         self.eq_thermosteps = run_params['eq_thermosteps']
         self.eq_runsteps = run_params['eq_runsteps']
         self.eq_equilibrium = run_params['eq_equilibrium']
+        self.drivingforce = run_params['drivingforce']
 
         # Load results
         if self.status == 'finished':
-
-            self.__msd_x_values = calc['msd_x']
-            self.__msd_y_values = calc['msd_y']
-            self.__msd_z_values = calc['msd_z']
-            self.__msd_values = calc['msd'] 
-            self.__diffusion_value = calc['diffusion']
-            self.__diffusion_value_stderr = calc['diffusion_stderr']
+            self.__viscosity_value = calc['viscosity']
+            self.__viscosity_value_stderr = calc['viscosity_stderr']
             self.__measured_temperature = calc['measured_temperature']
             self.__measured_temperature_stderr = calc['measured_temperature_stderr']
 
@@ -727,11 +654,11 @@ class DiffusionMSD(Calculation):
                 name='temperature',
                 path=f'{self.modelroot}.temperature.value',
                 description='search by temperature in Kelvin'),
-            'diffusion': load_query(
+            'viscosity': load_query(
                 style='float_match',
-                name='diffusion',
-                path=f'{self.modelroot}.diffusion.value',
-                description='search by diffusion in Units of Pressure Time ')
+                name='viscosity',
+                path=f'{self.modelroot}.viscosity.value',
+                description='search by viscosity in Pressure Time units')
         })
         return queries
 
@@ -754,13 +681,8 @@ class DiffusionMSD(Calculation):
 
             meta['measured_temperature'] = self.measured_temperature
             meta['measured_temperature_stderr'] = self.measured_temperature_stderr
-            meta['measured_diffusion'] = self.diffusion_value
-            meta['measured_diffusion_stderr'] = self.diffusion_value_stderror
-
-            meta['msd_x_values'] = self.msd_x_values
-            meta['msd_y_values'] = self.msd_y_values
-            meta['msd_z_values'] = self.msd_z_values
-            meta['msd_values'] = self.msd_values
+            meta['measured_viscosity'] = self.viscosity_value
+            meta['measured_viscosity_stderr'] = self.viscosity_value_stderror
 
         return meta
 
@@ -803,13 +725,12 @@ class DiffusionMSD(Calculation):
 
         # Add calculation-specific inputs
         input_dict['runsteps'] = self.runsteps
-        input_dict['dumpsteps'] = self.dumpsteps
         input_dict['randomseed'] = self.randomseed
         input_dict['temperature'] = self.temperature
         input_dict['timestep'] = self.timestep
         input_dict['thermosteps'] = self.thermosteps
         input_dict['dataoffset'] = self.dataoffset
-        input_dict['degrees_freedom'] = self.degrees_freedom
+        input_dict['drivingforce'] = self.drivingforce
         input_dict['eq_thermosteps'] = self.eq_thermosteps
         input_dict['eq_runsteps'] = self.eq_runsteps
         input_dict['eq_equilibrium'] = self.eq_equilibrium
@@ -828,12 +749,7 @@ class DiffusionMSD(Calculation):
             The dictionary returned by the calc() method.
         """
         self.__measured_temperature = results_dict['measured_temperature']
-        self.__measured_temperature_stderr = results_dict['measured_temperature_stderror']
-        self.__diffusion_value = results_dict["diffusion"]
-        self.__diffusion_value_stderr = results_dict["diffusion_stderror"]
-
-        self.__msd_x_values = results_dict['msd_x_values']
-        self.__msd_y_values = results_dict['msd_y_values']
-        self.__msd_z_values = results_dict['msd_z_values']
-        self.__msd_values = results_dict['msd_values']
+        self.__measured_temperature_stderr = results_dict['measured_temperature_stderr']
+        self.__viscosity_value = results_dict["viscosity"]
+        self.__viscosity_value_stderr = results_dict["viscosity_stderr"]
         self.__lammps_output = results_dict['lammps_output']

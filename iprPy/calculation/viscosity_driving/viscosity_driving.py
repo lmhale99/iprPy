@@ -9,23 +9,26 @@ from atomman.tools import filltemplate
 
 import numpy as np 
 
+from ...tools import read_calc_file
+
 # Note - the system fed in needs to be relaxed to a liquid phase 
 # otherwise the calculation doesn't make much sense and it needs to run for 
 # significantly longer 
 
-def viscosity_calc(lammps_command:str,
+def viscosity_driving(lammps_command:str,
               potential: lmp.Potential,
               system: am.System,
               mpi_command: Optional[str] = None,
               temperature: float = 200,
               timestep: float = .5,
-              correlation_length: int = 400,
-              sample_interval: int = 5,
-              dump_steps: int = 2000,
-              run_steps: int = 100000,
-              Thermo_steps: int = 100,
-              driving_force: float = .1,
-              Data_step: int = 500
+              runsteps: int = 100000,
+              thermosteps: int = 100,
+              drivingforce: float = .1,
+              dataoffset: int = 500,
+              randomseed: int = 74509,
+              eq_thermosteps: int = 0,
+              eq_runsteps: int = 0,
+              eq_equilibrium: bool = False
               ) -> dict:
     
     #Get the Units from Potential
@@ -41,43 +44,59 @@ def viscosity_calc(lammps_command:str,
     #Initialize the rest of the inputs to the Lammps Scripts 
     lammps_variables['Temperature'] = temperature
     lammps_variables['Time_Step'] = timestep
-    lammps_variables['Correlation_Length'] = correlation_length
-    lammps_variables['Sample_Interval'] = sample_interval
-    lammps_variables['Run_length'] = run_steps
-    lammps_variables['Driving_Force'] = driving_force
-    lammps_variables['Thermo_Steps'] = Thermo_steps
-    lammps_variables['Dump_Interval'] = dump_steps
+    lammps_variables['runsteps'] = runsteps
+    lammps_variables['drivingforce'] = drivingforce
+    lammps_variables['thermosteps'] = thermosteps
+    # Equilibrium steps
+    if eq_equilibrium:
+        instruct = f"""fix NVE all nve \n fix LANGEVIN all langevin $T $T {10*timestep} {randomseed} \n
+                        thermo {eq_thermosteps} \n run {eq_runsteps} \n unfix NVE \n unfix LANGEVIN \n
+                        reset_timestep 0"""
+        lammps_variables['Equilibration_instructions'] = instruct
+    elif not eq_equilibrium or eq_runsteps == 0:
+        lammps_variables['Equilibration_instructions'] = ""
+
     #Fill in the template 
     lammps_script = 'in.viscosity.in'
-    with open("in.viscosity_driving.template",'r') as template_f:
-        with open(lammps_script,'w') as f:
-            f.write(filltemplate(template_f,lammps_variables,'<','>'))
+    template = read_calc_file('iprPy.calculation.viscosity_driving',
+                              'in.viscosity_driving.template')
+    #with open("in.diffusion_msd.template",'r') as template_f:
+    with open(lammps_script,'w') as f:
+        f.write(filltemplate(template,lammps_variables,'<','>'))
+
     
     #Run lamps
     output = lmp.run(lammps_command,script_name=lammps_script,
                      mpi_command=mpi_command,screen=False,logfile="viscosity.log.lammps")
     
+    # Thermo index
+    indexOffset = 0
+    if eq_equilibrium: 
+        indexOffset += 1
+
     #From thermo data calculate the Viscosity 
     log = lmp.Log('viscosity.log.lammps')
-    runningViscosityInverse = log.simulations[0].thermo["v_reciprocalViscosity"]
-    runningTemperature = log.simulations[0].thermo["Temp"]
+    runningViscosityInverse = log.simulations[indexOffset].thermo["v_reciprocalViscosity"]
+    runningTemperature = log.simulations[indexOffset].thermo["Temp"]
     runningViscosity = np.array([1/i for i in runningViscosityInverse])
-    Viscosity = np.average(runningViscosity[Data_step:])
-    AveTemp = np.average(runningTemperature[Data_step:])
+    Viscosity = np.average(runningViscosity[dataoffset:])
+    AveTemp = np.average(runningTemperature[dataoffset:])
     #Unit Conversions
     unitString = "(" + lamps_units['length'] + "^3*"+ lamps_units['density'] + ")" + "/(" + lamps_units['velocity'] + "*" + lamps_units['time'] + "^2)"
     eta = uc.set_in_units(Viscosity,unitString)
+    eta_std = uc.set_in_units(np.std(runningViscosity[dataoffset:]),unitString)
 
     #Initialize the return dictionary
     results = {}
     # thermo = output.flatten()['thermo']
     #Data of interest
-    results['dumpfile_initial'] = '0.dump'
-    results['symbols_initial'] = system.symbols
+
     results['viscosity'] = eta
-    results['temperature'] = AveTemp
-    #Other Dump Data
-    print(eta)    
+    results['viscosity_stderr'] = eta_std
+    results['measured_temperature'] = AveTemp
+    results['measured_temperature_stderr'] = np.std(runningTemperature[dataoffset:])
+    results['lammps_output'] = output 
+    #Other Dump Data    
     return results
  
     

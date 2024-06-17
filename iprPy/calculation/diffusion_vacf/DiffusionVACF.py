@@ -71,6 +71,7 @@ class DiffusionVACF(Calculation):
         self.randomseed = 84951
 
         self.runsteps = 50000
+        self.timestep = .01 
 
 
         self.degrees_freedom = 3
@@ -193,41 +194,41 @@ class DiffusionVACF(Calculation):
     @degrees_freedom.setter
     def degrees_freedom(self, val: Optional[int]):
         if val is None:
-            self.__degrees_freedom = None
+            self.__degrees_freedom = 3
         else:
             val = int(val)
             assert val >= 3
             self.__degrees_freedom = val 
 
     @property
-    def equilthermosteps(self) -> int:
+    def eq_thermosteps(self) -> int:
         """int: Number of MD steps during the energy equilibration stage"""
         return self.__eq_thermosteps
     
-    @equilthermosteps.setter
-    def equilthermosteps(self, val: int):
+    @eq_thermosteps.setter
+    def eq_thermosteps(self, val: int):
         val = int(val)
         assert val >= 0
         self.__eq_thermosteps = val
 
     @property
-    def equilsteps(self) -> int:
+    def eq_runsteps(self) -> int:
         """int: Number of MD steps during the volume equilibration stage"""
         return self.__eq_runsteps
 
-    @equilsteps.setter
-    def equilsteps(self, val: int):
+    @eq_runsteps.setter
+    def eq_runsteps(self, val: int):
         val = int(val)
         assert val >= 0
         self.__eq_runsteps = val
 
     @property 
-    def equilibrium(self) -> bool:
+    def eq_equilibrium(self) -> bool:
         """bool: Does the system need equilibration"""
         return self.__eq_equilibrium
     
-    @equilibrium.setter
-    def equilbirium(self, val:bool):
+    @eq_equilibrium.setter
+    def eq_equilbirium(self, val:bool):
         self.__eq_equilibrium = val
 
     @property
@@ -558,7 +559,8 @@ class DiffusionVACF(Calculation):
                     'Degrees_freedom',
                     'eq_thermosteps',
                     'eq_runsteps',
-                    'eq_equilibrium'
+                    'eq_equilibrium',
+                    'randomseed'
                 ]
             ]
         )
@@ -676,8 +678,7 @@ class DiffusionVACF(Calculation):
                 style='float_match',
                 name='diffusion',
                 path=f'{self.modelroot}.diffusion.value',
-                description='search by diffusion in Pa s',
-                unit='Pa s')
+                description='search by diffusion in Pressure time potential units')
         })
         return queries
 
