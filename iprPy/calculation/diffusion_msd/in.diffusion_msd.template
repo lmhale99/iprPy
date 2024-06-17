@@ -5,9 +5,7 @@
 
 variable    T equal <Temperature>      
 variable    dt equal <Time_Step>
-variable    p equal <Correlation_Length>     
-variable    s equal <Sample_Interval>   
-variable    d equal <Dump_Interval>    
+variable    d equal <Dump_steps>    
 variable    n equal <Degrees_freedom>
 
 
@@ -20,7 +18,6 @@ variable    n equal <Degrees_freedom>
 <atomman_system_pair_info>
 
 timestep ${dt}
-thermo $d
 
 ##########################################################################
 
@@ -43,12 +40,12 @@ fix             runningMSD all vector 10 c_msd[4]
 
 variable        fitslope equal slope(f_runningMSD)/(2*${n})/(10*dt)
 
-thermo_style	custom step temp c_msd[4] v_fitslope
+thermo_style	custom step temp c_msd[1] c_msd[2] c_msd[3] c_msd[4] v_fitslope
 
 
 
 thermo          <Thermo_Steps>
 
-dump	        dumpy all custom 1000 dump/*.dump id type x y z
+#dump	        dumpy all custom $d dump/*.dump id type x y z
 
 run	            <Run_length>

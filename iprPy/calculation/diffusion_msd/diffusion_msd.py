@@ -9,26 +9,27 @@ from atomman.tools import filltemplate
 
 import numpy as np 
 
+from ...tools import read_calc_file
+
 # Note - the system fed in needs to be relaxed to a liquid phase 
 # otherwise the calculation doesn't make much sense and it needs to run for 
 # significantly longer 
 
-def calculate_diffusion_msd(lammps_command:str,
-              potential: lmp.Potential,
-              system: am.System,
+def diffusion_msd(lammps_command:str, #
+              potential: lmp.Potential,         #
+              system: am.System,                #
+              randomseed: int = 490329,
               mpi_command: Optional[str] = None,
-              temperature: float = 200,
-              timestep: float = .5,
-              correlation_length: int = 400,
-              sample_interval: int = 5,
-              dump_steps: int = 2000,
-              run_steps: int = 100000,
-              Thermo_steps: int = 100,
-              Data_step: int = 500,
-              Degrees_freedom: int = 3,
-              eq_Thermo_steps: int = 0,
-              eq_Run_steps: int = 0,
-              eq_Equibilibrium: bool = False,
+              temperature: float = 200,         #
+              timestep: float = .5,             #
+              dumpsteps: int = 1000,           #
+              runsteps: int = 100000,          #
+              thermosteps: int = 1000,          #
+              dataoffset: int = 500,             #
+              degrees_freedom: int = 3,         #
+              eq_thermosteps: int = 0,         #
+              eq_runsteps: int = 0,            #
+              eq_equilibrium: bool = False,   #
               ) -> dict:
     
     #Get the Units from Potential
@@ -44,28 +45,28 @@ def calculate_diffusion_msd(lammps_command:str,
     #Initialize the rest of the inputs to the Lammps Scripts 
     lammps_variables['Temperature'] = temperature
     lammps_variables['Time_Step'] = timestep
-    lammps_variables['Correlation_Length'] = correlation_length
-    lammps_variables['Sample_Interval'] = sample_interval
-    lammps_variables['Run_length'] = run_steps
-    lammps_variables['Thermo_Steps'] = Thermo_steps
-    lammps_variables['Dump_Interval'] = dump_steps
-    lammps_variables['Degrees_freedom'] = Degrees_freedom
+    lammps_variables['Run_length'] = runsteps
+    lammps_variables['Thermo_Steps'] = thermosteps
+    lammps_variables['Dump_steps'] = dumpsteps
+    lammps_variables['Degrees_freedom'] = degrees_freedom
     
     #Setting up equilbrium run
-    if eq_Equibilibrium:
-        instruct = f"""fix NVE all nve \n fix LANGEVIN all langevin $T $T {10*timestep} 498094 \n
-                        thermo {eq_Thermo_steps} \n run {eq_Run_steps} \n unfix NVE \n unfix LANGEVIN \n
+    if eq_equilibrium:
+        instruct = f"""fix NVE all nve \n fix LANGEVIN all langevin $T $T {10*timestep} {randomseed} \n
+                        thermo {eq_thermosteps} \n run {eq_runsteps} \n unfix NVE \n unfix LANGEVIN \n
                         reset_timestep 0"""
         lammps_variables['Equilibration_instructions'] = instruct
-    elif not eq_Equibilibrium or eq_Run_steps == 0:
+    elif not eq_equilibrium or eq_runsteps == 0:
         lammps_variables['Equilibration_instructions'] = ""
         
 
     #Fill in the template 
     lammps_script = 'in.diffusion.in'
-    with open("in.diffusion_msd.template",'r') as template_f:
-        with open(lammps_script,'w') as f:
-            f.write(filltemplate(template_f,lammps_variables,'<','>'))
+    template = read_calc_file('iprPy.calculation.diffusion_msd',
+                              'in.diffusion_msd.template')
+    #with open("in.diffusion_msd.template",'r') as template_f:
+    with open(lammps_script,'w') as f:
+        f.write(filltemplate(template,lammps_variables,'<','>'))
     
     # Run lamps
     output = lmp.run(lammps_command,script_name=lammps_script,
@@ -74,7 +75,7 @@ def calculate_diffusion_msd(lammps_command:str,
     results = {}
 
     thermo_index = 0
-    if eq_Equibilibrium:
+    if eq_equilibrium:
         thermo_index += 1
 
 
@@ -82,22 +83,35 @@ def calculate_diffusion_msd(lammps_command:str,
     runningDiffusion = log.simulations[thermo_index].thermo['v_fitslope']
     runningTemperature = log.simulations[thermo_index].thermo['Temp']
     runningMSD = log.simulations[thermo_index].thermo['c_msd[4]']
-    Diffusion_coeff = np.average(runningDiffusion[Data_step:])
-    print(len(runningDiffusion))
-    AveTemp = np.average(runningTemperature[Data_step:])
-    AveMSD = np.average(runningMSD[Data_step:])
+
+    runningMSD_x = log.simulations[thermo_index].thermo['c_msd[1]']
+    runningMSD_y = log.simulations[thermo_index].thermo['c_msd[2]']
+    runningMSD_z = log.simulations[thermo_index].thermo['c_msd[3]']
+
+
+    Diffusion_coeff = np.average(runningDiffusion[dataoffset:])
+    # print(len(runningDiffusion))
+    AveTemp = np.average(runningTemperature[dataoffset:])
+    AveMSD = np.average(runningMSD[dataoffset:])
     #unit conversions 
     unitString1 = f"({lamps_units['length']}^2)/({lamps_units['time']})"
-    print(unitString1)
+    # print(unitString1)
     unitString2 = f"({lamps_units['length']}^2)"
     D = uc.set_in_units(Diffusion_coeff,unitString1)
     
     MSD = uc.set_in_units(AveMSD,unitString2)
 
+    results['msd_x_values'] = runningMSD_x #
+    results['msd_y_values'] = runningMSD_y #
+    results['msd_z_values'] = runningMSD_z #
+    results['msd_values'] = MSD # 
+    results['measured_temperature'] = AveTemp
+    results['measured_temperature_stderror'] = np.std(runningTemperature[dataoffset:])
     results['diffusion'] = D
-    results['mean_sqaured_displacement'] = MSD
-    results['temperature'] = AveTemp
-    print(uc.get_in_units(D,'cm^2/s'))
+    results['diffusion_stderror'] = np.std(runningDiffusion[dataoffset:])
+    results['lammps_output'] = output 
+
+    # print(uc.get_in_units(D,'cm^2/s'))
     return results
     
 
