@@ -68,7 +68,7 @@ class DiffusionVACF(Calculation):
         # Initialize unique calculation attributes
 
         self.temperature = 300
-        self.randomseed = 84951
+        self.randomseed = None
 
         self.runsteps = 50000
         self.timestep = .01 
@@ -79,7 +79,8 @@ class DiffusionVACF(Calculation):
         self.eq_thermosteps = None
         self.eq_runsteps = None
         self.eq_equilibrium = False
-
+        self.dumpsteps = 0
+        self.directoryname = "dump"
 
         self.__measured_temperature = None
         self.__measured_temperature_stderr = None
@@ -243,7 +244,27 @@ class DiffusionVACF(Calculation):
         else:
             self.__simruns = int(val)
 
+    @property
+    def dumpsteps(self) -> int:
+        return self.__dumpsteps
 
+    @dumpsteps.setter
+    def dumpsteps(self, val: int):
+        if val is None:
+            self.__dumpsteps = 0
+        else:
+            self.__dumpsteps = int(val)
+
+    @property
+    def directoryname(self) -> str:
+        return self.__directoryname
+
+    @directoryname.setter
+    def directoryname(self, val: str):
+        if val is None: 
+            self.__directoryname = "dump"
+        else:
+            self.__directoryname = str(val)
 ###################################################################################################################
     ################# Calculated results #########################
 
@@ -374,6 +395,10 @@ class DiffusionVACF(Calculation):
             self.eq_runsteps = kwargs['eq_runsteps']
         if 'eq_equilbirium' in kwargs:
             self.eq_equilibrium = kwargs['eq_equilibrium']
+        if 'dumpsteps' in kwargs:
+            self.dumpsteps = kwargs['dumpsteps']
+        if "directoryname" in kwargs:
+            self.directoryname = kwargs['dumpsteps']
 
 ####################### Parameter file interactions ###########################
 
@@ -402,7 +427,7 @@ class DiffusionVACF(Calculation):
 
 
         # Load calculation-specific strings
-    
+        self.directoryname = str(input_dict.get('directoryname','dump'))
 
         # Load calculation-specific booleans
         self.eq_equilibrium = bool(input_dict.get('eq_equilibrium',False))
@@ -414,7 +439,7 @@ class DiffusionVACF(Calculation):
         self.simruns = int(input_dict.get('simruns',5))
         self.eq_thermosteps = int(input_dict.get('eq_termosteps',0))
         self.eq_runsteps = int(input_dict.get('eq_runsteps',0))
-
+        self.dumpsteps = int(input_dict.get('dumpsteps',0))
 
         # Load calculation-specific unitless floats
         self.temperature = float(input_dict.get('temperature',300))
@@ -511,7 +536,10 @@ class DiffusionVACF(Calculation):
             'eq_runsteps':' '.join(["How many time steps to run simulation for equilibration",
                                      "run - Default value is 0"]),
             'eq_equilibrium':' '.join(["Specifies whether or not to do an equilibration default is false",
-                                       "Set to yet if the input is not a relaxed liquid already"])
+                                       "Set to yet if the input is not a relaxed liquid already"]),
+            'dumpsteps':' '.join(["How often to write the system information to the dump files"]),
+            'directoryname':' '.join(["The name of the dump file you wish to use - can't be a directory that ",
+                                      "already exists in the current working directory"])
         }
 
     @property
@@ -560,7 +588,9 @@ class DiffusionVACF(Calculation):
                     'eq_thermosteps',
                     'eq_runsteps',
                     'eq_equilibrium',
-                    'randomseed'
+                    'randomseed',
+                    'dumpsteps',
+                    'directoryname'
                 ]
             ]
         )
@@ -606,7 +636,8 @@ class DiffusionVACF(Calculation):
         run_params['eq_thermosteps'] = self.eq_thermosteps
         run_params['eq_runsteps'] = self.eq_runsteps
         run_params['eq_equilibrium'] = self.eq_equilibrium
-
+        run_params['dumpsteps'] = self.dumpsteps
+        run_params['directoryname'] = self.directoryname
         # Build results
         if self.status == 'finished':
 
@@ -647,7 +678,8 @@ class DiffusionVACF(Calculation):
         self.randomseed = run_params['randomseed']
         self.temperature = run_params['temperature']
         self.simruns = run_params['simruns']
-
+        self.dumpsteps = run_params['dumpsteps']
+        self.directoryname = run_params['directoryname']
         self.degrees_freedom = run_params['degrees_freedom']
         self.eq_thermosteps = run_params['eq_thermosteps']
         self.eq_runsteps = run_params['eq_runsteps']
@@ -758,7 +790,8 @@ class DiffusionVACF(Calculation):
         input_dict['eq_thermosteps'] = self.eq_thermosteps
         input_dict['eq_runsteps'] = self.eq_runsteps
         input_dict['eq_equilibrium'] = self.eq_equilibrium
-
+        input_dict['dumpsteps'] = self.dumpsteps
+        input_dict['directoryname'] = self.directoryname
         # Return input_dict
         return input_dict
 

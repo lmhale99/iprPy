@@ -29,7 +29,7 @@ def viscosity_green_kubo(lammps_command:str,
               eq_runsteps: int = 0,
               eq_equilibrium: bool = False,
               dragcoeff: float = .2,
-              randomseed: int = 543212
+              randomseed: Optional[int] = None
               ) -> dict:
     
     #Get the Units from Potential
@@ -70,6 +70,9 @@ def viscosity_green_kubo(lammps_command:str,
     lammps_variables['Boltzman_constant'] = kb
     lammps_variables['Scale'] = scale 
     lammps_variables['Drag_coeff'] = dragcoeff 
+
+    if randomseed is None:
+        randomseed = random.randint(1,9000000)
 
     #Setting up equibilrium run 
     if eq_equilibrium:

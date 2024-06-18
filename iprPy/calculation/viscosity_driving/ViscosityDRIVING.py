@@ -247,6 +247,37 @@ class viscosityDRIVING(Calculation):
         else:
             self.__drivingforce = val
 
+    @property
+    def dumpsteps(self) -> int:
+        """int: How often to dump configuration during the final run."""
+        if self.__dumpsteps is None:
+            return 0
+        else:
+            return self.__dumpsteps
+
+    @dumpsteps.setter
+    def dumpsteps(self, val: Optional[int]):
+        if val is None:
+            self.__dumpsteps = None
+        else:
+            val = int(val)
+            assert val >= 0
+            self.__dumpsteps = val
+
+    @property
+    def directoryname(self) -> str:
+        if self.__directoryname is None:
+            return "dump"
+        else:
+            return self.__directoryname
+        
+    @directoryname.setter
+    def directoryname(self, val: str):
+        if val is None:
+            self.__directoryname = None
+        else:
+            self.__directoryname = val
+
 
 ###################################################################################################################
     ################# Calculated results #########################
@@ -328,6 +359,10 @@ class viscosityDRIVING(Calculation):
         randomseed : int or None, optional
             Random number seed used by LAMMPS in creating velocities and with
             the Langevin thermostat.
+        dumpsteps: int or None
+            How often to write to the dump files.
+        directorynames: String or none
+            The folder to write the dump files to
         **kwargs : any, optional
             Any keyword parameters supported by the set_values() methods of
             the parent Calculation class and the subset classes.
@@ -356,6 +391,10 @@ class viscosityDRIVING(Calculation):
             self.eq_equilibrium = kwargs['eq_equilibrium']
         if 'drivingforce' in kwargs:
             self.drivingforce = kwargs['drivingforce']
+        if 'dumpsteps' in kwargs:
+            self.dumpsteps = kwargs['dumpsteps']
+        if "directoryname" in kwargs:
+            self.directoryname = kwargs['dumpsteps']
 
 ####################### Parameter file interactions ###########################
 
@@ -384,7 +423,7 @@ class viscosityDRIVING(Calculation):
 
 
         # Load calculation-specific strings
-    
+        self.directoryname = str(input_dict.get('directoryname','dump'))
 
         # Load calculation-specific booleans
         self.eq_equilibrium = bool(input_dict.get('eq_equilibrium',False))
@@ -397,7 +436,7 @@ class viscosityDRIVING(Calculation):
         self.eq_thermosteps = int(input_dict.get('eq_termosteps',0))
         self.eq_runsteps = int(input_dict.get('eq_runsteps',0))
         self.dataoffset = int(input_dict.get('dataoffset',5))
-
+        self.dumpsteps = int(input_dict.get('dumpsteps',0))
 
         # Load calculation-specific unitless floats
         self.drivingforce = float(input_dict.get('drivingforce',.1))
@@ -497,7 +536,10 @@ class viscosityDRIVING(Calculation):
                                      "run - Default value is 0"]),
             'eq_equilibrium':' '.join(["Specifies whether or not to do an equilibration default is false",
                                        "Set to yet if the input is not a relaxed liquid already"]),
-            'drivingforce':' '.join(["The force needed for the calculation method - this method perturbs the system"])
+            'drivingforce':' '.join(["The force needed for the calculation method - this method perturbs the system"]),
+            'dumpsteps':' '.join(["How often to write the system information to the dump files"]),
+            'directoryname':' '.join(["The name of the dump file you wish to use - can't be a directory that ",
+                                      "already exists in the current working directory"])
         }
 
     @property
@@ -547,7 +589,9 @@ class viscosityDRIVING(Calculation):
                     'eq_thermosteps',
                     'eq_runsteps',
                     'eq_equilibrium',
-                    'dataoffset'
+                    'dataoffset',
+                    'dumpsteps',
+                    'directoryname'
                 ]
             ]
         )
@@ -594,6 +638,8 @@ class viscosityDRIVING(Calculation):
         run_params['eq_thermosteps'] = self.eq_thermosteps
         run_params['eq_runsteps'] = self.eq_runsteps
         run_params['eq_equilibrium'] = self.eq_equilibrium
+        run_params['dumpsteps'] = self.dumpsteps
+        run_params['directoryname'] = self.directoryname
 
         # Build results
         if self.status == 'finished':
@@ -630,7 +676,8 @@ class viscosityDRIVING(Calculation):
         self.timestep = run_params['timestep']
         self.randomseed = run_params['randomseed']
         self.temperature = run_params['temperature']
-
+        self.dumpsteps = run_params['dumpsteps']
+        self.directoryname = run_params['directoryname']
         self.thermosteps = run_params['thermosteps']
         self.dataoffset = run_params['dataoffset']
         self.eq_thermosteps = run_params['eq_thermosteps']
@@ -734,6 +781,8 @@ class viscosityDRIVING(Calculation):
         input_dict['eq_thermosteps'] = self.eq_thermosteps
         input_dict['eq_runsteps'] = self.eq_runsteps
         input_dict['eq_equilibrium'] = self.eq_equilibrium
+        input_dict['dumpsteps'] = self.dumpsteps
+        input_dict['directoryname'] = self.directoryname
 
         # Return input_dict
         return input_dict

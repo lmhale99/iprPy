@@ -41,6 +41,6 @@ thermo_style   custom step cpu temp press pe density v_V v_reciprocalViscosity
 thermo_modify  temp cos
 thermo         <thermosteps>
 
-#dump         dumpy all custom 1000 dump/*.dump id type x y z
+<Dump_instructions>
 
 run          <runsteps>

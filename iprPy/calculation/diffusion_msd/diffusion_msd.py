@@ -18,11 +18,12 @@ from ...tools import read_calc_file
 def diffusion_msd(lammps_command:str, 
               potential: lmp.Potential,         
               system: am.System,                
-              randomseed: int = 490329,
+              randomseed: Optional[int] = None,
               mpi_command: Optional[str] = None,
               temperature: float = 200,         
               timestep: float = .5,             
-              dumpsteps: int = 1000,           
+              dumpsteps: int = 0,
+              directoryname: str = "dump",          
               runsteps: int = 100000,         
               thermosteps: int = 1000,        
               dataoffset: int = 500,          
@@ -47,9 +48,20 @@ def diffusion_msd(lammps_command:str,
     lammps_variables['Time_Step'] = timestep
     lammps_variables['Run_length'] = runsteps
     lammps_variables['Thermo_Steps'] = thermosteps
-    lammps_variables['Dump_steps'] = dumpsteps
     lammps_variables['Degrees_freedom'] = degrees_freedom
     
+    # Setting up the dump instructions
+    if (dumpsteps != 0) or (dumpsteps != None):
+        mkdir(directoryname)
+        instruct = f"""dump	        dumpy all custom {dumpsteps} {directoryname}/*.dump id type x y z"""
+        lammps_variables["Dump_instructions"] = instruct
+    else:
+        lammps_variables['Dump_instructions'] = ""
+
+    # Set up the seed 
+    if randomseed is None:
+        randomseed = random.randint(1,9000000)
+
     #Setting up equilbrium run
     if eq_equilibrium:
         instruct = f"""fix NVE all nve \n fix LANGEVIN all langevin $T $T {10*timestep} {randomseed} \n
@@ -64,7 +76,6 @@ def diffusion_msd(lammps_command:str,
     lammps_script = 'in.diffusion.in'
     template = read_calc_file('iprPy.calculation.diffusion_msd',
                               'in.diffusion_msd.template')
-    #with open("in.diffusion_msd.template",'r') as template_f:
     with open(lammps_script,'w') as f:
         f.write(filltemplate(template,lammps_variables,'<','>'))
     
@@ -77,7 +88,6 @@ def diffusion_msd(lammps_command:str,
     thermo_index = 0
     if eq_equilibrium:
         thermo_index += 1
-
 
     log = lmp.Log('diffusion_msd.log.lammps')
     runningDiffusion = log.simulations[thermo_index].thermo['v_fitslope']
@@ -113,5 +123,11 @@ def diffusion_msd(lammps_command:str,
 
     return results
     
+import os 
+def mkdir(name):
+    try:
+        os.mkdir(name)
+    except:
+        print("Directory Already Exists - Please use a different name")
 
     

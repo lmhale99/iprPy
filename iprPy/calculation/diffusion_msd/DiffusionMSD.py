@@ -73,9 +73,10 @@ class DiffusionMSD(Calculation):
         
         self.runsteps = 50000
         self.dumpsteps = None
+        self.directoryname = ""
         self.thermosteps = 2000
         self.dataoffset = 10
-        self.randomseed = 84951
+        self.randomseed = None
         
         self.eq_equilibrium = False
         self.eq_thermosteps = None
@@ -166,7 +167,7 @@ class DiffusionMSD(Calculation):
     def dumpsteps(self) -> int:
         """int: How often to dump configuration during the final run."""
         if self.__dumpsteps is None:
-            return 2000
+            return 0
         else:
             return self.__dumpsteps
 
@@ -178,6 +179,20 @@ class DiffusionMSD(Calculation):
             val = int(val)
             assert val >= 0
             self.__dumpsteps = val
+
+    @property
+    def directoryname(self) -> str:
+        if self.__directoryname is None:
+            return "dump"
+        else:
+            return self.__directoryname
+        
+    @directoryname.setter
+    def directoryname(self, val: str):
+        if val is None:
+            self.__directoryname = None
+        else:
+            self.__directoryname = val
 
     @property
     def runsteps(self) -> int:
@@ -250,9 +265,11 @@ class DiffusionMSD(Calculation):
     
     @eq_thermosteps.setter
     def eq_thermosteps(self, val: int):
-        val = int(val)
-        assert val >= 0
-        self.__eq_thermosteps = val
+        if val is None:
+            self.__eq_thermosteps = 0
+        else:
+            assert val >= 0
+            self.__eq_thermosteps = val
 
     @property
     def eq_runsteps(self) -> int:
@@ -261,9 +278,11 @@ class DiffusionMSD(Calculation):
 
     @eq_runsteps.setter
     def eq_runsteps(self, val: int):
-        val = int(val)
-        assert val >= 0
-        self.__eq_runsteps = val
+        if val is None:
+            self.__eq_runsteps = 0
+        else:
+            assert val >= 0
+            self.__eq_runsteps = val
 
     @property 
     def eq_equilibrium(self) -> bool:
@@ -271,7 +290,7 @@ class DiffusionMSD(Calculation):
         return self.__eq_equilibrium
     
     @eq_equilibrium.setter
-    def eq_equilbirium(self, val:bool):
+    def eq_equilibrium(self, val:bool):
         self.__eq_equilibrium = val
 
 
@@ -414,6 +433,8 @@ class DiffusionMSD(Calculation):
             self.eq_runsteps = kwargs['eq_runsteps']
         if 'eq_equilbirium' in kwargs:
             self.eq_equilibrium = kwargs['eq_equilibrium']
+        if 'directoryname' in kwargs:
+            self.directoryname = kwargs['directoryname']
 
 ####################### Parameter file interactions ###########################
 
@@ -442,6 +463,7 @@ class DiffusionMSD(Calculation):
 
 
         # Load calculation-specific strings
+        self.directoryname = str(input_dict.get('directoryname',"dump"))
     
 
         # Load calculation-specific booleans
@@ -544,6 +566,7 @@ class DiffusionMSD(Calculation):
             'temperature': ' '.join(["Target temperature for the simulation - Default value of 300 K"]),
             'timestep': ' '.join(["How much to increase the time at each step - Default value of .001"]),
             'dumpsteps': ' '.join(["How often to write to the dump file for this calculation - Default value of 1000"]),
+            'directoryname':' '.join(["The name of the directory you would like the dump files in"]),
             'runsteps':' '.join(["How many time steps to run simulation - Default value is 100000"]),
             'thermosteps':' '.join(["How often to write calculated value to log file/ouput - Default value is 1000"]),
             'dataoffset':' '.join(["Specifies how much of the initial data to ignore",
@@ -558,7 +581,8 @@ class DiffusionMSD(Calculation):
             'eq_runsteps':' '.join(["How many time steps to run simulation for equilibration",
                                      "run - Default value is 0"]),
             'eq_equilibrium':' '.join(["Specifies whether or not to do an equilibration default is false",
-                                       "Set to yet if the input is not a relaxed liquid already"])
+                                       "Set to yet if the input is not a relaxed liquid already"]),
+            'randomseed':' '.join(["If doing an equilibrium run this is the seed for the random velocity assignment"])
         }
 
     @property
@@ -602,6 +626,7 @@ class DiffusionMSD(Calculation):
                     'temperature',
                     'timestep',
                     'dumpsteps',
+                    'directoryname',
                     'runsteps',
                     'thermosteps',
                     'dataoffset',
@@ -657,6 +682,7 @@ class DiffusionMSD(Calculation):
         run_params['eq_thermosteps'] = self.eq_thermosteps
         run_params['eq_runsteps'] = self.eq_runsteps
         run_params['eq_equilibrium'] = self.eq_equilibrium
+        run_params['directoryname']= self.directoryname 
 
         # Build results
         if self.status == 'finished':
@@ -696,6 +722,7 @@ class DiffusionMSD(Calculation):
         self.runsteps = run_params['runsteps']
         self.timestep = run_params['timestep']
         self.dumpsteps = run_params['dumpsteps']
+        self.directoryname = run_params['directoryname']
         self.randomseed = run_params['randomseed']
         self.temperature = run_params['temperature']
 
@@ -804,6 +831,7 @@ class DiffusionMSD(Calculation):
         # Add calculation-specific inputs
         input_dict['runsteps'] = self.runsteps
         input_dict['dumpsteps'] = self.dumpsteps
+        input_dict['directoryname'] = self.directoryname
         input_dict['randomseed'] = self.randomseed
         input_dict['temperature'] = self.temperature
         input_dict['timestep'] = self.timestep

@@ -21,11 +21,13 @@ def diffusion_vacf(lammps_command:str,
               potential: lmp.Potential,
               system: am.System,
               mpi_command: Optional[str] = None,
-              randomseed: int = None,
+              randomseed: Optional[int] = None,
               temperature: float = 300,
               timestep: float = .5,
               runsteps: int = 10000,
               simruns: int = 5,
+              dumpsteps: int = 0,
+              directoryname: Optional[str] = None,
               degrees_freedom: int = 3,
               eq_thermosteps: int = 0,
               eq_runsteps: int = 0,
@@ -52,6 +54,18 @@ def diffusion_vacf(lammps_command:str,
     lammps_variables['Degrees_freedom'] = degrees_freedom
     #Fill in the template 
 
+    if randomseed is None:
+        randomseed = random.randint(1,9000000)
+
+    if (dumpsteps != 0) or (dumpsteps != None):
+        mkdir(directoryname,simruns)
+        instruct = f"dump            dumpy all custom {dumpsteps} {directoryname}/$i/*.dump id type x y z"
+        lammps_variables['Dump_instructions'] = instruct 
+        lammps_variables['Dump_unfix'] = "undump dumpy"
+    else: 
+        lammps_variables['Dump_instructions'] = ""
+        lammps_variables['Dump_unfix'] = ""
+
     #Setting up equilbrium
     if eq_equilibrium:
         instruct = f"""fix NVE all nve \n fix LANGEVIN all langevin $T $T {10*timestep} {randomseed} \n
@@ -65,7 +79,7 @@ def diffusion_vacf(lammps_command:str,
     lammps_script = 'in.diffusion.in'
     template = read_calc_file('iprPy.calculation.diffusion_vacf',
                               'in.diffusion_vacf.template')
-    #with open("in.diffusion_msd.template",'r') as template_f:
+
     with open(lammps_script,'w') as f:
         f.write(filltemplate(template,lammps_variables,'<','>'))
     
@@ -124,4 +138,13 @@ def diffusion_vacf(lammps_command:str,
     return results
     
 
+import os 
+def mkdir(name,runs):
+    os.mkdir(name)
+    for i in range(1,runs+1):
+        path = os.path.join(name,str(i))
+        try:
+            os.mkdir(path)
+        except:
+            print("Directory Already Exists - Please use a different name")
     

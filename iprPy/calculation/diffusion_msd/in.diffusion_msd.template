@@ -4,9 +4,9 @@
 # settings
 
 variable    T equal <Temperature>      
-variable    dt equal <Time_Step>
-variable    d equal <Dump_steps>    
+variable    dt equal <Time_Step> 
 variable    n equal <Degrees_freedom>
+
 
 
 # problem setup
@@ -42,10 +42,8 @@ variable        fitslope equal slope(f_runningMSD)/(2*${n})/(10*dt)
 
 thermo_style	custom step temp c_msd[1] c_msd[2] c_msd[3] c_msd[4] v_fitslope
 
-
-
 thermo          <Thermo_Steps>
 
-#dump	        dumpy all custom $d dump/*.dump id type x y z
+<Dump_instructions>
 
 run	            <Run_length>

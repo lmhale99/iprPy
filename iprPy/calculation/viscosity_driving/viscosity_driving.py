@@ -25,10 +25,12 @@ def viscosity_driving(lammps_command:str,
               thermosteps: int = 100,
               drivingforce: float = .1,
               dataoffset: int = 500,
-              randomseed: int = 74509,
+              randomseed: Optional[int] = None,
               eq_thermosteps: int = 0,
               eq_runsteps: int = 0,
-              eq_equilibrium: bool = False
+              eq_equilibrium: bool = False,
+              dumpsteps: int = 0,
+              directoryname: str = "dump"
               ) -> dict:
     
     #Get the Units from Potential
@@ -47,6 +49,17 @@ def viscosity_driving(lammps_command:str,
     lammps_variables['runsteps'] = runsteps
     lammps_variables['drivingforce'] = drivingforce
     lammps_variables['thermosteps'] = thermosteps
+
+    if randomseed is None:
+        randomseed = random.randint(1,9000000)
+
+    if (dumpsteps != 0) or (dumpsteps != None):
+        mkdir(directoryname)
+        instruct = f"""dump         dumpy all custom {dumpsteps} {directoryname}/*.dump id type x y z"""
+        lammps_variables["Dump_instructions"] = instruct
+    else:
+        lammps_variables['Dump_instructions'] = ""
+
     # Equilibrium steps
     if eq_equilibrium:
         instruct = f"""fix NVE all nve \n fix LANGEVIN all langevin $T $T {10*timestep} {randomseed} \n
@@ -60,11 +73,9 @@ def viscosity_driving(lammps_command:str,
     lammps_script = 'in.viscosity.in'
     template = read_calc_file('iprPy.calculation.viscosity_driving',
                               'in.viscosity_driving.template')
-    #with open("in.diffusion_msd.template",'r') as template_f:
     with open(lammps_script,'w') as f:
         f.write(filltemplate(template,lammps_variables,'<','>'))
 
-    
     #Run lamps
     output = lmp.run(lammps_command,script_name=lammps_script,
                      mpi_command=mpi_command,screen=False,logfile="viscosity.log.lammps")
@@ -88,17 +99,19 @@ def viscosity_driving(lammps_command:str,
 
     #Initialize the return dictionary
     results = {}
-    # thermo = output.flatten()['thermo']
-    #Data of interest
 
+    #Data of interest
     results['viscosity'] = eta
     results['viscosity_stderr'] = eta_std
     results['measured_temperature'] = AveTemp
     results['measured_temperature_stderr'] = np.std(runningTemperature[dataoffset:])
-    results['lammps_output'] = output 
-    #Other Dump Data    
+    results['lammps_output'] = output    
     return results
  
     
-
-    
+import os 
+def mkdir(name):
+    try:
+        os.mkdir(name)
+    except:
+        print("Directory Already Exists - Please use a different name")
