@@ -24,6 +24,8 @@ for style in resources.contents(__name__):
         try:
             # Try importing calculation
             module = import_module(f'.{style}', __name__)
+            classname = module.__all__[0]
+            classmodule = getattr(module, classname)
             
         except Exception as e:
             # Add failed imports to managers
@@ -31,9 +33,6 @@ for style in resources.contents(__name__):
             calculationmanager.failed_styles[style] = '%s: %s' % sys.exc_info()[:2]
 
         else:
-            # Add successful imports to managers
-            classname = module.__all__[0]
-            classmodule = getattr(module, classname)
             recordmanager.loaded_styles[f'calculation_{style}'] = classmodule
             calculationmanager.loaded_styles[style] = classmodule
 
