@@ -76,8 +76,8 @@ class DiffusionVACF(Calculation):
 
         self.degrees_freedom = 3
         self.simruns = 5
-        self.eq_thermosteps = None
-        self.eq_runsteps = None
+        self.eq_thermosteps = 0
+        self.eq_runsteps = 0
         self.eq_equilibrium = False
         self.dumpsteps = 0
         self.directoryname = "dump"
