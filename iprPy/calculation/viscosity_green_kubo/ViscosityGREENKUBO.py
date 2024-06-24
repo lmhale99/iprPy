@@ -242,11 +242,17 @@ class viscosityGREENKUBO(Calculation):
     @property 
     def eq_equilibrium(self) -> bool:
         """bool: Does the system need equilibration"""
-        return self.__eq_equilibrium
+        if self.__eq_equilibrium is None:
+            return False
+        else:
+            return self.__eq_equilibrium
     
     @eq_equilibrium.setter
-    def eq_equilbirium(self, val:bool):
-        self.__eq_equilibrium = val
+    def eq_equilibrium(self, val:bool):
+        if val is None:
+            self.__eq_equilibrium = False 
+        else: 
+            self.__eq_equilibrium = val
 
     @property
     def correlationlength(self) -> int:
@@ -471,7 +477,7 @@ class viscosityGREENKUBO(Calculation):
         self.runsteps = int(input_dict.get('runsteps', 50000))
         self.randomseed = int(input_dict.get('randomseed', 89415))
         self.sample_interval = int(input_dict.get('sample_interval',5))
-        self.outputsteps = int(input_dict.get('outputsteps',100))
+        self.outputsteps = int(input_dict.get('outputsteps',2000))
         self.eq_thermosteps = int(input_dict.get('eq_termosteps',0))
         self.eq_runsteps = int(input_dict.get('eq_runsteps',0))
         self.dataoffset = int(input_dict.get('dataoffset',5))

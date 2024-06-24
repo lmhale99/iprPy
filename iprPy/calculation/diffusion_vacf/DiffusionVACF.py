@@ -204,33 +204,49 @@ class DiffusionVACF(Calculation):
     @property
     def eq_thermosteps(self) -> int:
         """int: Number of MD steps during the energy equilibration stage"""
-        return self.__eq_thermosteps
+        if self.__eq_thermosteps is None:
+            return 0
+        else:
+            return self.__eq_thermosteps
     
     @eq_thermosteps.setter
     def eq_thermosteps(self, val: int):
-        val = int(val)
-        assert val >= 0
-        self.__eq_thermosteps = val
+        if val is None:
+            self.__eq_thermosteps = 0
+        else:
+            assert val >= 0
+            self.__eq_thermosteps = val
 
     @property
     def eq_runsteps(self) -> int:
         """int: Number of MD steps during the volume equilibration stage"""
-        return self.__eq_runsteps
+        if self.__eq_runsteps is None:
+            return 0 
+        else:
+            return self.__eq_runsteps
 
     @eq_runsteps.setter
     def eq_runsteps(self, val: int):
-        val = int(val)
-        assert val >= 0
-        self.__eq_runsteps = val
+        if val is None:
+            self.__eq_runsteps = 0
+        else:
+            assert val >= 0
+            self.__eq_runsteps = val
 
     @property 
     def eq_equilibrium(self) -> bool:
         """bool: Does the system need equilibration"""
-        return self.__eq_equilibrium
+        if self.__eq_equilibrium is None:
+            return False
+        else:
+            return self.__eq_equilibrium
     
     @eq_equilibrium.setter
-    def eq_equilbirium(self, val:bool):
-        self.__eq_equilibrium = val
+    def eq_equilibrium(self, val:bool):
+        if val is None:
+            self.__eq_equilibrium = False 
+        else: 
+            self.__eq_equilibrium = val
 
     @property
     def simruns(self) -> int:

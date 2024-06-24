@@ -229,11 +229,17 @@ class viscosityDRIVING(Calculation):
     @property 
     def eq_equilibrium(self) -> bool:
         """bool: Does the system need equilibration"""
-        return self.__eq_equilibrium
+        if self.__eq_equilibrium is None:
+            return False
+        else:
+            return self.__eq_equilibrium
     
     @eq_equilibrium.setter
-    def eq_equilbirium(self, val:bool):
-        self.__eq_equilibrium = val
+    def eq_equilibrium(self, val:bool):
+        if val is None:
+            self.__eq_equilibrium = False 
+        else: 
+            self.__eq_equilibrium = val
 
     @property
     def drivingforce(self) -> float:

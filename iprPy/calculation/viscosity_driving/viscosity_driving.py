@@ -23,7 +23,7 @@ def viscosity_driving(lammps_command:str,
               timestep: float = .5,
               runsteps: int = 100000,
               thermosteps: int = 100,
-              drivingforce: float = .1,
+              drivingforce: float = .01,
               dataoffset: int = 500,
               randomseed: Optional[int] = None,
               eq_thermosteps: int = 0,
@@ -53,7 +53,7 @@ def viscosity_driving(lammps_command:str,
     if randomseed is None:
         randomseed = random.randint(1,9000000)
 
-    if (dumpsteps != 0) or (dumpsteps != None):
+    if (dumpsteps != 0) and (dumpsteps != None):
         mkdir(directoryname)
         instruct = f"""dump         dumpy all custom {dumpsteps} {directoryname}/*.dump id type x y z"""
         lammps_variables["Dump_instructions"] = instruct
@@ -95,7 +95,12 @@ def viscosity_driving(lammps_command:str,
     #Unit Conversions
     unitString = "(" + lamps_units['length'] + "^3*"+ lamps_units['density'] + ")" + "/(" + lamps_units['velocity'] + "*" + lamps_units['time'] + "^2)"
     eta = uc.set_in_units(Viscosity,unitString)
-    eta_std = uc.set_in_units(np.std(runningViscosity[dataoffset:]),unitString)
+
+
+    #error propogation formula 
+    #sigma_eta = sigma_inverse_visc / visc^2
+    eta_std_val = np.std(runningViscosityInverse)/(Viscosity**2)
+    eta_std = uc.set_in_units(eta_std_val,unitString)
 
     #Initialize the return dictionary
     results = {}

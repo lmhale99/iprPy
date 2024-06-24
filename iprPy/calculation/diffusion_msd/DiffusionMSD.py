@@ -21,7 +21,7 @@ from DataModelDict import DataModelDict as DM
 from .. import Calculation
 from .diffusion_msd import diffusion_msd
 from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
-                                   AtommanSystemLoad, AtommanSystemManipulate)
+                                   AtommanSystemLoad)
 from ...input import value
 
 class DiffusionMSD(Calculation):
@@ -63,7 +63,7 @@ class DiffusionMSD(Calculation):
         self.__commands = LammpsCommands(self)
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
-        self.__system_mods = AtommanSystemManipulate(self)
+        # self.__system_mods = AtommanSystemManipulate(self)
         subsets = (self.commands, self.potential, self.system, self.units)
 
         # Initialize unique calculation attributes
@@ -72,7 +72,7 @@ class DiffusionMSD(Calculation):
         self.temperature = 300
         
         self.runsteps = 50000
-        self.dumpsteps = None
+        self.dumpsteps = 0
         self.directoryname = ""
         self.thermosteps = 2000
         self.dataoffset = 10
@@ -81,7 +81,7 @@ class DiffusionMSD(Calculation):
         self.eq_equilibrium = False
         self.eq_thermosteps = None
         self.eq_runsteps = None
-
+        self.timestep = 0.001
         self.__measured_temperature = None
         self.__measured_temperature_stderr = None
  
@@ -211,7 +211,7 @@ class DiffusionMSD(Calculation):
     @property
     def thermosteps(self) -> int:
         """Frequency of the thermo outputs"""
-        if self._thermosteps is None:
+        if self.__thermosteps is None:
             return 1000
         else:
             return self.__thermosteps
@@ -502,8 +502,8 @@ class DiffusionMSD(Calculation):
 
 
         # Load calculation-specific unitless floats
-        self.temperature = float(input_dict.get('temperature',300))
-        self.timestep = float(input_dict.get('timestep',.01))
+        self.temperature = float(input_dict.get('temperature',300.0))
+        self.timestep = float(input_dict.get('timestep',.001))
 
         # Load calculation-specific floats with units
 
@@ -843,6 +843,7 @@ class DiffusionMSD(Calculation):
 
         # Add subset inputs
         for subset in self.subsets:
+            # print("Subset ->",subset)
             subset.calc_inputs(input_dict)
 
         # Remove unused subset inputs

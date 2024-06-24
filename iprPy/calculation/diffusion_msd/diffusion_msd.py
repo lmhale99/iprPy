@@ -21,12 +21,12 @@ def diffusion_msd(lammps_command:str,
               randomseed: Optional[int] = None,
               mpi_command: Optional[str] = None,
               temperature: float = 200,         
-              timestep: float = .5,             
+              timestep: float = .001,             
               dumpsteps: int = 0,
               directoryname: str = "dump",          
               runsteps: int = 100000,         
               thermosteps: int = 1000,        
-              dataoffset: int = 500,          
+              dataoffset: int = 10,          
               degrees_freedom: int = 3,       
               eq_thermosteps: int = 0,        
               eq_runsteps: int = 0,           
@@ -34,7 +34,9 @@ def diffusion_msd(lammps_command:str,
               ) -> dict:
     
     #Get the Units from Potential
-    lamps_units = lmp.style.unit(potential.units)
+    # print(system)
+    lammps_units = lmp.style.unit(potential.units)
+    # print(lammps_units)
 
     #Initialize the variables to fill in the script
     lammps_variables = {}
@@ -51,7 +53,7 @@ def diffusion_msd(lammps_command:str,
     lammps_variables['Degrees_freedom'] = degrees_freedom
     
     # Setting up the dump instructions
-    if (dumpsteps != 0) or (dumpsteps != None):
+    if (dumpsteps != 0) and (dumpsteps != None):
         mkdir(directoryname)
         instruct = f"""dump	        dumpy all custom {dumpsteps} {directoryname}/*.dump id type x y z"""
         lammps_variables["Dump_instructions"] = instruct
@@ -104,9 +106,9 @@ def diffusion_msd(lammps_command:str,
     AveTemp = np.average(runningTemperature[dataoffset:])
     AveMSD = np.average(runningMSD[dataoffset:])
     #unit conversions 
-    unitString1 = f"({lamps_units['length']}^2)/({lamps_units['time']})"
+    unitString1 = f"({lammps_units['length']}^2)/({lammps_units['time']})"
 
-    unitString2 = f"({lamps_units['length']}^2)"
+    unitString2 = f"({lammps_units['length']}^2)"
     D = uc.set_in_units(Diffusion_coeff,unitString1)
     
     MSD = uc.set_in_units(AveMSD,unitString2)

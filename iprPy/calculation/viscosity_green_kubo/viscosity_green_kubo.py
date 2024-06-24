@@ -24,7 +24,7 @@ def viscosity_green_kubo(lammps_command:str,
               sampleinterval: int = 5,
               outputsteps: int = 2000,
               runsteps: int = 100000,
-              dataoffset: int = 500,
+              dataoffset: int = 20,
               eq_thermosteps: int = 0,
               eq_runsteps: int = 0,
               eq_equilibrium: bool = False,
@@ -49,14 +49,14 @@ def viscosity_green_kubo(lammps_command:str,
 
     unitStringKB = f"({mass_unit}*{lamps_units['length']}^2)/({lamps_units['time']}^2*{lamps_units['temperature']})"
     kb = uc.get_in_units(kb_SI,unitStringKB)
-    print(f"kb={kb}",unitStringKB)
-    print(f"{uc.get_in_units(kb_SI,'(kg*m^2)/(s^2*K)')} - in J/K")
+    # print(f"kb={kb}",unitStringKB)
+    # print(f"{uc.get_in_units(kb_SI,'(kg*m^2)/(s^2*K)')} - in J/K")
 
 
     unitStringScale = f"({mass_unit})/({lamps_units['length']}*{lamps_units['time']}^2)"
     scale_unit = uc.set_in_units(1,f"{lamps_units['pressure']}")
     scale = uc.get_in_units(scale_unit,unitStringScale)
-    print(scale,unitStringScale)
+    # print(scale,unitStringScale)
 
 
     #Initialize the rest of the inputs to the Lammps Scripts 
