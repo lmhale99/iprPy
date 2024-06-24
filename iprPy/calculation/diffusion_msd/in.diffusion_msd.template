@@ -1,0 +1,49 @@
+# sample LAMMPS input script for diffusion of 2d LJ liquid
+# mean-squared displacement via compute msd
+
+# settings
+
+variable    T equal <Temperature>      
+variable    dt equal <Time_Step> 
+variable    n equal <Degrees_freedom>
+
+
+
+# problem setup
+
+##########################################################################
+
+# Setup data from Atomman
+
+<atomman_system_pair_info>
+
+timestep ${dt}
+
+##########################################################################
+
+# Equillibration run
+
+# If we are running an equilibration run several things will be added
+# fix langevin, fix nve, run, thermo ,unfix langevin reset time step. Otherwise
+# these will all be ommited 
+
+<Equilibration_instructions>
+
+##########################################################################
+# Data gethering run
+
+fix             NVE all nve
+
+compute         msd all msd com yes
+
+fix             runningMSD all vector 10 c_msd[4]
+
+variable        fitslope equal slope(f_runningMSD)/(2*${n})/(10*dt)
+
+thermo_style	custom step temp c_msd[1] c_msd[2] c_msd[3] c_msd[4] v_fitslope
+
+thermo          <Thermo_Steps>
+
+<Dump_instructions>
+
+run	            <Run_length>
