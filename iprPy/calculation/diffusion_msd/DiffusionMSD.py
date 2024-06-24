@@ -112,7 +112,7 @@ class DiffusionMSD(Calculation):
 
 ############################## Class attributes ################################
 
-    ########################## Input Paramteres #################################
+    ########################## Input Parameters #################################
 
     @property
     def commands(self) -> LammpsCommands:
@@ -135,16 +135,16 @@ class DiffusionMSD(Calculation):
         return self.__system
 
     @property
-    def timestep(self) -> float:
+    def timestep(self) -> Optional[float]:
         """float: time step for simulation"""
         return self.__timestep
     
     @timestep.setter
     def timestep(self, val: Optional[float]):
         if val is None:
-            self.__timestep = .001
+            self.__timestep = None
         else:
-            self.__timestep = val
+            self.__timestep = float(val)
     
     @property
     def temperature(self) -> float:
@@ -211,7 +211,7 @@ class DiffusionMSD(Calculation):
     @property
     def thermosteps(self) -> int:
         """Frequency of the thermo outputs"""
-        if self._thermosteps is None:
+        if self.__thermosteps is None:
             return 1000
         else:
             return self.__thermosteps
@@ -502,8 +502,8 @@ class DiffusionMSD(Calculation):
 
 
         # Load calculation-specific unitless floats
-        self.temperature = float(input_dict.get('temperature',300))
-        self.timestep = float(input_dict.get('timestep',.01))
+        self.temperature = float(input_dict['temperature'])
+        self.timestep = input_dict.get('timestep', None)
 
         # Load calculation-specific floats with units
 
@@ -585,7 +585,7 @@ class DiffusionMSD(Calculation):
 
         return {
             'temperature': ' '.join(["Target temperature for the simulation - Default value of 300 K"]),
-            'timestep': ' '.join(["How much to increase the time at each step - Default value of .001"]),
+            'timestep': ' '.join(["How much to increase the time at each step - Default value of None will use the LAMMPS default"]),
             'dumpsteps': ' '.join(["How often to write to the dump file for this calculation - Default value of 1000"]),
             'directoryname':' '.join(["The name of the directory you would like the dump files in"]),
             'runsteps':' '.join(["How many time steps to run simulation - Default value is 100000"]),

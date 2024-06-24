@@ -1,4 +1,4 @@
-# sample LAMMPS input script for diffusion of 2d LJ liquid
+# LAMMPS input script for diffusion in liquid using
 # mean-squared displacement via compute msd
 
 # settings
@@ -21,16 +21,16 @@ timestep ${dt}
 
 ##########################################################################
 
-# Equillibration run
+# Equilibration run
 
 # If we are running an equilibration run several things will be added
 # fix langevin, fix nve, run, thermo ,unfix langevin reset time step. Otherwise
-# these will all be ommited 
+# these will all be omitted 
 
 <Equilibration_instructions>
 
 ##########################################################################
-# Data gethering run
+# Data gathering run
 
 fix             NVE all nve
 
