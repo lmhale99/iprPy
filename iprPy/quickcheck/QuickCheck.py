@@ -1,11 +1,15 @@
 from pathlib import Path
 from typing import Optional, Union
+import json
 
+import potentials
 import atomman as am
 import atomman.unitconvert as uc
 
 import numpy as np
 import pandas as pd
+
+import matplotlib.pyplot as plt
 
 from .. import load_calculation
 from .QuickCheckCrystal import QuickCheckCrystal
@@ -48,6 +52,75 @@ class QuickCheck():
 
 ###############################################################################
 
+    @classmethod
+    def run_from_input(cls, input_dict: Union[str, dict, Path]):
+        """
+        Sets up and performs a quick check based on dict/JSON input settings.
+        """
+        if isinstance(input_dict, str):
+            try:
+                # Check if input_dict is a filename
+                if Path(input_dict).exists():
+                    input_dict = Path(input_dict)
+                else:
+                    raise OSError('Not a file')
+            except OSError as e:
+                # Read json string
+                input_dict = json.loads(input_dict)
+        
+        # Load JSON from file path
+        if isinstance(input_dict, Path):
+            with open(input_dict) as f:
+                input_dict = json.load(fp=f)
+
+        # Throw error if not dict
+        if not isinstance(input_dict, dict):
+            raise TypeError('input_dict neither a dict or JSON content')
+
+        # Extract lammps_command
+        lammps_command = input_dict.pop('lammps_command')
+
+        # Extract or build potential
+        pot_dict = input_dict.pop('potential')
+        if 'file' in pot_dict:
+            model = pot_dict.pop('file')
+            potential = am.lammps.Potential(model, **pot_dict)
+        elif 'pair_style' in pot_dict:
+            pair_style = pot_dict.pop('pair_style')
+            builder = am.build_lammps_potential(pair_style, **pot_dict)
+            potential = builder.potential()
+        else:
+            raise ValueError('potential must be loaded from a "file" or defined for a "pair_style"')
+
+        # Extract and build crystal unit cells
+
+        ucells = {}
+        for crystal_dict in input_dict['crystal']:
+            name = crystal_dict['name']
+            if 'symbols' in crystal_dict and not isinstance(crystal_dict['symbols'], str):
+                crystal_dict['symbols'] = ' '.join(crystal_dict['symbols'])
+            calc = load_calculation('relax_static')
+            calc.system.load_parameters(crystal_dict)
+            d = {}
+            calc.system.calc_inputs(d)
+            ucell = d['ucell']
+            ucells[name] = ucell
+        
+        self = cls(lammps_command, potential, ucells)
+
+        self.run(**input_dict)
+
+        if 'html_results' in input_dict:
+            htmlfilename = input_dict['html_results'].pop('filename', None)
+            display = htmlfilename is None
+            html = self.html_results(display=display, **input_dict['html_results'])
+
+            if htmlfilename is not None:
+                with open(htmlfilename, 'w') as f:
+                    f.write(html)
+
+        return self
+
     def run(self,
             isolated_atom: Union[dict, bool] = True,
             diatom_scan: Union[dict, bool] = True,
@@ -70,8 +143,10 @@ class QuickCheck():
             self.run_relax_static_diatom(**relax_static_diatom)
 
         for name, crystal in self.crystals.items():
-            crystal_kwargs = kwargs.get(name, {})
-            crystal.run(**crystal_kwargs)
+            for crystal_kwargs in kwargs['crystal']:
+                if crystal_kwargs['name'] == name:
+                    crystal.run(**crystal_kwargs)
+                    continue
 
 
     def run_isolated_atom(self):
@@ -83,22 +158,28 @@ class QuickCheck():
         self.results['isolated_atom'] = results
 
     def run_diatom_scan(self,
+                        symbols: Optional[list] = None,
                         rmin: float = 2.0,
                         rmax: float = 6.0,
                         rsteps: int = 50):
 
         calc = load_calculation('diatom_scan')
 
+        if symbols is None:
+            # Generate all unique symbol pairs
+            symbols = []
+            potsymbols = self.potential.symbols
+            for i in range(len(potsymbols)):
+                for j in range(i, len(potsymbols)):
+                    symbols.append([potsymbols[i], potsymbols[j]])
+
         self.results['diatom_scan'] = []
-        potsymbols = self.potential.symbols
-        for i in range(len(potsymbols)):
-            for j in range(i, len(potsymbols)):
-                symbols = [potsymbols[i], potsymbols[j]]
-                results = calc.calc(self.lammps_command, self.potential, symbols,
-                                    rmin=rmin, rmax=rmax, rsteps=rsteps)
-                results['symbols'] = symbols
-                calc.clean_files()
-                self.results['diatom_scan'].append(results)
+        for symbolpair in symbols:
+            results = calc.calc(self.lammps_command, self.potential, symbolpair,
+                                rmin=rmin, rmax=rmax, rsteps=rsteps)
+            results['symbols'] = symbolpair
+            calc.clean_files()
+            self.results['diatom_scan'].append(results)
 
     def run_relax_static_diatom(self,
                                 symbols: Optional[list] = None,
@@ -107,7 +188,7 @@ class QuickCheck():
                                 maxiter: int = 100000,
                                 maxeval: int = 1000000,
                                 dmax: float = 0.01,
-                                maxcycles: int = 100,
+                                maxcycles: int = 20,
                                 ctol: float = 1e-10,
                                 raise_at_maxcycles: bool = False):
         
@@ -193,7 +274,89 @@ class QuickCheck():
         
         data = pd.DataFrame(data)
         return data
+
+###############################################################################
+
+    def plot_diatom_scan(self,
+                         symbols: Optional[list] = None,
+                         filename: Optional[str] = None,
+                         xlim=(None, None),
+                         ylim=(None, None)):
+        if symbols is None:
+            symbols = [s['symbols'] for s in self.results['diatom_scan']]
+
+        if not isinstance(symbols, (list, tuple)):
+            raise ValueError('symbols must be a list of lists')
+            
+        for i, syms in enumerate(symbols):
+            if not isinstance(syms, (list, tuple)):
+                raise ValueError('symbols must be a list of lists')
+            if len(syms) == 1 and isinstance(syms[0], str):
+                symbols[i] = [syms[0], syms[0]]
+            elif len(syms) == 2 and isinstance(syms[0], str) and isinstance(syms[0], str):
+                pass
+            else:
+                raise ValueError('Each symbols list must have one or two symbol values')
+
+        for syms in symbols:
+            symbolstr1 = '-'.join(sorted(syms))
+
+            for scan in self.results['diatom_scan']:
+                symbolstr2 = '-'.join(sorted(scan['symbols']))
+                if symbolstr1 == symbolstr2:
+                    plt.plot(scan['r_values'], scan['energy_values'], label=symbolstr1)
+
+        plt.title('Diatom interactions')
+        plt.xlabel('r')
+        plt.ylabel('Energy')
+        plt.legend()
+        plt.xlim(*xlim)
+        plt.ylim(*ylim)
+        
+        if filename is None:
+            plt.show()
+        else:
+            plt.savefig(filename)
+            plt.close()
+
+    def plot_E_vs_r_scan(self,
+                         crystals=None,
+                         xaxis='r',
+                         filename=None,
+                         xlim=(None, None),
+                         ylim=(None, None)):
+                        
     
+        if crystals is None:
+            crystals = list(self.crystals.keys())
+        
+        for crystalname in crystals:
+            crystal = self.crystals[crystalname]
+            scan = crystal.results['E_vs_r_scan']
+        
+            if xaxis == 'r':
+                plt.plot(scan['r_values'], scan['Ecoh_values'], label=crystalname)
+            else:
+                plt.plot(scan['a_values'], scan['Ecoh_values'], label=crystalname)
+        
+        plt.title('Volumetric crystal scan')
+        plt.legend()
+        
+        if xaxis == 'r':
+            plt.xlabel('r')
+        else:
+            plt.xlabel('a')
+        plt.ylabel('Potential energy per atom')
+        
+        plt.xlim(*xlim)
+        plt.ylim(*ylim)
+
+        if filename is None:
+            plt.show()
+        else:
+            plt.savefig(filename)
+            plt.close()
+
 ###############################################################################
 
     def print_results(self,
@@ -217,19 +380,49 @@ class QuickCheck():
                      energy_unit: str = 'eV',
                      pressure_unit: str = 'GPa',
                      energy_per_area_unit: str = 'mJ/m^2',
+                     plot_diatom_scan: Union[dict, list, None] = None,
+                     plot_E_vs_r_scan: Union[dict, list, None] = None,
+                     plot_width = '500px',
                      display: bool = False):
+        
+        # Generate table of basic properties
         html = self.data(length_unit=length_unit,
                          energy_unit=energy_unit).to_html()
         
+        # Generate diatom scan plots
+        if plot_diatom_scan is not None:
+            if isinstance(plot_diatom_scan, dict):
+                plot_diatom_scan = [plot_diatom_scan]
+            for plot_kwargs in plot_diatom_scan:
+                self.plot_diatom_scan(**plot_kwargs)
+                html += self.html_img(plot_kwargs['filename'], 'diatom_scan', plot_width)
+
+        # Generate E vs r scan plots
+        if plot_E_vs_r_scan is not None:
+            if isinstance(plot_E_vs_r_scan, dict):
+                plot_E_vs_r_scan = [plot_E_vs_r_scan]
+            for plot_kwargs in plot_E_vs_r_scan:
+                self.plot_E_vs_r_scan(**plot_kwargs)
+                html += self.html_img(plot_kwargs['filename'], 'E_vs_r_scan', plot_width)
+
         for name, crystal in self.crystals.items():
             html += f'<h4>{name}</h4>'
+
+            # Generate crystal specific properties
             html += crystal.data(length_unit=length_unit,
                                  energy_unit=energy_unit,
                                  pressure_unit=pressure_unit, 
                                  energy_per_area_unit=energy_per_area_unit).to_html()
+            
+            # Insert any figures for crystal specific properties
+            for filename in Path('.').glob(f'{name}--*--band.png'):
+                html += self.html_img(filename, 'band_structure', plot_width)
             
         if display:
             import IPython.display
             IPython.display.display(IPython.display.HTML(html))
         else:
             return html
+        
+    def html_img(self, filename, alt, width):
+        return f'<img src="{filename}" alt="{alt}" style="width:{width}">'
