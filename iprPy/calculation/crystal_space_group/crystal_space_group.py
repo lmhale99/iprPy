@@ -6,7 +6,11 @@
 import numpy as np
 
 # https://atztogo.github.io/spglib/python-spglib.html
-import spglib
+# https://atztogo.github.io/spglib/python-spglib.html
+try:
+    import spglib
+except ImportError:
+    raise ImportError("The package, spglib, is not installed by default. Please install with pip or conda.")
 
 # https://github.com/usnistgov/atomman 
 import atomman as am

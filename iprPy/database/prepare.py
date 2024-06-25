@@ -88,6 +88,8 @@ def prepare(database,
     if not run_directory.is_absolute():
         run_directory = Path(Path.cwd(), run_directory)
     run_directory.resolve()
+    if not run_directory.exists():
+        raise ValueError(f"Directory, {run_directory}, not found.")
 
     # Parse input_script
     if input_script is not None:

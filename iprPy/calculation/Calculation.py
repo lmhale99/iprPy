@@ -50,18 +50,14 @@ class Calculation(Record):
         params : str, file-like object or dict, optional
             Calculation input parameters or input parameter file.  Cannot be
             given with model.
-        database : atomman.library.Database or Database, optional
-            A Database object to associate with the calculation record.  Some
-            calculation styles may have options where additional data can be
-            accessed from other records in a database.  Specifying a database
-            ensures that those calculations are retrieving that reference
-            information from the correct location.  If not given, then will
-            use the settings for the local potentials/atomman database.
         subsets : tuple, optional
-            The calculation subsets associated with the calculation style.
-            This should be set by the child class __init__ function.
+            The calculation subsets associated with the calculation style that
+            also show up in other calculation classes. Grouping them as subsets
+            helps ensure that all the calculations represent them in a similar
+            fashion. This should be set by the child class __init__ function.
         **kwargs : any
-            Any other core Calculation record attributes to set.  Cannot be
+            Any other core Calculation record attributes to set according to 
+            :class:`atomman.library.record.Record`.  Cannot be
             given with model.
         """
         # Throw error for default class
