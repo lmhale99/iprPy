@@ -24,7 +24,7 @@ def diffusion_msd(lammps_command: str,
                   dumpsteps: int = 0,
                   runsteps: int = 100000,
                   thermosteps: int = 1000,
-                  directoryname: str = "dump",
+                  directoryname: Optional[str] = None,
                   dataoffset: int = 500,
                   degrees_freedom: int = 3,
                   eq_thermosteps: int = 0,
@@ -55,7 +55,7 @@ def diffusion_msd(lammps_command: str,
     lammps_variables['Degrees_freedom'] = degrees_freedom
     
     # Setting up the dump instructions
-    if (dumpsteps != 0) or (dumpsteps != None):
+    if (dumpsteps != 0) and (dumpsteps != None):
         if not Path(directoryname).exists():
             Path(directoryname).mkdir(parents=True)
         instruct = f"""dump	        dumpy all custom {dumpsteps} {directoryname}/*.dump id type x y z"""
@@ -106,28 +106,23 @@ def diffusion_msd(lammps_command: str,
     runningMSD_y = thermo['c_msd[2]']
     runningMSD_z = thermo['c_msd[3]']
 
-
     Diffusion_coeff = np.average(runningDiffusion[dataoffset:])
 
     AveTemp = np.average(runningTemperature[dataoffset:])
-    AveMSD = np.average(runningMSD[dataoffset:])
+    MSD_unitless = (runningMSD[dataoffset:])
     
     # unit conversions 
     length2_per_time_unit = f"({lammps_units['length']}^2)/({lammps_units['time']})"
     length2_unit = f"({lammps_units['length']}^2)"
 
-    D = uc.set_in_units(Diffusion_coeff, length2_per_time_unit)
-    
-    MSD = uc.set_in_units(AveMSD, length2_unit)
-
-    results['msd_x_values'] = runningMSD_x 
-    results['msd_y_values'] = runningMSD_y 
-    results['msd_z_values'] = runningMSD_z 
-    results['msd_values'] = MSD 
-    results['measured_temperature'] = AveTemp
-    results['measured_temperature_stderror'] = np.std(runningTemperature[dataoffset:])
-    results['diffusion'] = D
-    results['diffusion_stderror'] = np.std(runningDiffusion[dataoffset:])
+    results['msd_x_values'] = uc.set_in_units(runningMSD_x,length2_unit) 
+    results['msd_y_values'] = uc.set_in_units(runningMSD_y,length2_unit)
+    results['msd_z_values'] = uc.set_in_units(runningMSD_z,length2_unit)
+    results['msd_values'] = uc.set_in_units(MSD_unitless,length2_unit) 
+    results['measured_temperature'] = uc.set_in_units(AveTemp,'K')
+    results['measured_temperature_stderror'] = uc.set_in_units(np.std(runningTemperature[dataoffset:]),'K')
+    results['diffusion'] = uc.set_in_units(Diffusion_coeff, length2_per_time_unit)
+    results['diffusion_stderror'] = uc.set_in_units(np.std(runningDiffusion[dataoffset:]),length2_per_time_unit)
     results['lammps_output'] = output 
 
     return results

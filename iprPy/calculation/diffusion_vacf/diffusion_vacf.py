@@ -1,6 +1,6 @@
 #current in 6/11/24 - duplicated in working directoy
 
-import datetime 
+from pathlib import Path 
 import random
 from typing import Optional
 
@@ -18,24 +18,28 @@ from ...tools import read_calc_file
 # significantly longer 
 
 def diffusion_vacf(lammps_command:str,
-              potential: lmp.Potential,
               system: am.System,
+              potential: lmp.Potential,
+              temperature: float,
               mpi_command: Optional[str] = None,
-              randomseed: Optional[int] = None,
-              temperature: float = 300,
-              timestep: float = .5,
+              timestep: Optional[float] = None,
+              dumpsteps: int = 0,
               runsteps: int = 10000,
               simruns: int = 5,
-              dumpsteps: int = 0,
-              directoryname: Optional[str] = None,
               degrees_freedom: int = 3,
+              directoryname: Optional[str] = None,
               eq_thermosteps: int = 0,
               eq_runsteps: int = 0,
               eq_equilibrium: bool = False,
+              randomseed: Optional[int] = None
               ) -> dict:
     
     #Get the Units from Potential
-    lamps_units = lmp.style.unit(potential.units)
+    lammps_units = lmp.style.unit(potential.units)
+
+    # Set default timestep based on units
+    if timestep is None:
+        timestep = lmp.style.timestep(potential.units)
 
     #Initialize the variables to fill in the script
     lammps_variables = {}
@@ -52,13 +56,11 @@ def diffusion_vacf(lammps_command:str,
     lammps_variables['Equilibration_steps'] = eq_runsteps
     lammps_variables['num_simulations'] = simruns
     lammps_variables['Degrees_freedom'] = degrees_freedom
-    #Fill in the template 
 
-    if randomseed is None:
-        randomseed = random.randint(1,9000000)
-
-    if (dumpsteps != 0) or (dumpsteps != None):
-        mkdir(directoryname,simruns)
+    #Setting up dump instrcutions
+    if (dumpsteps != 0) and (dumpsteps != None):
+        if not Path(directoryname).exists():
+            Path(directoryname).mkdir(parents=True)
         instruct = f"dump            dumpy all custom {dumpsteps} {directoryname}/$i/*.dump id type x y z"
         lammps_variables['Dump_instructions'] = instruct 
         lammps_variables['Dump_unfix'] = "undump dumpy"
@@ -66,20 +68,28 @@ def diffusion_vacf(lammps_command:str,
         lammps_variables['Dump_instructions'] = ""
         lammps_variables['Dump_unfix'] = ""
 
+    #Set up the seed
+    if randomseed is None:
+        randomseed = random.randint(1,9000000)
+
     #Setting up equilbrium
     if eq_equilibrium:
-        instruct = f"""fix NVE all nve \n fix LANGEVIN all langevin $T $T {10*timestep} {randomseed} \n
-                        thermo {eq_thermosteps} \n run {eq_runsteps} \n unfix NVE \n unfix LANGEVIN \n
-                        reset_timestep 0"""
+        instruct = '\n'.join([
+            "fix NVE all nve",
+            f"fix LANGEVIN all langevin $T $T {10*timestep} {randomseed}",
+            f"thermo {eq_thermosteps}",
+            f"run {eq_runsteps}",
+            "unfix NVE",
+            "unfix LANGEVIN",
+            "reset_timestep 0"])
         lammps_variables['Equilibration_instructions'] = instruct
     elif not eq_equilibrium or eq_runsteps == 0:
         lammps_variables['Equilibration_instructions'] = ""
 
-
+    #Fill in the template
     lammps_script = 'in.diffusion.in'
     template = read_calc_file('iprPy.calculation.diffusion_vacf',
                               'in.diffusion_vacf.template')
-
     with open(lammps_script,'w') as f:
         f.write(filltemplate(template,lammps_variables,'<','>'))
     
@@ -101,7 +111,7 @@ def diffusion_vacf(lammps_command:str,
     v3 = np.ndarray((simruns,runsteps+1))
     v = np.ndarray((simruns,runsteps+1))
     for i in range(indexOffset,simruns+indexOffset):
-        D[i-indexOffset] = log.simulations[i].thermo['v_eta'] #This is the integrated value - dumb name
+        D[i-indexOffset] = log.simulations[i].thermo['v_eta'] 
         T[i-indexOffset] = log.simulations[i].thermo['Temp']
         v1[i-indexOffset] = log.simulations[i].thermo['c_vacf[1]']
         v2[i-indexOffset] = log.simulations[i].thermo['c_vacf[2]']
@@ -119,32 +129,19 @@ def diffusion_vacf(lammps_command:str,
     Diffusion_coeff_err = np.std(runningDiffusion)
     AveTemp = np.average(runningTemperature)
     AveTemp_err = np.std(runningTemperature)
-    
-    #unit conversions 
-    # unitString1 = f"({lamps_units['length']}^2)/({lamps_units['time']})"
 
+    diffusionUnitString = f'{lammps_units['velocity']}^2*{lammps_units['time']}'
+    vacfUnitString = f'{lammps_units['velocity']}^2'
 
-
-
-    results['vacf_x_values'] = runningv1
-    results['vacf_y_values'] = runningv2
-    results['vacf_z_values'] = runningv3
-    results['vacf_values'] = runningv
-    results['diffusion'] = Diffusion_coeff
-    results['diffusion_stderr'] = Diffusion_coeff_err
-    results['measured_temperature'] = AveTemp
-    results['measured_temperature_stderr'] = AveTemp_err
+    results['vacf_x_values'] = uc.set_in_units(runningv1,vacfUnitString)
+    results['vacf_y_values'] = uc.set_in_units(runningv2,vacfUnitString)
+    results['vacf_z_values'] = uc.set_in_units(runningv3,vacfUnitString)
+    results['vacf_values'] = uc.set_in_units(runningv,vacfUnitString)
+    results['diffusion'] = uc.set_in_units(Diffusion_coeff,diffusionUnitString)
+    results['diffusion_stderr'] = uc.set_in_units(Diffusion_coeff_err,diffusionUnitString)
+    results['measured_temperature'] = uc.set_in_units(AveTemp,'K')
+    results['measured_temperature_stderr'] = uc.set_in_units(AveTemp_err,'K')
     results['lammps_output'] = output 
     return results
     
-
-import os 
-def mkdir(name,runs):
-    os.mkdir(name)
-    for i in range(1,runs+1):
-        path = os.path.join(name,str(i))
-        try:
-            os.mkdir(path)
-        except:
-            print("Directory Already Exists - Please use a different name")
     

@@ -81,7 +81,7 @@ class DiffusionMSD(Calculation):
         self.eq_equilibrium = False
         self.eq_thermosteps = None
         self.eq_runsteps = None
-        self.timestep = 0.001
+        self.timestep = None
         self.__measured_temperature = None
         self.__measured_temperature_stderr = None
  
@@ -137,7 +137,10 @@ class DiffusionMSD(Calculation):
     @property
     def timestep(self) -> Optional[float]:
         """float: time step for simulation"""
-        return self.__timestep
+        if self.__timestep is None:
+            return am.lammps.style.timestep(self.potential.potential.units)
+        else:
+            return self.__timestep
     
     @timestep.setter
     def timestep(self, val: Optional[float]):
@@ -183,7 +186,7 @@ class DiffusionMSD(Calculation):
     @property
     def directoryname(self) -> str:
         if self.__directoryname is None:
-            return "dump"
+            return None
         else:
             return self.__directoryname
         
@@ -493,7 +496,7 @@ class DiffusionMSD(Calculation):
         # Load calculation-specific its
         self.runsteps = int(input_dict.get('runsteps', 50000))
         self.dumpsteps = int(input_dict.get('dumpsteps', 2000))
-        self.randomseed = int(input_dict.get('randomseed', 89415))
+        self.randomseed = input_dict.get('randomseed', None)
         self.degrees_freedom = int(input_dict.get('degrees_freedom',3))
         self.sample_interval = int(input_dict.get('sample_interval',5))
         self.thermosteps = int(input_dict.get('thermosteps',100))
@@ -506,7 +509,6 @@ class DiffusionMSD(Calculation):
         self.timestep = input_dict.get('timestep', None)
 
         # Load calculation-specific floats with units
-
 
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
@@ -685,6 +687,8 @@ class DiffusionMSD(Calculation):
         self.system.build_model(calc, after='potential-LAMMPS')
         # self.system_mods.build_model(calc)
 
+    #Trying to get units
+
         # Build calculation-specific content
         if 'calculation' not in calc:
             calc['calculation'] = DM()
@@ -692,8 +696,8 @@ class DiffusionMSD(Calculation):
             calc['calculation']['run-parameter'] = DM()
         run_params = calc['calculation']['run-parameter']
 
-        run_params['temperature'] = self.temperature
-        run_params['timestep'] = self.timestep
+        run_params['temperature'] = uc.model(self.temperature,'K')
+        run_params['timestep'] = uc.model(self.timestep,'ps')
         run_params['runsteps'] = self.runsteps
         run_params['dumpsteps'] = self.dumpsteps
         run_params['randomseed'] = self.randomseed
@@ -708,14 +712,15 @@ class DiffusionMSD(Calculation):
         # Build results
         if self.status == 'finished':
 
-            calc['msd_x'] = self.msd_x_values.tolist()
-            calc['msd_y'] = self.msd_y_values.tolist()
-            calc['msd_z'] = self.msd_z_values.tolist()
-            calc['msd'] = self.msd_values.tolist()
-            calc['measured_temperature'] = self.measured_temperature
-            calc['measured_temperature_stderr'] = self.measured_temperature_stderr
-            calc['diffusion'] = self.diffusion_value
-            calc['diffusion_stderr'] = self.diffusion_value_stderror
+            calc['msd_x'] = uc.model(self.msd_x_values.tolist(),f'{self.units.length_unit}^2')
+            calc['msd_y'] = uc.model(self.msd_y_values.tolist(),f'{self.units.length_unit}^2')
+            calc['msd_z'] = uc.model(self.msd_z_values.tolist(),f'{self.units.length_unit}^2')
+            calc['msd'] = uc.model(self.msd_values.tolist(),f'{self.units.length_unit}^2')
+            calc['measured_temperature'] = uc.model(self.measured_temperature,'K')
+            calc['measured_temperature_stderr'] = uc.model(self.measured_temperature_stderr,'K')
+            calc['diffusion'] = uc.model(self.diffusion_value,f'{self.units.length_unit}^2/ps')
+            calc['diffusion_stderr'] = uc.model(self.diffusion_value_stderror,
+                                                f'{self.units.length_unit}^2/ps')
 
         self._set_model(model)
         return model
@@ -738,14 +743,19 @@ class DiffusionMSD(Calculation):
         super().load_model(model, name=name)
         calc = self.model[self.modelroot]
 
+        
+
+
+
+
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
         self.runsteps = run_params['runsteps']
-        self.timestep = run_params['timestep']
+        self.timestep = uc.value_unit(run_params['timestep'])
         self.dumpsteps = run_params['dumpsteps']
         self.directoryname = run_params['directoryname']
         self.randomseed = run_params['randomseed']
-        self.temperature = run_params['temperature']
+        self.temperature = uc.value_unit(run_params['temperature'])
 
         self.thermosteps = run_params['thermosteps']
         self.dataoffset = run_params['dataoffset']
@@ -757,14 +767,14 @@ class DiffusionMSD(Calculation):
         # Load results
         if self.status == 'finished':
 
-            self.__msd_x_values = calc['msd_x']
-            self.__msd_y_values = calc['msd_y']
-            self.__msd_z_values = calc['msd_z']
-            self.__msd_values = calc['msd'] 
-            self.__diffusion_value = calc['diffusion']
-            self.__diffusion_value_stderr = calc['diffusion_stderr']
-            self.__measured_temperature = calc['measured_temperature']
-            self.__measured_temperature_stderr = calc['measured_temperature_stderr']
+            self.__msd_x_values = uc.value_unit(calc['msd_x'])
+            self.__msd_y_values = uc.value_unit(calc['msd_y'])
+            self.__msd_z_values = uc.value_unit(calc['msd_z'])
+            self.__msd_values = uc.value_unit(calc['msd'] )
+            self.__diffusion_value = uc.value_unit(calc['diffusion'])
+            self.__diffusion_value_stderr = uc.value_unit(calc['diffusion_stderr'])
+            self.__measured_temperature = uc.value_unit(calc['measured_temperature'])
+            self.__measured_temperature_stderr = uc.value_unit(calc['measured_temperature_stderr'])
 
     @property
     def queries(self) -> dict:

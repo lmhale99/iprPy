@@ -68,10 +68,10 @@ class viscosityDRIVING(Calculation):
 
         # Initialize unique calculation attributes
 
-        self.temperature = 300
-        self.randomseed = 84951
+        self.temperature = None
+        self.randomseed = 300
 
-        self.timestep = .01
+        self.timestep = None
         self.runsteps = 50000
         self.thermosteps = 2000
         self.dataoffset = 10
@@ -128,14 +128,17 @@ class viscosityDRIVING(Calculation):
         return self.__system
 
     @property
-    def timestep(self) -> float:
+    def timestep(self) -> Optional[float]:
         """float: time step for simulation"""
-        return self.__timestep
+        if self.__timestep is None:
+            return am.lammps.style.timestep(self.potential.potential.units)
+        else:
+            return self.__timestep
     
     @timestep.setter
     def timestep(self, val: Optional[float]):
         if val is None:
-            self.__timestep = .001
+            self.__timestep = None
         else:
             self.__timestep = val
     
@@ -436,7 +439,7 @@ class viscosityDRIVING(Calculation):
 
         # Load calculation-specific its
         self.runsteps = int(input_dict.get('runsteps', 50000))
-        self.randomseed = int(input_dict.get('randomseed', 89415))
+        self.randomseed = input_dict.get('randomseed', None)
         self.sample_interval = int(input_dict.get('sample_interval',5))
         self.thermosteps = int(input_dict.get('thermosteps',100))
         self.eq_thermosteps = int(input_dict.get('eq_termosteps',0))
@@ -447,7 +450,7 @@ class viscosityDRIVING(Calculation):
         # Load calculation-specific unitless floats
         self.drivingforce = float(input_dict.get('drivingforce',.1))
         self.temperature = float(input_dict.get('temperature',300))
-        self.timestep = float(input_dict.get('timestep',.01))
+        self.timestep = input_dict.get('timestep',None)
 
         # Load calculation-specific floats with units
 
@@ -529,7 +532,7 @@ class viscosityDRIVING(Calculation):
 
         return {
             'temperature': ' '.join(["Target temperature for the simulation - Default value of 300 K"]),
-            'timestep': ' '.join(["How much to increase the time at each step - Default value of .001"]),
+            'timestep': ' '.join(["How much to increase the time at each step - Default value of None will use the LAMMPS default"]),
             'runsteps':' '.join(["How many time steps to run simulation - Default value is 100000"]),
             'thermosteps':' '.join(["How often to write calculated value to log file/ouput - Default value is 1000"]),
             'dataoffset':' '.join(["Specifies how much of the initial data to ignore",
@@ -634,13 +637,13 @@ class viscosityDRIVING(Calculation):
             calc['calculation']['run-parameter'] = DM()
         run_params = calc['calculation']['run-parameter']
 
-        run_params['temperature'] = self.temperature
-        run_params['timestep'] = self.timestep
+        run_params['temperature'] = uc.model(self.temperature,'K')
+        run_params['timestep'] = uc.model(self.timestep,'ps')
         run_params['runsteps'] = self.runsteps
         run_params['randomseed'] = self.randomseed
         run_params['thermosteps'] = self.thermosteps
         run_params['dataoffset'] = self.dataoffset
-        run_params['drivingforce'] = self.drivingforce
+        run_params['drivingforce'] = uc.model(self.drivingforce,f'{self.units.length_unit}/(ps)^2')
         run_params['eq_thermosteps'] = self.eq_thermosteps
         run_params['eq_runsteps'] = self.eq_runsteps
         run_params['eq_equilibrium'] = self.eq_equilibrium
@@ -649,11 +652,13 @@ class viscosityDRIVING(Calculation):
 
         # Build results
         if self.status == 'finished':
+            #Viscosity unit conversion string 
+            unitString = f"{self.units.pressure_unit}*ps"
 
-            calc['measured_temperature'] = self.measured_temperature
-            calc['measured_temperature_stderr'] = self.measured_temperature_stderr
-            calc['viscosity'] = self.viscosity_value
-            calc['viscosity_stderr'] = self.viscosity_value_stderror
+            calc['measured_temperature'] = uc.model(self.measured_temperature,'K')
+            calc['measured_temperature_stderr'] = uc.model(self.measured_temperature_stderr,'K')
+            calc['viscosity'] = uc.model(self.viscosity_value,unitString)
+            calc['viscosity_stderr'] = uc.model(self.viscosity_value_stderror,unitString)
 
         self._set_model(model)
         return model
@@ -679,9 +684,9 @@ class viscosityDRIVING(Calculation):
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
         self.runsteps = run_params['runsteps']
-        self.timestep = run_params['timestep']
+        self.timestep = uc.value_unit(run_params['timestep'])
         self.randomseed = run_params['randomseed']
-        self.temperature = run_params['temperature']
+        self.temperature = uc.value_unit(run_params['temperature'])
         self.dumpsteps = run_params['dumpsteps']
         self.directoryname = run_params['directoryname']
         self.thermosteps = run_params['thermosteps']
@@ -689,14 +694,14 @@ class viscosityDRIVING(Calculation):
         self.eq_thermosteps = run_params['eq_thermosteps']
         self.eq_runsteps = run_params['eq_runsteps']
         self.eq_equilibrium = run_params['eq_equilibrium']
-        self.drivingforce = run_params['drivingforce']
+        self.drivingforce = uc.value_unit(run_params['drivingforce'])
 
         # Load results
         if self.status == 'finished':
-            self.__viscosity_value = calc['viscosity']
-            self.__viscosity_value_stderr = calc['viscosity_stderr']
-            self.__measured_temperature = calc['measured_temperature']
-            self.__measured_temperature_stderr = calc['measured_temperature_stderr']
+            self.__viscosity_value = uc.value_unit(calc['viscosity'])
+            self.__viscosity_value_stderr = uc.value_unit(calc['viscosity_stderr'])
+            self.__measured_temperature = uc.value_unit(calc['measured_temperature'])
+            self.__measured_temperature_stderr = uc.value_unit(calc['measured_temperature_stderr'])
 
     @property
     def queries(self) -> dict:

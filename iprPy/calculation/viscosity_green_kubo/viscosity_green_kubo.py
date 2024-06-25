@@ -15,16 +15,16 @@ from ...tools import read_calc_file
 # significantly longer 
 
 def viscosity_green_kubo(lammps_command:str,
-              potential: lmp.Potential,
               system: am.System,
+              potential: lmp.Potential,
+              temperature: float,
               mpi_command: Optional[str] = None,
-              temperature: float = 200,
-              timestep: float = .5,
+              timestep: Optional[float] = None,
               correlationlength: int = 400,
               sampleinterval: int = 5,
               outputsteps: int = 2000,
               runsteps: int = 100000,
-              dataoffset: int = 20,
+              dataoffset: int = 5,
               eq_thermosteps: int = 0,
               eq_runsteps: int = 0,
               eq_equilibrium: bool = False,
@@ -33,7 +33,11 @@ def viscosity_green_kubo(lammps_command:str,
               ) -> dict:
     
     #Get the Units from Potential
-    lamps_units = lmp.style.unit(potential.units)
+    lammps_units = lmp.style.unit(potential.units)
+
+    # Set default timestep based on units
+    if timestep is None:
+        timestep = lmp.style.timestep(potential.units)
 
     #Initialize the variables to fill in the script
     lammps_variables = {}
@@ -42,22 +46,24 @@ def viscosity_green_kubo(lammps_command:str,
     system_info = system.dump('atom_data',f='init.dat',potential = potential)
     lammps_variables['atomman_system_pair_info'] = system_info
 
+    #Conversion tools
+
+    #Get the boltzman constant in si
     kb_SI = uc.set_in_units(1.3806504*(10**(-23)),"(kg*m^2)/(s^2*K)")
 
-    mass_unit = lamps_units['mass']
+    #Account for /mole unit
+    mass_unit = lammps_units['mass']
     if mass_unit == "g/mol": mass_unit = 'g'
 
-    unitStringKB = f"({mass_unit}*{lamps_units['length']}^2)/({lamps_units['time']}^2*{lamps_units['temperature']})"
+    #Get boltzman in new unit system
+    unitStringKB = f"({mass_unit}*{lammps_units['length']}^2)/({lammps_units['time']}^2*{lammps_units['temperature']})"
     kb = uc.get_in_units(kb_SI,unitStringKB)
-    # print(f"kb={kb}",unitStringKB)
-    # print(f"{uc.get_in_units(kb_SI,'(kg*m^2)/(s^2*K)')} - in J/K")
 
-
-    unitStringScale = f"({mass_unit})/({lamps_units['length']}*{lamps_units['time']}^2)"
-    scale_unit = uc.set_in_units(1,f"{lamps_units['pressure']}")
+    #Conversion factor from dimensions of pressure to working calculation units
+    unitStringScale = f"({mass_unit})/({lammps_units['length']}*{lammps_units['time']}^2)"
+    scale_unit = uc.set_in_units(1,f"{lammps_units['pressure']}")
     scale = uc.get_in_units(scale_unit,unitStringScale)
-    # print(scale,unitStringScale)
-
+ 
 
     #Initialize the rest of the inputs to the Lammps Scripts 
     lammps_variables['Temperature'] = temperature
@@ -66,7 +72,6 @@ def viscosity_green_kubo(lammps_command:str,
     lammps_variables['Sample_Interval'] = sampleinterval
     lammps_variables['Run_length'] = runsteps
     lammps_variables['Dump_Interval'] = outputsteps
-    #Weird conversion tools 
     lammps_variables['Boltzman_constant'] = kb
     lammps_variables['Scale'] = scale 
     lammps_variables['Drag_coeff'] = dragcoeff 
@@ -76,19 +81,22 @@ def viscosity_green_kubo(lammps_command:str,
 
     #Setting up equibilrium run 
     if eq_equilibrium:
-        instruct = f"""fix NVE all nve \n fix LANGEVIN all langevin $T $T {10*timestep} {randomseed} \n
-                        thermo {eq_thermosteps} \n run {eq_runsteps} \n unfix NVE \n unfix LANGEVIN \n
-                        reset_timestep 0"""
+        instruct = '\n'.join([
+            "fix NVE all nve",
+            f"fix LANGEVIN all langevin $T $T {10*timestep} {randomseed}",
+            f"thermo {eq_thermosteps}",
+            f"run {eq_runsteps}",
+            "unfix NVE",
+            "unfix LANGEVIN",
+            "reset_timestep 0"])
         lammps_variables['Equilibration_instructions'] = instruct
     elif not eq_equilibrium or eq_runsteps == 0:
         lammps_variables['Equilibration_instructions'] = ""
-
 
     #Fill in the template 
     lammps_script = 'in.viscosity.in'
     template = read_calc_file('iprPy.calculation.viscosity_green_kubo',
                               'in.viscosity_green_kubo.template')
-    #with open("in.diffusion_msd.template",'r') as template_f:
     with open(lammps_script,'w') as f:
         f.write(filltemplate(template,lammps_variables,'<','>'))
     
@@ -96,44 +104,40 @@ def viscosity_green_kubo(lammps_command:str,
     output = lmp.run(lammps_command,script_name=lammps_script,
                      mpi_command=mpi_command,screen=False,logfile="viscosity.log.lammps")
     
-    log = lmp.Log('viscosity.log.lammps')
-
-    thermo_index = 0
-    if eq_equilibrium:
-        thermo_index += 1
+    thermo = output.simulations[-1].thermo
 
     #From thermo data calculate the Viscosity 
-    log = lmp.Log('viscosity.log.lammps')
-    runningViscosity = log.simulations[thermo_index].thermo["v_v"]
-    runningTemperature = log.simulations[thermo_index].thermo["Temp"]
+    runningViscosity = thermo["v_v"]
+    runningTemperature = thermo["Temp"]
 
-    running_pxy = log.simulations[thermo_index].thermo['v_pxy']
-    running_pxz = log.simulations[thermo_index].thermo['v_pxz']
-    running_pyz = log.simulations[thermo_index].thermo['v_pyz']
+    running_pxy = thermo['v_pxy']
+    running_pxz = thermo['v_pxz']
+    running_pyz = thermo['v_pyz']
 
-    running_vx = log.simulations[thermo_index].thermo['v_v11']
-    running_vy = log.simulations[thermo_index].thermo['v_v22']
-    running_vz = log.simulations[thermo_index].thermo['v_v33']
+    running_vx = thermo['v_v11']
+    running_vy = thermo['v_v22']
+    running_vz = thermo['v_v33']
 
     Viscosity = np.average(runningViscosity[dataoffset:])
     AveTemp = np.average(runningTemperature[dataoffset:])
 
-
+    viscosityUnitString = f'{lammps_units['pressure']}*{lammps_units['time']}'
+    pressureUnitString = f'{lammps_units['pressure']}'
     #Initialize the return dictionary
     results = {}
     #Data of interest
-    results['viscosity_stderr'] = np.std(runningViscosity[dataoffset:])
-    results['viscosity'] = Viscosity
-    results['measured_temperature'] = AveTemp
-    results['measured_temperature_stderr'] = np.std(runningTemperature[dataoffset:])
+    results['viscosity_stderr'] = uc.set_in_units(np.std(runningViscosity[dataoffset:]),viscosityUnitString)
+    results['viscosity'] = uc.set_in_units(Viscosity,viscosityUnitString)
+    results['measured_temperature'] = uc.set_in_units(AveTemp,'K')
+    results['measured_temperature_stderr'] = uc.set_in_units(np.std(runningTemperature[dataoffset:]),'K')
 
-    results['pxy_values'] = running_pxy[dataoffset:]
-    results['pxz_values'] = running_pxz[dataoffset:]
-    results['pyz_values'] = running_pyz[dataoffset:]
+    results['pxy_values'] = uc.set_in_units(running_pxy[dataoffset:],pressureUnitString)
+    results['pxz_values'] = uc.set_in_units(running_pxz[dataoffset:],pressureUnitString)
+    results['pyz_values'] = uc.set_in_units(running_pyz[dataoffset:],pressureUnitString)
 
-    results['vx_value'] = np.average(running_vx[dataoffset:])
-    results['vy_value'] = np.average(running_vy[dataoffset:])
-    results['vz_value'] = np.average(running_vz[dataoffset:])
+    results['vx_value'] = uc.set_in_units(np.average(running_vx[dataoffset:]),viscosityUnitString)
+    results['vy_value'] = uc.set_in_units(np.average(running_vy[dataoffset:]),viscosityUnitString)
+    results['vz_value'] = uc.set_in_units(np.average(running_vz[dataoffset:]),viscosityUnitString)
 
     results['lammps_output'] = output
     return results

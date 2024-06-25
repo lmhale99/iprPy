@@ -71,7 +71,7 @@ class DiffusionVACF(Calculation):
         self.randomseed = None
 
         self.runsteps = 50000
-        self.timestep = .01 
+        self.timestep = None 
 
 
         self.degrees_freedom = 3
@@ -80,7 +80,7 @@ class DiffusionVACF(Calculation):
         self.eq_runsteps = 0
         self.eq_equilibrium = False
         self.dumpsteps = 0
-        self.directoryname = "dump"
+        self.directoryname = None
 
         self.__measured_temperature = None
         self.__measured_temperature_stderr = None
@@ -132,14 +132,17 @@ class DiffusionVACF(Calculation):
         return self.__system
 
     @property
-    def timestep(self) -> float:
+    def timestep(self) -> Optional[float]:
         """float: time step for simulation"""
-        return self.__timestep
+        if self.__timestep is None:
+            return am.lammps.style.timestep(self.potential.potential.units)
+        else:
+            return self.__timestep
     
     @timestep.setter
     def timestep(self, val: Optional[float]):
         if val is None:
-            self.__timestep = .001
+            self.__timestep = None
         else:
             self.__timestep = val
     
@@ -158,8 +161,6 @@ class DiffusionVACF(Calculation):
             val = float(val)
             assert val >= 0.0
             self.__temperature = val
-
-
 
     @property
     def runsteps(self) -> int:
@@ -278,7 +279,7 @@ class DiffusionVACF(Calculation):
     @directoryname.setter
     def directoryname(self, val: str):
         if val is None: 
-            self.__directoryname = "dump"
+            self.__directoryname = None
         else:
             self.__directoryname = str(val)
 ###################################################################################################################
@@ -443,14 +444,14 @@ class DiffusionVACF(Calculation):
 
 
         # Load calculation-specific strings
-        self.directoryname = str(input_dict.get('directoryname','dump'))
+        self.directoryname = str(input_dict.get('directoryname',None))
 
         # Load calculation-specific booleans
         self.eq_equilibrium = bool(input_dict.get('eq_equilibrium',False))
 
         # Load calculation-specific its
         self.runsteps = int(input_dict.get('runsteps', 50000))
-        self.randomseed = int(input_dict.get('randomseed', 89415))
+        self.randomseed = input_dict.get('randomseed', None)
         self.degrees_freedom = int(input_dict.get('degrees_freedom',3))
         self.simruns = int(input_dict.get('simruns',5))
         self.eq_thermosteps = int(input_dict.get('eq_termosteps',0))
@@ -459,7 +460,7 @@ class DiffusionVACF(Calculation):
 
         # Load calculation-specific unitless floats
         self.temperature = float(input_dict.get('temperature',300))
-        self.timestep = float(input_dict.get('timestep',.01))
+        self.timestep = input_dict.get('timestep',None)
 
         # Load calculation-specific floats with units
 
@@ -541,7 +542,7 @@ class DiffusionVACF(Calculation):
 
         return {
             'temperature': ' '.join(["Target temperature for the simulation - Default value of 300 K"]),
-            'timestep': ' '.join(["How much to increase the time at each step - Default value of .001"]),
+            'timestep': ' '.join(["How much to increase the time at each step - Default value of None will use the LAMMPS default"]),
             'runsteps':' '.join(["How many time steps to run simulation - Default value is 100000"]),
             'simruns':' '.join(["The number of simulations to run - a higher number helps damp out simulation noise"]),
             'Degrees_freedom':' '.join(["The degrees of freedom for the molecule or atom",
@@ -643,8 +644,8 @@ class DiffusionVACF(Calculation):
             calc['calculation']['run-parameter'] = DM()
         run_params = calc['calculation']['run-parameter']
 
-        run_params['temperature'] = self.temperature
-        run_params['timestep'] = self.timestep
+        run_params['temperature'] = uc.model(self.temperature,'K')
+        run_params['timestep'] = uc.model(self.timestep,'ps')
         run_params['runsteps'] = self.runsteps
         run_params['simruns'] = self.simruns
         run_params['randomseed'] = self.randomseed
@@ -657,14 +658,15 @@ class DiffusionVACF(Calculation):
         # Build results
         if self.status == 'finished':
 
-            calc['vacf_x'] = self.vacf_x_values.tolist()
-            calc['vacf_y'] = self.vacf_y_values.tolist()
-            calc['vacf_z'] = self.vacf_z_values.tolist()
-            calc['vacf'] = self.vacf_values.tolist()
-            calc['measured_temperature'] = self.measured_temperature
-            calc['measured_temperature_stderr'] = self.measured_temperature_stderr
-            calc['diffusion'] = self.diffusion_value
-            calc['diffusion_stderr'] = self.diffusion_value_stderror
+            calc['vacf_x'] = uc.model(self.vacf_x_values.tolist(),f'({self.units.length_unit}/ps)^2')
+            calc['vacf_y'] = uc.model(self.vacf_y_values.tolist(),f'({self.units.length_unit}/ps)^2')
+            calc['vacf_z'] = uc.model(self.vacf_z_values.tolist(),f'({self.units.length_unit}/ps)^2')
+            calc['vacf'] = uc.model(self.vacf_values.tolist(),f'({self.units.length_unit}/ps)^2')
+            calc['measured_temperature'] = uc.model(self.measured_temperature,'K')
+            calc['measured_temperature_stderr'] = uc.model(self.measured_temperature_stderr,'K')
+            calc['diffusion'] = uc.model(self.diffusion_value,f'({self.units.length_unit}/ps)^2*ps')
+            calc['diffusion_stderr'] = uc.model(self.diffusion_value_stderror,
+                                                f'({self.units.length_unit}/ps)^2*ps')
 
         self._set_model(model)
         return model
@@ -690,9 +692,9 @@ class DiffusionVACF(Calculation):
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
         self.runsteps = run_params['runsteps']
-        self.timestep = run_params['timestep']
+        self.timestep = uc.value_unit(run_params['timestep'])
         self.randomseed = run_params['randomseed']
-        self.temperature = run_params['temperature']
+        self.temperature = uc.value_unit(run_params['temperature'])
         self.simruns = run_params['simruns']
         self.dumpsteps = run_params['dumpsteps']
         self.directoryname = run_params['directoryname']
@@ -704,14 +706,14 @@ class DiffusionVACF(Calculation):
         # Load results
         if self.status == 'finished':
 
-            self.__vacf_x_values = calc['vacf_x']
-            self.__vacf_y_values = calc['vacf_y']
-            self.__vacf_z_values = calc['vacf_z']
-            self.__vacf_values = calc['vacf'] 
-            self.__diffusion_value = calc['diffusion']
-            self.__diffusion_value_stderr = calc['diffusion_stderr']
-            self.__measured_temperature = calc['measured_temperature']
-            self.__measured_temperature_stderr = calc['measured_temperature_stderr']
+            self.__vacf_x_values = uc.value_unit(calc['vacf_x'])
+            self.__vacf_y_values = uc.value_unit(calc['vacf_y'])
+            self.__vacf_z_values = uc.value_unit(calc['vacf_z'])
+            self.__vacf_values = uc.value_unit(calc['vacf'] )
+            self.__diffusion_value = uc.value_unit(calc['diffusion'])
+            self.__diffusion_value_stderr = uc.value_unit(calc['diffusion_stderr'])
+            self.__measured_temperature = uc.value_unit(calc['measured_temperature'])
+            self.__measured_temperature_stderr = uc.value_unit(calc['measured_temperature_stderr'])
 
     @property
     def queries(self) -> dict:
