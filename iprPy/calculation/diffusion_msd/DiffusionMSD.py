@@ -68,20 +68,16 @@ class DiffusionMSD(Calculation):
 
         # Initialize unique calculation attributes
 
-        self.degrees_freedom = 3
         self.temperature = 300
         
         self.runsteps = 50000
-        self.dumpsteps = 0
-        self.directoryname = ""
         self.thermosteps = 2000
-        self.dataoffset = 10
         self.randomseed = None
         
         self.eq_equilibrium = False
         self.eq_thermosteps = None
         self.eq_runsteps = None
-        self.timestep = None
+        self.timestep = .001
         self.__measured_temperature = None
         self.__measured_temperature_stderr = None
  
@@ -138,7 +134,7 @@ class DiffusionMSD(Calculation):
     def timestep(self) -> Optional[float]:
         """float: time step for simulation"""
         if self.__timestep is None:
-            return am.lammps.style.timestep(self.potential.potential.units)
+            return .001
         else:
             return self.__timestep
     
@@ -164,38 +160,6 @@ class DiffusionMSD(Calculation):
             val = float(val)
             assert val >= 0.0
             self.__temperature = val
-
-
-    @property
-    def dumpsteps(self) -> int:
-        """int: How often to dump configuration during the final run."""
-        if self.__dumpsteps is None:
-            return 0
-        else:
-            return self.__dumpsteps
-
-    @dumpsteps.setter
-    def dumpsteps(self, val: Optional[int]):
-        if val is None:
-            self.__dumpsteps = None
-        else:
-            val = int(val)
-            assert val >= 0
-            self.__dumpsteps = val
-
-    @property
-    def directoryname(self) -> str:
-        if self.__directoryname is None:
-            return None
-        else:
-            return self.__directoryname
-        
-    @directoryname.setter
-    def directoryname(self, val: str):
-        if val is None:
-            self.__directoryname = None
-        else:
-            self.__directoryname = val
 
     @property
     def runsteps(self) -> int:
@@ -227,21 +191,6 @@ class DiffusionMSD(Calculation):
             self.__thermosteps = val
 
     @property
-    def dataoffset(self) -> int:
-        """How much of the first data we ignore"""
-        if self.__dataoffset is None:
-            return 5
-        else:
-            return self.__dataoffset
-
-    @dataoffset.setter
-    def dataoffset(self, val: Optional[int]):
-        if val is None: 
-            self.__dataoffset = 20
-        else:
-            self.__dataoffset = val
-
-    @property
     def randomseed(self) -> int:
         """int: Random number seed."""
         return self.__randomseed
@@ -254,21 +203,6 @@ class DiffusionMSD(Calculation):
             val = int(val)
             assert val > 0 and val <= 900000000
         self.__randomseed = val
-
-    @property
-    def degrees_freedom(self) -> int:
-        """int: Degrees of freedom for molecules, i.e water -> 9"""
-        return self.__degrees_freedom
-    
-    @degrees_freedom.setter
-    def degrees_freedom(self, val: Optional[int]):
-        if val is None:
-            self.__degrees_freedom = None
-        else:
-            val = int(val)
-            assert val >= 3
-            self.__degrees_freedom = val
-
 
     @property
     def eq_thermosteps(self) -> int:
@@ -403,20 +337,10 @@ class DiffusionMSD(Calculation):
         runsteps : int or None, optional
             The number of nve integration steps to perform on the system to
             obtain measurements of diffusion
-        dumpsteps : int or None, optional
-            Dump files will be saved every this many steps during the runsteps
-            simulation.
         timestep: float or None
             the difference in time between each step of the calculation
         thermosteps: int or None
             The number of steps inbetween the thermo writes to the log file
-        dataoffset: int or None
-            The number of thrown away values due to the calculation method
-            requiring suitable time to produce reasonable values
-        degrees_freedom: int or None
-            The degrees of freedom for the molecule being simulated, this 
-            should include the dimensional DOF (3) plus rotational and 
-            vibrational. For example water has a DOF of 9. 
         eq_thermosteps: int or None
             If doing an equilibrium run this is the number of steps inbetween
             the thermo calculations
@@ -441,24 +365,16 @@ class DiffusionMSD(Calculation):
             self.temperature = kwargs['temperature']
         if 'timestep' in kwargs:
             self.timestep = kwargs['timestep']
-        if 'dumpsteps' in kwargs:
-            self.dumpsteps = kwargs['dumpsteps']
         if 'runsteps' in kwargs:
             self.runsteps = kwargs['runsteps']
         if 'thermosteps' in kwargs:
             self.thermosteps = kwargs['thermosteps']
-        if 'dataoffset' in kwargs:
-            self.dataoffset = kwargs['dataoffset']
-        if 'degrees_freedom' in kwargs:
-            self.degrees_freedom = kwargs['degrees_freedom']
         if 'eq_thermosteps' in kwargs:
             self.eq_thermosteps = kwargs['eq_thermosteps']
         if 'eq_runsteps' in kwargs:
             self.eq_runsteps = kwargs['eq_runsteps']
         if 'eq_equilbirium' in kwargs:
             self.eq_equilibrium = kwargs['eq_equilibrium']
-        if 'directoryname' in kwargs:
-            self.directoryname = kwargs['directoryname']
 
 ####################### Parameter file interactions ###########################
 
@@ -487,29 +403,27 @@ class DiffusionMSD(Calculation):
 
 
         # Load calculation-specific strings
-        self.directoryname = str(input_dict.get('directoryname',"dump"))
-    
 
         # Load calculation-specific booleans
         self.eq_equilibrium = bool(input_dict.get('eq_equilibrium',False))
 
         # Load calculation-specific its
         self.runsteps = int(input_dict.get('runsteps', 50000))
-        self.dumpsteps = int(input_dict.get('dumpsteps', 2000))
         self.randomseed = input_dict.get('randomseed', None)
-        self.degrees_freedom = int(input_dict.get('degrees_freedom',3))
-        self.sample_interval = int(input_dict.get('sample_interval',5))
         self.thermosteps = int(input_dict.get('thermosteps',100))
         self.eq_thermosteps = int(input_dict.get('eq_termosteps',0))
         self.eq_runsteps = int(input_dict.get('eq_runsteps',0))
 
 
         # Load calculation-specific unitless floats
-        self.temperature = float(input_dict['temperature'])
-        self.timestep = input_dict.get('timestep', None)
 
         # Load calculation-specific floats with units
-
+        self.timestep = value(input_dict,'timestep',
+                              default_unit='ps',
+                              default_term='0.001 ps')
+        self.temperature = value(input_dict,'temperature',
+                                 default_unit='K',
+                                 default_term='300 K')
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
 
@@ -588,17 +502,8 @@ class DiffusionMSD(Calculation):
         return {
             'temperature': ' '.join(["Target temperature for the simulation - Default value of 300 K"]),
             'timestep': ' '.join(["How much to increase the time at each step - Default value of None will use the LAMMPS default"]),
-            'dumpsteps': ' '.join(["How often to write to the dump file for this calculation - Default value of 1000"]),
-            'directoryname':' '.join(["The name of the directory you would like the dump files in"]),
             'runsteps':' '.join(["How many time steps to run simulation - Default value is 100000"]),
             'thermosteps':' '.join(["How often to write calculated value to log file/ouput - Default value is 1000"]),
-            'dataoffset':' '.join(["Specifies how much of the initial data to ignore",
-                                  "For these calculations it takes a while for the system",
-                                  "orient so the initial calculated data is not reasonable",
-                                  "- Default value is 500"]),
-            'Degrees_freedom':' '.join(["The degrees of freedom for the molecule or atom",
-                                        "being simulated. Default for point particles is 3 but for example",
-                                        "waters would be 9. - Default value of 3"]),
             'eq_thermosteps':' '.join(["How often to write calculated value to log file/ouput for",
                                          "equilibriation run- Default value is 1000"]),
             'eq_runsteps':' '.join(["How many time steps to run simulation for equilibration",
@@ -648,12 +553,8 @@ class DiffusionMSD(Calculation):
                 [
                     'temperature',
                     'timestep',
-                    'dumpsteps',
-                    'directoryname',
                     'runsteps',
                     'thermosteps',
-                    'dataoffset',
-                    'Degrees_freedom',
                     'eq_thermosteps',
                     'eq_runsteps',
                     'eq_equilibrium',
@@ -699,15 +600,11 @@ class DiffusionMSD(Calculation):
         run_params['temperature'] = uc.model(self.temperature,'K')
         run_params['timestep'] = uc.model(self.timestep,'ps')
         run_params['runsteps'] = self.runsteps
-        run_params['dumpsteps'] = self.dumpsteps
         run_params['randomseed'] = self.randomseed
         run_params['thermosteps'] = self.thermosteps
-        run_params['dataoffset'] = self.dataoffset
-        run_params['degrees_freedom'] = self.degrees_freedom
         run_params['eq_thermosteps'] = self.eq_thermosteps
         run_params['eq_runsteps'] = self.eq_runsteps
         run_params['eq_equilibrium'] = self.eq_equilibrium
-        run_params['directoryname']= self.directoryname 
 
         # Build results
         if self.status == 'finished':
@@ -752,14 +649,9 @@ class DiffusionMSD(Calculation):
         run_params = calc['calculation']['run-parameter']
         self.runsteps = run_params['runsteps']
         self.timestep = uc.value_unit(run_params['timestep'])
-        self.dumpsteps = run_params['dumpsteps']
-        self.directoryname = run_params['directoryname']
         self.randomseed = run_params['randomseed']
         self.temperature = uc.value_unit(run_params['temperature'])
-
         self.thermosteps = run_params['thermosteps']
-        self.dataoffset = run_params['dataoffset']
-        self.degrees_freedom = run_params['degrees_freedom']
         self.eq_thermosteps = run_params['eq_thermosteps']
         self.eq_runsteps = run_params['eq_runsteps']
         self.eq_equilibrium = run_params['eq_equilibrium']
@@ -862,14 +754,10 @@ class DiffusionMSD(Calculation):
 
         # Add calculation-specific inputs
         input_dict['runsteps'] = self.runsteps
-        input_dict['dumpsteps'] = self.dumpsteps
-        input_dict['directoryname'] = self.directoryname
         input_dict['randomseed'] = self.randomseed
         input_dict['temperature'] = self.temperature
         input_dict['timestep'] = self.timestep
         input_dict['thermosteps'] = self.thermosteps
-        input_dict['dataoffset'] = self.dataoffset
-        input_dict['degrees_freedom'] = self.degrees_freedom
         input_dict['eq_thermosteps'] = self.eq_thermosteps
         input_dict['eq_runsteps'] = self.eq_runsteps
         input_dict['eq_equilibrium'] = self.eq_equilibrium
@@ -888,9 +776,9 @@ class DiffusionMSD(Calculation):
             The dictionary returned by the calc() method.
         """
         self.__measured_temperature = results_dict['measured_temperature']
-        self.__measured_temperature_stderr = results_dict['measured_temperature_stderror']
+        self.__measured_temperature_stderr = results_dict['measured_temperature_stderr']
         self.__diffusion_value = results_dict["diffusion"]
-        self.__diffusion_value_stderr = results_dict["diffusion_stderror"]
+        self.__diffusion_value_stderr = results_dict["diffusion_stderr"]
 
         self.__msd_x_values = results_dict['msd_x_values']
         self.__msd_y_values = results_dict['msd_y_values']

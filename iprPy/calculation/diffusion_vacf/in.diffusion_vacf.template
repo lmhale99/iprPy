@@ -34,23 +34,20 @@ label runLoop
 
     compute         vacf all vacf
 
-
     fix             all_vacf all vector 1 c_vacf[4]
 
     variable        eta equal (1/$n)*dt*trap(f_all_vacf)
+
     #This is the integrated value, ie the diffusion constant 
 
     thermo_style	custom step temp c_vacf[1] c_vacf[2] c_vacf[3] c_vacf[4] v_eta
 
     thermo          1
 
-    <Dump_instructions>
-
     run	            <Run_length>
 
     uncompute vacf
     unfix all_vacf
-    <Dump_unfix>
     next i
 
 jump SELF runLoop

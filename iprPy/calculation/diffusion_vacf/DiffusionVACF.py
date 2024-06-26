@@ -71,16 +71,13 @@ class DiffusionVACF(Calculation):
         self.randomseed = None
 
         self.runsteps = 50000
-        self.timestep = None 
+        self.timestep = .001 
 
 
-        self.degrees_freedom = 3
         self.simruns = 5
         self.eq_thermosteps = 0
         self.eq_runsteps = 0
         self.eq_equilibrium = False
-        self.dumpsteps = 0
-        self.directoryname = None
 
         self.__measured_temperature = None
         self.__measured_temperature_stderr = None
@@ -188,19 +185,6 @@ class DiffusionVACF(Calculation):
             assert val > 0 and val <= 900000000
         self.__randomseed = val
 
-    @property
-    def degrees_freedom(self) -> int:
-        """int: Degrees of freedom for molecules, i.e water -> 9"""
-        return self.__degrees_freedom
-    
-    @degrees_freedom.setter
-    def degrees_freedom(self, val: Optional[int]):
-        if val is None:
-            self.__degrees_freedom = 3
-        else:
-            val = int(val)
-            assert val >= 3
-            self.__degrees_freedom = val 
 
     @property
     def eq_thermosteps(self) -> int:
@@ -261,27 +245,6 @@ class DiffusionVACF(Calculation):
         else:
             self.__simruns = int(val)
 
-    @property
-    def dumpsteps(self) -> int:
-        return self.__dumpsteps
-
-    @dumpsteps.setter
-    def dumpsteps(self, val: int):
-        if val is None:
-            self.__dumpsteps = 0
-        else:
-            self.__dumpsteps = int(val)
-
-    @property
-    def directoryname(self) -> str:
-        return self.__directoryname
-
-    @directoryname.setter
-    def directoryname(self, val: str):
-        if val is None: 
-            self.__directoryname = None
-        else:
-            self.__directoryname = str(val)
 ###################################################################################################################
     ################# Calculated results #########################
 
@@ -372,10 +335,6 @@ class DiffusionVACF(Calculation):
         simruns: int or None
             The number of simulations to run - more simulations equates to
             less noise. Default value of 5
-        degrees_freedom: int or None
-            The degrees of freedom for the molecule being simulated, this 
-            should include the dimensional DOF (3) plus rotational and 
-            vibrational. For example water has a DOF of 9. 
         eq_thermosteps: int or None
             If doing an equilibrium run this is the number of steps inbetween
             the thermo calculations
@@ -404,18 +363,12 @@ class DiffusionVACF(Calculation):
             self.simruns = kwargs['simruns']
         if 'runsteps' in kwargs:
             self.runsteps = kwargs['runsteps']
-        if 'degrees_freedom' in kwargs:
-            self.degrees_freedom = kwargs['degrees_freedom']
         if 'eq_thermosteps' in kwargs:
             self.eq_thermosteps = kwargs['eq_thermosteps']
         if 'eq_runsteps' in kwargs:
             self.eq_runsteps = kwargs['eq_runsteps']
         if 'eq_equilbirium' in kwargs:
             self.eq_equilibrium = kwargs['eq_equilibrium']
-        if 'dumpsteps' in kwargs:
-            self.dumpsteps = kwargs['dumpsteps']
-        if "directoryname" in kwargs:
-            self.directoryname = kwargs['dumpsteps']
 
 ####################### Parameter file interactions ###########################
 
@@ -444,7 +397,6 @@ class DiffusionVACF(Calculation):
 
 
         # Load calculation-specific strings
-        self.directoryname = str(input_dict.get('directoryname',None))
 
         # Load calculation-specific booleans
         self.eq_equilibrium = bool(input_dict.get('eq_equilibrium',False))
@@ -452,18 +404,19 @@ class DiffusionVACF(Calculation):
         # Load calculation-specific its
         self.runsteps = int(input_dict.get('runsteps', 50000))
         self.randomseed = input_dict.get('randomseed', None)
-        self.degrees_freedom = int(input_dict.get('degrees_freedom',3))
         self.simruns = int(input_dict.get('simruns',5))
         self.eq_thermosteps = int(input_dict.get('eq_termosteps',0))
         self.eq_runsteps = int(input_dict.get('eq_runsteps',0))
-        self.dumpsteps = int(input_dict.get('dumpsteps',0))
 
         # Load calculation-specific unitless floats
-        self.temperature = float(input_dict.get('temperature',300))
-        self.timestep = input_dict.get('timestep',None)
 
         # Load calculation-specific floats with units
-
+        self.timestep = value(input_dict,'timestep',
+                              default_unit='ps',
+                              default_term='0.001 ps')
+        self.temperature = value(input_dict,'temperature',
+                                 default_unit='K',
+                                 default_term='300 K')
 
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
@@ -545,18 +498,12 @@ class DiffusionVACF(Calculation):
             'timestep': ' '.join(["How much to increase the time at each step - Default value of None will use the LAMMPS default"]),
             'runsteps':' '.join(["How many time steps to run simulation - Default value is 100000"]),
             'simruns':' '.join(["The number of simulations to run - a higher number helps damp out simulation noise"]),
-            'Degrees_freedom':' '.join(["The degrees of freedom for the molecule or atom",
-                                        "being simulated. Default for point particles is 3 but for example",
-                                        "waters would be 9. - Default value of 3"]),
             'eq_thermosteps':' '.join(["How often to write calculated value to log file/ouput for",
                                          "equilibriation run- Default value is 1000"]),
             'eq_runsteps':' '.join(["How many time steps to run simulation for equilibration",
                                      "run - Default value is 0"]),
             'eq_equilibrium':' '.join(["Specifies whether or not to do an equilibration default is false",
                                        "Set to yet if the input is not a relaxed liquid already"]),
-            'dumpsteps':' '.join(["How often to write the system information to the dump files"]),
-            'directoryname':' '.join(["The name of the dump file you wish to use - can't be a directory that ",
-                                      "already exists in the current working directory"])
         }
 
     @property
@@ -601,13 +548,10 @@ class DiffusionVACF(Calculation):
                     'timestep',
                     'runsteps',
                     'simruns',
-                    'Degrees_freedom',
                     'eq_thermosteps',
                     'eq_runsteps',
                     'eq_equilibrium',
                     'randomseed',
-                    'dumpsteps',
-                    'directoryname'
                 ]
             ]
         )
@@ -649,12 +593,9 @@ class DiffusionVACF(Calculation):
         run_params['runsteps'] = self.runsteps
         run_params['simruns'] = self.simruns
         run_params['randomseed'] = self.randomseed
-        run_params['degrees_freedom'] = self.degrees_freedom
         run_params['eq_thermosteps'] = self.eq_thermosteps
         run_params['eq_runsteps'] = self.eq_runsteps
         run_params['eq_equilibrium'] = self.eq_equilibrium
-        run_params['dumpsteps'] = self.dumpsteps
-        run_params['directoryname'] = self.directoryname
         # Build results
         if self.status == 'finished':
 
@@ -696,9 +637,6 @@ class DiffusionVACF(Calculation):
         self.randomseed = run_params['randomseed']
         self.temperature = uc.value_unit(run_params['temperature'])
         self.simruns = run_params['simruns']
-        self.dumpsteps = run_params['dumpsteps']
-        self.directoryname = run_params['directoryname']
-        self.degrees_freedom = run_params['degrees_freedom']
         self.eq_thermosteps = run_params['eq_thermosteps']
         self.eq_runsteps = run_params['eq_runsteps']
         self.eq_equilibrium = run_params['eq_equilibrium']
@@ -804,12 +742,9 @@ class DiffusionVACF(Calculation):
         input_dict['temperature'] = self.temperature
         input_dict['timestep'] = self.timestep
         input_dict['simruns'] = self.simruns
-        input_dict['degrees_freedom'] = self.degrees_freedom
         input_dict['eq_thermosteps'] = self.eq_thermosteps
         input_dict['eq_runsteps'] = self.eq_runsteps
         input_dict['eq_equilibrium'] = self.eq_equilibrium
-        input_dict['dumpsteps'] = self.dumpsteps
-        input_dict['directoryname'] = self.directoryname
         # Return input_dict
         return input_dict
 

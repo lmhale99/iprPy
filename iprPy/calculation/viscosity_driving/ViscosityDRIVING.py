@@ -68,13 +68,12 @@ class viscosityDRIVING(Calculation):
 
         # Initialize unique calculation attributes
 
-        self.temperature = None
-        self.randomseed = 300
+        self.temperature = 300
+        self.randomseed = None
 
-        self.timestep = None
+        self.timestep = .001
         self.runsteps = 50000
         self.thermosteps = 2000
-        self.dataoffset = 10
         self.drivingforce = .1
 
         self.eq_thermosteps = 0
@@ -130,6 +129,7 @@ class viscosityDRIVING(Calculation):
     @property
     def timestep(self) -> Optional[float]:
         """float: time step for simulation"""
+        print(am.lammps.style.timestep(self.potential.potential.units),"default setter")
         if self.__timestep is None:
             return am.lammps.style.timestep(self.potential.potential.units)
         else:
@@ -137,6 +137,7 @@ class viscosityDRIVING(Calculation):
     
     @timestep.setter
     def timestep(self, val: Optional[float]):
+        print(val,"setting")
         if val is None:
             self.__timestep = None
         else:
@@ -180,18 +181,6 @@ class viscosityDRIVING(Calculation):
             self.__thermosteps = 2000
         else:
             self.__thermosteps = val
-
-    @property
-    def dataoffset(self) -> int:
-        """How much of the first data we ignore"""
-        return self.__dataoffset
-
-    @dataoffset.setter
-    def dataoffset(self, val: Optional[int]):
-        if val is None: 
-            self.__dataoffset = 20
-        else:
-            self.__dataoffset = val
 
     @property
     def randomseed(self) -> int:
@@ -256,38 +245,6 @@ class viscosityDRIVING(Calculation):
         else:
             self.__drivingforce = val
 
-    @property
-    def dumpsteps(self) -> int:
-        """int: How often to dump configuration during the final run."""
-        if self.__dumpsteps is None:
-            return 0
-        else:
-            return self.__dumpsteps
-
-    @dumpsteps.setter
-    def dumpsteps(self, val: Optional[int]):
-        if val is None:
-            self.__dumpsteps = None
-        else:
-            val = int(val)
-            assert val >= 0
-            self.__dumpsteps = val
-
-    @property
-    def directoryname(self) -> str:
-        if self.__directoryname is None:
-            return "dump"
-        else:
-            return self.__directoryname
-        
-    @directoryname.setter
-    def directoryname(self, val: str):
-        if val is None:
-            self.__directoryname = None
-        else:
-            self.__directoryname = val
-
-
 ###################################################################################################################
     ################# Calculated results #########################
 
@@ -349,13 +306,6 @@ class viscosityDRIVING(Calculation):
             the difference in time between each step of the calculation
         thermosteps: int or None
             The number of steps inbetween the thermo writes to the log file
-        dataoffset: int or None
-            The number of thrown away values due to the calculation method
-            requiring suitable time to produce reasonable values
-        degrees_freedom: int or None
-            The degrees of freedom for the molecule being simulated, this 
-            should include the dimensional DOF (3) plus rotational and 
-            vibrational. For example water has a DOF of 9. 
         eq_thermosteps: int or None
             If doing an equilibrium run this is the number of steps inbetween
             the thermo calculations
@@ -368,10 +318,6 @@ class viscosityDRIVING(Calculation):
         randomseed : int or None, optional
             Random number seed used by LAMMPS in creating velocities and with
             the Langevin thermostat.
-        dumpsteps: int or None
-            How often to write to the dump files.
-        directorynames: String or none
-            The folder to write the dump files to
         **kwargs : any, optional
             Any keyword parameters supported by the set_values() methods of
             the parent Calculation class and the subset classes.
@@ -388,10 +334,6 @@ class viscosityDRIVING(Calculation):
             self.runsteps = kwargs['runsteps']
         if 'thermosteps' in kwargs:
             self.thermosteps = kwargs['thermosteps']
-        if 'dataoffset' in kwargs:
-            self.dataoffset = kwargs['dataoffset']
-        if 'degrees_freedom' in kwargs:
-            self.degrees_freedom = kwargs['degrees_freedom']
         if 'eq_thermosteps' in kwargs:
             self.eq_thermosteps = kwargs['eq_thermosteps']
         if 'eq_runsteps' in kwargs:
@@ -400,10 +342,7 @@ class viscosityDRIVING(Calculation):
             self.eq_equilibrium = kwargs['eq_equilibrium']
         if 'drivingforce' in kwargs:
             self.drivingforce = kwargs['drivingforce']
-        if 'dumpsteps' in kwargs:
-            self.dumpsteps = kwargs['dumpsteps']
-        if "directoryname" in kwargs:
-            self.directoryname = kwargs['dumpsteps']
+
 
 ####################### Parameter file interactions ###########################
 
@@ -432,7 +371,6 @@ class viscosityDRIVING(Calculation):
 
 
         # Load calculation-specific strings
-        self.directoryname = str(input_dict.get('directoryname','dump'))
 
         # Load calculation-specific booleans
         self.eq_equilibrium = bool(input_dict.get('eq_equilibrium',False))
@@ -444,17 +382,20 @@ class viscosityDRIVING(Calculation):
         self.thermosteps = int(input_dict.get('thermosteps',100))
         self.eq_thermosteps = int(input_dict.get('eq_termosteps',0))
         self.eq_runsteps = int(input_dict.get('eq_runsteps',0))
-        self.dataoffset = int(input_dict.get('dataoffset',5))
-        self.dumpsteps = int(input_dict.get('dumpsteps',0))
 
         # Load calculation-specific unitless floats
         self.drivingforce = float(input_dict.get('drivingforce',.1))
         self.temperature = float(input_dict.get('temperature',300))
-        self.timestep = input_dict.get('timestep',None)
+        
 
         # Load calculation-specific floats with units
-
-
+        print(input_dict)
+        self.timestep = value(input_dict,'timestep',
+                              default_unit='ps',
+                              default_term='0.001 ps')
+        self.temperature = value(input_dict,'temperature',
+                                 default_unit='K',
+                                 default_term='300 K')
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
 
@@ -535,10 +476,6 @@ class viscosityDRIVING(Calculation):
             'timestep': ' '.join(["How much to increase the time at each step - Default value of None will use the LAMMPS default"]),
             'runsteps':' '.join(["How many time steps to run simulation - Default value is 100000"]),
             'thermosteps':' '.join(["How often to write calculated value to log file/ouput - Default value is 1000"]),
-            'dataoffset':' '.join(["Specifies how much of the initial data to ignore",
-                                  "For these calculations it takes a while for the system",
-                                  "orient so the initial calculated data is not reasonable",
-                                  "- Default value is 500"]),
             'eq_thermosteps':' '.join(["How often to write calculated value to log file/ouput for",
                                          "equilibriation run- Default value is 1000"]),
             'eq_runsteps':' '.join(["How many time steps to run simulation for equilibration",
@@ -546,9 +483,6 @@ class viscosityDRIVING(Calculation):
             'eq_equilibrium':' '.join(["Specifies whether or not to do an equilibration default is false",
                                        "Set to yet if the input is not a relaxed liquid already"]),
             'drivingforce':' '.join(["The force needed for the calculation method - this method perturbs the system"]),
-            'dumpsteps':' '.join(["How often to write the system information to the dump files"]),
-            'directoryname':' '.join(["The name of the dump file you wish to use - can't be a directory that ",
-                                      "already exists in the current working directory"])
         }
 
     @property
@@ -588,19 +522,18 @@ class viscosityDRIVING(Calculation):
 
             # Run parameters
             [
+
+                [
+                    'drivingforce'
+                ],
                 [
                     'temperature',
                     'timestep',
-                    'drivingforce',
                     'runsteps',
                     'thermosteps',
-                    'dataoffset',
                     'eq_thermosteps',
                     'eq_runsteps',
                     'eq_equilibrium',
-                    'dataoffset',
-                    'dumpsteps',
-                    'directoryname'
                 ]
             ]
         )
@@ -639,16 +572,14 @@ class viscosityDRIVING(Calculation):
 
         run_params['temperature'] = uc.model(self.temperature,'K')
         run_params['timestep'] = uc.model(self.timestep,'ps')
+        # print(run_params['timestep'],"timestep loaded")
         run_params['runsteps'] = self.runsteps
         run_params['randomseed'] = self.randomseed
         run_params['thermosteps'] = self.thermosteps
-        run_params['dataoffset'] = self.dataoffset
         run_params['drivingforce'] = uc.model(self.drivingforce,f'{self.units.length_unit}/(ps)^2')
         run_params['eq_thermosteps'] = self.eq_thermosteps
         run_params['eq_runsteps'] = self.eq_runsteps
         run_params['eq_equilibrium'] = self.eq_equilibrium
-        run_params['dumpsteps'] = self.dumpsteps
-        run_params['directoryname'] = self.directoryname
 
         # Build results
         if self.status == 'finished':
@@ -683,14 +614,13 @@ class viscosityDRIVING(Calculation):
 
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
+        print(run_params)
+
         self.runsteps = run_params['runsteps']
-        self.timestep = uc.value_unit(run_params['timestep'])
         self.randomseed = run_params['randomseed']
         self.temperature = uc.value_unit(run_params['temperature'])
-        self.dumpsteps = run_params['dumpsteps']
-        self.directoryname = run_params['directoryname']
+        self.timestep = uc.value_unit(run_params['timestep'])
         self.thermosteps = run_params['thermosteps']
-        self.dataoffset = run_params['dataoffset']
         self.eq_thermosteps = run_params['eq_thermosteps']
         self.eq_runsteps = run_params['eq_runsteps']
         self.eq_equilibrium = run_params['eq_equilibrium']
@@ -733,7 +663,7 @@ class viscosityDRIVING(Calculation):
 
         # Extract calculation-specific content
         meta['temperature'] = self.temperature
-
+        meta['drivingforce'] = self.drivingforce
         # Extract results
         if self.status == 'finished':
 
@@ -763,6 +693,7 @@ class viscosityDRIVING(Calculation):
         """dict: The terms to compare metadata values using a tolerance."""
         return {
             'temperature':1e-2,
+            'drivingforce':.001
         }
 
 ########################### Calculation interactions ##########################
@@ -787,14 +718,10 @@ class viscosityDRIVING(Calculation):
         input_dict['temperature'] = self.temperature
         input_dict['timestep'] = self.timestep
         input_dict['thermosteps'] = self.thermosteps
-        input_dict['dataoffset'] = self.dataoffset
         input_dict['drivingforce'] = self.drivingforce
         input_dict['eq_thermosteps'] = self.eq_thermosteps
         input_dict['eq_runsteps'] = self.eq_runsteps
         input_dict['eq_equilibrium'] = self.eq_equilibrium
-        input_dict['dumpsteps'] = self.dumpsteps
-        input_dict['directoryname'] = self.directoryname
-
         # Return input_dict
         return input_dict
 

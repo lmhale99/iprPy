@@ -70,11 +70,10 @@ class viscosityGREENKUBO(Calculation):
 
         self.temperature = 300
         self.randomseed = None
-        self.timestep = None
+        self.timestep = .001
 
         self.runsteps = 50000
         self.outputsteps = 2000
-        self.dataoffset = 10
 
         self.sampleinterval = 5
         self.correlationlength = 200
@@ -193,18 +192,6 @@ class viscosityGREENKUBO(Calculation):
             self.__outputsteps = 2000
         else:
             self.__outputsteps = val
-
-    @property
-    def dataoffset(self) -> int:
-        """How much of the first data we ignore"""
-        return self.__dataoffset
-
-    @dataoffset.setter
-    def dataoffset(self, val: Optional[int]):
-        if val is None: 
-            self.__dataoffset = 20
-        else:
-            self.__dataoffset = val
 
     @property
     def randomseed(self) -> int:
@@ -392,16 +379,10 @@ class viscosityGREENKUBO(Calculation):
         runsteps : int or None, optional
             The number of nve integration steps to perform on the system to
             obtain measurements of viscosity
-        dumpsteps : int or None, optional
-            Dump files will be saved every this many steps during the runsteps
-            simulation.
         timestep: float or None
             the difference in time between each step of the calculation
         outputsteps: int or None
             The number of steps inbetween the thermo writes to the log file
-        dataoffset: int or None
-            The number of thrown away values due to the calculation method
-            requiring suitable time to produce reasonable values
         dragcoeff: float or None
             this term affects the drag force that the thermostat function uses
             to calculate the temperature of the system.  
@@ -433,8 +414,6 @@ class viscosityGREENKUBO(Calculation):
             self.runsteps = kwargs['runsteps']
         if 'outputsteps' in kwargs:
             self.outputsteps = kwargs['outputsteps']
-        if 'dataoffset' in kwargs:
-            self.dataoffset = kwargs['dataoffset']
         if 'eq_thermosteps' in kwargs:
             self.eq_thermosteps = kwargs['eq_thermosteps']
         if 'eq_runsteps' in kwargs:
@@ -487,7 +466,6 @@ class viscosityGREENKUBO(Calculation):
         self.outputsteps = int(input_dict.get('outputsteps',2000))
         self.eq_thermosteps = int(input_dict.get('eq_termosteps',0))
         self.eq_runsteps = int(input_dict.get('eq_runsteps',0))
-        self.dataoffset = int(input_dict.get('dataoffset',5))
         self.sampleinterval = int(input_dict.get('sampleinterval',5))
         self.correlationlength = int(input_dict.get('correlationlength',200))
     
@@ -496,11 +474,14 @@ class viscosityGREENKUBO(Calculation):
 
         # Load calculation-specific unitless floats
         self.dragcoeff = float(input_dict.get('dragcoeff',.2))
-        self.temperature = float(input_dict.get('temperature',300))
-        self.timestep = input_dict.get('timestep',None)
 
         # Load calculation-specific floats with units
-
+        self.timestep = value(input_dict,'timestep',
+                              default_unit='ps',
+                              default_term='0.001 ps')
+        self.temperature = value(input_dict,'temperature',
+                                 default_unit='K',
+                                 default_term='300 K')
 
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
@@ -582,10 +563,6 @@ class viscosityGREENKUBO(Calculation):
             'timestep': ' '.join(["How much to increase the time at each step - Default value of None will use the LAMMPS default"]),
             'runsteps':' '.join(["How many time steps to run simulation - Default value is 100000"]),
             'outputsteps':' '.join(["How often to write calculated value to log file/ouput - Default value is 1000"]),
-            'dataoffset':' '.join(["Specifies how much of the initial data to ignore",
-                                  "For these calculations it takes a while for the system",
-                                  "orient so the initial calculated data is not reasonable",
-                                  "- Default value is 500"]),
             'eq_thermosteps':' '.join(["How often to write calculated value to log file/ouput for",
                                          "equilibriation run- Default value is 1000"]),
             'eq_runsteps':' '.join(["How many time steps to run simulation for equilibration",
@@ -645,7 +622,6 @@ class viscosityGREENKUBO(Calculation):
                     'eq_thermosteps',
                     'eq_runsteps',
                     'eq_equilibrium',
-                    'dataoffset',
                     'sampleinterval',
                     'correlationlength'
                 ]
@@ -689,7 +665,6 @@ class viscosityGREENKUBO(Calculation):
         run_params['runsteps'] = self.runsteps
         run_params['randomseed'] = self.randomseed
         run_params['outputsteps'] = self.outputsteps
-        run_params['dataoffset'] = self.dataoffset
         run_params['dragcoeff'] = self.dragcoeff
         run_params['eq_thermosteps'] = self.eq_thermosteps
         run_params['eq_runsteps'] = self.eq_runsteps
@@ -741,7 +716,6 @@ class viscosityGREENKUBO(Calculation):
         self.temperature = uc.value_unit(run_params['temperature'])
 
         self.outputsteps = run_params['outputsteps']
-        self.dataoffset = run_params['dataoffset']
         self.eq_thermosteps = run_params['eq_thermosteps']
         self.eq_runsteps = run_params['eq_runsteps']
         self.eq_equilibrium = run_params['eq_equilibrium']
@@ -855,7 +829,6 @@ class viscosityGREENKUBO(Calculation):
         input_dict['temperature'] = self.temperature
         input_dict['timestep'] = self.timestep
         input_dict['outputsteps'] = self.outputsteps
-        input_dict['dataoffset'] = self.dataoffset
         input_dict['dragcoeff'] = self.dragcoeff
         input_dict['eq_thermosteps'] = self.eq_thermosteps
         input_dict['eq_runsteps'] = self.eq_runsteps

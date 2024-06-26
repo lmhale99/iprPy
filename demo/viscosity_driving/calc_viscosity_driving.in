@@ -1,4 +1,4 @@
-# Input script for iprPy calculation diffusion_msd
+# Input script for iprPy calculation viscosity_driving
 
 # Calculation Metadata
 branch                          
@@ -19,7 +19,7 @@ load_style                      atom_dump
 load_options                    
 family                          
 symbols                         Ni
-box_parameters                               
+box_parameters                        
 
 # Input/Output Units
 length_unit                     
@@ -28,15 +28,14 @@ energy_unit
 force_unit                      
 
 # Run Parameters
-temperature            1500        
+temperature                    500 
 timestep                        
-dumpsteps                       
-directoryname                   
-runsteps               50000    
+runsteps                       1000 
 thermosteps                     
 dataoffset                      
-Degrees_freedom                 
 eq_thermosteps                  
 eq_runsteps                     
 eq_equilibrium                  
-randomseed                      
+drivingforce                    
+dumpsteps                       
+directoryname                   

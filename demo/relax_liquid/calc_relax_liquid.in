@@ -4,8 +4,8 @@
 branch                          
 
 # LAMMPS and MPI Commands
-lammps_command                  /home/lmh1/LAMMPS/2022-06-23/src/lmp_mpi
-mpi_command                     mpiexec -n 8
+lammps_command                  /usr/bin/lmp
+mpi_command                     
 
 # Interatomic Potential
 potential_file                  ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1.json

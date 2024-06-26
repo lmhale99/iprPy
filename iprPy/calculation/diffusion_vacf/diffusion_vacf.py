@@ -23,17 +23,80 @@ def diffusion_vacf(lammps_command:str,
               temperature: float,
               mpi_command: Optional[str] = None,
               timestep: Optional[float] = None,
-              dumpsteps: int = 0,
               runsteps: int = 10000,
               simruns: int = 5,
-              degrees_freedom: int = 3,
-              directoryname: Optional[str] = None,
               eq_thermosteps: int = 0,
               eq_runsteps: int = 0,
               eq_equilibrium: bool = False,
               randomseed: Optional[int] = None
               ) -> dict:
+    """
+    Calculates the diffusion constant for a liquid system using
+    the integral of the velocity autocorrelation function
+
+    Parameters
+    ----------
+    lammps_command : str
+        Command for running LAMMPS
+    system : atomman.System
+        The system to perform the calculation on.
+    potential : atomman.lammps.Potential
+        the LAMMPS implemented potential to use.
+    temperature : float
+        The temperature to run at.
+    mpi_command : str, optional
+        The MPI command for running LAMMPS in paralell. If not given, LAMMPS
+        will run serially.
+    timestep : float, optional
+        The amount of time to increase each frame of the simulation. The 
+        default value is given by the default value for the specified LAMMPS
+        unit system. 
+    runsteps : int, optional
+        How many timesteps the simulation will run for. Default value of 100,000
+        should be suitable for a short run. 
+    simruns : int, optional
+        The number of simulations to run. The higher the number the less noise
+        in the calculation. Default value of 5.
+    eq_thermosteps : int, optional
+        How often the calculated values of the equilibirum run get stored in 
+        the thermo table of the LAMMPS output. Default value of 0.  
+    eq_runsteps : int, optional
+        How many timesteps the equilibiration simulation will run for. Default 
+        value of 0.
+    eq_equilibrium : bool, optional
+        Dictates whether to run an equilibration simulation before the calculation
+        simulation. Default value is false. 
+    randomseed : int, optional,
+        The randomseed for velocity assignment in an equilibration run. Default 
+        value of None will result in a number being chosen at random from the 
+        python random package.  
     
+    
+    Returns
+    -------
+    dict
+        Dictionary of resutls consisting of keys:
+
+        -**'vacf_x_values'** (*Numpy array of floats*) - The array of 
+        calculated x components of the msd values
+        -**'vacf_y_values'** (*Numpy array of floats*) - The array of 
+        calculated y components of the msd values
+        -**'vacf_z_values'** (*Numpy array of floats*) - The array of 
+        calculated z components of the msd values
+        -**'vacf_values'** (*Numpy array of floats*) - The array of 
+        calculated msd values
+        -**'measured_temperature'** (*float*) - The average measured
+        temperature of the system ignore initial data according to 
+        the data offset.
+        -**'measured_temperature_stderr'** (*float*) - The standard 
+        deviation measured temperature of the system ignore initial 
+        data according to the data offset.
+        -**'diffusion'** (*float*) - The calculated diffusion 
+        coeffecient
+        -**'diffusion_stderr'** (*float*) - The standard deviation
+        of the diffusion coeffecient
+        -**'lammps_output'** - The lammps output log
+    """
     #Get the Units from Potential
     lammps_units = lmp.style.unit(potential.units)
 
@@ -55,18 +118,7 @@ def diffusion_vacf(lammps_command:str,
     lammps_variables['Equilibration_thermo'] = eq_thermosteps
     lammps_variables['Equilibration_steps'] = eq_runsteps
     lammps_variables['num_simulations'] = simruns
-    lammps_variables['Degrees_freedom'] = degrees_freedom
-
-    #Setting up dump instrcutions
-    if (dumpsteps != 0) and (dumpsteps != None):
-        if not Path(directoryname).exists():
-            Path(directoryname).mkdir(parents=True)
-        instruct = f"dump            dumpy all custom {dumpsteps} {directoryname}/$i/*.dump id type x y z"
-        lammps_variables['Dump_instructions'] = instruct 
-        lammps_variables['Dump_unfix'] = "undump dumpy"
-    else: 
-        lammps_variables['Dump_instructions'] = ""
-        lammps_variables['Dump_unfix'] = ""
+    lammps_variables['Degrees_freedom'] = 3
 
     #Set up the seed
     if randomseed is None:
@@ -118,12 +170,12 @@ def diffusion_vacf(lammps_command:str,
         v3[i-indexOffset] = log.simulations[i].thermo['c_vacf[3]']
         v[i-indexOffset] = log.simulations[i].thermo['c_vacf[4]']
 
-    runningDiffusion = np.average(D,axis=1)
-    runningTemperature = np.average(D,axis=1)
-    runningv1 = np.average(v1,axis=1)
-    runningv2 = np.average(v2,axis=1)
-    runningv3 = np.average(v3,axis=1)
-    runningv = np.average(v,axis=1)
+    runningDiffusion = np.average(D,axis=0)
+    runningTemperature = np.average(D,axis=0)
+    runningv1 = np.average(v1,axis=0)
+    runningv2 = np.average(v2,axis=0)
+    runningv3 = np.average(v3,axis=0)
+    runningv = np.average(v,axis=0)
 
     Diffusion_coeff = np.average(runningDiffusion)
     Diffusion_coeff_err = np.std(runningDiffusion)
@@ -138,9 +190,9 @@ def diffusion_vacf(lammps_command:str,
     results['vacf_z_values'] = uc.set_in_units(runningv3,vacfUnitString)
     results['vacf_values'] = uc.set_in_units(runningv,vacfUnitString)
     results['diffusion'] = uc.set_in_units(Diffusion_coeff,diffusionUnitString)
-    results['diffusion_stderr'] = uc.set_in_units(Diffusion_coeff_err,diffusionUnitString)
+    results['diffusion_stderr'] = uc.set_in_units(Diffusion_coeff_err/((len(runningDiffusion))**0.5),diffusionUnitString)
     results['measured_temperature'] = uc.set_in_units(AveTemp,'K')
-    results['measured_temperature_stderr'] = uc.set_in_units(AveTemp_err,'K')
+    results['measured_temperature_stderr'] = uc.set_in_units(AveTemp_err/((len(runningTemperature))**0.5),'K')
     results['lammps_output'] = output 
     return results
     
