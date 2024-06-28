@@ -113,7 +113,7 @@ def diffusion_msd(lammps_command: str,
 
     # Initialize the rest of the inputs to the Lammps Scripts 
     lammps_variables['Temperature'] = temperature
-    lammps_variables['Time_Step'] = uc.set_in_units(timestep,lammps_units['time'])
+    lammps_variables['Time_Step'] = uc.get_in_units(timestep,lammps_units['time'])
     lammps_variables['Run_length'] = runsteps
     lammps_variables['Thermo_Steps'] = thermosteps
     lammps_variables['Degrees_freedom'] = 3 #Fixed value 
