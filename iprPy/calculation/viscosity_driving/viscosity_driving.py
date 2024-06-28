@@ -107,9 +107,10 @@ def viscosity_driving(lammps_command:str,
 
     #Initialize the rest of the inputs to the Lammps Scripts 
     lammps_variables['Temperature'] = temperature
-    lammps_variables['Time_Step'] = timestep
+    lammps_variables['Time_Step'] = uc.get_in_units(timestep,lammps_units['time'])
+
     lammps_variables['runsteps'] = runsteps
-    lammps_variables['drivingforce'] = drivingforce
+    lammps_variables['drivingforce'] = uc.get_in_units(drivingforce,f"{lammps_units['velocity']}/{lammps_units['time']}")
     lammps_variables['thermosteps'] = thermosteps
 
     #Setting up the seed 

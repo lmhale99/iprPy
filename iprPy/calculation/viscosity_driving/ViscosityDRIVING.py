@@ -129,15 +129,13 @@ class viscosityDRIVING(Calculation):
     @property
     def timestep(self) -> Optional[float]:
         """float: time step for simulation"""
-        print(am.lammps.style.timestep(self.potential.potential.units),"default setter")
         if self.__timestep is None:
-            return am.lammps.style.timestep(self.potential.potential.units)
+            return .001
         else:
             return self.__timestep
     
     @timestep.setter
     def timestep(self, val: Optional[float]):
-        print(val,"setting")
         if val is None:
             self.__timestep = None
         else:
@@ -384,18 +382,20 @@ class viscosityDRIVING(Calculation):
         self.eq_runsteps = int(input_dict.get('eq_runsteps',0))
 
         # Load calculation-specific unitless floats
-        self.drivingforce = float(input_dict.get('drivingforce',.1))
+        #self.drivingforce = float(input_dict.get('drivingforce',.1))
         self.temperature = float(input_dict.get('temperature',300))
         
 
         # Load calculation-specific floats with units
-        print(input_dict)
         self.timestep = value(input_dict,'timestep',
                               default_unit='ps',
                               default_term='0.001 ps')
         self.temperature = value(input_dict,'temperature',
                                  default_unit='K',
                                  default_term='300 K')
+        self.drivingforce = value(input_dict,'drivingforce',
+                                  default_unit='angstrom/(ps^2)',
+                                  default_term='1.5 angstrom/(ps^2)')
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
 
@@ -572,7 +572,6 @@ class viscosityDRIVING(Calculation):
 
         run_params['temperature'] = uc.model(self.temperature,'K')
         run_params['timestep'] = uc.model(self.timestep,'ps')
-        # print(run_params['timestep'],"timestep loaded")
         run_params['runsteps'] = self.runsteps
         run_params['randomseed'] = self.randomseed
         run_params['thermosteps'] = self.thermosteps
@@ -614,7 +613,6 @@ class viscosityDRIVING(Calculation):
 
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
-        print(run_params)
 
         self.runsteps = run_params['runsteps']
         self.randomseed = run_params['randomseed']

@@ -19,7 +19,7 @@ def viscosity_green_kubo(lammps_command:str,
               potential: lmp.Potential,
               temperature: float,
               mpi_command: Optional[str] = None,
-              timestep: Optional[float] = None,
+              timestep: float = .001,
               correlationlength: int = 400,
               sampleinterval: int = 5,
               outputsteps: int = 2000,
@@ -128,7 +128,7 @@ def viscosity_green_kubo(lammps_command:str,
 
     #Initialize the rest of the inputs to the Lammps Scripts 
     lammps_variables['Temperature'] = temperature
-    lammps_variables['Time_Step'] = timestep
+    lammps_variables['Time_Step'] = uc.get_in_units(timestep,lammps_units['time'])
     lammps_variables['Correlation_Length'] = correlationlength
     lammps_variables['Sample_Interval'] = sampleinterval
     lammps_variables['Run_length'] = runsteps
