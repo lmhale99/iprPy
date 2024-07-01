@@ -6,7 +6,7 @@
 variable    T equal <Temperature>      
 variable    dt equal <Time_Step> 
 variable    n equal <Degrees_freedom>
-
+variable    damp equal 10*${dt}
 
 
 # problem setup
@@ -32,7 +32,7 @@ timestep ${dt}
 ##########################################################################
 # Data gathering run
 
-fix             NVE all nve
+fix             NVT all nvt temp $T $T ${damp} 
 
 compute         msd all msd com yes
 

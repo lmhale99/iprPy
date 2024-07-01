@@ -6,6 +6,7 @@ variable    dt equal <Time_Step>
 variable    equib_len equal <Equilibration_steps>
 variable    equib_thermo_len equal <Equilibration_thermo>
 variable    n equal <Degrees_freedom>
+variable    damp equal 10*${dt}
  
 
 # Setup data from Atomman
@@ -25,7 +26,7 @@ timestep ${dt}
 ###############################################################################################
 # data gathering run
 
-fix NVE all nve
+fix          NVT all nvt temp $T $T ${damp} 
 
 variable i loop <num_simulations>
 label runLoop
