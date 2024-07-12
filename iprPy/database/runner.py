@@ -208,7 +208,12 @@ class RunManager():
         """list : The current list of calculation names in the run directory."""
         calcs = []
         for calc in self.run_directory.iterdir():
-            if calc.is_dir() and len([b for b in calc.glob('*.bid')]) == 0:
+            try:
+                # Test in try to avoid bug where calc is deleted by another runner
+                assert len([b for b in calc.glob('*.bid')]) == 0
+            except:
+                pass
+            else:
                 calcs.append(calc.name)
         return calcs
     
