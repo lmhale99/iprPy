@@ -111,6 +111,9 @@ def diffusion_vacf(lammps_command:str,
     system_info = system.dump('atom_data',f='init.dat',potential = potential)
     lammps_variables['atomman_system_pair_info'] = system_info
 
+
+
+
     #Initialize the rest of the inputs to the Lammps Scripts 
     lammps_variables['Temperature'] = temperature
     lammps_variables['Time_Step'] = uc.get_in_units(timestep,lammps_units['time'])
@@ -156,22 +159,22 @@ def diffusion_vacf(lammps_command:str,
         indexOffset += 1
 
     log = lmp.Log('diffusion_vacf.log.lammps')
-    D = np.ndarray((simruns,runsteps+1))
+    D = np.ndarray((simruns,))
     T = np.ndarray((simruns,runsteps+1))
     v1 = np.ndarray((simruns,runsteps+1))
     v2 = np.ndarray((simruns,runsteps+1))
     v3 = np.ndarray((simruns,runsteps+1))
     v = np.ndarray((simruns,runsteps+1))
     for i in range(indexOffset,simruns+indexOffset):
-        D[i-indexOffset] = log.simulations[i].thermo['v_eta'] 
+        D[i-indexOffset] = log.simulations[i].thermo['v_eta'][-1]
         T[i-indexOffset] = log.simulations[i].thermo['Temp']
         v1[i-indexOffset] = log.simulations[i].thermo['c_vacf[1]']
         v2[i-indexOffset] = log.simulations[i].thermo['c_vacf[2]']
         v3[i-indexOffset] = log.simulations[i].thermo['c_vacf[3]']
         v[i-indexOffset] = log.simulations[i].thermo['c_vacf[4]']
 
-    runningDiffusion = np.average(D,axis=0)
-    runningTemperature = np.average(D,axis=0)
+    runningDiffusion = D
+    runningTemperature = np.average(T,axis=0)
     runningv1 = np.average(v1,axis=0)
     runningv2 = np.average(v2,axis=0)
     runningv3 = np.average(v3,axis=0)
@@ -190,9 +193,9 @@ def diffusion_vacf(lammps_command:str,
     results['vacf_z_values'] = uc.set_in_units(runningv3,vacfUnitString)
     results['vacf_values'] = uc.set_in_units(runningv,vacfUnitString)
     results['diffusion'] = uc.set_in_units(Diffusion_coeff,diffusionUnitString)
-    results['diffusion_stderr'] = uc.set_in_units(Diffusion_coeff_err/((len(runningDiffusion))**0.5),diffusionUnitString)
+    results['diffusion_stderr'] = uc.set_in_units(Diffusion_coeff_err/(simruns**(.5)),diffusionUnitString)
     results['measured_temperature'] = uc.set_in_units(AveTemp,'K')
-    results['measured_temperature_stderr'] = uc.set_in_units(AveTemp_err/((len(runningTemperature))**0.5),'K')
+    results['measured_temperature_stderr'] = uc.set_in_units(AveTemp_err/((len(runningTemperature)*simruns)**(0.5)),'K')
     results['lammps_output'] = output 
     return results
     

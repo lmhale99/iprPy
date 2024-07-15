@@ -36,7 +36,7 @@ fix             NVT all nvt temp $T $T ${damp}
 
 compute         msd all msd com yes
 
-fix             runningMSD all vector 10 c_msd[4]
+fix             runningMSD all vector <nsample> c_msd[4] nmax <nmax> 
 
 variable        fitslope equal slope(f_runningMSD)/(2*${n})/(10*dt)
 

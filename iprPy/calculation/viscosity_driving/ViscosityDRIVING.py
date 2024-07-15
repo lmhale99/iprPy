@@ -63,8 +63,8 @@ class viscosityDRIVING(Calculation):
         self.__commands = LammpsCommands(self)
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
-        # self.__system_mods = AtommanSystemManipulate(self)
-        subsets = (self.commands, self.potential, self.system, self.units)
+        self.__system_mods = AtommanSystemManipulate(self)
+        subsets = (self.commands, self.potential, self.system, self.units, self.system_mods)
 
         # Initialize unique calculation attributes
 
@@ -125,6 +125,11 @@ class viscosityDRIVING(Calculation):
     def system(self) -> AtommanSystemLoad:
         """AtommanSystemLoad subset"""
         return self.__system
+
+    @property
+    def system_mods(self) -> AtommanSystemManipulate:
+        """AtommanSystemManipulate subset"""
+        return self.__system_mods
 
     @property
     def timestep(self) -> Optional[float]:
@@ -366,7 +371,7 @@ class viscosityDRIVING(Calculation):
         self.units.load_parameters(input_dict)
 
         # Change default values for subset terms
-
+        input_dict['sizemults'] = input_dict.get('sizemults', '1 1 1')
 
         # Load calculation-specific strings
 
@@ -406,7 +411,7 @@ class viscosityDRIVING(Calculation):
         self.system.load_parameters(input_dict)
 
         # Manipulate system
-
+        self.system_mods.load_parameters(input_dict)
 
     def master_prepare_inputs(self,
                               branch: str = 'main',
@@ -444,7 +449,7 @@ class viscosityDRIVING(Calculation):
 
             # Set default workflow settings
             params['buildcombos'] =  'atomicarchive load_file archive'
-
+            params['sizemults']
             params['archive_record'] = 'calculation_viscosity_msd'
             params['archive_load_key'] = 'final-system'
             params['archive_status'] = 'finished'
@@ -516,9 +521,9 @@ class viscosityDRIVING(Calculation):
             ] +
 
             # System mods keys
-            # [
-            #     self.system_mods.keyset
-            # ] +
+            [
+                self.system_mods.keyset
+            ] +
 
             # Run parameters
             [
@@ -561,7 +566,7 @@ class viscosityDRIVING(Calculation):
         self.commands.build_model(calc, after='atomman-version')
         self.potential.build_model(calc, after='calculation')
         self.system.build_model(calc, after='potential-LAMMPS')
-        # self.system_mods.build_model(calc)
+        self.system_mods.build_model(calc)
 
         # Build calculation-specific content
         if 'calculation' not in calc:
@@ -707,8 +712,8 @@ class viscosityDRIVING(Calculation):
             subset.calc_inputs(input_dict)
 
         # Remove unused subset inputs
-        # del input_dict['transform']
-        input_dict['system'] = input_dict.pop('ucell')
+        del input_dict['transform']
+        del input_dict['ucell']
 
         # Add calculation-specific inputs
         input_dict['runsteps'] = self.runsteps

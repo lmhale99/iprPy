@@ -105,6 +105,10 @@ def viscosity_driving(lammps_command:str,
     system_info = system.dump('atom_data',f='init.dat',potential = potential)
     lammps_variables['atomman_system_pair_info'] = system_info
 
+    #Raise Error if the values don't commute
+    if (runsteps%(thermosteps) != 0):
+        raise ValueError('Thermosteps must divide runsteps')
+
     #Initialize the rest of the inputs to the Lammps Scripts 
     lammps_variables['Temperature'] = temperature
     lammps_variables['Time_Step'] = uc.get_in_units(timestep,lammps_units['time'])

@@ -22,7 +22,8 @@ def diffusion_msd(lammps_command: str,
                   mpi_command: Optional[str] = None,
                   timestep: Optional[float] = None,
                   runsteps: int = 100000,
-                  thermosteps: int = 1000,
+                  nsample: int = 10,
+                  nmax: int = 100,
                   eq_thermosteps: int = 0,
                   eq_runsteps: int = 0,
                   eq_equilibrium: bool = False,
@@ -53,9 +54,12 @@ def diffusion_msd(lammps_command: str,
     runsteps : int, optional
         How many timesteps the simulation will run for. Default value of 100,000
         should be suitable for a short run. 
-    thermosteps : int, optional
-        How often the calculated values get stored in the thermo table of the 
-        LAMMPS output. Default value of 1,000.
+    nsample : int, optional
+        How frequently the mean squared displacement gets sampled, Default value of 10
+        Multiplying nsample and nmax gives the thermosteps
+    nmax: int, optional
+        The number of points to take the derivative over. Multiplied together with 
+        nsample gives the thermosteps. 
     eq_thermosteps : int, optional
         How often the calculated values of the equilibirum run get stored in 
         the thermo table of the LAMMPS output. Default value of 0.  
@@ -111,11 +115,18 @@ def diffusion_msd(lammps_command: str,
     system_info = system.dump('atom_data', f='init.dat', potential=potential)
     lammps_variables['atomman_system_pair_info'] = system_info
 
+    #Raise Error if the values don't commute
+    if (runsteps%(nsample*nmax) != 0):
+        raise ValueError('nmax times nsample must divide runsteps')
+
+
     # Initialize the rest of the inputs to the Lammps Scripts 
     lammps_variables['Temperature'] = temperature
     lammps_variables['Time_Step'] = uc.get_in_units(timestep,lammps_units['time'])
     lammps_variables['Run_length'] = runsteps
-    lammps_variables['Thermo_Steps'] = thermosteps
+    lammps_variables['Thermo_Steps'] = nsample*nmax
+    lammps_variables['nsample'] = nsample
+    lammps_variables['nmax'] = nmax
     lammps_variables['Degrees_freedom'] = 3 #Fixed value 
     
 

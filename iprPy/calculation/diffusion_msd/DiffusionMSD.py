@@ -71,7 +71,8 @@ class DiffusionMSD(Calculation):
         self.temperature = 300
         
         self.runsteps = 50000
-        self.thermosteps = 2000
+        self.nsample = 10
+        self.nmax = 100
         self.randomseed = None
         
         self.eq_equilibrium = False
@@ -176,19 +177,34 @@ class DiffusionMSD(Calculation):
             self.__runsteps = val
 
     @property
-    def thermosteps(self) -> int:
-        """Frequency of the thermo outputs"""
-        if self.__thermosteps is None:
-            return 1000
+    def nsample(self) -> int:
+        """Sample size for MSD Values"""
+        if self.__nsample is None:
+            return 10
         else:
-            return self.__thermosteps
+            return self.__nsample
     
-    @thermosteps.setter
-    def thermosteps(self, val: Optional[int]):
+    @nsample.setter
+    def nsample(self, val: Optional[int]):
         if val is None:
-            self.__thermosteps = 2000
+            self.__nsample = 10
         else:
-            self.__thermosteps = val
+            self.__nsample = val 
+    
+    @property
+    def nmax(self) -> int:
+        """Sample size for MSD Values"""
+        if self.__nmax is None:
+            return 100
+        else:
+            return self.__nmax
+    
+    @nmax.setter
+    def nmax(self, val: Optional[int]):
+        if val is None:
+            self.__namx = 10
+        else:
+            self.__nmax = val 
 
     @property
     def randomseed(self) -> int:
@@ -339,8 +355,10 @@ class DiffusionMSD(Calculation):
             obtain measurements of diffusion
         timestep: float or None
             the difference in time between each step of the calculation
-        thermosteps: int or None
-            The number of steps inbetween the thermo writes to the log file
+        nsample: int or None
+            The sample size of MSD values
+        nmax: int or None
+            The number of values to calculate the sample diffusion from
         eq_thermosteps: int or None
             If doing an equilibrium run this is the number of steps inbetween
             the thermo calculations
@@ -367,8 +385,10 @@ class DiffusionMSD(Calculation):
             self.timestep = kwargs['timestep']
         if 'runsteps' in kwargs:
             self.runsteps = kwargs['runsteps']
-        if 'thermosteps' in kwargs:
-            self.thermosteps = kwargs['thermosteps']
+        if 'nsample' in kwargs:
+            self.nsample = kwargs['nsample']
+        if 'nmax' in kwargs:
+            self.nmax = kwargs['nmax']
         if 'eq_thermosteps' in kwargs:
             self.eq_thermosteps = kwargs['eq_thermosteps']
         if 'eq_runsteps' in kwargs:
@@ -410,7 +430,8 @@ class DiffusionMSD(Calculation):
         # Load calculation-specific its
         self.runsteps = int(input_dict.get('runsteps', 50000))
         self.randomseed = input_dict.get('randomseed', None)
-        self.thermosteps = int(input_dict.get('thermosteps',100))
+        self.nsample = int(input_dict.get('nsample',10))
+        self.nmax = int(input_dict.get('nmax',100))
         self.eq_thermosteps = int(input_dict.get('eq_termosteps',0))
         self.eq_runsteps = int(input_dict.get('eq_runsteps',0))
 
@@ -503,7 +524,8 @@ class DiffusionMSD(Calculation):
             'temperature': ' '.join(["Target temperature for the simulation - Default value of 300 K"]),
             'timestep': ' '.join(["How much to increase the time at each step - Default value of None will use the LAMMPS default"]),
             'runsteps':' '.join(["How many time steps to run simulation - Default value is 100000"]),
-            'thermosteps':' '.join(["How often to write calculated value to log file/ouput - Default value is 1000"]),
+            'nsample':' '.join(["Sample mean size for derivative calculation, Default is 10"]),
+            'nmax':' '.join(['The number of values for the calculation od derivative']),
             'eq_thermosteps':' '.join(["How often to write calculated value to log file/ouput for",
                                          "equilibriation run- Default value is 1000"]),
             'eq_runsteps':' '.join(["How many time steps to run simulation for equilibration",
@@ -554,7 +576,8 @@ class DiffusionMSD(Calculation):
                     'temperature',
                     'timestep',
                     'runsteps',
-                    'thermosteps',
+                    'nsample',
+                    'nmax',
                     'eq_thermosteps',
                     'eq_runsteps',
                     'eq_equilibrium',
@@ -601,7 +624,8 @@ class DiffusionMSD(Calculation):
         run_params['timestep'] = uc.model(self.timestep,'ps')
         run_params['runsteps'] = self.runsteps
         run_params['randomseed'] = self.randomseed
-        run_params['thermosteps'] = self.thermosteps
+        run_params['nsample'] = self.nsample
+        run_params['nmax'] = self.nmax
         run_params['eq_thermosteps'] = self.eq_thermosteps
         run_params['eq_runsteps'] = self.eq_runsteps
         run_params['eq_equilibrium'] = self.eq_equilibrium
@@ -651,7 +675,8 @@ class DiffusionMSD(Calculation):
         self.timestep = uc.value_unit(run_params['timestep'])
         self.randomseed = run_params['randomseed']
         self.temperature = uc.value_unit(run_params['temperature'])
-        self.thermosteps = run_params['thermosteps']
+        self.nsample = run_params['nsample']
+        self.nmax = run_params['nmax']
         self.eq_thermosteps = run_params['eq_thermosteps']
         self.eq_runsteps = run_params['eq_runsteps']
         self.eq_equilibrium = run_params['eq_equilibrium']
@@ -757,7 +782,8 @@ class DiffusionMSD(Calculation):
         input_dict['randomseed'] = self.randomseed
         input_dict['temperature'] = self.temperature
         input_dict['timestep'] = self.timestep
-        input_dict['thermosteps'] = self.thermosteps
+        input_dict['nsample'] = self.nsample
+        input_dict['nmax'] = self.nmax
         input_dict['eq_thermosteps'] = self.eq_thermosteps
         input_dict['eq_runsteps'] = self.eq_runsteps
         input_dict['eq_equilibrium'] = self.eq_equilibrium

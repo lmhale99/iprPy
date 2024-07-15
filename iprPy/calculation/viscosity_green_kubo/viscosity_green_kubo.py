@@ -125,6 +125,9 @@ def viscosity_green_kubo(lammps_command:str,
     scale_unit = uc.set_in_units(1,f"{lammps_units['pressure']}")
     scale = uc.get_in_units(scale_unit,unitStringScale)
  
+    #Raise Error if the values don't commute
+    if (runsteps%(outputsteps) != 0):
+        raise ValueError('Thermosteps must divide runsteps')
 
     #Initialize the rest of the inputs to the Lammps Scripts 
     lammps_variables['Temperature'] = temperature
