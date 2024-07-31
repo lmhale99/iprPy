@@ -1,0 +1,42 @@
+# Input script for iprPy calculation diffusion_liquid
+
+# Calculation Metadata
+branch                          
+
+# LAMMPS and MPI Commands
+lammps_command                  /home/lmh1/LAMMPS/2022-06-23/src/lmp_mpi
+mpi_command                     mpiexec -n 8          
+
+# Interatomic Potential
+potential_file                  ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1.json
+potential_kim_id                
+potential_kim_potid             
+potential_dir                   ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1
+
+# Initial System Configuration
+load_file                       ../0-files/relax_liquid_170000.dump
+load_style                      atom_dump
+load_options                    
+family                          
+symbols                         Ni
+box_parameters                              
+
+# Input/Output Units
+length_unit                     
+pressure_unit                   
+energy_unit                     
+force_unit                      
+
+# System Manipulations
+a_uvw                           
+b_uvw                           
+c_uvw                           
+atomshift                       
+sizemults                       1 1 1
+
+# Run Parameters
+temperature                     1500
+timestep                        
+runsteps                        2000
+simruns                         10
+equilsteps                        

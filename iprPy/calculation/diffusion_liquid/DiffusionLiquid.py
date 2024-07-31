@@ -4,7 +4,6 @@ from io import IOBase
 from pathlib import Path
 from copy import deepcopy
 from typing import Optional, Union
-import random
 
 import numpy as np
 
@@ -22,7 +21,7 @@ from .. import Calculation
 from .diffusion_liquid import diffusion_liquid
 from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
                                    AtommanSystemLoad, AtommanSystemManipulate)
-from ...input import value, boolean
+from ...input import value
 
 class DiffusionLiquid(Calculation):
     """
@@ -67,17 +66,15 @@ class DiffusionLiquid(Calculation):
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
         self.__system_mods = AtommanSystemManipulate(self)
-        subsets = (self.commands, self.potential, self.system, self.units, self.system_mods)
+        subsets = (self.commands, self.potential, self.system,
+                   self.system_mods, self.units)
 
         # Initialize unique calculation attributes
         self.temperature = None
-        self.randomseed = None
-
         self.runsteps = 50000
         self.timestep = None
         self.simruns = 10
         self.equilsteps = 0
-        self.eq_equilibrium = False
 
         self.__measured_temperature = None
         self.__measured_temperature_stderr = None
@@ -135,9 +132,11 @@ class DiffusionLiquid(Calculation):
     def timestep(self) -> Optional[float]:
         """float: time step for simulation"""
         if self.__timestep is None:
-            return am.lammps.style.timestep(self.potential.potential.units)
-        else:
-            return self.__timestep
+            timestep = am.lammps.style.timestep(self.potential.potential.units)
+            lammps_units = am.lammps.style.unit(self.potential.potential.units)
+            self.__timestep = uc.set_in_units(timestep, lammps_units['time'])
+        
+        return self.__timestep
     
     @timestep.setter
     def timestep(self, val: Optional[float]):
@@ -174,20 +173,6 @@ class DiffusionLiquid(Calculation):
         self.__runsteps = val
 
     @property
-    def randomseed(self) -> int:
-        """int: Random number seed."""
-        return self.__randomseed
-
-    @randomseed.setter
-    def randomseed(self, val: Optional[int]):
-        if val is None:
-            val = random.randint(1, 900000000)
-        else:
-            val = int(val)
-            assert val > 0 and val <= 900000000
-        self.__randomseed = val
-
-    @property
     def equilsteps(self) -> int:
         """int: Number of MD steps during the volume equilibration stage"""
         return self.__equilsteps
@@ -197,15 +182,6 @@ class DiffusionLiquid(Calculation):
         val = int(val)
         assert val >= 0
         self.__equilsteps = val
-
-    @property 
-    def eq_equilibrium(self) -> bool:
-        """bool: Does the system need equilibration"""
-        return self.__eq_equilibrium
-    
-    @eq_equilibrium.setter
-    def eq_equilibrium(self, val:bool):
-        self.__eq_equilibrium  = boolean(val)
 
     @property
     def simruns(self) -> int:
@@ -271,7 +247,7 @@ class DiffusionLiquid(Calculation):
         """Error in the diffusion measurements"""
         if self.__diffusion_msd_short_stderr is None:
             raise ValueError("No results! Does not get loaded from records")
-        return self.__diffusion_msd_short_value
+        return self.__diffusion_msd_short_stderr
     
     @property
     def diffusion_vacf(self) -> float:
@@ -287,11 +263,7 @@ class DiffusionLiquid(Calculation):
         if self.__diffusion_vacf_stderr is None:
             raise ValueError("No results! Does not get loaded from records")
         return self.__diffusion_vacf_stderr
-
-
-
-
-    
+  
     def set_values(self,
                    name: Optional[str] = None,
                    **kwargs: any):
@@ -317,20 +289,12 @@ class DiffusionLiquid(Calculation):
         equilsteps: int or None
             If doing an equilibrium run this is the number of simulation
             timesteps 
-        eq_equilibrium: bool or None
-            Set to true if you need to relax the system first. False if the 
-            system is already relaxed. 
-        randomseed : int or None, optional
-            Random number seed used by LAMMPS in creating velocities and with
-            the Langevin thermostat.
         **kwargs : any, optional
             Any keyword parameters supported by the set_values() methods of
             the parent Calculation class and the subset classes.
         """
         # Call super to set universal and subset content
         super().set_values(name=name, **kwargs)
-        if 'randomseed' in kwargs:
-            self.randomseed = kwargs['randomseed']
         if 'temperature' in kwargs:
             self.temperature = kwargs['temperature']
         if 'timestep' in kwargs:
@@ -341,8 +305,6 @@ class DiffusionLiquid(Calculation):
             self.runsteps = kwargs['runsteps']
         if 'equilsteps' in kwargs:
             self.equilsteps = kwargs['equilsteps']
-        if 'eq_equilbirium' in kwargs:
-            self.eq_equilibrium = kwargs['eq_equilibrium']
 
 ####################### Parameter file interactions ###########################
 
@@ -373,11 +335,9 @@ class DiffusionLiquid(Calculation):
         # Load calculation-specific strings
 
         # Load calculation-specific booleans
-        self.eq_equilibrium = boolean(input_dict.get('eq_equilibrium',False))
 
         # Load calculation-specific its
         self.runsteps = int(input_dict.get('runsteps', 50000))
-        self.randomseed = input_dict.get('randomseed', None)
         self.simruns = int(input_dict.get('simruns', 10))
         self.equilsteps = int(input_dict.get('equilsteps', 0))
 
@@ -483,9 +443,6 @@ class DiffusionLiquid(Calculation):
                 "The number of equilibrium timesteps to run prior to evaluating the",
                 "diffusion.  Useful if your initial configuration and velocities are",
                 "not already in an equilibrium state.  Default value is 0."]),
-            'eq_equilibrium':' '.join([
-                "Boolean flag indicating if an equilibrium run will be performed.",
-                "Default value is False."]),
         }
 
     @property
@@ -531,8 +488,6 @@ class DiffusionLiquid(Calculation):
                     'runsteps',
                     'simruns',
                     'equilsteps',
-                    'eq_equilibrium',
-                    'randomseed',
                 ]
             ]
         )
@@ -571,9 +526,7 @@ class DiffusionLiquid(Calculation):
         run_params['timestep'] = uc.model(self.timestep, 'ps')
         run_params['runsteps'] = self.runsteps
         run_params['simruns'] = self.simruns
-        run_params['randomseed'] = self.randomseed
         run_params['equilsteps'] = self.equilsteps
-        run_params['eq_equilibrium'] = self.eq_equilibrium
         
         # Build results
         if self.status == 'finished':
@@ -611,11 +564,9 @@ class DiffusionLiquid(Calculation):
         run_params = calc['calculation']['run-parameter']
         self.runsteps = run_params['runsteps']
         self.timestep = uc.value_unit(run_params['timestep'])
-        self.randomseed = run_params['randomseed']
         self.temperature = uc.value_unit(run_params['temperature'])
         self.simruns = run_params['simruns']
         self.equilsteps = run_params['equilsteps']
-        self.eq_equilibrium = run_params['eq_equilibrium']
 
         # Load results
         if self.status == 'finished':
@@ -715,13 +666,11 @@ class DiffusionLiquid(Calculation):
 
         # Add calculation-specific inputs
         input_dict['runsteps'] = self.runsteps
-        input_dict['randomseed'] = self.randomseed
         input_dict['temperature'] = self.temperature
         input_dict['timestep'] = self.timestep
         input_dict['simruns'] = self.simruns
         input_dict['equilsteps'] = self.equilsteps
-        input_dict['eq_equilibrium'] = self.eq_equilibrium
-        
+
         # Return input_dict
         return input_dict
 
@@ -729,9 +678,9 @@ class DiffusionLiquid(Calculation):
     def calc_output_files(self) -> list:
         """list : Glob path strings for files generated by this calculation"""
         return [
-           # 'atom.dat',
-           # 'run0-*-log.lammps',
-           # 'run0.in'
+            'init.dat',
+            'log.lammps',
+            'diffusion_liquid.in'
         ]
 
     def process_results(self, results_dict: dict):

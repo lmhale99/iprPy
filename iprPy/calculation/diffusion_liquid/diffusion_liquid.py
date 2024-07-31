@@ -1,7 +1,4 @@
-#current in 6/11/24 - duplicated in working directoy
 
-from pathlib import Path 
-import random
 from typing import Optional
 
 import atomman as am
@@ -26,8 +23,6 @@ def diffusion_liquid(lammps_command:str,
                      runsteps: int = 50000,
                      simruns: int = 10,
                      equilsteps: int = 0,
-                     eq_equilibrium: bool = False,
-                     randomseed: Optional[int] = None
                      ) -> dict:
     """
     Calculates the diffusion constant for a liquid system using
@@ -58,15 +53,7 @@ def diffusion_liquid(lammps_command:str,
     equilsteps : int, optional
         How many timesteps the equilibiration simulation will run for. Default 
         value of 0.
-    eq_equilibrium : bool, optional
-        Dictates whether to run an equilibration simulation before the calculation
-        simulation. Default value is false. 
-    randomseed : int, optional,
-        The randomseed for velocity assignment in an equilibration run. Default 
-        value of None will result in a number being chosen at random from the 
-        python random package.  
-    
-    
+
     Returns
     -------
     dict
@@ -92,48 +79,27 @@ def diffusion_liquid(lammps_command:str,
         of the diffusion coeffecient
         -**'lammps_output'** - The lammps output log
     """
-    #Get the Units from Potential
+    # Get the Units from Potential
     lammps_units = lmp.style.unit(potential.units)
 
     # Set default timestep based on units
     if timestep is None:
-        timestep = lmp.style.timestep(potential.units)
+        timestep = uc.set_in_units(lmp.style.timestep(potential.units),
+                                   lammps_units['time'])
 
     # Initialize the variables to fill in the script
     lammps_variables = {}
 
     # Get the system info by loading the system into the init.dat and using the specified potential
-    system_info = system.dump('atom_data', f='init.dat', potential = potential)
+    system_info = system.dump('atom_data', f='init.dat', potential=potential)
     lammps_variables['atomman_system_pair_info'] = system_info
 
-
-
-
     # Initialize the rest of the inputs to the Lammps Scripts 
-    lammps_variables['Temperature'] = temperature
-    lammps_variables['Time_Step'] = uc.get_in_units(timestep,lammps_units['time'])
-    lammps_variables['Run_length'] = runsteps
-    lammps_variables['Equilibration_steps'] = equilsteps
+    lammps_variables['temperature'] = temperature
+    lammps_variables['timestep'] = uc.get_in_units(timestep, lammps_units['time'])
+    lammps_variables['runsteps'] = runsteps
+    lammps_variables['equilsteps'] = equilsteps
     lammps_variables['num_simulations'] = simruns
-    lammps_variables['Degrees_freedom'] = 3
-
-    #Set up the seed
-    if randomseed is None:
-        randomseed = random.randint(1, 9000000)
-
-    #Setting up equilbrium
-    if eq_equilibrium:
-        instruct = '\n'.join([
-            "fix NVE all nve",
-            f"fix LANGEVIN all langevin $T $T {10*timestep} {randomseed}",
-            f"thermo 100",
-            f"run {equilsteps}",
-            "unfix NVE",
-            "unfix LANGEVIN",
-            "reset_timestep 0"])
-        lammps_variables['Equilibration_instructions'] = instruct
-    elif not eq_equilibrium or equilsteps == 0:
-        lammps_variables['Equilibration_instructions'] = ""
 
     #Fill in the template
     lammps_script = 'diffusion_liquid.in'
@@ -146,69 +112,68 @@ def diffusion_liquid(lammps_command:str,
     output = lmp.run(lammps_command, script_name=lammps_script,
                      mpi_command=mpi_command, screen=False)
     
-    results = {}
-
-    indexOffset = 0
-    if eq_equilibrium: 
-        indexOffset += 1
-    
-
+    # Init lists of values
     diffusion_vacf_values = []
     diffusion_msd_short_values = []
-    diffusion_msd_long_value = 0
     measured_temps = []
-
-
     msd_long_running = []
     steps_long_running = []
 
-    for i in range(indexOffset,simruns+indexOffset):
-        # Iterating through the different simulations
-        # Want to take the the last values for each run for 
-        # fitslopeShort and eta, only want the very last value
-        # for fitslopeLong
-        thermo = output.simulations[i]
+    msd_unit = f"{lammps_units['length']}^2"
+    diffusion_msd_unit = f"{lammps_units['length']}^2/{lammps_units['time']}"
+    diffusion_vacf_unit = f"{lammps_units['velocity']}^2*{lammps_units['time']}"
 
-        diffusion_vacf_values.append(thermo['v_eta'][-1])
-        diffusion_msd_short_values.append(thermo['v_fitslopeShort'][-1])
-        msd_long_running += thermo['c_msdLong[4]']
-        steps_long_running += thermo['Step']
-        measured_temps.append(thermo['Temp'])
+    for i in range(1, simruns+1):
+        thermo = output.simulations[i].thermo
 
-        if (i == simruns+indexOffset-1):
-            diffusion_msd_long_value = thermo['v_fitslopeLong']
+        # Get last diffusion values for short MSD and VACF
+        diffusion_vacf_values.append(thermo['v_eta'].values[-1])
+        diffusion_msd_short_values.append(thermo['v_fitslopeShort'].values[-1])
+        
+        # Append lists with all long MSD, steps, and temperature measurements
+        msd_long_running += thermo['c_msdLong[4]'].tolist()
+        steps_long_running += thermo['Step'].tolist()
+        measured_temps += thermo['Temp'].tolist()
 
-    # The error for the vacf and msd_short values will just be the standard method
-    # The error for msd_long will be the error associated with the linear fit
-    # Error calculation for msd_long calculation
-    temp_error_sum = 0
-    for i in range(len(msd_long_running)):
-        temp_error_sum += (msd_long_running[i] - (diffusion_msd_long_value*2*3*timestep))**2 
+    # Get long MSD estimate from the last simulation
+    thermo = output.simulations[-1].thermo
+    diffusion_msd_long_value = uc.set_in_units(thermo['v_fitslopeLong'].values[-1], 
+                                               diffusion_msd_unit)
+
+    # Unit convert MSD and diffusion values
+    diffusion_vacf_values = uc.set_in_units(diffusion_vacf_values, diffusion_vacf_unit)
+    diffusion_msd_short_values = uc.set_in_units(diffusion_msd_short_values, diffusion_msd_unit)
+    msd_long_running = uc.set_in_units(msd_long_running, msd_unit)
+    time_running = np.array(steps_long_running) * timestep
+
+    # Compute error associated with linear fit for MSD long
+    #temp_error_sum = 0
+    #for i in range(len(msd_long_running)):
+    #    temp_error_sum += (msd_long_running[i] - (diffusion_msd_long_value*2*3*timestep))**2 
         #Note the 2 and 3 come from the diffusion formula 
+    #diffusion_msd_long_stderr = temp_error_sum / len(msd_long_running)
+    diffusion_msd_long_stderr = (np.sum((msd_long_running[1:] / (6 * time_running[1:]) - diffusion_msd_long_value)**2) / len(msd_long_running)) ** 0.5
 
-    diffusion_msd_long_stderr = temp_error_sum / len(msd_long_running)
-    diffusion_msd_short_stderr = np.std(diffusion_msd_short_values) / ((len(diffusion_msd_short_values))**(.5))
-    diffusion_vacf_stderr = np.std(diffusion_vacf_values) / ((len(diffusion_vacf_values))**(.5))
-
-    diffusion_vacf_value = np.average(diffusion_vacf_values)
-    diffusion_msd_short_value = np.average(diffusion_msd_short_values)
-
+    # Compute mean and stderr of mean for temp, VACF and MSD short
     measured_temp = np.average(measured_temps)
-    measured_temp_stderr = np.std(measured_temps) / ((len(measured_temps))**(.5))
+    measured_temp_stderr = np.std(measured_temps) / ((len(measured_temps) / 100) ** .5)
+    
+    diffusion_msd_short_value = np.average(diffusion_msd_short_values)
+    diffusion_msd_short_stderr = np.std(diffusion_msd_short_values) / (simruns ** .5)
+    
+    diffusion_vacf_value = np.average(diffusion_vacf_values)
+    diffusion_vacf_stderr = np.std(diffusion_vacf_values) / (simruns ** .5)
 
-    diffusion_unit = f'{lammps_units['velocity']}^2*{lammps_units['time']}'
-
-    results['diffusion_msd_short'] = uc.set_in_units(diffusion_msd_short_value, diffusion_unit)
-    results['diffusion_msd_short_stderr'] = uc.set_in_units(diffusion_msd_short_stderr, diffusion_unit)
-
-    results['diffusion_msd_long'] = uc.set_in_units(diffusion_msd_long_value, diffusion_unit)
-    results['diffusion_msd_long_stderr'] = uc.set_in_units(diffusion_msd_long_stderr, diffusion_unit)
-
-    results['diffusion_vacf'] = uc.set_in_units(diffusion_vacf_value, diffusion_unit)
-    results['diffusion_vacf_stderr'] = uc.set_in_units(diffusion_vacf_stderr, diffusion_unit)
-
-    results['measured_temperature'] = uc.set_in_units(measured_temp, 'K')
-    results['measured_temperature_stderr'] = uc.set_in_units(measured_temp_stderr, 'K')
+    # Build results dict
+    results = {}
+    results['diffusion_msd_short'] = diffusion_msd_short_value
+    results['diffusion_msd_short_stderr'] = diffusion_msd_short_stderr
+    results['diffusion_msd_long'] = diffusion_msd_long_value
+    results['diffusion_msd_long_stderr'] = diffusion_msd_long_stderr
+    results['diffusion_vacf'] = diffusion_vacf_value
+    results['diffusion_vacf_stderr'] = diffusion_vacf_stderr
+    results['measured_temperature'] = measured_temp
+    results['measured_temperature_stderr'] = measured_temp_stderr
     
     results['lammps_output'] = output 
     return results
