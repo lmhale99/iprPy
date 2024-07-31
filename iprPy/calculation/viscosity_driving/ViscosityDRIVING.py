@@ -74,7 +74,7 @@ class viscosityDRIVING(Calculation):
         self.timestep = .001
         self.runsteps = 50000
         self.thermosteps = 2000
-        self.drivingforce = .1
+        self.drivingforce = 1.5
 
         self.eq_thermosteps = 0
         self.eq_runsteps = 0
@@ -400,7 +400,7 @@ class viscosityDRIVING(Calculation):
                                  default_term='300 K')
         self.drivingforce = value(input_dict,'drivingforce',
                                   default_unit='angstrom/(ps^2)',
-                                  default_term='1.5 angstrom/(ps^2)')
+                                  default_term='2 angstrom/(ps^2)')
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
 
@@ -689,6 +689,7 @@ class viscosityDRIVING(Calculation):
 
             'potential_LAMMPS_key',
             'potential_key',
+            'drivingforce'
         ]
 
     @property
@@ -696,7 +697,6 @@ class viscosityDRIVING(Calculation):
         """dict: The terms to compare metadata values using a tolerance."""
         return {
             'temperature':1e-2,
-            'drivingforce':.001
         }
 
 ########################### Calculation interactions ##########################

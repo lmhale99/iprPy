@@ -605,9 +605,9 @@ class DiffusionVACF(Calculation):
             calc['vacf'] = uc.model(self.vacf_values.tolist(),f'({self.units.length_unit}/ps)^2')
             calc['measured_temperature'] = uc.model(self.measured_temperature,'K')
             calc['measured_temperature_stderr'] = uc.model(self.measured_temperature_stderr,'K')
-            calc['diffusion'] = uc.model(self.diffusion_value,f'({self.units.length_unit}/ps)^2*ps')
+            calc['diffusion'] = uc.model(self.diffusion_value,f'({self.units.length_unit}^2*ps')
             calc['diffusion_stderr'] = uc.model(self.diffusion_value_stderror,
-                                                f'({self.units.length_unit}/ps)^2*ps')
+                                                f'({self.units.length_unit}^2/ps')
 
         self._set_model(model)
         return model

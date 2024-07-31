@@ -166,7 +166,7 @@ def diffusion_vacf(lammps_command:str,
     v3 = np.ndarray((simruns,runsteps+1))
     v = np.ndarray((simruns,runsteps+1))
     for i in range(indexOffset,simruns+indexOffset):
-        D[i-indexOffset] = log.simulations[i].thermo['v_eta'][-1]
+        D[i-indexOffset] = log.simulations[i].thermo['v_eta'][len(log.simulations[i].thermo['v_eta'])-1]
         T[i-indexOffset] = log.simulations[i].thermo['Temp']
         v1[i-indexOffset] = log.simulations[i].thermo['c_vacf[1]']
         v2[i-indexOffset] = log.simulations[i].thermo['c_vacf[2]']
