@@ -1,0 +1,29 @@
+# LAMMPS input script that performs a liquid phase relaxation and evaluation
+
+# Cumulative run steps
+variable maxstep equal <meltsteps>+<coolsteps>+<equilvolumesteps>+<runsteps>
+
+box tilt large
+
+<atomman_pair_restart_info>
+
+###################### NVE analysis run ########################
+
+# Set up analysis computes
+compute pe all pe/atom
+compute rdf all rdf 200
+fix 1 all ave/time 100 1 100 c_rdf[*] file rdf.txt mode vector
+
+# Dump configurations
+dump dumpit all custom <dumpsteps> *.dump <dump_keys>
+dump_modify dumpit format <dump_modify_format>
+restart <restartsteps> *.restart
+
+# Change thermo to report msd
+thermo 100
+thermo_style custom step temp pe ke etotal pxx pyy pzz 
+thermo_modify format float %.13e
+
+# Perform nvt
+fix nvt all nvt temp <temperature> <temperature> <temperature_damp>
+run ${maxstep} upto
