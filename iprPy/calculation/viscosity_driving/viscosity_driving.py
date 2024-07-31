@@ -151,11 +151,11 @@ def viscosity_driving(lammps_command:str,
     #From thermo data calculate the Viscosity 
     runningViscosityInverse = thermo["v_reciprocalViscosity"]
     runningTemperature = thermo["Temp"]
-    avgTemp = np.avg(runningTemperature)
+    avgTemp = np.average(runningTemperature)
     runningViscosity = np.array([1/i for i in runningViscosityInverse])
     avgInvVisc = np.average(runningViscosityInverse)
     stdInvVisc = np.std(runningViscosityInverse)
-    avgVisc = np.avg(runningViscosity)
+    avgVisc = np.average(runningViscosity)
 
     std_errVisc = (avgVisc)*abs(stdInvVisc/avgInvVisc)
 
