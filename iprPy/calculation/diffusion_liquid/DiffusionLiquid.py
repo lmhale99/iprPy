@@ -19,13 +19,16 @@ from DataModelDict import DataModelDict as DM
 
 # iprPy imports
 from .. import Calculation
-from .diffusion import diffusion
+from .diffusion_liquid import diffusion_liquid
 from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
                                    AtommanSystemLoad, AtommanSystemManipulate)
-from ...input import value
+from ...input import value, boolean
 
-class Diffusion(Calculation):
-    """Class for managing dynamic relaxations"""
+class DiffusionLiquid(Calculation):
+    """
+    Class for measuring the diffusion coefficient for a liquid using both mean
+    squared displacement and velocity autocorrelation methods.
+    """
 
 ############################# Core properties #################################
 
@@ -67,31 +70,27 @@ class Diffusion(Calculation):
         subsets = (self.commands, self.potential, self.system, self.units, self.system_mods)
 
         # Initialize unique calculation attributes
-
-        self.temperature = 2500
+        self.temperature = None
         self.randomseed = None
 
         self.runsteps = 50000
-        self.timestep = .001 
-
-
+        self.timestep = None
         self.simruns = 10
-        self.eq_thermosteps = 0
-        self.eq_runsteps = 0
+        self.equilsteps = 0
         self.eq_equilibrium = False
 
         self.__measured_temperature = None
         self.__measured_temperature_stderr = None
-        self.__diffusion_msd_long_value = None
-        self.__diffusion_msd_long_value_stderr = None
-        self.__diffusion_msd_short_value = None
-        self.__diffusion_msd_short_value_stderr = None
-        self.__diffusion_vacf_value = None
-        self.__diffusion_vacf_value_stderr = None
+        self.__diffusion_msd_long = None
+        self.__diffusion_msd_long_stderr = None
+        self.__diffusion_msd_short = None
+        self.__diffusion_msd_short_stderr = None
+        self.__diffusion_vacf = None
+        self.__diffusion_vacf_stderr = None
         self.__lammps_output = None
 
         # Define calc shortcut
-        self.calc = diffusion
+        self.calc = diffusion_liquid
 
         # Call parent constructor
         super().__init__(model=model, name=name, database=database, params=params,
@@ -106,8 +105,6 @@ class Diffusion(Calculation):
         ]
 
 ############################## Class attributes ################################
-
-    ########################## Input Paramteres #################################
 
     @property
     def commands(self) -> LammpsCommands:
@@ -130,6 +127,11 @@ class Diffusion(Calculation):
         return self.__system
 
     @property
+    def system_mods(self) -> AtommanSystemManipulate:
+        """AtommanSystemManipulate subset"""
+        return self.__system_mods
+
+    @property
     def timestep(self) -> Optional[float]:
         """float: time step for simulation"""
         if self.__timestep is None:
@@ -142,7 +144,7 @@ class Diffusion(Calculation):
         if val is None:
             self.__timestep = None
         else:
-            self.__timestep = val
+            self.__timestep = float(val)
     
     @property
     def temperature(self) -> float:
@@ -171,14 +173,13 @@ class Diffusion(Calculation):
         assert val >= 0
         self.__runsteps = val
 
-
     @property
     def randomseed(self) -> int:
         """int: Random number seed."""
         return self.__randomseed
 
     @randomseed.setter
-    def randomseed(self, val: int):
+    def randomseed(self, val: Optional[int]):
         if val is None:
             val = random.randint(1, 900000000)
         else:
@@ -186,53 +187,25 @@ class Diffusion(Calculation):
             assert val > 0 and val <= 900000000
         self.__randomseed = val
 
-
     @property
-    def eq_thermosteps(self) -> int:
-        """int: Number of MD steps during the energy equilibration stage"""
-        if self.__eq_thermosteps is None:
-            return 0
-        else:
-            return self.__eq_thermosteps
-    
-    @eq_thermosteps.setter
-    def eq_thermosteps(self, val: int):
-        if val is None:
-            self.__eq_thermosteps = 0
-        else:
-            assert val >= 0
-            self.__eq_thermosteps = val
-
-    @property
-    def eq_runsteps(self) -> int:
+    def equilsteps(self) -> int:
         """int: Number of MD steps during the volume equilibration stage"""
-        if self.__eq_runsteps is None:
-            return 0 
-        else:
-            return self.__eq_runsteps
+        return self.__equilsteps
 
-    @eq_runsteps.setter
-    def eq_runsteps(self, val: int):
-        if val is None:
-            self.__eq_runsteps = 0
-        else:
-            assert val >= 0
-            self.__eq_runsteps = val
+    @equilsteps.setter
+    def equilsteps(self, val: int):
+        val = int(val)
+        assert val >= 0
+        self.__equilsteps = val
 
     @property 
     def eq_equilibrium(self) -> bool:
         """bool: Does the system need equilibration"""
-        if self.__eq_equilibrium is None:
-            return False
-        else:
-            return self.__eq_equilibrium
+        return self.__eq_equilibrium
     
     @eq_equilibrium.setter
     def eq_equilibrium(self, val:bool):
-        if val is None:
-            self.__eq_equilibrium = False 
-        else: 
-            self.__eq_equilibrium = val
+        self.__eq_equilibrium  = boolean(val)
 
     @property
     def simruns(self) -> int:
@@ -241,10 +214,9 @@ class Diffusion(Calculation):
     
     @simruns.setter
     def simruns(self, val: int):
-        if val is None:
-            self.__simruns = 10
-        else:
-            self.__simruns = int(val)
+        val = int(val)
+        assert val >= 1
+        self.__simruns = val
 
 ###################################################################################################################
     ################# Calculated results #########################
@@ -270,51 +242,51 @@ class Diffusion(Calculation):
         if self.__measured_temperature_stderr is None:
             raise ValueError("No results! Does not get loaded from records")
         return self.__measured_temperature_stderr
-#############################################################################
+
     @property
-    def diffusion_msd_long_value(self) -> float:
+    def diffusion_msd_long(self) -> float:
         """Calculated diffusion coeffecient averaged over the run 
             starting at the data offset value"""
-        if self.__diffusion_msd_long_value is None:
+        if self.__diffusion_msd_long is None:
             raise ValueError("No results! Does not get loaded from records")
-        return self.__diffusion_msd_long_value
+        return self.__diffusion_msd_long
     
     @property
-    def diffusion_msd_long_value_stderror(self) -> float:
+    def diffusion_msd_long_stderr(self) -> float:
         """Error in the diffusion measurements"""
-        if self.__diffusion_msd_long_value_stderr is None:
+        if self.__diffusion_msd_long_stderr is None:
             raise ValueError("No results! Does not get loaded from records")
-        return self.__diffusion_msd_long_value_stderr
+        return self.__diffusion_msd_long_stderr
     
     @property
-    def diffusion_msd_short_value(self) -> float:
+    def diffusion_msd_short(self) -> float:
         """Calculated diffusion coeffecient averaged over the run 
             starting at the data offset value"""
-        if self.__diffusion_msd_short_value is None:
+        if self.__diffusion_msd_short is None:
+            raise ValueError("No results! Does not get loaded from records")
+        return self.__diffusion_msd_short
+    
+    @property
+    def diffusion_msd_short_stderr(self) -> float:
+        """Error in the diffusion measurements"""
+        if self.__diffusion_msd_short_stderr is None:
             raise ValueError("No results! Does not get loaded from records")
         return self.__diffusion_msd_short_value
     
     @property
-    def diffusion_msd_short_value_stderror(self) -> float:
-        """Error in the diffusion measurements"""
-        if self.__diffusion_msd_short_value_stderr is None:
-            raise ValueError("No results! Does not get loaded from records")
-        return self.__diffusion_msd_short_value_stderr
-    
-    @property
-    def diffusion_vacf_value(self) -> float:
+    def diffusion_vacf(self) -> float:
         """Calculated diffusion coeffecient averaged over the run 
             starting at the data offset value"""
-        if self.__diffusion_vacf_value is None:
+        if self.__diffusion_vacf is None:
             raise ValueError("No results! Does not get loaded from records")
-        return self.__diffusion_vacf_value
+        return self.__diffusion_vacf
     
     @property
-    def diffusion_vacf_value_stderror(self) -> float:
+    def diffusion_vacf_stderr(self) -> float:
         """Error in the diffusion measurements"""
-        if self.__diffusion_vacf_value_stderr is None:
+        if self.__diffusion_vacf_stderr is None:
             raise ValueError("No results! Does not get loaded from records")
-        return self.__diffusion_vacf_value_stderr
+        return self.__diffusion_vacf_stderr
 
 
 
@@ -342,10 +314,7 @@ class Diffusion(Calculation):
         simruns: int or None
             The number of simulations to run - more simulations equates to
             less noise. Default value of 5
-        eq_thermosteps: int or None
-            If doing an equilibrium run this is the number of steps inbetween
-            the thermo calculations
-        eq_runsteps: int or None
+        equilsteps: int or None
             If doing an equilibrium run this is the number of simulation
             timesteps 
         eq_equilibrium: bool or None
@@ -370,10 +339,8 @@ class Diffusion(Calculation):
             self.simruns = kwargs['simruns']
         if 'runsteps' in kwargs:
             self.runsteps = kwargs['runsteps']
-        if 'eq_thermosteps' in kwargs:
-            self.eq_thermosteps = kwargs['eq_thermosteps']
-        if 'eq_runsteps' in kwargs:
-            self.eq_runsteps = kwargs['eq_runsteps']
+        if 'equilsteps' in kwargs:
+            self.equilsteps = kwargs['equilsteps']
         if 'eq_equilbirium' in kwargs:
             self.eq_equilibrium = kwargs['eq_equilibrium']
 
@@ -406,24 +373,23 @@ class Diffusion(Calculation):
         # Load calculation-specific strings
 
         # Load calculation-specific booleans
-        self.eq_equilibrium = bool(input_dict.get('eq_equilibrium',False))
+        self.eq_equilibrium = boolean(input_dict.get('eq_equilibrium',False))
 
         # Load calculation-specific its
         self.runsteps = int(input_dict.get('runsteps', 50000))
         self.randomseed = input_dict.get('randomseed', None)
-        self.simruns = int(input_dict.get('simruns',10))
-        self.eq_thermosteps = int(input_dict.get('eq_termosteps',0))
-        self.eq_runsteps = int(input_dict.get('eq_runsteps',0))
+        self.simruns = int(input_dict.get('simruns', 10))
+        self.equilsteps = int(input_dict.get('equilsteps', 0))
 
         # Load calculation-specific unitless floats
+        self.temperature = float(input_dict['temperature'])
 
         # Load calculation-specific floats with units
-        self.timestep = value(input_dict,'timestep',
-                              default_unit='ps',
-                              default_term='0.001 ps')
-        self.temperature = value(input_dict,'temperature',
-                                 default_unit='K',
-                                 default_term='2500 K')
+        if 'timestep' in input_dict:
+            self.timestep = value(input_dict, 'timestep',
+                                  default_unit='ps')
+        else:
+            self.timestep = None
 
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
@@ -435,7 +401,7 @@ class Diffusion(Calculation):
         self.system.load_parameters(input_dict)
 
         # Manipulate system
-
+        self.system_mods.load_parameters(input_dict)
 
     def master_prepare_inputs(self,
                               branch: str = 'main',
@@ -474,7 +440,7 @@ class Diffusion(Calculation):
             # Set default workflow settings
             params['buildcombos'] =  'atomicarchive load_file archive'
 
-            params['archive_record'] = 'calculation_diffusion_vacf'
+            params['archive_record'] = 'calculation_relax_liquid_redo'
             params['archive_load_key'] = 'final-system'
             params['archive_status'] = 'finished'
             params['archive_temperature'] = kwargs['temperature']
@@ -501,16 +467,25 @@ class Diffusion(Calculation):
         """dict : The calculation-specific input keys and their descriptions."""
 
         return {
-            'temperature': ' '.join(["Target temperature for the simulation - Default value of 300 K"]),
-            'timestep': ' '.join(["How much to increase the time at each step - Default value of None will use the LAMMPS default"]),
-            'runsteps':' '.join(["How many time steps to run simulation - Default value is 100000"]),
-            'simruns':' '.join(["The number of simulations to run - a higher number helps damp out simulation noise"]),
-            'eq_thermosteps':' '.join(["How often to write calculated value to log file/ouput for",
-                                         "equilibriation run- Default value is 1000"]),
-            'eq_runsteps':' '.join(["How many time steps to run simulation for equilibration",
-                                     "run - Default value is 0"]),
-            'eq_equilibrium':' '.join(["Specifies whether or not to do an equilibration default is false",
-                                       "Set to yet if the input is not a relaxed liquid already"]),
+            'temperature': ' '.join([
+                "Target temperature for the simulation. Required."]),
+            'timestep': ' '.join([
+                "How much to increase the time at each step.  If not given, will",
+                "use the default LAMMPS timestep value associated with the",
+                "potential's unit style."]),
+            'runsteps':' '.join([
+                "How many time steps to run during each simulation.  The total steps",
+                 "will be runsteps * simruns"]),
+            'simruns':' '.join([
+                "The number of separate VACF simulations to run.  A higher number",
+                 "helps damp out the simulation noise.  Default value is 10."]),
+            'equilsteps':' '.join([
+                "The number of equilibrium timesteps to run prior to evaluating the",
+                "diffusion.  Useful if your initial configuration and velocities are",
+                "not already in an equilibrium state.  Default value is 0."]),
+            'eq_equilibrium':' '.join([
+                "Boolean flag indicating if an equilibrium run will be performed.",
+                "Default value is False."]),
         }
 
     @property
@@ -555,8 +530,7 @@ class Diffusion(Calculation):
                     'timestep',
                     'runsteps',
                     'simruns',
-                    'eq_thermosteps',
-                    'eq_runsteps',
+                    'equilsteps',
                     'eq_equilibrium',
                     'randomseed',
                 ]
@@ -567,12 +541,10 @@ class Diffusion(Calculation):
 
 ########################### Data model interactions ###########################
 
-#Don't know what to do with the data model interactions 
-#This stuff makes the json file
     @property
     def modelroot(self) -> str:
         """str: The root element of the content"""
-        return 'calculation_diffusion_vacf'
+        return 'calculation_diffusion_liquid'
 
     def build_model(self) -> DM:
         """
@@ -595,30 +567,24 @@ class Diffusion(Calculation):
             calc['calculation']['run-parameter'] = DM()
         run_params = calc['calculation']['run-parameter']
 
-        run_params['temperature'] = uc.model(self.temperature,'K')
-        run_params['timestep'] = uc.model(self.timestep,'ps')
+        run_params['temperature'] = uc.model(self.temperature, 'K')
+        run_params['timestep'] = uc.model(self.timestep, 'ps')
         run_params['runsteps'] = self.runsteps
         run_params['simruns'] = self.simruns
         run_params['randomseed'] = self.randomseed
-        run_params['eq_thermosteps'] = self.eq_thermosteps
-        run_params['eq_runsteps'] = self.eq_runsteps
+        run_params['equilsteps'] = self.equilsteps
         run_params['eq_equilibrium'] = self.eq_equilibrium
+        
         # Build results
         if self.status == 'finished':
-            calc['measured_temperature'] = uc.model(self.measured_temperature,'K')
-            calc['measured_temperature_stderr'] = uc.model(self.measured_temperature_stderr,'K')
-
-            calc['diffusion_msd_short'] = uc.model(self.diffusion_msd_short_value,f'({self.units.length_unit}/ps)^2*ps')
-            calc['diffusion_msd_short_stderr'] = uc.model(self.diffusion_msd_short_value_stderror,
-                                                f'({self.units.length_unit}/ps)^2*ps')
-            
-            calc['diffusion_msd_long'] = uc.model(self.diffusion_msd_long_value,f'({self.units.length_unit}/ps)^2*ps')
-            calc['diffusion_msd_long_stderr'] = uc.model(self.diffusion_msd_long_value_stderror,
-                                                f'({self.units.length_unit}/ps)^2*ps')
-            
-            calc['diffusion_vacf'] = uc.model(self.diffusion_vacf_value,f'({self.units.length_unit}/ps)^2*ps')
-            calc['diffusion_vacf_stderr'] = uc.model(self.diffusion_vacf_value_stderror,
-                                                f'({self.units.length_unit}/ps)^2*ps')
+            calc['measured_temperature'] = uc.model(self.measured_temperature, 'K',
+                                                    self.measured_temperature_stderr)
+            calc['diffusion_msd_short'] = uc.model(self.diffusion_msd_short, 'm^2/s',
+                                                   self.diffusion_msd_short_stderr)
+            calc['diffusion_msd_long'] = uc.model(self.diffusion_msd_long, 'm^2/s',
+                                                  self.diffusion_msd_long_stderr)
+            calc['diffusion_vacf'] = uc.model(self.diffusion_vacf, 'm^2/s',
+                                              self.diffusion_vacf_stderr)
 
         self._set_model(model)
         return model
@@ -648,24 +614,23 @@ class Diffusion(Calculation):
         self.randomseed = run_params['randomseed']
         self.temperature = uc.value_unit(run_params['temperature'])
         self.simruns = run_params['simruns']
-        self.eq_thermosteps = run_params['eq_thermosteps']
-        self.eq_runsteps = run_params['eq_runsteps']
+        self.equilsteps = run_params['equilsteps']
         self.eq_equilibrium = run_params['eq_equilibrium']
 
         # Load results
         if self.status == 'finished':
 
-            self.__diffusion_msd_short_value = uc.value_unit(calc['diffusion_msd_short'])
-            self.__diffusion_msd_short_value_stderr = uc.value_unit(calc['diffusion_msd_short_stderr'])
+            self.__diffusion_msd_short = uc.value_unit(calc['diffusion_msd_short'])
+            self.__diffusion_msd_short_stderr = uc.error_unit(calc['diffusion_msd_short'])
 
-            self.__diffusion_msd_long_value = uc.value_unit(calc['diffusion_msd_long'])
-            self.__diffusion_msd_long_value_stderr = uc.value_unit(calc['diffusion_msd_long_stderr'])
+            self.__diffusion_msd_long = uc.value_unit(calc['diffusion_msd_long'])
+            self.__diffusion_msd_long_stderr = uc.error_unit(calc['diffusion_msd_long'])
 
-            self.__diffusion_vacf_value = uc.value_unit(calc['diffusion_vacf'])
-            self.__diffusion_vacf_value_stderr = uc.value_unit(calc['diffusion_vacf_stderr'])
+            self.__diffusion_vacf = uc.value_unit(calc['diffusion_vacf'])
+            self.__diffusion_vacf_stderr = uc.error_unit(calc['diffusion_vacf'])
 
             self.__measured_temperature = uc.value_unit(calc['measured_temperature'])
-            self.__measured_temperature_stderr = uc.value_unit(calc['measured_temperature_stderr'])
+            self.__measured_temperature_stderr = uc.error_unit(calc['measured_temperature'])
 
     @property
     def queries(self) -> dict:
@@ -676,11 +641,6 @@ class Diffusion(Calculation):
                 name='temperature',
                 path=f'{self.modelroot}.temperature.value',
                 description='search by temperature in Kelvin'),
-            'diffusion': load_query(
-                style='float_match',
-                name='diffusion',
-                path=f'{self.modelroot}.diffusion_vacf.value',
-                description='search by diffusion in Pressure time potential units')
         })
         return queries
 
@@ -704,14 +664,14 @@ class Diffusion(Calculation):
             meta['measured_temperature'] = self.measured_temperature
             meta['measured_temperature_stderr'] = self.measured_temperature_stderr
 
-            meta['measured_diffusion_msd_short'] = self.diffusion_msd_short_value
-            meta['measured_diffusion_msd_short_stderr'] = self.diffusion_msd_short_value_stderror
+            meta['diffusion_msd_short'] = self.diffusion_msd_short
+            meta['diffusion_msd_short_stderr'] = self.diffusion_msd_short_stderr
 
-            meta['measured_diffusion_msd_long'] = self.diffusion_msd_long_value
-            meta['measured_diffusion_msd_long_stderr'] = self.diffusion_msd_long_value_stderror
+            meta['diffusion_msd_long'] = self.diffusion_msd_long
+            meta['diffusion_msd_long_stderr'] = self.diffusion_msd_long_stderr
 
-            meta['measured_diffusion_vacf'] = self.diffusion_vacf_value
-            meta['measured_diffusion_vacf_stderr'] = self.diffusion_vacf_value_stderror
+            meta['diffusion_vacf'] = self.diffusion_vacf
+            meta['diffusion_vacf_stderr'] = self.diffusion_vacf_stderr
 
 
         return meta
@@ -759,11 +719,20 @@ class Diffusion(Calculation):
         input_dict['temperature'] = self.temperature
         input_dict['timestep'] = self.timestep
         input_dict['simruns'] = self.simruns
-        input_dict['eq_thermosteps'] = self.eq_thermosteps
-        input_dict['eq_runsteps'] = self.eq_runsteps
+        input_dict['equilsteps'] = self.equilsteps
         input_dict['eq_equilibrium'] = self.eq_equilibrium
+        
         # Return input_dict
         return input_dict
+
+    @property
+    def calc_output_files(self) -> list:
+        """list : Glob path strings for files generated by this calculation"""
+        return [
+           # 'atom.dat',
+           # 'run0-*-log.lammps',
+           # 'run0.in'
+        ]
 
     def process_results(self, results_dict: dict):
         """
@@ -778,13 +747,13 @@ class Diffusion(Calculation):
         self.__measured_temperature = results_dict['measured_temperature']
         self.__measured_temperature_stderr = results_dict['measured_temperature_stderr']
 
-        self.__diffusion_msd_short_value = results_dict["diffusion_msd_short"]
-        self.__diffusion_msd_short_value_stderr = results_dict["diffusion_msd_short_stderr"]
+        self.__diffusion_msd_short = results_dict["diffusion_msd_short"]
+        self.__diffusion_msd_short_stderr = results_dict["diffusion_msd_short_stderr"]
 
-        self.__diffusion_msd_long_value = results_dict["diffusion_msd_long"]
-        self.__diffusion_msd_long_value_stderr = results_dict["diffusion_msd_long_stderr"]
+        self.__diffusion_msd_long = results_dict["diffusion_msd_long"]
+        self.__diffusion_msd_long_stderr = results_dict["diffusion_msd_long_stderr"]
 
-        self.__diffusion_vacf_value = results_dict["diffusion_vacf"]
-        self.__diffusion_vacf_value_stderr = results_dict["diffusion_vacf_stderr"]
+        self.__diffusion_vacf = results_dict["diffusion_vacf"]
+        self.__diffusion_vacf_stderr = results_dict["diffusion_vacf_stderr"]
 
         self.__lammps_output = results_dict['lammps_output']
