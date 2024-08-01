@@ -165,8 +165,8 @@ def get_lineformats() -> pd.DataFrame:
     Defines the line colors and styles to use for each plotted family.
     """
     lineformats = []
-    colors = ['black', 'blue', 'red', 'cyan', 'magenta', '#EAC117', 'orange', 'gray', 'green','brown']
-    lines = ['solid', 'dashed', 'dotted', 'dashdot', 'solid', 'dashed', 'dotted', 'dashdot']
+    colors = ['black', 'blue', 'red', 'cyan', 'magenta', '#EAC117', 'orange', 'gray', 'green', 'brown']
+    lines = 10 * ['solid', 'dashed', 'dotted', 'dashdot'] 
     
     for line in lines:
         for color in colors:
