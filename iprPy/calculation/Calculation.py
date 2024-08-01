@@ -861,5 +861,20 @@ class Calculation(Record):
 
         # Save results to json
         if results_json is True:
-            with open('results.json', 'w', encoding='UTF-8') as f:
-                self.build_model().json(fp=f, indent=4, ensure_ascii=False)
+            model = self.build_model()
+            savesuccess = False
+            savetries = 0
+            while savetries < 5:
+                try:
+                    with open('results.json', 'w', encoding='UTF-8') as f:
+                        model.json(fp=f, indent=4, ensure_ascii=False)
+                except OSError:
+                    savetries += 1
+                else:
+                    savesuccess = True
+                    break
+
+            if savesuccess is False:
+                with open('results.json', 'w', encoding='UTF-8') as f:
+                    model.json(fp=f, indent=4, ensure_ascii=False)
+            
