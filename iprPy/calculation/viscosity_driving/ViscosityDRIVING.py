@@ -450,7 +450,7 @@ class viscosityDRIVING(Calculation):
             # Set default workflow settings
             params['buildcombos'] =  'atomicarchive load_file archive'
             params['sizemults']
-            params['archive_record'] = 'calculation_viscosity_msd'
+            params['archive_record'] = 'calculation_viscosity_Driving'
             params['archive_load_key'] = 'final-system'
             params['archive_status'] = 'finished'
             params['archive_temperature'] = kwargs['temperature']
