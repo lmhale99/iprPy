@@ -405,6 +405,9 @@ class DiffusionLiquid(Calculation):
             params['archive_status'] = 'finished'
             params['archive_temperature'] = kwargs['temperature']
             params['temperature'] = kwargs['temperature']
+            params['runsteps'] = '2000'
+            params['simruns'] = '100'
+            params['sizemults'] = '1 1 1'
 
             # Copy kwargs to params
             for key in kwargs:
