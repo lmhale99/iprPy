@@ -483,9 +483,9 @@ class RelaxStatic(Calculation):
             params['maxiterations'] = '10000'
             params['maxevaluations'] = '100000'
             params['maxatommotion'] = '0.01 angstrom'
-            params['maxcycles'] = '100'
+            params['maxcycles'] = '20'
             params['cycletolerance'] = '1e-10'
-            params['raise_at_maxcycles'] = 'True'
+            params['raise_at_maxcycles'] = 'False'
 
             # Copy kwargs to params
             for key in kwargs:
@@ -517,9 +517,9 @@ class RelaxStatic(Calculation):
             params['maxiterations'] = '10000'
             params['maxevaluations'] = '100000'
             params['maxatommotion'] = '0.01 angstrom'
-            params['maxcycles'] = '100'
+            params['maxcycles'] = '20'
             params['cycletolerance'] = '1e-10'
-            params['raise_at_maxcycles'] = 'True'
+            params['raise_at_maxcycles'] = 'False'
 
             # Copy kwargs to params
             for key in kwargs:
