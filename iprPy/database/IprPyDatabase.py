@@ -358,7 +358,8 @@ class IprPyDatabase():
         """
         reset_orphans(run_directory, orphan_directory=orphan_directory)
 
-    def merge_records(self, dest, record_style, includetar=True, overwrite=False, dryrun=False):
+    def merge_records(self, dest, record_style, includetar=True, overwrite=False,
+                      dryrun=False, **kwargs):
         """
         Copies records from the current database to another database by first comparing
         the records in the two databases to identify missing (and changed) content.  
@@ -385,6 +386,10 @@ class IprPyDatabase():
             can then be called afterwards using the list of records.
             If False (default), copy_records will automatically be called and
             the list not returned.
+        **kwargs : any, optional
+            Any query keyword options to use when building the lists of existing
+            calculations to compare. NOTE these are only applied to get_records
+            calls at the moment and so should not be combined with includetar!!!
             
         Returns
         -------
@@ -394,11 +399,11 @@ class IprPyDatabase():
         """
         
         # Get records in source database
-        self_records, self_df = self.get_records(record_style, return_df=True)
+        self_records, self_df = self.get_records(record_style, return_df=True, **kwargs)
         print(len(self_records), 'records in source')
         
         # Get records in destination database
-        dest_records, dest_df = dest.get_records(record_style, return_df=True)
+        dest_records, dest_df = dest.get_records(record_style, return_df=True, **kwargs)
         print(len(dest_records), 'records in destination')
         
         # Identify records missing from destination
@@ -448,13 +453,12 @@ class IprPyDatabase():
             records = self_records[self_df.name.isin(missing)]
             if dryrun:
                 print(len(records), 'to copy')
-                return records
             else:
                 self.copy_records(dest, records=records, includetar=includetar, overwrite=overwrite)
+            return records
         else:
             print('No records to copy')
-            if dryrun:
-                return []
+            return []
         
     def copy_references(self, dest, includetar=True, overwrite=False):
         """
