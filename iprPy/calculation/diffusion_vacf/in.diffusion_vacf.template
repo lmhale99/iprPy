@@ -1,0 +1,56 @@
+# template input script for diffusion of 3d liquid 
+
+
+variable    T equal <Temperature>      
+variable    dt equal <Time_Step>
+variable    equib_len equal <Equilibration_steps>
+variable    equib_thermo_len equal <Equilibration_thermo>
+variable    n equal <Degrees_freedom>
+variable    damp equal 10*${dt}
+ 
+
+# Setup data from Atomman
+###############################################################################################
+
+<atomman_system_pair_info>
+
+timestep ${dt}
+
+###############################################################################################
+# equilibration run
+
+# fix NVE, fix langevin, thermo, run, unfix lang, unfix NVE
+
+<Equilibration_instructions>
+
+###############################################################################################
+# data gathering run
+
+fix          NVT all nvt temp $T $T ${damp} 
+
+variable i loop <num_simulations>
+label runLoop
+
+    reset_timestep  0
+
+    compute         vacf all vacf
+
+    fix             all_vacf all vector 1 c_vacf[4]
+
+    variable        eta equal (1/$n)*dt*trap(f_all_vacf)
+
+    #This is the integrated value, ie the diffusion constant 
+
+    thermo_style	custom step temp c_vacf[1] c_vacf[2] c_vacf[3] c_vacf[4] v_eta
+
+    thermo          1
+
+    run	            <Run_length>
+
+    uncompute vacf
+    unfix all_vacf
+    next i
+
+jump SELF runLoop
+
+###############################################################################################
