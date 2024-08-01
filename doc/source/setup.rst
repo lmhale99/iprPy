@@ -68,7 +68,7 @@ terminal
 
 .. code-block:: console
 
-      python iprPy check_modules
+      iprPy check_modules
 
 If everything installed properly, this should print informative statements
 about the modules that make up iprPy.  In particular, there should be a list of

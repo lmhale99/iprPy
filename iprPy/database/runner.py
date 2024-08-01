@@ -19,7 +19,7 @@ from .. import settings, load_run_directory
 
 def runner(database, run_directory, calc_name=None, orphan_directory=None,
            hold_directory=None, log=True, bidtries=10, bidverbose=False,
-           temp=False, temp_directory=None):
+           temp=False, temp_directory=None, kwargs_calc={}):
     """
     High-throughput calculation runner.
     
@@ -57,6 +57,10 @@ def runner(database, run_directory, calc_name=None, orphan_directory=None,
     temp_directory : path-like object, optional
         The path to an existing temporary directory where the calculations
         are to be copied to and executed there instead of in the run_directory.
+    kwargs_calc : dict, optional
+        Keyword arguments for :meth:`iprPy.calculation.Calculation.Calculation.run`.
+        Default is ``{"results_json": True}``
+            
     """
     # Initialize a RunManager
     runmanager = RunManager(database, run_directory,
@@ -68,13 +72,15 @@ def runner(database, run_directory, calc_name=None, orphan_directory=None,
         print(f'Runner started with pid {runmanager.pid}', flush=True)
         runmanager.runall(bidtries=bidtries, temp=temp,
                           temp_directory=temp_directory,
-                          bidverbose=bidverbose)
+                          bidverbose=bidverbose, kwargs_calc=kwargs_calc)
     
     else:
         print(f'Runner started with pid {runmanager.pid} for calculation {calc_name}', flush=True)
+        tmp_kwargs_calc = {"results_json": True}
+        tmp_kwargs_calc.update(kwargs_calc)
         status = runmanager.run(calc_name=calc_name, temp=temp,
                                 temp_directory=temp_directory,
-                                bidverbose=bidverbose)
+                                bidverbose=bidverbose, kwargs_calc=tmp_kwargs_calc)
 
 class RunManager():
     """
@@ -472,7 +478,7 @@ class RunManager():
 
         return status, message
     
-    def run(self, calc_name, temp=False, temp_directory=None, bidverbose=False):
+    def run(self, calc_name, temp=False, temp_directory=None, bidverbose=False, kwargs_calc={}):
         """
         Runs one calculation from the run_directory.
         
@@ -488,7 +494,10 @@ class RunManager():
             are to be performed.
         bidverbose : bool, optional
             If True, info about the calculation bidding process will be printed.
-            Default value is False. 
+            Default value is False.
+        kwargs_calc : dict, optional
+            Keyword arguments for :meth:`iprPy.calculation.Calculation.Calculation.run`.
+            Default is ``{"results_json": True}``
 
         Returns
         -------
@@ -552,7 +561,9 @@ class RunManager():
             # Run calc
             os.chdir(exe_directory)
             calculation.load_parameters(calc_in)
-            calculation.run(results_json=True)
+            tmp_kwargs_calc = {"results_json": True}
+            tmp_kwargs_calc.update(kwargs_calc)
+            calculation.run(**tmp_kwargs_calc)
             os.chdir(self.run_directory)
 
             # Check status
@@ -604,7 +615,7 @@ class RunManager():
         return status
     
     def runall(self, bidtries=10, temp=False, temp_directory=None,
-               bidverbose=False):
+               bidverbose=False, kwargs_calc={"results_json": True}):
         """
         Sequentially runs calculations within the run_directory until all
         are finished.
@@ -624,6 +635,9 @@ class RunManager():
         bidverbose : bool, optional
             If True, info about the calculation bidding process will be printed.
             Default value is False. 
+        kwargs_calc : dict, optional
+            Keyword arguments for :meth:`iprPy.calculation.Calculation.Calculation.run`.
+            Default is ``{"results_json": True}``
         """
 
         # Create temp_directory if needed
@@ -642,7 +656,7 @@ class RunManager():
 
             # Run the calculation
             status = self.run(calc_name, temp_directory=temp_directory,
-                              bidverbose=bidverbose)
+                              bidverbose=bidverbose, **kwargs_calc)
 
             if status == 'bidfail':
                 bidcount += 1

@@ -1,0 +1,15 @@
+
+# Base Requirements
+DataModelDict
+numpy
+matplotlib
+scipy
+pandas
+atomman>=1.4.11
+requests
+bokeh
+plotly
+
+# Extra Requirements for specific calculations
+phonopy
+spglib
