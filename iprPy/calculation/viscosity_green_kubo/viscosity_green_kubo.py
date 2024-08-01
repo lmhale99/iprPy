@@ -182,7 +182,7 @@ def viscosity_green_kubo(lammps_command:str,
     running_vy = thermo['v_v22']
     running_vz = thermo['v_v33']
 
-    Viscosity = np.average(runningViscosity[1:])
+    Viscosity = runningViscosity[-1]
     AveTemp = np.average(runningTemperature[1:])
 
     viscosityUnitString = f'{lammps_units['pressure']}*{lammps_units['time']}'
@@ -190,7 +190,7 @@ def viscosity_green_kubo(lammps_command:str,
     #Initialize the return dictionary
     results = {}
     #Data of interest
-    results['viscosity_stderr'] = uc.set_in_units(np.std(runningViscosity[1:])/((len(runningViscosity))**0.5),viscosityUnitString)
+    results['viscosity_stderr'] = uc.set_in_units(0,viscosityUnitString)
     results['viscosity'] = uc.set_in_units(Viscosity,viscosityUnitString)
     results['measured_temperature'] = uc.set_in_units(AveTemp,'K')
     results['measured_temperature_stderr'] = uc.set_in_units(np.std(runningTemperature[1:])/((len(runningTemperature))**0.5),'K')

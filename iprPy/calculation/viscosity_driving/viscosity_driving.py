@@ -151,20 +151,24 @@ def viscosity_driving(lammps_command:str,
     #From thermo data calculate the Viscosity 
     runningViscosityInverse = thermo["v_reciprocalViscosity"]
     runningTemperature = thermo["Temp"]
+    avgTemp = np.avg(runningTemperature)
     runningViscosity = np.array([1/i for i in runningViscosityInverse])
-    Viscosity = np.average(runningViscosity[1:])
-    AveTemp = np.average(runningTemperature[1:])
+    avgInvVisc = np.average(runningViscosityInverse)
+    stdInvVisc = np.std(runningViscosityInverse)
+    avgVisc = np.avg(runningViscosity)
+
+    std_errVisc = (avgVisc)*abs(stdInvVisc/avgInvVisc)
+
     #Unit Conversions
     unitString = f"({lammps_units['length']}^3*{lammps_units['density']})/({lammps_units['velocity']}*{lammps_units['time']}^2)"
-    #error propogation formula sigma_eta = sigma_inverse_visc / visc^2
-    eta_std_val = np.std(runningViscosityInverse)/(Viscosity**2)
+
     #Initialize the return dictionary
     results = {}
 
     #Data of interest
-    results['viscosity'] = uc.set_in_units(Viscosity,unitString)
-    results['viscosity_stderr'] = uc.set_in_units(eta_std_val/((len(runningViscosityInverse))**0.5),unitString)
-    results['measured_temperature'] = uc.set_in_units(AveTemp,'K')
+    results['viscosity'] = uc.set_in_units(avgVisc,unitString)
+    results['viscosity_stderr'] = uc.set_in_units(std_errVisc/((len(runningViscosityInverse))**0.5),unitString)
+    results['measured_temperature'] = uc.set_in_units(avgTemp,'K')
     results['measured_temperature_stderr'] = uc.set_in_units(np.std(runningTemperature[1:])/((len(runningTemperature[1:]))**0.5),'K')
     results['lammps_output'] = output    
     return results
