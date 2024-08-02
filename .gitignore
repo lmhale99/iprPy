@@ -9,6 +9,7 @@
 dist/
 build/
 dist-old/
+pip-wheel-metadata/
 
 # Local iprPy settings
 iprPy/.iprPy
@@ -18,7 +19,8 @@ test/
 
 # High-throughput log files
 runner-logs/
-bin/iprPy_runner.*
+bin/runner_*.txt
+bin/emperor*.txt
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
