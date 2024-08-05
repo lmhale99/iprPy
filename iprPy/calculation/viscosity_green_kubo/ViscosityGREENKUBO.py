@@ -64,7 +64,7 @@ class viscosityGREENKUBO(Calculation):
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
         self.__system_mods = AtommanSystemManipulate(self)
-        subsets = (self.commands, self.potential, self.system, self.units)
+        subsets = (self.commands, self.potential, self.system, self.units, self.system_mods)
 
         # Initialize unique calculation attributes
 
@@ -457,7 +457,7 @@ class viscosityGREENKUBO(Calculation):
         self.units.load_parameters(input_dict)
 
         # Change default values for subset terms
-
+        input_dict['sizemults'] = input_dict.get('sizemults', '1 1 1')
 
         # Load calculation-specific strings
     
@@ -536,8 +536,8 @@ class viscosityGREENKUBO(Calculation):
 
             # Set default workflow settings
             params['buildcombos'] =  'atomicarchive load_file archive'
-
-            params['archive_record'] = 'calculation_viscosity_msd'
+            params['sizemults']
+            params['archive_record'] = 'calculation_viscosity_Green_Kubo'
             params['archive_load_key'] = 'final-system'
             params['archive_status'] = 'finished'
             params['archive_temperature'] = kwargs['temperature']

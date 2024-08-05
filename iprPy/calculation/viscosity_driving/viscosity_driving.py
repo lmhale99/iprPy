@@ -149,17 +149,19 @@ def viscosity_driving(lammps_command:str,
     thermo = output.simulations[-1].thermo
 
     #From thermo data calculate the Viscosity 
-    runningViscosityInverse = thermo["v_reciprocalViscosity"]
     runningTemperature = thermo["Temp"]
-    avgTemp = np.avg(runningTemperature)
-    runningViscosity = np.array([1/i for i in runningViscosityInverse])
+    avgTemp = np.average(runningTemperature)
+
+    runningViscosityInverse = thermo["v_reciprocalViscosity"]
+    
     avgInvVisc = np.average(runningViscosityInverse)
     stdInvVisc = np.std(runningViscosityInverse)
-    avgVisc = np.avg(runningViscosity)
+    # This is the correct way to average the data according to the "Harmonic Mean" 
+    avgVisc = 1/avgInvVisc
+    # This is the error propogation formula for f(x)=1/x 
+    std_Visc = (avgVisc)*abs(stdInvVisc/avgInvVisc)
 
-    std_errVisc = (avgVisc)*abs(stdInvVisc/avgInvVisc)
-
-    #Unit Conversions
+    #Unit Conversions According to the units in the lammps script 
     unitString = f"({lammps_units['length']}^3*{lammps_units['density']})/({lammps_units['velocity']}*{lammps_units['time']}^2)"
 
     #Initialize the return dictionary
@@ -167,7 +169,7 @@ def viscosity_driving(lammps_command:str,
 
     #Data of interest
     results['viscosity'] = uc.set_in_units(avgVisc,unitString)
-    results['viscosity_stderr'] = uc.set_in_units(std_errVisc/((len(runningViscosityInverse))**0.5),unitString)
+    results['viscosity_stderr'] = uc.set_in_units(std_Visc/((len(runningViscosityInverse))**0.5),unitString)
     results['measured_temperature'] = uc.set_in_units(avgTemp,'K')
     results['measured_temperature_stderr'] = uc.set_in_units(np.std(runningTemperature[1:])/((len(runningTemperature[1:]))**0.5),'K')
     results['lammps_output'] = output    
