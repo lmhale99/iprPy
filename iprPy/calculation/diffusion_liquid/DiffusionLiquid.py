@@ -98,7 +98,7 @@ class DiffusionLiquid(Calculation):
         """list: the names of each file used by the calculation."""
         return [
             'diffusion_vacf.py',
-            'in.diffusion_vacf.template'
+            'diffusion_vacf.template'
         ]
 
 ############################## Class attributes ################################
@@ -336,7 +336,7 @@ class DiffusionLiquid(Calculation):
 
         # Load calculation-specific booleans
 
-        # Load calculation-specific its
+        # Load calculation-specific ints
         self.runsteps = int(input_dict.get('runsteps', 50000))
         self.simruns = int(input_dict.get('simruns', 10))
         self.equilsteps = int(input_dict.get('equilsteps', 0))

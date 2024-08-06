@@ -1,29 +1,30 @@
 # LAMMPS input script for evaluating diffusion in a liquid
 
-variable    T equal <temperature>      
-variable    dt equal <timestep>
-variable    n equal 3
-variable    Tdamp equal 10*${dt}
+variable        T equal <temperature>      
+variable        dt equal <timestep>
+variable        n equal 3
+variable        Tdamp equal 10*${dt}
  
 
 <atomman_system_pair_info>
 
-timestep     ${dt}
+timestep        ${dt}
 
-fix          NVT all nvt temp $T $T ${Tdamp} 
+fix             NVT all nvt temp $T $T ${Tdamp} 
 
 # Equilibration run
-run         <equilsteps>
+run             <equilsteps>
+reset_timestep  0
 
 
 # MSD long calculation parameters
-compute      msdLong all msd com yes 
-fix          runningMSDLong all vector 1 c_msdLong[4]
-variable     fitslopeLong equal slope(f_runningMSDLong)/(2*${n})/(dt)
+compute         msdLong all msd com yes 
+fix             runningMSDLong all vector 1 c_msdLong[4]
+variable        fitslopeLong equal slope(f_runningMSDLong)/(2*${n})/(dt)
 
 # Setup and run repeated simulations
-variable i loop <num_simulations>
-label runLoop
+variable        i loop <num_simulations>
+label           runLoop
 
     # MSD short calculation parameters
     compute         msdShort all msd com yes
@@ -46,10 +47,10 @@ label runLoop
     run	            <runsteps>
 
     # Clear MSD short and VACF fixes and computes
-    uncompute msdShort
-    unfix runningMSDShort
-    uncompute vacf
-    unfix all_vacf
-    next i
+    uncompute       msdShort
+    unfix           runningMSDShort
+    uncompute       vacf
+    unfix           all_vacf
+    next            i
 
-jump SELF runLoop
+jump            SELF runLoop
