@@ -24,7 +24,7 @@ from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
                                    AtommanSystemLoad, AtommanSystemManipulate)
 from ...input import value
 
-class viscosityGREENKUBO(Calculation):
+class ViscosityGreenKubo(Calculation):
     """Class for managing dynamic relaxations"""
 
 ############################# Core properties #################################
@@ -64,24 +64,17 @@ class viscosityGREENKUBO(Calculation):
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
         self.__system_mods = AtommanSystemManipulate(self)
-        subsets = (self.commands, self.potential, self.system, self.units, self.system_mods)
+        subsets = (self.commands, self.potential, self.system, self.system_mods, self.units)
 
         # Initialize unique calculation attributes
-
-        self.temperature = 300
-        self.randomseed = None
-        self.timestep = .001
-
-        self.runsteps = 50000
+        self.temperature = None
+        self.timestep = None
+        self.runsteps = 1000000
         self.outputsteps = 2000
-
         self.sampleinterval = 5
         self.correlationlength = 200
-        self.dragcoeff = .2
-
-        self.eq_thermosteps = 0
-        self.eq_runsteps = 0
-        self.eq_equilibrium = False
+        self.dragcoeff = 0.2
+        self.equilsteps = 0
 
 ########################################################
 
@@ -95,8 +88,8 @@ class viscosityGREENKUBO(Calculation):
 
         self.__measured_temperature = None
         self.__measured_temperature_stderr = None
-        self.__viscosity_value = None
-        self.__viscosity_value_stderr = None
+        self.__viscosity = None
+        self.__viscosity_stderr = None
         self.__lammps_output = None
 
         # Define calc shortcut
@@ -147,16 +140,18 @@ class viscosityGREENKUBO(Calculation):
     def timestep(self) -> Optional[float]:
         """float: time step for simulation"""
         if self.__timestep is None:
-            return am.lammps.style.timestep(self.potential.potential.units)
-        else:
-            return self.__timestep
+            timestep = am.lammps.style.timestep(self.potential.potential.units)
+            lammps_units = am.lammps.style.unit(self.potential.potential.units)
+            self.__timestep = uc.set_in_units(timestep, lammps_units['time'])
+        
+        return self.__timestep
     
     @timestep.setter
     def timestep(self, val: Optional[float]):
         if val is None:
             self.__timestep = None
         else:
-            self.__timestep = val
+            self.__timestep = float(val)
     
     @property
     def temperature(self) -> float:
@@ -173,7 +168,6 @@ class viscosityGREENKUBO(Calculation):
             val = float(val)
             assert val >= 0.0
             self.__temperature = val
-
 
     @property
     def runsteps(self) -> int:
@@ -193,61 +187,20 @@ class viscosityGREENKUBO(Calculation):
     
     @outputsteps.setter
     def outputsteps(self, val: Optional[int]):
-        if val is None:
-            self.__outputsteps = 2000
-        else:
-            self.__outputsteps = val
-
-    @property
-    def randomseed(self) -> int:
-        """int: Random number seed."""
-        return self.__randomseed
-
-    @randomseed.setter
-    def randomseed(self, val: int):
-        if val is None:
-            val = random.randint(1, 900000000)
-        else:
-            val = int(val)
-            assert val > 0 and val <= 900000000
-        self.__randomseed = val
-
-    @property
-    def eq_thermosteps(self) -> int:
-        """int: Number of MD steps during the energy equilibration stage"""
-        return self.__eq_thermosteps
-    
-    @eq_thermosteps.setter
-    def eq_thermosteps(self, val: int):
         val = int(val)
         assert val >= 0
-        self.__eq_thermosteps = val
+        self.__outputsteps = val
 
     @property
-    def eq_runsteps(self) -> int:
+    def equilsteps(self) -> int:
         """int: Number of MD steps during the volume equilibration stage"""
-        return self.__eq_runsteps
+        return self.__equilsteps
 
-    @eq_runsteps.setter
-    def eq_runsteps(self, val: int):
+    @equilsteps.setter
+    def equilsteps(self, val: int):
         val = int(val)
         assert val >= 0
-        self.__eq_runsteps = val
-
-    @property 
-    def eq_equilibrium(self) -> bool:
-        """bool: Does the system need equilibration"""
-        if self.__eq_equilibrium is None:
-            return False
-        else:
-            return self.__eq_equilibrium
-    
-    @eq_equilibrium.setter
-    def eq_equilibrium(self, val:bool):
-        if val is None:
-            self.__eq_equilibrium = False 
-        else: 
-            self.__eq_equilibrium = val
+        self.__equilsteps = val
 
     @property
     def correlationlength(self) -> int:
@@ -256,10 +209,9 @@ class viscosityGREENKUBO(Calculation):
     
     @correlationlength.setter
     def correlationlength(self, val: int):
-        if val is None:
-            self.__correlationlength = 5
-        else:
-            self.__correlationlength = val 
+        val = int(val)
+        assert val >= 0
+        self.__correlationlength = val 
     
     @property 
     def sampleinterval(self) -> int:
@@ -267,10 +219,9 @@ class viscosityGREENKUBO(Calculation):
     
     @sampleinterval.setter
     def sampleinterval(self, val: int):
-        if val is None: 
-            self.__sampleinterval = 400
-        else:
-            self.__sampleinterval = val
+        val = int(val)
+        assert val >= 0
+        self.__sampleinterval = val
     
     @property
     def dragcoeff(self) -> float:
@@ -278,13 +229,7 @@ class viscosityGREENKUBO(Calculation):
     
     @dragcoeff.setter
     def dragcoeff(self, val: float):
-        if val is None:
-            self.__dragcoeff = .2
-        else:
-            self.__dragcoeff = val
-
-    
-
+        self.__dragcoeff = float(val)
 
 ###################################################################################################################
     ################# Calculated results #########################
@@ -353,19 +298,19 @@ class viscosityGREENKUBO(Calculation):
         return self.__measured_temperature_stderr
     
     @property
-    def viscosity_value(self) -> float:
+    def viscosity(self) -> float:
         """Calculated viscosity coeffecient averaged over the run 
             starting at the data offset value"""
-        if self.__viscosity_value is None:
+        if self.__viscosity is None:
             raise ValueError("No results! Does not get loaded from records")
-        return self.__viscosity_value
+        return self.__viscosity
     
     @property
-    def viscosity_value_stderror(self) -> float:
+    def viscosity_stderror(self) -> float:
         """Error in the viscosity measurements"""
-        if self.__viscosity_value_stderr is None:
+        if self.__viscosity_stderr is None:
             raise ValueError("No results! Does not get loaded from records")
-        return self.__viscosity_value_stderr
+        return self.__viscosity_stderr
     
     def set_values(self,
                    name: Optional[str] = None,
@@ -387,30 +332,19 @@ class viscosityGREENKUBO(Calculation):
         timestep: float or None
             the difference in time between each step of the calculation
         outputsteps: int or None
-            The number of steps inbetween the thermo writes to the log file
+            The number of steps in between the thermo writes to the log file
         dragcoeff: float or None
             this term affects the drag force that the thermostat function uses
             to calculate the temperature of the system.  
-        eq_thermosteps: int or None
-            If doing an equilibrium run this is the number of steps inbetween
-            the thermo calculations
-        eq_runsteps: int or None
+        equilsteps: int or None
             If doing an equilibrium run this is the number of simulation
             timesteps 
-        eq_equilibrium: bool or None
-            Set to true if you need to relax the system first. False if the 
-            system is already relaxed. 
-        randomseed : int or None, optional
-            Random number seed used by LAMMPS in creating velocities and with
-            the Langevin thermostat.
         **kwargs : any, optional
             Any keyword parameters supported by the set_values() methods of
             the parent Calculation class and the subset classes.
         """
         # Call super to set universal and subset content
         super().set_values(name=name, **kwargs)
-        if 'randomseed' in kwargs:
-            self.randomseed = kwargs['randomseed']
         if 'temperature' in kwargs:
             self.temperature = kwargs['temperature']
         if 'timestep' in kwargs:
@@ -419,12 +353,8 @@ class viscosityGREENKUBO(Calculation):
             self.runsteps = kwargs['runsteps']
         if 'outputsteps' in kwargs:
             self.outputsteps = kwargs['outputsteps']
-        if 'eq_thermosteps' in kwargs:
-            self.eq_thermosteps = kwargs['eq_thermosteps']
-        if 'eq_runsteps' in kwargs:
-            self.eq_runsteps = kwargs['eq_runsteps']
-        if 'eq_equilbirium' in kwargs:
-            self.eq_equilibrium = kwargs['eq_equilibrium']
+        if 'equilsteps' in kwargs:
+            self.equilsteps = kwargs['equilsteps']
         if 'dragcoeff' in kwargs:
             self.dragcoeff = kwargs['dragcoeff']
         if 'sampleinterval' in kwargs:
@@ -457,36 +387,29 @@ class viscosityGREENKUBO(Calculation):
         self.units.load_parameters(input_dict)
 
         # Change default values for subset terms
-        input_dict['sizemults'] = input_dict.get('sizemults', '1 1 1')
-
+        
         # Load calculation-specific strings
     
-
         # Load calculation-specific booleans
-        self.eq_equilibrium = bool(input_dict.get('eq_equilibrium',False))
-
-        # Load calculation-specific its
-        self.runsteps = int(input_dict.get('runsteps', 50000))
-        self.randomseed = input_dict.get('randomseed', None)
-        self.outputsteps = int(input_dict.get('outputsteps',2000))
-        self.eq_thermosteps = int(input_dict.get('eq_termosteps',0))
-        self.eq_runsteps = int(input_dict.get('eq_runsteps',0))
-        self.sampleinterval = int(input_dict.get('sampleinterval',5))
-        self.correlationlength = int(input_dict.get('correlationlength',200))
     
-
-
+        # Load calculation-specific its
+        self.runsteps = int(input_dict.get('runsteps', 1000000))
+        self.outputsteps = int(input_dict.get('outputsteps', 2000))
+        self.eq_thermosteps = int(input_dict.get('eq_termosteps', 0))
+        self.eq_runsteps = int(input_dict.get('eq_runsteps', 0))
+        self.sampleinterval = int(input_dict.get('sampleinterval', 5))
+        self.correlationlength = int(input_dict.get('correlationlength', 200))
 
         # Load calculation-specific unitless floats
-        self.dragcoeff = float(input_dict.get('dragcoeff',.2))
+        self.temperature = float(input_dict['temperature'])
+        self.dragcoeff = float(input_dict.get('dragcoeff', .2))
 
         # Load calculation-specific floats with units
-        self.timestep = value(input_dict,'timestep',
-                              default_unit='ps',
-                              default_term='0.001 ps')
-        self.temperature = value(input_dict,'temperature',
-                                 default_unit='K',
-                                 default_term='300 K')
+        if 'timestep' in input_dict:
+            self.timestep = value(input_dict, 'timestep',
+                                  default_unit='ps')
+        else:
+            self.timestep = None
 
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
@@ -536,12 +459,12 @@ class viscosityGREENKUBO(Calculation):
 
             # Set default workflow settings
             params['buildcombos'] =  'atomicarchive load_file archive'
-            params['sizemults']
-            params['archive_record'] = 'calculation_viscosity_Green_Kubo'
+            params['archive_record'] = 'calculation_relax_liquid_redo'
             params['archive_load_key'] = 'final-system'
             params['archive_status'] = 'finished'
             params['archive_temperature'] = kwargs['temperature']
             params['temperature'] = kwargs['temperature']
+            params['sizemults'] = '1 1 1'
 
             # Copy kwargs to params
             for key in kwargs:
@@ -564,21 +487,31 @@ class viscosityGREENKUBO(Calculation):
         """dict : The calculation-specific input keys and their descriptions."""
 
         return {
-            'temperature': ' '.join(["Target temperature for the simulation - Default value of 300 K"]),
-            'timestep': ' '.join(["How much to increase the time at each step - Default value of None will use the LAMMPS default"]),
-            'runsteps':' '.join(["How many time steps to run simulation - Default value is 100000"]),
-            'outputsteps':' '.join(["How often to write calculated value to log file/ouput - Default value is 1000"]),
-            'eq_thermosteps':' '.join(["How often to write calculated value to log file/ouput for",
-                                         "equilibriation run- Default value is 1000"]),
-            'eq_runsteps':' '.join(["How many time steps to run simulation for equilibration",
-                                     "run - Default value is 0"]),
-            'eq_equilibrium':' '.join(["Specifies whether or not to do an equilibration default is false",
-                                       "Set to yet if the input is not a relaxed liquid already"]),
-            'dragcoeff':' '.join(["The damping in the thermostat calculations"]),
-            'sampleinterval':' '.join(["How many frames the calculation averages over. This times the correlation length",
-                                       "must be a divisor of the outputsteps"]),
-            'correlationlength':' '.join(["The number of averaged intervals for one calculation window. This time the",
-                                          "sample interval must be a divisor of outputsteps"])
+            'temperature': ' '.join([
+                "Target temperature for the simulation. Required."]),
+            'timestep': ' '.join([
+                "How much to increase the time at each step.  If not given, will",
+                "use the default LAMMPS timestep value associated with the",
+                "potential's unit style."]),
+            'runsteps':' '.join([
+                "How many time steps to run the simulation. Default value is 1000000"]),
+            'outputsteps':' '.join([
+                "How often to write calculated values to the log file. Default",
+                "value is 2000"]),
+            'equilsteps':' '.join([
+                "The number of equilibrium timesteps to run prior to evaluating the",
+                "viscosity.  Useful if your initial configuration and velocities are",
+                "not already in an equilibrium state.  Default value is 0."]),
+            'dragcoeff':' '.join([
+                "The damping in the thermostat calculations.  Default value is 0.2"]),
+            'sampleinterval':' '.join([
+                "How many frames the calculation averages over. This times the",
+                "correlation length must be a divisor of the outputsteps.",
+                "Default value is 5."]),
+            'correlationlength':' '.join([
+                "The number of averaged intervals for one calculation window.",
+                "This time the sample interval must be a divisor of outputsteps.",
+                "Default value is 200."])
         }
 
     @property
@@ -624,9 +557,7 @@ class viscosityGREENKUBO(Calculation):
                     'dragcoeff',
                     'runsteps',
                     'outputsteps',
-                    'eq_thermosteps',
-                    'eq_runsteps',
-                    'eq_equilibrium',
+                    'equilsteps',
                     'sampleinterval',
                     'correlationlength'
                 ]
@@ -668,12 +599,9 @@ class viscosityGREENKUBO(Calculation):
         run_params['temperature'] = uc.model(self.temperature,'K')
         run_params['timestep'] = uc.model(self.timestep,'ps')
         run_params['runsteps'] = self.runsteps
-        run_params['randomseed'] = self.randomseed
         run_params['outputsteps'] = self.outputsteps
         run_params['dragcoeff'] = self.dragcoeff
-        run_params['eq_thermosteps'] = self.eq_thermosteps
-        run_params['eq_runsteps'] = self.eq_runsteps
-        run_params['eq_equilibrium'] = self.eq_equilibrium
+        run_params['equilsteps'] = self.equilsteps
         run_params['sampleinterval'] = self.sampleinterval
         run_params['correlationlength'] = self.correlationlength
 
@@ -681,16 +609,16 @@ class viscosityGREENKUBO(Calculation):
         # Build results
         if self.status == 'finished':
             
-            calc['pxy_values'] = uc.model(self.pxy_values.tolist(),f'{self.units.pressure_unit}')
-            calc['pxz_values'] = uc.model(self.pxz_values.tolist(),f'{self.units.pressure_unit}')
-            calc['pyz_values'] = uc.model(self.pyz_values.tolist(),f'{self.units.pressure_unit}')
-            calc['vx_value'] = uc.model(self.vx_value,f'{self.units.pressure_unit}*ps')
-            calc['vy_value'] = uc.model(self.vy_value,f'{self.units.pressure_unit}*ps')
-            calc['vz_value'] = uc.model(self.vz_value,f'{self.units.pressure_unit}*ps')
-            calc['measured_temperature'] = uc.model(self.measured_temperature,'K')
-            calc['measured_temperature_stderr'] = uc.model(self.measured_temperature_stderr,'K')
-            calc['viscosity'] = uc.model(self.viscosity_value,f'{self.units.pressure_unit}*ps')
-            calc['viscosity_stderr'] = uc.model(self.viscosity_value_stderror,f'{self.units.pressure_unit}*ps')
+            calc['pxy_values'] = uc.model(self.pxy_values.tolist(), f'{self.units.pressure_unit}')
+            calc['pxz_values'] = uc.model(self.pxz_values.tolist(), f'{self.units.pressure_unit}')
+            calc['pyz_values'] = uc.model(self.pyz_values.tolist(), f'{self.units.pressure_unit}')
+            calc['vx_value'] = uc.model(self.vx_value, f'{self.units.pressure_unit}*ps')
+            calc['vy_value'] = uc.model(self.vy_value, f'{self.units.pressure_unit}*ps')
+            calc['vz_value'] = uc.model(self.vz_value, f'{self.units.pressure_unit}*ps')
+            calc['measured_temperature'] = uc.model(self.measured_temperature, 'K')
+            calc['measured_temperature_stderr'] = uc.model(self.measured_temperature_stderr, 'K')
+            calc['viscosity'] = uc.model(self.viscosity, f'{self.units.pressure_unit}*ps')
+            calc['viscosity_stderr'] = uc.model(self.viscosity_stderror, f'{self.units.pressure_unit}*ps')
 
         self._set_model(model)
         return model
@@ -717,17 +645,12 @@ class viscosityGREENKUBO(Calculation):
         run_params = calc['calculation']['run-parameter']
         self.runsteps = run_params['runsteps']
         self.timestep = uc.value_unit(run_params['timestep'])
-        self.randomseed = run_params['randomseed']
         self.temperature = uc.value_unit(run_params['temperature'])
-
         self.outputsteps = run_params['outputsteps']
-        self.eq_thermosteps = run_params['eq_thermosteps']
-        self.eq_runsteps = run_params['eq_runsteps']
-        self.eq_equilibrium = run_params['eq_equilibrium']
+        self.equilsteps = run_params['equilsteps']
         self.dragcoeff = run_params['dragcoeff']
         self.sampleinterval = run_params['sampleinterval']
         self.correlationlength = run_params['correlationlength']
-        
 
         # Load results
         if self.status == 'finished':
@@ -738,8 +661,8 @@ class viscosityGREENKUBO(Calculation):
             self.__vy_value  = uc.value_unit(calc['vy_value']) 
             self.__vz_value  = uc.value_unit(calc['vz_value']) 
 
-            self.__viscosity_value = uc.value_unit(calc['viscosity'])
-            self.__viscosity_value_stderr = uc.value_unit(calc['viscosity_stderr'])
+            self.__viscosity = uc.value_unit(calc['viscosity'])
+            self.__viscosity_stderr = uc.value_unit(calc['viscosity_stderr'])
             self.__measured_temperature = uc.value_unit(calc['measured_temperature'])
             self.__measured_temperature_stderr = uc.value_unit(calc['measured_temperature_stderr'])
 
@@ -752,11 +675,6 @@ class viscosityGREENKUBO(Calculation):
                 name='temperature',
                 path=f'{self.modelroot}.temperature.value',
                 description='search by temperature in Kelvin'),
-            'viscosity': load_query(
-                style='float_match',
-                name='viscosity',
-                path=f'{self.modelroot}.viscosity.value',
-                description='search by viscosity in Pressure Time units')
         })
         return queries
 
@@ -779,8 +697,8 @@ class viscosityGREENKUBO(Calculation):
 
             meta['measured_temperature'] = self.measured_temperature
             meta['measured_temperature_stderr'] = self.measured_temperature_stderr
-            meta['measured_viscosity'] = self.viscosity_value
-            meta['measured_viscosity_stderr'] = self.viscosity_value_stderror
+            meta['measured_viscosity'] = self.viscosity
+            meta['measured_viscosity_stderr'] = self.viscosity_stderror
 
             meta['pxy_values'] = self.pxy_values
             meta['pxz_values'] = self.pxz_values
@@ -809,7 +727,7 @@ class viscosityGREENKUBO(Calculation):
     def compare_fterms(self) -> dict:
         """dict: The terms to compare metadata values using a tolerance."""
         return {
-            'temperature':1e-2,
+            'temperature': 1e-2,
         }
 
 ########################### Calculation interactions ##########################
@@ -830,20 +748,27 @@ class viscosityGREENKUBO(Calculation):
 
         # Add calculation-specific inputs
         input_dict['runsteps'] = self.runsteps
-        input_dict['randomseed'] = self.randomseed
         input_dict['temperature'] = self.temperature
         input_dict['timestep'] = self.timestep
         input_dict['outputsteps'] = self.outputsteps
         input_dict['dragcoeff'] = self.dragcoeff
-        input_dict['eq_thermosteps'] = self.eq_thermosteps
-        input_dict['eq_runsteps'] = self.eq_runsteps
-        input_dict['eq_equilibrium'] = self.eq_equilibrium
+        input_dict['equilsteps'] = self.equilsteps
         input_dict['sampleinterval'] = self.sampleinterval
         input_dict['correlationlength'] = self.correlationlength
 
         # Return input_dict
         return input_dict
 
+    @property
+    def calc_output_files(self) -> list:
+        """list : Glob path strings for files generated by this calculation"""
+        return [
+            'init.dat',
+            'log.lammps',
+            'viscosity_green_kubo.in',
+            'S0St.dat'
+        ]
+    
     def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
@@ -856,8 +781,8 @@ class viscosityGREENKUBO(Calculation):
         """
         self.__measured_temperature = results_dict['measured_temperature']
         self.__measured_temperature_stderr = results_dict['measured_temperature_stderr']
-        self.__viscosity_value = results_dict["viscosity"]
-        self.__viscosity_value_stderr = results_dict["viscosity_stderr"] 
+        self.__viscosity = results_dict["viscosity"]
+        self.__viscosity_stderr = results_dict["viscosity_stderr"] 
         
         self.__pxy_values = results_dict['pxy_values']
         self.__pxz_values = results_dict['pxz_values']

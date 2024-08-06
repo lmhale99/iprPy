@@ -1,2 +1,2 @@
-from .ViscosityGREENKUBO import viscosityGREENKUBO
-__all__ = ['viscosityGREENKUBO']
+from .ViscosityGreenKubo import ViscosityGreenKubo
+__all__ = ['ViscosityGreenKubo']
