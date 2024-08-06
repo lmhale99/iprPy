@@ -4,8 +4,8 @@
 branch                          
 
 # LAMMPS and MPI Commands
-lammps_command                 /usr/bin/lmp 
-mpi_command                          
+lammps_command                  /home/lmh1/LAMMPS/2022-06-23/src/lmp_mpi
+mpi_command                     mpiexec -n 4
 
 # Interatomic Potential
 potential_file                  ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1.json
@@ -19,7 +19,14 @@ load_style                      atom_dump
 load_options                    
 family                          
 symbols                         Ni
-box_parameters                        
+box_parameters                                  
+
+# System Manipulations
+a_uvw                           
+b_uvw                           
+c_uvw                           
+atomshift                       
+sizemults                       1 1 3
 
 # Input/Output Units
 length_unit                     
@@ -28,14 +35,9 @@ energy_unit
 force_unit                      
 
 # Run Parameters
-temperature                    500 
+temperature                     1500
 timestep                        
-runsteps                       1000 
+runsteps                        100000
 thermosteps                     
-dataoffset                      
-eq_thermosteps                  
-eq_runsteps                     
-eq_equilibrium                  
-drivingforce                    
-dumpsteps                       
-directoryname                   
+equilsteps                      
+drivingforce                    1.0 angstrom/(ps^2)

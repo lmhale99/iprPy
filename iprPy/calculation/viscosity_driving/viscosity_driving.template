@@ -1,0 +1,37 @@
+# LAMMPS input script for measuring viscosity using the Hess periodic perturbation method
+
+variable        T equal <temperature> 
+variable        V equal vol
+variable        dt equal <timestep>
+variable        Tdamp equal 10*${dt}
+
+<atomman_system_pair_info>
+
+timestep        ${dt}
+
+fix             NVT all nvt temp $T $T ${Tdamp}
+
+# Equilibration run
+run             <equilsteps>
+
+#velocity       all create $T 102486 mom yes rot yes dist gaussian
+
+# Set up the applied perturbation
+variable        A equal <drivingforce>  
+fix             cos all accelerate/cos ${A}
+compute         cos all viscosity/cos 
+variable        V equal c_cos[7]
+fix_modify      NVT temp cos
+
+# Define calculation terms
+variable        density equal density
+variable        lz equal lz 
+variable        reciprocalViscosity equal v_V/${A}/v_density*39.4784/v_lz/v_lz
+
+# Set thermo outputs
+thermo_style    custom step cpu temp press pe density v_V v_reciprocalViscosity
+thermo_modify   temp cos
+thermo          <thermosteps>
+
+# Run for runsteps
+run             <runsteps>

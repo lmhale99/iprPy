@@ -1,2 +1,2 @@
-from .ViscosityDRIVING import viscosityDRIVING
-__all__ = ['viscosityDRIVING']
+from .ViscosityDriving import ViscosityDriving
+__all__ = ['ViscosityDriving']
