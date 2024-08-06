@@ -50,7 +50,6 @@ class CTCMSEmperorPrepare(BaseEmperorPrepare):
         }
         return terms
 
-
     def build_prepare_pool(self):
         """Method to map prepare pool methods to pool numbers"""
         self.prepare_pool[1] = self.prepare_pool_1
@@ -69,6 +68,7 @@ class CTCMSEmperorPrepare(BaseEmperorPrepare):
         self.prepare_pool[14] = self.prepare_pool_14
         self.prepare_pool[15] = self.prepare_pool_15
         self.prepare_pool[16] = self.prepare_pool_16
+        self.prepare_pool[17] = self.prepare_pool_17
 
     def prepare_pool_1(self, debug=False, **kwargs):
         """Pool #1: Basic potential evaluations and scans"""
@@ -76,6 +76,7 @@ class CTCMSEmperorPrepare(BaseEmperorPrepare):
         # Specify master_prepare pool settings
         pool_params = {
             'styles': 'isolated_atom diatom_scan E_vs_r_scan:bop E_vs_r_scan',
+            #'styles': 'E_vs_r_scan',
             'run_directory': 'iprhub_1',
             'np_per_runner': '1',
             'num_pots': '100',
@@ -89,7 +90,7 @@ class CTCMSEmperorPrepare(BaseEmperorPrepare):
 
         # Specify master_prepare pool settings
         pool_params = {
-            'styles': 'relax_box relax_static relax_dynamic',
+            'styles': 'relax_dynamic',
             'run_directory': 'iprhub_2',
             'np_per_runner': '1',
             'num_pots': '50',
@@ -103,7 +104,7 @@ class CTCMSEmperorPrepare(BaseEmperorPrepare):
 
         # Specify master_prepare pool settings
         pool_params = {
-            'styles': 'relax_static:from_dynamic',
+            'styles': 'relax_box relax_static relax_static:from_dynamic',
             'run_directory': 'iprhub_3',
             'np_per_runner': '1',
             'num_pots': '50',
@@ -187,7 +188,7 @@ class CTCMSEmperorPrepare(BaseEmperorPrepare):
         # Specify master_prepare pool settings
         pool_params = {
             'styles': 'stacking_fault_map_2D',
-            'run_directory': 'iprhub_8',
+            'run_directory': 'iprhub_28',
             'np_per_runner': '1',
             'num_pots': '50',
         }
@@ -222,6 +223,7 @@ class CTCMSEmperorPrepare(BaseEmperorPrepare):
 
         prepare_params = self.compile_prepare_params(pool_params, **kwargs)
         self.database.master_prepare(debug=debug, **prepare_params)
+
 
     def prepare_pool_11(self, debug=False, **kwargs):
         """Pool #11: Dynamic relax at 50K"""
@@ -298,7 +300,7 @@ class CTCMSEmperorPrepare(BaseEmperorPrepare):
 
         # Loop from max temperature down to 50
         for temperature in range(100, max_temperature+50, 50):
-            
+
             # Set melt and run temperatures
             prepare_params['temperature'] = str(temperature)
 
@@ -345,14 +347,14 @@ class CTCMSEmperorPrepare(BaseEmperorPrepare):
 
         # Specify master_prepare pool settings
         pool_params = {
-            'styles': 'relax_liquid:melt',
+            'styles': 'relax_liquid_redo:melt',
             'run_directory': 'iprhub_14',
             'np_per_runner': '16',
             'num_pots': '50',
         }
 
         prepare_params = self.compile_prepare_params(pool_params, **kwargs)
-        self.database.master_prepare(**prepare_params)
+        self.database.master_prepare(debug=debug, **prepare_params)
 
     def prepare_pool_15(self, debug: bool = False, **kwargs):
         """
@@ -366,16 +368,15 @@ class CTCMSEmperorPrepare(BaseEmperorPrepare):
 
         # Specify master_prepare pool settings
         pool_params = {
-            'styles': 'relax_liquid:change_temp',
+            'styles': 'relax_liquid_redo:change_temp',
             'run_directory': 'iprhub_15',
-            'np_per_runner': '8',
+            'np_per_runner': '16',
             'num_pots': '50',
         }
 
         # Pull out pool-specific settings if present
         max_temperature = int(kwargs.pop('max_temperature', 6100))
 
-        
         # Compile prepare_params
         prepare_params = self.compile_prepare_params(pool_params, **kwargs)
 
@@ -383,8 +384,8 @@ class CTCMSEmperorPrepare(BaseEmperorPrepare):
         for temperature in range(max_temperature, 0, -50):
 
             # Set melt and run temperatures
-            prepare_params['temperature'] = str(temperature - 50)
-            prepare_params['temperature_melt'] = str(temperature)
+            prepare_params['temperature'] = str(temperature)
+            prepare_params['temperature_melt'] = str(temperature + 50)
 
             # Call master prepare
             print('Starting to prepare for T=', prepare_params['temperature'])
@@ -424,7 +425,39 @@ class CTCMSEmperorPrepare(BaseEmperorPrepare):
             print('Starting to prepare for T=', prepare_params['temperature'])
             self.database.master_prepare(debug=debug, **prepare_params)
 
+    def prepare_pool_17(self, debug: bool = False, **kwargs):
+        """
+        Pool #17: Diffusion liquid
 
+        Pool-specific kwargs
+        ------------------------
+        max_temperature : int, optional
+            The maximum temperature to prepare.
+        """
+
+        # Specify master_prepare pool settings
+        pool_params = {
+            'styles': 'diffusion_liquid',
+            'run_directory': 'iprhub_17',
+            'np_per_runner': '8',
+            'num_pots': '50',
+        }
+
+        # Pull out pool-specific settings if present
+        max_temperature = int(kwargs.pop('max_temperature', 6100))
+
+        # Compile prepare_params
+        prepare_params = self.compile_prepare_params(pool_params, **kwargs)
+
+        # Loop from max temperature down to 50
+        for temperature in range(max_temperature, 0, -50):
+
+            # Set melt and run temperatures
+            prepare_params['temperature'] = str(temperature)
+
+            # Call master prepare
+            print('Starting to prepare for T=', prepare_params['temperature'])
+            self.database.master_prepare(debug=debug, **prepare_params)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Command line options for Emperor prepare on CTCMS')

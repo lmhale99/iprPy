@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+#SBATCH --job-name="pool16"
+#SBATCH --time=21-00:00:00
+#SBATCH --output=emperor16_%j.txt
+#SBATCH --partition=serial
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+
+python emperor/CTCMSEmperorPrepare.py 16 -i emperor/pool_16.in
+python multi_runner_slurm.py iprhub iprhub_16 -c 8 --maxjobs 30 --percentjobs 5 -t
+
