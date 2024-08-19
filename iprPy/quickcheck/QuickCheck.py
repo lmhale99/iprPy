@@ -258,19 +258,20 @@ class QuickCheck():
                                  length_unit: str = 'angstrom',
                                  energy_unit: str = 'eV'):
         data = {}
-        for i in range(len(self.results['relax_static_diatom'])):
-            relax = self.results['relax_static_diatom'][i]
-            diatom = relax['relaxed_diatom']
-            if diatom.symbols[0] == diatom.symbols[1]:
-                symbol = diatom.symbols[0]
-            else:
-                symbol = '-'.join(diatom.symbols)
-            
-            r0 = np.linalg.norm(diatom.atoms.pos[0] - diatom.atoms.pos[1])
+        if 'relax_static_diatom' in self.results:
+            for i in range(len(self.results['relax_static_diatom'])):
+                relax = self.results['relax_static_diatom'][i]
+                diatom = relax['relaxed_diatom']
+                if diatom.symbols[0] == diatom.symbols[1]:
+                    symbol = diatom.symbols[0]
+                else:
+                    symbol = '-'.join(diatom.symbols)
+                
+                r0 = np.linalg.norm(diatom.atoms.pos[0] - diatom.atoms.pos[1])
 
-            data[symbol] = d = {}
-            d['E_diatom'] = uc.get_in_units(relax['E_pot'], energy_unit)
-            d['r_diatom'] = uc.get_in_units(r0, length_unit)
+                data[symbol] = d = {}
+                d['E_diatom'] = uc.get_in_units(relax['E_pot'], energy_unit)
+                d['r_diatom'] = uc.get_in_units(r0, length_unit)
         
         data = pd.DataFrame(data)
         return data

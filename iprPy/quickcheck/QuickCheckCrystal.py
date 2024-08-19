@@ -139,12 +139,16 @@ class QuickCheckCrystal():
 
         calc = load_calculation('E_vs_r_scan')
         system = self.ucell.supersize(sizemult, sizemult, sizemult)
-        results = calc.calc(self.lammps_command, system, self.potential,
-                            ucell=self.ucell, rmin=rmin, rmax=rmax,
-                            rsteps=rsteps)
+        try:
+            results = calc.calc(self.lammps_command, system, self.potential,
+                                ucell=self.ucell, rmin=rmin, rmax=rmax,
+                                rsteps=rsteps)
+        except Exception as error:
+            print(f'E vs r failed for {self.name}!')
+            print(f'{type(error).__name__}: {error}')
+        else:
+            self.results['E_vs_r_scan'] = results
         calc.clean_files()
-
-        self.results['E_vs_r_scan'] = results
 
     def run_relax_static(self,
                          ucells: Union[am.System, list, None] = None,
@@ -193,16 +197,19 @@ class QuickCheckCrystal():
         self.results['relax_static'] = []
         calc = load_calculation('relax_static')
         for ucell in ucells:
-            results = calc.calc(self.lammps_command, ucell, self.potential,
-                                etol=etol, ftol=ftol, maxiter=maxiter,
-                                maxeval=maxeval, dmax=dmax, maxcycles=maxcycles,
-                                ctol=ctol, raise_at_maxcycles=raise_at_maxcycles)
-            
-            results['relaxed_ucell'] = am.load('atom_dump', results['dumpfile_final'],
-                                                symbols=results['symbols_final'])
+            try:
+                results = calc.calc(self.lammps_command, ucell, self.potential,
+                                    etol=etol, ftol=ftol, maxiter=maxiter,
+                                    maxeval=maxeval, dmax=dmax, maxcycles=maxcycles,
+                                    ctol=ctol, raise_at_maxcycles=raise_at_maxcycles)
+            except Exception as error:
+                print(f'relax static failed for {self.name}!')
+                print(f'{type(error).__name__}: {error}')
+            else:
+                results['relaxed_ucell'] = am.load('atom_dump', results['dumpfile_final'],
+                                                    symbols=results['symbols_final'])
+                self.results['relax_static'].append(results)
             calc.clean_files()
-
-            self.results['relax_static'].append(results)
 
     def run_crystal_space_group(self,
                                 symprec: float = 1e-5,
@@ -253,12 +260,17 @@ class QuickCheckCrystal():
         self.results['elastic_constants_static'] = []
         for static in self.results['relax_static']:
             ucell = static['relaxed_ucell']
-            results = calc.calc(self.lammps_command, ucell, self.potential,
-                                strainrange=strainrange, etol=etol, ftol=ftol,
-                                maxiter=maxiter, maxeval=maxeval, dmax=dmax)
+            try:
+                results = calc.calc(self.lammps_command, ucell, self.potential,
+                                    strainrange=strainrange, etol=etol, ftol=ftol,
+                                    maxiter=maxiter, maxeval=maxeval, dmax=dmax)
+            except Exception as error:
+                print(f'elastic constants failed for {self.name}!')
+                print(f'{type(error).__name__}: {error}')
+            else:
+                self.results['elastic_constants_static'].append(results)
             calc.clean_files()
-            self.results['elastic_constants_static'].append(results)
-
+            
     def run_phonon(self,
                    distance: float = 0.01,
                    symprec: float = 1e-5,
@@ -269,12 +281,19 @@ class QuickCheckCrystal():
         self.results['phonon'] = []
         for i, static in enumerate(self.results['relax_static']):
             ucell = static['relaxed_ucell']
-            results = calc.calc(self.lammps_command, ucell, self.potential,
-                                distance=distance, symprec=symprec,
-                                numstrains=numstrains, strainrange=strainrange)
-            Path('band.png').rename(f'{self.name}--{i}--band.png')
+            try:
+                results = calc.calc(self.lammps_command, ucell, self.potential,
+                                    distance=distance, symprec=symprec,
+                                    numstrains=numstrains, strainrange=strainrange)
+            except Exception as error:
+                print(f'phonon failed for {self.name}!')
+                print(f'{type(error).__name__}: {error}')
+            else:
+                self.results['phonon'].append(results)
+            if Path('band.png').exists():
+                Path('band.png').rename(f'{self.name}--{i}--band.png')
             calc.clean_files()
-            self.results['phonon'].append(results)
+            
 
     def run_point_defect_static(self,
                                 point_defects: dict,
@@ -315,10 +334,15 @@ class QuickCheckCrystal():
                 system = ucell.supersize(sizemult, sizemult, sizemult)
 
                 # Run the calculation
-                results = calc.calc(self.lammps_command, system, self.potential,
-                                    point_kwargs, cutoff, etol=etol, ftol=ftol,
-                                    maxiter=maxiter, maxeval=maxeval, dmax=dmax)
-                r[name] = results
+                try:
+                    results = calc.calc(self.lammps_command, system, self.potential,
+                                        point_kwargs, cutoff, etol=etol, ftol=ftol,
+                                        maxiter=maxiter, maxeval=maxeval, dmax=dmax)
+                except Exception as error:
+                    print(f'point defect {name} failed for {self.name}!')
+                    print(f'{type(error).__name__}: {error}')
+                else:
+                    r[name] = results
                 calc.clean_files()
             self.results['point_defect_static'].append(r)
 
@@ -358,11 +382,17 @@ class QuickCheckCrystal():
                 
                 
                 # Run the calculation
-                results = calc.calc(self.lammps_command, ucell, self.potential,
-                                    hkl=hkl, minwidth=minwidth, even=True,
-                                    shiftindex=shiftindex, etol=etol, ftol=ftol,
-                                    maxiter=maxiter, maxeval=maxeval, dmax=dmax)
-                r[name] = results
+                try:
+                    results = calc.calc(self.lammps_command, ucell, self.potential,
+                                        hkl=hkl, minwidth=minwidth, even=True,
+                                        shiftindex=shiftindex, etol=etol, ftol=ftol,
+                                        maxiter=maxiter, maxeval=maxeval, dmax=dmax)
+                    r[name] = results
+                except Exception as error:
+                    print(f'surface {name} failed for {self.name}!')
+                    print(f'{type(error).__name__}: {error}')
+                else:
+                    r[name] = results
                 calc.clean_files()
             self.results['surface_energy_static'].append(r)
         
@@ -433,6 +463,9 @@ class QuickCheckCrystal():
             data.append(d)
         data = pd.DataFrame(data)
 
+        if len(data) == 0:
+            data = pd.DataFrame(columns=['E_pot','a','b','c','alpha','beta','gamma'])
+
         # Delimit by crystal system
         if crystal_system == 'cubic':
             data = data[['E_pot', 'a']]
@@ -494,6 +527,11 @@ class QuickCheckCrystal():
             d['C66'] = uc.get_in_units(cij[5,5], pressure_unit)
             data.append(d)
         data = pd.DataFrame(data)
+        if len(data) == 0:
+            data = pd.DataFrame(columns=['C11','C12','C13','C14','C15','C16',
+                                         'C22','C23','C24','C25','C26',
+                                         'C33','C34','C35','C36',
+                                         'C44','C45','C46','C55','C56','C66'])
 
         # Delimit by crystal system
         if crystal_system == 'cubic':
