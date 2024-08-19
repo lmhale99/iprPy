@@ -70,6 +70,7 @@ class WSLLaptopEmperorPrepare(BaseEmperorPrepare):
         self.prepare_pool[15] = self.prepare_pool_15
         self.prepare_pool[16] = self.prepare_pool_16
         self.prepare_pool[17] = self.prepare_pool_17
+        self.prepare_pool[18] = self.prepare_pool_18
 
     def prepare_pool_1(self, debug=False, **kwargs):
         """Pool #1: Basic potential evaluations and scans"""
@@ -427,7 +428,7 @@ class WSLLaptopEmperorPrepare(BaseEmperorPrepare):
 
     def prepare_pool_17(self, debug: bool = False, **kwargs):
         """
-        Pool #16: diffusion liquid
+        Pool #17: diffusion liquid
 
         Pool-specific kwargs
         ------------------------
@@ -438,6 +439,40 @@ class WSLLaptopEmperorPrepare(BaseEmperorPrepare):
         # Specify master_prepare pool settings
         pool_params = {
             'styles': 'diffusion_liquid',
+            'run_directory': 'iprhub_12',
+            'np_per_runner': '8',
+            'num_pots': '50',
+        }
+
+        # Pull out pool-specific settings if present
+        max_temperature = int(kwargs.pop('max_temperature', 6100))
+
+        # Compile prepare_params
+        prepare_params = self.compile_prepare_params(pool_params, **kwargs)
+
+        # Loop from max temperature down to 50
+        for temperature in range(max_temperature, 0, -50):
+
+            # Set melt and run temperatures
+            prepare_params['temperature'] = str(temperature)
+
+            # Call master prepare
+            print('Starting to prepare for T=', prepare_params['temperature'])
+            self.database.master_prepare(debug=debug, **prepare_params)
+
+    def prepare_pool_18(self, debug: bool = False, **kwargs):
+        """
+        Pool #18: viscosity
+
+        Pool-specific kwargs
+        ------------------------
+        max_temperature : int, optional
+            The maximum temperature to prepare.
+        """
+
+        # Specify master_prepare pool settings
+        pool_params = {
+            'styles': 'viscosity_driving viscosity_green_kubo',
             'run_directory': 'iprhub_12',
             'np_per_runner': '8',
             'num_pots': '50',

@@ -5,7 +5,7 @@ branch
 
 # LAMMPS and MPI Commands
 lammps_command                  /home/lmh1/LAMMPS/2022-06-23/src/lmp_mpi
-mpi_command                     mpiexec -n 4
+mpi_command                     mpiexec -n 8
 
 # Interatomic Potential
 potential_file                  ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1.json
@@ -37,7 +37,7 @@ force_unit
 # Run Parameters
 temperature                     1500
 timestep                        
-runsteps                        1000000
+runsteps                        10000
 outputsteps                     
 equilsteps                      
 dragcoeff                       

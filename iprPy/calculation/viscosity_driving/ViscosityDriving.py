@@ -305,7 +305,7 @@ class ViscosityDriving(Calculation):
         self.units.load_parameters(input_dict)
 
         # Change default values for subset terms
-        input_dict['sizemults'] = input_dict.get('sizemults', '1 1 1')
+        input_dict['sizemults'] = input_dict.get('sizemults', '1 1 3')
 
         # Load calculation-specific strings
 
@@ -327,7 +327,7 @@ class ViscosityDriving(Calculation):
             self.timestep = None
         self.drivingforce = value(input_dict,'drivingforce',
                                   default_unit='angstrom/(ps^2)',
-                                  default_term='2 angstrom/(ps^2)')
+                                  default_term='1.5 angstrom/(ps^2)')
         
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
@@ -382,7 +382,7 @@ class ViscosityDriving(Calculation):
             params['archive_status'] = 'finished'
             params['archive_temperature'] = kwargs['temperature']
             params['temperature'] = kwargs['temperature']
-            params['sizemults'] = '1 1 1'
+            params['sizemults'] = '1 1 3'
 
             # Copy kwargs to params
             for key in kwargs:
@@ -508,13 +508,16 @@ class ViscosityDriving(Calculation):
             calc['calculation']['run-parameter'] = DM()
         run_params = calc['calculation']['run-parameter']
 
-        run_params['temperature'] = uc.model(self.temperature, 'K')
         run_params['timestep'] = uc.model(self.timestep, 'ps')
         run_params['runsteps'] = self.runsteps
         run_params['thermosteps'] = self.thermosteps
         run_params['drivingforce'] = uc.model(self.drivingforce,
                                               f'{self.units.length_unit}/(ps)^2')
         run_params['equilsteps'] = self.equilsteps
+
+        # Save phase-state info
+        calc['phase-state'] = DM()
+        calc['phase-state']['temperature'] = uc.model(self.temperature, 'K')
 
         # Build results
         if self.status == 'finished':
@@ -551,11 +554,13 @@ class ViscosityDriving(Calculation):
         run_params = calc['calculation']['run-parameter']
 
         self.runsteps = run_params['runsteps']
-        self.temperature = uc.value_unit(run_params['temperature'])
         self.timestep = uc.value_unit(run_params['timestep'])
         self.thermosteps = run_params['thermosteps']
         self.equilsteps = run_params['equilsteps']
         self.drivingforce = uc.value_unit(run_params['drivingforce'])
+
+        # Load phase-state info
+        self.temperature = uc.value_unit(calc['phase-state']['temperature'])
 
         # Load results
         if self.status == 'finished':
@@ -571,7 +576,7 @@ class ViscosityDriving(Calculation):
             'temperature': load_query(
                 style='float_match',
                 name='temperature',
-                path=f'{self.modelroot}.temperature.value',
+                path=f'{self.modelroot}.phase-state.temperature.value',
                 description='search by temperature in Kelvin'),
         })
         return queries

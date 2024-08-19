@@ -50,7 +50,7 @@ def viscosity_green_kubo(lammps_command:str,
         The amplitude of the driving force for the calculation method. Default 
         value of 0.2. 
     runsteps : int, optional
-        How many timesteps the simulation will run for. Default value of 100,000
+        How many timesteps the simulation will run for. Default value of 1,000,000
         should be suitable for a short run. 
     thermosteps : int, optional
         How often the calculated values get stored in the thermo table of the 

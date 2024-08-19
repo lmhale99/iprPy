@@ -596,7 +596,6 @@ class ViscosityGreenKubo(Calculation):
             calc['calculation']['run-parameter'] = DM()
         run_params = calc['calculation']['run-parameter']
 
-        run_params['temperature'] = uc.model(self.temperature,'K')
         run_params['timestep'] = uc.model(self.timestep,'ps')
         run_params['runsteps'] = self.runsteps
         run_params['outputsteps'] = self.outputsteps
@@ -605,6 +604,9 @@ class ViscosityGreenKubo(Calculation):
         run_params['sampleinterval'] = self.sampleinterval
         run_params['correlationlength'] = self.correlationlength
 
+        # Save phase-state info
+        calc['phase-state'] = DM()
+        calc['phase-state']['temperature'] = uc.model(self.temperature, 'K')
 
         # Build results
         if self.status == 'finished':
@@ -645,12 +647,14 @@ class ViscosityGreenKubo(Calculation):
         run_params = calc['calculation']['run-parameter']
         self.runsteps = run_params['runsteps']
         self.timestep = uc.value_unit(run_params['timestep'])
-        self.temperature = uc.value_unit(run_params['temperature'])
         self.outputsteps = run_params['outputsteps']
         self.equilsteps = run_params['equilsteps']
         self.dragcoeff = run_params['dragcoeff']
         self.sampleinterval = run_params['sampleinterval']
         self.correlationlength = run_params['correlationlength']
+
+        # Load phase-state info
+        self.temperature = uc.value_unit(calc['phase-state']['temperature'])
 
         # Load results
         if self.status == 'finished':
@@ -673,7 +677,7 @@ class ViscosityGreenKubo(Calculation):
             'temperature': load_query(
                 style='float_match',
                 name='temperature',
-                path=f'{self.modelroot}.temperature.value',
+                path=f'{self.modelroot}.phase-state.temperature.value',
                 description='search by temperature in Kelvin'),
         })
         return queries
