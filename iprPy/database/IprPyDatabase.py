@@ -587,8 +587,8 @@ class IprPyDatabase():
         """
         
         # Call prepare with self as database
-        prepare(self, run_directory, calculation, input_script=input_script,
-                debug=debug, content_dict=content_dict, calc_df=calc_df, **kwargs)
+        return prepare(self, run_directory, calculation, input_script=input_script,
+                       debug=debug, content_dict=content_dict, calc_df=calc_df, **kwargs)
     
     def master_prepare(self, input_script=None, debug=False, **kwargs):
         """
@@ -610,7 +610,7 @@ class IprPyDatabase():
             calculation for the particular parameter.
         """
         # Call master_prepare with self as database
-        master_prepare(self, input_script=input_script, debug=debug, **kwargs)
+        return master_prepare(self, input_script=input_script, debug=debug, **kwargs)
 
     def runner(self, run_directory, calc_name=None, orphan_directory=None,
                hold_directory=None, log=True, bidtries=10, bidverbose=False,

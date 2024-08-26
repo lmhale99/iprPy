@@ -116,7 +116,7 @@ def prepare(database,
     test_calcs, test_calcs_df, test_inputfiles, test_contents, content_dict = build_test_calcs(database, calculation, content_dict, debug=debug, **kwargs)
     print(len(test_calcs_df), 'calculation combinations to check', flush=True)
     if len(test_calcs_df) == 0:
-        return
+        return []
 
     # Find new unique combinations
     new_calcs_df = new_calculations(old_calcs_df, test_calcs_df,
@@ -132,6 +132,8 @@ def prepare(database,
         
         prepare_calc(database, run_directory, new_calc, inputfile,
                      copy_content, content_dict)
+    
+    return new_calcs_df['key'].to_list()
 
 def manual_content_dict(database,
                         content_dict: Optional[dict] = None,
@@ -328,7 +330,11 @@ def build_test_calcs(database, calculation, content_dict, debug=False,
     numinvalid = 0
 
     # Iterate over multidict combinations
+    numcalcs = 0
     for subdict in itermultidict(calculation.multikeys, **kwargs):
+        numcalcs += 1
+
+    for subdict in tqdm(itermultidict(calculation.multikeys, **kwargs), total=numcalcs):
         calculation_dict.update(subdict)
         
         # Generate inputfile

@@ -55,9 +55,13 @@ def master_prepare(database, input_script=None, debug=False, **kwargs):
     all_lmppot_ids = np.unique(lmppots_df.id).tolist()
     print(len(all_lmppot_ids), 'potential ids found')
 
+    new_calc_keys = []
     for i in range(len(styles)):
-        prepare_pool(database, styles[i], int(np_per_runner[i]), run_directory[i],
-                     all_lmppot_ids, int(num_pots[i]), debug=debug, **kwargs)
+        keys = prepare_pool(database, styles[i], int(np_per_runner[i]), run_directory[i],
+                            all_lmppot_ids, int(num_pots[i]), debug=debug, **kwargs)
+        new_calc_keys.extend(keys)
+    
+    return new_calc_keys
 
 def prepare_pool(database, styles, np_per_runner, run_directory, 
                  all_lmppot_ids, num_pots, debug=False, **kwargs):
@@ -103,6 +107,7 @@ def prepare_pool(database, styles, np_per_runner, run_directory,
         dbwargs['refresh_cache'] = True
 
     # Loop over styles
+    new_calc_keys = []
     for style in styles.strip().split():
 
         # Separate style and branch
@@ -132,12 +137,15 @@ def prepare_pool(database, styles, np_per_runner, run_directory,
                                                   **dbwargs)
 
             # Prepare the calculation
-            database.prepare(run_directory, calculation, debug=debug,
-                             calc_df=calc_df, **params)
+            keys = database.prepare(run_directory, calculation, debug=debug,
+                                    calc_df=calc_df, **params)
+            new_calc_keys.extend(keys)
             print()
 
     # Update lammps_commands as needed
     fix_lammps_versions(run_directory, **kwargs)
+    
+    return new_calc_keys
 
 def yield_lmppot_ids(all_lmppot_ids, delta=100):
     """
