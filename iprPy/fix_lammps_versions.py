@@ -2,11 +2,13 @@
 
 # Standard Python libraries
 from pathlib import Path
+from typing import Optional
 
 # iprPy imports
 from . import load_run_directory
 
 def fix_lammps_versions(run_directory: str,
+                        calc_names: Optional[list] = None,
                         **kwargs):
     """
     Iterates over all prepared calculations in a run_directory and updates
@@ -64,20 +66,42 @@ def fix_lammps_versions(run_directory: str,
         for pot_id in kim_pots():
             replacementdict[pot_id] = f"{key}{kwargs['lammps_command_kim']}"
 
+    # Check if any replacement lammps_commands are defined
     if len(replacementdict) > 0:
 
-        # Change the lammps commands in the input files
-        for inscript in run_directory.glob('*/calc_*.in'):
+        # Iterate over the calculation scripts
+        for inscript in iter_calc_scripts(run_directory, calc_names):
+            
+            # Read the input script contents
             with open(inscript, encoding='UTF-8') as f:
                 content = f.read()
+            original_content = content
 
+            # Update the lammps command if a match is found
             for pot_id, lammps in replacementdict.items():
                 if pot_id in content:
                     content = content.replace(oldlammps, lammps)
                     break
 
-            with open(inscript, 'w', encoding='UTF-8') as f:
-                f.write(content)
+            # Update the script if it changed
+            if content != original_content:
+                with open(inscript, 'w', encoding='UTF-8') as f:
+                    f.write(content)
+
+def iter_calc_scripts(run_directory: Path, calc_names: Optional[list]):
+    """Iterate over calc scripts in a run directory: either all or a selection"""
+    if calc_names is None:
+        # Iterate over all calc scripts
+        for inscript in run_directory.glob('*/calc_*.in'):
+            if inscript.exists():
+                yield inscript
+
+    else:
+        # Iterate over only the calc scripts for the given calculations
+        for calc_name in calc_names:
+            for inscript in Path(run_directory, calc_name).glob('calc_*.in'):
+                if inscript.exists():
+                    yield inscript
 
 def snap1_pots():
     """This is a list of all version 1 SNAP potentials."""
