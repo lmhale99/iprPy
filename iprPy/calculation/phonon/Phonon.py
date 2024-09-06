@@ -10,6 +10,8 @@ from yabadaba import load_query
 # http://www.numpy.org/
 import numpy as np
 
+import pandas as pd
+
 # https://github.com/usnistgov/atomman
 import atomman.unitconvert as uc
 
@@ -202,21 +204,30 @@ class Phonon(Calculation):
     def bandstructure(self) -> dict:
         """dict: band structure information"""
         if self.__bandstructure is None:
-            raise ValueError('No results yet!')
+            if self.status == 'finished':
+                self.load_band_structure()
+            else:
+                raise ValueError('No results yet!')
         return self.__bandstructure
 
     @property
     def dos(self) -> dict:
         """dict: density of states information"""
         if self.__dos is None:
-            raise ValueError('No results yet!')
+            if self.status == 'finished':
+                self.load_density_of_states()
+            else:
+                raise ValueError('No results yet!')
         return self.__dos
 
     @property
     def thermal(self) -> dict:
         """dict: estimated properties vs temperature"""
         if self.__thermal is None:
-            raise ValueError('No results yet!')
+            if self.status == 'finished':
+                self.load_thermal_properties()
+            else:
+                raise ValueError('No results yet!')
         return self.__thermal
 
     @property
@@ -315,6 +326,54 @@ class Phonon(Calculation):
             self.a_mult = kwargs['b_mult']
         if 'c_mult' in kwargs:
             self.a_mult = kwargs['c_mult']
+
+    def load_band_structure(self):
+        """Loads the band structure data from the associated JSON file"""
+        model = DM(self.get_file('band_structure.json'))
+
+        self.__bandstructure = {}
+        self.bandstructure['qpoints'] = []
+        for qpoints in model['band-structure']['qpoints']:
+            self.bandstructure['qpoints'].append(uc.value_unit(qpoints))
+
+        self.bandstructure['distances'] = []
+        for distances in model['band-structure']['distances']:
+            self.bandstructure['distances'].append(uc.value_unit(distances))
+
+        self.bandstructure['frequencies'] = []
+        for frequencies in model['band-structure']['frequencies']:
+            self.bandstructure['frequencies'].append(uc.value_unit(frequencies))
+    
+    def load_density_of_states(self):
+        """Loads the density of states data from the associated JSON file"""
+        model = DM(self.get_file('density_of_states.json'))
+
+        self.__dos = {}
+        self.dos['frequency'] = uc.value_unit(model['density-of-states']['frequency'])
+        self.dos['total_dos'] = uc.value_unit(model['density-of-states']['total_dos'])
+        self.dos['projected_dos'] = uc.value_unit(model['density-of-states']['projected_dos'])
+
+    def load_thermal_properties(self):
+        """Loads the thermal data from the associated CSV file"""
+        data = pd.read_csv(self.get_file('thermal_properties.csv'))
+
+        # Add basic thermal properties
+        self.__thermal = {}
+        self.thermal['temperature'] = data['temperature (K)']
+        self.thermal['Helmholtz'] = uc.set_in_units(data['Helmholtz (eV/atom)'], 'eV')
+        self.thermal['entropy'] = uc.set_in_units(data['entropy (J/K/mol)'], 'J/K/mol')
+        self.thermal['heat_capacity_v'] = uc.set_in_units(data['Cv (J/K/mol)'], 'J/K/mol')
+
+        # Add QHA results
+        if 'gruneisen' in data:
+            self.thermal['volume'] = uc.set_in_units(data['volume (Å^3)'], 'angstrom^3')
+            self.thermal['thermal_expansion'] = data['thermal expansion']
+            self.thermal['Gibbs'] = uc.set_in_units(data['Gibbs (eV/atom)'], 'eV')
+            self.thermal['bulk_modulus'] = uc.set_in_units(data['bulk modulus (GPa)'], 'GPa')
+            self.thermal['heat_capacity_p_numerical'] = uc.set_in_units(data['Cp numerical (J/K/mol)'], 'J/K/mol')
+            self.thermal['heat_capacity_p_polyfit'] = uc.set_in_units(data['Cp polyfit (J/K/mol)'], 'J/K/mol')
+            self.thermal['gruneisen'] = data['gruneisen']
+
 
 ####################### Parameter file interactions ###########################
 
@@ -532,37 +591,37 @@ class Phonon(Calculation):
 
         # Build results
         if self.status == 'finished':
-            calc['band-structure'] = DM()
+            #calc['band-structure'] = DM()
 
-            for qpoints in self.bandstructure['qpoints']:
-                calc['band-structure'].append('qpoints', uc.model(qpoints))
+            #for qpoints in self.bandstructure['qpoints']:
+            #    calc['band-structure'].append('qpoints', uc.model(qpoints))
 
-            for distances in self.bandstructure['distances']:
-                calc['band-structure'].append('distances', uc.model(distances))
+            #for distances in self.bandstructure['distances']:
+            #    calc['band-structure'].append('distances', uc.model(distances))
 
-            for frequencies in self.bandstructure['frequencies']:
-                calc['band-structure'].append('frequencies', uc.model(frequencies))
+            #for frequencies in self.bandstructure['frequencies']:
+            #    calc['band-structure'].append('frequencies', uc.model(frequencies))
 
-            calc['density-of-states'] = DM()
-            calc['density-of-states']['frequency'] = uc.model(self.dos['frequency'], 'THz')
-            calc['density-of-states']['total_dos'] = uc.model(self.dos['total_dos'])
-            calc['density-of-states']['projected_dos'] = uc.model(self.dos['projected_dos'])
+            #calc['density-of-states'] = DM()
+            #calc['density-of-states']['frequency'] = uc.model(self.dos['frequency'], 'THz')
+            #calc['density-of-states']['total_dos'] = uc.model(self.dos['total_dos'])
+            #calc['density-of-states']['projected_dos'] = uc.model(self.dos['projected_dos'])
 
-            calc['thermal-properties'] = DM()
-            calc['thermal-properties']['temperature'] = uc.model(self.thermal['temperature'], 'K')
-            calc['thermal-properties']['Helmholtz'] = uc.model(self.thermal['Helmholtz'], 'eV')
-            calc['thermal-properties']['entropy'] = uc.model(self.thermal['entropy'], 'J/K/mol')
-            calc['thermal-properties']['heat_capacity_v'] = uc.model(self.thermal['heat_capacity_v'], 'J/K/mol')
+            #calc['thermal-properties'] = DM()
+            #calc['thermal-properties']['temperature'] = uc.model(self.thermal['temperature'], 'K')
+            #calc['thermal-properties']['Helmholtz'] = uc.model(self.thermal['Helmholtz'], 'eV')
+            #calc['thermal-properties']['entropy'] = uc.model(self.thermal['entropy'], 'J/K/mol')
+            #calc['thermal-properties']['heat_capacity_v'] = uc.model(self.thermal['heat_capacity_v'], 'J/K/mol')
 
             # Add qha results
             if self.__volumescan is not None:
-                calc['thermal-properties']['volume'] = uc.model(self.thermal['volume'], 'angstrom^3')
-                calc['thermal-properties']['thermal_expansion'] = uc.model(self.thermal['thermal_expansion'])
-                calc['thermal-properties']['Gibbs'] = uc.model(self.thermal['Gibbs'], 'eV')
-                calc['thermal-properties']['bulk_modulus'] = uc.model(self.thermal['bulk_modulus'], 'GPa')
-                calc['thermal-properties']['heat_capacity_p_numerical'] = uc.model(self.thermal['heat_capacity_p_numerical'], 'J/K/mol')
-                calc['thermal-properties']['heat_capacity_p_polyfit'] = uc.model(self.thermal['heat_capacity_p_polyfit'], 'J/K/mol')
-                calc['thermal-properties']['gruneisen'] = uc.model(self.thermal['gruneisen'])
+                #calc['thermal-properties']['volume'] = uc.model(self.thermal['volume'], 'angstrom^3')
+                #calc['thermal-properties']['thermal_expansion'] = uc.model(self.thermal['thermal_expansion'])
+                #calc['thermal-properties']['Gibbs'] = uc.model(self.thermal['Gibbs'], 'eV')
+                #calc['thermal-properties']['bulk_modulus'] = uc.model(self.thermal['bulk_modulus'], 'GPa')
+                #calc['thermal-properties']['heat_capacity_p_numerical'] = uc.model(self.thermal['heat_capacity_p_numerical'], 'J/K/mol')
+                #calc['thermal-properties']['heat_capacity_p_polyfit'] = uc.model(self.thermal['heat_capacity_p_polyfit'], 'J/K/mol')
+                #alc['thermal-properties']['gruneisen'] = uc.model(self.thermal['gruneisen'])
 
                 calc['volume-scan'] = DM()
                 calc['volume-scan']['volume'] = uc.model(self.volumescan['volume'], 'angstrom^3')
@@ -608,39 +667,43 @@ class Phonon(Calculation):
         # Load results
         if self.status == 'finished':
 
-            self.__bandstructure = {}
-            self.bandstructure['qpoints'] = []
-            for qpoints in calc['band-structure']['qpoints']:
-                self.bandstructure['qpoints'].append(uc.value_unit(qpoints))
+            if 'band-structure' in calc:
+                self.__bandstructure = {}
+                self.bandstructure['qpoints'] = []
+                for qpoints in calc['band-structure']['qpoints']:
+                    self.bandstructure['qpoints'].append(uc.value_unit(qpoints))
 
-            self.bandstructure['distances'] = []
-            for distances in calc['band-structure']['distances']:
-                self.bandstructure['distances'].append(uc.value_unit(distances))
+                self.bandstructure['distances'] = []
+                for distances in calc['band-structure']['distances']:
+                    self.bandstructure['distances'].append(uc.value_unit(distances))
 
-            self.bandstructure['frequencies'] = []
-            for frequencies in calc['band-structure']['frequencies']:
-                self.bandstructure['frequencies'].append(uc.value_unit(frequencies))
+                self.bandstructure['frequencies'] = []
+                for frequencies in calc['band-structure']['frequencies']:
+                    self.bandstructure['frequencies'].append(uc.value_unit(frequencies))
 
-            self.__dos = {}
-            self.dos['frequency'] = uc.value_unit(calc['density-of-states']['frequency'])
-            self.dos['total_dos'] = uc.value_unit(calc['density-of-states']['total_dos'])
-            self.dos['projected_dos'] = uc.value_unit(calc['density-of-states']['projected_dos'])
+            if 'density-of-states' in calc:
+                self.__dos = {}
+                self.dos['frequency'] = uc.value_unit(calc['density-of-states']['frequency'])
+                self.dos['total_dos'] = uc.value_unit(calc['density-of-states']['total_dos'])
+                self.dos['projected_dos'] = uc.value_unit(calc['density-of-states']['projected_dos'])
 
-            self.__thermal = {}
-            self.thermal['temperature'] = uc.value_unit(calc['thermal-properties']['temperature'])
-            self.thermal['Helmholtz'] = uc.value_unit(calc['thermal-properties']['Helmholtz'])
-            self.thermal['entropy'] = uc.value_unit(calc['thermal-properties']['entropy'])
-            self.thermal['heat_capacity_v'] = uc.value_unit(calc['thermal-properties']['heat_capacity_v'])
+            if 'thermal-properties' in calc:
+                self.__thermal = {}
+                self.thermal['temperature'] = uc.value_unit(calc['thermal-properties']['temperature'])
+                self.thermal['Helmholtz'] = uc.value_unit(calc['thermal-properties']['Helmholtz'])
+                self.thermal['entropy'] = uc.value_unit(calc['thermal-properties']['entropy'])
+                self.thermal['heat_capacity_v'] = uc.value_unit(calc['thermal-properties']['heat_capacity_v'])
 
             # Add qha results
             if 'volume-scan' in calc:
-                self.thermal['volume'] = uc.value_unit(calc['thermal-properties']['volume'])
-                self.thermal['thermal_expansion'] = uc.value_unit(calc['thermal-properties']['thermal_expansion'])
-                self.thermal['Gibbs'] = uc.value_unit(calc['thermal-properties']['Gibbs'])
-                self.thermal['bulk_modulus'] = uc.value_unit(calc['thermal-properties']['bulk_modulus'])
-                self.thermal['heat_capacity_p_numerical'] = uc.value_unit(calc['thermal-properties']['heat_capacity_p_numerical'])
-                self.thermal['heat_capacity_p_polyfit'] = uc.value_unit(calc['thermal-properties']['heat_capacity_p_polyfit'])
-                self.thermal['gruneisen'] = uc.value_unit(calc['thermal-properties']['gruneisen'])
+                if 'thermal-properties' in calc:
+                    self.thermal['volume'] = uc.value_unit(calc['thermal-properties']['volume'])
+                    self.thermal['thermal_expansion'] = uc.value_unit(calc['thermal-properties']['thermal_expansion'])
+                    self.thermal['Gibbs'] = uc.value_unit(calc['thermal-properties']['Gibbs'])
+                    self.thermal['bulk_modulus'] = uc.value_unit(calc['thermal-properties']['bulk_modulus'])
+                    self.thermal['heat_capacity_p_numerical'] = uc.value_unit(calc['thermal-properties']['heat_capacity_p_numerical'])
+                    self.thermal['heat_capacity_p_polyfit'] = uc.value_unit(calc['thermal-properties']['heat_capacity_p_polyfit'])
+                    self.thermal['gruneisen'] = uc.value_unit(calc['thermal-properties']['gruneisen'])
 
                 self.__volumescan = {}
                 self.volumescan['volume'] = uc.value_unit(calc['volume-scan']['volume'])
@@ -763,9 +826,18 @@ class Phonon(Calculation):
             'log.lammps',
             'phonon.in',
             'forces.dump',
+            
             'phonopy_params*.yaml',
+            'thermal_properties*.yaml',
+
             'band.png',
-            'thermal_properties*.yaml'
+            'bulk_modulus.png',
+            'helmholtz_volume.png',
+
+            'band_structure.json',
+            'density_of_states.json',
+            'thermal_properties.csv',
+            
         ]
 
     def process_results(self, results_dict: dict):

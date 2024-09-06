@@ -10,6 +10,8 @@ import datetime
 # http://www.numpy.org/
 import numpy as np
 
+import pandas as pd
+
 # https://matplotlib.org/
 import matplotlib.pyplot as plt
 
@@ -18,6 +20,8 @@ try:
     import phonopy
 except ImportError:
     raise ImportError("The package, phonopy, is not installed by default. Please install with pip or conda.")
+
+from DataModelDict import DataModelDict as DM
 
 # https://github.com/usnistgov/atomman
 import atomman as am
@@ -261,6 +265,11 @@ def phonon_quasiharmonic(lammps_command: str,
         results['thermal_properties']['heat_capacity_p_polyfit'] = uc.set_in_units(np.hstack([qha.heat_capacity_P_polyfit, np.nan]), 'J/K/mol')
         results['thermal_properties']['gruneisen'] = np.hstack([qha.gruneisen_temperature, np.nan])
     
+    # Build extra data files of results
+    save_band_structure(results['band_structure'])
+    save_density_of_states(results['density_of_states'])
+    save_thermal_properties(results['thermal_properties'])
+
     return results
 
 
@@ -398,3 +407,56 @@ def phononcalc(lammps_command: str,
 
     results['phonon'] = phonon
     return results
+
+def save_band_structure(band_structure_dict):
+    """Create a JSON file containing the zero strain band structure data"""
+    model = DM()
+    model['band-structure'] = DM()
+
+    for qpoints in band_structure_dict['qpoints']:
+        model['band-structure'].append('qpoints', uc.model(qpoints))
+
+    for distances in band_structure_dict['distances']:
+        model['band-structure'].append('distances', uc.model(distances))
+
+    for frequencies in band_structure_dict['frequencies']:
+        model['band-structure'].append('frequencies', uc.model(frequencies))
+    
+    with open(f"band_structure.json", 'w', encoding='UTF-8') as f:
+        model.json(fp=f, ensure_ascii=False)
+    
+def save_density_of_states(dos_dict):
+    """Create a JSON file containing the zero strain density of states data"""
+    model = DM()
+    model['density-of-states'] = DM()
+    model['density-of-states']['frequency'] = uc.model(dos_dict['frequency'], 'THz')
+    model['density-of-states']['total_dos'] = uc.model(dos_dict['total_dos'])
+    model['density-of-states']['projected_dos'] = uc.model(dos_dict['projected_dos'])
+
+    with open(f"density_of_states.json", 'w', encoding='UTF-8') as f:
+        model.json(fp=f, ensure_ascii=False)
+
+def save_thermal_properties(thermal_dict):
+
+    data = {}
+
+    # Add zero strain thermal properties
+    data['temperature (K)'] = thermal_dict['temperature']
+    data['Helmholtz (eV/atom)'] = uc.get_in_units(thermal_dict['Helmholtz'], 'eV')
+    data['entropy (J/K/mol)'] = uc.get_in_units(thermal_dict['entropy'], 'J/K/mol')
+    data['Cv (J/K/mol)'] = uc.get_in_units(thermal_dict['heat_capacity_v'], 'J/K/mol')
+
+    # Add qha results
+    if 'volume' in thermal_dict:
+        data['volume (Å^3)'] = uc.get_in_units(thermal_dict['volume'], 'angstrom^3')
+        data['thermal expansion'] = thermal_dict['thermal_expansion']
+        data['Gibbs (eV/atom)'] = uc.get_in_units(thermal_dict['Gibbs'], 'eV')
+        data['bulk modulus (GPa)'] = uc.get_in_units(thermal_dict['bulk_modulus'], 'GPa')
+        data['Cp numerical (J/K/mol)'] = uc.get_in_units(thermal_dict['heat_capacity_p_numerical'], 'J/K/mol')
+        data['Cp polyfit (J/K/mol)'] = uc.get_in_units(thermal_dict['heat_capacity_p_polyfit'], 'J/K/mol')
+        data['gruneisen'] = thermal_dict['gruneisen']
+
+    data = pd.DataFrame(data)
+
+    with open('thermal_properties.csv', 'w', encoding='UTF-8') as f:
+        data.to_csv(f, index=False)
