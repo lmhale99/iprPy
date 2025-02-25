@@ -24,6 +24,7 @@ def prepare(database,
             input_script: Optional[Union[Path, str]] = None,
             debug: bool = False,
             content_dict: Optional[dict] = None,
+            tar_dict: Optional[dict] = None,
             calc_df: Optional[pd.DataFrame] = None,
             **kwargs):
     """
@@ -55,6 +56,14 @@ def prepare(database,
         parameter allows for the contents to be manually specified instead.
         Keys should be the record names and values the record model contents as
         DataModelDict objects.
+    tar_dict : dict, optional
+        Option for advanced prepare control.  This can be used where copies of
+        files in existing database record tars need to be extracted for the new
+        calculations being prepared.  This is a dict where the keys
+        correspond to record names and the values are the tarfile objects of
+        the associated record tars.  Providing such a dictionary allows some or
+        all necessary tars to be pre-loaded before preparing and can reduce
+        prepare time.
     calc_df : pandas.DataFrame, optional
         Option for advanced prepare control.  The metadata DataFrame of
         pre-existing calculations to use for filtering out duplicates from the
@@ -65,7 +74,7 @@ def prepare(database,
         is called or providing filtering keywords to reduce the number of
         records returned by get_records_df.  CAUTION: Extra care is required
         with using calc_df as it makes it easier to accidentally prepare
-        duplicate calculations!        
+        duplicate calculations!
     **kwargs : str or list
         Allows for input parameters for preparing the calculation to be
         directly specified.  Any kwargs parameters that have names matching
@@ -131,7 +140,7 @@ def prepare(database,
         copy_content = test_contents[i]
         
         prepare_calc(database, run_directory, new_calc, inputfile,
-                     copy_content, content_dict)
+                     copy_content, content_dict, tar_dict)
     
     return new_calcs_df['key'].to_list()
 
@@ -469,7 +478,8 @@ def new_calculations(old, test, dterms, fterms):
         isnew = ~isdup[old_count:].values
         return test[isnew]
 
-def prepare_calc(database, run_directory, new_calc, inputfile, copy_content, content_dict):
+def prepare_calc(database, run_directory, new_calc, inputfile, copy_content, content_dict,
+                 tar_dict):
     """
     Prepares a single calculation by building the calculation folder and adding
     a record to the database.
@@ -490,8 +500,16 @@ def prepare_calc(database, run_directory, new_calc, inputfile, copy_content, con
     content_dict : dict
         Keys are the file name and values are the associated loaded file
         contents for extra input files needed for the calculations.
+    tar_dict : dict, optional
+        Option for advanced prepare control.  This can be used where copies of
+        files in existing database record tars need to be extracted for the new
+        calculations being prepared.  This is a dict where the keys
+        correspond to record names and the values are the tarfile objects of
+        the associated record tars.  Providing such a dictionary allows some or
+        all necessary tars to be pre-loaded before preparing and can reduce
+        prepare time.
     """
-    
+
     # Generate calculation folder
     calc_directory = Path(run_directory, new_calc.name)
     if not calc_directory.is_dir():
@@ -522,18 +540,27 @@ def prepare_calc(database, run_directory, new_calc, inputfile, copy_content, con
                 tar.close()
 
         elif terms[0] == 'tar':
-            try:
-                tar = database.get_tar(name=terms[1])
-            except:
-                try:
-                    dirpath = database.get_folder(name=terms[1])
-                except:
-                    print(f'No tar for {terms[1]} found')
-                else:
-                    shutil.copytree(dirpath, Path(calc_directory, dirpath.name))
-            else:
+            if tar_dict is not None and terms[1] in tar_dict:
+                # Get already loaded tar from tar_dict
+                tar = tar_dict[terms[1]]
                 tar.extractall(calc_directory)
-                tar.close()
+            
+            else:
+                # Fetch content from the database
+                try:
+                    tar = database.get_tar(name=terms[1])
+                except:
+                    try:
+                        dirpath = database.get_folder(name=terms[1])
+                    except:
+                        print(f'No tar for {terms[1]} found')
+                    else:
+                        shutil.copytree(dirpath, Path(calc_directory, dirpath.name))
+                else:
+                    tar.extractall(calc_directory)
+                    if tar_dict is not None:
+                        # Save open tar to tar_dict
+                        tar_dict[terms[1]] = tar
 
     # Add record to database
     database.add_record(record=new_calc)
