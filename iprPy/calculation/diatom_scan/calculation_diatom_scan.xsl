@@ -10,14 +10,17 @@
         .diatomtable {border: 1px solid black; border-collapse: collapse;}
       </style>
 
+      <xsl:variable name="calckey" select="key"/>
+
       <!-- Load plotly.js into the DOM -->
       <script src='https://cdn.plot.ly/plotly-2.12.1.min.js'>//</script>
       
-      <h1>Diatom scan calculation results</h1>
+      <h2>Diatom scan calculation results</h2>
 
       <ul>
         <li><b><xsl:text>UUID4: </xsl:text></b><xsl:value-of select="key"/></li>
         <li><b><xsl:text>Calculation: </xsl:text></b><a href="https://www.ctcms.nist.gov/potentials/iprPy/notebook/diatom_scan.html">diatom_scan</a></li>
+        <li><b><xsl:text>Branch: </xsl:text></b><xsl:value-of select="calculation/branch"/></li>
         <li><b><xsl:text>Potential: </xsl:text></b>
           <xsl:choose>
             <xsl:when test="potential-LAMMPS/potential/URL">
@@ -48,8 +51,24 @@
         </li>
       </ul>
       
-      <xsl:if test="diatom-energy-relation">
+      <h3>Calculation parameters:</h3>
+      <ul>
+        <li>
+          <b><xsl:text>Minimum r (Angstrom): </xsl:text></b>
+          <xsl:value-of select="calculation/run-parameter/minimum_r/value"/>
+        </li>
+        <li>
+          <b><xsl:text>Maximum r (Angstrom): </xsl:text></b>
+          <xsl:value-of select="calculation/run-parameter/maximum_r/value"/>
+        </li>
+        <li>
+          <b><xsl:text>Number of r measurements: </xsl:text></b>
+          <xsl:value-of select="calculation/run-parameter/number_of_steps_r"/>
+        </li>
+      </ul>
 
+      <xsl:if test="diatom-energy-relation">
+        <h3>Diatom energy vs. separation distance:</h3>
         <div id='plotDiv'><!-- Plotly chart will be drawn inside this DIV --></div>
         
         <table class="diatomtable">

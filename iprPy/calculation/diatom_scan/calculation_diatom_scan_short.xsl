@@ -6,15 +6,13 @@
   
   <xsl:template match="calculation-diatom-scan">
     <div>
-      <style>
-        .diatomtable {border: 1px solid black; border-collapse: collapse;}
-      </style>
       
-      <h1>Diatom scan calculation results</h1>
+      <h2>Diatom scan calculation results</h2>
 
       <ul>
         <li><b><xsl:text>UUID4: </xsl:text></b><xsl:value-of select="key"/></li>
         <li><b><xsl:text>Calculation: </xsl:text></b><a href="https://www.ctcms.nist.gov/potentials/iprPy/notebook/diatom_scan.html">diatom_scan</a></li>
+        <li><b><xsl:text>Branch: </xsl:text></b><xsl:value-of select="calculation/branch"/></li>
         <li><b><xsl:text>Potential: </xsl:text></b>
           <xsl:choose>
             <xsl:when test="potential-LAMMPS/potential/URL">
@@ -45,22 +43,21 @@
         </li>
       </ul>
       
-      <xsl:if test="diatom-energy-relation">
-        
-        <table class="diatomtable">
-          <tr class="diatomtable">
-            <th class="diatomtable"><b>r (Å)</b></th>
-            <th class="diatomtable"><b>E<sub>pot</sub> (eV)</b></th>
-          </tr>
-          <xsl:for-each select="diatom-energy-relation/r/value">
-            <xsl:variable name="row" select="position()"/>
-            <tr class="diatomtable">
-              <td class="diatomtable"><xsl:value-of select="format-number(current(), '##0.00')"/></td>
-              <td class="diatomtable"><xsl:value-of select="(../../potential-energy/value)[$row]"/></td>
-            </tr>
-          </xsl:for-each>
-        </table>
-      </xsl:if>
+      <h3>Calculation parameters:</h3>
+      <ul>
+        <li>
+          <b><xsl:text>Minimum r (Angstrom): </xsl:text></b>
+          <xsl:value-of select="calculation/run-parameter/minimum_r/value"/>
+        </li>
+        <li>
+          <b><xsl:text>Maximum r (Angstrom): </xsl:text></b>
+          <xsl:value-of select="calculation/run-parameter/maximum_r/value"/>
+        </li>
+        <li>
+          <b><xsl:text>Number of r measurements: </xsl:text></b>
+          <xsl:value-of select="calculation/run-parameter/number_of_steps_r"/>
+        </li>
+      </ul>
 
       <xsl:if test="error">
         <p><b><xsl:text>Error: </xsl:text></b><xsl:value-of select="error"/></p>

@@ -4,14 +4,19 @@
   xmlns="http://www.w3.org/TR/xhtml1/strict">
   <xsl:output method="html" encoding="utf-8" indent="yes" />
   
-  <xsl:template match="calculation-E-vs-r-scan">
+  <xsl:template match="calculation-phonon">
     <div>
-      
-      <h2>E vs. r scan calculation results</h2>
+      <style>
+        .cijtable {border: 1px solid black; border-collapse: collapse;}
+      </style>
+
+      <xsl:variable name="calckey" select="key"/>
+
+      <h2>Phonon calculation results</h2>
 
       <ul>
         <li><b><xsl:text>UUID4: </xsl:text></b><xsl:value-of select="key"/></li>
-        <li><b><xsl:text>Calculation: </xsl:text></b><a href="https://www.ctcms.nist.gov/potentials/iprPy/notebook/E_vs_r_scan.html">E_vs_r_scan</a></li>
+        <li><b><xsl:text>Calculation: </xsl:text></b><a href="https://www.ctcms.nist.gov/potentials/iprPy/notebook/phonon.html">phonon</a></li>
         <li><b><xsl:text>Branch: </xsl:text></b><xsl:value-of select="calculation/branch"/></li>
         <li><b><xsl:text>Potential: </xsl:text></b>
           <xsl:choose>
@@ -76,19 +81,59 @@
           <xsl:value-of select="calculation/run-parameter/size-multipliers/c[2]"/>
           <xsl:text>)</xsl:text>
         </li>
+        
         <li>
-          <b><xsl:text>Minimum r (Angstrom): </xsl:text></b>
-          <xsl:value-of select="calculation/run-parameter/minimum_r/value"/>
+          <b><xsl:text>Atomic displacement distance (Angstrom): </xsl:text></b>
+          <xsl:value-of select="calculation/run-parameter/displacementdistance/value"/>
         </li>
         <li>
-          <b><xsl:text>Maximum r (Angstrom): </xsl:text></b>
-          <xsl:value-of select="calculation/run-parameter/maximum_r/value"/>
+          <b><xsl:text>Symmetry precision tolerance: </xsl:text></b>
+          <xsl:value-of select="calculation/run-parameter/symmetryprecision"/>
         </li>
         <li>
-          <b><xsl:text>Number of r measurements: </xsl:text></b>
-          <xsl:value-of select="calculation/run-parameter/number_of_steps_r"/>
+          <b><xsl:text>Strain range: </xsl:text></b>
+          <xsl:value-of select="calculation/run-parameter/strainrange"/>
+        </li>
+        <li>
+          <b><xsl:text>Number of strains used for QHA: </xsl:text></b>
+          <xsl:value-of select="calculation/run-parameter/numstrains"/>
         </li>
       </ul>
+
+      <xsl:if test="not(status)">
+        <h3>Phonon plots:</h3>
+        <img src="https://potentials.nist.gov/pid/rest/local/potentials/{$calckey}-band.png" alt="band structure"/>
+        <img src="https://potentials.nist.gov/pid/rest/local/potentials/{$calckey}-dos.png" alt="density of states"/>
+        <img src="https://potentials.nist.gov/pid/rest/local/potentials/{$calckey}-pdos.png" alt="partial density of states"/>
+        <xsl:if test="volume-scan">
+          <img src="https://potentials.nist.gov/pid/rest/local/potentials/{$calckey}-bmod.png" alt="volumetric scan for B"/>
+          <img src="https://potentials.nist.gov/pid/rest/local/potentials/{$calckey}-helmvol.png" alt="Helmholtz volumetric scan"/>
+        </xsl:if>
+        
+      </xsl:if>
+
+      <xsl:if test="volume-scan">
+        <h3>Volumetric scan properties:</h3>
+        <ul>
+          <li>
+            <b><xsl:text>E0 (eV/atom): </xsl:text></b>
+            <xsl:value-of select="E0/value"/>
+          </li>
+          <li>
+            <b><xsl:text>B0 (GPa): </xsl:text></b>
+            <xsl:value-of select="B0/value"/>
+          </li>
+          <li>
+            <b><xsl:text>B0' (GPa): </xsl:text></b>
+            <xsl:value-of select="B0prime/value"/>
+          </li>
+          <li>
+            <b><xsl:text>V0 (Angstrom^3): </xsl:text></b>
+            <xsl:value-of select="V0/value"/>
+          </li>
+        </ul>        
+      </xsl:if>
+
 
       <xsl:if test="error">
         <p><b><xsl:text>Error: </xsl:text></b><xsl:value-of select="error"/></p>
