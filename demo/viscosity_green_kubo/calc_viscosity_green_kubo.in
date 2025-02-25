@@ -37,9 +37,11 @@ force_unit
 # Run Parameters
 temperature                     1500
 timestep                        
-runsteps                        10000
+runsteps                        
 outputsteps                     
-equilsteps                      
+equilsteps                      10000
 dragcoeff                       
 sampleinterval                  
 correlationlength               
+resetvelocities                 true
+randomseed                      1

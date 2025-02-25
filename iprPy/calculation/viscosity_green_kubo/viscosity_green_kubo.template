@@ -16,6 +16,8 @@ variable        Tdrag equal <dragcoeff>
 
 timestep        ${dt}
 
+<velocity_create>
+
 # Equilibration run
 fix             NVT all nvt temp $T $T ${Tdamp}
 run             <equilsteps>

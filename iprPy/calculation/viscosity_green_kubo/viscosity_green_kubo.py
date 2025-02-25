@@ -1,4 +1,5 @@
 from typing import Optional
+import random
 
 import atomman as am
 import atomman.lammps as lmp
@@ -24,6 +25,8 @@ def viscosity_green_kubo(lammps_command:str,
                          runsteps: int = 1000000,
                          equilsteps: int = 0,
                          dragcoeff: float = 0.2,
+                         resetvelocities: bool = False,
+                         randomseed: Optional[int] = None,
                          ) -> dict:
     """
     Calculates the diffusion constant for a liquid system using
@@ -57,7 +60,19 @@ def viscosity_green_kubo(lammps_command:str,
         LAMMPS output. Default value of 1,000.
     equilsteps : int, optional
         How many timesteps the equilibration simulation will run for. Default 
-        value of 0.    
+        value of 0.
+    dragcoeff : float, optional
+        The drag coefficient to use on the thermostat during NVT integration.
+        Default value is 0.2
+    resetvelocities : bool, optional
+        Setting this to True will assign new random velocities to the atoms
+        prior to running.  If this is used, then it would be wise to set an
+        equilsteps value to let the velocities equilibrate before running the
+        main Green-Kubo run.
+    randomseed : int or None, optional
+        Random number seed used by LAMMPS in creating velocities.  Only used
+        if resetvelocities is True.  Default is None which will select a
+        random int between 1 and 900000000.
     
     Returns
     -------
@@ -112,6 +127,15 @@ def viscosity_green_kubo(lammps_command:str,
     # Raise Error if the values don't commute
     if (runsteps % (outputsteps) != 0):
         raise ValueError('thermosteps must divide runsteps')
+    
+    # Build the set velocities command if needed
+    if resetvelocities:
+        # Set default randomseed
+        if randomseed is None: 
+            randomseed = random.randint(1, 900000000)
+        lammps_variables['velocity_create'] = f'velocity all create {temperature} {randomseed}'
+    else:
+        lammps_variables['velocity_create'] = ''
 
     # Initialize the rest of the inputs to the Lammps Scripts 
     lammps_variables['temperature'] = temperature
