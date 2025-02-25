@@ -1,0 +1,17 @@
+#LAMMPS input script for relaxing a dislocation
+
+box tilt large
+
+<atomman_system_pair_info>
+
+compute peatom all pe/atom
+
+dump first all custom <maxiter> *.dump id type x y z c_peatom
+dump_modify first format float %.13e
+thermo_style custom step pe
+
+<anneal_info>
+
+min_modify dmax <dmax>
+
+minimize <etol> <ftol> <maxiter> <maxeval>
