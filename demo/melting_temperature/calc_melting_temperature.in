@@ -1,0 +1,48 @@
+# Input script for iprPy calculation melting_temperature
+
+# Calculation Metadata
+branch                          
+
+# LAMMPS and MPI Commands
+lammps_command                  /home/lmh1/LAMMPS/2022-06-23/src/lmp_serial
+mpi_command                     #mpiexec -n 12
+
+# Interatomic Potential
+potential_file                  ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1.json
+potential_kim_id                
+potential_kim_potid             
+potential_dir                   ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1
+
+# Initial System Configuration
+load_file                       ../0-files/A1--Cu--fcc.json
+load_style                      system_model
+load_options                    
+family                          
+symbols                         Ni
+box_parameters                  3.6 3.6 3.6
+
+# System Manipulations
+a_uvw                           
+b_uvw                           
+c_uvw                           
+atomshift                       
+sizemults                       6 6 12
+
+# Input/Output Units
+length_unit                     
+pressure_unit                   
+energy_unit                     
+force_unit                      
+
+# Run Parameters
+temperature_guess               2250
+temperature_liquid              
+temperature_solid               
+pressure                        
+ptm_structures                  fcc
+meltsteps                       10000
+scalesteps                      10000
+runsteps                        100000
+thermosteps                     
+dumpsteps                       10000
+randomseed                      1
