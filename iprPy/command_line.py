@@ -13,6 +13,7 @@ from . import (load_database, load_run_directory, load_calculation,
 from .calculation import run_calculation
 from .database import reset_orphans
 from .tools import filltemplate
+from .quickcheck.QuickCheck import QuickCheck
 
 def command_line():
     """
@@ -173,6 +174,10 @@ def command_line_actions(args):
                         temp=args.temp,
                         bidtries=args.bidtries,
                         bidverbose=args.bidverbose)
+
+    elif args.action == 'quick_check':
+        input_file = args.input_file
+        qc = QuickCheck.run_from_input(input_file)
 
     # Actions for subcommand set_database
     elif args.action == 'set_database':
@@ -411,6 +416,11 @@ def command_line_parser():
                         help='number of sequential bid failures before stopping the runner')
     subparser.add_argument('-v', '--bidverbose', action='store_true',
                         help='bid action info will be printed')
+
+    # Define subparser for quick_check
+    subparser = subparsers.add_parser('quick_check',
+                        help='run a series of quick calculations based on JSON settings')
+    subparser.add_argument('input_file', help='JSON input file name')
 
     # Define subparser for list_databases
     subparser = subparsers.add_parser('list_databases',
