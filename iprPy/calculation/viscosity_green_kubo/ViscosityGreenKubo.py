@@ -252,6 +252,7 @@ class ViscosityGreenKubo(Calculation):
     
     @property
     def resetvelocities(self) -> bool:
+        """bool: Indicates if velocities are to be reset before evaluating"""
         return self.__resetvelocities
     
     @resetvelocities.setter
