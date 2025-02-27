@@ -15,6 +15,7 @@ from .. import Calculation
 from .energy_check import energy_check
 from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
                                    AtommanSystemLoad)
+from ...input import boolean
 
 class EnergyCheck(Calculation):
     """Class for managing potential energy checks of structures"""
@@ -59,7 +60,12 @@ class EnergyCheck(Calculation):
         subsets = (self.commands, self.potential, self.system, self.units)
 
         # Initialize unique calculation attributes
+        self.dumpforces = False
         self.__potential_energy = None
+        self.__potential_energy_atom = None
+        self.__pressure_xx = None
+        self.__pressure_yy = None
+        self.__pressure_zz = None
 
         # Define calc shortcut
         self.calc = energy_check
@@ -99,11 +105,70 @@ class EnergyCheck(Calculation):
         return self.__system
 
     @property
+    def dumpforces(self) -> bool:
+        """bool: Indicates if the atomic forces are to be calculated and dumped"""
+        return self.__dumpforces
+    
+    @dumpforces.setter
+    def dumpforces(self, val: bool):
+        self.__dumpforces = boolean(val)
+
+    @property
     def potential_energy(self) -> float:
-        """float: The measured potential energy per atom for the system"""
+        """float: The measured potential energy for the system"""
         if self.__potential_energy is None:
             raise ValueError('No results yet!')
         return self.__potential_energy
+    
+    @property
+    def potential_energy_atom(self) -> float:
+        """float: The measured potential energy per atom for the system"""
+        if self.__potential_energy_atom is None:
+            raise ValueError('No results yet!')
+        return self.__potential_energy_atom
+    
+    @property
+    def pressure_xx(self) -> float:
+        """float: The measured xx component of pressure for the system"""
+        if self.__pressure_xx is None:
+            raise ValueError('No results yet!')
+        return self.__pressure_xx
+    
+    @property
+    def pressure_yy(self) -> float:
+        """float: The measured yy component of pressure for the system"""
+        if self.__pressure_yy is None:
+            raise ValueError('No results yet!')
+        return self.__pressure_yy
+    
+    @property
+    def pressure_zz(self) -> float:
+        """float: The measured zz component of pressure for the system"""
+        if self.__pressure_zz is None:
+            raise ValueError('No results yet!')
+        return self.__pressure_zz
+
+    def set_values(self,
+                   name: Optional[str] = None,
+                   **kwargs: any):
+        """
+        Set calculation values directly.  Any terms not given will be set
+        or reset to the calculation's default values.
+
+        Parameters
+        ----------
+        name : str, optional
+            The name to assign to the calculation.  By default, this is set as
+            the calculation's key.
+        dumpforces : bool, optional 
+            Indicates if the atomic forces are to be calculated and dumped.
+        """
+        # Call super to set universal and subset content
+        super().set_values(name=name, **kwargs)
+
+        # Set calculation-specific values
+        if 'dumpforces' in kwargs:
+            self.dumpforces = kwargs['dumpforces']
 
 ####################### Parameter file interactions ###########################
 
@@ -133,6 +198,7 @@ class EnergyCheck(Calculation):
         # Load calculation-specific strings
 
         # Load calculation-specific booleans
+        self.dumpforces = input_dict.get('dumpforces', False)
 
         # Load calculation-specific integers
 
@@ -150,6 +216,16 @@ class EnergyCheck(Calculation):
         self.system.load_parameters(input_dict)
 
     @property
+    def templatekeys(self) -> dict:
+        """dict : The calculation-specific input keys and their descriptions."""
+
+        return {
+            'dumpforces': ' '.join([
+                "Bool flag indicating if atomic forces are to be reported in",
+                "a dump file.  Default value is False"]),
+        }
+
+    @property
     def singularkeys(self) -> list:
         """list: Calculation keys that can have single values during prepare."""
 
@@ -162,6 +238,9 @@ class EnergyCheck(Calculation):
             + self.units.keyset
 
             # Calculation-specific keys
+            + [
+                'dumpforces'
+            ]
         )
         return keys
 
@@ -204,10 +283,20 @@ class EnergyCheck(Calculation):
         # Build results
         if self.status == 'finished':
 
-            # Save the final cohesive energy
+            # Save measured phase-state info
+            calc['measured-phase-state'] = mps = DM()
+            mps['pressure-xx'] = uc.model(self.pressure_xx,
+                                          self.units.pressure_unit)
+            mps['pressure-yy'] = uc.model(self.pressure_yy,
+                                          self.units.pressure_unit)
+            mps['pressure-zz'] = uc.model(self.pressure_zz,
+                                          self.units.pressure_unit)
+
+            # Save the evaluated potential energy
             calc['potential-energy'] = uc.model(self.potential_energy,
-                                                self.units.energy_unit,
-                                                None)
+                                                self.units.energy_unit)
+            calc['potential-energy-per-atom'] = uc.model(self.potential_energy_atom,
+                                                self.units.energy_unit)
 
         self._set_model(model)
         return model
@@ -232,7 +321,13 @@ class EnergyCheck(Calculation):
 
         # Load results
         if self.status == 'finished':
+            mps = calc['measured-phase-state']
+            self.__pressure_xx = uc.value_unit(mps['pressure-xx'])
+            self.__pressure_yy = uc.value_unit(mps['pressure-yy'])
+            self.__pressure_zz = uc.value_unit(mps['pressure-zz'])
+
             self.__potential_energy = uc.value_unit(calc['potential-energy'])
+            self.__potential_energy_atom = uc.value_unit(calc['potential-energy-per-atom'])
 
 ########################## Metadata interactions ##############################
 
@@ -247,7 +342,11 @@ class EnergyCheck(Calculation):
 
         # Extract results
         if self.status == 'finished':
-            meta['E_pot'] = self.potential_energy
+            meta['E_pot_total'] = self.potential_energy
+            meta['E_pot_atom'] = self.potential_energy_atom
+            meta['pressure_xx'] = self.pressure_xx
+            meta['pressure_yy'] = self.pressure_yy
+            meta['pressure_zz'] = self.pressure_zz
 
         return meta
 
@@ -280,6 +379,9 @@ class EnergyCheck(Calculation):
         # Rename ucell to system
         input_dict['system'] = input_dict.pop('ucell')
 
+        # Add calculation-specific inputs
+        input_dict['dumpforces'] = self.dumpforces
+
         # Return input_dict
         return input_dict
 
@@ -293,4 +395,8 @@ class EnergyCheck(Calculation):
         results_dict: dict
             The dictionary returned by the calc() method.
         """
-        self.__potential_energy = results_dict['E_pot']
+        self.__potential_energy = results_dict['E_pot_total']
+        self.__potential_energy_atom = results_dict['E_pot_atom']
+        self.__pressure_xx = results_dict['P_xx']
+        self.__pressure_yy = results_dict['P_yy']
+        self.__pressure_zz = results_dict['P_zz']

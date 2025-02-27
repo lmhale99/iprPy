@@ -10,6 +10,8 @@ The energy_check calculation style provides a quick check if the energy of an at
 
 ### Version notes
 
+- 2/25/2025 : Calculation updated to include more outputs and option to create a dumpfile with atomic forces.
+
 ### Additional dependencies
 
 ### Disclaimers

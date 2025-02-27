@@ -1,4 +1,4 @@
-#LAMMPS input script that evaluates a system's energy and pressure without relaxing
+#LAMMPS input script that evaluates a system's energy, pressure and atomic forces without relaxing
 
 box tilt large
 
@@ -9,4 +9,7 @@ variable peatom equal pe/atoms
 thermo_style custom step lx ly lz pxx pyy pzz pe v_peatom
 thermo_modify format float %.13e
 
+fix nve all nve
+
+<dump_lines>
 run 0
