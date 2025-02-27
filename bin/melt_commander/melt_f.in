@@ -1,0 +1,17 @@
+# Run commands
+lammps_command                /home/lmh1/LAMMPS/2022-06-23/src/lmp_serial
+mpi_command                   
+
+# Database settings
+database                      master
+run_directory                 master_4
+
+# Element model settings
+potential_id                  2017--Bonny-G--W-Re--LAMMPS--ipr1
+composition                   Re
+family                        A1--Cu--fcc
+alat                          3.95
+
+# Method settings
+min_temperature               3300
+max_temperature               5000
