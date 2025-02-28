@@ -113,7 +113,7 @@ class DiatomScan(Calculation):
         if val is None:
             self.__symbols = []
         else:
-            val = aslist(val)
+            val = [str(v) for v in aslist(val)]
             # Replicate single symbol
             if len(val) == 1:
                 val += val

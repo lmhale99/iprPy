@@ -11,8 +11,8 @@ import numpy as np
 # https://pandas.pydata.org/
 import pandas as pd
 
-# https://docs.bokeh.org/en/latest/
-import bokeh
+# https://plotly.com/python
+import plotly.graph_objects as go
 
 # Local imports
 from ... import load_record
@@ -90,10 +90,10 @@ def evsr(self,
             comp_df = imp_df[imp_df.composition == composition].sort_values('family')
             
             # Build and save table
-            evsr_table(comp_df, outputpath, pot_id, imp_id, composition)
+            self.evsr_table(comp_df, outputpath, pot_id, imp_id, composition)
             
             # Build and save EvsR plot as html and png
-            evsr_bokeh_plot(comp_df, outputpath, pot_id, imp_id, composition)
+            self.evsr_plotly_plot(comp_df, outputpath, pot_id, imp_id, composition)
             
             # Add composition listing to PotentialProperties content
             prop.evsr.compositions.append(composition)
@@ -120,7 +120,8 @@ def evsr(self,
     print(num_updated, 'added/updated')
     print(num_skipped, 'skipped')
 
-def evsr_table(df: pd.DataFrame,
+def evsr_table(self,
+               df: pd.DataFrame,
                outputpath: Path,
                potential: str,
                implementation: str,
@@ -212,7 +213,7 @@ def get_lineformats():
     # Unary
     lineformats.append({'family':'A1--Cu--fcc',                'color':'black',   'line':'solid'})
     lineformats.append({'family':'A2--W--bcc',                 'color':'blue',    'line':'solid'})
-    lineformats.append({'family':'A3--Mg--hcp',                'color':'red',     'line':'dashed'})
+    lineformats.append({'family':'A3--Mg--hcp',                'color':'red',     'line':'dash'})
     lineformats.append({'family':'A3\'--alpha-La--double-hcp', 'color':'cyan',    'line':'dashdot'})
     lineformats.append({'family':'A4--C--dc',                  'color':'magenta', 'line':'solid'})
     lineformats.append({'family':'A5--beta-Sn',                'color':'#EAC117', 'line':'solid'})
@@ -240,13 +241,14 @@ def get_lineformats():
     
     return pd.DataFrame(lineformats)
 
-def evsr_bokeh_plot(df: pd.DataFrame,
-                    outputpath: Path,
-                    potential: str,
-                    implementation: str,
-                    composition: str):
+def evsr_plotly_plot(self,
+                     df: pd.DataFrame,
+                     outputpath: Path,
+                     potential: str,
+                     implementation: str,
+                     composition: str):
     """
-    Generates a Bokeh plot from the data
+    Generates a Plotly plot from the data
     
     Parameters
     ----------
@@ -260,30 +262,23 @@ def evsr_bokeh_plot(df: pd.DataFrame,
         Name of the potential implementation associated with the records.
     composition : str
         The elemental composition associated with the records.
-        
-    Returns
-    -------
-    p : Bokeh.plotting.figure
-        The generated plot.
     """
-    resources = bokeh.resources.Resources(mode='cdn')
-
+    contentpath = Path(outputpath, potential, implementation)
+    if not contentpath.exists():
+        contentpath.mkdir(parents=True)
+    
     lineformats = get_lineformats()
     
     # Initialize plot
-    title = f'Potential Energy vs. Interatomic Spacing for {composition} Using {implementation}'
-    p = bokeh.plotting.figure(title = title,
-                              width = 800,
-                              height = 600,
-                              x_range = [1, 6],
-                              y_range = [-10, 1],
-                              x_axis_label = 'r (Angstrom)', 
-                              y_axis_label = 'Potential Energy (eV/atom)')
+    fig = go.Figure()
+    pngfile = f'EvsR.{composition}.png'
+    htmlfile = f'EvsR.{composition}.html'
     
     # Loop over energies
     lowylim = -1
-    for i in df.index:
-        series = df.loc[i]
+    for i, index in enumerate(df.sort_values('family').index):
+        
+        series = df.loc[index]
         family = series.family
         rvalues = np.array(series.r_values)
         Evalues = np.array(series.energy_values)
@@ -291,32 +286,56 @@ def evsr_bokeh_plot(df: pd.DataFrame,
         
         lineformat = lineformats[lineformats.family==family].iloc[0]
         
-        # Adjust lowylim if needed
         if not np.all(np.isnan(Evalues)):
+            
+            # Find lowylim
             lowy = floor(np.nanmin(Evalues))
             if lowy < lowylim:
                 lowylim = lowy
         
             # Define plot line
-            l = p.line(rvalues, Evalues, legend_label=family, 
-                       line_color=lineformat.color, line_dash=lineformat.line, line_width = 2)
-            p.add_tools(bokeh.models.HoverTool(renderers=[l],
-                                               tooltips=[("prototype", family),
-                                                         ("r (Angstrom)", "$x"),
-                                                         ("E_pot (eV/atom)", "$y")]))
+            fig.add_trace(go.Scatter(x=rvalues, y=Evalues,
+                                     mode='lines',
+                                     name=family,
+                                     showlegend=True,
+                                     line=dict(
+                                         color=lineformat.color,
+                                         dash=lineformat.line)
+                                    )
+                         )
+            
     # Adjust lower y limit
-    if lowylim > -10:
-        p.y_range = bokeh.models.Range1d(lowylim, 1)
+    if lowylim < -10:
+        lowylim = -10
+        
+    # Edit the layout
+    fig.update_layout(
+        title=dict(
+            text=f'Potential Energy vs. Interatomic Spacing for {composition} Using {implementation}',
+            font=dict(size=12),
+        ),
+        xaxis=dict(
+            title=dict(
+                text='r (Angstrom)'
+            )
+        ),
+        yaxis=dict(
+            title=dict(
+                text='Potential Energy (eV/atom)'
+            )
+        ),
+        paper_bgcolor='white',
+        plot_bgcolor='white',
+    )
+    fig.update_xaxes(
+        range=[1, 6],
+        **self.plotly_axes_settings
+    )
+    fig.update_yaxes(
+        range=[lowylim, 1],
+        **self.plotly_axes_settings
+    )
     
-    # Set legend location
-    p.legend.location = "bottom_right"
-    
-    htmlpath = Path(outputpath, potential, implementation,
-                     f'EvsR.{composition}.html')
-    bokeh.io.save(p, htmlpath, resources=resources, 
-                  title='Interatomic Potentials Repository Project')
-
-    pngpath = Path(outputpath, potential, implementation,
-                     f'EvsR.{composition}.png')
-    bokeh.io.export_png(p, filename=pngpath)
-    bokeh.io.reset_output()
+    fig.write_image(Path(contentpath, pngfile), width=1200, height=600) 
+    fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
+    fig.data = []
