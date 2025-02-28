@@ -19,14 +19,17 @@ class PropertyProcessor():
 
     # Class imports
     from ._empty import empty
-    from ._diatom import diatom
-    from ._evsr import evsr
+    from ._diatom import diatom, diatom_table, diatom_plotly_plot, diatom_plotly_short_plot
+    from ._evsr import evsr, evsr_table, evsr_plotly_plot
     from ._crystal import crystal
     from ._elastic import elastic
     from ._surface import surface
     from ._stacking import stacking
     from ._point import point
-    from ._phonon import phonon
+    from ._phonon import (phonon, phonon_extract_plots, phonon_thermo_plots,
+                          phonon_bulk_plot, phonon_cp_num_plot, phonon_cp_poly_plot,
+                          phonon_cv_plot, phonon_entropy_plot, phonon_expansion_plot,
+                          phonon_gibbs_plot, phonon_volume_plot)
 
     def __init__(self,
                  database: Union[IprPyDatabase, str],
@@ -224,6 +227,39 @@ class PropertyProcessor():
             imp_df = records_df[(records_df.potential_key == potential_key) &
                                 (records_df.potential_LAMMPS_key == potential_LAMMPS_key)]
             yield imp_df, potential_id, potential_key, potential_LAMMPS_id, potential_LAMMPS_key
+
+    @property
+    def plotly_axes_settings(self) -> dict:
+        """
+        The default settings to use with plotly update_xaxis, update_yaxis methods.
+        """
+        return dict(
+                ticks='outside',
+                showline=True,
+                linecolor='black',
+                gridcolor='lightgrey',
+                minor=dict(
+                    tickcolor='black',
+                    ticks='outside'
+                ),
+                zeroline=True,
+                zerolinecolor='lightgrey'
+            )
+    
+    @property
+    def plotly_line_formats(self):
+        """
+        The default settings to use for line colors and dash types.
+        """
+        lineformats = []
+        colors = ['black', 'blue', 'red', 'cyan', 'magenta', '#EAC117', 'orange', 'gray', 'green', 'brown']
+        lines = 10 * ['solid', 'dash', 'dot', 'dashdot'] 
+        
+        for line in lines:
+            for color in colors:
+                lineformats.append({'color':color, 'line':line})
+        
+        return pd.DataFrame(lineformats)
 
 
     def identify_prototypes(self,
