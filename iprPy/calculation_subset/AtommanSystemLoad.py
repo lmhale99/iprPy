@@ -541,8 +541,15 @@ class AtommanSystemLoad(CalculationSubset):
         else:
             raise ValueError('neither load file nor embedded content found for the initial system')
 
-        d['symbols'] = sub['symbol']
+        # Load symbols and composition
+        d['symbols'] = aslist(sub['symbol'])
         d['composition'] = sub.get('composition', None)
+
+        # Manually convert symbols and composition to str values
+        for i in range(len(d['symbols'])):
+            d['symbols'][i] = str(d['symbols'][i])
+        if d['composition'] is not None:
+            d['composition'] = str(d['composition'])
 
         if load_options is not None:
             d['load_options'] = {}
