@@ -1,6 +1,7 @@
 # coding: utf-8
 
 # Python script created by Lucas Hale
+from dataclasses import asdict
 
 # http://www.numpy.org/
 import numpy as np
@@ -70,7 +71,7 @@ def crystal_space_group(system: am.System,
           together.
     """
     # Identify the standardized unit cell representation
-    sym_data = spglib.get_symmetry_dataset(system.dump('spglib_cell'), symprec=symprec)
+    sym_data = spg_asdict(spglib.get_symmetry_dataset(system.dump('spglib_cell'), symprec=symprec))
     ucell = spglib.standardize_cell(system.dump('spglib_cell'),
                                     to_primitive=to_primitive,
                                     no_idealize=no_idealize, symprec=symprec)
@@ -96,8 +97,8 @@ def crystal_space_group(system: am.System,
             ucell.atoms.view[key][sym_data['std_mapping_to_primitive'] == index] = value
     
     # Get space group metadata
-    sym_data = spglib.get_symmetry_dataset(ucell.dump('spglib_cell'))
-    spg_type = spglib.get_spacegroup_type(sym_data['hall_number'])
+    sym_data = spg_asdict(spglib.get_symmetry_dataset(ucell.dump('spglib_cell')))
+    spg_type = spg_asdict(spglib.get_spacegroup_type(sym_data['hall_number']))
     
     # Generate Pearson symbol
     if spg_type['number'] <= 2:
@@ -144,3 +145,10 @@ def crystal_space_group(system: am.System,
     results_dict['wyckoff_fingerprint'] = fingerprint
     
     return results_dict
+
+def spg_asdict(obj):
+    """Fix for spglib as new versions return objects rather than dicts"""
+    if isinstance(obj, dict):
+        return obj
+    else:
+        return asdict(obj)
