@@ -739,7 +739,7 @@ def phonon_cv_plot(self, df, composition, contentpath, data, uc_unit='J/mol', pl
             
     fig.data = []
     
-def phonon_volume_plot(self, df, composition, contentpath, data, uc_unit='angstrom^3', plot_unit='$\AA^3$/atom'):
+def phonon_volume_plot(self, df, composition, contentpath, data, uc_unit='angstrom^3', plot_unit='$\\AA^3$/atom'):
     
     # Initialize plot and table
     fig = go.Figure()
