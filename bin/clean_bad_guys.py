@@ -45,7 +45,6 @@ def clean_bad_guys(database, run_directory, message):
         #    else:
         removecalc(calc_directory)
 
-
 def removecalc(calc_directory):
     """
     Removes the specified calculation from the run directory leaving .bid files
@@ -56,7 +55,6 @@ def removecalc(calc_directory):
     calc_directory : path-like object
         The calculation directory to delete.
     """
-
     # Loop over all files and directories in calc_directory
     for path in calc_directory.iterdir():
 
@@ -94,15 +92,16 @@ def removecalc(calc_directory):
 
 if __name__ == '__main__':
     database = iprPy.load_database('iprhub')
-    run_directory = iprPy.load_run_directory('iprhub_1')
+    run_directory = iprPy.load_run_directory('iprhub_38')
 
     # Known runtime errors
-    #message = 'failed to finish in a reasonable time'
+    message = 'failed to finish in a reasonable time'
     #message = 'memory issue with neighborlist'
     #message = 'calculation always crashes before finishing'
+    #message = 'bad elastic constants'
 
     # relax_liquid:melt errors
-    message = 'duplicate phase'
+    #message = 'duplicate phase'
     #message = 'no liquid phase found at any temperature'
     #message = 'melt temperature too high: evaporated'
     #message = 'melt temperature too low: remained solid'
