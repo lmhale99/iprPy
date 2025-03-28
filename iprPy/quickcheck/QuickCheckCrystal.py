@@ -267,8 +267,8 @@ class QuickCheckCrystal():
             except Exception as error:
                 print(f'elastic constants failed for {self.name}!')
                 print(f'{type(error).__name__}: {error}')
-            else:
-                self.results['elastic_constants_static'].append(results)
+                results = None
+            self.results['elastic_constants_static'].append(results)
             calc.clean_files()
             
     def run_phonon(self,
@@ -502,29 +502,17 @@ class QuickCheckCrystal():
 
         data = []
         for i in range(len(self.results['relax_static'])):
-            cij = self.results['elastic_constants_static'][i]['C'].normalized_as(crystal_system).Cij
+            cij_results = self.results['elastic_constants_static'][i]
             d = {}
-            d['C11'] = uc.get_in_units(cij[0,0], pressure_unit)
-            d['C12'] = uc.get_in_units(cij[0,1], pressure_unit)
-            d['C13'] = uc.get_in_units(cij[0,2], pressure_unit)
-            d['C14'] = uc.get_in_units(cij[0,3], pressure_unit)
-            d['C15'] = uc.get_in_units(cij[0,4], pressure_unit)
-            d['C16'] = uc.get_in_units(cij[0,5], pressure_unit)
-            d['C22'] = uc.get_in_units(cij[1,1], pressure_unit)
-            d['C23'] = uc.get_in_units(cij[1,2], pressure_unit)
-            d['C24'] = uc.get_in_units(cij[1,3], pressure_unit)
-            d['C25'] = uc.get_in_units(cij[1,4], pressure_unit)
-            d['C26'] = uc.get_in_units(cij[1,5], pressure_unit)
-            d['C33'] = uc.get_in_units(cij[2,2], pressure_unit)
-            d['C34'] = uc.get_in_units(cij[2,3], pressure_unit)
-            d['C35'] = uc.get_in_units(cij[2,4], pressure_unit)
-            d['C36'] = uc.get_in_units(cij[2,5], pressure_unit)
-            d['C44'] = uc.get_in_units(cij[3,3], pressure_unit)
-            d['C45'] = uc.get_in_units(cij[3,4], pressure_unit)
-            d['C46'] = uc.get_in_units(cij[3,5], pressure_unit)
-            d['C55'] = uc.get_in_units(cij[4,4], pressure_unit)
-            d['C56'] = uc.get_in_units(cij[4,5], pressure_unit)
-            d['C66'] = uc.get_in_units(cij[5,5], pressure_unit)
+            if cij_results is None:
+                for i in range(6):
+                    for j in range(i, 6):
+                        d[f'C{i+1}{j+1}'] = np.nan
+            else:
+                cij = cij_results['C'].normalized_as(crystal_system).Cij
+                for i in range(6):
+                    for j in range(i, 6):
+                        d[f'C{i+1}{j+1}'] = uc.get_in_units(cij[i,j], pressure_unit)
             data.append(d)
         data = pd.DataFrame(data)
         if len(data) == 0:

@@ -277,7 +277,7 @@ def disl_relax(lammps_command: str,
         which will skip the dynamic relaxation.
     annealsteps : int, optional
         The number of time steps to run the dynamic relaxation for.  Default
-        is None, which will run for 10000 steps if annealtemp is not 0.0.        
+        is None, which will run for 10000 steps if annealtemp is not 0.0.
     randomseed : int or None, optional
         Random number seed used by LAMMPS in creating velocities and with
         the Langevin thermostat.  Default is None which will select a
@@ -324,6 +324,7 @@ def disl_relax(lammps_command: str,
     lammps_variables['atomman_system_pair_info'] = system_info
     lammps_variables['anneal_info'] = anneal_info(annealtemp, annealsteps, 
                                                   randomseed, potential.units)
+    lammps_variables['dumpsteps'] = maxiter + annealsteps
     lammps_variables['etol'] = etol
     lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])
     lammps_variables['maxiter'] = maxiter

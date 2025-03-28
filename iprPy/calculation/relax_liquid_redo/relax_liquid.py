@@ -176,7 +176,7 @@ def relax_liquid(lammps_command: str,
     # Phase settings
     lammps_variables['temperature'] = temperature
     lammps_variables['temperature_melt'] = temperature_melt
-    lammps_variables['pressure'] = pressure
+    lammps_variables['pressure'] = uc.get_in_units(pressure, lammps_units['pressure'])
 
     # Set timestep dependent parameters
     timestep = lmp.style.timestep(potential.units)

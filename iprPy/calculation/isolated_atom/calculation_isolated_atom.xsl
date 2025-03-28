@@ -10,11 +10,14 @@
         .isolatedtable {border: 1px solid black; border-collapse: collapse;}
       </style>
       
-      <h1>Isolated atom calculation results</h1>
+      <xsl:variable name="calckey" select="key"/>
+
+      <h2>Isolated atom calculation results</h2>
 
       <ul>
         <li><b><xsl:text>UUID4: </xsl:text></b><xsl:value-of select="key"/></li>
         <li><b><xsl:text>Calculation: </xsl:text></b><a href="https://www.ctcms.nist.gov/potentials/iprPy/notebook/isolated_atom.html">isolated_atom</a></li>
+        <li><b><xsl:text>Branch: </xsl:text></b><xsl:value-of select="calculation/branch"/></li>
         <li><b><xsl:text>Potential: </xsl:text></b>
           <xsl:choose>
             <xsl:when test="potential-LAMMPS/potential/URL">
@@ -38,6 +41,7 @@
       </ul>
       
       <xsl:if test="isolated-atom-energy">
+      <h3>Isolated atom energies:</h3>
         <table class="isolatedtable">
           <tr class="isolatedtable">
             <th class="isolatedtable"><b>Symbol</b></th>

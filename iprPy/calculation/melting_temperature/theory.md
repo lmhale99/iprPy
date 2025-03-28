@@ -1,0 +1,11 @@
+## Method and Theory
+
+First, an initial system is constructed by creating a supercell of a solid crystal phase.  The structure should be roughly the same dimensions along the a- and b-axes, and roughly twice that along the c-axis.  Two regions, a top and bottom, are defined such that they both encompass half of the system divided along the middle of the z-axis.
+
+The system is iterated using an nph barostat for the target pressure, plus Berendsen thermostats set at the initial liquid temperature (T_liquid) value for the top region and set at the initial solid temperature (T_solid) value for the bottom region.  The aim of this simulation stage is to melt the crystal in the top region while keeping the crystal in the bottom region from transforming.  After an initial melt period, the thermostats are updated to gradually migrate the temperatures of the two regions towards the guess temperature (T_guess).  Finally, the thermostats are removed and the system is allowed to continue relaxing with only the barostat.
+
+The default behavior of the calculation sets T_liquid = 1.25 T_guess, and T_solid = 0.5 T_guess thereby reducing the number of required input temperature values to one.  This seems to be a good choice for most cases, but you can freely define all three temperatures separately if you wish.
+
+The resulting melting temperature is estimated as the mean of the temperature for the second half of the final nph run.  If reference crystal structures were specified for use with the polyhedral template matching method then the fraction of solid elements is estimated for each dump file generated in the second half of the final nph run.
+
+__NOTE__: The nature of this calculation is best suited as a unit of work to be integrated into an iterative workflow that tries different guess temperatures until the simulation results in solid fractions within some target range around 0.50.  Good melting temperature estimates can be estimated by averaging the measured melting temperature for multiple runs of this calculation that all result in acceptable solid fractions.  See the bin/melt_commander directory for one such implementation.

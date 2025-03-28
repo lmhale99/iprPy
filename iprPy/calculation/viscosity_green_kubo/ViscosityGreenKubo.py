@@ -22,10 +22,10 @@ from .. import Calculation
 from .viscosity_green_kubo import viscosity_green_kubo
 from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
                                    AtommanSystemLoad, AtommanSystemManipulate)
-from ...input import value
+from ...input import value, boolean
 
 class ViscosityGreenKubo(Calculation):
-    """Class for managing dynamic relaxations"""
+    """Class for managing liquid viscosity calculations using the Green-Kubo method."""
 
 ############################# Core properties #################################
 
@@ -75,6 +75,8 @@ class ViscosityGreenKubo(Calculation):
         self.correlationlength = 200
         self.dragcoeff = 0.2
         self.equilsteps = 0
+        self.resetvelocities = False
+        self.randomseed = None
 
 ########################################################
 
@@ -231,6 +233,32 @@ class ViscosityGreenKubo(Calculation):
     def dragcoeff(self, val: float):
         self.__dragcoeff = float(val)
 
+    @property
+    def randomseed(self) -> int:
+        """int: Random number generator seed"""
+        if not self.resetvelocities:
+            return 900000000
+        else:
+            return self.__randomseed
+
+    @randomseed.setter
+    def randomseed(self, val: int):
+        if val is None:
+            val = random.randint(1, 900000000)
+        else:
+            val = int(val)
+            assert val > 0 and val <= 900000000
+        self.__randomseed = val
+    
+    @property
+    def resetvelocities(self) -> bool:
+        """bool: Indicates if velocities are to be reset before evaluating"""
+        return self.__resetvelocities
+    
+    @resetvelocities.setter
+    def resetvelocities(self, val: bool):
+        self.__resetvelocities = boolean(val)
+
 ###################################################################################################################
     ################# Calculated results #########################
 
@@ -361,7 +389,10 @@ class ViscosityGreenKubo(Calculation):
             self.sampleinterval = kwargs['sampleinterval']
         if 'correlationlength' in kwargs:
             self.correlationlength = kwargs['correlationlength']
-    
+        if 'resetvelocities' in kwargs:
+            self.resetvelocities = kwargs['resetvelocities']
+        if 'randomseed' in kwargs:
+            self.randomseed = kwargs['randomseed']
 
 ####################### Parameter file interactions ###########################
 
@@ -391,14 +422,17 @@ class ViscosityGreenKubo(Calculation):
         # Load calculation-specific strings
     
         # Load calculation-specific booleans
+        self.resetvelocities = input_dict.get('resetvelocities', False)
     
-        # Load calculation-specific its
+        # Load calculation-specific integers
         self.runsteps = int(input_dict.get('runsteps', 1000000))
+        self.equilsteps = int(input_dict.get('equilsteps', 0))
         self.outputsteps = int(input_dict.get('outputsteps', 2000))
         self.eq_thermosteps = int(input_dict.get('eq_termosteps', 0))
         self.eq_runsteps = int(input_dict.get('eq_runsteps', 0))
         self.sampleinterval = int(input_dict.get('sampleinterval', 5))
         self.correlationlength = int(input_dict.get('correlationlength', 200))
+        self.randomseed = input_dict.get('randomseed', None)
 
         # Load calculation-specific unitless floats
         self.temperature = float(input_dict['temperature'])
@@ -511,7 +545,14 @@ class ViscosityGreenKubo(Calculation):
             'correlationlength':' '.join([
                 "The number of averaged intervals for one calculation window.",
                 "This time the sample interval must be a divisor of outputsteps.",
-                "Default value is 200."])
+                "Default value is 200."]),
+            'resetvelocities': ' '.join([
+                "Setting this to True will reset the atomic velocities prior to",
+                "running.  If used, equilsteps should also be set to allow for the",
+                "velocities to equilibrate prior to the main Green-Kubo run."]),
+            'randomseed': ' '.join([
+                "An int random number seed to use for generating initial velocities.",
+                "A random int will be selected if not given."]),
         }
 
     @property
@@ -560,6 +601,10 @@ class ViscosityGreenKubo(Calculation):
                     'equilsteps',
                     'sampleinterval',
                     'correlationlength'
+                ],
+                [
+                    'resetvelocities',
+                    'randomseed'
                 ]
             ]
         )
@@ -568,8 +613,6 @@ class ViscosityGreenKubo(Calculation):
 
 ########################### Data model interactions ###########################
 
-#Don't know what to do with the data model interactions 
-#This stuff makes the json file
     @property
     def modelroot(self) -> str:
         """str: The root element of the content"""
@@ -603,6 +646,9 @@ class ViscosityGreenKubo(Calculation):
         run_params['equilsteps'] = self.equilsteps
         run_params['sampleinterval'] = self.sampleinterval
         run_params['correlationlength'] = self.correlationlength
+        if self.resetvelocities:
+            run_params['resetvelocities'] = self.resetvelocities
+            run_params['randomseed'] = self.randomseed
 
         # Save phase-state info
         calc['phase-state'] = DM()
@@ -652,6 +698,8 @@ class ViscosityGreenKubo(Calculation):
         self.dragcoeff = run_params['dragcoeff']
         self.sampleinterval = run_params['sampleinterval']
         self.correlationlength = run_params['correlationlength']
+        self.resetvelocities = run_params.get('resetvelocities', False)
+        self.randomseed = run_params.get('randomseed', 900000000)
 
         # Load phase-state info
         self.temperature = uc.value_unit(calc['phase-state']['temperature'])
@@ -695,6 +743,8 @@ class ViscosityGreenKubo(Calculation):
 
         # Extract calculation-specific content
         meta['temperature'] = self.temperature
+        meta['resetvelocities'] = self.resetvelocities
+        meta['randomseed'] = self.randomseed
 
         # Extract results
         if self.status == 'finished':
@@ -725,6 +775,9 @@ class ViscosityGreenKubo(Calculation):
 
             'potential_LAMMPS_key',
             'potential_key',
+
+            'resetvelocities',
+            'randomseed',
         ]
 
     @property
@@ -759,6 +812,8 @@ class ViscosityGreenKubo(Calculation):
         input_dict['equilsteps'] = self.equilsteps
         input_dict['sampleinterval'] = self.sampleinterval
         input_dict['correlationlength'] = self.correlationlength
+        input_dict['resetvelocities'] = self.resetvelocities
+        input_dict['randomseed'] = self.randomseed
 
         # Return input_dict
         return input_dict

@@ -566,9 +566,9 @@ class GrainBoundary(CalculationSubset):
             for key in ('grainboundary_auvw1',
                         'grainboundary_buvw1',
                         'grainboundary_cuvw1',
-                        'grainboundary_auvw1',
-                        'grainboundary_buvw1',
-                        'grainboundary_cuvw1',
+                        'grainboundary_auvw2',
+                        'grainboundary_buvw2',
+                        'grainboundary_cuvw2',
                         'grainboundary_cellsetting',
                         'grainboundary_cutboxvector'):
                 if keymap[key] in input_dict:

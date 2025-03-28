@@ -74,6 +74,7 @@ def phonon(self,
     num_updated = 0
     num_skipped = 0
     for i, prop in enumerate(props):
+
         pot_id = prop.potential_id
         pot_key = prop.potential_key
         imp_id = prop.potential_LAMMPS_id
@@ -123,7 +124,8 @@ def phonon(self,
                 qhas.append(np.nan)
 
             # Extract plots from tar files
-            extract_plots(database, record, record_series, contentpath, phononplot)
+            self.phonon_extract_plots(database, record, record_series, contentpath, phononplot)
+            record.clear_tar()
 
         # Add qha objects to the data frame
         records_df['qha'] = qhas
@@ -133,7 +135,7 @@ def phonon(self,
         for composition in np.unique(records_df.composition):
             comp_records_df = records_df[records_df.composition == composition]
 
-            thermo_plots(comp_records_df, composition, contentpath, thermoplot)
+            self.phonon_thermo_plots(comp_records_df, composition, contentpath, thermoplot)
         
         # Build info tables for the extracted/generated plots
         prop.phonons.phononplot = pd.DataFrame(phononplot)
@@ -160,12 +162,12 @@ def phonon(self,
     print(num_skipped, 'skipped')
 
 
-def extract_plots(database, record, series, contentpath, data):
+def phonon_extract_plots(self, database, record, series, contentpath, data):
     """
     Fetch a phonon record's tar file and extract the figures contained in it.
     """
     # Get the record's tar to extract contained plot figures 
-    tar = database.get_tar(record=record)
+    tar = record.tar
     tarnames = tar.getnames()
     
     # Set root name for extracted files
@@ -252,22 +254,22 @@ def extract_plots(database, record, series, contentpath, data):
         dat['png'] = fname
         data.append(dat)
 
-    tar.close()
+    #tar.close()
 
-def thermo_plots(df, composition, contentpath, data):
+def phonon_thermo_plots(self, df, composition, contentpath, data):
     """
     Function to call all other plot generation functions for thermo data.
     """
-    gibbs_plot(df, composition, contentpath, data, uc_unit='eV', plot_unit='eV/atom')
-    entropy_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/mol')
-    cp_poly_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/mol')
-    cp_num_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/mol')
-    cv_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/mol')
-    volume_plot(df, composition, contentpath, data, uc_unit='angstrom^3', plot_unit='&#197;^3/atom')
-    expansion_plot(df, composition, contentpath, data)
-    bulk_plot(df, composition, contentpath, data, uc_unit='GPa', plot_unit='GPa')
+    self.phonon_gibbs_plot(df, composition, contentpath, data, uc_unit='eV', plot_unit='eV/atom')
+    self.phonon_entropy_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/mol')
+    self.phonon_cp_poly_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/mol')
+    self.phonon_cp_num_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/mol')
+    self.phonon_cv_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/mol')
+    self.phonon_volume_plot(df, composition, contentpath, data, uc_unit='angstrom^3', plot_unit='&#197;^3/atom')
+    self.phonon_expansion_plot(df, composition, contentpath, data)
+    self.phonon_bulk_plot(df, composition, contentpath, data, uc_unit='GPa', plot_unit='GPa')
     
-def gibbs_plot(df, composition, contentpath, data, uc_unit='eV', plot_unit='eV/atom'):
+def phonon_gibbs_plot(self, df, composition, contentpath, data, uc_unit='eV', plot_unit='eV/atom'):
     
     # Initialize plot and table
     fig = go.Figure()
@@ -275,6 +277,8 @@ def gibbs_plot(df, composition, contentpath, data, uc_unit='eV', plot_unit='eV/a
     csvfile = f'phonon.{composition}.G.csv'
     htmlfile = f'phonon.{composition}.G.html'
     csv_df = {}
+    
+    lineformats = self.plotly_line_formats
     
     sorted_df = df.sort_values('potential_energy')
     min_series =  None
@@ -294,18 +298,23 @@ def gibbs_plot(df, composition, contentpath, data, uc_unit='eV', plot_unit='eV/a
     
     # Loop over results
     count = 0
-    for index in df.sort_values(['prototype', 'a']).index:
+    for i, index in enumerate(df.sort_values(['prototype', 'a']).index):
         series = df.loc[index]
         qha = series.qha
         if pd.isna(qha):
             continue 
         label = f'{series.prototype} a={series.a:.4f}'
-    
+        lineformat = lineformats.iloc[i]
+
         try:
             G = uc.get_in_units(qha.G, uc_unit)
             fig.add_trace(go.Scatter(x=qha.T, y=G - ref_G,
-                          mode='lines+markers',
-                          name=series.prototype))
+                                     mode='lines',
+                                     name=series.prototype,
+                                     showlegend=True,
+                                     line=dict(
+                                         color=lineformat.color,
+                                         dash=lineformat.line)))
             
             csv_df[label] = G
             count += 1
@@ -314,15 +323,34 @@ def gibbs_plot(df, composition, contentpath, data, uc_unit='eV', plot_unit='eV/a
         
     if count > 0:
         
-        # Save png figure
         fig.update_layout(
-            title="Phonon/QHA Predictions",
-            xaxis_title="Temperature (K)",
-            yaxis_title=f"&#916;Gibbs ({plot_unit})",
-            )
+            title=dict(
+                text="Phonon/QHA Predictions",
+                font=dict(size=14),
+            ),
+            xaxis=dict(
+                title=dict(
+                    text="Temperature (K)"
+                )
+            ),
+            yaxis=dict(
+                title=dict(
+                    text=f"&#916;Gibbs ({plot_unit})"
+                )
+            ),
+            paper_bgcolor='white',
+            plot_bgcolor='white',
+        )
+        fig.update_xaxes(
+            range=[0, 1000],
+            **self.plotly_axes_settings
+        )
+        fig.update_yaxes(
+            **self.plotly_axes_settings
+        )
 
-        fig.write_image(Path(contentpath, pngfile), width=1000, height=600,) 
-        fig.write_html(Path(contentpath, htmlfile))
+        fig.write_image(Path(contentpath, pngfile), width=1200, height=600,) 
+        fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
         
         # Save csv table
         csv_df = pd.DataFrame(csv_df)
@@ -339,7 +367,7 @@ def gibbs_plot(df, composition, contentpath, data, uc_unit='eV', plot_unit='eV/a
             
     fig.data = []
 
-def entropy_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/mol'):
+def phonon_entropy_plot(self, df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/mol'):
     
     # Initialize plot and table
     fig = go.Figure()
@@ -347,6 +375,8 @@ def entropy_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit=
     csvfile = f'phonon.{composition}.S.csv'
     htmlfile = f'phonon.{composition}.S.html'
     csv_df = {}
+
+    lineformats = self.plotly_line_formats
 
     for index in df.index:
         series = df.loc[index]
@@ -361,18 +391,23 @@ def entropy_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit=
     
     # Loop over results
     count = 0
-    for index in df.sort_values(['prototype', 'a']).index:
+    for i, index in enumerate(df.sort_values(['prototype', 'a']).index):
         series = df.loc[index]
         qha = series.qha
         if pd.isna(qha):
             continue 
         label = f'{series.prototype} a={series.a:.4f}'
+        lineformat = lineformats.iloc[i]
         
         try:
             S = uc.get_in_units(qha.S, uc_unit)
             fig.add_trace(go.Scatter(x=qha.T, y=S,
-                          mode='lines+markers',
-                          name=series.prototype))
+                                     mode='lines',
+                                     name=series.prototype,
+                                     showlegend=True,
+                                     line=dict(
+                                         color=lineformat.color,
+                                         dash=lineformat.line)))
             
             csv_df[label] = S            
             count += 1
@@ -381,14 +416,35 @@ def entropy_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit=
         
     # Save plot and csv if results exist
     if count > 0:
-        # Save png figure
+      
         fig.update_layout(
-            title="Phonon/QHA Predictions",
-            xaxis_title="Temperature (K)",
-            yaxis_title=f"Entropy ({plot_unit})",
-            )
-        fig.write_image(Path(contentpath, pngfile), width=1000, height=600,) 
-        fig.write_html(Path(contentpath, htmlfile))
+            title=dict(
+                text="Phonon/QHA Predictions",
+                font=dict(size=14),
+            ),
+            xaxis=dict(
+                title=dict(
+                    text="Temperature (K)"
+                )
+            ),
+            yaxis=dict(
+                title=dict(
+                    text=f"Entropy ({plot_unit})"
+                )
+            ),
+            paper_bgcolor='white',
+            plot_bgcolor='white',
+        )
+        fig.update_xaxes(
+            range=[0, 1000],
+            **self.plotly_axes_settings
+        )
+        fig.update_yaxes(
+            rangemode="nonnegative",
+            **self.plotly_axes_settings
+        )
+        fig.write_image(Path(contentpath, pngfile), width=1200, height=600,) 
+        fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
         
         csv_df = pd.DataFrame(csv_df)
         csv_df.to_csv(Path(contentpath, csvfile))
@@ -404,7 +460,7 @@ def entropy_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit=
             
     fig.data = []
     
-def cp_poly_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/mol'):
+def phonon_cp_poly_plot(self, df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/mol'):
     
     # Initialize plot and table
     fig = go.Figure()
@@ -412,6 +468,8 @@ def cp_poly_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit=
     csvfile = f'phonon.{composition}.Cp-poly.csv'
     htmlfile = f'phonon.{composition}.Cp-poly.html'
     csv_df = {}
+
+    lineformats = self.plotly_line_formats
     
     for index in df.index:
         series = df.loc[index]
@@ -426,18 +484,23 @@ def cp_poly_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit=
     
     # Loop over results
     count = 0
-    for index in df.sort_values(['prototype', 'a']).index:
+    for i, index in enumerate(df.sort_values(['prototype', 'a']).index):
         series = df.loc[index]
         qha = series.qha
         if pd.isna(qha):
             continue 
         label = f'{series.prototype} a={series.a:.4f}'
+        lineformat = lineformats.iloc[i]
         
         try:
             Cp = uc.get_in_units(qha.Cp_poly, uc_unit)
             fig.add_trace(go.Scatter(x=qha.T, y=Cp,
-                          mode='lines+markers',
-                          name=series.prototype))
+                                     mode='lines',
+                                     name=series.prototype,
+                                     showlegend=True,
+                                     line=dict(
+                                         color=lineformat.color,
+                                         dash=lineformat.line)))
             
             csv_df[label] = Cp            
             count += 1
@@ -446,14 +509,35 @@ def cp_poly_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit=
         
     # Save plot and csv if results exist
     if count > 0:
-        # Save png figure
+
         fig.update_layout(
-            title="Phonon/QHA Predictions",
-            xaxis_title="Temperature (K)",
-            yaxis_title=f"Cp polyfit ({plot_unit})",
-            )
-        fig.write_image(Path(contentpath, pngfile), width=1000, height=600,) 
-        fig.write_html(Path(contentpath, htmlfile))
+            title=dict(
+                text="Phonon/QHA Predictions",
+                font=dict(size=14),
+            ),
+            xaxis=dict(
+                title=dict(
+                    text="Temperature (K)"
+                )
+            ),
+            yaxis=dict(
+                title=dict(
+                    text=f"Cp polyfit ({plot_unit})",
+                )
+            ),
+            paper_bgcolor='white',
+            plot_bgcolor='white',
+        )
+        fig.update_xaxes(
+            range=[0, 1000],
+            **self.plotly_axes_settings
+        )
+        fig.update_yaxes(
+            rangemode="nonnegative",
+            **self.plotly_axes_settings
+        )
+        fig.write_image(Path(contentpath, pngfile), width=1200, height=600,) 
+        fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
         
         csv_df = pd.DataFrame(csv_df)
         csv_df.to_csv(Path(contentpath, csvfile))
@@ -469,7 +553,7 @@ def cp_poly_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit=
             
     fig.data = []
     
-def cp_num_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/mol'):
+def phonon_cp_num_plot(self, df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/mol'):
     
     # Initialize plot and table
     fig = go.Figure()
@@ -477,6 +561,8 @@ def cp_num_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='
     csvfile = f'phonon.{composition}.Cp-num.csv'
     htmlfile = f'phonon.{composition}.Cp-num.html'
     csv_df = {}
+
+    lineformats = self.plotly_line_formats
     
     for index in df.index:
         series = df.loc[index]
@@ -491,18 +577,23 @@ def cp_num_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='
     
     # Loop over results
     count = 0
-    for index in df.sort_values(['prototype', 'a']).index:
+    for i, index in enumerate(df.sort_values(['prototype', 'a']).index):
         series = df.loc[index]
         qha = series.qha
         if pd.isna(qha):
             continue 
         label = f'{series.prototype} a={series.a:.4f}'
+        lineformat = lineformats.iloc[i]
         
         try:
             Cp = uc.get_in_units(qha.Cp_num, uc_unit)
             fig.add_trace(go.Scatter(x=qha.T, y=Cp,
-                          mode='lines+markers',
-                          name=series.prototype))
+                                     mode='lines',
+                                     name=series.prototype,
+                                     showlegend=True,
+                                     line=dict(
+                                         color=lineformat.color,
+                                         dash=lineformat.line)))
             
             csv_df[label] = Cp            
             count += 1
@@ -511,14 +602,35 @@ def cp_num_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='
         
     # Save plot and csv if results exist
     if count > 0:
-        # Save png figure
+
         fig.update_layout(
-            title="Phonon/QHA Predictions",
-            xaxis_title="Temperature (K)",
-            yaxis_title=f"Cp numerical ({plot_unit})",
-            )
-        fig.write_image(Path(contentpath, pngfile), width=1000, height=600,) 
-        fig.write_html(Path(contentpath, htmlfile))
+            title=dict(
+                text="Phonon/QHA Predictions",
+                font=dict(size=14),
+            ),
+            xaxis=dict(
+                title=dict(
+                    text="Temperature (K)"
+                )
+            ),
+            yaxis=dict(
+                title=dict(
+                    text=f"Cp numerical ({plot_unit})",
+                )
+            ),
+            paper_bgcolor='white',
+            plot_bgcolor='white',
+        )
+        fig.update_xaxes(
+            range=[0, 1000],
+            **self.plotly_axes_settings
+        )
+        fig.update_yaxes(
+            rangemode="nonnegative",
+            **self.plotly_axes_settings
+        )
+        fig.write_image(Path(contentpath, pngfile), width=1200, height=600,) 
+        fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
         
         csv_df = pd.DataFrame(csv_df)
         csv_df.to_csv(Path(contentpath, csvfile))
@@ -534,7 +646,7 @@ def cp_num_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='
             
     fig.data = []
     
-def cv_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/mol'):
+def phonon_cv_plot(self, df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/mol'):
     
     # Initialize plot and table
     fig = go.Figure()
@@ -542,6 +654,8 @@ def cv_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/
     csvfile = f'phonon.{composition}.Cv.csv'
     htmlfile = f'phonon.{composition}.Cv.html'
     csv_df = {}
+
+    lineformats = self.plotly_line_formats
     
     for index in df.index:
         series = df.loc[index]
@@ -556,18 +670,23 @@ def cv_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/
     
     # Loop over results
     count = 0
-    for index in df.sort_values(['prototype', 'a']).index:
+    for i, index in enumerate(df.sort_values(['prototype', 'a']).index):
         series = df.loc[index]
         qha = series.qha
         if pd.isna(qha):
             continue 
         label = f'{series.prototype} a={series.a:.4f}'
+        lineformat = lineformats.iloc[i]
         
         try:
             Cv = uc.get_in_units(qha.Cv, uc_unit)
             fig.add_trace(go.Scatter(x=qha.T, y=Cv,
-                          mode='lines+markers',
-                          name=series.prototype))
+                                     mode='lines',
+                                     name=series.prototype,
+                                     showlegend=True,
+                                     line=dict(
+                                         color=lineformat.color,
+                                         dash=lineformat.line)))
             
             csv_df[label] = Cv            
             count += 1
@@ -576,14 +695,35 @@ def cv_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/
         
     # Save plot and csv if results exist
     if count > 0:
-        # Save png figure
+
         fig.update_layout(
-            title="Phonon/QHA Predictions",
-            xaxis_title="Temperature (K)",
-            yaxis_title=f"Cv ({plot_unit})",
-            )
-        fig.write_image(Path(contentpath, pngfile), width=1000, height=600,) 
-        fig.write_html(Path(contentpath, htmlfile))
+            title=dict(
+                text="Phonon/QHA Predictions",
+                font=dict(size=14),
+            ),
+            xaxis=dict(
+                title=dict(
+                    text="Temperature (K)"
+                )
+            ),
+            yaxis=dict(
+                title=dict(
+                    text=f"Cv ({plot_unit})",
+                )
+            ),
+            paper_bgcolor='white',
+            plot_bgcolor='white',
+        )
+        fig.update_xaxes(
+            range=[0, 1000],
+            **self.plotly_axes_settings
+        )
+        fig.update_yaxes(
+            rangemode="nonnegative",
+            **self.plotly_axes_settings
+        )
+        fig.write_image(Path(contentpath, pngfile), width=1200, height=600,) 
+        fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
         
         csv_df = pd.DataFrame(csv_df)
         csv_df.to_csv(Path(contentpath, csvfile))
@@ -599,7 +739,7 @@ def cv_plot(df, composition, contentpath, data, uc_unit='J/mol', plot_unit='J/K/
             
     fig.data = []
     
-def volume_plot(df, composition, contentpath, data, uc_unit='angstrom^3', plot_unit='$\AA^3$/atom'):
+def phonon_volume_plot(self, df, composition, contentpath, data, uc_unit='angstrom^3', plot_unit='$\AA^3$/atom'):
     
     # Initialize plot and table
     fig = go.Figure()
@@ -607,6 +747,8 @@ def volume_plot(df, composition, contentpath, data, uc_unit='angstrom^3', plot_u
     csvfile = f'phonon.{composition}.V.csv'
     htmlfile = f'phonon.{composition}.V.html'
     csv_df = {}
+
+    lineformats = self.plotly_line_formats
     
     for index in df.index:
         series = df.loc[index]
@@ -621,18 +763,23 @@ def volume_plot(df, composition, contentpath, data, uc_unit='angstrom^3', plot_u
     
     # Loop over results
     count = 0
-    for index in df.sort_values(['prototype', 'a']).index:
+    for i, index in enumerate(df.sort_values(['prototype', 'a']).index):
         series = df.loc[index]
         qha = series.qha
         if pd.isna(qha):
             continue 
         label = f'{series.prototype} a={series.a:.4f}'
+        lineformat = lineformats.iloc[i]
         
         try:
             V = uc.get_in_units(qha.V, uc_unit)
             fig.add_trace(go.Scatter(x=qha.T, y=V,
-                          mode='lines+markers',
-                          name=series.prototype))
+                                     mode='lines',
+                                     name=series.prototype,
+                                     showlegend=True,
+                                     line=dict(
+                                         color=lineformat.color,
+                                         dash=lineformat.line)))
             
             csv_df[label] = V            
             count += 1
@@ -641,14 +788,34 @@ def volume_plot(df, composition, contentpath, data, uc_unit='angstrom^3', plot_u
         
     # Save plot and csv if results exist
     if count > 0:
-        # Save png figure
+
         fig.update_layout(
-            title="Phonon/QHA Predictions",
-            xaxis_title="Temperature (K)",
-            yaxis_title=f"Volume ({plot_unit})",
-            )
-        fig.write_image(Path(contentpath, pngfile), width=1000, height=600,) 
-        fig.write_html(Path(contentpath, htmlfile))
+            title=dict(
+                text="Phonon/QHA Predictions",
+                font=dict(size=14),
+            ),
+            xaxis=dict(
+                title=dict(
+                    text="Temperature (K)"
+                )
+            ),
+            yaxis=dict(
+                title=dict(
+                    text=f"Volume ({plot_unit})",
+                )
+            ),
+            paper_bgcolor='white',
+            plot_bgcolor='white',
+        )
+        fig.update_xaxes(
+            range=[0, 1000],
+            **self.plotly_axes_settings
+        )
+        fig.update_yaxes(
+            **self.plotly_axes_settings
+        )
+        fig.write_image(Path(contentpath, pngfile), width=1200, height=600,) 
+        fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
         
         csv_df = pd.DataFrame(csv_df)
         csv_df.to_csv(Path(contentpath, csvfile))
@@ -664,7 +831,7 @@ def volume_plot(df, composition, contentpath, data, uc_unit='angstrom^3', plot_u
             
     fig.data = []
     
-def expansion_plot(df, composition, contentpath, data):
+def phonon_expansion_plot(self, df, composition, contentpath, data):
     
     # Initialize plot and table
     fig = go.Figure()
@@ -672,6 +839,8 @@ def expansion_plot(df, composition, contentpath, data):
     csvfile = f'phonon.{composition}.alpha.csv'
     htmlfile = f'phonon.{composition}.alpha.html'
     csv_df = {}
+
+    lineformats = self.plotly_line_formats
     
     for index in df.index:
         series = df.loc[index]
@@ -686,18 +855,23 @@ def expansion_plot(df, composition, contentpath, data):
     
     # Loop over results
     count = 0
-    for index in df.sort_values(['prototype', 'a']).index:
+    for i, index in enumerate(df.sort_values(['prototype', 'a']).index):
         series = df.loc[index]
         qha = series.qha
         if pd.isna(qha):
             continue 
         label = f'{series.prototype} a={series.a:.4f}'
+        lineformat = lineformats.iloc[i]
         
         try:
             alpha = qha.alpha
             fig.add_trace(go.Scatter(x=qha.T, y=alpha,
-                          mode='lines+markers',
-                          name=series.prototype))
+                                     mode='lines',
+                                     name=series.prototype,
+                                     showlegend=True,
+                                     line=dict(
+                                         color=lineformat.color,
+                                         dash=lineformat.line)))
             
             csv_df[label] = alpha           
             count += 1
@@ -706,14 +880,35 @@ def expansion_plot(df, composition, contentpath, data):
         
     # Save plot and csv if results exist
     if count > 0:
-        # Save png figure
+
         fig.update_layout(
-            title="Phonon/QHA Predictions",
-            xaxis_title="Temperature (K)",
-            yaxis_title=f"Thermal expansion",
-            )
-        fig.write_image(Path(contentpath, pngfile), width=1000, height=600,) 
-        fig.write_html(Path(contentpath, htmlfile))
+            title=dict(
+                text="Phonon/QHA Predictions",
+                font=dict(size=14),
+            ),
+            xaxis=dict(
+                title=dict(
+                    text="Temperature (K)"
+                )
+            ),
+            yaxis=dict(
+                title=dict(
+                    text="Thermal expansion"
+                )
+            ),
+            paper_bgcolor='white',
+            plot_bgcolor='white',
+        )
+        fig.update_xaxes(
+            range=[0, 1000],
+            **self.plotly_axes_settings
+        )
+        fig.update_yaxes(
+            range=[0, None],
+            **self.plotly_axes_settings
+        )
+        fig.write_image(Path(contentpath, pngfile), width=1200, height=600,) 
+        fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
         
         csv_df = pd.DataFrame(csv_df)
         csv_df.to_csv(Path(contentpath, csvfile))
@@ -729,7 +924,7 @@ def expansion_plot(df, composition, contentpath, data):
             
     fig.data = []
     
-def bulk_plot(df, composition, contentpath, data, uc_unit='GPa', plot_unit='GPa'):
+def phonon_bulk_plot(self, df, composition, contentpath, data, uc_unit='GPa', plot_unit='GPa'):
     
     # Initialize plot and table
     fig = go.Figure()
@@ -737,6 +932,8 @@ def bulk_plot(df, composition, contentpath, data, uc_unit='GPa', plot_unit='GPa'
     csvfile = f'phonon.{composition}.B.csv'
     htmlfile = f'phonon.{composition}.B.html'
     csv_df = {}
+
+    lineformats = self.plotly_line_formats
     
     for index in df.index:
         series = df.loc[index]
@@ -751,18 +948,23 @@ def bulk_plot(df, composition, contentpath, data, uc_unit='GPa', plot_unit='GPa'
     
     # Loop over results
     count = 0
-    for index in df.sort_values(['prototype', 'a']).index:
+    for i, index in enumerate(df.sort_values(['prototype', 'a']).index):
         series = df.loc[index]
         qha = series.qha
         if pd.isna(qha):
             continue 
         label = f'{series.prototype} a={series.a:.4f}'
+        lineformat = lineformats.iloc[i]
         
         try:
             B = uc.get_in_units(qha.B, uc_unit)
             fig.add_trace(go.Scatter(x=qha.T, y=B,
-                          mode='lines+markers',
-                          name=series.prototype))
+                                     mode='lines',
+                                     name=series.prototype,
+                                     showlegend=True,
+                                     line=dict(
+                                         color=lineformat.color,
+                                         dash=lineformat.line)))
             
             csv_df[label] = B            
             count += 1
@@ -771,14 +973,34 @@ def bulk_plot(df, composition, contentpath, data, uc_unit='GPa', plot_unit='GPa'
         
     # Save plot and csv if results exist
     if count > 0:
-        # Save png figure
+
         fig.update_layout(
-            title="Phonon/QHA Predictions",
-            xaxis_title="Temperature (K)",
-            yaxis_title=f"Bulk modulus ({plot_unit})",
-            )
-        fig.write_image(Path(contentpath, pngfile), width=1000, height=600,) 
-        fig.write_html(Path(contentpath, htmlfile))
+            title=dict(
+                text="Phonon/QHA Predictions",
+                font=dict(size=14),
+            ),
+            xaxis=dict(
+                title=dict(
+                    text="Temperature (K)"
+                )
+            ),
+            yaxis=dict(
+                title=dict(
+                    text=f"Bulk modulus ({plot_unit})",
+                )
+            ),
+            paper_bgcolor='white',
+            plot_bgcolor='white',
+        )
+        fig.update_xaxes(
+            range=[0, 1000],
+            **self.plotly_axes_settings
+        )
+        fig.update_yaxes(
+            **self.plotly_axes_settings
+        )
+        fig.write_image(Path(contentpath, pngfile), width=1200, height=600,) 
+        fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
         
         csv_df = pd.DataFrame(csv_df)
         csv_df.to_csv(Path(contentpath, csvfile))

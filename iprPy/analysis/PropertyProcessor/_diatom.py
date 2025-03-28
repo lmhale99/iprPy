@@ -11,8 +11,8 @@ import numpy as np
 # https://pandas.pydata.org/
 import pandas as pd
 
-# https://docs.bokeh.org/en/latest/
-import bokeh
+# https://plotly.com/python
+import plotly.graph_objects as go
 
 # Local imports
 from ... import load_record
@@ -83,13 +83,13 @@ def diatom(self,
             contentpath.mkdir(parents=True)
         
         # Build and save table
-        diatom_table(imp_df, outputpath, pot_id, imp_id)
+        self.diatom_table(imp_df, outputpath, pot_id, imp_id)
         
         # Build and save main diatom plot as html and png
-        diatom_bokeh_plot(imp_df, outputpath, pot_id, imp_id)
+        self.diatom_plotly_plot(imp_df, outputpath, pot_id, imp_id)
             
         # Build and save shortrange diatom plot as html and png
-        diatom_bokeh_short_plot(imp_df, outputpath, pot_id, imp_id)
+        self.diatom_plotly_short_plot(imp_df, outputpath, pot_id, imp_id)
         
         # Build model component
         prop.diatom.exists = True
@@ -113,7 +113,8 @@ def diatom(self,
     print(num_updated, 'added/updated')
     print(num_skipped, 'skipped')
 
-def diatom_table(df: pd.DataFrame,
+def diatom_table(self, 
+                 df: pd.DataFrame,
                  outputpath: Path,
                  potential: str,
                  implementation: str):
@@ -159,27 +160,14 @@ def diatom_table(df: pd.DataFrame,
     tablepath = Path(outputpath, potential, implementation, f'diatom.txt')
     with open(tablepath, 'w', encoding='UTF-8') as f:
         f.write(table)
-    
-def get_lineformats() -> pd.DataFrame:
-    """
-    Defines the line colors and styles to use for each plotted family.
-    """
-    lineformats = []
-    colors = ['black', 'blue', 'red', 'cyan', 'magenta', '#EAC117', 'orange', 'gray', 'green', 'brown']
-    lines = 10 * ['solid', 'dashed', 'dotted', 'dashdot'] 
-    
-    for line in lines:
-        for color in colors:
-            lineformats.append({'color':color, 'line':line})
-    
-    return pd.DataFrame(lineformats)
 
-def diatom_bokeh_plot(df: pd.DataFrame,
-                      outputpath: Path,
-                      potential: str,
-                      implementation: str):
+def diatom_plotly_plot(self, 
+                       df: pd.DataFrame,
+                       outputpath: Path,
+                       potential: str,
+                       implementation: str):
     """
-    Generates a Bokeh plot from the data
+    Generates a Plotly plot from the data
     
     Parameters
     ----------
@@ -192,30 +180,29 @@ def diatom_bokeh_plot(df: pd.DataFrame,
     implementation : str
         Name of the potential implementation associated with the records.
     """
-    resources = bokeh.resources.Resources(mode='cdn')
-
-    lineformats = get_lineformats()
+    contentpath = Path(outputpath, potential, implementation)
+    if not contentpath.exists():
+        contentpath.mkdir(parents=True)
+    
+    lineformats = self.plotly_line_formats
     
     # Initialize plot
-    title = f'Diatom Energy vs. Interatomic Spacing for {implementation}'
-    p = bokeh.plotting.figure(title = title,
-                              width = 800,
-                              height = 600,
-                              x_range = [1, 6],
-                              y_range = [-20, 1],
-                              x_axis_label = 'r (Angstrom)', 
-                              y_axis_label = 'Energy (eV)')
+    fig = go.Figure()
+    pngfile = f'diatom.png'
+    htmlfile = f'diatom.html'
     
     # Get r values
-    rvalues = np.array(df.iloc[0].r_values)
+    allrvalues = np.array(df.iloc[0].r_values)
+    rvalues = allrvalues[allrvalues >= 1]
     
     # Loop over energies
     lowylim = -1
-    for i, series in enumerate(df.itertuples()):
-        Evalues = np.array(series.energy_values)
-        Evalues[rvalues < 1] = np.nan
+    for i, index in enumerate(df.sort_values('symbols').index):
         
         lineformat = lineformats.iloc[i]
+        
+        series = df.loc[index]
+        Evalues = np.array(series.energy_values)[allrvalues >= 1]
         
         if not np.all(np.isnan(Evalues)):
             
@@ -225,35 +212,60 @@ def diatom_bokeh_plot(df: pd.DataFrame,
                 lowylim = lowy
         
             # Define plot line
-            l = p.line(rvalues, Evalues, legend_label=series.symbols, 
-                       line_color=lineformat.color, line_dash=lineformat.line, line_width = 2)
-            p.add_tools(bokeh.models.HoverTool(renderers=[l],
-                                               tooltips=[("symbols", series.symbols),
-                                                         ("r (Angstrom)", "$x"),
-                                                         ("energy (eV)", "$y")]))
+            fig.add_trace(go.Scatter(x=rvalues, y=Evalues,
+                                     mode='lines',
+                                     name=series.symbols,
+                                     showlegend=True,
+                                     line=dict(
+                                         color=lineformat.color,
+                                         dash=lineformat.line)
+                                    )
+                         )
+            
     # Adjust lower y limit
     if lowylim < -20:
         lowylim = -20
-    p.y_range = bokeh.models.Range1d(lowylim, 1)
+        
+        
+    # Edit the layout
+    fig.update_layout(
+        title=dict(
+            text=f'Diatom Energy vs. Interatomic Spacing for {implementation}',
+            font=dict(size=12),
+        ),
+        xaxis=dict(
+            title=dict(
+                text='r (Angstrom)'
+            )
+        ),
+        yaxis=dict(
+            title=dict(
+                text='Energy (eV)'
+            )
+        ),
+        paper_bgcolor='white',
+        plot_bgcolor='white',
+    )
+    fig.update_xaxes(
+        range=[1, 6],
+        **self.plotly_axes_settings
+    )
+    fig.update_yaxes(
+        range=[lowylim, 1],
+        **self.plotly_axes_settings
+    )
     
-    # Set legend location
-    p.legend.location = "bottom_right"
-    
-    htmlpath = Path(outputpath, potential, implementation, f'diatom.html')
-    
-    bokeh.io.save(p, htmlpath, resources=resources, 
-                  title='Interatomic Potentials Repository Project')
-    
-    pngpath = Path(outputpath, potential, implementation, f'diatom.png')
-    bokeh.io.export_png(p, filename=pngpath)
-    bokeh.io.reset_output() 
+    fig.write_image(Path(contentpath, pngfile), width=800, height=600) 
+    fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
+    fig.data = []
 
-def diatom_bokeh_short_plot(df: pd.DataFrame,
-                            outputpath: Path,
-                            potential: str,
-                            implementation: str):
+def diatom_plotly_short_plot(self,
+                             df: pd.DataFrame,
+                             outputpath: Path,
+                             potential: str,
+                             implementation: str):
     """
-    Generates a Bokeh plot from the data
+    Generates a Plotly plot from the data
     
     Parameters
     ----------
@@ -266,19 +278,16 @@ def diatom_bokeh_short_plot(df: pd.DataFrame,
     implementation : str
         Name of the potential implementation associated with the records.
     """
-    resources = bokeh.resources.Resources(mode='cdn')
-
-    lineformats = get_lineformats()
+    contentpath = Path(outputpath, potential, implementation)
+    if not contentpath.exists():
+        contentpath.mkdir(parents=True)
+    
+    lineformats = self.plotly_line_formats
     
     # Initialize plot
-    title = f'Diatom Energy vs. Interatomic Spacing for {implementation}'
-    p = bokeh.plotting.figure(title = title,
-                              width = 800,
-                              height = 600,
-                              x_range = [0, 2],
-                              y_range = [-5e5, 5e5],
-                              x_axis_label = 'r (Angstrom)', 
-                              y_axis_label = 'Energy (eV)')
+    fig = go.Figure()
+    pngfile = 'diatom_short.png'
+    htmlfile = 'diatom_short.html'
     
     # Get r values
     rvalues = np.array(df.iloc[0].r_values)
@@ -286,25 +295,27 @@ def diatom_bokeh_short_plot(df: pd.DataFrame,
     # Loop over energies
     lowylim = 0
     highylim = 0
-    for i, series in enumerate(df.itertuples()):
+    for i, index in enumerate(df.sort_values('symbols').index):
+        
+        lineformat = lineformats.iloc[i]
+        
+        series = df.loc[index]
         Evalues = np.array(series.energy_values)
         with np.errstate(invalid='ignore'):
             Evalues[Evalues > 1e5] = 1e5
             Evalues[Evalues < -1e5] = np.nan
         
-        lineformat = lineformats.iloc[i]
-        
         if not np.all(np.isnan(Evalues)):
             
-            # Find ylims
+            # Find lowylim
             lowy = floor(np.nanmin(Evalues))
             if lowy < lowylim:
                 lowylim = lowy
-            
+        
             # Find highy based on values less than 1e5
             with np.errstate(invalid='ignore'):
                 max = np.nanmax(Evalues[Evalues < 1e5])
-            
+        
             # Round up smartly
             if max > 10:
                 exp = floor(np.log10(max))
@@ -315,26 +326,50 @@ def diatom_bokeh_short_plot(df: pd.DataFrame,
                 highylim = highy
         
             # Define plot line
-            l = p.line(rvalues, Evalues, legend_label=series.symbols, 
-                       line_color=lineformat.color, line_dash=lineformat.line, line_width = 2)
-            p.add_tools(bokeh.models.HoverTool(renderers=[l],
-                                               tooltips=[("symbols", series.symbols),
-                                                         ("r (Angstrom)", "$x"),
-                                                         ("energy (eV)", "$y")]))
+            fig.add_trace(go.Scatter(x=rvalues, y=Evalues,
+                                     mode='lines',
+                                     name=series.symbols,
+                                     showlegend=True,
+                                     line=dict(
+                                         color=lineformat.color,
+                                         dash=lineformat.line)
+                                    )
+                         )
+            
     # Set y limits
     if lowylim < -1e5:
         lowylim = -1e5
     if highylim > 1e5:
         highylim = 1e5
-    p.y_range = bokeh.models.Range1d(lowylim, highylim)
+        
+    # Edit the layout
+    fig.update_layout(
+        title=dict(
+            text=f'Diatom Energy vs. Interatomic Spacing for {implementation}',
+            font=dict(size=12),
+        ),
+        xaxis=dict(
+            title=dict(
+                text='r (Angstrom)'
+            )
+        ),
+        yaxis=dict(
+            title=dict(
+                text='Energy (eV)'
+            )
+        ),
+        paper_bgcolor='white',
+        plot_bgcolor='white',
+    )
+    fig.update_xaxes(
+        range=[0, 2],
+        **self.plotly_axes_settings
+    )
+    fig.update_yaxes(
+        range=[lowylim, highylim],
+        **self.plotly_axes_settings
+    )
     
-    # Set legend location
-    p.legend.location = "bottom_right"
-    
-    htmlpath = Path(outputpath, potential, implementation, f'diatom_short.html')
-    bokeh.io.save(p, htmlpath, resources=resources, 
-                  title = 'Interatomic Potentials Repository Project')
-    
-    pngpath = Path(outputpath, potential, implementation, f'diatom_short.png')
-    bokeh.io.export_png(p, filename=pngpath)
-    bokeh.io.reset_output()
+    fig.write_image(Path(contentpath, pngfile), width=800, height=600) 
+    fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
+    fig.data = []

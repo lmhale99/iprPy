@@ -143,7 +143,7 @@ def prepare_pool(database, styles, np_per_runner, run_directory,
             print()
 
     # Update lammps_commands as needed
-    fix_lammps_versions(run_directory, **kwargs)
+    fix_lammps_versions(run_directory, calc_names=new_calc_keys, **kwargs)
     
     return new_calc_keys
 

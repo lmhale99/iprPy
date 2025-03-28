@@ -431,7 +431,8 @@ class ElasticConstantsStatic(Calculation):
                 style='float_match',
                 name='strainrange',
                 path=f'{self.modelroot}.calculation.run-parameter.strain-range',
-                description='search by strain range used'),
+                description='search by strain range used',
+                atol=1e-10),
         })
         return queries
 

@@ -16,16 +16,16 @@ def clean_bad_guys(database, run_directory, message):
         # Load content
         record = database.get_record(name=calc_name)
         model = record.model
-        
+
         # Update status and error fields
         root = record.modelroot
         model[root]['status'] = 'error'
         model[root]['error'] = message
-        
+
         # Save to execution directory
         with open(Path(calc_directory, 'results.json'), 'w', encoding='utf-8') as f:
             model.json(fp=f, indent=4, ensure_ascii=False)
-            
+
         # Update record
         tries = 0
         #while tries < 10:
@@ -41,10 +41,9 @@ def clean_bad_guys(database, run_directory, message):
                 # tar.gz calculation and add to database
         database.add_tar(style=record.style, root_dir=run_directory, name=calc_name)
         #    except:
-        #        print(f'failed to upload archive {calc_name}', flush=True)      
-        #    else:    
+        #        print(f'failed to upload archive {calc_name}', flush=True)
+        #    else:
         removecalc(calc_directory)
-        
 
 def removecalc(calc_directory):
     """
@@ -56,7 +55,6 @@ def removecalc(calc_directory):
     calc_directory : path-like object
         The calculation directory to delete.
     """
-    
     # Loop over all files and directories in calc_directory
     for path in calc_directory.iterdir():
 
@@ -88,7 +86,7 @@ def removecalc(calc_directory):
             break
         except:
             tries += 1
-    
+
     if tries == 10:
         print(f'failed to delete {calc_directory}', flush=True)
 

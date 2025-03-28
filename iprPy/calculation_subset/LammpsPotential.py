@@ -51,8 +51,10 @@ class LammpsPotential(CalculationSubset):
 
         self.__potential_key = None
         self.__potential_id = None
+        self.__potential_url = None
         self.__potential_LAMMPS_key = None
         self.__potential_LAMMPS_id = None
+        self.__potential_LAMMPS_url = None
         self.__potential = None
 
 ############################## Class attributes ################################
@@ -76,6 +78,15 @@ class LammpsPotential(CalculationSubset):
         self.__potential_id = str(val)
 
     @property
+    def potential_url(self) -> str:
+        """str: URL where the potential model record can be found"""
+        return self.__potential_url
+
+    @potential_url.setter
+    def potential_url(self, val: str):
+        self.__potential_url = str(val)
+
+    @property
     def potential_LAMMPS_key(self) -> str:
         """str: UUID4 key assigned to the LAMMPS implementation"""
         return self.__potential_LAMMPS_key
@@ -92,6 +103,15 @@ class LammpsPotential(CalculationSubset):
     @potential_LAMMPS_id.setter
     def potential_LAMMPS_id(self, val: str):
         self.__potential_LAMMPS_id = str(val)
+
+    @property
+    def potential_LAMMPS_url(self) -> str:
+        """str: URL where the LAMMPS implementation record can be found"""
+        return self.__potential_LAMMPS_url
+
+    @potential_LAMMPS_url.setter
+    def potential_LAMMPS_url(self, val: str):
+        self.__potential_LAMMPS_url = str(val)
 
     @property
     def potential(self) -> BasePotentialLAMMPS:
@@ -113,8 +133,10 @@ class LammpsPotential(CalculationSubset):
         # Set metadata values
         self.potential_key = val.potkey
         self.potential_id = val.potid
+        self.potential_url = val.poturl
         self.potential_LAMMPS_key = val.key
         self.potential_LAMMPS_id = val.id
+        self.potential_LAMMPS_url = val.url
         self.__potential = val
 
     def set_values(self, **kwargs: any):
@@ -139,8 +161,10 @@ class LammpsPotential(CalculationSubset):
             try:
                 assert 'potential_key' not in kwargs
                 assert 'potential_id' not in kwargs
+                assert 'potential_url' not in kwargs
                 assert 'potential_LAMMPS_key' not in kwargs
                 assert 'potential_LAMMPS_id' not in kwargs
+                assert 'potential_LAMMPS_url' not in kwargs
             except:
                 raise ValueError('potential cannot be given with other potential kwargs')
             self.potential = kwargs['potential']
@@ -149,10 +173,14 @@ class LammpsPotential(CalculationSubset):
                 self.potential_key = kwargs['potential_key']
             if 'potential_id' in kwargs:
                 self.potential_id = kwargs['potential_id']
+            if 'potential_url' in kwargs:
+                self.potential_url = kwargs['potential_url']
             if 'potential_LAMMPS_key' in kwargs:
                 self.potential_LAMMPS_key = kwargs['potential_LAMMPS_key']
             if 'potential_LAMMPS_id' in kwargs:
                 self.potential_LAMMPS_id = kwargs['potential_LAMMPS_id']
+            if 'potential_LAMMPS_url' in kwargs:
+                self.potential_LAMMPS_url = kwargs['potential_LAMMPS_url']
 
 ####################### Parameter file interactions ###########################
 
@@ -272,8 +300,10 @@ class LammpsPotential(CalculationSubset):
 
         self.potential_LAMMPS_key = sub['key']
         self.potential_LAMMPS_id = sub['id']
+        self.potential_LAMMPS_url = sub.get('URL', None)
         self.potential_key = sub['potential']['key']
         self.potential_id = sub['potential']['id']
+        self.potential_url = sub['potential'].get('URL', None)
 
     def build_model(self,
                     model: DM,
@@ -304,9 +334,13 @@ class LammpsPotential(CalculationSubset):
 
         pot['key'] = self.potential_LAMMPS_key
         pot['id'] = self.potential_LAMMPS_id
+        if self.potential_LAMMPS_url is not None:
+            pot['URL'] = self.potential_LAMMPS_url
         pot['potential'] = DM()
         pot['potential']['key'] = self.potential_key
         pot['potential']['id'] = self.potential_id
+        if self.potential_url is not None:
+            pot['potential']['URL'] = self.potential_url
 
         dict_insert(model, self.modelroot, pot, **kwargs)
 
@@ -362,8 +396,10 @@ class LammpsPotential(CalculationSubset):
 
         meta[f'{self.prefix}potential_LAMMPS_key'] = self.potential_LAMMPS_key
         meta[f'{self.prefix}potential_LAMMPS_id'] = self.potential_LAMMPS_id
+        meta[f'{self.prefix}potential_LAMMPS_url'] = self.potential_LAMMPS_url
         meta[f'{self.prefix}potential_key'] = self.potential_key
         meta[f'{self.prefix}potential_id'] = self.potential_id
+        meta[f'{self.prefix}potential_url'] = self.potential_url
 
 ########################### Calculation interactions ##########################
 

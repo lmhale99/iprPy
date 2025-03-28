@@ -90,7 +90,7 @@ class WSLEmperorPrepare(BaseEmperorPrepare):
 
             # Run the prepared calculations
             for calc_name in calc_names:
-                self.database.runner(pool_params['run_directory'], calc_name=calc_name)
+                self.database.runner(prepare_params['run_directory'], calc_name=calc_name)
 
     def prepare_pool_15(self, debug: bool = False, **kwargs):
         """
@@ -129,7 +129,7 @@ class WSLEmperorPrepare(BaseEmperorPrepare):
             
             # Run the prepared calculations
             for calc_name in calc_names:
-                self.database.runner(pool_params['run_directory'], calc_name=calc_name)
+                self.database.runner(prepare_params['run_directory'], calc_name=calc_name)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Command line options for Emperor prepare on CTCMS')

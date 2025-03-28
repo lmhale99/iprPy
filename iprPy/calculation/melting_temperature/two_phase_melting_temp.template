@@ -1,0 +1,67 @@
+# LAMMPS script for a solid-liquid coexistence simulation
+
+# Specify temperatures to use
+variable Tguess index <temperature_guess>
+variable Tsolid index <temperature_solid>
+variable Tliquid index <temperature_liquid>
+
+# Specify relaxation pressure
+variable P index <pressure>
+
+# Specify the boundary between the two regions
+variable zb index <zboundary>
+
+# Specify simulation steps for runs and outputs 
+variable meltsteps index <meltsteps>
+variable scalesteps index <scalesteps>
+variable runsteps index <runsteps>
+variable dumpsteps index <dumpsteps>
+variable thermosteps index <thermosteps>
+variable timestep index <timestep>
+
+<atomman_system_pair_info>
+
+# Split system into top and bot regions
+region top block INF INF INF INF ${zb} INF
+region bot block INF INF INF INF INF ${zb}
+group top region top
+group bot region bot
+
+# Per-atom property computes
+compute pe all pe/atom
+compute ke all ke/atom
+<compute_ptm>
+
+# Thermo output definition
+thermo ${thermosteps}
+thermo_style custom step temp pe ke etotal lx ly lz pxx pyy pzz
+thermo_modify format float %.13e
+timestep ${timestep}
+
+# Define dump files
+dump dumpit all custom ${dumpsteps} *.dump id type x y z c_pe c_ke <ptm_dump>
+dump_modify dumpit format float %.13e
+
+# Create velocities
+velocity top create ${Tliquid} <randomseed>
+velocity bot create ${Tsolid}  <randomseed>
+
+# Set barostat to use throughout
+fix nph all nph aniso ${P} ${P} $(1000.0*dt)
+
+# Set different thermostats to top and bottom to create two phases
+fix beren_liquid top temp/berendsen ${Tliquid} ${Tliquid} $(100.0*dt)
+fix beren_solid  bot temp/berendsen ${Tsolid}  ${Tsolid}  $(100.0*dt)
+run ${meltsteps}
+
+# Update thermostats to scale to the guess temperature
+unfix beren_liquid
+unfix beren_solid
+fix beren_liquid top temp/berendsen ${Tliquid} ${Tguess} $(100.0*dt)
+fix beren_solid  bot temp/berendsen ${Tsolid}  ${Tguess} $(100.0*dt)
+run ${scalesteps}
+
+# Remove thermostats and relax
+unfix beren_liquid
+unfix beren_solid
+run ${runsteps}

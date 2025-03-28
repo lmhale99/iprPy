@@ -4,8 +4,11 @@
 from io import IOBase
 from pathlib import Path
 from typing import Optional, Union
+from copy import deepcopy
 
 import numpy as np
+
+from yabadaba import load_query
 
 # https://github.com/usnistgov/atomman
 import atomman as am
@@ -277,6 +280,20 @@ class StackingFaultMap2D(Calculation):
         if 'num_a2' in kwargs:
             self.num_a2 = kwargs['num_a2']
 
+    def add_path(self, sp):
+        """
+        Adds a new path object to the paths list.
+
+        Parameters
+        ----------
+        sp : DataModelDict
+            Dictionary of stacking fault mep results terms
+        """
+        newpath = StackingFaultPath(sp)
+        if self.__paths is None:
+            self.__paths = []
+        self.paths.append(newpath)
+
 ####################### Parameter file interactions ###########################
 
     def load_parameters(self,
@@ -540,6 +557,23 @@ class StackingFaultMap2D(Calculation):
                 for sp in calc.iteraslist('slip-path'):
                     self.paths.append(StackingFaultPath(sp))
 
+    @property
+    def queries(self) -> dict:
+        queries = deepcopy(super().queries)
+        queries.update({
+            'num_a1': load_query(
+                style='int_match',
+                name='num_a1',
+                path=f'{self.modelroot}.calculation.run-parameter.stackingfault_num_a1',
+                description='search by number of a1 steps used'),
+            'num_a2': load_query(
+                style='int_match',
+                name='num_a2',
+                path=f'{self.modelroot}.calculation.run-parameter.stackingfault_num_a2',
+                description='search by number of a2 steps used'),
+        })
+        return queries
+    
 ########################## Metadata interactions ##############################
 
     def metadata(self) -> dict:
@@ -552,6 +586,8 @@ class StackingFaultMap2D(Calculation):
         meta = super().metadata()
 
         # Extract calculation-specific content
+        meta['num_a1'] = self.num_a1
+        meta['num_a2'] = self.num_a2
 
         # Extract results
         if self.status == 'finished':

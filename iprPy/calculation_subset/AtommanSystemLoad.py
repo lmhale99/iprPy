@@ -56,6 +56,7 @@ class AtommanSystemLoad(CalculationSubset):
         self.__load_options = {}
         self.__load_content = None
         self.family = None
+        self.family_url = None
         self.symbols = None
         self.__ucell = None
         self.box_parameters = None
@@ -108,6 +109,19 @@ class AtommanSystemLoad(CalculationSubset):
             self.__family = None
         else:
             self.__family = str(value)
+
+    @property
+    def family_url(self) -> Optional[str]:
+        """str or None: The URL for the family (prototype) record"""
+        return self.__family_url
+
+    @family_url.setter
+    def family_url(self, value: Optional[str]):
+        if value is None:
+            self.__family_url = None
+        else:
+            self.__family_url = str(value)
+
 
     @property
     def symbols(self) -> Optional[list]:
@@ -316,6 +330,8 @@ class AtommanSystemLoad(CalculationSubset):
             self.__load_options = kwargs['load_options']
         if 'family' in kwargs:
             self.family = kwargs['family']
+        if 'family_url' in kwargs:
+            self.family_url = kwargs['family_url']
         if 'symbols' in kwargs:
             self.symbols = kwargs['symbols']
         if 'box_parameters' in kwargs:
@@ -529,6 +545,7 @@ class AtommanSystemLoad(CalculationSubset):
 
         d = {}
         d['family'] = sub['family']
+        d['family_url'] = sub.get('family-URL', None)
 
         if 'artifact' in sub:
             if  'initial-atomic-system' in sub:
@@ -541,8 +558,15 @@ class AtommanSystemLoad(CalculationSubset):
         else:
             raise ValueError('neither load file nor embedded content found for the initial system')
 
-        d['symbols'] = sub['symbol']
+        # Load symbols and composition
+        d['symbols'] = aslist(sub['symbol'])
         d['composition'] = sub.get('composition', None)
+
+        # Manually convert symbols and composition to str values
+        for i in range(len(d['symbols'])):
+            d['symbols'][i] = str(d['symbols'][i])
+        if d['composition'] is not None:
+            d['composition'] = str(d['composition'])
 
         if load_options is not None:
             d['load_options'] = {}
@@ -575,6 +599,8 @@ class AtommanSystemLoad(CalculationSubset):
         system = DM()
 
         system['family'] = self.family
+        if self.family_url is not None:
+            system['family-URL'] = self.family_url
 
         if self.load_file is not None:
             system['artifact'] = DM()
@@ -650,6 +676,7 @@ class AtommanSystemLoad(CalculationSubset):
             meta[f'{self.prefix}parent_key'] = parent
 
         meta[f'{self.prefix}family'] = self.family
+        meta[f'{self.prefix}family_url'] = self.family_url
         if self.symbols is None:
             symbolstr = ''
         else:

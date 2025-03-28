@@ -1,0 +1,17 @@
+# Run commands
+lammps_command                /home/lmh1/LAMMPS/2022-06-23/src/lmp_serial
+mpi_command                   
+
+# Database settings
+database                      master
+run_directory                 master_4
+
+# Element model settings
+potential_id                  2017--Beland-L-K--Fe-Ni-Cr--LAMMPS--ipr1
+composition                   Fe
+family                        A1--Cu--fcc
+alat                          3.53
+
+# Method settings
+min_temperature               1100
+max_temperature               2200
