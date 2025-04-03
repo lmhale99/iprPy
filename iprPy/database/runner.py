@@ -15,7 +15,7 @@ import requests
 from DataModelDict import DataModelDict as DM
 
 # iprPy imports
-from .. import settings, load_run_directory
+from .. import settings, load_run_directory, load_calculation
 
 def runner(database, run_directory, calc_name=None, orphan_directory=None,
            hold_directory=None, log=True, bidtries=10, bidverbose=False,
@@ -560,7 +560,8 @@ class RunManager():
 
             # Run calc
             os.chdir(exe_directory)
-            calculation.load_parameters(calc_in)
+            #calculation.load_parameters(calc_in)
+            calculation = load_calculation(calculation.calc_style, params=calc_in, key=calc_name)
             tmp_kwargs_calc = {"results_json": True}
             tmp_kwargs_calc.update(kwargs_calc)
             calculation.run(**tmp_kwargs_calc)
