@@ -372,6 +372,7 @@ def build_test_calcs(database, calculation, content_dict, debug=False,
             try:
                 # Build test calculation and check if valid
                 test_calc = load_calculation(calculation.calc_style, params=input_dict)
+                test_calc.build_model()
                 assert test_calc.isvalid()
             except:
                 numinvalid += 1
@@ -385,6 +386,7 @@ def build_test_calcs(database, calculation, content_dict, debug=False,
             
             # Build test calculation and check if valid
             test_calc = load_calculation(calculation.calc_style, params=input_dict)
+            test_calc.build_model()
             assert test_calc.isvalid()
             
             # Add test calculation data to lists
