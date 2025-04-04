@@ -1,10 +1,15 @@
 # coding: utf-8
 
 # Standard Python libraries
-from io import IOBase
+from io import IOBase, BytesIO
 from pathlib import Path
 from typing import Optional, Union
 import random
+
+from IPython.display import display
+from PIL import Image as PILImage
+
+import requests
 
 import numpy as np
 
@@ -267,6 +272,98 @@ class DislocationMonopole(Calculation):
         else:
             return self.__K_tensor
 
+
+    def retrieve_defect_system(self):
+        """Downloads the dislocation defect file contents from potentials.nist.gov."""
+        url = f'https://potentials.nist.gov/pid/rest/local/potentials/{self.name}-disl.dump'
+        r = requests.get(url)
+        r.raise_for_status()
+        
+        return r.content
+        
+    def load_defect_system(self):
+        """Loads the dislocation defect system from potentials.nist.gov."""
+        return am.load('atom_dump', self.retrieve_defect_system(), symbols=self.symbols_defect)
+
+    def save_defect_system(self, fname=None):
+        """
+        Saves the dislocation defect system from potentials.nist.gov to a local file.
+
+        Parameters
+        ----------
+        fname : str or Path, optional
+            The file name or path where the file is to be saved.  If None, will use the
+            dumpfile_defect file name.
+        """
+        if fname is None:
+            fname = self.dumpfile_defect
+        
+        with open(fname, 'wb') as f:
+            f.write(self.retrieve_defect_system())
+
+    def retrieve_base_system(self):
+        """Downloads the base reference file contents from potentials.nist.gov."""
+        url = f'https://potentials.nist.gov/pid/rest/local/potentials/{self.name}-base.dump'
+        r = requests.get(url)
+        r.raise_for_status()
+        
+        return r.content
+
+    def load_base_system(self):
+        """Loads the base reference system from potentials.nist.gov."""
+        return am.load('atom_dump', self.retrieve_base_system(), symbols=self.symbols_base)
+
+    def save_base_system(self, fname=None):
+        """
+        Saves the base reference system from potentials.nist.gov to a local file.
+
+        Parameters
+        ----------
+        fname : str or Path, optional
+            The file name or path where the file is to be saved.  If None, will use the
+            dumpfile_base file name.
+        """
+        if fname is None:
+            fname = self.dumpfile_base
+        
+        with open(fname, 'wb') as f:
+            f.write(self.retrieve_base_system())
+
+    def retrieve_nye_dd_plot(self):
+        """
+        Downloads the Nye-DD plot from potentials.nist.gov database.
+        """
+        url = f'https://potentials.nist.gov/pid/rest/local/potentials/{self.name}-nye-dd.png'
+        r = requests.get(url)
+        r.raise_for_status()
+        
+        return r.content
+
+    def display_nye_dd_plot(self):
+        """
+        Downloads and displays the Nye-DD plot from potentials.nist.gov in IPython environments
+        """
+        image_bytes = self.retrieve_nye_dd_plot()
+        image = PILImage.open(BytesIO(image_bytes))
+        display(image)
+
+    def save_nye_dd_plot(self, fname='nye_dd.png'):
+        """
+        Saves the Nye-DD plot image from potentials.nist.gov to a local file.
+
+        Parameters
+        ----------
+        fname : str or Path, optional
+            The file name or path where the file is to be saved.  Default value
+            is "nye_dd.png".
+        """
+        if fname is None:
+            fname = self.dumpfile_base
+        
+        with open(fname, 'wb') as f:
+            f.write(self.retrieve_nye_dd_plot())
+
+
     def set_values(self,
                    name: Optional[str] = None,
                    **kwargs: any):
@@ -422,7 +519,7 @@ class DislocationMonopole(Calculation):
         params['dislocation_boundaryscale'] = 'True'
         params['dislocation_boundaryshape'] = 'cylinder'
         params['annealtemperature'] = '10'
-        params['annealsteps'] = '10000000'
+        params['annealsteps'] = '1000000'
         params['maxiterations'] = '10000'
         params['maxevaluations'] = '100000'
 
