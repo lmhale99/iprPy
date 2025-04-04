@@ -631,6 +631,11 @@ class AtommanSystemLoad(CalculationSubset):
                 name=f'{self.prefix}load_file',
                 path=f'{root}.artifact.file',
                 description='search by the filename for the initial configuration'),
+            'parent_key': load_query(
+                style='str_match',
+                name=f'{self.prefix}parent_key',
+                path=f'{root}.parent',
+                description='search by the key of the parent record'),
             'family': load_query(
                 style='str_match',
                 name=f'{self.prefix}family',
