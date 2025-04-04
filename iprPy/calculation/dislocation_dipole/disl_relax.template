@@ -6,7 +6,7 @@ box tilt large
 
 compute peatom all pe/atom
 
-dump first all custom <maxiter> *.dump id type x y z c_peatom
+dump first all custom <dumpsteps> *.dump id type x y z c_peatom
 dump_modify first format float %.13e
 thermo_style custom step pe
 
