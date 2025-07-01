@@ -466,7 +466,7 @@ class Calculation(Record):
         calc['calculation'] = DM()
         calc['calculation']['iprPy-version'] = self.iprPy_version
         calc['calculation']['atomman-version'] = self.atomman_version
-        calc['calculation']['script'] = self.script
+        #calc['calculation']['script'] = self.script
         calc['calculation']['branch'] = self.branch
 
         if self.status != 'finished':
@@ -499,7 +499,7 @@ class Calculation(Record):
         self.__url = calc.get('URL', None)
         self.__iprPy_version = calc['calculation']['iprPy-version']
         self.__atomman_version = calc['calculation']['atomman-version']
-        self.__script = calc['calculation']['script']
+        self.__script = calc['calculation'].get('script', f'calc_{self.calc_style}')
         self.__branch = calc['calculation'].get('branch', 'main')
         self.__status = calc.get('status', 'finished')
         self.__error = calc.get('error', None)
@@ -533,11 +533,11 @@ class Calculation(Record):
                 name='atomman_version',
                 path=f'{self.modelroot}.calculation.atomman-version',
                 description="search by atomman version used"),
-            'script': load_query(
-                style='str_match',
-                name='script',
-                path=f'{self.modelroot}.calculation.script',
-                description="search by script name used"),
+            #'script': load_query(
+            #    style='str_match',
+            #    name='script',
+            #    path=f'{self.modelroot}.calculation.script',
+            #    description="search by script name used"),
             'branch': load_query(
                 style='str_match',
                 name='branch',
@@ -561,7 +561,7 @@ class Calculation(Record):
                    key: Union[str, list, None] = None,
                    iprPy_version: Union[str, list, None] = None,
                    atomman_version: Union[str, list, None] = None,
-                   script: Union[str, list, None] = None,
+                   #script: Union[str, list, None] = None,
                    branch: Union[str, list, None] = None,
                    status: Union[str, list, None] = None,
                    **kwargs: any) -> dict:
@@ -596,7 +596,7 @@ class Calculation(Record):
 
         # Pass all known and unknown kwargs except status
         mquery = super().mongoquery(name=name, key=key, iprPy_version=iprPy_version,
-                                    atomman_version=atomman_version, script=script,
+                                    atomman_version=atomman_version, #script=script,
                                     branch=branch, **kwargs)
 
         # Add status
@@ -617,7 +617,7 @@ class Calculation(Record):
                   key: Union[str, list, None] = None,
                   iprPy_version: Union[str, list, None] = None,
                   atomman_version: Union[str, list, None] = None,
-                  script: Union[str, list, None] = None,
+                  #script: Union[str, list, None] = None,
                   branch: Union[str, list, None] = None,
                   status: Union[str, list, None] = None,
                   **kwargs: any) -> dict:
@@ -649,7 +649,7 @@ class Calculation(Record):
         """
         # Pass all known and unknown kwargs except status
         mquery = super().cdcsquery(key=key, iprPy_version=iprPy_version,
-                                   atomman_version=atomman_version, script=script,
+                                   atomman_version=atomman_version, #script=script,
                                    branch=branch, **kwargs)
 
         # Add status
