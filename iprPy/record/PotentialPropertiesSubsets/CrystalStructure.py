@@ -35,8 +35,8 @@ class CrystalStructure(PotentialsPropertiesSubset):
     @property
     def datacolumns(self):
         """list : The column names found in the associated dataframe"""
-        return ['composition', 'prototype', 'method', 'potential_energy',
-                'cohesive_energy', 'a', 'b', 'c', 'alpha', 'beta', 'gamma']
+        return ['composition', 'prototype', 'method', 'Epot (eV/atom)',
+                'Ecoh (eV/atom)', 'a', 'b', 'c', 'alpha', 'beta', 'gamma']
             
     @property
     def protorefcolumns(self):
@@ -69,8 +69,8 @@ class CrystalStructure(PotentialsPropertiesSubset):
                 crystal['composition'] = crystal_model['composition']
                 crystal['prototype'] = crystal_model['prototype']
                 crystal['method'] = crystal_model['method']
-                crystal['potential_energy'] = uc.value_unit(crystal_model['potential-energy'])
-                crystal['cohesive_energy'] = uc.value_unit(crystal_model['cohesive-energy'])
+                crystal['Epot (eV/atom)'] = uc.value_unit(crystal_model['potential-energy'])
+                crystal['Ecoh (eV/atom)'] = uc.value_unit(crystal_model['cohesive-energy'])
                 crystal['a'] = uc.value_unit(crystal_model['a'])
                 crystal['b'] = uc.value_unit(crystal_model['b'])
                 crystal['c'] = uc.value_unit(crystal_model['c'])
@@ -99,15 +99,15 @@ class CrystalStructure(PotentialsPropertiesSubset):
                     protoref_model['ref'] = protoref.references
                 model['crystal-structure'].append('prototype-ref-set', protoref_model)
             
-            for i in self.data.sort_values(['composition', 'cohesive_energy']).index:
+            for i in self.data.sort_values(['composition', 'Ecoh (eV/atom)']).index:
                 crystal = self.data.loc[i]
 
                 crystal_model = DM()
                 crystal_model['composition'] = crystal.composition
                 crystal_model['prototype'] = crystal.prototype
                 crystal_model['method'] = crystal.method
-                crystal_model['potential-energy'] = DM([('value', float(f"{crystal.potential_energy:.4f}")), ('unit', 'eV')])
-                crystal_model['cohesive-energy'] = DM([('value', float(f"{crystal.cohesive_energy:.4f}")), ('unit', 'eV')])
+                crystal_model['potential-energy'] = DM([('value', float(f"{crystal['Epot (eV/atom)']:.4f}")), ('unit', 'eV')])
+                crystal_model['cohesive-energy'] = DM([('value', float(f"{crystal['Ecoh (eV/atom)']:.4f}")), ('unit', 'eV')])
                 crystal_model['a'] = DM([('value', float(f"{crystal.a:.4f}")), ('unit', 'angstrom')])
                 crystal_model['b'] = DM([('value', float(f"{crystal.b:.4f}")), ('unit', 'angstrom')])
                 crystal_model['c'] = DM([('value', float(f"{crystal.c:.4f}")), ('unit', 'angstrom')])
