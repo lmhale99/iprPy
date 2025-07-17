@@ -16,6 +16,8 @@ from .load_run_directory import load_run_directory
 from .fix_lammps_versions import fix_lammps_versions
 from . import input
 
+from . import value
+from .value import valuemanager
 from . import record
 from .record import load_record, recordmanager
 
