@@ -18,7 +18,7 @@ from DataModelDict import DataModelDict as DM
 from .. import settings, load_run_directory, load_calculation
 
 def runner(database, run_directory, calc_name=None, orphan_directory=None,
-           hold_directory=None, log=True, bidtries=10, bidverbose=False,
+           hold_directory=None, log=False, bidtries=10, bidverbose=False,
            temp=False, temp_directory=None, kwargs_calc={}):
     """
     High-throughput calculation runner.
@@ -42,7 +42,7 @@ def runner(database, run_directory, calc_name=None, orphan_directory=None,
         uploaded are moved to.  If None (default) then will use 'hold' at the
         same level as the run_directory.
     log : bool, optional
-        If True (default), the runner will create and save a log file detailing the
+        If True, the runner will create and save a log file detailing the
         status of each calculation that it runs.
     bidtries : int, optional
         The runner will stop if it fails on bidding this many times in a
@@ -88,7 +88,7 @@ class RunManager():
     """
     
     def __init__(self, database, run_directory, orphan_directory=None,
-                 hold_directory=None, log=True):
+                 hold_directory=None, log=False):
         """
         Class initializer
         
@@ -108,7 +108,7 @@ class RunManager():
             uploaded are moved to.  If None (default) then will use 'hold' at the
             same level as the run_directory.
         log : bool, optional
-            If True (default), the runner will create and save a log file detailing the
+            If True, the runner will create and save a log file detailing the
             status of each calculation that it runs.
         """
         
