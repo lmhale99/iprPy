@@ -167,6 +167,7 @@ class IprPyDatabase():
         
         # Loop over all error records
         for record in records:
+
             # Check if record has saved tar
             try:
                 tar = self.get_tar(record=record)
@@ -189,8 +190,12 @@ class IprPyDatabase():
             
             # Clean record and update in the database
             record.clean()
-            record.build_model()
-            self.update_record(record=record)
+            try:
+                record.build_model()
+            except:
+                print('failed to update', record.name)
+            else:
+                self.update_record(record=record)
         
         # Remove bid files
         for bidfile in run_directory.glob('*/*.bid'):
@@ -613,7 +618,7 @@ class IprPyDatabase():
         return master_prepare(self, input_script=input_script, debug=debug, **kwargs)
 
     def runner(self, run_directory, calc_name=None, orphan_directory=None,
-               hold_directory=None, log=True, bidtries=10, bidverbose=False,
+               hold_directory=None, log=False, bidtries=10, bidverbose=False,
                temp=False, temp_directory=None, kwargs_calc={}):
         """
         High-throughput calculation runner.
@@ -635,7 +640,7 @@ class IprPyDatabase():
             uploaded are moved to.  If None (default) then will use 'hold' at the
             same level as the run_directory.
         log : bool, optional
-            If True (default), the runner will create and save a log file detailing the
+            If True, the runner will create and save a log file detailing the
             status of each calculation that it runs.
         bidtries : int, optional
             The runner will stop if it fails on bidding this many times in a
@@ -662,7 +667,7 @@ class IprPyDatabase():
                temp=temp, temp_directory=temp_directory, kwargs_calc=kwargs_calc)
 
     def runmanager(self, run_directory, orphan_directory=None,
-                    hold_directory=None, log=True):
+                    hold_directory=None, log=False):
         """
         Creates a RunManager object linked to the database.  This allows users
         more control on how to perform calculations by being able to directly
@@ -682,7 +687,7 @@ class IprPyDatabase():
             uploaded are moved to.  If None (default) then will use 'hold' at the
             same level as the run_directory.
         log : bool, optional
-            If True (default), the runner will create and save a log file detailing the
+            If True, the runner will create and save a log file detailing the
             status of each calculation that it runs.
         """
         return RunManager(self, run_directory, orphan_directory=orphan_directory,

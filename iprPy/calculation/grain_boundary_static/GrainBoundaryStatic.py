@@ -69,6 +69,14 @@ class GrainBoundaryStatic(Calculation):
 
         # Initialize unique calculation attributes
         self.potential_energy = 0.0
+        self.gbwidth = 20.0
+        self.boundarywidth = 10.0
+        self.num_a1 = 8
+        self.num_a2 = 8
+        self.deletefrom = 'top'
+        self.min_deleter = 0.30
+        self.max_deleter = 0.99
+        self.num_deleter = 100
         self.__gb_energies = None
         self.__min_gb_energy = None
         self.__final_dump = None
@@ -130,6 +138,80 @@ class GrainBoundaryStatic(Calculation):
         self.__potential_energy = float(val)
 
     @property
+    def gbwidth(self) -> float:
+        """float: The width of the region around the grain boundary that is relaxed"""
+        return self.__gbwidth
+    
+    @gbwidth.setter
+    def gbwidth(self, val: float):
+        self.__gbwidth = float(val)
+
+    @property
+    def boundarywidth(self) -> float:
+        """float: The minimum width of the region outside the grain boundary region"""
+        return self.__boundarywidth
+    
+    @boundarywidth.setter
+    def boundarywidth(self, val: float):
+        self.__boundarywidth = float(val)
+
+    @property
+    def num_a1(self) -> int:
+        """int: The number of in-plane shifts along the first in-plane vector to explore."""
+        return self.__num_a1
+
+    @num_a1.setter
+    def num_a1(self, val: int):
+        self.__num_a1 = int(val)
+
+    @property
+    def num_a2(self) -> int:
+        """int: The number of in-plane shifts along the second in-plane vector to explore."""
+        return self.__num_a2
+
+    @num_a2.setter
+    def num_a2(self, val: int):
+        self.__num_a2 = int(val)
+
+    @property
+    def deletefrom(self) -> str:
+        """str: Indicates which grain 'top', 'bottom', or 'both' close atoms will be deleted from"""
+        return self.__deletefrom
+    
+    @deletefrom.setter
+    def deletefrom(self, val: str):
+        if val not in ['top', 'bottom', 'both']:
+            raise ValueError('invalid deletefrom')
+        self.__deletefrom = val
+    
+    @property
+    def min_deleter(self) -> float:
+        """float: The minimum interatomic spacing for atom deletion at the boundary"""
+        return self.__min_deleter
+
+    @min_deleter.setter
+    def min_deleter(self, val: float):
+        self.__min_deleter = float(val)
+
+    @property
+    def max_deleter(self) -> float:
+        """float: The minimum interatomic spacing for atom deletion at the boundary"""
+        return self.__max_deleter
+
+    @max_deleter.setter
+    def max_deleter(self, val: float):
+        self.__max_deleter = float(val)
+
+    @property
+    def num_deleter(self) -> int:
+        """int: The number of interatomic spacing thresholds for atom deletion at the boundary"""
+        return self.__num_deleter
+
+    @num_deleter.setter
+    def num_deleter(self, val: int):
+        self.__num_deleter = int(val)
+
+    @property
     def final_dump(self) -> dict:
         """dict: Info about the final dump file"""
         if self.__final_dump is None:
@@ -165,6 +247,28 @@ class GrainBoundaryStatic(Calculation):
         potential_energy : float, optional
             The reference per-atom bulk potential energy to use when computing
             grain boundary energies.
+        gbwidth : float, optional
+            The width of the region around the grain boundary that will be
+            relaxed.  Note that this is applied to both grains independently.
+        boundarywidth : float, optional
+            The minimum width of the system outside the grain boundary region
+            where atoms will not be relaxed.
+        num_a1 : int, optional
+            The number of in-plane shifts along the first in-plane vector to
+            explore.
+        num_a2 : int, optional
+            The number of in-plane shifts along the second in-plane vector to
+            explore.
+        deletefrom : str
+            Indicates which grain 'top', 'bottom', or 'both' close atoms will
+            be deleted from.
+        min_deleter : float
+            The minimum interatomic spacing for atom deletion at the boundary.
+        max_deleter : float
+            The minimum interatomic spacing for atom deletion at the boundary.
+        num_deleter : int
+            The number of interatomic spacing thresholds for atom deletion at
+            the boundary.
         **kwargs : any, optional
             Any keyword parameters supported by the set_values() methods of
             the parent Calculation class and the subset classes.
@@ -175,6 +279,22 @@ class GrainBoundaryStatic(Calculation):
         # Set calculation-specific values
         if 'potential_energy' in kwargs:
             self.potential_energy = kwargs['potential_energy']
+        if 'gbwidth' in kwargs:
+            self.gbwidth = kwargs['gbwidth']
+        if 'boundarywidth' in kwargs:
+            self.boundarywidth = kwargs['boundarywidth']
+        if 'num_a1' in kwargs:
+            self.num_a1 = kwargs['num_a1']
+        if 'num_a2' in kwargs:
+            self.num_a2 = kwargs['num_a2']
+        if 'deletefrom' in kwargs:
+            self.deletefrom = kwargs['deletefrom']
+        if 'min_deleter' in kwargs:
+            self.min_deleter = kwargs['min_deleter']
+        if 'max_deleter' in kwargs:
+            self.max_deleter = kwargs['max_deleter']
+        if 'num_deleter' in kwargs:
+            self.num_deleter = kwargs['num_deleter']
 
 ####################### Parameter file interactions ###########################
 
@@ -205,17 +325,29 @@ class GrainBoundaryStatic(Calculation):
                                                   '1.0e-18 eV/angstrom')
 
         # Load calculation-specific strings
+        self.deletefrom = input_dict.get('deletefrom', 'top')
 
         # Load calculation-specific booleans
 
         # Load calculation-specific integers
+        self.num_a1 = int(input_dict.get('num_a1', 8))
+        self.num_a2 = int(input_dict.get('num_a2', 8))
+        self.num_deleter = int(input_dict.get('num_deleter', 100))
 
         # Load calculation-specific unitless floats
+        self.min_deleter = float(input_dict.get('min_deleter', 0.30))
+        self.max_deleter = float(input_dict.get('max_deleter', 0.99))
 
         # Load calculation-specific floats with units
         self.potential_energy = value(input_dict, 'potential_energy',
                               default_unit=self.units.energy_unit,
                               default_term='0.0 eV')
+        self.gbwidth = value(input_dict, 'gbwidth',
+                             default_unit=self.units.length_unit,
+                             default_term='20.0 angstrom')
+        self.boundarywidth = value(input_dict, 'boundarywidth',
+                             default_unit=self.units.length_unit,
+                             default_term='10.0 angstrom')
 
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
@@ -287,12 +419,11 @@ class GrainBoundaryStatic(Calculation):
             params['parent_standing'] = 'good'
             params['defect_record'] = 'grain_boundary'
       
-            params['grainboundary_minwidth'] = '120'
-            params['forcetolerance'] = '1e-18 eV/angstrom'
-            params['maxiterations'] = '10000'
+            params['energytolerance'] = '1e-15'
+            params['forcetolerance'] = '1e-15 eV/angstrom'
+            params['maxiterations'] = '100000'
             params['maxevaluations'] = '100000'
-            params['maxevaluations'] = '100000'
-
+        
             # Copy kwargs to params
             for key in kwargs:
 
@@ -319,6 +450,40 @@ class GrainBoundaryStatic(Calculation):
                 "to use for calculating the grain boundary energies. If not given,",
                 "will try to extract from the load file if it is a relaxed_crystal",
                 "record, or set to 0.0 otherwise."]),
+            'gbwidth': ' '.join([
+                "The width of the region around the grain boundary that will be",
+                "relaxed. Note that the region will be twice as thick as gbwidth",
+                "as it is applied to both crystals independently.  Default value",
+                 "is 20 angstroms."]),
+            'boundarywidth': ' '.join([
+                "The minimum width of the boundary region beyond the gbwidth",
+                "where atoms exist but are not subjected to relaxations.",
+                "This region prevents the other atoms from seeing a free surface.",
+                "Default value is 10 angstroms."]),
+            'num_a1': ' '.join([
+                "The number of boundary grid shifts to explore along the first",
+                "identified in-plane vector.  Default value is 8."]),
+            'num_a2': ' '.join([
+                "The number of boundary grid shifts to explore along the second",
+                "identified in-plane vector.  Default value is 8."]),
+            'deletefrom': ' '.join([
+                "Indicates which grain ('top', 'bottom' or 'both') that atoms",
+                "close to each other across the boundary will be deleted from.",
+                "Default value is 'top'."]),
+            'min_deleter': ' '.join([
+                "The smallest interatomic spacing (relative to the unit cell's r0)",
+                "to include in the iterative deletion search of atoms close to",
+                "each other across the boundary.  Default value is 0.3"]),
+            'max_deleter': ' '.join([
+                "The largest interatomic spacing (relative to the unit cell's r0)",
+                "to include in the iterative deletion search of atoms close to",
+                "each other across the boundary.  Default value is 0.99"]),
+            'num_deleter': ' '.join([
+                "The number of interatomic spacings ranging from min_deleter",
+                "to max_deleter that are to be used for the boundary atom deletion",
+                "threshold.  Note that only unique configurations will be minimized",
+                "so this is the max number of configurations that can be explored",
+                "for each a1,a2 shift set.  Default value is 100"]),
         }
 
     @property
@@ -358,11 +523,18 @@ class GrainBoundaryStatic(Calculation):
             self.defect.multikeys +
 
             # Run parameter keys
-            #[
-            #    [
-                    
-            #    ]
-            #] +
+            [
+                [
+                    'gbwidth',
+                    'boundarywidth',
+                    'num_a1',
+                    'num_a2',
+                    'deletefrom',
+                    'min_deleter',
+                    'max_deleter',
+                    'num_deleter'
+                ]
+            ] +
 
             # Minimize keys
             [
@@ -402,6 +574,16 @@ class GrainBoundaryStatic(Calculation):
 
         run_params['potential-energy'] = uc.model(self.potential_energy,
                                                  self.units.energy_unit)
+        run_params['grain-boundary-width'] = uc.model(self.gbwidth,
+                                                      self.units.length_unit)
+        run_params['boundary-width'] = uc.model(self.boundarywidth,
+                                                self.units.length_unit)
+        run_params['num_a1'] = self.num_a1
+        run_params['num_a2'] = self.num_a2
+        run_params['deletefrom'] = self.deletefrom
+        run_params['min_deleter'] = self.min_deleter
+        run_params['max_deleter'] = self.max_deleter
+        run_params['num_deleter'] = self.num_deleter
 
         # Build results
         if self.status == 'finished':
@@ -443,6 +625,14 @@ class GrainBoundaryStatic(Calculation):
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
         self.potential_energy = uc.value_unit(run_params['potential-energy'])
+        self.gbwidth = uc.value_unit(run_params['grain-boundary-width'])
+        self.boundarywidth = uc.value_unit(run_params['boundary-width'])
+        self.num_a1 = run_params['num_a1']
+        self.num_a2 = run_params['num_a2']
+        self.deletefrom = run_params['deletefrom']
+        self.min_deleter = run_params['min_deleter']
+        self.max_deleter = run_params['max_deleter']
+        self.num_deleter = run_params['num_deleter']
 
         # Load results
         if self.status == 'finished':
@@ -468,6 +658,10 @@ class GrainBoundaryStatic(Calculation):
 
         # Extract calculation-specific content
         meta['potential_energy'] = self.potential_energy
+        meta['gbwidth'] = self.gbwidth
+        meta['boundarywidth'] = self.boundarywidth
+        meta['num_a1'] = self.num_a1
+        meta['num_a2'] = self.num_a2
 
         # Extract results
         if self.status == 'finished':
@@ -516,6 +710,14 @@ class GrainBoundaryStatic(Calculation):
 
         # Add calculation-specific inputs
         input_dict['potential_energy'] = self.potential_energy
+        input_dict['gbwidth'] = self.gbwidth
+        input_dict['boundarywidth'] = self.boundarywidth
+        input_dict['num_a1'] = self.num_a1
+        input_dict['num_a2'] = self.num_a2
+        input_dict['deletefrom'] = self.deletefrom
+        input_dict['min_deleter'] = self.min_deleter
+        input_dict['max_deleter'] = self.max_deleter
+        input_dict['num_deleter'] = self.num_deleter
 
         # Return input_dict
         return input_dict

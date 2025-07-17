@@ -1,0 +1,20 @@
+{
+    "grain-boundary": {
+        "key": "3780e266-b698-4837-b1ca-4a36f4294d9a",
+        "id": "A1--Cu--fcc--stgb-100-05.72",
+        "system-family": "A1--Cu--fcc",
+        "type": "symmetric tilt",
+        "axis": "<100>",
+        "misorientation-angle": 5.724810452223812,
+        "calculation-parameter": {
+            "auvw1": "0 0 1",
+            "buvw1": "2 1 0",
+            "cuvw1": "-1 2 0",
+            "auvw2": "0 0 1",
+            "buvw2": "2 -1 0",
+            "cuvw2": "1 2 0",
+            "cutboxvector": "c",
+            "cellsetting": "f"
+        }
+    }
+}

@@ -8,3 +8,4 @@ __all__.sort()
 
 # Add the modular Record styles
 recordmanager.import_style('PotentialProperties', '.PotentialProperties', __name__)
+recordmanager.import_style('md_solid_properties', '.MDSolidProperties', __name__)

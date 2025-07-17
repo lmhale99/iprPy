@@ -4,14 +4,13 @@
 from io import IOBase
 from pathlib import Path
 from typing import Optional, Union
-from copy import deepcopy
+import secrets
 
 import numpy as np
 
-from yabadaba import load_query
-
 # https://github.com/usnistgov/atomman
 import atomman as am
+import atomman.lammps as lmp
 import atomman.unitconvert as uc
 
 # https://github.com/usnistgov/DataModelDict
@@ -19,102 +18,14 @@ from DataModelDict import DataModelDict as DM
 
 # iprPy imports
 from .. import Calculation
-from .stacking_fault_map_2D import stackingfaultmap
+from .grain_boundary_grip import grain_boundary_grip
 from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
                                    AtommanSystemLoad, LammpsMinimize,
-                                   StackingFault)
+                                   GRIP, GrainBoundary)
+from ...input import value, boolean
 
-class StackingFaultPath():
-    """Class for managing a path along a stacking fault map"""
-
-    def __init__(self, sp: DM):
-        self.__direction = sp['direction']
-        self.__error = sp.get('error', None)
-
-        if self.__error is None:
-            self.__coord = uc.value_unit(sp['minimum-energy-path'])
-            self.__usf_mep = uc.value_unit(sp['unstable-fault-energy-mep'])
-            self.__usf_urp = uc.value_unit(sp['unstable-fault-energy-unrelaxed-path'])
-            self.__shear_mep = uc.value_unit(sp['ideal-shear-stress-mep'])
-            self.__shear_urp = uc.value_unit(sp['ideal-shear-stress-unrelaxed-path'])
-
-        else:
-            self.__coord = None
-
-            self.__usf_mep = None
-            self.__usf_urp = None
-            self.__shear_mep = None
-            self.__shear_urp = None
-
-    @property
-    def direction(self) -> str:
-        """str: The direction of slip"""
-        return self.__direction
-
-    @property
-    def coord(self) -> np.ndarray:
-        """numpy.ndarray: Coordinates along the path"""
-        return self.__coord
-
-    @property
-    def usf_mep(self) -> float:
-        """float: The USF energy found along the minimum energy path"""
-        return self.__usf_mep
-
-    @property
-    def usf_urp(self) -> float:
-        """float: The USF energy found along the unrelaxed (ideal) path"""
-        return self.__usf_urp
-
-    @property
-    def shear_mep(self) -> float:
-        """float: The ideal shear stress found along the minimum energy path"""
-        return self.__shear_mep
-
-    @property
-    def shear_urp(self) -> float:
-        """float: The ideal shear stress found along the unrelaxed (ideal) path"""
-        return self.__shear_urp
-
-    @property
-    def error(self) -> Optional[str]:
-        """str or None: Any error that may have been issued during the MEP calculation"""
-        return self.__error
-
-    def build_model(self,
-                    length_unit: str = 'angstrom',
-                    energyperarea_unit: str = 'mJ/m^2',
-                    stress_unit: str = 'GPa') -> DM:
-        """
-        Constructs the model contents associated with the path.
-
-        Parameters
-        ----------
-        length_unit : str, optional
-            The unit of length to use when outputting the path coordinates.
-        energyperarea_unit : str, optional
-            The unit of energy per area to use when outputting the unstable fault
-            energies.
-        stress_unit : str, optional
-            The unit of stress to use when outputting the ideal shear stresses.
-        """
-        sp = DM()
-        sp['direction'] = self.direction
-
-        if self.error is None:
-            sp['minimum-energy-path'] = uc.model(self.coord, length_unit)
-            sp['unstable-fault-energy-mep'] = uc.model(self.usf_mep, energyperarea_unit)
-            sp['unstable-fault-energy-unrelaxed-path'] = uc.model(self.usf_urp, energyperarea_unit)
-            sp['ideal-shear-stress-mep'] = uc.model(self.shear_mep, stress_unit)
-            sp['ideal-shear-stress-unrelaxed-path'] = uc.model(self.shear_urp, stress_unit)
-
-        else:
-            sp['error'] = self.error
-
-        return sp
-
-class StackingFaultMap2D(Calculation):
-    """Class for managing 2D maps of stacking fault energy calculations"""
+class GrainBoundaryGRIP(Calculation):
+    """Class for grain boundary energy calculations using the GRIP algorithm"""
 
 ############################# Core properties #################################
 
@@ -154,19 +65,22 @@ class StackingFaultMap2D(Calculation):
         self.__units = Units(self)
         self.__system = AtommanSystemLoad(self)
         self.__minimize = LammpsMinimize(self)
-        self.__defect = StackingFault(self)
+        self.__defect = GrainBoundary(self)
+        self.__grip = GRIP(self)
         subsets = (self.commands, self.potential, self.system,
-                   self.minimize, self.defect, self.units)
+                   self.minimize, self.defect, self.grip, self.units)
 
         # Initialize unique calculation attributes
-        self.num_a1 = 10
-        self.num_a2 = 10
-        self.__gamma = None
-        self.__paths = None
-        self.__E_isf = None
-
+        self.potential_energy = 0.0
+        self.gbwidth = 10.0
+        self.bufferwidth = 10.0
+        self.boundarywidth = 10.0
+        self.verbose = False
+        self.__gb_energy = None
+        self.__final_dump = None
+        
         # Define calc shortcut
-        self.calc = stackingfaultmap
+        self.calc = grain_boundary_grip
 
         # Call parent constructor
         super().__init__(model=model, name=name, database=database, params=params,
@@ -176,8 +90,8 @@ class StackingFaultMap2D(Calculation):
     def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
-            'stacking_fault_map_2D.py',
-            'sfmin.template'
+            'grain_boundary_grip.py',
+            'grip_relax.template'
         ]
 
 ############################## Class attributes ###############################
@@ -206,50 +120,89 @@ class StackingFaultMap2D(Calculation):
     def minimize(self) -> LammpsMinimize:
         """LammpsMinimize subset"""
         return self.__minimize
-
+    
     @property
-    def defect(self) -> StackingFault:
-        """StackingFault subset"""
+    def defect(self) -> GrainBoundary:
+        """GrainBoundary subset"""
         return self.__defect
+    
+    @property
+    def grip(self) -> GRIP:
+        """GRIP subset"""
+        return self.__grip
 
     @property
-    def num_a1(self) -> int:
-        """int: Number of fractional shifts along the a1vect direction to evaluate"""
-        return self.__num_a1
-
-    @num_a1.setter
-    def num_a1(self, val: int):
-        self.__num_a1 = int(val)
-
-    @property
-    def num_a2(self) -> int:
-        """int: Number of fractional shifts along the a2vect direction to evaluate"""
-        return self.__num_a2
-
-    @num_a2.setter
-    def num_a2(self, val: int):
-        self.__num_a2 = int(val)
+    def potential_energy(self) -> float:
+        """float: The reference per-atom bulk potential energy to use when computing grain boundary energies"""
+        return self.__potential_energy
+    
+    @potential_energy.setter
+    def potential_energy(self, val: float):
+        self.__potential_energy = float(val)
 
     @property
-    def gamma(self) -> am.defect.GammaSurface:
-        """atomman.defect.GammaSurface: GSF results"""
-        if self.__gamma is None:
+    def gbwidth(self) -> float:
+        """float: The width of the region around the grain boundary that is relaxed with MD and minimization"""
+        return self.__gbwidth
+    
+    @gbwidth.setter
+    def gbwidth(self, val: float):
+        self.__gbwidth = float(val)
+    
+    @property
+    def bufferwidth(self) -> float:
+        """float: The width of the region beyond the grain boundary region that is only relaxed with minimization"""
+        return self.__bufferwidth
+    
+    @bufferwidth.setter
+    def bufferwidth(self, val: float):
+        self.__bufferwidth = float(val)
+    
+    @property
+    def boundarywidth(self) -> float:
+        """float: The minimum width of the region outside the grain boundary and buffer regions"""
+        return self.__boundarywidth
+    
+    @boundarywidth.setter
+    def boundarywidth(self, val: float):
+        self.__boundarywidth = float(val)
+
+    @property
+    def verbose(self) -> bool:
+        """bool: If True then GRIP algorithm messages will be generated"""
+        return self.__verbose
+    
+    @verbose.setter
+    def verbose(self, val: bool):
+        self.__verbose = boolean(val)
+
+    @property
+    def randomseed(self) -> int:
+        """int: Random number generator seed for GRIP and LAMMPS"""
+        return self.grip.randomseed
+
+    @property
+    def randomseed(self) -> int:
+        """int: Random number generator seed for GRIP and LAMMPS"""
+        return self.grip.grip.randomseed
+
+    @randomseed.setter
+    def randomseed(self, val: Optional[int]):
+        self.grip.grip.randomseed = lmp.seed(val)
+
+    @property
+    def final_dump(self) -> dict:
+        """dict: filename and symbols of the final relaxed configuration"""
+        if self.__final_dump is None:
             raise ValueError('No results yet!')
-        if not isinstance(self.__gamma, am.defect.GammaSurface):
-            self.__gamma = am.defect.GammaSurface(model=self.__gamma)
-        return self.__gamma
+        return self.__final_dump
 
     @property
-    def paths(self) -> list:
-        """list: Any StackingFaultPath results"""
-        if self.__paths is None:
-            raise ValueError('No path results!')
-        return self.__paths
-
-    @property
-    def E_isf(self) -> Optional[float]:
-        """float or None: Intrinsic stacking fault energy for the plane, if exists and found."""
-        return self.__E_isf
+    def gb_energy(self) -> float:
+        """float: The grain boundary energy for the relaxed configuration"""
+        if self.__gb_energy is None:
+            raise ValueError('No results yet!')
+        return self.__gb_energy
 
     def set_values(self,
                    name: Optional[str] = None,
@@ -263,10 +216,9 @@ class StackingFaultMap2D(Calculation):
         name : str, optional
             The name to assign to the calculation.  By default, this is set as
             the calculation's key.
-        num_a1 : int, optional
-            The number of shifts to evaluate along the a1 shift vector.
-        num_a2 : int, optional
-            The number of shifts to evaluate along the a2 shift vector.
+        potential_energy : float, optional
+            The reference per-atom bulk potential energy to use when computing
+            grain boundary energies.
         **kwargs : any, optional
             Any keyword parameters supported by the set_values() methods of
             the parent Calculation class and the subset classes.
@@ -275,24 +227,18 @@ class StackingFaultMap2D(Calculation):
         super().set_values(name=name, **kwargs)
 
         # Set calculation-specific values
-        if 'num_a1' in kwargs:
-            self.num_a1 = kwargs['num_a1']
-        if 'num_a2' in kwargs:
-            self.num_a2 = kwargs['num_a2']
-
-    def add_path(self, sp):
-        """
-        Adds a new path object to the paths list.
-
-        Parameters
-        ----------
-        sp : DataModelDict
-            Dictionary of stacking fault mep results terms
-        """
-        newpath = StackingFaultPath(sp)
-        if self.__paths is None:
-            self.__paths = []
-        self.paths.append(newpath)
+        if 'potential_energy' in kwargs:
+            self.potential_energy = kwargs['potential_energy']
+        if 'gbwidth' in kwargs:
+            self.gbwidth = kwargs['gbwidth']
+        if 'bufferwidth' in kwargs:
+            self.bufferwidth = kwargs['bufferwidth']
+        if 'boundarywidth' in kwargs:
+            self.boundarywidth = kwargs['boundarywidth']
+        if 'verbose' in kwargs:
+            self.verbose = kwargs['verbose']
+        if 'randomseed' in kwargs:
+            self.grip.grip.randomseed = kwargs['randomseed']
 
 ####################### Parameter file interactions ###########################
 
@@ -318,21 +264,30 @@ class StackingFaultMap2D(Calculation):
         self.units.load_parameters(input_dict)
 
         # Change default values for subset terms
-        input_dict['sizemults'] = input_dict.get('sizemults', '3 3 3')
-        input_dict['forcetolerance'] = input_dict.get('forcetolerance',
-                                                  '1.0e-6 eV/angstrom')
 
         # Load calculation-specific strings
 
         # Load calculation-specific booleans
+        self.verbose = boolean(input_dict.get('verbose', False))
 
         # Load calculation-specific integers
-        self.num_a1 = int(input_dict.get('stackingfault_num_a1', 10))
-        self.num_a2 = int(input_dict.get('stackingfault_num_a2', 10))
+        self.randomseed = input_dict.get('randomseed', None)
 
         # Load calculation-specific unitless floats
 
         # Load calculation-specific floats with units
+        self.potential_energy = value(input_dict, 'potential_energy',
+                              default_unit=self.units.energy_unit,
+                              default_term='0.0 eV')
+        self.gbwidth = value(input_dict, 'gbwidth',
+                             default_unit=self.units.length_unit,
+                             default_term='10.0 angstrom')
+        self.bufferwidth = value(input_dict, 'bufferwidth',
+                             default_unit=self.units.length_unit,
+                             default_term='10.0 angstrom')
+        self.boundarywidth = value(input_dict, 'boundarywidth',
+                             default_unit=self.units.length_unit,
+                             default_term='10.0 angstrom')
 
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
@@ -348,6 +303,22 @@ class StackingFaultMap2D(Calculation):
 
         # Load defect parameters
         self.defect.load_parameters(input_dict)
+
+        # Load GRIP parameters
+        self.grip.load_parameters(input_dict)
+
+        # Extract potential energy from load file if needed/possible
+        if self.potential_energy == 0.0 and self.system.load_style == 'system_model':
+            if self.system.load_content is not None:
+                model = self.system.load_content
+            else:
+                model = self.system.load_file
+            try:
+                parent = am.library.load_record('relaxed_crystal', model=model)
+            except:
+                pass
+            else:
+                self.potential_energy = parent.potential_energy
 
     def master_prepare_inputs(self,
                               branch: str = 'main',
@@ -384,15 +355,29 @@ class StackingFaultMap2D(Calculation):
             # Set default workflow settings
             params['buildcombos'] = [
                 'atomicparent load_file parent',
-                'defect stackingfault_file'
+                'defect grainboundary_file'
             ]
             params['parent_record'] = 'relaxed_crystal'
             params['parent_method'] = 'dynamic'
             params['parent_standing'] = 'good'
-            params['defect_record'] = 'stacking_fault'
-            params['sizemults'] = '5 5 10'
-            params['stackingfault_num_a1'] = '30'
-            params['stackingfault_num_a2'] = '30'
+            params['defect_record'] = 'grain_boundary'
+      
+            params['interstitial_max_num'] = '0'
+
+            params['energytolerance'] = '1e-15'
+            params['forcetolerance'] = '1e-15 eV/angstrom'
+            params['maxiterations'] = '100000'
+            params['maxevaluations'] = '100000'
+
+            if 'randomseed' not in kwargs:
+                num_randomseeds = int(kwargs.pop('num_randomseeds', 1))
+                params['randomseed'] = [str(lmp.seed()) for i in range(num_randomseeds)]
+            elif 'num_randomseeds' in kwargs:
+                num_randomseeds = int(kwargs.pop('num_randomseeds'))
+                if isinstance(kwargs['randomseed'], str) and num_randomseeds != 1:
+                    raise ValueError('mismatch between randomseed and num_randomseeds')
+                elif num_randomseeds != len(kwargs['randomseed']):
+                    raise ValueError('mismatch between randomseed and num_randomseeds')
 
             # Copy kwargs to params
             for key in kwargs:
@@ -415,12 +400,32 @@ class StackingFaultMap2D(Calculation):
         """dict : The calculation-specific input keys and their descriptions."""
 
         return {
-            'stackingfault_num_a1': ' '.join([
-                "The number of fractional shift steps to measure along the a1",
-                "shift vector. Default value is 10."]),
-            'stackingfault_num_a2': ' '.join([
-                "The number of fractional shift steps to measure along the a2",
-                "shift vector. Default value is 10."]),
+            'potential_energy': ' '.join([
+                "The reference per-atom potential energy from the bulk crystal",
+                "to use for calculating the grain boundary energies. If not given,",
+                "will try to extract from the load file if it is a relaxed_crystal",
+                "record, or set to 0.0 otherwise."]),
+            'gbwidth': ' '.join([
+                "The width of the grain boundary region taken as the distance into both",
+                "crystals from the grain boundary plane.  This region will be relaxed",
+                "during both the MD and minimization stages.  Note that the region",
+                "itself will be twice as thick as gbwidth as it is applied to both",
+                "crystals independently.  Default value is 10 angstroms."]),
+            'bufferwidth': ' '.join([
+                "The width of the buffer regions that separate the grain boundary",
+                "region from the fixed atom surface boundary regions.  The buffer",
+                "regions will not be relaxed during the MD stage, but will be relaxed",
+                "during the minimization stage. Default value is 10 angstroms."]),
+            'boundarywidth': ' '.join([
+                "The minimum width of the boundary region beyond both gbwidth and",
+                "bufferwidth where atoms exist but are not subjected to relaxations.",
+                "This region prevents the other atoms from seeing a free surface.",
+                "Default value is 10 angstroms."]),
+            'randomseed': ' '.join([
+                "Random number generator seed for use by GRIP and LAMMPS.  A seed",
+                "value will be randomly selected if one is not given."]),
+            'verbose': ' '.join([
+                "If set to True then GRIP algorithm info will be printed"])
         }
 
     @property
@@ -434,8 +439,15 @@ class StackingFaultMap2D(Calculation):
             # Subset keys
             + self.commands.keyset
             + self.units.keyset
+            + self.grip.keyset
 
             # Calculation-specific keys
+            + [
+                'gbwidth',
+                'bufferwidth',
+                'boundarywidth',
+                'verbose'
+            ]
         )
         return keys
 
@@ -450,7 +462,10 @@ class StackingFaultMap2D(Calculation):
             # Combination of potential and system keys
             [
                 self.potential.keyset +
-                self.system.keyset
+                self.system.keyset +
+                [
+                    'potential_energy',
+                ]
             ] +
 
             # Defect multikeys
@@ -459,10 +474,9 @@ class StackingFaultMap2D(Calculation):
             # Run parameter keys
             [
                 [
-                    'stackingfault_num_a1',
-                    'stackingfault_num_a2',
+                    'randomseed'        
                 ]
-            ] +
+            ]  +
 
             # Minimize keys
             [
@@ -476,7 +490,7 @@ class StackingFaultMap2D(Calculation):
     @property
     def modelroot(self) -> str:
         """str: The root element of the content"""
-        return 'calculation-stacking-fault-map-2D'
+        return 'calculation-grain-boundary-grip'
 
     def build_model(self) -> DM:
         """
@@ -491,6 +505,7 @@ class StackingFaultMap2D(Calculation):
         self.potential.build_model(calc, after='calculation')
         self.system.build_model(calc, after='potential-LAMMPS')
         self.defect.build_model(calc, after='system-info')
+        self.grip.build_model(calc, after='grain-boundary')
         self.minimize.build_model(calc)
 
         # Build calculation-specific content
@@ -499,27 +514,31 @@ class StackingFaultMap2D(Calculation):
         if 'run-parameter' not in calc['calculation']:
             calc['calculation']['run-parameter'] = DM()
         run_params = calc['calculation']['run-parameter']
-        run_params['stackingfault_num_a1'] = self.num_a1
-        run_params['stackingfault_num_a2'] = self.num_a2
+
+        run_params['potential-energy'] = uc.model(self.potential_energy,
+                                                  self.units.energy_unit)
+        run_params['grain-boundary-width'] = uc.model(self.gbwidth,
+                                                      self.units.length_unit)
+        run_params['buffer-width'] = uc.model(self.bufferwidth,
+                                              self.units.length_unit)
+        run_params['boundary-width'] = uc.model(self.boundarywidth,
+                                                self.units.length_unit)
 
         # Build results
         if self.status == 'finished':
-            energy_per_area_unit = f'{self.units.energy_unit}/{self.units.length_unit}^2'
-            gamma_model = self.gamma.model(length_unit=self.units.length_unit,
-                                           energyperarea_unit=energy_per_area_unit)
-            calc['stacking-fault-map'] = gamma_model['stacking-fault-map']
+            
+            calc['final-system'] = DM()
+            calc['final-system']['artifact'] = DM()
+            calc['final-system']['artifact']['file'] = self.final_dump['filename']
+            calc['final-system']['artifact']['format'] = 'atom_dump'
+            calc['final-system']['symbols'] = self.final_dump['symbols']
+            
+            #energy_per_area_unit = f'{self.units.energy_unit}/{self.units.length_unit}^2'
+            energy_per_area_unit = 'mJ/m^2'
 
-            if self.E_isf is not None:
-                calc['intrinsic-fault-energy'] = uc.model(self.E_isf, 'mJ/m^2')
+            calc['grain-boundary-energy'] = uc.model(self.gb_energy, energy_per_area_unit)
 
-            try:
-                paths = self.paths
-            except:
-                pass
-            else:
-                for path in paths:
-                    calc.append('slip-path', path.build_model())
-
+            
         self._set_model(model)
         return model
 
@@ -543,37 +562,21 @@ class StackingFaultMap2D(Calculation):
 
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
-        self.num_a1 = run_params['stackingfault_num_a1']
-        self.nun_a2 = run_params['stackingfault_num_a2']
-
+        self.potential_energy = uc.value_unit(run_params['potential-energy'])
+        self.gbwidth = uc.value_unit(run_params['grain-boundary-width'])
+        self.bufferwidth = uc.value_unit(run_params['buffer-width'])
+        self.boundarywidth = uc.value_unit(run_params['boundary-width'])
+        
         # Load results
         if self.status == 'finished':
-            self.__gamma = calc
+            
+            self.__final_dump = {
+                'filename': calc['final-system']['artifact']['file'],
+                'symbols': calc['final-system']['symbols']
+            }
 
-            if 'intrinsic-fault-energy' in calc:
-                self.__E_isf = uc.value_unit(calc['intrinsic-fault-energy'])
-            if 'slip-path' in calc:
-                self.__paths = []
-                for sp in calc.iteraslist('slip-path'):
-                    self.paths.append(StackingFaultPath(sp))
+            self.__gb_energy = uc.value_unit(calc['grain-boundary-energy'])
 
-    @property
-    def queries(self) -> dict:
-        queries = deepcopy(super().queries)
-        queries.update({
-            'num_a1': load_query(
-                style='int_match',
-                name='num_a1',
-                path=f'{self.modelroot}.calculation.run-parameter.stackingfault_num_a1',
-                description='search by number of a1 steps used'),
-            'num_a2': load_query(
-                style='int_match',
-                name='num_a2',
-                path=f'{self.modelroot}.calculation.run-parameter.stackingfault_num_a2',
-                description='search by number of a2 steps used'),
-        })
-        return queries
-    
 ########################## Metadata interactions ##############################
 
     def metadata(self) -> dict:
@@ -586,31 +589,15 @@ class StackingFaultMap2D(Calculation):
         meta = super().metadata()
 
         # Extract calculation-specific content
-        meta['num_a1'] = self.num_a1
-        meta['num_a2'] = self.num_a2
+        meta['potential_energy'] = self.potential_energy
+        meta['gbwidth'] = self.gbwidth
+        meta['bufferwidth'] = self.bufferwidth
+        meta['boundarywidth'] = self.boundarywidth
 
         # Extract results
         if self.status == 'finished':
-            if self.E_isf is not None:
-                meta['E_isf'] = self.E_isf
-
-            try:
-                paths = self.paths
-            except:
-                meta['has_mep'] = False
-            else:
-                meta['has_mep'] = True
-                for path in paths:
-                    direction = path.direction
-
-                    if path.error is None:
-                        meta[f'E_usf_mep {direction}'] = path.usf_mep
-                        meta[f'E_usf_urp {direction}'] = path.usf_urp
-                        meta[f'τ_ideal_mep {direction}'] = path.shear_mep
-                        meta[f'τ_ideal_urp {direction}'] = path.shear_urp
-                    else:
-                        meta[f'error {direction}'] = path.error
-
+            meta['gb_energy'] = self.gb_energy
+           
         return meta
 
     @property
@@ -626,14 +613,10 @@ class StackingFaultMap2D(Calculation):
             'potential_LAMMPS_key',
             'potential_key',
 
-            'a_mult',
-            'b_mult',
-            'c_mult',
+            'grainboundary_key',
 
-            'stackingfault_key',
+            'randomseed',
 
-            'num_a1',
-            'num_a2'
         ]
 
     @property
@@ -657,11 +640,25 @@ class StackingFaultMap2D(Calculation):
             subset.calc_inputs(input_dict)
 
         # Add calculation-specific inputs
-        input_dict['num_a1'] = self.num_a1
-        input_dict['num_a2'] = self.num_a2
+        input_dict['potential_energy'] = self.potential_energy
+        input_dict['gbwidth'] = self.gbwidth
+        input_dict['bufferwidth'] = self.bufferwidth
+        input_dict['boundarywidth'] = self.boundarywidth
+        input_dict['randomseed'] = self.randomseed
+        input_dict['verbose'] = self.verbose
 
         # Return input_dict
         return input_dict
+
+    @property
+    def calc_output_files(self) -> list:
+        """list : Glob path strings for files generated by this calculation"""
+        return [
+            'init.dat',
+            'log.lammps',
+            'final.dump',
+            'grip_relax.in'
+        ]
 
     def process_results(self, results_dict: dict):
         """
@@ -673,4 +670,9 @@ class StackingFaultMap2D(Calculation):
         results_dict: dict
             The dictionary returned by the calc() method.
         """
-        self.__gamma = results_dict['gamma']
+        self.__final_dump = {
+            'filename': results_dict['dumpfile_final'],
+            'symbols': results_dict['symbols_final']
+        }
+        self.grip.grip = results_dict['grip']
+        self.__gb_energy = results_dict['gb_energy']

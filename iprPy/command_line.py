@@ -172,6 +172,7 @@ def command_line_actions(args):
         database.runner(run_directory,
                         calc_name=args.calc_name,
                         temp=args.temp,
+                        log=args.log,
                         bidtries=args.bidtries,
                         bidverbose=args.bidverbose)
 
@@ -412,6 +413,8 @@ def command_line_parser():
                         help='specifies a single calculation in run_directory to run')
     subparser.add_argument('-t', '--temp', action='store_true',
                         help='indicates that the calculations are to run in a temporary directory')
+    subparser.add_argument('-l', '--log', action='store_true',
+                        help='indicates that a log file for the runner is to be created (in the main settings directory)')
     subparser.add_argument('-b', '--bidtries', default=10, type=int,
                         help='number of sequential bid failures before stopping the runner')
     subparser.add_argument('-v', '--bidverbose', action='store_true',

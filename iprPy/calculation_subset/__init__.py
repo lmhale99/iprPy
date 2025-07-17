@@ -17,4 +17,5 @@ from .StackingFault import StackingFault
 from .PointDefect import PointDefect
 from .PointDefectNEB import PointDefectNEB
 from .Dislocation import Dislocation
+from .GRIP import GRIP
 from .GrainBoundary import GrainBoundary

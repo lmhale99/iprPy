@@ -25,22 +25,21 @@ def grain_boundary_static(lammps_command: str,
                           potential: lmp.Potential,
                           uvws1: npt.ArrayLike,
                           uvws2: npt.ArrayLike,
-                          potential_energy: float,
                           mpi_command: Optional[str] = None,
                           conventional_setting: str = 'p',
                           cutboxvector: str = 'c',
-                          gbwidth: float = uc.set_in_units(20, 'angstrom'),
-                          boundarywidth: float = uc.set_in_units(10, 'angstrom'),
+                          minwidth: float = 0.0,
                           num_a1: int = 8,
                           num_a2: int = 8,
                           deletefrom: str = 'top',
                           min_deleter = 0.30,
                           max_deleter = 0.99,
-                          num_deleter = 100, 
-                          etol: float = 1e-15,
-                          ftol: float = 1e-15,
-                          maxiter: int = 100000,
-                          maxeval: int = 1000000,
+                          num_deleter = 100,
+                          potential_energy: float = 0.0,
+                          etol: float = 0.0,
+                          ftol: float = 0.0,
+                          maxiter: int = 10000,
+                          maxeval: int = 100000,
                           dmax: float = uc.set_in_units(0.01, 'angstrom')):
     """
     Evaluates the energy of a grain boundary by building a two grain system and
@@ -62,10 +61,6 @@ def grain_boundary_static(lammps_command: str,
     uvws2 : array-like object
         The Miller(-Bravais) crystal vectors associated with rotating ucell to
         form the 'bottom' grain.
-    potential_energy : float, optional
-        The per-atom potential energy of the bulk crystal to use for the grain
-        boundary energy calculation.  This is currently limited to a single
-        value so it only works with elemental systems.
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
         will run serially.
@@ -76,15 +71,10 @@ def grain_boundary_static(lammps_command: str,
         Specifies the cell setting for ucell if it is a non-primitive unit cell.
         This is used in generating the boundary configuration and determining
         the smallest out-of-plane lattice vector component.
-    gbwidth : float, optional
-        The width of the region around the grain boundary that will be relaxed.
-        Note that the region itself will be twice as thick as gbwidth as it is
-        applied to both crystals independently.  Default value is 20 angstroms.
-    boundarywidth : float, optional
-        The minimum width of the boundary region beyond the gbwidth where
-        atoms exist but are not subjected to relaxation. This region prevents
-        the other atoms from seeing a free surface.  Default value is 10
-        angstroms.
+    minwidth : float, optional
+        The minimum width to use for the system along the cutboxvector.  Default
+        value is 0.0, which will use the un-multiplied uvw crystal vectors
+        along this direction.
     num_a1 : int, optional
         The number of in-plane shifts to perform in one of the two in-plane
         directions.  Default value is 8.
@@ -119,18 +109,22 @@ def grain_boundary_static(lammps_command: str,
         'i' for body-centered, and 'a', 'b', or 'c' for side-centered.  Default
         behavior is to perform no conversion, i.e. take (hkl) relative to the
         given ucell.
+    potential_energy : float, optional
+        The per-atom potential energy of the bulk crystal to use for the grain
+        boundary energy calculation.  This is currently limited to a single
+        value so it only works with elemental systems.  Default value is 0.0. 
     etol : float, optional
         The energy tolerance for the structure minimization. This value is
-        unitless. (Default is 1e-15).
+        unitless. (Default is 0.0).
     ftol : float, optional
         The force tolerance for the structure minimization. This value is in
-        units of force. (Default is 1e-15).
+        units of force. (Default is 0.0).
     maxiter : int, optional
         The maximum number of minimization iterations to use (default is 
-        100000).
+        10000).
     maxeval : int, optional
         The maximum number of minimization evaluations to use (default is 
-        1000000).
+        100000).
     dmax : float, optional
         The maximum distance in length units that any atom is allowed to relax
         in any direction during a single minimization iteration (default is
@@ -158,36 +152,27 @@ def grain_boundary_static(lammps_command: str,
     gb = am.defect.GrainBoundary(ucell, uvws1, uvws2,
                        conventional_setting=conventional_setting,
                        cutboxvector=cutboxvector)
-    
-    # Add boundary width and identify multiples
-    minwidth = gbwidth+boundarywidth
     gb.identifymults(minwidth=minwidth, setvalues=True)
 
     # Build list of deleter values
     deleters = np.linspace(min_deleter, max_deleter, num_deleter) * ucell.r0()
+    
     
     i = 0
     gb_energies = []
     A_fault = None
     for system, natoms1 in gb.iterboundaryshift(deletefrom=deletefrom,
                                                 shifts1=num_a1, shifts2=num_a2,
-                                                freesurface=True, 
                                                 deleters=deleters):
         
-        # Cut out excess atoms to save calc time
-        keepids = np.where(
-            (system.atoms.pos[:, gb.cutindex] > -minwidth) &
-            (system.atoms.pos[:, gb.cutindex] <  minwidth))
-        system = system.atoms_ix[keepids]
-
         # Compute grain boundary area for first configuration (same for all)
         if i == 0:
             if cutboxvector == 'a':
-                A_fault = np.linalg.norm(np.cross(system.box.bvect, system.box.cvect))
+                A_fault = 2 * np.linalg.norm(np.cross(system.box.bvect, system.box.cvect))
             elif cutboxvector == 'b':
-                A_fault = np.linalg.norm(np.cross(system.box.avect, system.box.cvect))
+                A_fault = 2 * np.linalg.norm(np.cross(system.box.avect, system.box.cvect))
             elif cutboxvector == 'c':
-                A_fault = np.linalg.norm(np.cross(system.box.avect, system.box.bvect))
+                A_fault = 2 * np.linalg.norm(np.cross(system.box.avect, system.box.bvect))
             else:
                 raise ValueError("cutboxvector limited to values 'a', 'b', or 'c'")
 
@@ -196,7 +181,6 @@ def grain_boundary_static(lammps_command: str,
                                        system,
                                        potential,
                                        mpi_command=mpi_command,
-                                       gbwidth=gbwidth,
                                        etol = etol,
                                        ftol = ftol,
                                        lammps_date=lammps_date,
@@ -208,7 +192,8 @@ def grain_boundary_static(lammps_command: str,
         i += 1
  
         # Calculate grain boundary energy
-        delta_pe = results['Epotgb'] - results['natomsgb'] * potential_energy
+        total_pe = results['potentialenergy']
+        delta_pe = total_pe - system.natoms * potential_energy
         gb_energy = delta_pe / A_fault
         
         gb_energies.append(gb_energy)
@@ -229,7 +214,6 @@ def grain_boundary_relax(lammps_command: str,
                          system: am.System,
                          potential: lmp.Potential,
                          mpi_command: Optional[str] = None,
-                         gbwidth: float = 20.0,
                          etol: float = 0.0,
                          ftol: float = 0.0,
                          maxiter: int = 10000,
@@ -253,10 +237,6 @@ def grain_boundary_relax(lammps_command: str,
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
         will run serially.
-    gbwidth : float, optional
-        The width of the region around the grain boundary that will be relaxed.
-        Note that the region itself will be twice as thick as gbwidth as it is
-        applied to both crystals independently.  Default value is 20 angstroms.
     etol : float, optional
         The energy tolerance for the structure minimization. This value is
         unitless. (Default is 0.0).
@@ -313,7 +293,6 @@ def grain_boundary_relax(lammps_command: str,
     lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])
     lammps_variables['maxiter'] = maxiter
     lammps_variables['maxeval'] =  maxeval
-    lammps_variables['gbwidth'] = uc.get_in_units(gbwidth, lammps_units['length'])
     
     # Set box relax direction based on cutboxvector orientation
     box2cart = {'a':'x', 'b':'y', 'c':'z'}
@@ -340,18 +319,17 @@ def grain_boundary_relax(lammps_command: str,
     
     # Extract total final potential energy
     thermo = output.simulations[0].thermo
+    total_pe = uc.set_in_units(thermo.PotEng.values[-1], lammps_units['energy'])
     
     # Rename and clean up dump files
     finalstep = thermo.Step.values[-1]
-    Path(f'run_{finalstep}.dump').rename(f'{gbindex}.dump')
-    for atomfile in Path('.').glob('run_*.dump'):
+    Path(f'atom.{finalstep}').rename(f'{gbindex}.dump')
+    for atomfile in Path('.').glob('atom.*'):
         atomfile.unlink()
     
     results = {}
     results['gbindex'] = gbindex
-    results['natomsgb'] = thermo.v_natomsgb.values[-1]
-    results['Epotgb'] = uc.set_in_units(thermo.c_pegb.values[-1],
-                                        lammps_units['energy'])
+    results['potentialenergy'] = total_pe
     
     return results
 
