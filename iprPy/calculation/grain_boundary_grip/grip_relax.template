@@ -1,0 +1,115 @@
+# LAMMPS input script that performs MD relaxation of a grain boundary
+
+# ---------- Run variables ------------------------------------
+
+# Temperatures for relaxing and velocity creation
+variable Trelax equal <temperature>
+variable Tfinal equal 50
+variable Tvelocity equal 2*${Trelax}
+
+# Number of MD steps for the two stages
+variable runsteps equal <runsteps>
+variable coolsteps equal 1000
+
+variable timestep index <timestep>
+
+# Region widths
+variable gbwidth equal <gbwidth>
+variable bufferwidth equal <bufferwidth>
+variable energybufferwidth equal 1.5
+variable gbbufferwidth equal ${gbwidth}+${bufferwidth}
+variable energywidth equal ${gbbufferwidth}+${energybufferwidth}
+
+# ---------- Load potential and configuration ----------------- 
+
+box tilt large
+
+<atomman_system_pair_info>
+
+# ---------- Define regions and groups ------------------------ 
+
+# Always active region
+region gbregion block INF INF INF INF -${gbwidth} ${gbwidth} units box
+group gbregion region gbregion
+
+# Buffer regions
+region topbuffer block INF INF INF INF ${gbwidth} ${gbbufferwidth} units box
+group topbuffer region topbuffer
+
+region botbuffer block INF INF INF INF -${gbbufferwidth} -${gbwidth} units box
+group botbuffer region botbuffer
+
+# Boundary regions
+region topboundary block INF INF INF INF ${gbbufferwidth} INF units box
+group topboundary region topboundary
+
+region botboundary block INF INF INF INF INF -${gbbufferwidth} units box
+group botboundary region botboundary
+
+# Region for the final energy evaluations
+region energyeval block INF INF INF INF -${energywidth} ${energywidth} units box
+group energyeval region energyeval
+
+# Composite groups joining buffers to gbregion or boundaries
+group topboundary_md union topbuffer topboundary
+group botboundary_md union botbuffer botboundary
+group gbregion_min union gbregion topbuffer botbuffer
+
+
+# Skip MD simulation if runsteps is 0
+if "${runsteps} == 0" then "jump SELF minrelax"
+
+# ---------- MD simulation ---------------------
+
+# Fix atoms in buffer and boundary regions
+fix bothold botboundary_md setforce 0.0 0.0 0.0
+fix tophold topboundary_md aveforce 0.0 0.0 0.0
+
+# Minimize
+min_style cg
+min_modify dmax <dmax>
+minimize <etol> <ftol> <maxiter> <maxeval>
+
+# Set timestep and initialize velocities
+timestep ${timestep}
+velocity gbregion create ${Tvelocity} <randomseed> dist gaussian rot yes
+
+# High-temperature MD
+fix nve all nve
+fix langevin gbregion langevin ${Trelax} ${Trelax} $(100.0*dt) <randomseed>
+run ${runsteps}
+
+# Cool the system
+unfix langevin
+fix langevin gbregion langevin ${Trelax} ${Tfinal} $(100.0*dt) <randomseed>
+run ${coolsteps}
+
+# Unfix everything
+unfix bothold
+unfix tophold
+unfix langevin
+unfix nve
+
+# Jump label
+label minrelax
+
+# ---------- Compute properties --------------------- 
+reset_timestep 0
+
+compute peatom all pe/atom
+compute pegb energyeval reduce sum c_peatom
+variable natomsgb equal count(energyeval)
+
+thermo 0
+thermo_style custom step pe lx ly lz press pxx pyy pzz c_pegb v_natomsgb
+dump dump all custom <maxiter> *.dump id type x y z c_peatom
+dump_modify dump sort id format <dump_modify_format>
+
+# ---------- Run Minimization --------------------- 
+
+fix bothold botboundary setforce 0.0 0.0 0.0
+fix tophold topboundary aveforce 0.0 0.0 0.0
+min_style cg
+min_modify dmax <dmax>
+minimize <etol> <ftol> <maxiter> <maxeval>
+
