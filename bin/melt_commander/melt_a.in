@@ -7,11 +7,11 @@ database                      master
 run_directory                 master_4
 
 # Element model settings
-potential_id                  2016--Zhang-Y--Ni-Nb--LAMMPS--ipr1
-composition                   Nb
+potential_id                  2020--Starikov-S--Si-Au-Al--LAMMPS--ipr1
+composition                   Al
 family                        A1--Cu--fcc
-alat                          4.4
+alat                          4.05
 
 # Method settings
-min_temperature               1600
-max_temperature               3000
+min_temperature               100
+max_temperature               4000
