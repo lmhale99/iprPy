@@ -64,21 +64,29 @@ def stacking_fault_mep_runner(database_name: str,
     database = iprPy.load_database(database_name)
     
     # Get all matching finished calculation results
-    records = database.get_records(style='calculation_stacking_fault_map_2D',
+    allrecords = database.get_records(style='calculation_stacking_fault_map_2D',
                                     family=family, stackingfault_id=stackingfault_id,
                                     potential_LAMMPS_id=potential_LAMMPS_id,
                                     status='finished', num_a1=30)
     
-    # Search for records to run
+    # Filter records by first letter
+    if nameletter is not None:
+        records = []
+        for record in allrecords:
+            if record.name[0] == nameletter:
+                records.append(record)
+    else:
+        records = allrecords
+    print(f'{len(records)} total records found', flush=True)
+
+    # Search for records that don't have mep results
     run_records = []
     for record in records:
         try:
             record.paths
         except ValueError:
-            if nameletter is None or record.name[0] == nameletter:
-                run_records.append(record)
-                
-    print(f'{len(run_records)} records found to run', flush=True)
+            run_records.append(record)         
+    print(f'{len(run_records)} records missing mep results', flush=True)
 
     for record in run_records:
         update = compute_props(record, npoints=npoints, ipoints=ipoints,
