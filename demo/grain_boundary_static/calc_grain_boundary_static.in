@@ -1,4 +1,4 @@
-# Input script for iprPy calculation elastic_constants_static
+# Input script for iprPy calculation grain_boundary_static
 
 # Calculation Metadata
 branch                          
@@ -21,19 +21,23 @@ family
 symbols                         Ni
 box_parameters                  3.5199994375404287 3.5199994375404287 3.5199994375404287
 
-# System Manipulations
-a_uvw                           
-b_uvw                           
-c_uvw                           
-atomshift                       
-sizemults                       3 3 3
-
 # LAMMPS Energy/Force Minimization
-energytolerance                 
-forcetolerance                  
+energytolerance                 1e-15
+forcetolerance                  1e-15
 maxiterations                   
 maxevaluations                  
 maxatommotion                   
+
+# Grain Boundary
+grainboundary_file              ../0-files/A1--Cu--fcc--stgb-100-05.72.json
+grainboundary_auvw1             
+grainboundary_buvw1             
+grainboundary_cuvw1             
+grainboundary_auvw2             
+grainboundary_buvw2             
+grainboundary_cuvw2             
+grainboundary_cellsetting       
+grainboundary_cutboxvector      
 
 # Input/Output Units
 length_unit                     
@@ -42,4 +46,12 @@ energy_unit
 force_unit                      
 
 # Run Parameters
-strainrange                     
+potential_energy                -4.4499999983489
+gbwidth                         60
+boundarywidth                   10
+num_a1                          
+num_a2                          
+deletefrom                      
+min_deleter                     
+max_deleter                     
+num_deleter                     

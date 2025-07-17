@@ -1,0 +1,79 @@
+# Input script for iprPy calculation grain_boundary_grip
+
+# Calculation Metadata
+branch                          
+
+# LAMMPS and MPI Commands
+lammps_command                  lmp_serial
+mpi_command                     
+
+# Interatomic Potential
+potential_file                  ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1.json
+potential_kim_id                
+potential_kim_potid             
+potential_dir                   ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1
+
+# Initial System Configuration
+load_file                       ../0-files/A1--Cu--fcc.json
+load_style                      system_model
+load_options                    
+family                          
+symbols                         Ni
+box_parameters                  3.5199994375404287 3.5199994375404287 3.5199994375404287
+
+# LAMMPS Energy/Force Minimization
+energytolerance                 1e-15
+forcetolerance                  1e-15  
+maxiterations                   100000
+maxevaluations                  1000000
+maxatommotion                   
+
+# Grain Boundary
+grainboundary_file              ../0-files/A1--Cu--fcc--stgb-100-05.72.json
+grainboundary_auvw1             
+grainboundary_buvw1             
+grainboundary_cuvw1             
+grainboundary_auvw2             
+grainboundary_buvw2             
+grainboundary_cuvw2             
+grainboundary_cellsetting       
+grainboundary_cutboxvector      
+
+# GRIP settings
+shift_delta                     
+temperature_min                 
+temperature_max                 
+temperature_delta               
+temperature_sample_style        
+sizemults_max1                  
+sizemults_max2                  
+sizemults_sample_style          
+runsteps_chance                 
+runsteps_min                    
+runsteps_max                    
+runsteps_delta                  
+runsteps_sample_style           
+maxmult                         
+minwidth                        
+delete_min                      
+delete_max                      
+perturb_width                   
+perturb_max1                    
+perturb_max2                    
+interstitial_max_num            0
+interstitial_width              
+interstitial_sample_style       
+
+# Input/Output Units
+length_unit                     
+pressure_unit                   
+energy_unit                     
+force_unit                      
+
+# Run Parameters
+potential_energy                -4.4499999983489
+gbwidth                         
+bufferwidth                     
+boundarywidth                   
+randomseed                      5
+verbose                         

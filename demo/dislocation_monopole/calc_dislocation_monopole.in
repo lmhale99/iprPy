@@ -4,8 +4,8 @@
 branch                          
 
 # LAMMPS and MPI Commands
-lammps_command                  /home/lmh1/LAMMPS/2022-06-23/src/lmp_mpi
-mpi_command                     mpiexec -n 8
+lammps_command                  lmp_serial
+#mpi_command                     mpiexec -n 8
 
 # Interatomic Potential
 potential_file                  ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1.json
@@ -22,9 +22,9 @@ symbols                         Ni
 box_parameters                  3.5199994375404287 3.5199994375404287 3.5199994375404287
 
 # Elastic Constants
-elasticconstants_file           
-C11                             247.86233089
-C12                             147.828379816
+elasticconstants_file           ../elastic_constants_static/results.json
+#C11                             247.86233089
+#C12                             147.828379816
 C13                             
 C14                             
 C15                             
@@ -38,7 +38,7 @@ C33
 C34                             
 C35                             
 C36                             
-C44                             124.83811759
+#C44                             124.83811759
 C45                             
 C46                             
 C55                             
