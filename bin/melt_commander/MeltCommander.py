@@ -19,8 +19,9 @@ class MeltCommander():
                  family: str,
                  mpi_command: str = '',
                  min_temperature: float = 50,
-                 max_temperature: float = 3000,
-                 calc_style: str = 'melting_temperature'):
+                 max_temperature: float = 9000,
+                 calc_style: str = 'melting_temperature',
+                 verbose: bool = True):
         """
         Initializes a MeltCommander object, which is designed to iteratively
         run the iprPy melting_temperature calculation at different guess
@@ -65,7 +66,8 @@ class MeltCommander():
         self.calc_style = calc_style
 
         self.load_existing_records()
-        print(len(self.temperature_melts), 'existing records')
+        if verbose:
+            print(len(self.temperature_melts), 'existing records')
 
     @property
     def database(self) -> iprPy.database.IprPyDatabase:
@@ -126,7 +128,7 @@ class MeltCommander():
     def family(self, val: str):
         val = str(val)
 
-        if val not in ['A1--Cu--fcc', 'A2--W--bcc', 'A3--Mg--hcp']:
+        if val not in ['A1--Cu--fcc', 'A2--W--bcc', 'A3--Mg--hcp', 'A4--C--dc']:
             raise ValueError('Unsupported family type')
         
         self.__family =  val
@@ -207,10 +209,11 @@ class MeltCommander():
         self.__temperature_melts = []
 
         # Fetch any currently existing records
-        self.records_df = self.database.get_records_df(f'calculation_{self.calc_style}',
+        self.records_df = self.database.get_records_df(f'calculation_{self.calc_style}', status='finished',
                                                        potential_LAMMPS_id = self.potential_LAMMPS_id,
                                                        composition = self.composition,
                                                        family = self.family)
+        
         for index in self.records_df.index:
             record = self.records_df.loc[index]
             
@@ -271,6 +274,8 @@ class MeltCommander():
             prepare_kwargs.update(self.default_bcc_prepare_kwargs(alat))
         elif self.family == 'A3--Mg--hcp':
             prepare_kwargs.update(self.default_hcp_prepare_kwargs(alat))
+        elif self.family == 'A4--C--dc':
+            prepare_kwargs.update(self.default_dc_prepare_kwargs(alat))
 
         # Overwrite with input kwargs
         prepare_kwargs.update(kwargs)
@@ -312,6 +317,18 @@ class MeltCommander():
             'sizemults':                       '13 13 26',
             'ptm_structures':                  'hcp',
         }
+    
+    def default_dc_prepare_kwargs(self,
+                                   alat: float):
+        """The default prepare input kwargs to use for dc crystals"""
+        return {
+            'load_file':                       'A4--C--dc.json',
+            'load_content':                    'record A4--C--dc',
+            'load_style':                      'system_model',
+            'box_parameters':                  f'{alat:.3} {alat:.3} {alat:.3}',
+            'sizemults':                       '8 8 16',
+            'ptm_structures':                  'dcub',
+        }
 
 
 
@@ -319,6 +336,7 @@ class MeltCommander():
             run_directory,
             alat: float,
             max_melts: int = 10,
+            max_runs: int = 25,
             temperature_guess: Optional[float] = None,
             **kwargs):
         """
@@ -339,6 +357,11 @@ class MeltCommander():
             The target number of melt simulations to obtain that are within
             the target solid fraction range.  When this is achieved, the
             calculations will stop.  Default value is 10.
+        max_runs : int, optional
+            An upper cutoff on the total number of calculations to perform
+            even if max_melts is never reached.  This is important as many
+            systems will never converge to a good melting temperature due to
+            phase instabilities.  Default value is 25.
         temperature_guess : float, optional
             The initial guess temperature to start with.  If not given, will
             select the temperature halfway between the min_temperature and
@@ -354,8 +377,14 @@ class MeltCommander():
         tar = self.database.get_tar(style='potential_LAMMPS', name=self.potential_LAMMPS_id)
         tar_dict = {self.potential_LAMMPS_id: tar}
 
+        run_count = len(self.records_df)
+
         # Loop until max_melts performed
         while len(self.temperature_melts) < max_melts:
+
+            if run_count >= max_runs:
+                print('Max number of runs reached!')
+                break
 
             # Build prepare keys and prepare the calculation
             prepare_kwargs = self.prepare_kwargs(alat, temperature_guess, **kwargs)
@@ -367,8 +396,13 @@ class MeltCommander():
             # Run prepared calculation and fetch record
             runner.run(key)
             record = self.database.get_record(f'calculation_{self.calc_style}', key=key)
+            if record.status == 'error':
+                run_count += 1
+                continue
+            
             fraction_solid = np.mean(record.fraction_solids)
             temperature_melt = record.melting_temperature
+            run_count += 1
 
             print(f'{temperature_guess:.3f} {fraction_solid:.4} {temperature_melt:.3f}')
 
@@ -403,5 +437,6 @@ if __name__ == '__main__':
     run_directory = kwargs.pop('run_directory')
     alat = float(kwargs.pop('alat'))
     max_melts = int(kwargs.pop('max_melts', 10))
+    max_runs = int(kwargs.pop('max_runs', 30))
 
-    commander.run(run_directory, alat, max_melts, **kwargs)
+    commander.run(run_directory, alat, max_melts, max_runs, **kwargs)
