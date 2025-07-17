@@ -4,7 +4,7 @@ from pathlib import Path
 from importlib import import_module, resources
 from typing import Optional, Union
 
-from yabadaba.tools import ModuleManager
+from yabadaba.tools import ModuleManager, is_uuid
 
 calculationmanager = ModuleManager('Calculation')
 from .. import recordmanager
@@ -57,6 +57,7 @@ def load_calculation(style, **kwargs):
 
 def run_calculation(params: Union[str, dict, IOBase, None] = None,
                     calc_style: Optional[str] = None,
+                    calc_key: Optional[str] = None,
                     raise_error: bool = False,
                     verbose: bool = True):
     """
@@ -71,6 +72,11 @@ def run_calculation(params: Union[str, dict, IOBase, None] = None,
     calc_style : str, optional
         Specifies the style of calculation to run.  Optional if params is a
         path to a file where the file's name is calc_<calc_style>.in.
+    calc_key : str, optional
+        Allows for a calculation UUID key to be passed in.  If not given, then
+        will check if the parent directory's name is a UUID key and will use it
+        if possible.  Otherwise, a new UUID key will be assigned to the
+        calculation.
     raise_error : bool, optional
         The default behavior of run is to take any error messages from the
         calculation and set them to class attributes and save to
@@ -88,8 +94,30 @@ def run_calculation(params: Union[str, dict, IOBase, None] = None,
         else:
             raise ValueError('calc_style not given and cannot be determined from params')
 
+    kwargs = {}
+    if calc_key is None:
+        
+        # If params is a file, check if its parent directory name is a uuid key
+        if isinstance(params, (str, Path)):
+            calc_key = Path(params).absolute().parent.name
+        
+        # Otherwise, check the name of the working directory
+        else:
+            calc_key = Path('.').absolute().name
+        
+        if is_uuid(calc_key):
+            kwargs['key'] = calc_key
+
+    
+    else:
+        # Check that given calc_key is a valid uuid key
+        if not is_uuid(calc_key):
+            raise ValueError('calc_key must be a uuid key!')
+        kwargs['key'] = calc_key
+
+
     # Load calculation style and read in paramfile
-    calculation = load_calculation(calc_style, params=params)
+    calculation = load_calculation(calc_style, params=params, **kwargs)
     
     # Run and create results_json
     calculation.run(results_json=True, raise_error=raise_error, verbose=verbose)
