@@ -58,13 +58,6 @@ class GrainBoundary(CalculationSubset):
         self.uvws2 = None
         self.cellsetting = 'p'
         self.cutboxvector = 'c'
-        self.minwidth = 0.0
-        self.num_a1 = 8
-        self.num_a2 = 8
-        self.deletefrom = 'top'
-        self.min_deleter = 0.30
-        self.max_deleter = 0.99
-        self.num_deleter = 100
         self.family = None
         self.__content = None
         self.__model = None
@@ -156,71 +149,6 @@ class GrainBoundary(CalculationSubset):
         if val not in ['a', 'b', 'c']:
             raise ValueError('invalid cutboxvector')
         self.__cutboxvector = str(val)
-
-    @property
-    def minwidth(self) -> float:
-        """float: The minimum width allowed perpendicular to the boundary"""
-        return self.__minwidth
-
-    @minwidth.setter
-    def minwidth(self, val: float):
-        self.__minwidth = float(val)
-
-    @property
-    def num_a1(self) -> int:
-        """int: The number of in-plane shifts along the first in-plane vector to explore."""
-        return self.__num_a1
-
-    @num_a1.setter
-    def num_a1(self, val: int):
-        self.__num_a1 = int(val)
-
-    @property
-    def num_a2(self) -> int:
-        """int: The number of in-plane shifts along the second in-plane vector to explore."""
-        return self.__num_a2
-
-    @num_a2.setter
-    def num_a2(self, val: int):
-        self.__num_a2 = int(val)
-
-    @property
-    def deletefrom(self) -> str:
-        """str: Indicates which grain 'top', 'bottom', or 'both' close atoms will be deleted from"""
-        return self.__deletefrom
-    
-    @deletefrom.setter
-    def deletefrom(self, val: str):
-        if val not in ['top', 'bottom', 'both']:
-            raise ValueError('invalid deletefrom')
-        self.__deletefrom = val
-    
-    @property
-    def min_deleter(self) -> float:
-        """float: The minimum interatomic spacing for atom deletion at the boundary"""
-        return self.__min_deleter
-
-    @min_deleter.setter
-    def min_deleter(self, val: float):
-        self.__min_deleter = float(val)
-
-    @property
-    def max_deleter(self) -> float:
-        """float: The minimum interatomic spacing for atom deletion at the boundary"""
-        return self.__max_deleter
-
-    @max_deleter.setter
-    def max_deleter(self, val: float):
-        self.__max_deleter = float(val)
-
-    @property
-    def num_deleter(self) -> int:
-        """int: The number of interatomic spacing thresholds for atom deletion at the boundary"""
-        return self.__num_deleter
-
-    @num_deleter.setter
-    def num_deleter(self, val: int):
-        self.__num_deleter = int(val)
 
     @property
     def family(self) -> Optional[str]:
@@ -332,25 +260,6 @@ class GrainBoundary(CalculationSubset):
         cutboxvector : str, optional
             Indicates which box vector will be made non-periodic to allow for
             the defect to be created.
-        minwidth : float, optional
-            A minimum width for the box's cutboxvector direction.  The sizemults
-            will be modified to ensure this as needed.
-        num_a1 : int, optional
-            The number of in-plane shifts along the first in-plane vector to
-            explore.
-        num_a2 : int, optional
-            The number of in-plane shifts along the second in-plane vector to
-            explore.
-        deletefrom : str
-            Indicates which grain 'top', 'bottom', or 'both' close atoms will
-            be deleted from.
-        min_deleter : float
-            The minimum interatomic spacing for atom deletion at the boundary.
-        max_deleter : float
-            The minimum interatomic spacing for atom deletion at the boundary.
-        num_deleter : int
-            The number of interatomic spacing thresholds for atom deletion at
-            the boundary.
         family : str or None, optional
             The system's family identifier that the defect is defined for.
         
@@ -382,20 +291,6 @@ class GrainBoundary(CalculationSubset):
             self.cellsetting = kwargs['cellsetting']
         if 'cutboxvector' in kwargs:
             self.cutboxvector = kwargs['cutboxvector']
-        if 'minwidth' in kwargs:
-            self.minwidth = kwargs['minwidth']
-        if 'num_a1' in kwargs:
-            self.num_a1 = kwargs['num_a1']
-        if 'num_a2' in kwargs:
-            self.num_a2 = kwargs['num_a2']
-        if 'deletefrom' in kwargs:
-            self.deletefrom = kwargs['deletefrom']
-        if 'min_deleter' in kwargs:
-            self.min_deleter = kwargs['min_deleter']
-        if 'max_deleter' in kwargs:
-            self.max_deleter = kwargs['max_deleter']
-        if 'num_deleter' in kwargs:
-            self.num_deleter = kwargs['num_deleter']
         if 'family' in kwargs:
             self.family = kwargs['family']
         
@@ -459,34 +354,6 @@ class GrainBoundary(CalculationSubset):
                 "Indicates which of the three box vectors ('a', 'b', or 'c')",
                 "that the grain boundary planes will be made along.",
                 "Default value is 'c'."]),
-            'grainboundary_minwidth': ' '.join([
-                "Specifies a mimimum width in length units that the system must be",
-                "along the cutboxvector direction. The associated sizemult value",
-                "will be increased if necessary to ensure this. Default value is 0.0."]),
-            'grainboundary_num_a1': ' '.join([
-                "The number of boundary grid shifts to explore along the first",
-                "identified in-plane vector.  Default value is 8."]),
-            'grainboundary_num_a2': ' '.join([
-                "The number of boundary grid shifts to explore along the second",
-                "identified in-plane vector.  Default value is 8."]),
-            'grainboundary_deletefrom': ' '.join([
-                "Indicates which grain ('top', 'bottom' or 'both') that atoms",
-                "close to each other across the boundary will be deleted from.",
-                "Default value is 'top'."]),
-            'grainboundary_min_deleter': ' '.join([
-                "The smallest interatomic spacing (relative to the unit cell's r0)",
-                "to include in the iterative deletion search of atoms close to",
-                "each other across the boundary.  Default value is 0.3"]),
-            'grainboundary_max_deleter': ' '.join([
-                "The largest interatomic spacing (relative to the unit cell's r0)",
-                "to include in the iterative deletion search of atoms close to",
-                "each other across the boundary.  Default value is 0.99"]),
-            'grainboundary_num_deleter': ' '.join([
-                "The number of interatomic spacings ranging from min_deleter",
-                "to max_deleter that are to be used for the boundary atom deletion",
-                "threshold.  Note that only unique configurations will be minimized",
-                "so this is the max number of configurations that can be explored",
-                "for each a1,a2 shift set.  Default value is 100"]),
         }
 
     @property
@@ -517,25 +384,8 @@ class GrainBoundary(CalculationSubset):
         """
         list: Calculation subset key sets that can have multiple values during prepare.
         """
-        # Define key set for system size parameters
-        sizekeys = ['grainboundary_num_a1',
-                    'grainboundary_num_a2',
-                    'grainboundary_deletefrom',
-                    'grainboundary_min_deleter',
-                    'grainboundary_max_deleter',
-                    'grainboundary_num_deleter']
-
-        # Define key set for defect parameters as the remainder
-        defectkeys = []
-        for key in self.preparekeys:
-            if key not in sizekeys:
-                defectkeys.append(key)
-
         # Add prefixes and return
-        return [
-            self._pre(sizekeys),
-            self._pre(defectkeys)
-        ]
+        return [self._pre(self.preparekeys)]
 
     def load_parameters(self, input_dict: dict):
         """
@@ -608,15 +458,7 @@ class GrainBoundary(CalculationSubset):
                           input_dict[keymap['grainboundary_cuvw2']])
             self.cutboxvector = input_dict.get(keymap['grainboundary_cutboxvector'], 'c')
             self.cellsetting = input_dict.get(keymap['grainboundary_cellsetting'], 'p')
-
-        # Set default values for fault system manipulations
-        self.minwidth = float(input_dict.get(keymap['grainboundary_minwidth'], 0.0))
-        self.num_a1 = int(input_dict.get(keymap['grainboundary_num_a1'], 8))
-        self.num_a2 = int(input_dict.get(keymap['grainboundary_num_a2'], 8))
-        self.deletefrom = input_dict.get(keymap['grainboundary_deletefrom'], 'top')
-        self.min_deleter = float(input_dict.get(keymap['grainboundary_min_deleter'], 0.30))
-        self.max_deleter = float(input_dict.get(keymap['grainboundary_max_deleter'], 0.99))
-        self.num_deleter = int(input_dict.get(keymap['grainboundary_num_deleter'], 100))
+        
 
 ########################### Data model interactions ###########################
 
@@ -641,17 +483,6 @@ class GrainBoundary(CalculationSubset):
         self.set_uvws(2, cp['auvw2'], cp['buvw2'], cp['cuvw2'])
         self.cutboxvector = cp['cutboxvector']
         self.cellsetting = cp['cellsetting'] 
-
-        run_params = model['calculation']['run-parameter']
-
-        self.minwidth = uc.value_unit(run_params[f'{self.modelprefix}minimum-width'])
-        self.num_a1 = run_params['grainboundary_num_a1']
-        self.num_a2 = run_params['grainboundary_num_a2']
-        self.deletefrom = run_params['grainboundary_deletefrom']
-        self.min_deleter = run_params['grainboundary_min_deleter']
-        self.max_deleter = run_params['grainboundary_max_deleter']
-        self.num_deleter = run_params['grainboundary_num_deleter']
-
 
     def build_model(self,
                     model: DM,
@@ -681,24 +512,7 @@ class GrainBoundary(CalculationSubset):
         cp['buvw2'] = ' '.join([f'{v}' for v in self.uvws2[1]])
         cp['cuvw2'] = ' '.join([f'{v}' for v in self.uvws2[2]])
         cp['cutboxvector'] = self.cutboxvector
-        cp['cellsetting'] = self.cellsetting
-
-        # Build paths if needed
-        if 'calculation' not in model:
-            model['calculation'] = DM()
-        if 'run-parameter' not in model['calculation']:
-            model['calculation']['run-parameter'] = DM()
-
-        run_params = model['calculation']['run-parameter']
-
-        run_params[f'{self.modelprefix}minimum-width'] = uc.model(self.minwidth,
-                                                             self.parent.units.length_unit)
-        run_params['grainboundary_num_a1'] = self.num_a1
-        run_params['grainboundary_num_a2'] = self.num_a2
-        run_params['grainboundary_deletefrom'] = self.deletefrom
-        run_params['grainboundary_min_deleter'] = self.min_deleter
-        run_params['grainboundary_max_deleter'] = self.max_deleter
-        run_params['grainboundary_num_deleter'] = self.num_deleter
+        cp['cellsetting'] = self.cellsetting  
 
     @property
     def queries(self) -> dict:
@@ -741,8 +555,8 @@ class GrainBoundary(CalculationSubset):
         meta[f'{prefix}grainboundary_key'] = self.key
         meta[f'{prefix}grainboundary_id'] = self.id
         meta[f'{prefix}grainboundary_family'] = self.family
-        meta[f'{prefix}grainboundary_uvws1'] = self.uvws1
-        meta[f'{prefix}grainboundary_uvws2'] = self.uvws2
+        #meta[f'{prefix}grainboundary_uvws1'] = self.uvws1
+        #meta[f'{prefix}grainboundary_uvws2'] = self.uvws2
 
 ########################### Calculation interactions ##########################
 
@@ -764,12 +578,5 @@ class GrainBoundary(CalculationSubset):
         input_dict['uvws1'] = self.uvws1
         input_dict['uvws2'] = self.uvws2
 
-        #input_dict['conventional_setting'] = self.cellsetting
-        input_dict['minwidth'] = self.minwidth
-        input_dict['num_a1'] = self.num_a1
-        input_dict['num_a2'] = self.num_a2
-        input_dict['deletefrom'] = self.deletefrom
-        input_dict['min_deleter'] = self.min_deleter
-        input_dict['max_deleter'] = self.max_deleter
-        input_dict['num_deleter'] = self.num_deleter
+        input_dict['conventional_setting'] = self.cellsetting
         input_dict['cutboxvector'] = self.cutboxvector

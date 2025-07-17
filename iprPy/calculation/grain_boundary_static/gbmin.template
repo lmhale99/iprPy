@@ -1,19 +1,46 @@
-# LAMMPS input script that performs a simple energy minimization
+# LAMMPS input script that performs energy minimization of a grain boundary
+
+# ---------- Run variables ------------------------------------
+
+# Region width
+variable gbwidth equal <gbwidth>
+
+# ---------- Load potential and configuration ----------------- 
 
 box tilt large
 
 <atomman_system_pair_info>
 
-thermo_style custom step lx ly lz pxx pyy pzz pxy pxz pyz pe
+# ---------- Define regions and groups ------------------------ 
+
+# Relaxation region
+region relax block INF INF INF INF -${gbwidth} ${gbwidth} units box
+group relax region relax
+
+# Boundary regions
+region topboundary block INF INF INF INF ${gbwidth} INF units box
+group topboundary region topboundary
+
+region botboundary block INF INF INF INF INF -${gbwidth} units box
+group botboundary region botboundary
+
+# ---------- Compute properties --------------------- 
+
+compute peatom all pe/atom
+compute pegb relax reduce sum c_peatom
+variable natomsgb equal count(relax)
+
+thermo_style custom step lx ly lz pxx pyy pzz pxy pxz pyz c_pegb v_natomsgb
 thermo_modify format float %.13e
 
-compute peatom all pe/atom 
-
-fix boxrelax all box/relax <box_relax_direction> 0.0 vmax 0.001
-
-dump dumpit all custom <maxiter> atom.* id type x y z c_peatom
+dump dumpit all custom <maxiter> run_*.dump id type x y z c_peatom
 dump_modify dumpit format <dump_modify_format>
 
-min_modify dmax <dmax>
+# ---------- Run Minimization --------------------- 
 
+fix bothold botboundary aveforce 0.0 0.0 0.0
+fix tophold topboundary aveforce 0.0 0.0 0.0
+min_style cg
+
+min_modify dmax <dmax>
 minimize <etol> <ftol> <maxiter> <maxeval>
