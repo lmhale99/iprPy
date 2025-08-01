@@ -29,8 +29,8 @@ def elastic_constants_static(lammps_command: str,
                              maxeval: int = 100000,
                              dmax: float = uc.set_in_units(0.01, 'angstrom')) -> dict:
     """
-    Repeatedly runs the ELASTIC example distributed with LAMMPS until box
-    dimensions converge within a tolerance.
+    Computes the elastic constants of an atomic configuration using small
+    strains.  This calculation is comparable to the LAMMPS ELASTIC example.
     
     Parameters
     ----------
