@@ -138,7 +138,7 @@ def prepare_pool(database, styles, np_per_runner, run_directory,
 
             # Prepare the calculation
             keys = database.prepare(run_directory, calculation, debug=debug,
-                                    calc_df=calc_df, **params)
+                                    calc_df=calc_df, tar_dict={}, **params)
             new_calc_keys.extend(keys)
             print()
 
