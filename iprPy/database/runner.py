@@ -19,7 +19,8 @@ from .. import settings, load_run_directory, load_calculation
 
 def runner(database, run_directory, calc_name=None, orphan_directory=None,
            hold_directory=None, log=False, bidtries=10, bidverbose=False,
-           temp=False, temp_directory=None, kwargs_calc={}):
+           temp=False, temp_directory=None, free=False,
+           kwargs_calc={}):
     """
     High-throughput calculation runner.
     
@@ -57,6 +58,11 @@ def runner(database, run_directory, calc_name=None, orphan_directory=None,
     temp_directory : path-like object, optional
         The path to an existing temporary directory where the calculations
         are to be copied to and executed there instead of in the run_directory.
+    free : bool, optional
+        Setting this to True indicates that the calculations should be ran
+        without interfacing with the database.  This allows for runners to
+        work even when the associated database is inaccessible.  Finished
+        calculations can be uploaded later using "finish_calculations".
     kwargs_calc : dict, optional
         Keyword arguments for :meth:`iprPy.calculation.Calculation.Calculation.run`.
         Default is ``{"results_json": True}``
@@ -72,7 +78,8 @@ def runner(database, run_directory, calc_name=None, orphan_directory=None,
         print(f'Runner started with pid {runmanager.pid}', flush=True)
         runmanager.runall(bidtries=bidtries, temp=temp,
                           temp_directory=temp_directory,
-                          bidverbose=bidverbose, kwargs_calc=kwargs_calc)
+                          bidverbose=bidverbose, free=free,
+                          kwargs_calc=kwargs_calc)
     
     else:
         print(f'Runner started with pid {runmanager.pid} for calculation {calc_name}', flush=True)
@@ -80,7 +87,8 @@ def runner(database, run_directory, calc_name=None, orphan_directory=None,
         tmp_kwargs_calc.update(kwargs_calc)
         status = runmanager.run(calc_name=calc_name, temp=temp,
                                 temp_directory=temp_directory,
-                                bidverbose=bidverbose, kwargs_calc=tmp_kwargs_calc)
+                                bidverbose=bidverbose, free=free, 
+                                kwargs_calc=tmp_kwargs_calc)
 
 class RunManager():
     """
@@ -352,7 +360,9 @@ class RunManager():
             with open(self.logfilename, 'a+') as log:
                 log.write(content)
     
-    def __filecheck(self, calc_directory):
+    def __filecheck(self,
+                    calc_directory: str,
+                    free: bool = False):
         """
         Check if the calculation has a calc_*.in file and an
         associated record in the database. If one or more are missing, then
@@ -362,6 +372,10 @@ class RunManager():
         ----------
         calc_directory : str
             The calculation directory to check
+        free : bool, optional
+            Indicates if the runner is operating free of the database.  Here,
+            if this is set to True no check is performed as to if a matching
+            record is found in the database.
         
         Returns
         -------
@@ -387,17 +401,21 @@ class RunManager():
 
         # Search database for calculation record
         if incomplete is False:
-            try:
-                calculation = self.database.get_record(style=style, name=calc_name)
+            if free:
+                calculation = load_calculation(style.replace('calculation_', ''), name=calc_name)
             
-            # Kill runner for ConnectionErrors
-            except requests.ConnectionError as e:
-                self.__logwrite(e)
-                raise requests.ConnectionError(e)
-            
-            except:
-                incomplete = True
-                message = f'Failed to find matching record in database: moved to orphan directory\n\n'
+            else:
+                try:
+                    calculation = self.database.get_record(style=style, name=calc_name)
+                
+                # Kill runner for ConnectionErrors
+                except requests.ConnectionError as e:
+                    self.__logwrite(e)
+                    raise requests.ConnectionError(e)
+                
+                except:
+                    incomplete = True
+                    message = f'Failed to find matching record in database: moved to orphan directory\n\n'
             
         if incomplete is False:
             return calculation, calc_in.name
@@ -413,7 +431,9 @@ class RunManager():
             return None, None
 
     
-    def __parentcheck(self, calc_directory):
+    def __parentcheck(self,
+                      calc_directory: str,
+                      free: bool = False):
         """
         Check status of parent calculations
         
@@ -448,7 +468,7 @@ class RunManager():
                 except:
                     parentstatus = 'finished'
 
-                if parentstatus == 'not calculated':
+                if parentstatus == 'not calculated' and free is False:
                     # Get status of remote copy
                     parent = self.database.get_record(name=parent_name)
                     try:
@@ -478,7 +498,13 @@ class RunManager():
 
         return status, message
     
-    def run(self, calc_name, temp=False, temp_directory=None, bidverbose=False, kwargs_calc={}):
+    def run(self,
+            calc_name: str,
+            temp: bool = False,
+            temp_directory = None,
+            bidverbose: bool = False,
+            free: bool = False,
+            kwargs_calc = {}):
         """
         Runs one calculation from the run_directory.
         
@@ -486,7 +512,7 @@ class RunManager():
         ----------
         calc_name :str
             The name of the calculation in run_directory to run.
-        use_temp : bool, optional
+        temp : bool, optional
             If True, a new temporary directory will be created and used for this
             run.  
         temp_directory : path-like object, optional
@@ -495,6 +521,11 @@ class RunManager():
         bidverbose : bool, optional
             If True, info about the calculation bidding process will be printed.
             Default value is False.
+        free : bool, optional
+            Setting this to True indicates that the calculation should be ran
+            without interfacing with the database.  This allows for runners to
+            work even when the associated database is inaccessible.  Finished
+            calculations can be uploaded later using "finish_calculations".
         kwargs_calc : dict, optional
             Keyword arguments for :meth:`iprPy.calculation.Calculation.Calculation.run`.
             Default is ``{"results_json": True}``
@@ -504,6 +535,9 @@ class RunManager():
         status : str
             The status of the calculation after calling run.    
         """
+        if free:
+            assert temp is False and temp_directory is None
+
         # Strip slashes from calc_name due to shell autofills
         calc_name = calc_name.strip('/')
 
@@ -517,17 +551,18 @@ class RunManager():
         self.__logwrite(f'{calc_name}\n')
 
         # Find calculation and calc script
-        calculation, calc_in = self.__filecheck(calc_directory)
+        calculation, calc_in = self.__filecheck(calc_directory, free=free)
         if calculation is None:
             return 'orphan'
         
         # Check on the status of the parent calculations
-        status, message = self.__parentcheck(calc_directory)
+        status, message = self.__parentcheck(calc_directory, free=free)
 
         # Remove bidfile and move to another calc if parents are not ready
         if status == 'not ready':
-            for bidfile in calc_directory.glob('*.bid'):
-                bidfile.unlink()
+            if free is False:
+                for bidfile in calc_directory.glob('*.bid'):
+                    bidfile.unlink()
             return 'need to run ' + message
         
         # Change calculation's status to error if parents issued errors
@@ -581,32 +616,33 @@ class RunManager():
             raise RuntimeError(f'Unknown status {status}')
 
         # Update record
-        tries = 0
-        while tries < 10:
-            try:
-                self.database.update_record(record=calculation)
-                break
-            except:
-                tries += 1
-        if tries == 10:
-            self.__logwrite('failed to update record\n')
-            status += ' - record upload failed'
-        else:
-            if True:
-            #try:
-                # tar.gz calculation and add to database
-                self.database.add_tar(root_dir=zip_directory, name=calc_name)
+        if free is False:
+            tries = 0
+            while tries < 10:
+                try:
+                    self.database.update_record(record=calculation)
+                    break
+                except:
+                    tries += 1
+            if tries == 10:
+                self.__logwrite('failed to update record\n')
+                status += ' - record upload failed'
             else:
-            #except:
-                status += ' - tar upload failed'
-                self.__logwrite('failed to upload archive\n')
-                
-                # Move tar file to hold if it was created 
-                tarname = Path(exe_directory, f'{calc_name}.tar.gz')
-                if tarname.is_file():
-                    shutil.move(tarname, self.hold_directory)
+                if True:
+                #try:
+                    # tar.gz calculation and add to database
+                    self.database.add_tar(root_dir=zip_directory, name=calc_name)
+                else:
+                #except:
+                    status += ' - tar upload failed'
+                    self.__logwrite('failed to upload archive\n')
+                    
+                    # Move tar file to hold if it was created 
+                    tarname = Path(exe_directory, f'{calc_name}.tar.gz')
+                    if tarname.is_file():
+                        shutil.move(tarname, self.hold_directory)
 
-            self.__removecalc(calc_directory)
+                self.__removecalc(calc_directory)
 
         # Clean temp_directory if needed
         if temp:
@@ -615,8 +651,13 @@ class RunManager():
         self.__logwrite('\n')
         return status
     
-    def runall(self, bidtries=10, temp=False, temp_directory=None,
-               bidverbose=False, kwargs_calc={"results_json": True}):
+    def runall(self,
+               bidtries: int = 10,
+               temp: bool = False,
+               temp_directory = None,
+               bidverbose: bool = False,
+               free: bool = False,
+               kwargs_calc={"results_json": True}):
         """
         Sequentially runs calculations within the run_directory until all
         are finished.
@@ -635,11 +676,18 @@ class RunManager():
             are to be performed.
         bidverbose : bool, optional
             If True, info about the calculation bidding process will be printed.
-            Default value is False. 
+            Default value is False.
+        free : bool, optional
+            Setting this to True indicates that the calculations should be ran
+            without interfacing with the database.  This allows for runners to
+            work even when the associated database is inaccessible.  Finished
+            calculations can be uploaded later using "finish_calculations".
         kwargs_calc : dict, optional
             Keyword arguments for :meth:`iprPy.calculation.Calculation.Calculation.run`.
             Default is ``{"results_json": True}``
         """
+        if free:
+            assert temp is False and temp_directory is None
 
         # Create temp_directory if needed
         if temp:
@@ -657,7 +705,8 @@ class RunManager():
 
             # Run the calculation
             status = self.run(calc_name, temp_directory=temp_directory,
-                              bidverbose=bidverbose, **kwargs_calc)
+                              bidverbose=bidverbose, free=free,
+                              **kwargs_calc)
 
             if status == 'bidfail':
                 bidcount += 1

@@ -619,7 +619,7 @@ class IprPyDatabase():
 
     def runner(self, run_directory, calc_name=None, orphan_directory=None,
                hold_directory=None, log=False, bidtries=10, bidverbose=False,
-               temp=False, temp_directory=None, kwargs_calc={}):
+               temp=False, temp_directory=None, free=False, kwargs_calc={}):
         """
         High-throughput calculation runner.
         
@@ -655,6 +655,11 @@ class IprPyDatabase():
         temp_directory : path-like object, optional
             The path to an existing temporary directory where the calculations
             are to be copied to and executed there instead of in the run_directory.
+        free : bool, optional
+            Setting this to True indicates that the calculations should be ran
+            without interfacing with the database.  This allows for runners to
+            work even when the associated database is inaccessible.  Finished
+            calculations can be uploaded later using "finish_calculations".
         kwargs_calc : dict, optional
             Keyword arguments for :meth:`iprPy.calculation.Calculation.Calculation.run`.
             Default is ``{"results_json": True}``
@@ -664,7 +669,8 @@ class IprPyDatabase():
         runner(self, run_directory, calc_name=calc_name,
                orphan_directory=orphan_directory, hold_directory=hold_directory,
                log=log, bidtries=bidtries, bidverbose=bidverbose,
-               temp=temp, temp_directory=temp_directory, kwargs_calc=kwargs_calc)
+               temp=temp, temp_directory=temp_directory, free=free,
+               kwargs_calc=kwargs_calc)
 
     def runmanager(self, run_directory, orphan_directory=None,
                     hold_directory=None, log=False):

@@ -174,7 +174,8 @@ def command_line_actions(args):
                         temp=args.temp,
                         log=args.log,
                         bidtries=args.bidtries,
-                        bidverbose=args.bidverbose)
+                        bidverbose=args.bidverbose,
+                        free=args.free)
 
     elif args.action == 'quick_check':
         input_file = args.input_file
@@ -419,6 +420,8 @@ def command_line_parser():
                         help='number of sequential bid failures before stopping the runner')
     subparser.add_argument('-v', '--bidverbose', action='store_true',
                         help='bid action info will be printed')
+    subparser.add_argument('-f', '--free', action='store_true',
+                        help='run free from the database')
 
     # Define subparser for quick_check
     subparser = subparsers.add_parser('quick_check',
