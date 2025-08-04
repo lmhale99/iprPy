@@ -310,7 +310,9 @@ def disl_relax(lammps_command: str,
         - **'E_total'** (*float*) - The total potential energy for the
           relaxed system.
     """
-
+    if annealsteps is None:
+        annealsteps = 10000
+        
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
     
