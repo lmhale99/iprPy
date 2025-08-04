@@ -318,6 +318,8 @@ def disl_relax(lammps_command: str,
         - **'E_total'** (*float*) - The total potential energy for the
           relaxed system.
     """
+    if annealsteps is None:
+        annealsteps = 10000
 
     # Get lammps units
     lammps_units = lmp.style.unit(potential.units)
@@ -332,6 +334,7 @@ def disl_relax(lammps_command: str,
     lammps_variables['atomman_system_pair_info'] = system_info
     lammps_variables['anneal_info'] = anneal_info(annealtemp, annealsteps, 
                                                   randomseed, potential.units)
+    lammps_variables['dumpsteps'] = maxiter + annealsteps
     lammps_variables['etol'] = etol
     lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])
     lammps_variables['maxiter'] = maxiter
