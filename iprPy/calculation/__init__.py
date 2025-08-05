@@ -26,8 +26,6 @@ for style in resources.contents(__name__):
             module = import_module(f'.{style}', __name__)
             classname = module.__all__[0]
             classmodule = getattr(module, classname)
-            classname = module.__all__[0]
-            classmodule = getattr(module, classname)
             
         except Exception as e:
             # Add failed imports to managers
