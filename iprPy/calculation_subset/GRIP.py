@@ -223,6 +223,8 @@ class GRIP(CalculationSubset):
         prefix = self.prefix
 
         for key, value in self.grip.metadata().items():
+            if key == 'name':
+                continue
             meta[f'{prefix}{key}'] = value
 
 ########################### Calculation interactions ##########################
