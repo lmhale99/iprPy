@@ -14,7 +14,7 @@ import pandas as pd
 # https://plotly.com/python
 import plotly.graph_objects as go
 
-from atomman import Box, ElasticConstants2
+from atomman import Box, ElasticConstants
 
 # Local imports
 from ... import load_record
@@ -185,7 +185,7 @@ def mdsolid_table(self,
                 cdict[key[:3]] = series[key]
         try:
             # Normalize elastic constants and add only unique values to data
-            C = ElasticConstants2(**cdict)
+            C = ElasticConstants(**cdict)
             newCdict = C.normalized_as(symmetryfamily, return_dict=True)
         except:
             pass

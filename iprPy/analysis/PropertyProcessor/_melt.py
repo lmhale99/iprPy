@@ -15,7 +15,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 import dbliquid
-from atomman import Box, ElasticConstants2
+from atomman import Box, ElasticConstants
 
 # Local imports
 from ... import load_record

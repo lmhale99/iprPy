@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 import atomman.unitconvert as uc
-from atomman import Box, ElasticConstants2
+from atomman import Box, ElasticConstants
 
 
 # Local imports
@@ -108,7 +108,7 @@ class ThermoSolid(Thermo):
             for key in sorted_df.keys():
                 if key[0] == 'C':
                     cdict[key[:3]] = series[key]
-            C = ElasticConstants2(**cdict)
+            C = ElasticConstants(**cdict)
             Cij_df.append(C.normalized_as(symmetryfamily, return_dict=True))
         self.__Cij_df = pd.DataFrame(Cij_df)
 
