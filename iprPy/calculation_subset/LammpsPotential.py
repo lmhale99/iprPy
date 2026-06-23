@@ -1,15 +1,13 @@
-# coding: utf-8
-
 # Standard Python libraries
-from typing import Optional, Union
+from typing import Optional
 
 # https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.lammps as lmp
+from atomman.typing import lammpspotential
 
+# https://github.com/usnistgov/yabadaba
 from yabadaba import load_query
-
-from potentials.record.BasePotentialLAMMPS import BasePotentialLAMMPS
 
 # https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
@@ -114,7 +112,7 @@ class LammpsPotential(CalculationSubset):
         self.__potential_LAMMPS_url = str(val)
 
     @property
-    def potential(self) -> BasePotentialLAMMPS:
+    def potential(self) -> lammpspotential:
         """BasePotentialLAMMPS: The record object for the LAMMPS implementation"""
         if (self.__potential is None and (
                 self.potential_LAMMPS_id is not None
@@ -129,7 +127,7 @@ class LammpsPotential(CalculationSubset):
         return self.__potential
 
     @potential.setter
-    def potential(self, val: BasePotentialLAMMPS):
+    def potential(self, val: lammpspotential):
         # Set metadata values
         self.potential_key = val.potkey
         self.potential_id = val.potid
