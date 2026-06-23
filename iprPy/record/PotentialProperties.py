@@ -14,7 +14,8 @@ from yabadaba import load_query
 from . import Record
 from .PotentialPropertiesSubsets import (DiatomScan, EvsRScan, CrystalStructure,
                                          ElasticConstants, FreeSurface, StackingFault,
-                                         PointDefect, Phonon)
+                                         PointDefect, DislMono, DislDi, Phonon, 
+                                         MDThermo, MDSolid, MDLiquid, Melt)
 
 class PotentialProperties(Record):
     """
@@ -80,7 +81,13 @@ class PotentialProperties(Record):
         self.freesurfaces = FreeSurface(self)
         self.stackingfaults = StackingFault(self)
         self.pointdefects = PointDefect(self)
+        self.dislmono = DislMono(self)
+        self.disldi = DislDi(self)
         self.phonons = Phonon(self)
+        self.mdsolid = MDSolid(self)
+        self.mdliquid = MDLiquid(self)
+        self.mdthermo = MDThermo(self)
+        self.melt = Melt(self)
 
         # Build list of all available subsets
         self.subsets = [
@@ -91,7 +98,13 @@ class PotentialProperties(Record):
             self.freesurfaces,
             self.stackingfaults,
             self.pointdefects,
-            self.phonons
+            self.dislmono,
+            self.disldi,
+            self.phonons,
+            self.mdsolid,
+            self.mdliquid,
+            self.mdthermo,
+            self.melt,
         ]
 
         # Call parent init

@@ -4,7 +4,7 @@
 from pathlib import Path
 from datetime import date
 from math import floor, ceil
-from copy import deepcopy
+import warnings
 
 # http://www.numpy.org/
 import numpy as np
@@ -15,11 +15,13 @@ import pandas as pd
 # https://plotly.com/python
 import plotly.graph_objects as go
 
+import dbliquid
 from atomman import Box, ElasticConstants2
 import atomman.unitconvert as uc
 
 # Local imports
 from ... import load_record
+from ...tools import num_deriv_3_point
 
 
 
@@ -51,57 +53,47 @@ def mdthermo(self,
     
     # Class attributes
     database = self.database
-    getkwargs = deepcopy(self.getkwargs)
     outputpath = self.outputpath
-    props = self.props
-    prop_df = self.prop_df()
-
-    # Parse props based on getkwargs if needed
-    mask = np.ones(len(props), dtype=bool)
-    if 'potential_LAMMPS_id' in getkwargs:
-        mask = (mask) & (prop_df.potential_LAMMPS_id == getkwargs['potential_LAMMPS_id'])
-        del getkwargs['potential_LAMMPS_id']
-    if 'potential_LAMMPS_key' in getkwargs:
-        mask = (mask) & (prop_df.potential_LAMMPS_key == getkwargs['potential_LAMMPS_key'])
-        del getkwargs['potential_LAMMPS_key']
-    if 'potential_id' in getkwargs:
-        mask = (mask) & (prop_df.potential_id == getkwargs['potential_id'])
-        del getkwargs['potential_id']
-    if 'potential_key' in getkwargs:
-        mask = (mask) & (prop_df.potential_key == getkwargs['potential_key'])
-        del getkwargs['potential_key']
-    if mask.sum() != len(props):
-        props = props[mask]
-        prop_df = prop_df[mask].reset_index(drop=True)
 
     # Loop over all props
     num_updated = 0
     num_skipped = 0
-    for i, prop in enumerate(props):
-
+    for prop, getkwargs in self.iter_by_prop():
         pot_id = prop.potential_id
-        pot_key = prop.potential_key
         imp_id = prop.potential_LAMMPS_id
-        imp_key = prop.potential_LAMMPS_key
-        print(i, pot_id, imp_id, end=' ')
     
         # Skip records with existing results
         if prop.mdthermo.exists and runall is False:
             print('skipped')
             num_skipped += 1
             continue
+        else:
+            # reset data
+            prop.mdliquid.compositions.clear()
     
         # Get solid and liquid results
-        getkwargs['potential_key'] = pot_key
-        getkwargs['potential_LAMMPS_key'] = imp_key
         all_solid_df = database.get_records_df(style='md_solid_properties',
                                             **getkwargs)
+        if len(all_solid_df) > 0:
+            all_solid_df = all_solid_df[np.isclose(all_solid_df['Pxx (GPa)'], 0.0)]
+
         all_liquid_df = database.get_records_df(style='md_liquid_properties',
                                             **getkwargs)
+        if len(all_liquid_df) > 0:
+            all_liquid_df = all_liquid_df[np.isclose(all_liquid_df['P (MPa)'], 0.0)]
 
         if len(all_solid_df) == 0 and len(all_liquid_df) == 0:   
-            print('no finished records found')
-            continue   
+            print('no finished records')
+            continue
+        if 'G (eV/atom)' not in all_solid_df and 'G (eV/atom)' not in all_liquid_df:
+            print('no thermo results')
+            continue
+        
+        # Add keys if needed
+        if 'G (eV/atom)' not in all_solid_df:
+            all_solid_df['G (eV/atom)'] = np.nan
+        if 'G (eV/atom)' not in all_liquid_df:
+            all_liquid_df['G (eV/atom)'] = np.nan
 
         # Add prototype field to solid data
         self.identify_prototypes(all_solid_df)
@@ -109,17 +101,15 @@ def mdthermo(self,
         compositions = np.unique(all_solid_df.composition.tolist() + all_liquid_df.composition.tolist())
         
         # Loop over compositions
-        thermoplot = []
         for composition in compositions:
             solid_df = all_solid_df[all_solid_df.composition == composition]
             liquid_df = all_liquid_df[all_liquid_df.composition == composition]
-
             # Build and save plots and tables
             self.mdthermo_plots(solid_df, liquid_df, outputpath, pot_id, imp_id,
-                                composition, thermoplot)
-        
-        # Build info tables for the extracted/generated plots
-        prop.mdthermo.thermoplot = pd.DataFrame(thermoplot)
+                                composition)
+            
+            # Add composition listing to PotentialProperties content
+            prop.mdthermo.compositions.append(composition)
 
         # Build model component
         prop.mdthermo.exists = True
@@ -147,8 +137,7 @@ def mdthermo_plots(self,
                    outputpath: Path,
                    potential: str,
                    implementation: str,
-                   composition,
-                   data):
+                   composition):
     """
     Function to call all plot generation functions for thermo data.
     """
@@ -157,15 +146,15 @@ def mdthermo_plots(self,
         contentpath.mkdir(parents=True)
 
 
-    self.mdthermo_energy_plot(solid_df, liquid_df, composition, contentpath, data,
+    self.mdthermo_energy_plot(solid_df, liquid_df, composition, contentpath, 
                               uc_unit='eV', plot_unit='eV/atom')
-    self.mdthermo_gibbs_plot(solid_df, liquid_df, composition, contentpath, data,
+    self.mdthermo_gibbs_plot(solid_df, liquid_df, composition, contentpath,
                              uc_unit='eV', plot_unit='eV/atom')
-    self.mdthermo_entropy_plot(solid_df, liquid_df, composition, contentpath, data,
+    self.mdthermo_entropy_plot(solid_df, liquid_df, composition, contentpath,
                                uc_unit='J/mol', plot_unit='J/K/mol')
-    self.mdthermo_cp_plot(solid_df, liquid_df, composition, contentpath, data,
+    self.mdthermo_cp_plot(solid_df, liquid_df, composition, contentpath,
                           uc_unit='J/mol', plot_unit='J/K/mol')
-    self.mdthermo_volume_plot(solid_df, liquid_df, composition, contentpath, data,
+    self.mdthermo_volume_plot(solid_df, liquid_df, composition, contentpath,
                               uc_unit='angstrom^3', plot_unit='&#197;^3/atom')
 
 
@@ -174,7 +163,6 @@ def mdthermo_energy_plot(self,
                          liquid_df,
                          composition,
                          contentpath,
-                         data,
                          uc_unit='eV',
                          plot_unit='eV/atom'):
     
@@ -208,8 +196,8 @@ def mdthermo_energy_plot(self,
     if len(liquid_df) > 0:
         sorted_df = liquid_df.sort_values('T (K)')
         v = sorted_df['U (eV/atom)'].values
-        v[~liquid_df.isliquid] = np.nan
-        values['liquid'] = v
+        v[~sorted_df.isliquid] = np.nan
+        values['liquid'] = np.hstack([[np.nan]*round(sorted_df['T (K)'].values[0] / 50), v])
 
         if Tmax < sorted_df['T (K)'].values[-1]:
             Tmax = sorted_df['T (K)'].values[-1]
@@ -262,15 +250,6 @@ def mdthermo_energy_plot(self,
     fig.write_image(Path(contentpath, pngfile), width=1200, height=600,) 
     fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
     table_df.to_csv(Path(contentpath, csvfile), index=False)
-
-    # Collect data for web generation
-    dat = {}
-    dat['composition'] = composition
-    dat['name'] = 'Energy'
-    dat['html'] = htmlfile
-    dat['png'] = pngfile
-    dat['csv'] = csvfile
-    data.append(dat)
             
     fig.data = []
 
@@ -279,7 +258,6 @@ def mdthermo_gibbs_plot(self,
                         liquid_df,
                         composition,
                         contentpath,
-                        data,
                         uc_unit='eV',
                         plot_unit='eV/atom'):
     
@@ -294,6 +272,8 @@ def mdthermo_gibbs_plot(self,
     # Loop over solid prototypes
     values = {}
     Tmax = 0
+    min_G0 = 9999999
+    min_tag = None
     for prototype in np.unique(solid_df.prototype):
         proto_df = solid_df[solid_df.prototype == prototype]
         for i, relaxed_crystal_key in enumerate(np.unique(proto_df.relaxed_crystal_key)):
@@ -306,6 +286,10 @@ def mdthermo_gibbs_plot(self,
             parsed_df = crystal_df[crystal_df.untransformed].sort_values('T (K)')
             values[tag] = parsed_df['G (eV/atom)'].values
 
+            if values[tag][0] < min_G0:
+                min_tag = tag
+                min_G0 = values[tag][0]
+
             if Tmax < parsed_df['T (K)'].values[-1]:
                 Tmax = parsed_df['T (K)'].values[-1]
             
@@ -313,25 +297,34 @@ def mdthermo_gibbs_plot(self,
     if len(liquid_df) > 0:
         sorted_df = liquid_df.sort_values('T (K)')
         v = sorted_df['G (eV/atom)'].values
-        v[~liquid_df.isliquid] = np.nan
-        values['liquid'] = v
+        v[~sorted_df.isliquid] = np.nan
+        values['liquid'] = np.hstack([[np.nan]*round(sorted_df['T (K)'].values[0] / 50), v])
 
         if Tmax < sorted_df['T (K)'].values[-1]:
             Tmax = sorted_df['T (K)'].values[-1]
     
+    if len(values) == 0:
+        return
+
     # Build table
     table_df = build_table(values, Tmax, uc_unit)
-    
     # Loop over results
+    ylabel = f"Gibbs ({plot_unit})"
     for i, tag in enumerate(values.keys()):
-                
+        if min_tag is None:
+            yvals = table_df[tag].values
+            ylabel = f"Gibbs ({plot_unit})"
+        else:
+            yvals = table_df[tag].values - table_df[min_tag].values
+            ylabel = f"&#916;Gibbs ({plot_unit})"
+
         lineformat = lineformats.iloc[i]
 
         # Define plot lines
         fig.add_trace(
             go.Scatter(
                 x=table_df.temperature,
-                y=table_df[tag],
+                y=yvals,
                 mode='lines',
                 name=tag,
                 showlegend=True,
@@ -351,7 +344,7 @@ def mdthermo_gibbs_plot(self,
         ),
         yaxis=dict(
             title=dict(
-                text=f"Gibbs ({plot_unit})"
+                text=ylabel
             )
         ),
         paper_bgcolor='white',
@@ -367,15 +360,6 @@ def mdthermo_gibbs_plot(self,
     fig.write_image(Path(contentpath, pngfile), width=1200, height=600,) 
     fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
     table_df.to_csv(Path(contentpath, csvfile), index=False)
-
-    # Collect data for web generation
-    dat = {}
-    dat['composition'] = composition
-    dat['name'] = 'Energy'
-    dat['html'] = htmlfile
-    dat['png'] = pngfile
-    dat['csv'] = csvfile
-    data.append(dat)
             
     fig.data = []
 
@@ -385,15 +369,14 @@ def mdthermo_entropy_plot(self,
                          liquid_df,
                          composition,
                          contentpath,
-                         data,
-                         uc_unit='eV',
-                         plot_unit='eV/atom'):
+                         uc_unit='J/mol',
+                         plot_unit='J/K/mol'):
     
     # Initialize plot and table
     fig = go.Figure()
-    pngfile = f'mdthermo.{composition}.U.png'
-    csvfile = f'mdthermo.{composition}.U.csv'
-    htmlfile = f'mdthermo.{composition}.U.html'
+    pngfile = f'mdthermo.{composition}.S.png'
+    csvfile = f'mdthermo.{composition}.S.csv'
+    htmlfile = f'mdthermo.{composition}.S.html'
 
     lineformats = self.plotly_line_formats
 
@@ -410,7 +393,12 @@ def mdthermo_entropy_plot(self,
                 tag = f'{prototype} ({i+1})'
 
             parsed_df = crystal_df[crystal_df.untransformed].sort_values('T (K)')
-            values[tag] = parsed_df['U (eV/atom)'].values
+            G = parsed_df['G (eV/atom)'].values
+            H = parsed_df['H (eV/atom)'].values
+            T = parsed_df['T (K)'].values
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                values[tag] = (H - G) / T
 
             if Tmax < parsed_df['T (K)'].values[-1]:
                 Tmax = parsed_df['T (K)'].values[-1]
@@ -418,9 +406,14 @@ def mdthermo_entropy_plot(self,
     # Add liquid
     if len(liquid_df) > 0:
         sorted_df = liquid_df.sort_values('T (K)')
-        v = sorted_df['U (eV/atom)'].values
-        v[~liquid_df.isliquid] = np.nan
-        values['liquid'] = v
+        G = sorted_df['G (eV/atom)'].values
+        H = sorted_df['H (eV/atom)'].values
+        T = sorted_df['T (K)'].values
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            v = (H - G) / T
+        v[~sorted_df.isliquid] = np.nan
+        values['liquid'] = np.hstack([[np.nan]*round(sorted_df['T (K)'].values[0] / 50), v])
 
         if Tmax < sorted_df['T (K)'].values[-1]:
             Tmax = sorted_df['T (K)'].values[-1]
@@ -447,7 +440,7 @@ def mdthermo_entropy_plot(self,
             
     fig.update_layout(
         title=dict(
-            text="Energy vs. Temperature",
+            text="Entropy vs. Temperature",
             font=dict(size=14),
         ),
         xaxis=dict(
@@ -457,7 +450,7 @@ def mdthermo_entropy_plot(self,
         ),
         yaxis=dict(
             title=dict(
-                text=f"Energy ({plot_unit})"
+                text=f"Entropy ({plot_unit})"
             )
         ),
         paper_bgcolor='white',
@@ -473,15 +466,6 @@ def mdthermo_entropy_plot(self,
     fig.write_image(Path(contentpath, pngfile), width=1200, height=600,) 
     fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
     table_df.to_csv(Path(contentpath, csvfile), index=False)
-
-    # Collect data for web generation
-    dat = {}
-    dat['composition'] = composition
-    dat['name'] = 'Energy'
-    dat['html'] = htmlfile
-    dat['png'] = pngfile
-    dat['csv'] = csvfile
-    data.append(dat)
             
     fig.data = []
 
@@ -490,15 +474,14 @@ def mdthermo_cp_plot(self,
                          liquid_df,
                          composition,
                          contentpath,
-                         data,
-                         uc_unit='eV',
-                         plot_unit='eV/atom'):
+                         uc_unit='J/mol',
+                         plot_unit='J/K/mol'):
     
     # Initialize plot and table
     fig = go.Figure()
-    pngfile = f'mdthermo.{composition}.U.png'
-    csvfile = f'mdthermo.{composition}.U.csv'
-    htmlfile = f'mdthermo.{composition}.U.html'
+    pngfile = f'mdthermo.{composition}.Cp.png'
+    csvfile = f'mdthermo.{composition}.Cp.csv'
+    htmlfile = f'mdthermo.{composition}.Cp.html'
 
     lineformats = self.plotly_line_formats
 
@@ -515,17 +498,23 @@ def mdthermo_cp_plot(self,
                 tag = f'{prototype} ({i+1})'
 
             parsed_df = crystal_df[crystal_df.untransformed].sort_values('T (K)')
-            values[tag] = parsed_df['U (eV/atom)'].values
+            if len(parsed_df) < 3:
+                continue
+            H = parsed_df['H (eV/atom)'].values
+            T = parsed_df['T (K)'].values
+            values[tag] = num_deriv_3_point(T, H)
 
             if Tmax < parsed_df['T (K)'].values[-1]:
                 Tmax = parsed_df['T (K)'].values[-1]
             
     # Add liquid
-    if len(liquid_df) > 0:
+    if len(liquid_df) >= 3:
         sorted_df = liquid_df.sort_values('T (K)')
-        v = sorted_df['U (eV/atom)'].values
-        v[~liquid_df.isliquid] = np.nan
-        values['liquid'] = v
+        H = sorted_df['H (eV/atom)'].values
+        T = sorted_df['T (K)'].values
+        v = num_deriv_3_point(T, H)
+        v[~sorted_df.isliquid] = np.nan
+        values['liquid'] = np.hstack([[np.nan]*round(sorted_df['T (K)'].values[0] / 50), v])
 
         if Tmax < sorted_df['T (K)'].values[-1]:
             Tmax = sorted_df['T (K)'].values[-1]
@@ -552,7 +541,7 @@ def mdthermo_cp_plot(self,
             
     fig.update_layout(
         title=dict(
-            text="Energy vs. Temperature",
+            text="Constant P Heat Capacity vs. Temperature",
             font=dict(size=14),
         ),
         xaxis=dict(
@@ -562,7 +551,7 @@ def mdthermo_cp_plot(self,
         ),
         yaxis=dict(
             title=dict(
-                text=f"Energy ({plot_unit})"
+                text=f"Cp ({plot_unit})"
             )
         ),
         paper_bgcolor='white',
@@ -578,15 +567,6 @@ def mdthermo_cp_plot(self,
     fig.write_image(Path(contentpath, pngfile), width=1200, height=600,) 
     fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
     table_df.to_csv(Path(contentpath, csvfile), index=False)
-
-    # Collect data for web generation
-    dat = {}
-    dat['composition'] = composition
-    dat['name'] = 'Energy'
-    dat['html'] = htmlfile
-    dat['png'] = pngfile
-    dat['csv'] = csvfile
-    data.append(dat)
             
     fig.data = []
 
@@ -595,15 +575,18 @@ def mdthermo_volume_plot(self,
                          liquid_df,
                          composition,
                          contentpath,
-                         data,
-                         uc_unit='eV',
-                         plot_unit='eV/atom'):
+                         uc_unit='angstrom^3',
+                         plot_unit='&#197;^3/atom'):
     
+    def get_volume(series):
+        box = Box(a=series.a, b=series.b, c=series.c, alpha=series.alpha, beta=series.beta, gamma=series.gamma)
+        return box.volume
+
     # Initialize plot and table
     fig = go.Figure()
-    pngfile = f'mdthermo.{composition}.U.png'
-    csvfile = f'mdthermo.{composition}.U.csv'
-    htmlfile = f'mdthermo.{composition}.U.html'
+    pngfile = f'mdthermo.{composition}.V.png'
+    csvfile = f'mdthermo.{composition}.V.csv'
+    htmlfile = f'mdthermo.{composition}.V.html'
 
     lineformats = self.plotly_line_formats
 
@@ -620,7 +603,7 @@ def mdthermo_volume_plot(self,
                 tag = f'{prototype} ({i+1})'
 
             parsed_df = crystal_df[crystal_df.untransformed].sort_values('T (K)')
-            values[tag] = parsed_df['U (eV/atom)'].values
+            values[tag] = parsed_df.apply(get_volume, axis=1)
 
             if Tmax < parsed_df['T (K)'].values[-1]:
                 Tmax = parsed_df['T (K)'].values[-1]
@@ -628,9 +611,9 @@ def mdthermo_volume_plot(self,
     # Add liquid
     if len(liquid_df) > 0:
         sorted_df = liquid_df.sort_values('T (K)')
-        v = sorted_df['U (eV/atom)'].values
-        v[~liquid_df.isliquid] = np.nan
-        values['liquid'] = v
+        v = uc.set_in_units(sorted_df['V (m^3)'].values, 'm^3')
+        v[~sorted_df.isliquid] = np.nan
+        values['liquid'] = np.hstack([[np.nan]*round(sorted_df['T (K)'].values[0] / 50), v])
 
         if Tmax < sorted_df['T (K)'].values[-1]:
             Tmax = sorted_df['T (K)'].values[-1]
@@ -657,7 +640,7 @@ def mdthermo_volume_plot(self,
             
     fig.update_layout(
         title=dict(
-            text="Energy vs. Temperature",
+            text="Volume vs. Temperature",
             font=dict(size=14),
         ),
         xaxis=dict(
@@ -667,7 +650,7 @@ def mdthermo_volume_plot(self,
         ),
         yaxis=dict(
             title=dict(
-                text=f"Energy ({plot_unit})"
+                text=f"Volume ({plot_unit})"
             )
         ),
         paper_bgcolor='white',
@@ -683,29 +666,21 @@ def mdthermo_volume_plot(self,
     fig.write_image(Path(contentpath, pngfile), width=1200, height=600,) 
     fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
     table_df.to_csv(Path(contentpath, csvfile), index=False)
-
-    # Collect data for web generation
-    dat = {}
-    dat['composition'] = composition
-    dat['name'] = 'Energy'
-    dat['html'] = htmlfile
-    dat['png'] = pngfile
-    dat['csv'] = csvfile
-    data.append(dat)
             
     fig.data = []
 
 
 def build_table(values, Tmax, uc_unit):
 
-    Tvalues = np.arange(0, Tmax+50, 50)
+    Tvalues = np.arange(0, Tmax+50, 50, dtype=float)
     
     # Build table
     table_df = {}
     table_df['temperature'] = Tvalues
     for tag in values:
         table_df[tag] = np.full_like(Tvalues, np.nan)
-        table_df[tag][:len(values[tag])] = uc.get_in_units(values[tag], uc_unit)
+        if len(values[tag]) > 0:
+            table_df[tag][:len(values[tag])] = uc.get_in_units(values[tag], uc_unit)
     table_df = pd.DataFrame(table_df)
 
     return table_df

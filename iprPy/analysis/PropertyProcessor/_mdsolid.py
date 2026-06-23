@@ -48,51 +48,41 @@ def mdsolid(self,
     
     # Class attributes
     database = self.database
-    getkwargs = self.getkwargs
     outputpath = self.outputpath
-    props = self.props
-    prop_df = self.prop_df()
-
-    # Get records
-    records_df = database.get_records_df(style='md_solid_properties',
-                                         **getkwargs)
-    
-    # Add prototype field
-    self.identify_prototypes(records_df)
 
     num_updated = 0
     num_skipped = 0
-    newprops = []
-    for imp_df, pot_id, pot_key, imp_id, imp_key in self.iter_imp_df(records_df):
+    for prop, getkwargs in self.iter_by_prop():
+        pot_id = prop.potential_id
+        imp_id = prop.potential_LAMMPS_id
 
-        # Get or init a properties record
-        matching_props = props[(prop_df.potential_LAMMPS_key == imp_key) & (prop_df.potential_key == pot_key)]
-        if len(matching_props) == 1:
-            prop = matching_props[0]
-        elif len(matching_props) == 0:
-            prop = load_record('PotentialProperties', potential_key=pot_key,
-                                potential_id=pot_id, potential_LAMMPS_key=imp_key,
-                                potential_LAMMPS_id=imp_id)
-            prop.build_model()
-            newprops.append(prop)
-        else:
-            print('multiple prop records found!')
-            continue
-        
         # Skip records with existing results
         if prop.mdsolid.exists and runall is False:
             print('skipped')
             num_skipped += 1
             continue
         
+        # Get records
+        imp_df = database.get_records_df(style='md_solid_properties',
+                                             **getkwargs)
+        if len(imp_df) > 0:
+            imp_df = imp_df[np.isclose(imp_df['Pxx (GPa)'], 0.0)]
+        if len(imp_df) == 0:
+            print('no finished records')
+            continue
+        
+        # Add prototype field
+        self.identify_prototypes(imp_df)
+
         # Loop over relaxed_crystal_keys sorted by composition and family
-        sort_keys = ['composition', 'family', 'relaxed_crystal_key']
+        structures = []
+        sort_keys = ['composition', 'prototype', 'relaxed_crystal_key']
         for relaxed_crystal_key in imp_df.sort_values(sort_keys).relaxed_crystal_key.unique():
             crystal_df = imp_df[imp_df.relaxed_crystal_key == relaxed_crystal_key]
             composition = crystal_df.composition.values[0]
-            family = crystal_df.family.values[0]
-            alat = crystal_df.a.values[0]
-            tag = f'mdsolid.{composition}.{family}.{relaxed_crystal_key[:8]}'
+            prototype = crystal_df.prototype.values[0]
+            alat = crystal_df.sort_values('T (K)').a.values[0]
+            tag = f'mdsolid.{composition}.{prototype}.{relaxed_crystal_key[:8]}'
 
             # Process and save the structure data
             processed_df = self.mdsolid_table(crystal_df, outputpath, pot_id, imp_id, tag)
@@ -100,7 +90,16 @@ def mdsolid(self,
             # Build and save alat and cij plots as html and png
             self.mdsolid_alat_plotly_plot(processed_df, outputpath, pot_id, imp_id, tag)
             self.mdsolid_cij_plotly_plot(processed_df, outputpath, pot_id, imp_id, tag)
-            
+
+            # Add to data
+            dat = {}
+            dat['composition'] = composition
+            dat['prototype'] = prototype
+            dat['a'] = alat
+            dat['relaxed_crystal_key'] = relaxed_crystal_key
+            structures.append(dat)
+        prop.mdsolid.structures = pd.DataFrame(structures)
+
         # Build model component
         prop.mdsolid.exists = True
         model = prop.model['per-potential-properties']
@@ -118,8 +117,6 @@ def mdsolid(self,
             print('created/modified')
         num_updated += 1
         
-    if len(newprops) > 0:
-        self.add_props(newprops)
     print(num_updated, 'added/updated')
     print(num_skipped, 'skipped')
 
@@ -186,10 +183,14 @@ def mdsolid_table(self,
         for key in sorted_df.keys():
             if key[0] == 'C':
                 cdict[key[:3]] = series[key]
-        C = ElasticConstants2(**cdict)
-
-        # Normalize elastic constants and add only unique values to data
-        data.update(C.normalized_as(symmetryfamily, return_dict=True))
+        try:
+            # Normalize elastic constants and add only unique values to data
+            C = ElasticConstants2(**cdict)
+            newCdict = C.normalized_as(symmetryfamily, return_dict=True)
+        except:
+            pass
+        else:
+            data.update(newCdict)
 
         processed_df.append(data)
     
@@ -243,12 +244,14 @@ def mdsolid_alat_plotly_plot(self,
             go.Scatter(
                 x=df.temperature,
                 y=df[key],
-                mode='lines',
+                mode='markers+lines',
                 name=key,
                 showlegend=True,
                 line=dict(
                     color=lineformat.color,
-                    dash=lineformat.line)))
+                    dash='dot'),
+                marker=dict(
+                    color=lineformat.color)))
         
     # Edit the layout
     fig.update_layout(
@@ -333,12 +336,14 @@ def mdsolid_cij_plotly_plot(self,
             go.Scatter(
                 x=df.temperature,
                 y=df[key],
-                mode='lines',
+                mode='markers+lines',
                 name=key,
                 showlegend=True,
                 line=dict(
                     color=lineformat.color,
-                    dash=lineformat.line)))
+                    dash='dot'),
+                marker=dict(
+                    color=lineformat.color)))
         
     # Edit the layout
     fig.update_layout(
@@ -369,7 +374,9 @@ def mdsolid_cij_plotly_plot(self,
     fig.update_yaxes(
         **self.plotly_axes_settings
     )
-    
-    fig.write_image(Path(contentpath, pngfile), width=800, height=600) 
-    fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
+    try:
+        fig.write_image(Path(contentpath, pngfile), width=800, height=600) 
+        fig.write_html(Path(contentpath, htmlfile), include_plotlyjs='cdn', full_html=False)
+    except:
+        pass
     fig.data = []

@@ -5,4 +5,10 @@ from .ElasticConstants import ElasticConstants
 from .FreeSurface import FreeSurface
 from .StackingFault import StackingFault
 from .PointDefect import PointDefect
+from .DislMono import DislMono
+from .DislDi import DislDi
 from .Phonon import Phonon
+from .MDLiquid import MDLiquid
+from .MDSolid import MDSolid
+from .MDThermo import MDThermo
+from .Melt import Melt

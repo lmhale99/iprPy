@@ -227,6 +227,7 @@ def get_lineformats():
     lineformats.append({'family':'B2--CsCl',                   'color':'blue',    'line':'solid'})
     lineformats.append({'family':'B3--ZnS--cubic-zinc-blende', 'color':'red',     'line':'solid'})
     lineformats.append({'family':'L1_0--AuCu',                 'color':'cyan',    'line':'solid'})
+    lineformats.append({'family':'B4--ZnS--wurtzite',          'color':'magenta', 'line':'solid'})
     
     # AB2 binary
     lineformats.append({'family':'C1--CaF2--fluorite',         'color':'black',   'line':'solid'})

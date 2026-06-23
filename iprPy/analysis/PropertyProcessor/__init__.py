@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Optional, Union
-
+from copy import deepcopy
 
 import pandas as pd
 import numpy as np
@@ -26,10 +26,19 @@ class PropertyProcessor():
     from ._surface import surface
     from ._stacking import stacking
     from ._point import point
+    from ._dislmono import dislmono
     from ._phonon import (phonon, phonon_extract_plots, phonon_thermo_plots,
                           phonon_bulk_plot, phonon_cp_num_plot, phonon_cp_poly_plot,
                           phonon_cv_plot, phonon_entropy_plot, phonon_expansion_plot,
                           phonon_gibbs_plot, phonon_volume_plot)
+    from ._mdsolid import (mdsolid, mdsolid_table, mdsolid_alat_plotly_plot, 
+                           mdsolid_cij_plotly_plot)
+    from ._mdliquid import (mdliquid, mdliquid_diffusion_plot, mdliquid_rdf_plot,
+                            mdliquid_table, mdliquid_viscosity_plot)
+    from ._mdthermo import (mdthermo, mdthermo_cp_plot, mdthermo_energy_plot,
+                            mdthermo_entropy_plot, mdthermo_gibbs_plot,
+                            mdthermo_plots, mdthermo_volume_plot)
+    from ._melt import melt
 
     def __init__(self,
                  database: Union[IprPyDatabase, str],
@@ -160,6 +169,51 @@ class PropertyProcessor():
         """
         self.__props = np.hstack([self.props, newprops])
 
+    def iter_by_prop(self):
+        """
+        Iterates through property records and modifies the getkwargs
+        to allow fetching results records one potential-implementation
+        at a time.
+        
+        Yields
+        ------
+        prop
+            A single property record.
+        getkwargs: dict
+            The modified getkwargs dict to correspond only to the
+            potential-implementation of prop.
+        """
+        # Class attributes
+        getkwargs = deepcopy(self.getkwargs)
+        props = self.props
+        prop_df = self.prop_df()
+
+        # Parse props based on getkwargs if needed
+        mask = np.ones(len(props), dtype=bool)
+        if 'potential_LAMMPS_id' in getkwargs:
+            mask = (mask) & (prop_df.potential_LAMMPS_id == getkwargs['potential_LAMMPS_id'])
+            del getkwargs['potential_LAMMPS_id']
+        if 'potential_LAMMPS_key' in getkwargs:
+            mask = (mask) & (prop_df.potential_LAMMPS_key == getkwargs['potential_LAMMPS_key'])
+            del getkwargs['potential_LAMMPS_key']
+        if 'potential_id' in getkwargs:
+            mask = (mask) & (prop_df.potential_id == getkwargs['potential_id'])
+            del getkwargs['potential_id']
+        if 'potential_key' in getkwargs:
+            mask = (mask) & (prop_df.potential_key == getkwargs['potential_key'])
+            del getkwargs['potential_key']
+        if mask.sum() != len(props):
+            props = props[mask]
+            prop_df = prop_df[mask].reset_index(drop=True)
+
+        for i, prop in enumerate(props):
+            getkwargs['potential_key'] = prop.potential_key
+            getkwargs['potential_LAMMPS_key'] = prop.potential_LAMMPS_key
+            
+            print(i, prop.potential_id, prop.potential_LAMMPS_id, end=' ')
+            yield prop, getkwargs
+
+
     def iter_imp_df(self, records_df: pd.DataFrame):
         """
         Iterates through dataframe subsets that correspond to unique
@@ -253,7 +307,7 @@ class PropertyProcessor():
         """
         lineformats = []
         colors = ['black', 'blue', 'red', 'cyan', 'magenta', '#EAC117', 'orange', 'gray', 'green', 'brown']
-        lines = 10 * ['solid', 'dash', 'dot', 'dashdot'] 
+        lines = 50 * ['solid', 'dash', 'dot', 'dashdot'] 
         
         for line in lines:
             for color in colors:
