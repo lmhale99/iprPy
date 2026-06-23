@@ -16,8 +16,12 @@ from . import load_transition_temp, save_transition_temp, noval
 
 
 def find_transition_temps(database,
+                          potential_id: Union[str, list, None] = None,
+                          potential_key: Union[str, list, None] = None,
+                          potential_LAMMPS_id: Union[str, list, None] = None,
+                          potential_LAMMPS_key: Union[str, list, None] = None,
                           transition_temp_csv: Union[Path, str] = 'transition_temp.csv',
-                          search_temp: float = 500,
+                          search_temp: float = 300,
                           threshold: float = 0.015):
     """
     Method to automatically identify the transition temperature of crystalline
@@ -49,7 +53,11 @@ def find_transition_temps(database,
     print(len(transition_temp), 'relaxed_crystals already known')
 
     # Fetch md_solid_properties records
-    results_df = database.get_records_df('md_solid_properties')
+    results_df = database.get_records_df('md_solid_properties',
+                                         potential_id=potential_id,
+                                         potential_key=potential_key,
+                                         potential_LAMMPS_id=potential_LAMMPS_id,
+                                         potential_LAMMPS_key=potential_LAMMPS_key)
     print(len(results_df), 'md_solid_properties records found')
 
     # Add any missing crystals to transition_temp(_csv)

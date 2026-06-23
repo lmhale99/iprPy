@@ -1,27 +1,15 @@
 from typing import Union
 
-from copy import deepcopy
-from uuid import uuid4
-
-
-
-from DataModelDict import DataModelDict as DM
-
 import atomman as am
-import atomman.unitconvert as uc
-
-
-
-import numpy as np
 
 import pandas as pd
 
-from tqdm import tqdm
-
-
 
 def process_0K(database,
+               potential_id: Union[str, list, None] = None,
+               potential_key: Union[str, list, None] = None,
                potential_LAMMPS_id: Union[str, list, None] = None,
+               potential_LAMMPS_key: Union[str, list, None] = None,
                strainrange: float = 1e-7,
                verbose: bool = False):
     """
@@ -38,11 +26,22 @@ def process_0K(database,
     database : iprPy.Database
         The database to interact with where existing records are to be found
         and new md_solid_properties will be added to.
+    potential_id : str, list or None, optional
+        One or more potential_ids that will limit the records being
+        queried, parsed and built to only those associated with the indicated
+        potentials.
+    potential_key : str, list or None, optional
+        One or more potential_keys that will limit the records being
+        queried, parsed and built to only those associated with the indicated
+        potentials.
     potential_LAMMPS_id : str, list or None, optional
         One or more potential_LAMMPS_ids that will limit the records being
         queried, parsed and built to only those associated with the indicated
-        potentials.  If None, then all potentials will be explored which can
-        take some time and require large amounts of memory.
+        potentials.
+    potential_LAMMPS_key : str, list or None, optional
+        One or more potential_LAMMPS_keys that will limit the records being
+        queried, parsed and built to only those associated with the indicated
+        potentials.
     strainrange : float, optional
         The strainrange value of the elastic_constants_static results to use.
         The default iprPy workflow performs the elastic_constants_static
@@ -62,7 +61,10 @@ def process_0K(database,
 
     # Fetch existing md_solid_properties results
     results, results_df = database.get_records('md_solid_properties', return_df=True,
+                                               potential_id=potential_id,
+                                               potential_key=potential_key,
                                                potential_LAMMPS_id=potential_LAMMPS_id,
+                                               potential_LAMMPS_key=potential_LAMMPS_key,
                                                method='0K')
     if verbose:
         print(len(results), 'md_solid_properties:0K records found', flush=True)
@@ -75,14 +77,20 @@ def process_0K(database,
     # Fetch good, dynamic relaxed relax_crystal records
     crystals, crystals_df = database.get_records('relaxed_crystal', return_df=True,
                                                  standing='good', method='dynamic',
-                                                 potential_LAMMPS_id=potential_LAMMPS_id)
+                                                 potential_id=potential_id,
+                                                 potential_key=potential_key,
+                                                 potential_LAMMPS_id=potential_LAMMPS_id,
+                                                 potential_LAMMPS_key=potential_LAMMPS_key)
     if verbose:
         print(len(crystals), 'relaxed_crystal records found', flush=True)
 
     # Fetch finished elastic_constants_static results
     cijs, cijs_df = database.get_records('calculation_elastic_constants_static', return_df=True,
                                          status='finished',
+                                         potential_id=potential_id,
+                                         potential_key=potential_key,
                                          potential_LAMMPS_id=potential_LAMMPS_id,
+                                         potential_LAMMPS_key=potential_LAMMPS_key,
                                          strainrange=strainrange)
     if verbose:
         print(len(cijs), 'elastic_constants_static records found', flush=True)
@@ -116,7 +124,7 @@ def process_0K(database,
             raise ValueError('Multiple solid records!!!')
 
         # Add Cij results if not already in the record and they exist
-        if solid.C is None:
+        if solid.C is None and len(cijs_df) > 0:
             match = cijs_df[cijs_df.parent_key == crystal.key]
             
             if len(match) == 1:

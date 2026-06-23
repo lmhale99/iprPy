@@ -21,7 +21,12 @@ from tqdm import tqdm
 
 
 def process_at_temp(database,
+                    potential_id: Union[str, list, None] = None,
+                    potential_key: Union[str, list, None] = None,
                     potential_LAMMPS_id: Union[str, list, None] = None,
+                    potential_LAMMPS_key: Union[str, list, None] = None,
+                    update_all_cij: bool = False,
+                    update_all_fe: bool = False,
                     verbose: bool = False):
     """
     Constructs md_solid_properties records by combining finished 
@@ -53,11 +58,30 @@ def process_at_temp(database,
     database : iprPy.Database
         The database to interact with where existing records are to be found
         and new md_solid_properties will be added to.
+    potential_id : str, list or None, optional
+        One or more potential_ids that will limit the records being
+        queried, parsed and built to only those associated with the indicated
+        potentials.
+    potential_key : str, list or None, optional
+        One or more potential_keys that will limit the records being
+        queried, parsed and built to only those associated with the indicated
+        potentials.
     potential_LAMMPS_id : str, list or None, optional
         One or more potential_LAMMPS_ids that will limit the records being
         queried, parsed and built to only those associated with the indicated
-        potentials.  If None, then all potentials will be explored which can
-        take some time and require large amounts of memory.
+        potentials.
+    potential_LAMMPS_key : str, list or None, optional
+        One or more potential_LAMMPS_keys that will limit the records being
+        queried, parsed and built to only those associated with the indicated
+        potentials.
+    update_all_cij : bool, optional
+        If False (default), elastic constants values are only added to records
+        that do not already have the values set.  Setting this to True will
+        update the elastic constants values in all records being checked.
+    update_all_fe : bool, optional
+        If False (default), free energy values are only added to records
+        that do not already have the values set.  Setting this to True will
+        update the free energy values in all records being checked.
     verbose : bool, optional
         Informative messages will be printed if verbose is set to True.
     
@@ -66,12 +90,20 @@ def process_at_temp(database,
     count_add : int
         The number of new records added.
     count_update : int
-        The number of old records updated with Cij results.
+        The number of old records updated with free energy and/or Cij results.
     """
     
     # Fetch existing md_solid_properties results
     results, results_df = database.get_records('md_solid_properties', return_df=True,
-                                               potential_LAMMPS_id=potential_LAMMPS_id)
+                                               potential_id=potential_id,
+                                               potential_key=potential_key,
+                                               potential_LAMMPS_id=potential_LAMMPS_id,
+                                               potential_LAMMPS_key=potential_LAMMPS_key,)
+    # Create empty dataframe if needed
+    if len(results) == 0:
+        keys = ['potential_LAMMPS_key', 'potential_key', 'relaxed_crystal_key', 'method']
+        results_df = pd.DataFrame(columns=keys)
+
     if verbose:
         print(len(results), 'md_solid_properties records found', flush=True)
         print(len(results[results_df.method.isin(['at_temp', 'at_temp_50K'])]), 'are at_temp(_50K)')
@@ -80,21 +112,36 @@ def process_at_temp(database,
     relaxes, relaxes_df = database.get_records('calculation_relax_dynamic', return_df=True,  
                                                 branch=['at_temp', 'at_temp_50K'],
                                                 status='finished',
-                                                potential_LAMMPS_id=potential_LAMMPS_id)
+                                                potential_id=potential_id,
+                                                potential_key=potential_key,
+                                                potential_LAMMPS_id=potential_LAMMPS_id,
+                                                potential_LAMMPS_key=potential_LAMMPS_key,)
+    # Quick exit if no relaxations exist
+    if len(relaxes) == 0:
+        if verbose:
+            print('0 relaxation records found > 0K')
+            return 0, 0
+
     if verbose:
         print(len(relaxes), 'relax_dynamic:at_temp(_50K) records found', flush=True)
 
     # Fetch finished free_energy results 
     free_energies, free_energies_df = database.get_records('calculation_free_energy', return_df=True, 
                                                            status='finished',
-                                                           potential_LAMMPS_id=potential_LAMMPS_id)
+                                                           potential_id=potential_id,
+                                                           potential_key=potential_key,
+                                                           potential_LAMMPS_id=potential_LAMMPS_id,
+                                                           potential_LAMMPS_key=potential_LAMMPS_key,)
     if verbose:
         print(len(free_energies), 'free_energy records found', flush=True)
 
     # Fetch finished elastic_constants_dynamic results
     cijs, cijs_df = database.get_records('calculation_elastic_constants_dynamic', return_df=True,
                                          status='finished',  
-                                         potential_LAMMPS_id=potential_LAMMPS_id)
+                                         potential_id=potential_id,
+                                         potential_key=potential_key,
+                                         potential_LAMMPS_id=potential_LAMMPS_id,
+                                         potential_LAMMPS_key=potential_LAMMPS_key,)
     if verbose:
         print(len(cijs), 'elastic_constants_dynamic records found', flush=True)
 
@@ -152,8 +199,23 @@ def process_at_temp(database,
             else:
                 raise ValueError('Multiple matches!!!')
 
+            # Reset existing free energy values if updating all
+            if update_all_fe and solid.gibbs is not None:
+                solid.free_energy_key = None
+                solid.free_energy_url = None
+                solid.gibbs = None
+                solid.helmholtz = None
+                updated = True
+            
+            # Reset existing Cij values if updating all
+            if update_all_cij and solid.C is not None:
+                solid.elastic_constants_key = None
+                solid.elastic_constants_url = None
+                solid.C = None
+                updated = True
+
             # Add Cij values if they exist and are not already in the md_solid_properties
-            if solid.C is None:
+            if solid.C is None and len(cijs_df) > 0:
                 match = cijs_df[cijs_df.parent_key == relax.key]
 
                 if len(match) == 1:
@@ -164,7 +226,7 @@ def process_at_temp(database,
                     print('multiple Cij!')
 
             # Add free energy values if they exist and are not already in the md_solid_properties
-            if solid.gibbs is None:
+            if solid.gibbs is None and len(free_energies_df) > 0:
                 match = free_energies_df[free_energies_df.parent_key == relax.key]
 
                 if len(match) == 1:
@@ -184,7 +246,6 @@ def process_at_temp(database,
                     database.update_record(solid)
                     count_update += 1
             
-            
             # Find the next relaxation calculation in line
             child_df = relaxes_df[relaxes_df.parent_key == relax.key]
             if len(child_df) == 0:
@@ -194,7 +255,6 @@ def process_at_temp(database,
             else:
                 relax = relaxes[child_df.index[0]]
                 
-
     if verbose:
         print(count_add, 'records added')
         print(count_update, 'records updated')

@@ -943,7 +943,7 @@ def fetch_ucell(database: IprPyDatabase,
     spg_records = database.get_records('calculation_crystal_space_group',
                                        key=relax_df.key.tolist())
     # Initialize ucell column
-    relax_df['ucell'] = np.nan
+    relax_df['ucell'] = pd.Series(index=relax_df.index, dtype=object)
 
     for spg_record in spg_records:
         

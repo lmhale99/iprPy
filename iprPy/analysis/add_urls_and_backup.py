@@ -127,7 +127,7 @@ def add_urls_to_calculations(records: list,
             changed = True
         
         # Add parent key and url
-        if 'system-info' in calc and 'parent_key' in meta and 'parent-key' not in calc['system-info']:
+        if 'system-info' in calc and 'parent_key' in meta and ('parent' not in calc['system-info'] or 'parent-URL' not in calc['system-info']):
             parent = meta['parent_key']
             url = '/'.join([base_url, parent])
             dict_insert(calc['system-info'], 'parent', parent, after='artifact')
@@ -247,7 +247,7 @@ def copy_record_cdcs(alt_database, record, workspace):
             # Update records that exist
             alt_database.update_record(record=record, workspace=workspace)
         
-        except ValueError:
+        except ValueError as e:
             try:
                 # Add records that don't exist (update throws ValueError)
                 alt_database.add_record(record=record, workspace=workspace)
@@ -256,6 +256,10 @@ def copy_record_cdcs(alt_database, record, workspace):
                 # Sleep for one minute and then try again
                 time.sleep(60)
             
+            except:
+                print((f'{record.name} {record.style} failed upload'))
+                raise
+
             else:
                 # Break while loop if add was successful
                 break 
