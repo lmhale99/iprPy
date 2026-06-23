@@ -13,6 +13,8 @@ from DataModelDict import DataModelDict as DM
 
 from yabadaba import load_query
 
+import atomman as am
+
 # Local imports
 from . import CalculationSubset
 from ..tools import aslist
@@ -117,7 +119,8 @@ class Dislocation(CalculationSubset):
             self.__slip_hkl = None
         else:
             if isinstance(val, str):
-                val = np.array(val.strip().split(), dtype=float)
+                val = am.tools.miller.fromstring(val)
+                #val = np.array(val.strip().split(), dtype=float)
             else:
                 val = np.asarray(val, dtype=float)
             assert val.shape == (3,) or val.shape == (4,)
@@ -134,7 +137,8 @@ class Dislocation(CalculationSubset):
             self.__ξ_uvw = None
         else:
             if isinstance(val, str):
-                val = np.array(val.strip().split(), dtype=float)
+                val = am.tools.miller.fromstring(val)
+                #val = np.array(val.strip().split(), dtype=float)
             else:
                 val = np.asarray(val, dtype=float)
             assert val.shape == (3,) or val.shape == (4,)
@@ -151,7 +155,8 @@ class Dislocation(CalculationSubset):
             self.__burgers = None
         else:
             if isinstance(val, str):
-                val = np.array(val.strip().split(), dtype=float)
+                val = am.tools.miller.fromstring(val)
+                #val = np.array(val.strip().split(), dtype=float)
             else:
                 val = np.asarray(val, dtype=float)
             assert val.shape == (3,) or val.shape == (4,)
