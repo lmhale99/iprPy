@@ -39,6 +39,7 @@ from . import quickcheck
 __all__ = ['__version__', 'tools', 'settings', 'input',
            'load_run_directory', 'fix_lammps_versions',
            'record', 'load_record', 'recordmanager',
+           'value', 'valuemanager',
            'calculation_subset', 'analysis', 'workflow',
            'calculation', 'load_calculation', 'calculationmanager',
            'database', 'load_database', 'databasemanager',
