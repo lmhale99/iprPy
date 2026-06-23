@@ -1,17 +1,18 @@
-# coding: utf-8
-import datetime
-from pathlib import Path
-
 # Standard Python libraries
+import datetime
 from typing import Optional
 
 # https://github.com/usnistgov/DataModelDict
 from DataModelDict import DataModelDict as DM
 
 # https://github.com/usnistgov/atomman
-import atomman.lammps as lmp
+from atomman.lammps import LAMMPS, LAMMPSobj, LAMMPSLIB
 
+# https://github.com/usnistgov/yabadaba
 from yabadaba import load_query
+
+# PLACEHOLDER for mpi4py code
+comm = None
 
 # iprPy imports
 from . import CalculationSubset
@@ -52,20 +53,29 @@ class LammpsCommands(CalculationSubset):
         self.__mpi_command = None
         self.__lammps_version = None
         self.__lammps_date = None
+        self.__cmdargs = ['-l', 'none', '-screen', 'none']
+        self.__lmp = None
 
 ############################## Class attributes ################################
 
     @property
-    def lammps_command(self) -> str:
-        """str: The LAMMPS executable to use"""
+    def lammps_command(self) -> Optional[str]:
+        """str: The LAMMPS executable command to use"""
         return self.__lammps_command
 
     @lammps_command.setter
-    def lammps_command(self, val: str):
-        self.__lammps_command = Path(val).as_posix()
-        if self.__lammps_version is not None:
+    def lammps_command(self, val: Optional[str]):
+        
+        if val is None:
+            self.__lammps_command = None
+        else:
+            self.__lammps_command = str(val)
+        
+        # Reset lmp object and version info if needed
+        if self.__lmp is not None:
             self.__lammps_version = None
             self.__lammps_date = None
+            self.__lmp = None
 
     @property
     def mpi_command(self) -> Optional[str]:
@@ -80,24 +90,43 @@ class LammpsCommands(CalculationSubset):
             self.__mpi_command = str(val)
 
     @property
-    def lammps_version(self) -> str:
-        """str: The LAMMPS version str"""
-        if self.__lammps_version is None and self.lammps_command is not None:
-            lammps_version = lmp.checkversion(self.lammps_command)
-            self.__lammps_version = lammps_version['version']
-            self.__lammps_date = lammps_version['date']
+    def lmp(self) -> Optional[LAMMPSobj]:
+        """LAMMPSEXE or LAMMPSLIB: LAMMPS interface object"""
+        
+        # Build lmp object if needed
+        if self.__lmp is None and self.lammps_command is not None:
+            
+            if self.lammps_command == 'LAMMPSLIB':
+                # Create a LAMMPSLIB object
+                self.__lmp = LAMMPS(cmdargs=['-l', 'none', '-screen', 'none'], comm=comm)
+            else:
+                # Create a LAMMPSEXE object
+                self.__lmp = LAMMPS(lammps_command=self.lammps_command,
+                                    mpi_command=self.mpi_command)
+        return self.__lmp
+
+    @property
+    def lammps_version(self) -> Optional[str]:
+        """str: The LAMMPS version string"""
+        # Build lmp object and get version string if needed
+        if self.__lammps_version is None and self.lmp is not None:
+            self.__lammps_version = self.lmp.versionstr
         return self.__lammps_version
 
     @property
-    def lammps_date(self) -> datetime.date:
+    def lammps_date(self) -> Optional[datetime.date]:
         """datetime.date: The LAMMPS version date"""
-        if self.__lammps_version is None and self.lammps_command is not None:
-            lammps_version = lmp.checkversion(self.lammps_command)
-            self.__lammps_version = lammps_version['version']
-            self.__lammps_date = lammps_version['date']
+        # Build lmp object and get version date if needed
+        if self.__lammps_date is None and self.lmp is not None:
+            self.__lammps_date = self.lmp.versiondate
         return self.__lammps_date
 
-    def set_values(self, **kwargs: any):
+    @property
+    def cmdargs(self) -> list:
+        """Command line arguments to use when generating the lmp object"""
+        return self.__cmdargs
+
+    def set_values(self, **kwargs):
         """
         Allows for multiple class attribute values to be updated at once.
 
@@ -204,7 +233,7 @@ class LammpsCommands(CalculationSubset):
 
     def build_model(self,
                     model: DM,
-                    **kwargs: any):
+                    **kwargs):
         """
         Adds the subset model to the parent model.
         
@@ -258,5 +287,10 @@ class LammpsCommands(CalculationSubset):
         if self.lammps_command is None:
             raise ValueError('lammps_command not set!')
 
-        input_dict['lammps_command'] = self.lammps_command
-        input_dict['mpi_command'] = self.mpi_command
+        # Temporary backwards compatibility check
+        if isinstance(self.lmp, LAMMPSLIB):
+            input_dict['lammps_command'] = self.lmp
+            input_dict['mpi_command'] = None
+        else:
+            input_dict['lammps_command'] = self.lammps_command
+            input_dict['mpi_command'] = self.mpi_command
