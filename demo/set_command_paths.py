@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 
 # Set the lammps_command path for your specific machine
-lammps_command = '/home/lmh1/LAMMPS/2022-06-23/src/lmp_mpi'
+#lammps_command = '/home/lmh1/LAMMPS/2022-06-23/src/lmp_mpi'
+#lammps_command = 'LAMMPSLIB'
+lammps_command = 'lmp_mpi'
+
 
 # Set the mpi_command value for the more expensive LAMMPS-based calculations
-mpi_command = 'mpiexec -n 12'
+#mpi_command = 'mpiexec -n 12'
+mpi_command = 'mpiexec -localonly 8'
 
 
 # List the expensive styles that will use the mpi_command
@@ -17,10 +21,6 @@ expensive_calculations = [
     'relax_dynamic',
     'relax_liquid',
 ]
-
-
-
-
 
 ###############################################################################
 
