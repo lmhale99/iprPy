@@ -607,7 +607,8 @@ class Calculation(Record):
             querylist = mquery['$and']
 
             if status == 'finished':
-                querylist.append( {f'{root}.status': {'$exists': False} } )
+                #querylist.append( {f'{root}.status': {'$exists': False} } )
+                querylist.append( {f'{root}.status': None} )
             else:
                 querylist.append( {f'{root}.status': status} )
 
@@ -660,7 +661,8 @@ class Calculation(Record):
             querylist = mquery['$and']
 
             if status == 'finished':
-                querylist.append( {f'{root}.status': {'$exists': False} } )
+                #querylist.append( {f'{root}.status': {'$exists': False} } )
+                querylist.append( {f'{root}.status': None} )
             else:
                 querylist.append( {f'{root}.status': status} )
 
@@ -770,7 +772,7 @@ class Calculation(Record):
         """Calls the calculation's primary function(s)"""
         raise AttributeError('calc not defined for Calculation style')
 
-    def process_results(self, results_dict: dict):
+    def process_results(self, results_dict: dict) -> None:
         """
         Processes calculation results and saves them to the object's results
         attributes.
