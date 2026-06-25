@@ -1,81 +1,111 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale
 
 # Standard Python libraries
-from typing import Optional
+from typing import Optional, Union
+
+import pandas as pd
 
 # https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
-import atomman.unitconvert as uc
-from atomman.tools import filltemplate
+from atomman.typing import lammpspotential
+from atomman.lammps import LAMMPS, LAMMPSobj
 
-# iprPy imports
-from ...tools import read_calc_file
-
-def isolated_atom(lammps_command: str,
-                  potential: am.lammps.Potential, 
-                  mpi_command: Optional[str] = None) -> dict:
+def isolated_atom(lammps_command: Union[str, LAMMPSobj],
+                  potential: lammpspotential,
+                  mpi_command: Optional[str] = None,
+                  usefiles: bool = False) -> dict:
     """
     Evaluates the isolated atom energy for each elemental model of a potential.
     
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     potential : atomman.lammps.Potential
         The LAMMPS implemented potential to use.
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
         will run serially.
+    usefiles : bool, optional
+        If set to True, then all input/output files for LAMMPS will be generated.
+        Default value of False will minimize the files created.
     
     Returns
     -------
     dict
         Dictionary of results consisting of keys:
-        
         - **'energy'** (*dict*) - The computed potential energies for each
           symbol.
     """
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
+
+    # File generation settings
+    if usefiles:
+        logfile = 'log.lammps'
+        script = 'run0.in'
+    else:
+        logfile = 'none'
+        script = None
+        
     # Initialize dictionary
     energydict = {}
     
-    # Initialize single atom system 
+    lmp.commands_string('\n# Initialize empty system and potential')
     box = am.Box.cubic(a=1)
-    atoms = am.Atoms(atype=1, pos=[[0.5, 0.5, 0.5]])
-    system = am.System(atoms=atoms, box=box, pbc=[False, False, False])
+    system = am.System(box=box, pbc=(False, False, False), symbols=potential.symbols)
+    lmp.new_system_no_atoms(system, potential, logfile=logfile)
 
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
+    lmp.commands_string('\n# Set up thermo style')
+    lmp.cmd.thermo_style('custom', 'step', 'pe')
+    lmp.cmd.thermo_modify('format', 'float', '%.17e')
 
-    # Define lammps variables
-    lammps_variables = {}
+    lmp.commands_string('\n# Define integrator to keep LAMMPS from complaining')
+    lmp.cmd.fix('nve', 'all', 'nve')
 
     # Loop over symbols
-    for symbol in potential.symbols:
-        system.symbols = symbol
+    thermos = []
+    for i, symbol in enumerate(potential.symbols):
 
-        # Add charges if required
+        # Create atom on first loop
+        if i == 0:
+            lmp.commands_string('\n# Create atom')
+            lmp.cmd.create_atoms(1, 'single', 0.5, 0.5, 0.5, 'units', 'box')
+        
+        # Change atom type on later loops
+        else:
+            lmp.commands_string('\n# Change atom type')
+            lmp.cmd.set('atom', 1, 'type', i+1)
+
+        # Set charge if needed  
         if potential.atom_style == 'charge':
-            system.atoms.prop_atype('charge', potential.charges(system.symbols))
+            lmp.cmd.set('atom', 1, 'charge', potential.charges(symbol)[0])
 
-        # Save configuration
-        system_info = system.dump('atom_data', f='isolated.dat',
-                                  potential=potential)
-        lammps_variables['atomman_system_pair_info'] = system_info
+        lmp.commands_string('\n# Perform a run 0 to evaluate the system')
+        lmp.cmd.run(0)
+
+        # Extract thermo data
+        if lmp.islib and not usefiles:
+            thermos.append(lmp.last_thermo())
+            lmp.cmd.reset_timestep(i)
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
+
+    # Compile thermo data
+    if lmp.islib and not usefiles:
+        thermo = pd.DataFrame(thermos)
+    else:
+        thermo = log.flatten('all').thermo
+
+    # Convert units on standard thermo terms
+    lmp.set_thermo_units(thermo)
         
-        # Write lammps input script
-        lammps_script = 'run0.in'
-        template = read_calc_file('iprPy.calculation.isolated_atom', 'run0.template')
-        with open(lammps_script, 'w') as f:
-            f.write(filltemplate(template, lammps_variables, '<', '>'))
-        
-        # Run lammps and extract data
-        output = lmp.run(lammps_command, script_name=lammps_script,
-                         mpi_command=mpi_command)
-        energy = output.simulations[0]['thermo'].PotEng.values[-1]
-        energydict[symbol] = uc.set_in_units(energy, lammps_units['energy'])
+    # Pull energy values out for each symbol
+    energydict = {}
+    for i, symbol in enumerate(potential.symbols):
+        energydict[symbol] = thermo['PotEng'].values[i]
     
     # Collect results
     results_dict = {}

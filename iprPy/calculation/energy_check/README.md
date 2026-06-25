@@ -10,8 +10,8 @@ The energy_check calculation style provides a quick check if the energy of an at
 
 ### Version notes
 
-- 6/24/2026 : Method updated to support the LAMMPS library interface.  Shear pressures now also measured.
-- 2/25/2025 : Calculation updated to include more outputs and option to create a dumpfile with atomic forces.
+- 2025-25-02: Calculation updated to include more outputs and option to create a dumpfile with atomic forces.
+- 2026-25-06: Method updated to support the LAMMPS library interface.  Shear pressures now also measured.
 
 ### Additional dependencies
 
