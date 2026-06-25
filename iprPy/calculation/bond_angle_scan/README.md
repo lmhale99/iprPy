@@ -8,7 +8,8 @@ The bond_angle_scan calculation style evaluates the interaction energy between t
 
 ### Version notes
 
-- 2021-04-XX: Calculation added
+- 2021-04-30: Calculation added.
+- 2026-25-06: Method updated to support the LAMMPS library interface. Runs are also faster as a single LAMMPS instance is used.
 
 ### Additional dependencies
 

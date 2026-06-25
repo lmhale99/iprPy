@@ -4,7 +4,7 @@
 branch                          
 
 # LAMMPS and MPI Commands
-lammps_command                  /home/lmh1/LAMMPS/2022-06-23/src/lmp_mpi
+lammps_command                  lmp_mpi
 mpi_command                     
 
 # Interatomic Potential
