@@ -1,64 +1,71 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale and Karina Stetsyuk
 
 # Standard library imports
 import datetime
-import random
-from typing import Optional
+from typing import Optional, Union
+
+# http://www.numpy.org/
+import numpy as np
 
 # https://github.com/usnistgov/atomman 
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
-from atomman.tools import filltemplate
+from atomman.typing import lammpspotential, unitfloat
+from atomman.lammps import LAMMPS, LAMMPSobj
 
-import numpy as np
-
-# iprPy imports
-from ...tools import read_calc_file
-
-def relax_dynamic(lammps_command: str,
+def relax_dynamic(lammps_command: Union[str, LAMMPSobj],
                   system: am.System,
-                  potential: lmp.Potential,
+                  potential: lammpspotential,
                   mpi_command: Optional[str] = None,
-                  p_xx: float = 0.0,
-                  p_yy: float = 0.0,
-                  p_zz: float = 0.0,
-                  p_xy: float = 0.0,
-                  p_xz: float = 0.0,
-                  p_yz: float = 0.0,
+                  pxx: unitfloat = 0.0,
+                  pyy: unitfloat = 0.0,
+                  pzz: unitfloat = 0.0,
+                  pxy: unitfloat = 0.0,
+                  pxz: unitfloat = 0.0,
+                  pyz: unitfloat = 0.0,
                   temperature: float = 0.0,
                   integrator: Optional[str] = None,
-                  runsteps: int = 220000,
+                  equilsteps: int = 20000,
+                  runsteps: int = 200000,
                   thermosteps: int = 100,
                   dumpsteps: Optional[int] = None,
                   restartsteps: Optional[int] = None,
-                  equilsteps: int = 20000,
-                  randomseed: Optional[int] = None) -> dict:
+                  createvelocities: bool = True,
+                  randomseed: Optional[int] = None,
+                  usefiles: bool = False) -> dict:
     """
     Performs a full dynamic relax on a given system at the given temperature
     to the specified pressure state.
     
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     system : atomman.System
         The system to perform the calculation on.
-    potential : atomman.lammps.Potential
+    potential : PotentialLAMMPS or PotentialLAMMPSKIM
         The LAMMPS implemented potential to use.
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
         will run serially.
-    p_xx : float, optional
+    pxx : float or str, optional
         The value to relax the x tensile pressure component to (default is
         0.0).
-    p_yy : float, optional
+    pyy : float or str, optional
         The value to relax the y tensile pressure component to (default is
         0.0).
-    p_zz : float, optional
+    pzz : float or str, optional
         The value to relax the z tensile pressure component to (default is
+        0.0).
+    pxy : float or str, optional
+        The value to relax the xy shear pressure component to (default is
+        0.0).
+    pxz : float or str, optional
+        The value to relax the xz shear pressure component to (default is
+        0.0).
+    pyz : float or str, optional
+        The value to relax the yz shear pressure component to (default is
         0.0).
     temperature : float, optional
         The temperature to relax at (default is 0.0).
@@ -135,96 +142,161 @@ def relax_dynamic(lammps_command: str,
         - **'temp_std'** (*float*) - The standard deviation in the measured
           temperature values.
     """
-  
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
+    logfile = 'log.lammps'
+    restartfile = '*.restart'
+
+    if usefiles:
+        script = 'md_relax.in'
+    else:
+        script = None
+
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
+
+    # Convert values given with units if needed
+    pxx = uc.set_in_units(pxx)
+    pyy = uc.set_in_units(pyy)
+    pzz = uc.set_in_units(pzz)
+    pxy = uc.set_in_units(pxy)
+    pxz = uc.set_in_units(pxz)
+    pyz = uc.set_in_units(pyz)
     
-    #Get lammps version date
-    lammps_date = lmp.checkversion(lammps_command)['date']
-    
+    # Check temperature and set default integrator
+    if temperature == 0.0:
+        if integrator is None:
+            integrator = 'nph+l'
+        assert integrator not in ['npt', 'nvt'], 'npt and nvt cannot run at 0 K'
+    elif temperature > 0:
+        if integrator is None:
+            integrator = 'npt'
+    else:
+        raise ValueError('Temperature must be positive')
+
     # Handle default values
     if dumpsteps is None:
         dumpsteps = runsteps
     if restartsteps is None:
         restartsteps = runsteps
+    randomseed = am.lammps.seed(randomseed)
     
-    # Define lammps variables
-    lammps_variables = {}
-    
-    # Dump initial system as data and build LAMMPS inputs
-    system_info = system.dump('atom_data', f='init.dat',
-                              potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
+    # Timestep and timestep-dependent variables
+    timestep = am.lammps.style.timestep(lmp.potential.units)
+    temperature_damp = 100 * timestep
+    pressure_damp = 1000 * timestep
 
-    # Generate LAMMPS inputs for restarting
-    system_info2 = potential.pair_restart_info('*.restart', system.symbols)
-    lammps_variables['atomman_pair_restart_info'] = system_info2
-    
-    # Integrator lines for main run
-    integ_info = integrator_info(integrator=integrator,
-                                 p_xx=p_xx, p_yy=p_yy, p_zz=p_zz,
-                                 p_xy=p_xy, p_xz=p_xz, p_yz=p_yz,
-                                 temperature=temperature,
-                                 randomseed=randomseed,
-                                 units=potential.units,
-                                 lammps_date=lammps_date)
-    lammps_variables['integrator_info'] = integ_info
+    # Check if simulation is a restart
+    isrestart = lmp.restart_check(logfile, restartfile)
 
-    # Integrator lines for restarts
-    integ_info2 = integrator_info(integrator=integrator,
-                                 p_xx=p_xx, p_yy=p_yy, p_zz=p_zz,
-                                 p_xy=p_xy, p_xz=p_xz, p_yz=p_yz,
-                                 temperature=temperature,
-                                 velocity_temperature=0.0,
-                                 randomseed=randomseed,
-                                 units=potential.units,
-                                 lammps_date=lammps_date)
-    lammps_variables['integrator_restart_info'] = integ_info2
+    # Set up new simulation and run initial relaxations
+    if not isrestart:
 
-    # Other run settings
-    lammps_variables['thermosteps'] = thermosteps
-    lammps_variables['runsteps'] = runsteps
-    lammps_variables['dumpsteps'] = dumpsteps
-    lammps_variables['restartsteps'] = restartsteps
+        # Pass system and potential info into LAMMPS
+        lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                      usefiles=usefiles, logfile=logfile)
     
-    # Set dump_keys based on atom_style
-    if potential.atom_style in ['charge']:
-        lammps_variables['dump_keys'] = 'id type q xu yu zu c_pe c_ke'
+        # Set timestep
+        lmp.cmd.timestep(timestep)
+
     else:
-        lammps_variables['dump_keys'] = 'id type xu yu zu c_pe c_ke'
+        # Tell LAMMPS to read in from restart and redefine potential
+        lmp.new_system_from_restart(system, restartfile, tilt_large=True,
+                                    usefiles=True, logfile=logfile)
 
-    # Set dump_modify_format based on lammps_date
-    if lammps_date < datetime.date(2016, 8, 3):
-        if potential.atom_style in ['charge']:
-            lammps_variables['dump_modify_format'] = f'"%d %d{12 * " %.13e"}"'
+    # Per-atom energy computes
+    lmp.cmd.compute('pe', 'all', 'pe/atom')
+    lmp.cmd.compute('ke', 'all', 'ke/atom')
+
+    # Define thermo
+    lmp.cmd.thermo(thermosteps)
+    lmp.cmd.thermo_style('custom', 'step', 'temp', 'pe', 'ke', 'etotal',
+                         'lx', 'ly', 'lz', 'yz', 'xz', 'xy',
+                         'pxx', 'pyy', 'pzz', 'pyz', 'pxz', 'pxy')
+    lmp.cmd.thermo_modify('format', 'float', '%.17e')
+
+    # Create velocities
+    if createvelocities:
+        velocity_temperature = 2.0 * temperature + 1
+        lmp.cmd.velocity('all', 'create', velocity_temperature, randomseed, 'mom',
+                         'yes', 'rot', 'yes', 'dist', 'gaussian')
+
+
+    # Integrator info
+    if integrator == 'npt':
+        lmp.cmd.fix('npt', 'all', 'npt',
+                    'temp', temperature, temperature, temperature_damp,
+                    'x', pxx, pxx, pressure_damp,
+                    'y', pyy, pyy, pressure_damp,
+                    'z', pzz, pzz, pressure_damp,
+                    'xy', pxy, pxy, pressure_damp,
+                    'xz', pxz, pxz, pressure_damp,
+                    'yz', pyz, pyz, pressure_damp)
+
+    elif integrator == 'nvt':
+        lmp.cmd.fix('nvt', 'all', 'nvt',
+                    'temp', temperature, temperature, temperature_damp)
+    
+    elif integrator == 'nph':
+        lmp.cmd.fix('nph', 'all', 'nph',
+                    'x', pxx, pxx, pressure_damp,
+                    'y', pyy, pyy, pressure_damp,
+                    'z', pzz, pzz, pressure_damp,
+                    'xy', pxy, pxy, pressure_damp,
+                    'xz', pxz, pxz, pressure_damp,
+                    'yz', pyz, pyz, pressure_damp)
+    
+    elif integrator == 'nve':
+        lmp.cmd.fix('nve', 'all', 'nve')
+    
+    elif integrator == 'nve+l':
+        lmp.cmd.fix('nve', 'all', 'nve')
+        lmp.cmd.fix('langevin', 'all', 'langevin',
+                    temperature, temperature, temperature_damp, randomseed)
+
+    elif integrator == 'nph+l':
+        # Add ptemp if LAMMPS is newer than June 2020 and temperature is zero
+        if np.isclose(temperature, 0.0) and lmp.versiondate >= datetime.date(2020, 6, 9):
+            ptemp = ['ptemp', 1.0]
         else:
-            lammps_variables['dump_modify_format'] = f'"%d %d{11 * " %.13e"}"'
+            ptemp = []
+        
+        lmp.cmd.fix('nph', 'all', 'nph',
+                    'x', pxx, pxx, pressure_damp,
+                    'y', pyy, pyy, pressure_damp,
+                    'z', pzz, pzz, pressure_damp,
+                    'xy', pxy, pxy, pressure_damp,
+                    'xz', pxz, pxz, pressure_damp,
+                    'yz', pyz, pyz, pressure_damp, *ptemp)
+        lmp.cmd.fix('langevin', 'all', 'langevin',
+                    temperature, temperature, temperature_damp, randomseed)
+    
     else:
-        lammps_variables['dump_modify_format'] = 'float %.13e'
-    
-    # Write lammps input script
-    lammps_script = 'full_relax.in'
-    template = read_calc_file('iprPy.calculation.relax_dynamic',
-                              'full_relax.template')
-    with open(lammps_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
+        raise ValueError('Invalid integrator style')
 
-    # Write lammps restart input script
-    restart_script = 'full_relax_restart.in'
-    template = read_calc_file('iprPy.calculation.relax_dynamic',
-                              'full_relax_restart.template')
-    with open(restart_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
+
+    # Equilibrium run
+    if not isrestart:
+        lmp.cmd.run(equilsteps)
+        lmp.cmd.reset_timestep(0)
+
+    # Dump configurations
+    if lmp.potential.atom_style == 'charge':
+        dump_keys = ['id', 'type', 'q', 'xu', 'yu', 'zu', 'c_pe', 'c_ke', 'vx', 'vy', 'vz']
+    else:
+        dump_keys = ['id', 'type', 'xu', 'yu', 'zu', 'c_pe', 'c_ke', 'vx', 'vy', 'vz']
+    lmp.cmd.dump('dumpit', 'all', 'custom', dumpsteps, '*.dump', *dump_keys)
+    lmp.cmd.dump_modify('dumpit', 'format', 'float', '%.17e')
+    lmp.cmd.restart(restartsteps, restartfile)
+
+    lmp.cmd.run(runsteps, 'upto')
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
     
-    # Run lammps 
-    output = lmp.run(lammps_command, script_name=lammps_script,
-                     restart_script_name=restart_script,
-                     mpi_command=mpi_command, screen=False)
+    # Get combined thermo data of primary simulation(s).
+    thermo = log.flatten('last', firstindex=1).thermo
+    lmp.set_thermo_units(thermo)
     
-    # Extract LAMMPS thermo data. 
     results = {}
-    thermo = output.flatten()['thermo']
-    
     results['dumpfile_initial'] = '0.dump'
     results['symbols_initial'] = system.symbols
     
@@ -234,215 +306,47 @@ def relax_dynamic(lammps_command: str,
     system = am.load('atom_dump', last_dump_file, symbols=system.symbols)
     results['symbols_final'] = system.symbols
     
-    # Only consider values where Step >= equilsteps
-    thermo = thermo[thermo.Step >= equilsteps]
-    results['nsamples'] = len(thermo)
-    
-    # Get cohesive energy estimates
+    # Get ave/stderr thermo properties
+    nsamples = len(thermo)
+    sqrt_nsamples = nsamples ** 0.5
     natoms = system.natoms
-    results['E_pot'] = uc.set_in_units(thermo.PotEng.mean() / natoms, lammps_units['energy'])
-    results['E_pot_std'] = uc.set_in_units(thermo.PotEng.std() / natoms, lammps_units['energy'])
-
-    results['E_total'] = uc.set_in_units(thermo.TotEng.mean() / natoms, lammps_units['energy'])
-    results['E_total_std'] = uc.set_in_units(thermo.TotEng.std() / natoms, lammps_units['energy'])
     
-    results['lx'] = uc.set_in_units(thermo.Lx.mean(), lammps_units['length'])
-    results['lx_std'] = uc.set_in_units(thermo.Lx.std(), lammps_units['length'])
-    results['ly'] = uc.set_in_units(thermo.Ly.mean(), lammps_units['length'])
-    results['ly_std'] = uc.set_in_units(thermo.Ly.std(), lammps_units['length'])
-    results['lz'] = uc.set_in_units(thermo.Lz.mean(), lammps_units['length'])
-    results['lz_std'] = uc.set_in_units(thermo.Lz.std(), lammps_units['length'])
-    results['xy'] = uc.set_in_units(thermo.Xy.mean(), lammps_units['length'])
-    results['xy_std'] = uc.set_in_units(thermo.Xy.std(), lammps_units['length'])
-    results['xz'] = uc.set_in_units(thermo.Xz.mean(), lammps_units['length'])
-    results['xz_std'] = uc.set_in_units(thermo.Xz.std(), lammps_units['length'])
-    results['yz'] = uc.set_in_units(thermo.Yz.mean(), lammps_units['length'])
-    results['yz_std'] = uc.set_in_units(thermo.Yz.std(), lammps_units['length'])
+    # Energy estimates
+    results['E_pot'] = thermo.PotEng.mean() / natoms
+    results['E_pot_stderr'] = thermo.PotEng.std() / natoms / sqrt_nsamples
+    results['E_total'] = thermo.TotEng.mean() / natoms
+    results['E_total_stderr'] = thermo.TotEng.std() / natoms / sqrt_nsamples
     
-    results['measured_pxx'] = uc.set_in_units(thermo.Pxx.mean(), lammps_units['pressure'])
-    results['measured_pxx_std'] = uc.set_in_units(thermo.Pxx.std(), lammps_units['pressure'])
-    results['measured_pyy'] = uc.set_in_units(thermo.Pyy.mean(), lammps_units['pressure'])
-    results['measured_pyy_std'] = uc.set_in_units(thermo.Pyy.std(), lammps_units['pressure'])
-    results['measured_pzz'] = uc.set_in_units(thermo.Pzz.mean(), lammps_units['pressure'])
-    results['measured_pzz_std'] = uc.set_in_units(thermo.Pzz.std(), lammps_units['pressure'])
-    results['measured_pxy'] = uc.set_in_units(thermo.Pxy.mean(), lammps_units['pressure'])
-    results['measured_pxy_std'] = uc.set_in_units(thermo.Pxy.std(), lammps_units['pressure'])
-    results['measured_pxz'] = uc.set_in_units(thermo.Pxz.mean(), lammps_units['pressure'])
-    results['measured_pxz_std'] = uc.set_in_units(thermo.Pxz.std(), lammps_units['pressure'])
-    results['measured_pyz'] = uc.set_in_units(thermo.Pyz.mean(), lammps_units['pressure'])
-    results['measured_pyz_std'] = uc.set_in_units(thermo.Pyz.std(), lammps_units['pressure'])
+    # Box dimension estimates
+    results['lx'] = thermo.Lx.mean()
+    results['lx_stderr'] = thermo.Lx.std() / sqrt_nsamples
+    results['ly'] = thermo.Ly.mean()
+    results['ly_stderr'] = thermo.Ly.std() / sqrt_nsamples
+    results['lz'] = thermo.Lz.mean()
+    results['lz_stderr'] = thermo.Lz.std() / sqrt_nsamples
+    results['xy'] = thermo.Xy.mean()
+    results['xy_stderr'] = thermo.Xy.std() / sqrt_nsamples
+    results['xz'] = thermo.Xz.mean()
+    results['xz_stderr'] = thermo.Xz.std() / sqrt_nsamples
+    results['yz'] = thermo.Yz.mean()
+    results['yz_stderr'] = thermo.Yz.std() / sqrt_nsamples
+    
+    # Pressure estimates
+    results['measured_pxx'] = thermo.Pxx.mean()
+    results['measured_pxx_stderr'] = thermo.Pxx.std() / sqrt_nsamples
+    results['measured_pyy'] = thermo.Pyy.mean()
+    results['measured_pyy_stderr'] = thermo.Pyy.std() / sqrt_nsamples
+    results['measured_pzz'] = thermo.Pzz.mean()
+    results['measured_pzz_stderr'] = thermo.Pzz.std() / sqrt_nsamples
+    results['measured_pxy'] = thermo.Pxy.mean()
+    results['measured_pxy_stderr'] = thermo.Pxy.std() / sqrt_nsamples
+    results['measured_pxz'] = thermo.Pxz.mean()
+    results['measured_pxz_stderr'] = thermo.Pxz.std() / sqrt_nsamples
+    results['measured_pyz'] = thermo.Pyz.mean()
+    results['measured_pyz_stderr'] = thermo.Pyz.std() / sqrt_nsamples
+    
+    # Temperature estimates
     results['temp'] = thermo.Temp.mean()
-    results['temp_std'] = thermo.Temp.std()
+    results['temp_stderr'] = thermo.Temp.std() / sqrt_nsamples
     
     return results
-
-def integrator_info(integrator: Optional[str] = None, 
-                    p_xx: float = 0.0,
-                    p_yy: float = 0.0,
-                    p_zz: float = 0.0,
-                    p_xy: float = 0.0,
-                    p_xz: float = 0.0,
-                    p_yz: float = 0.0,
-                    temperature: float = 0.0,
-                    velocity_temperature: Optional[float] = None,
-                    randomseed: Optional[int] = None,
-                    units: str = 'metal',
-                    lammps_date=None) -> str:
-    """
-    Generates LAMMPS commands for velocity creation and fix integrators. 
-    
-    Parameters
-    ----------
-    integrator : str or None, optional
-        The integration method to use. Options are 'npt', 'nvt', 'nph',
-        'nve', 'nve+l', 'nph+l'. The +l options use Langevin thermostat.
-        (Default is None, which will use 'nph+l' for temperature == 0, and
-        'npt' otherwise.)
-    p_xx : float, optional
-        The value to relax the x tensile pressure component to (default is
-        0.0).
-    p_yy : float, optional
-        The value to relax the y tensile pressure component to (default is
-        0.0).
-    p_zz : float, optional
-        The value to relax the z tensile pressure component to (default is
-        0.0).
-    p_xy : float, optional
-        The value to relax the xy shear pressure component to (default is
-        0.0).
-    p_xz : float, optional
-        The value to relax the xz shear pressure component to (default is
-        0.0).
-    p_yz : float, optional
-        The value to relax the yz shear pressure component to (default is
-        0.0).
-    temperature : float, optional
-        The temperature to relax at (default is 0.0).
-    velocity_temperature : float or None, optional
-        The temperature to use for generating initial atomic velocities with
-        integrators containing thermostats.  If None (default) then it will
-        be set to 2 * temperature + 1.  If 0.0 then the velocities will not be
-        (re)set.
-    randomseed : int or None, optional
-        Random number seed used by LAMMPS in creating velocities and with
-        the Langevin thermostat.  (Default is None which will select a
-        random int between 1 and 900000000.)
-    units : str, optional
-        The LAMMPS units style to use (default is 'metal').
-    
-    Returns
-    -------
-    str
-        The generated LAMMPS input lines for velocity create and fix
-        integration commands.
-    """
-    
-    # Get lammps units
-    lammps_units = lmp.style.unit(units)
-
-    # Convert pressures to lammps units
-    p_xx = uc.get_in_units(p_xx, lammps_units['pressure'])
-    p_yy = uc.get_in_units(p_yy, lammps_units['pressure'])
-    p_zz = uc.get_in_units(p_zz, lammps_units['pressure'])
-    p_xy = uc.get_in_units(p_xy, lammps_units['pressure'])
-    p_xz = uc.get_in_units(p_xz, lammps_units['pressure'])
-    p_yz = uc.get_in_units(p_yz, lammps_units['pressure'])
-
-    # Check temperature and set default integrator
-    if temperature == 0.0:
-        if integrator is None: integrator = 'nph+l'
-        assert integrator not in ['npt', 'nvt'], 'npt and nvt cannot run at 0 K'
-    elif temperature > 0:
-        if integrator is None: integrator = 'npt'
-    else:
-        raise ValueError('Temperature must be positive')
-    
-    # Set dampening parameters based on timestep values
-    temperature_damp = 100 * lmp.style.timestep(units)
-    pressure_damp = 1000 * lmp.style.timestep(units)
-
-    # Set default randomseed
-    if randomseed is None: 
-        randomseed = random.randint(1, 900000000)
-    
-    # Set default velocity_temperature
-    if velocity_temperature is None:
-        velocity_temperature = 2.0 * temperature + 1
-
-    # Build info_lines
-    info_lines = []
-
-    if integrator == 'npt':
-
-        if velocity_temperature > 0.0:
-            info_lines.append(f'velocity all create {velocity_temperature} {randomseed}')
-
-        info_lines.extend([
-            f'fix npt all npt temp {temperature} {temperature} {temperature_damp} &',
-            f'                x {p_xx} {p_xx} {pressure_damp} &',
-            f'                y {p_yy} {p_yy} {pressure_damp} &',
-            f'                z {p_zz} {p_zz} {pressure_damp} &',
-            f'                xy {p_xy} {p_xy} {pressure_damp} &',
-            f'                xz {p_xz} {p_xz} {pressure_damp} &',
-            f'                yz {p_yz} {p_yz} {pressure_damp}'
-        ])
-
-    
-    elif integrator == 'nvt':
-        
-        if velocity_temperature > 0.0:
-            info_lines.append(f'velocity all create {velocity_temperature} {randomseed}')
-        
-        info_lines.extend([
-            f'fix nvt all nvt temp {temperature} {temperature} {temperature_damp}'
-        ])
-    
-    elif integrator == 'nph':
-
-        info_lines.extend([
-            f'fix nph all nph x {p_xx} {p_xx} {pressure_damp} &',
-            f'                y {p_yy} {p_yy} {pressure_damp} &',
-            f'                z {p_zz} {p_zz} {pressure_damp} &',
-            f'                xy {p_xy} {p_xy} {pressure_damp} &',
-            f'                xz {p_xz} {p_xz} {pressure_damp} &',
-            f'                yz {p_yz} {p_yz} {pressure_damp}'
-        ])
-    
-    elif integrator == 'nve':
-        
-        info_lines.extend([
-            'fix nve all nve'
-        ])
-        
-    elif integrator == 'nve+l':
-
-        if velocity_temperature > 0.0:
-            info_lines.append(f'velocity all create {velocity_temperature} {randomseed}')
-
-        info_lines.extend([
-            'fix nve all nve',
-            f'fix langevin all langevin {temperature} {temperature} {temperature_damp} {randomseed}'
-        ])
-
-    elif integrator == 'nph+l':
-
-        info_lines.extend([
-            f'fix nph all nph x {p_xx} {p_xx} {pressure_damp} &',
-            f'                y {p_yy} {p_yy} {pressure_damp} &',
-            f'                z {p_zz} {p_zz} {pressure_damp} &',
-            f'                xy {p_xy} {p_xy} {pressure_damp} &',
-            f'                xz {p_xz} {p_xz} {pressure_damp} &',
-            f'                yz {p_yz} {p_yz} {pressure_damp}',
-        ])
-        
-        # Add ptemp if LAMMPS is newer than June 2020 and temperature is zero
-        if np.isclose(temperature, 0.0) and lammps_date >= datetime.date(2020, 6, 9):
-            info_lines[-1] += ' &'
-            info_lines.extend(['                ptemp 1.0'])
-            
-        info_lines.extend([f'fix langevin all langevin {temperature} {temperature} {temperature_damp} {randomseed}'])
-    
-    else:
-        raise ValueError('Invalid integrator style')
-    
-    return '\n'.join(info_lines)

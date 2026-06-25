@@ -10,12 +10,13 @@ The relax_static calculation style uses static energy/force minimizations to rel
 
 - 2018-07-09: Notebook added.
 - 2019-07-30: Description updated and small changes due to iprPy version.
-- 2020-05-22: Version 0.10 update - potentials now loaded from database.
+- v0.10.0: Version 0.10 update - potentials now loaded from database.
 - 2020-09-22: Setup and parameter definition streamlined.
-- 2022-03-11: Notebook updated to reflect version 0.11.
-- iprPy version 0.1.11: raise_at_maxcycles parameter added that when set to
+- v0.11.0: Notebook updated to reflect version 0.11.
+- v0.11.1: raise_at_maxcycles parameter added that when set to
   False will allow calculations to finish without error if maxcycles is reached.
-
+- v0.12.0: Method updated to support the LAMMPS library interface.
+  
 ### Additional dependencies
 
 ### Disclaimers

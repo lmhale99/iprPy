@@ -1,47 +1,47 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale
 
 # Standard Python libraries
 from copy import deepcopy
-from typing import Optional
+from typing import Optional, Union
 
 # http://www.numpy.org/
 import numpy as np
 
+# https://pandas.pydata.org/
+import pandas as pd
+
 # https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
-from atomman.tools import filltemplate
+from atomman.typing import lammpspotential, unitfloat
+from atomman.lammps import LAMMPS, LAMMPSobj
 
-# iprPy imports
-from ...tools import read_calc_file
-
-def relax_box(lammps_command: str,
+def relax_box(lammps_command: Union[str, LAMMPSobj],
               system: am.System,
-              potential: lmp.Potential,
+              potential: lammpspotential,
               mpi_command: Optional[str] = None,
               strainrange: float = 1e-6,
-              p_xx: float = 0.0,
-              p_yy: float = 0.0,
-              p_zz: float = 0.0,
-              p_xy: float = 0.0,
-              p_xz: float = 0.0,
-              p_yz: float = 0.0,
+              pxx: unitfloat = 0.0,
+              pyy: unitfloat = 0.0,
+              pzz: unitfloat = 0.0,
+              pxy: unitfloat = 0.0,
+              pxz: unitfloat = 0.0,
+              pyz: unitfloat = 0.0,
               tol: float = 1e-10,
-              diverge_scale: float = 3.0)  -> dict:
+              diverge_scale: float = 3.0,
+              usefiles: bool = False)  -> dict:
     """
     Quickly refines static orthorhombic system by evaluating the elastic
     constants and the virial pressure.
     
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     system : atomman.System
         The system to perform the calculation on.
-    potential : atomman.lammps.Potential
+    potential : PotentialLAMMPS or PotentialLAMMPSKIM
         The LAMMPS implemented potential to use.
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
@@ -49,22 +49,22 @@ def relax_box(lammps_command: str,
     strainrange : float, optional
         The small strain value to apply when calculating the elastic
         constants (default is 1e-6).
-    p_xx : float, optional
+    pxx : float, optional
         The value to relax the x tensile pressure component to (default is
         0.0).
-    p_yy : float, optional
+    pyy : float, optional
         The value to relax the y tensile pressure component to (default is
         0.0).
-    p_zz : float, optional
+    pzz : float, optional
         The value to relax the z tensile pressure component to (default is
         0.0).
-    p_xy : float, optional
+    pxy : float, optional
         The value to relax the xy shear pressure component to (default is
         0.0).
-    p_xz : float, optional
+    pxz : float, optional
         The value to relax the xz shear pressure component to (default is
         0.0).
-    p_yz : float, optional
+    pyz : float, optional
         The value to relax the yz shear pressure component to (default is
         0.0).
     tol : float, optional
@@ -76,6 +76,9 @@ def relax_box(lammps_command: str,
         original dimension multiplied by diverge_scale, or if any current box
         dimension is less than the original dimension divided by diverge_scale.
         (Default is 3.0).
+    usefiles : bool, optional
+        If set to True, then all input/output files for LAMMPS will be generated.
+        Default value of False will minimize the files created.
     
     Returns
     -------
@@ -116,7 +119,17 @@ def relax_box(lammps_command: str,
     RuntimeError
         If system diverges or no convergence reached after 100 cycles.
     """
-    
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
+
+    # Convert values given with units if needed
+    pxx = uc.set_in_units(pxx)
+    pyy = uc.set_in_units(pyy)
+    pzz = uc.set_in_units(pzz)
+    pxy = uc.set_in_units(pxy)
+    pxz = uc.set_in_units(pxz)
+    pyz = uc.set_in_units(pyz)
+
     # Flag for if values have converged
     converged = False
     
@@ -124,18 +137,19 @@ def relax_box(lammps_command: str,
     system_current = deepcopy(system)
     system_old = None
     
+    # Save initial configuration as a dump file
     system.dump('atom_dump', f='initial.dump')
     
     for cycle in range(100):
-        
+        logfile = f'cij-{cycle}-log.lammps'
+
         # Run LAMMPS and evaluate results based on system_old
-        results = cij_run0(lammps_command, system_current, potential,
-                           mpi_command=mpi_command, strainrange=strainrange,
-                           cycle=cycle)
-        pij = results['pij']
-        Cij = results['C'].Cij
+        results = cij_run0(lmp, system_current,
+                           strainrange=strainrange,
+                           logfile=logfile, usefiles=usefiles)
+        
         system_new = update_box(system_current, results['C'], results['pij'],
-                                p_xx, p_yy, p_zz, p_xy, p_xz, p_yz, tol)
+                                pxx, pyy, pzz, pxy, pxz, pyz, tol)
         
         # Compare new and current to test for convergence
         if np.allclose(system_new.box.vects,
@@ -156,11 +170,11 @@ def relax_box(lammps_command: str,
                                    scale=True)
             
             # Calculate Cij for the averaged system
-            results = cij_run0(lammps_command, system_current, potential,
-                               mpi_command=mpi_command, strainrange=strainrange,
-                               cycle=cycle)
+            results = cij_run0(lmp, system_current,
+                               strainrange=strainrange,
+                               logfile=logfile, usefiles=usefiles)
             system_new = update_box(system_current, results['C'], results['pij'],
-                                    p_xx, p_yy, p_zz, p_xy, p_xz, p_yz, tol)
+                                    pxx, pyy, pzz, pxy, pxz, pyz, tol)
             converged = True
             break
         
@@ -214,34 +228,31 @@ def relax_box(lammps_command: str,
     else:
         raise RuntimeError('Failed to converge after 100 cycles')
 
-def cij_run0(lammps_command: str,
+def cij_run0(lmp: LAMMPSobj,
              system: am.System,
-             potential: lmp.Potential,
-             mpi_command: Optional[str] = None,
              strainrange: float = 1e-6,
-             cycle: int = 0) -> dict:
+             logfile: Optional[str] = None,
+             usefiles: bool = False) -> dict:
     """
     Runs cij_run0.in LAMMPS script to evaluate the elastic constants,
     pressure and potential energy of the current system.
     
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : LAMMPSEXE or LAMMPSLIB
+        An atomman LAMMPS interface object.
     system : atomman.System
         The system to perform the calculation on.
-    potential : atomman.lammps.Potential
-        The LAMMPS implemented potential to use.
-    mpi_command : str, optional
-        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
-        will run serially.
     strainrange : float, optional
         The small strain value to apply when calculating the elastic
         constants (default is 1e-6).
-    cycle : int, optional
+    logfile : int, optional
         Indicates the iteration cycle of quick_a_Cij().  This is used to
         uniquely save the LAMMPS input and output files.
-    
+    usefiles : bool, optional
+        If set to True, then all input/output files for LAMMPS will be generated.
+        Default value of False will minimize the files created.
+
     Returns
     -------
     dict
@@ -254,48 +265,127 @@ def cij_run0(lammps_command: str,
         - **'C_elastic'** (*atomman.ElasticConstants*) - The supplied system's
           elastic constants.
     """
+    if usefiles:
+        script = 'cij_run0'
+    else:
+        script = None
+        logfile = 'none'
+    
+    thermo = []
 
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
+    # Pass system and potential info into LAMMPS
+    lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                  usefiles=usefiles, logfile=logfile)
+
+    # Specify strain
+    lmp.cmd.variable('strain', 'equal', strainrange)
+
+    # Specify variables of the initial configuration's dimensions
+    lmp.cmd.variable('lx0', 'equal', '$(lx)')
+    lmp.cmd.variable('ly0', 'equal', '$(ly)')
+    lmp.cmd.variable('lz0', 'equal', '$(lz)')
+
+    # Specify the thermo properties to calculate
+    lmp.cmd.variable('peatom', 'equal', 'pe/atoms')
+
+    # Define thermo info and integrator
+    lmp.cmd.thermo_style('custom', 'step', 'lx', 'ly', 'lz', 'yz', 'xz', 'xy', 'pxx', 'pyy', 'pzz', 'pxy', 'pxz', 'pyz', 'v_peatom', 'pe')
+    lmp.cmd.thermo_modify('format', 'float', '%.17e')
+    lmp.cmd.fix('nve', 'all', 'nve')
+
+    # Run initial run0
+    lmp.cmd.run(0)
+
+    if lmp.islib and not usefiles:
+        # Get thermo data
+        thermo.append(lmp.last_thermo())
+    else:
+        # Define restart
+        lmp.cmd.write_restart('initial.restart')
+
+    shear_states = ['-x', '+x', '-y', '+y', '-z', '+z', 
+                    '-yz', '+yz', '-xz', '+xz', '-xy', '+xy']
+    for state in shear_states:
+
+        # Reset system to the restart/original system
+        lmp.new_system_from_restart(filename='initial.restart', system=system,
+                                    tilt_large=True, usefiles=usefiles)
+
+        # Redefine thermo info and integrator
+        lmp.cmd.thermo_style('custom', 'step', 'lx', 'ly', 'lz', 'yz', 'xz', 'xy', 'pxx', 'pyy', 'pzz', 'pxy', 'pxz', 'pyz', 'v_peatom', 'pe')
+        lmp.cmd.thermo_modify('format', 'float', '%.17e')
+        lmp.cmd.fix('nve', 'all', 'nve')
+
+        # Apply the strain state
+        add_strain(lmp, state)
+
+        # Run strained run0
+        lmp.cmd.run(0)
+
+        if lmp.islib and not usefiles:
+            # Get thermo data
+            thermo.append(lmp.last_thermo())
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
+
+    if log is None:
+        # Compile thermo into a pandas DataFrame
+        thermo = pd.DataFrame(thermo)
+    else:
+        # Get thermo from log output
+        thermo = log.flatten('all').thermo
+
+    # Convert units on thermo terms
+    lmp.set_thermo_units(thermo)
+    thermo.v_peatom = uc.set_in_units(thermo.v_peatom, lmp.unitsdict['energy'])
+
+    return build_Cij_pij(thermo)
+
+def add_strain(lmp, state: str):
+    """
+    Applies a strain state
     
-    # Define lammps variables
-    lammps_variables = {}
-    system_info = system.dump('atom_data', f='init.dat',
-                              potential=potential)
-    restart_info = potential.pair_restart_info('initial.restart', system.symbols)
-    lammps_variables['pair_data_info'] = system_info
-    lammps_variables['pair_restart_info'] = restart_info
-    lammps_variables['strainrange'] = strainrange
-    
-    # Write lammps input script
-    lammps_script = 'cij_run0.in'
-    template = read_calc_file('iprPy.calculation.relax_box', 'cij_run0.template')
-    with open(lammps_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
-    
-    # Run lammps
-    output = lmp.run(lammps_command, script_name=lammps_script,
-                     mpi_command=mpi_command,
-                     logfile=f'cij-{cycle}-log.lammps')
-    thermo = output.flatten('all').thermo
-    
+    Parameters
+    ----------
+    state : str
+        The sign for the shear (+ or -) followed by the direction
+        (x, y, z, xz, yz, or xy) without spaces.
+    """
+    # Build inputs based on state value
+    sign = state[0]
+    if sign == '+':
+        sign = ''
+    ref = state[-1]   # length reference is normal direction or last direction in shear
+    delta = f'{sign}${{strain}}*${{l{ref}0}}'
+    direction = state[1:]
+
+    # Call LAMMPS commands
+    lmp.cmd.variable('delta', 'equal', delta)
+    if len(direction) == 1:
+        lmp.cmd.change_box('all', direction, 'delta', 0, '${delta}', 'remap', 'units', 'box')
+    else:
+        lmp.cmd.change_box('all', direction, 'delta', '${delta}', 'remap', 'units', 'box')
+
+def build_Cij_pij(thermo):
+
     # Extract LAMMPS thermo data. Each term ranges i=0-12 where i=0 is undeformed
     # The remaining values are for -/+ strain pairs in the six unique directions
-    lx = uc.set_in_units(thermo.Lx, lammps_units['length'])
-    ly = uc.set_in_units(thermo.Ly, lammps_units['length'])
-    lz = uc.set_in_units(thermo.Lz, lammps_units['length'])
-    xy = uc.set_in_units(thermo.Xy, lammps_units['length'])
-    xz = uc.set_in_units(thermo.Xz, lammps_units['length'])
-    yz = uc.set_in_units(thermo.Yz, lammps_units['length'])
+    lx = thermo.Lx.values
+    ly = thermo.Ly.values
+    lz = thermo.Lz.values
+    xy = thermo.Xy.values
+    xz = thermo.Xz.values
+    yz = thermo.Yz.values
     
-    pxx = uc.set_in_units(thermo.Pxx, lammps_units['pressure'])
-    pyy = uc.set_in_units(thermo.Pyy, lammps_units['pressure'])
-    pzz = uc.set_in_units(thermo.Pzz, lammps_units['pressure'])
-    pxy = uc.set_in_units(thermo.Pxy, lammps_units['pressure'])
-    pxz = uc.set_in_units(thermo.Pxz, lammps_units['pressure'])
-    pyz = uc.set_in_units(thermo.Pyz, lammps_units['pressure'])
+    pxx = thermo.Pxx.values
+    pyy = thermo.Pyy.values
+    pzz = thermo.Pzz.values
+    pxy = thermo.Pxy.values
+    pxz = thermo.Pxz.values
+    pyz = thermo.Pyz.values
     
-    pe = uc.set_in_units(thermo.PotEng / system.natoms, lammps_units['energy'])
+    pe = thermo.v_peatom
     
     # Extract the pressure tensor
     pij = np.array([[pxx[0], pxy[0], pxz[0]],
@@ -334,7 +424,8 @@ def cij_run0(lammps_command: str,
     results['C'] = C
     
     return results
-    
+
+
 def update_box(system: am.System,
                C: am.ElasticConstants,
                pij: np.ndarray,

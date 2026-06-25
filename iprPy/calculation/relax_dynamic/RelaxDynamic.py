@@ -1,4 +1,3 @@
-# coding: utf-8
 # Standard Python libraries
 from io import IOBase
 from pathlib import Path
@@ -92,31 +91,30 @@ class RelaxDynamic(Calculation):
         self.__xy_mean = None
         self.__xz_mean = None
         self.__yz_mean = None
-        self.__lx_std = None
-        self.__ly_std = None
-        self.__lz_std = None
-        self.__xy_std = None
-        self.__xz_std = None
-        self.__yz_std = None
-        self.__numsamples = None
+        self.__lx_stderr = None
+        self.__ly_stderr = None
+        self.__lz_stderr = None
+        self.__xy_stderr = None
+        self.__xz_stderr = None
+        self.__yz_stderr = None
         self.__potential_energy = None
-        self.__potential_energy_std = None
+        self.__potential_energy_stderr = None
         self.__total_energy = None
-        self.__total_energy_std = None
+        self.__total_energy_stderr = None
         self.__measured_pressure_xx = None
-        self.__measured_pressure_xx_std = None
+        self.__measured_pressure_xx_stderr = None
         self.__measured_pressure_yy = None
-        self.__measured_pressure_yy_std = None
+        self.__measured_pressure_yy_stderr = None
         self.__measured_pressure_zz = None
-        self.__measured_pressure_zz_std = None
+        self.__measured_pressure_zz_stderr = None
         self.__measured_pressure_xy = None
-        self.__measured_pressure_xy_std = None
+        self.__measured_pressure_xy_stderr = None
         self.__measured_pressure_xz = None
-        self.__measured_pressure_xz_std = None
+        self.__measured_pressure_xz_stderr = None
         self.__measured_pressure_yz = None
-        self.__measured_pressure_yz_std = None
+        self.__measured_pressure_yz_stderr = None
         self.__measured_temperature = None
-        self.__measured_temperature_std = None
+        self.__measured_temperature_stderr = None
 
         # Define calc shortcut
         self.calc = relax_dynamic
@@ -129,8 +127,7 @@ class RelaxDynamic(Calculation):
     def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
-            'relax_dynamic.py',
-            'full_relax.template'
+            'relax_dynamic.py'
         ]
 
 ############################## Class attributes ################################
@@ -312,13 +309,8 @@ class RelaxDynamic(Calculation):
         return self.__randomseed
 
     @randomseed.setter
-    def randomseed(self, val: int):
-        if val is None:
-            val = random.randint(1, 900000000)
-        else:
-            val = int(val)
-            assert val > 0 and val <= 900000000
-        self.__randomseed = val
+    def randomseed(self, val: Optional[int]):
+        self.__randomseed = am.lammps.seed(val)
 
     @property
     def initial_dump(self) -> dict:
@@ -349,11 +341,11 @@ class RelaxDynamic(Calculation):
         return self.__lx_mean
 
     @property
-    def lx_std(self) -> float:
-        """float: Standard deviation for final_box's lx length"""
-        if self.__lx_std is None:
+    def lx_stderr(self) -> float:
+        """float: Standard error for final_box's lx length"""
+        if self.__lx_stderr is None:
             raise ValueError('No results yet!')
-        return self.__lx_std
+        return self.__lx_stderr
 
     @property
     def ly_mean(self) -> float:
@@ -363,11 +355,11 @@ class RelaxDynamic(Calculation):
         return self.__ly_mean
 
     @property
-    def ly_std(self) -> float:
-        """float: Standard deviation for final_box's ly length"""
-        if self.__ly_std is None:
+    def ly_stderr(self) -> float:
+        """float: Standard error for final_box's ly length"""
+        if self.__ly_stderr is None:
             raise ValueError('No results yet!')
-        return self.__ly_std
+        return self.__ly_stderr
 
     @property
     def lz_mean(self) -> float:
@@ -377,11 +369,11 @@ class RelaxDynamic(Calculation):
         return self.__lz_mean
 
     @property
-    def lz_std(self) -> float:
-        """float: Standard deviation for final_box's lz length"""
-        if self.__lz_std is None:
+    def lz_stderr(self) -> float:
+        """float: Standard error for final_box's lz length"""
+        if self.__lz_stderr is None:
             raise ValueError('No results yet!')
-        return self.__lz_std
+        return self.__lz_stderr
 
     @property
     def xy_mean(self) -> float:
@@ -391,11 +383,11 @@ class RelaxDynamic(Calculation):
         return self.__xy_mean
 
     @property
-    def xy_std(self) -> float:
-        """float: Standard deviation for final_box's xy tilt"""
-        if self.__xy_std is None:
+    def xy_stderr(self) -> float:
+        """float: Standard error for final_box's xy tilt"""
+        if self.__xy_stderr is None:
             raise ValueError('No results yet!')
-        return self.__xy_std
+        return self.__xy_stderr
 
     @property
     def xz_mean(self) -> float:
@@ -405,11 +397,11 @@ class RelaxDynamic(Calculation):
         return self.__xz_mean
 
     @property
-    def xz_std(self) -> float:
-        """float: Standard deviation for final_box's xz tilt"""
-        if self.__xz_std is None:
+    def xz_stderr(self) -> float:
+        """float: Standard error for final_box's xz tilt"""
+        if self.__xz_stderr is None:
             raise ValueError('No results yet!')
-        return self.__xz_std
+        return self.__xz_stderr
 
     @property
     def yz_mean(self) -> float:
@@ -419,18 +411,11 @@ class RelaxDynamic(Calculation):
         return self.__yz_mean
 
     @property
-    def yz_std(self) -> float:
-        """float: Standard deviation for final_box's yz tilt"""
-        if self.__yz_std is None:
+    def yz_stderr(self) -> float:
+        """float: Standard error for final_box's yz tilt"""
+        if self.__yz_stderr is None:
             raise ValueError('No results yet!')
-        return self.__yz_std
-
-    @property
-    def numsamples(self) -> int:
-        """int: Number of measurement samples used in mean, std values"""
-        if self.__numsamples is None:
-            raise ValueError('No results yet!')
-        return self.__numsamples
+        return self.__yz_stderr
 
     @property
     def potential_energy(self) -> float:
@@ -440,11 +425,11 @@ class RelaxDynamic(Calculation):
         return self.__potential_energy
 
     @property
-    def potential_energy_std(self) -> float:
-        """float: Standard deviation for potential_energy"""
-        if self.__potential_energy_std is None:
+    def potential_energy_stderr(self) -> float:
+        """float: Standard error for potential_energy"""
+        if self.__potential_energy_stderr is None:
             raise ValueError('No results yet!')
-        return self.__potential_energy_std
+        return self.__potential_energy_stderr
 
     @property
     def total_energy(self) -> float:
@@ -454,11 +439,11 @@ class RelaxDynamic(Calculation):
         return self.__total_energy
 
     @property
-    def total_energy_std(self) -> float:
-        """float: Standard deviation for total_energy"""
-        if self.__total_energy_std is None:
+    def total_energy_stderr(self) -> float:
+        """float: Standard error for total_energy"""
+        if self.__total_energy_stderr is None:
             raise ValueError('No results yet!')
-        return self.__total_energy_std
+        return self.__total_energy_stderr
 
     @property
     def measured_pressure_xx(self) -> float:
@@ -468,11 +453,11 @@ class RelaxDynamic(Calculation):
         return self.__measured_pressure_xx
 
     @property
-    def measured_pressure_xx_std(self) -> float:
-        """float: Standard deviation for measured_pressure_xx"""
-        if self.__measured_pressure_xx_std is None:
+    def measured_pressure_xx_stderr(self) -> float:
+        """float: Standard error for measured_pressure_xx"""
+        if self.__measured_pressure_xx_stderr is None:
             raise ValueError('No results yet!')
-        return self.__measured_pressure_xx_std
+        return self.__measured_pressure_xx_stderr
 
     @property
     def measured_pressure_yy(self) -> float:
@@ -482,11 +467,11 @@ class RelaxDynamic(Calculation):
         return self.__measured_pressure_yy
 
     @property
-    def measured_pressure_yy_std(self) -> float:
-        """float: Standard deviation for measured_pressure_yy"""
-        if self.__measured_pressure_yy_std is None:
+    def measured_pressure_yy_stderr(self) -> float:
+        """float: Standard error for measured_pressure_yy"""
+        if self.__measured_pressure_yy_stderr is None:
             raise ValueError('No results yet!')
-        return self.__measured_pressure_yy_std
+        return self.__measured_pressure_yy_stderr
 
     @property
     def measured_pressure_zz(self) -> float:
@@ -496,11 +481,11 @@ class RelaxDynamic(Calculation):
         return self.__measured_pressure_zz
 
     @property
-    def measured_pressure_zz_std(self) -> float:
-        """float: Standard deviation for measured_pressure_zz"""
-        if self.__measured_pressure_zz_std is None:
+    def measured_pressure_zz_stderr(self) -> float:
+        """float: Standard error for measured_pressure_zz"""
+        if self.__measured_pressure_zz_stderr is None:
             raise ValueError('No results yet!')
-        return self.__measured_pressure_zz_std
+        return self.__measured_pressure_zz_stderr
 
     @property
     def measured_pressure_xy(self) -> float:
@@ -510,11 +495,11 @@ class RelaxDynamic(Calculation):
         return self.__measured_pressure_xy
 
     @property
-    def measured_pressure_xy_std(self) -> float:
-        """float: Standard deviation for measured_pressure_xy"""
-        if self.__measured_pressure_xy_std is None:
+    def measured_pressure_xy_stderr(self) -> float:
+        """float: Standard error for measured_pressure_xy"""
+        if self.__measured_pressure_xy_stderr is None:
             raise ValueError('No results yet!')
-        return self.__measured_pressure_xy_std
+        return self.__measured_pressure_xy_stderr
 
     @property
     def measured_pressure_xz(self) -> float:
@@ -524,11 +509,11 @@ class RelaxDynamic(Calculation):
         return self.__measured_pressure_xz
 
     @property
-    def measured_pressure_xz_std(self) -> float:
-        """float: Standard deviation for measured_pressure_xz"""
-        if self.__measured_pressure_xz_std is None:
+    def measured_pressure_xz_stderr(self) -> float:
+        """float: Standard error for measured_pressure_xz"""
+        if self.__measured_pressure_xz_stderr is None:
             raise ValueError('No results yet!')
-        return self.__measured_pressure_xz_std
+        return self.__measured_pressure_xz_stderr
 
     @property
     def measured_pressure_yz(self) -> float:
@@ -538,11 +523,11 @@ class RelaxDynamic(Calculation):
         return self.__measured_pressure_yz
 
     @property
-    def measured_pressure_yz_std(self) -> float:
-        """float: Standard deviation for measured_pressure_yz"""
-        if self.__measured_pressure_yz_std is None:
+    def measured_pressure_yz_stderr(self) -> float:
+        """float: Standard error for measured_pressure_yz"""
+        if self.__measured_pressure_yz_stderr is None:
             raise ValueError('No results yet!')
-        return self.__measured_pressure_yz_std
+        return self.__measured_pressure_yz_stderr
 
     @property
     def measured_temperature(self) -> float:
@@ -552,11 +537,11 @@ class RelaxDynamic(Calculation):
         return self.__measured_temperature
 
     @property
-    def measured_temperature_std(self) -> float:
-        """float: Standard deviation for measured_temperature"""
-        if self.__measured_temperature_std is None:
+    def measured_temperature_stderr(self) -> float:
+        """float: Standard error for measured_temperature"""
+        if self.__measured_temperature_stderr is None:
             raise ValueError('No results yet!')
-        return self.__measured_temperature_std
+        return self.__measured_temperature_stderr
 
     def set_values(self,
                    name: Optional[str] = None,
@@ -1033,54 +1018,52 @@ class RelaxDynamic(Calculation):
             calc['final-system']['artifact']['format'] = 'atom_dump'
             calc['final-system']['symbols'] = self.final_dump['symbols']
 
-            calc['number-of-measurements'] = self.numsamples
-
             # Save measured box parameter info
             calc['measured-box-parameter'] = mbp = DM()
             mbp['lx'] = uc.model(self.lx_mean, self.units.length_unit,
-                                 self.lx_std)
+                                 self.lx_stderr)
             mbp['ly'] = uc.model(self.ly_mean, self.units.length_unit,
-                                 self.ly_std)
+                                 self.ly_stderr)
             mbp['lz'] = uc.model(self.lz_mean, self.units.length_unit,
-                                 self.lz_std)
+                                 self.lz_stderr)
             mbp['xy'] = uc.model(self.xy_mean, self.units.length_unit,
-                                 self.xy_std)
+                                 self.xy_stderr)
             mbp['xz'] = uc.model(self.xz_mean, self.units.length_unit,
-                                 self.xz_std)
+                                 self.xz_stderr)
             mbp['yz'] = uc.model(self.yz_mean, self.units.length_unit,
-                                 self.yz_std)
+                                 self.yz_stderr)
 
             # Save measured phase-state info
             calc['measured-phase-state'] = mps = DM()
             mps['temperature'] = uc.model(self.measured_temperature, 'K',
-                                          self.measured_temperature_std)
+                                          self.measured_temperature_stderr)
             mps['pressure-xx'] = uc.model(self.measured_pressure_xx,
                                           self.units.pressure_unit,
-                                          self.measured_pressure_xx_std)
+                                          self.measured_pressure_xx_stderr)
             mps['pressure-yy'] = uc.model(self.measured_pressure_yy,
                                           self.units.pressure_unit,
-                                          self.measured_pressure_yy_std)
+                                          self.measured_pressure_yy_stderr)
             mps['pressure-zz'] = uc.model(self.measured_pressure_zz,
                                           self.units.pressure_unit,
-                                          self.measured_pressure_zz_std)
+                                          self.measured_pressure_zz_stderr)
             mps['pressure-xy'] = uc.model(self.measured_pressure_xy,
                                           self.units.pressure_unit,
-                                          self.measured_pressure_xy_std)
+                                          self.measured_pressure_xy_stderr)
             mps['pressure-xz'] = uc.model(self.measured_pressure_xz,
                                           self.units.pressure_unit,
-                                          self.measured_pressure_xz_std)
+                                          self.measured_pressure_xz_stderr)
             mps['pressure-yz'] = uc.model(self.measured_pressure_yz,
                                           self.units.pressure_unit,
-                                          self.measured_pressure_yz_std)
+                                          self.measured_pressure_yz_stderr)
 
             # Save the final cohesive and total energies
             calc['cohesive-energy'] = uc.model(self.potential_energy,
                                                self.units.energy_unit,
-                                               self.potential_energy_std)
+                                               self.potential_energy_stderr)
             if not np.isnan(self.total_energy):
                 calc['average-total-energy'] = uc.model(self.total_energy,
                                                         self.units.energy_unit,
-                                                        self.total_energy_std)
+                                                        self.total_energy_stderr)
 
         self._set_model(model)
         return model
@@ -1134,50 +1117,48 @@ class RelaxDynamic(Calculation):
                 'symbols': calc['final-system']['symbols']
             }
 
-            self.__numsamples = calc['number-of-measurements']
-
             self.__lx_mean = uc.value_unit(calc['measured-box-parameter']['lx'])
-            self.__lx_std = uc.error_unit(calc['measured-box-parameter']['lx'])
+            self.__lx_stderr = uc.error_unit(calc['measured-box-parameter']['lx'])
             self.__ly_mean = uc.value_unit(calc['measured-box-parameter']['ly'])
-            self.__ly_std = uc.error_unit(calc['measured-box-parameter']['ly'])
+            self.__ly_stderr = uc.error_unit(calc['measured-box-parameter']['ly'])
             self.__lz_mean = uc.value_unit(calc['measured-box-parameter']['lz'])
-            self.__lz_std = uc.error_unit(calc['measured-box-parameter']['lz'])
+            self.__lz_stderr = uc.error_unit(calc['measured-box-parameter']['lz'])
             self.__xy_mean = uc.value_unit(calc['measured-box-parameter']['xy'])
-            self.__xy_std = uc.error_unit(calc['measured-box-parameter']['xy'])
+            self.__xy_stderr = uc.error_unit(calc['measured-box-parameter']['xy'])
             self.__xz_mean = uc.value_unit(calc['measured-box-parameter']['xz'])
-            self.__xz_std = uc.error_unit(calc['measured-box-parameter']['xz'])
+            self.__xz_stderr = uc.error_unit(calc['measured-box-parameter']['xz'])
             self.__yz_mean = uc.value_unit(calc['measured-box-parameter']['yz'])
-            self.__yz_std = uc.error_unit(calc['measured-box-parameter']['yz'])
+            self.__yz_stderr = uc.error_unit(calc['measured-box-parameter']['yz'])
             self.__final_box = am.Box(lx=self.lx_mean, ly=self.ly_mean, lz=self.lz_mean,
                                       xy=self.xy_mean, xz=self.xz_mean, yz=self.yz_mean)
 
             self.__potential_energy = uc.value_unit(calc['cohesive-energy'])
-            self.__potential_energy_std = uc.error_unit(calc['cohesive-energy'])
+            self.__potential_energy_stderr = uc.error_unit(calc['cohesive-energy'])
             if 'average-total-energy' in calc:
                 self.__total_energy = uc.value_unit(calc['average-total-energy'])
-                self.__total_energy_std = uc.error_unit(calc['average-total-energy'])
+                self.__total_energy_stderr = uc.error_unit(calc['average-total-energy'])
             elif self.temperature == 0.0:
                 self.__total_energy = self.__potential_energy
-                self.__total_energy_std = self.__potential_energy_std
+                self.__total_energy_stderr = self.__potential_energy_stderr
             else:
                 self.__total_energy = np.nan
-                self.__total_energy_std = np.nan
+                self.__total_energy_stderr = np.nan
 
             mps = calc['measured-phase-state']
             self.__measured_temperature = uc.value_unit(mps['temperature'])
-            self.__measured_temperature_std = uc.error_unit(mps['temperature'])
+            self.__measured_temperature_stderr = uc.error_unit(mps['temperature'])
             self.__measured_pressure_xx = uc.value_unit(mps['pressure-xx'])
-            self.__measured_pressure_xx_std = uc.error_unit(mps['pressure-xx'])
+            self.__measured_pressure_xx_stderr = uc.error_unit(mps['pressure-xx'])
             self.__measured_pressure_yy = uc.value_unit(mps['pressure-yy'])
-            self.__measured_pressure_yy_std = uc.error_unit(mps['pressure-yy'])
+            self.__measured_pressure_yy_stderr = uc.error_unit(mps['pressure-yy'])
             self.__measured_pressure_zz = uc.value_unit(mps['pressure-zz'])
-            self.__measured_pressure_zz_std = uc.error_unit(mps['pressure-zz'])
+            self.__measured_pressure_zz_stderr = uc.error_unit(mps['pressure-zz'])
             self.__measured_pressure_xy = uc.value_unit(mps['pressure-xy'])
-            self.__measured_pressure_xy_std = uc.error_unit(mps['pressure-xy'])
+            self.__measured_pressure_xy_stderr = uc.error_unit(mps['pressure-xy'])
             self.__measured_pressure_xz = uc.value_unit(mps['pressure-xz'])
-            self.__measured_pressure_xz_std = uc.error_unit(mps['pressure-xz'])
+            self.__measured_pressure_xz_stderr = uc.error_unit(mps['pressure-xz'])
             self.__measured_pressure_yz = uc.value_unit(mps['pressure-yz'])
-            self.__measured_pressure_yz_std = uc.error_unit(mps['pressure-yz'])
+            self.__measured_pressure_yz_stderr = uc.error_unit(mps['pressure-yz'])
 
     @property
     def queries(self) -> dict:
@@ -1213,39 +1194,38 @@ class RelaxDynamic(Calculation):
 
         # Extract results
         if self.status == 'finished':
-            meta['numsamples'] = self.numsamples
 
             meta['lx'] = self.lx_mean
-            meta['lx_std'] = self.lx_std
+            meta['lx_stderr'] = self.lx_stderr
             meta['ly'] = self.ly_mean
-            meta['ly_std'] = self.ly_std
+            meta['ly_stderr'] = self.ly_stderr
             meta['lz'] = self.lz_mean
-            meta['lz_std'] = self.lz_std
+            meta['lz_stderr'] = self.lz_stderr
             meta['xy'] = self.xy_mean
-            meta['xy_std'] = self.xy_std
+            meta['xy_stderr'] = self.xy_stderr
             meta['xz'] = self.xz_mean
-            meta['xz_std'] = self.xz_std
+            meta['xz_stderr'] = self.xz_stderr
             meta['yz'] = self.yz_mean
-            meta['yz_std'] = self.yz_std
+            meta['yz_stderr'] = self.yz_stderr
 
             meta['E_pot'] = self.potential_energy
-            meta['E_pot_std'] = self.potential_energy_std
+            meta['E_pot_stderr'] = self.potential_energy_stderr
             meta['E_total'] = self.total_energy
-            meta['E_total_std'] = self.total_energy_std
+            meta['E_total_stderr'] = self.total_energy_stderr
             meta['measured_temperature'] = self.measured_temperature
-            meta['measured_temperature_std'] = self.measured_temperature_std
+            meta['measured_temperature_stderr'] = self.measured_temperature_stderr
             meta['measured_pressure_xx'] = self.measured_pressure_xx
-            meta['measured_pressure_xx_std'] = self.measured_pressure_xx_std
+            meta['measured_pressure_xx_stderr'] = self.measured_pressure_xx_stderr
             meta['measured_pressure_yy'] = self.measured_pressure_yy
-            meta['measured_pressure_yy_std'] = self.measured_pressure_yy_std
+            meta['measured_pressure_yy_stderr'] = self.measured_pressure_yy_stderr
             meta['measured_pressure_zz'] = self.measured_pressure_zz
-            meta['measured_pressure_zz_std'] = self.measured_pressure_zz_std
+            meta['measured_pressure_zz_stderr'] = self.measured_pressure_zz_stderr
             meta['measured_pressure_xy'] = self.measured_pressure_xy
-            meta['measured_pressure_xy_std'] = self.measured_pressure_xy_std
+            meta['measured_pressure_xy_stderr'] = self.measured_pressure_xy_stderr
             meta['measured_pressure_xz'] = self.measured_pressure_xz
-            meta['measured_pressure_xz_std'] = self.measured_pressure_xz_std
+            meta['measured_pressure_xz_stderr'] = self.measured_pressure_xz_stderr
             meta['measured_pressure_yz'] = self.measured_pressure_yz
-            meta['measured_pressure_yz_std'] = self.measured_pressure_yz_std
+            meta['measured_pressure_yz_stderr'] = self.measured_pressure_yz_stderr
 
         return meta
 
@@ -1293,12 +1273,12 @@ class RelaxDynamic(Calculation):
         del input_dict['ucell']
 
         # Add calculation-specific inputs
-        input_dict['p_xx'] = self.pressure_xx
-        input_dict['p_yy'] = self.pressure_yy
-        input_dict['p_zz'] = self.pressure_zz
-        input_dict['p_xy'] = self.pressure_xy
-        input_dict['p_xz'] = self.pressure_xz
-        input_dict['p_yz'] = self.pressure_yz
+        input_dict['pxx'] = self.pressure_xx
+        input_dict['pyy'] = self.pressure_yy
+        input_dict['pzz'] = self.pressure_zz
+        input_dict['pxy'] = self.pressure_xy
+        input_dict['pxz'] = self.pressure_xz
+        input_dict['pyz'] = self.pressure_yz
         input_dict['temperature'] = self.temperature
         input_dict['runsteps'] = self.runsteps
         input_dict['integrator'] = self.integrator
@@ -1340,7 +1320,6 @@ class RelaxDynamic(Calculation):
             'filename': results_dict['dumpfile_final'],
             'symbols': results_dict['symbols_final']
         }
-        self.__numsamples = results_dict['nsamples']
         self.__lx_mean = results_dict['lx'] / (self.system_mods.a_mults[1] - self.system_mods.a_mults[0])
         self.__ly_mean = results_dict['ly'] / (self.system_mods.b_mults[1] - self.system_mods.b_mults[0])
         self.__lz_mean = results_dict['lz'] / (self.system_mods.c_mults[1] - self.system_mods.c_mults[0])
@@ -1350,30 +1329,30 @@ class RelaxDynamic(Calculation):
         self.__final_box = am.Box(lx=self.lx_mean, ly=self.ly_mean, lz=self.lz_mean,
                                   xy=self.xy_mean, xz=self.xz_mean, yz=self.yz_mean)
 
-        self.__lx_std = results_dict['lx_std']
-        self.__ly_std = results_dict['ly_std']
-        self.__lz_std = results_dict['lz_std']
-        self.__xy_std = results_dict['xy_std']
-        self.__xz_std = results_dict['xz_std']
-        self.__yz_std = results_dict['yz_std']
+        self.__lx_stderr = results_dict['lx_stderr']
+        self.__ly_stderr = results_dict['ly_stderr']
+        self.__lz_stderr = results_dict['lz_stderr']
+        self.__xy_stderr = results_dict['xy_stderr']
+        self.__xz_stderr = results_dict['xz_stderr']
+        self.__yz_stderr = results_dict['yz_stderr']
 
         self.__potential_energy = results_dict['E_pot']
-        self.__potential_energy_std = results_dict['E_pot_std']
+        self.__potential_energy_stderr = results_dict['E_pot_stderr']
         self.__total_energy = results_dict['E_total']
-        self.__total_energy_std = results_dict['E_total_std']
+        self.__total_energy_stderr = results_dict['E_total_stderr']
 
         self.__measured_pressure_xx = results_dict['measured_pxx']
-        self.__measured_pressure_xx_std = results_dict['measured_pxx_std']
+        self.__measured_pressure_xx_stderr = results_dict['measured_pxx_stderr']
         self.__measured_pressure_yy = results_dict['measured_pyy']
-        self.__measured_pressure_yy_std = results_dict['measured_pyy_std']
+        self.__measured_pressure_yy_stderr = results_dict['measured_pyy_stderr']
         self.__measured_pressure_zz = results_dict['measured_pzz']
-        self.__measured_pressure_zz_std = results_dict['measured_pzz_std']
+        self.__measured_pressure_zz_stderr = results_dict['measured_pzz_stderr']
         self.__measured_pressure_xy = results_dict['measured_pxy']
-        self.__measured_pressure_xy_std = results_dict['measured_pxy_std']
+        self.__measured_pressure_xy_stderr = results_dict['measured_pxy_stderr']
         self.__measured_pressure_xz = results_dict['measured_pxz']
-        self.__measured_pressure_xz_std = results_dict['measured_pxz_std']
+        self.__measured_pressure_xz_stderr = results_dict['measured_pxz_stderr']
         self.__measured_pressure_yz = results_dict['measured_pyz']
-        self.__measured_pressure_yz_std = results_dict['measured_pyz_std']
+        self.__measured_pressure_yz_stderr = results_dict['measured_pyz_stderr']
 
         self.__measured_temperature = results_dict['temp']
-        self.__measured_temperature_std = results_dict['temp_std']
+        self.__measured_temperature_stderr = results_dict['temp_stderr']

@@ -10,7 +10,7 @@ The isolated_atom calculation style evaluates the base energies of all atomic mo
 
 - 2020-09-22: Notebook first added.
 - 2022-03-11: Notebook updated to reflect version 0.11.
-- 2026-25-06: Method updated to support the LAMMPS library interface.
+- 2026-06-25: Method updated to support the LAMMPS library interface.
 
 ### Additional dependencies
 

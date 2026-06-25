@@ -15,7 +15,8 @@ This calculation was created as a quick method for scanning the phase space of a
 - 2020-05-22: Version 0.10 update - potentials now loaded from database.
 - 2020-09-22: Setup and parameter definitions streamlined.
 - 2022-03-11: Notebook updated to reflect version 0.11. r_a() function replaced by the atomman.System.r0() method.
-
+- 2026-06-25: Method updated to support the LAMMPS library interface.
+  
 ### Additional dependencies
 
 ### Disclaimers

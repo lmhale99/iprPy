@@ -1,4 +1,3 @@
-# coding: utf-8
 # Standard Python libraries
 from io import IOBase
 from pathlib import Path
@@ -92,8 +91,7 @@ class RelaxBox(Calculation):
     def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
-            'relax_box.py',
-            'cij.template'
+            'relax_box.py'
         ]
 
 ############################## Class attributes ################################
@@ -756,12 +754,12 @@ class RelaxBox(Calculation):
 
         # Add calculation-specific inputs
         input_dict['strainrange'] = self.strainrange
-        input_dict['p_xx'] = self.pressure_xx
-        input_dict['p_yy'] = self.pressure_yy
-        input_dict['p_zz'] = self.pressure_zz
-        input_dict['p_xy'] = self.pressure_xy
-        input_dict['p_xz'] = self.pressure_xz
-        input_dict['p_yz'] = self.pressure_yz
+        input_dict['pxx'] = self.pressure_xx
+        input_dict['pyy'] = self.pressure_yy
+        input_dict['pzz'] = self.pressure_zz
+        input_dict['pxy'] = self.pressure_xy
+        input_dict['pxz'] = self.pressure_xz
+        input_dict['pyz'] = self.pressure_yz
 
         # Return input_dict
         return input_dict
