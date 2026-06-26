@@ -1,12 +1,9 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale
 from dataclasses import asdict
 
 # http://www.numpy.org/
 import numpy as np
 
-# https://atztogo.github.io/spglib/python-spglib.html
 # https://atztogo.github.io/spglib/python-spglib.html
 try:
     import spglib

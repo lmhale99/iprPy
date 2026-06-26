@@ -10,8 +10,9 @@ The point_defect_diffusion calculation style estimates the diffusion rate of a p
 
 ### Version notes
 
-- 2022-03-11: Notebook updated to reflect version 0.11.
-
+- v0.11.0: Notebook updated to reflect version 0.11.
+- v0.12.0: Method updated to support the LAMMPS library interface.
+  
 ### Additional dependencies
 
 ### Disclaimers

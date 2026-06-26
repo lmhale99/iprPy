@@ -1,28 +1,20 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale
 
 # Standard library imports
-from pathlib import Path
 from typing import Optional, Union
-import datetime
-import random
 
 # http://www.numpy.org/
 import numpy as np 
 
-# https://github.com/usnistgov/atomman 
+# https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
-from atomman.tools import filltemplate
+from atomman.typing import lammpspotential
+from atomman.lammps import LAMMPS, LAMMPSobj
 
-# iprPy imports
-from ...tools import read_calc_file
-
-def pointdiffusion(lammps_command: str,
+def pointdiffusion(lammps_command: Union[str, LAMMPSobj],
                    system: am.System,
-                   potential: lmp.Potential,
+                   potential: lammpspotential,
                    point_kwargs: Union[list, dict],
                    mpi_command: Optional[str] = None,
                    temperature: float = 300.0,
@@ -30,8 +22,8 @@ def pointdiffusion(lammps_command: str,
                    thermosteps: Optional[int] = None,
                    dumpsteps: int = 0,
                    equilsteps: int = 20000,
-                   randomseed: Optional[int] = None) -> dict:
-                   
+                   randomseed: Optional[int] = None,
+                   usefiles: bool = False) -> dict:
     """
     Evaluates the diffusion rate of a point defect at a given temperature. This
     method will run two simulations: an NVT run at the specified temperature to 
@@ -42,11 +34,12 @@ def pointdiffusion(lammps_command: str,
     
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     system : atomman.System
         The system to perform the calculation on.
-    potential : atomman.lammps.Potential
+    potential : PotentialLAMMPS or PotentialLAMMPSKIM
         The LAMMPS implemented potential to use.
     point_kwargs : dict or list of dict
         One or more dictionaries containing the keyword arguments for
@@ -61,7 +54,7 @@ def pointdiffusion(lammps_command: str,
         The number of integration steps to perform (default is 200000).
     thermosteps : int, optional
         Thermo values will be reported every this many steps (default is
-        100).
+        runsteps divided by 1000).
     dumpsteps : int or None, optional
         Dump files will be saved every this many steps (default is 0,
         which does not output dump files).
@@ -103,6 +96,33 @@ def pointdiffusion(lammps_command: str,
           y-direction.
         - **'d'** (*float*) - The total computed diffusion constant.
     """
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
+
+    logfile = 'log.lammps'
+    if usefiles or not lmp.islib:
+        script = 'diffusion.in'
+    else:
+        script = None
+
+    # Handle default values
+    if thermosteps is None: 
+        thermosteps = runsteps // 1000
+        if thermosteps == 0:
+            thermosteps = 1
+    if dumpsteps is None:
+        dumpsteps = runsteps
+
+    # Check/select a randomseed value
+    randomseed = am.lammps.seed(randomseed)
+
+    # Check that temperature is greater than zero
+    if temperature <= 0.0:
+        raise ValueError('Temperature must be greater than zero')
+
+    # Timestep and timestep-dependent variables
+    timestep = am.lammps.style.timestep(lmp.potential.units)
+    temperature_damp = 100 * timestep
 
     # Add defect(s) to the initially perfect system
     if not isinstance(point_kwargs, (list, tuple)):
@@ -111,97 +131,64 @@ def pointdiffusion(lammps_command: str,
         #print(pkwargs)
         system = am.defect.point(system, **pkwargs)
     
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
+    # Pass system and potential info into LAMMPS
+    lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                  usefiles=usefiles, logfile=logfile)
+
+    lmp.commands_string('\n# Specify property computes')
+    lmp.cmd.compute('peatom', 'all', 'pe/atom')
+    lmp.cmd.compute('msd', 'all', 'msd', 'com', 'yes')
+
+    lmp.commands_string('\n# Define thermo data')
+    lmp.cmd.thermo(thermosteps)
+    lmp.cmd.thermo_style('custom', 'step', 'temp', 'pe', 'ke', 'etotal',
+                         'pxx', 'pyy', 'pzz', 'c_msd[1]', 'c_msd[2]', 'c_msd[3]', 'c_msd[4]')
+    lmp.cmd.thermo_modify('format', 'float', '%.17e')
+
+    lmp.commands_string('\n# Specify timestep')
+    lmp.cmd.timestep(timestep)
+
+    lmp.commands_string('\n# Create velocities and equilibrate system using nvt')
+    lmp.cmd.velocity('all', 'create', 2*temperature, randomseed)
+    lmp.cmd.fix('nvt', 'all', 'nvt', 'temp', temperature, temperature, temperature_damp)
+    lmp.cmd.run(equilsteps)
+    lmp.cmd.unfix('nvt')
     
-    #Get lammps version date
-    lammps_date = lmp.checkversion(lammps_command)['date']
-    
-    # Check that temperature is greater than zero
-    if temperature <= 0.0:
-        raise ValueError('Temperature must be greater than zero')
-    
-    # Handle default values
-    if thermosteps is None: 
-        thermosteps = runsteps // 1000
-        if thermosteps == 0:
-            thermosteps = 1
-    if dumpsteps is None:
-        dumpsteps = runsteps
-    if randomseed is None:
-        randomseed = random.randint(1, 900000000)
-    
-    # Define lammps variables
-    lammps_variables = {}
-    system_info = system.dump('atom_data', f='initial.dat',
-                              potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
-    lammps_variables['temperature'] = temperature
-    lammps_variables['runsteps'] = runsteps
-    lammps_variables['equilsteps'] = equilsteps
-    lammps_variables['thermosteps'] = thermosteps
-    lammps_variables['dumpsteps'] = dumpsteps
-    lammps_variables['randomseed'] = randomseed
-    lammps_variables['timestep'] = lmp.style.timestep(potential.units)
-    
-    # Set dump_info
-    if dumpsteps == 0:
-        lammps_variables['dump_info'] = ''
-    else:
-        lammps_variables['dump_info'] = '\n'.join([
-            '',
-            '# Define dump files',
-            'dump dumpit all custom ${dumpsteps} *.dump id type x y z c_peatom',
-            'dump_modify dumpit format <dump_modify_format>',
-            '',
-        ])
-        
-        # Set dump_modify_format based on lammps_date
-        if lammps_date < datetime.date(2016, 8, 3):
-            lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e"'
+    if dumpsteps > 0:
+        lmp.commands_string('\n# Define dump')
+        if lmp.potential.atom_style == 'charge':
+            dumpkeys = ['id', 'type', 'q', 'x', 'y', 'z', 'c_peatom']
         else:
-            lammps_variables['dump_modify_format'] = 'float %.13e'
+            dumpkeys = ['id', 'type', 'x', 'y', 'z', 'c_peatom']
+        lmp.cmd.dump('dumpit', 'all', 'custom', dumpsteps, '*.dump', *dumpkeys)
+        lmp.cmd.dump_modify('dumpit', 'format', 'float', '%.17e')
+
+    lmp.commands_string('\n# Run nve')
+    lmp.cmd.reset_timestep(0)
+    lmp.cmd.fix('nve', 'all', 'nve')
+    lmp.cmd.run(runsteps)
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
     
-    # Write lammps input script
-    lammps_script = 'diffusion.in'
-    template = read_calc_file('iprPy.calculation.point_defect_diffusion',
-                              'diffusion.template')
-    with open(lammps_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
-    
-    # Run lammps
-    output = lmp.run(lammps_command, script_name=lammps_script,
-                     mpi_command=mpi_command)
-    
-    # Extract LAMMPS thermo data.
-    thermo = output.simulations[1]['thermo']
+    # Extract LAMMPS thermo data and auto-set standard thermo units
+    thermo = log.simulations[1]['thermo']
+    lmp.set_thermo_units(thermo)
+
     temps = thermo.Temp.values
-    pxxs = uc.set_in_units(thermo.Pxx.values, lammps_units['pressure'])
-    pyys = uc.set_in_units(thermo.Pyy.values, lammps_units['pressure'])
-    pzzs = uc.set_in_units(thermo.Pzz.values, lammps_units['pressure'])
-    E_pots = uc.set_in_units(thermo.PotEng.values, lammps_units['energy'])
-    E_totals = uc.set_in_units(thermo.TotEng.values, lammps_units['energy'])
+    pxxs = thermo.Pxx.values
+    pyys = thermo.Pyy.values
+    pzzs = thermo.Pzz.values
+    E_pots = thermo.PotEng.values
+    E_totals = thermo.TotEng.values
     steps = thermo.Step.values
     
     # Read user-defined thermo data
-    if output.lammps_date < datetime.date(2016, 8, 1):
-        msd_x = uc.set_in_units(thermo['msd[1]'].values,
-                                lammps_units['length']+'^2')
-        msd_y = uc.set_in_units(thermo['msd[2]'].values,
-                                lammps_units['length']+'^2')
-        msd_z = uc.set_in_units(thermo['msd[3]'].values,
-                                lammps_units['length']+'^2')
-        msd = uc.set_in_units(thermo['msd[4]'].values,
-                              lammps_units['length']+'^2')
-    else:
-        msd_x = uc.set_in_units(thermo['c_msd[1]'].values,
-                                lammps_units['length']+'^2')
-        msd_y = uc.set_in_units(thermo['c_msd[2]'].values,
-                                lammps_units['length']+'^2')
-        msd_z = uc.set_in_units(thermo['c_msd[3]'].values,
-                                lammps_units['length']+'^2')
-        msd = uc.set_in_units(thermo['c_msd[4]'].values,
-                              lammps_units['length']+'^2')
+    mds_units = f"{lmp.unitsdict['length']}^2"
+    msd_x = uc.set_in_units(thermo['c_msd[1]'].values, mds_units)
+    msd_y = uc.set_in_units(thermo['c_msd[2]'].values, mds_units)
+    msd_z = uc.set_in_units(thermo['c_msd[3]'].values, mds_units)
+    msd = uc.set_in_units(thermo['c_msd[4]'].values, mds_units)
         
     # Initialize results dict
     results = {}
@@ -222,16 +209,16 @@ def pointdiffusion(lammps_command: str,
     results['E_total'] = np.mean(E_totals)
     results['E_total_std'] = np.std(E_totals)
     
-    # Convert steps to times
-    times = steps * uc.set_in_units(lammps_variables['timestep'], lammps_units['time'])
+    # Convert steps to time values
+    t = steps * uc.set_in_units(timestep, lmp.unitsdict['time'])
     
     # Estimate diffusion rates
     # MSD_ptd = natoms * MSD_atoms (if one defect in system)
     # MSD = 2 * ndim * D * t  -->  D = MSD/t / (2 * ndim)
-    mx = np.polyfit(times, system.natoms * msd_x, 1)[0]
-    my = np.polyfit(times, system.natoms * msd_y, 1)[0]
-    mz = np.polyfit(times, system.natoms * msd_z, 1)[0]
-    m = np.polyfit(times, system.natoms * msd, 1)[0]
+    mx = np.polyfit(t, system.natoms * msd_x, 1)[0]
+    my = np.polyfit(t, system.natoms * msd_y, 1)[0]
+    mz = np.polyfit(t, system.natoms * msd_z, 1)[0]
+    m = np.polyfit(t, system.natoms * msd, 1)[0]
     
     results['msd_x_values'] = msd_x
     results['msd_y_values'] = msd_y
@@ -243,4 +230,3 @@ def pointdiffusion(lammps_command: str,
     results['d'] = m / 6
     
     return results
-

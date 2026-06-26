@@ -1,44 +1,44 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale
-# Built around LAMMPS script by Steve Plimpton
+# Originally based on the LAMMPS example script by Steve Plimpton
 
 # Standard library imports
-from typing import Optional
+from typing import Optional, Union
 
 # http://www.numpy.org/
 import numpy as np
 
-# https://github.com/usnistgov/atomman 
+# https://pandas.pydata.org/
+import pandas as pd
+
+# https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
-from atomman.tools import filltemplate
+from atomman.typing import lammpspotential, unitfloat
+from atomman.lammps import LAMMPS, LAMMPSobj
 
-# iprPy imports
-from ...tools import read_calc_file
-
-def elastic_constants_static(lammps_command: str,
+def elastic_constants_static(lammps_command: Union[str, LAMMPSobj],
                              system: am.System,
-                             potential: lmp.Potential,
+                             potential: lammpspotential,
                              mpi_command: Optional[str] = None,
                              strainrange: float = 1e-6,
                              etol: float = 0.0,
-                             ftol: float = 0.0,
+                             ftol: unitfloat = 0.0,
                              maxiter: int = 10000,
                              maxeval: int = 100000,
-                             dmax: float = uc.set_in_units(0.01, 'angstrom')) -> dict:
+                             dmax: unitfloat = '0.01 angstrom',
+                             usefiles: bool = True) -> dict:
     """
     Computes the elastic constants of an atomic configuration using small
     strains.  This calculation is comparable to the LAMMPS ELASTIC example.
     
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     system : atomman.System
         The system to perform the calculation on.
-    potential : atomman.lammps.Potential
+    potential : PotentialLAMMPS or PotentialLAMMPSKIM
         The LAMMPS implemented potential to use.
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
@@ -61,6 +61,9 @@ def elastic_constants_static(lammps_command: str,
         The maximum distance in length units that any atom is allowed to relax
         in any direction during a single minimization iteration (default is
         0.01 Angstroms).
+    usefiles : bool, optional
+        If set to True, then all input/output files for LAMMPS will be generated.
+        Default value of False will minimize the files created.
     
     Returns
     -------
@@ -74,62 +77,44 @@ def elastic_constants_static(lammps_command: str,
         - **'C'** (*atomman.ElasticConstants*) - The computed elastic constants
           obtained from averaging the negative and positive strain values.
     """
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
+
+    # Convert values given with units if needed
+    ftol = uc.set_in_units(ftol)
+    dmax = uc.set_in_units(dmax)
 
     # Convert hexagonal cells to orthorhombic to avoid LAMMPS tilt issues
     if am.tools.ishexagonal(system.box):
         system = system.rotate([[2,-1,-1,0], [0, 1, -1, 0], [0,0,0,1]])
+
+    # Call exe or lib function version for LAMMPS calculation
+    all_thermo = cij_static(lmp, system, potential,
+                            strainrange=strainrange,
+                            etol=etol, ftol=ftol, maxiter=maxiter,
+                            maxeval=maxeval, dmax=dmax)
     
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
-    
-    # Get lammps version date
-    lammps_date = lmp.checkversion(lammps_command)['date']
-    
-    # Define lammps variables
-    lammps_variables = {}
-    system_info = system.dump('atom_data', f='init.dat',
-                              potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
-    lammps_variables['restart_commands'] = restart_commands(potential, system.symbols)
-    lammps_variables['strainrange'] = strainrange
-    lammps_variables['etol'] = etol
-    lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])
-    lammps_variables['maxiter'] = maxiter
-    lammps_variables['maxeval'] = maxeval
-    lammps_variables['dmax'] = uc.get_in_units(dmax, lammps_units['length'])
-    
-    # Fill in template files
-    lammps_script = 'cij.in'
-    template = read_calc_file('iprPy.calculation.elastic_constants_static',
-                              'cij.template')
-    with open(lammps_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
-    
-    # Run LAMMPS
-    output = lmp.run(lammps_command, script_name=lammps_script,
-                     mpi_command=mpi_command)
-    
+
     # Pull out initial state
-    thermo = output.simulations[0]['thermo']
-    pxx0 = uc.set_in_units(thermo.Pxx.values[-1], lammps_units['pressure'])
-    pyy0 = uc.set_in_units(thermo.Pyy.values[-1], lammps_units['pressure'])
-    pzz0 = uc.set_in_units(thermo.Pzz.values[-1], lammps_units['pressure'])
-    pyz0 = uc.set_in_units(thermo.Pyz.values[-1], lammps_units['pressure'])
-    pxz0 = uc.set_in_units(thermo.Pxz.values[-1], lammps_units['pressure'])
-    pxy0 = uc.set_in_units(thermo.Pxy.values[-1], lammps_units['pressure'])
+    pxx0 = all_thermo.Pxx.values[0]
+    pyy0 = all_thermo.Pyy.values[0]
+    pzz0 = all_thermo.Pzz.values[0]
+    pyz0 = all_thermo.Pyz.values[0]
+    pxz0 = all_thermo.Pxz.values[0]
+    pxy0 = all_thermo.Pxy.values[0]
     
     # Negative strains
     cij_n = np.empty((6,6))
     for i in range(6):
         j = 1 + i * 2
+        
         # Pull out strained state
-        thermo = output.simulations[j]['thermo']
-        pxx = uc.set_in_units(thermo.Pxx.values[-1], lammps_units['pressure'])
-        pyy = uc.set_in_units(thermo.Pyy.values[-1], lammps_units['pressure'])
-        pzz = uc.set_in_units(thermo.Pzz.values[-1], lammps_units['pressure'])
-        pyz = uc.set_in_units(thermo.Pyz.values[-1], lammps_units['pressure'])
-        pxz = uc.set_in_units(thermo.Pxz.values[-1], lammps_units['pressure'])
-        pxy = uc.set_in_units(thermo.Pxy.values[-1], lammps_units['pressure'])
+        pxx = all_thermo.Pxx.values[j]
+        pyy = all_thermo.Pyy.values[j]
+        pzz = all_thermo.Pzz.values[j]
+        pyz = all_thermo.Pyz.values[j]
+        pxz = all_thermo.Pxz.values[j]
+        pxy = all_thermo.Pxy.values[j]
         
         # Calculate cij_n using stress changes
         cij_n[i] = np.array([pxx - pxx0, pyy - pyy0, pzz - pzz0,
@@ -139,14 +124,14 @@ def elastic_constants_static(lammps_command: str,
     cij_p = np.empty((6,6))
     for i in range(6):
         j = 2 + i * 2
+
         # Pull out strained state
-        thermo = output.simulations[j]['thermo']
-        pxx = uc.set_in_units(thermo.Pxx.values[-1], lammps_units['pressure'])
-        pyy = uc.set_in_units(thermo.Pyy.values[-1], lammps_units['pressure'])
-        pzz = uc.set_in_units(thermo.Pzz.values[-1], lammps_units['pressure'])
-        pyz = uc.set_in_units(thermo.Pyz.values[-1], lammps_units['pressure'])
-        pxz = uc.set_in_units(thermo.Pxz.values[-1], lammps_units['pressure'])
-        pxy = uc.set_in_units(thermo.Pxy.values[-1], lammps_units['pressure'])
+        pxx = all_thermo.Pxx.values[j]
+        pyy = all_thermo.Pyy.values[j]
+        pzz = all_thermo.Pzz.values[j]
+        pyz = all_thermo.Pyz.values[j]
+        pxz = all_thermo.Pxz.values[j]
+        pxy = all_thermo.Pxy.values[j]
         
         # Calculate cij_p using stress changes
         cij_p[i] = np.array([pxx - pxx0, pyy - pyy0, pzz - pzz0,
@@ -166,40 +151,123 @@ def elastic_constants_static(lammps_command: str,
     
     return results_dict
 
-def restart_commands(potential: lmp.Potential,
-                     symbols: list) -> str:
-    """
-    Command lines to restart calculation from the initial relaxation
+def cij_static(lmp: LAMMPSobj,
+               system: am.System,
+               potential: lammpspotential,
+               strainrange: float = 1e-6,
+               etol: float = 0.0,
+               ftol: float = 0.0,
+               maxiter: int = 10000,
+               maxeval: int = 100000,
+               dmax: float = 0.01,
+               usefiles: bool = False) -> pd.DataFrame:
+    
+    if usefiles:
+        logfile = 'log.lammps'
+        script = 'cij.in'
+    else:
+        logfile = 'none'
+        script = None
 
+    thermo = []
+
+    # Specify common variables (retained after resets)
+    lmp.cmd.variable('strain', 'equal', strainrange)
+    lmp.cmd.variable('etol', 'equal', etol)
+    lmp.cmd.variable('ftol', 'equal', uc.get_in_units(ftol, lmp.unitsdict['force']))
+    lmp.cmd.variable('maxiter', 'equal', maxiter)
+    lmp.cmd.variable('maxeval', 'equal', maxeval)
+    lmp.cmd.variable('dmax', 'equal', uc.get_in_units(dmax, lmp.unitsdict['length']))
+
+    # Pass system and potential info into LAMMPS
+    lmp.new_system_from_data_file(system, filename='init.dat', potential=potential,
+                                  tilt_large=True, usefiles=usefiles, logfile=logfile)
+    
+    # Set initial configuration's dimensions as variables (retained after resets)
+    lmp.cmd.variable('lx0', 'equal', '$(lx)')
+    lmp.cmd.variable('ly0', 'equal', '$(ly)')
+    lmp.cmd.variable('lz0', 'equal', '$(lz)')
+
+    # Specify the thermo properties to calculate
+    lmp.cmd.variable('peatom', 'equal', 'pe/atoms')
+
+    # Set up minimization style and thermo info
+    lmp.cmd.min_modify('dmax', '${dmax}') 
+    lmp.cmd.thermo_style('custom', 'step', 'lx', 'ly', 'lz', 'yz', 'xz', 'xy', 'pxx', 'pyy', 'pzz', 'pxy', 'pxz', 'pyz', 'v_peatom', 'pe')
+    lmp.cmd.thermo_modify('format', 'float', '%.17e')
+
+    # Run initial minimization
+    lmp.cmd.minimize('${etol}', '${ftol}', '${maxiter}', '${maxeval}')
+    
+    if lmp.islib:
+        # Get thermo data and relaxed system0
+        thermo.append(lmp.last_thermo())
+        system0 = am.load('lammps_lib', lmp, symbols=system.symbols)
+    else:
+        # Define restart
+        lmp.cmd.write_restart('initial.restart')
+        system0 = system
+
+    shear_states = ['-x', '+x', '-y', '+y', '-z', '+z', 
+                    '-yz', '+yz', '-xz', '+xz', '-xy', '+xy']
+    for state in shear_states:
+
+        # Reset system to the restart/original system
+        lmp.new_system_from_restart(filename='initial.restart', system=system0,
+                                    potential=potential, tilt_large=True,
+                                    usefiles=usefiles)
+
+        # Redo setup minimization style and thermo info
+        lmp.cmd.min_modify('dmax', '${dmax}') 
+        lmp.cmd.thermo_style('custom', 'step', 'lx', 'ly', 'lz', 'yz', 'xz', 'xy', 'pxx', 'pyy', 'pzz', 'pxy', 'pxz', 'pyz', 'v_peatom', 'pe')
+        lmp.cmd.thermo_modify('format', 'float', '%.17e')
+
+        # Apply the strain state
+        add_strain(lmp, state)
+
+        # Run minimization
+        lmp.cmd.minimize('${etol}', '${ftol}', '${maxiter}', '${maxeval}')
+        if lmp.islib and not usefiles:
+            # Get thermo data
+            thermo.append(lmp.last_thermo())
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
+
+    if log is None:
+        # Compile thermo into a pandas DataFrame
+        thermo = pd.DataFrame(thermo)
+    else:
+        # Get thermo from log output
+        thermo = log.flatten('all').thermo
+        thermo = thermo[thermo.index % 2 == 1].reset_index(drop=True)
+
+    # Convert units on thermo terms
+    lmp.set_thermo_units(thermo)
+    
+    return thermo
+
+def add_strain(lmp, state: str):
+    """
+    Applies a strain state
+    
     Parameters
     ----------
-    potential : lmp.Potential
-        The interatomic potential.
-    symbols : list
-        The list of symbol models associated with the interatomic potential.
+    state : str
+        The sign for the shear (+ or -) followed by the direction
+        (x, y, z, xz, yz, or xy) without spaces.
     """
+    # Build inputs based on state value
+    sign = state[0]
+    if sign == '+':
+        sign = ''
+    ref = state[-1]   # length reference is normal direction or last direction in shear
+    delta = f'{sign}${{strain}}*${{l{ref}0}}'
+    direction = state[1:]
 
-    if potential.pair_style == 'kim':
-        pair_info = potential.pair_info(symbols)
-        commands = '\n'.join([
-            pair_info.split('\n')[0],
-            'read_restart initial.restart',
-        ])
-        commands += '\n' + '\n'.join(pair_info.split('\n')[1:])
-
+    # Call LAMMPS commands
+    lmp.cmd.variable('delta', 'equal', delta)
+    if len(direction) == 1:
+        lmp.cmd.change_box('all', direction, 'delta', 0, '${delta}', 'remap', 'units', 'box')
     else:
-        commands = '\n'.join([
-            'read_restart initial.restart',
-            potential.pair_info(symbols),
-        ])
-
-    commands += '\n'.join([
-        '',
-        '# Setup minimization style',
-        'min_modify dmax ${dmax}',
-        '',
-        '# Setup output',
-        'thermo_style custom step lx ly lz yz xz xy pxx pyy pzz pyz pxz pxy v_peatom pe',
-        'thermo_modify format float %.13e'])
-    
-    return commands
+        lmp.cmd.change_box('all', direction, 'delta', '${delta}', 'remap', 'units', 'box')

@@ -1,11 +1,8 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale and Norman Luu.
 
 # Standard library imports
 from pathlib import Path
 import shutil
-import datetime
 from typing import Optional, Union
 
 # http://www.numpy.org/
@@ -13,171 +10,20 @@ import numpy as np
 
 # https://github.com/usnistgov/atomman 
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
-from atomman.tools import filltemplate
+from atomman.typing import lammpspotential, unitfloat, lammps, millerindices
+from atomman.lammps import LAMMPS, LAMMPSobj
 
-# iprPy imports
-from ...tools import read_calc_file
-
-def stackingfaultrelax(lammps_command: str,
-                       system: am.System,
-                       potential: lmp.Potential,
-                       mpi_command: Optional[str] = None,
-                       sim_directory: Optional[str] = None,
-                       cutboxvector: str = 'c',
-                       etol: float = 0.0,
-                       ftol: float = 0.0,
-                       maxiter: int = 10000,
-                       maxeval: int = 100000,
-                       dmax: float = uc.set_in_units(0.01, 'angstrom'),
-                       lammps_date: Optional[datetime.date] = None) -> dict:
-    """
-    Perform a stacking fault relaxation simulation for a single faultshift.
-    
-    Parameters
-    ----------
-    lammps_command :str
-        Command for running LAMMPS.
-    system : atomman.System
-        The system containing a stacking fault.
-    potential : atomman.lammps.Potential
-        The LAMMPS implemented potential to use.
-    mpi_command : str, optional
-        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
-        will run serially.
-    sim_directory : str, optional
-        The path to the directory to perform the simulation in.  If not
-        given, will use the current working directory.
-    cutboxvector : str, optional
-        Indicates which of the three system box vectors, 'a', 'b', or 'c', has
-        the non-periodic boundary (default is 'c').  Fault plane normal is
-        defined by the cross of the other two box vectors.
-    etol : float, optional
-        The energy tolerance for the structure minimization. This value is
-        unitless. (Default is 0.0).
-    ftol : float, optional
-        The force tolerance for the structure minimization. This value is in
-        units of force. (Default is 0.0).
-    maxiter : int, optional
-        The maximum number of minimization iterations to use (default is 
-        10000).
-    maxeval : int, optional
-        The maximum number of minimization evaluations to use (default is 
-        100000).
-    dmax : float, optional
-        The maximum distance in length units that any atom is allowed to relax
-        in any direction during a single minimization iteration (default is
-        0.01 Angstroms).
-    lammps_date : datetime.date or None, optional
-        The date version of the LAMMPS executable.  If None, will be identified
-        from the lammps_command (default is None).
-    
-    Returns
-    -------
-    dict
-        Dictionary of results consisting of keys:
-        
-        - **'logfile'** (*str*) - The filename of the LAMMPS log file.
-        - **'dumpfile'** (*str*) - The filename of the LAMMPS dump file
-          of the relaxed system.
-        - **'system'** (*atomman.System*) - The relaxed system.
-        - **'E_total'** (*float*) - The total potential energy of the relaxed
-          system.
-    
-    Raises
-    ------
-    ValueError
-        For invalid cutboxvectors.
-    """    
-    # Give correct LAMMPS fix setforce command
-    if cutboxvector == 'a':
-        fix_cut_setforce = 'fix cut all setforce NULL 0 0'    
-    elif cutboxvector == 'b':
-        fix_cut_setforce = 'fix cut all setforce 0 NULL 0'
-    elif cutboxvector == 'c':
-        fix_cut_setforce = 'fix cut all setforce 0 0 NULL'    
-    else: 
-        raise ValueError('Invalid cutboxvector')
-    
-    if sim_directory is not None:
-        # Create sim_directory if it doesn't exist
-        sim_directory = Path(sim_directory)
-        if not sim_directory.is_dir():
-            sim_directory.mkdir()
-        sim_directory = sim_directory.as_posix()+'/'
-    else:
-        # Set sim_directory if is None
-        sim_directory = ''
-    
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
-    
-    #Get lammps version date
-    if lammps_date is None:
-        lammps_date = lmp.checkversion(lammps_command)['date']
-    
-    # Define lammps variables
-    lammps_variables = {}
-    system_info = system.dump('atom_data',
-                              f=Path(sim_directory, 'system.dat').as_posix(),
-                              potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
-    lammps_variables['fix_cut_setforce'] = fix_cut_setforce
-    lammps_variables['sim_directory'] = sim_directory
-    lammps_variables['etol'] = etol
-    lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])
-    lammps_variables['maxiter'] = maxiter
-    lammps_variables['maxeval'] = maxeval
-    lammps_variables['dmax'] = uc.get_in_units(dmax, lammps_units['length'])
-    
-    # Set dump_modify format based on dump_modify_version
-    if lammps_date < datetime.date(2016, 8, 3):
-        lammps_variables['dump_modify_format'] = '"%i %i %.13e %.13e %.13e %.13e"'
-    else:
-        lammps_variables['dump_modify_format'] = 'float %.13e'
-    
-    # Write lammps input script
-    lammps_script = Path(sim_directory, 'sfmin.in')
-    template = read_calc_file('iprPy.calculation.stacking_fault_static',
-                              'sfmin.template')
-    with open(lammps_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
-    
-    # Run LAMMPS
-    output = lmp.run(lammps_command, script_name=lammps_script.as_posix(),
-                     mpi_command=mpi_command,
-                     logfile=Path(sim_directory, 'log.lammps').as_posix())
-    
-    # Extract output values
-    thermo = output.simulations[-1]['thermo']
-    logfile = Path(sim_directory, 'log.lammps').as_posix()
-    dumpfile = Path(sim_directory, f'{thermo.Step.values[-1]}.dump').as_posix()
-    E_total = uc.set_in_units(thermo.PotEng.values[-1],
-                              lammps_units['energy'])
-    
-    # Load relaxed system
-    system = am.load('atom_dump', dumpfile, symbols=system.symbols)
-    
-    # Return results
-    results_dict = {}
-    results_dict['logfile'] = logfile
-    results_dict['dumpfile'] = dumpfile
-    results_dict['system'] = system
-    results_dict['E_total'] = E_total
-    
-    return results_dict
-
-def stackingfault(lammps_command: str,
+def stackingfault(lammps_command: Union[str, LAMMPSobj],
                   ucell: am.System,
-                  potential: lmp.Potential,
-                  hkl: Union[list, np.ndarray],
+                  potential: lammpspotential,
+                  hkl: millerindices,
                   mpi_command: Optional[str] = None,
                   sizemults: Union[list, tuple, None] = None,
-                  minwidth: float = None,
+                  minwidth: Optional[unitfloat] = None,
                   even: bool = False,
-                  a1vect_uvw: Union[list, np.ndarray, None] = None,
-                  a2vect_uvw: Union[list, np.ndarray, None] = None,
+                  a1vect_uvw: Optional[millerindices] = None,
+                  a2vect_uvw: Optional[millerindices] = None,
                   conventional_setting: str = 'p',
                   cutboxvector: str = 'c',
                   faultpos_rel: Optional[float] = None,
@@ -187,23 +33,25 @@ def stackingfault(lammps_command: str,
                   atomshift: Union[list, np.ndarray, None] = None,
                   shiftindex: Optional[int] = None,
                   etol: float = 0.0,
-                  ftol: float = 0.0,
+                  ftol: unitfloat = 0.0,
                   maxiter: int = 10000,
                   maxeval: int = 100000,
-                  dmax: float = uc.set_in_units(0.01, 'angstrom')) -> dict:
+                  dmax: unitfloat = '0.01 angstrom',
+                  usefiles: bool = False) -> dict:
     """
     Computes the generalized stacking fault value for a single faultshift.
     
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     ucell : atomman.System
         The crystal unit cell to use as the basis of the stacking fault
         configurations.
-    potential : atomman.lammps.Potential
+    potential : PotentialLAMMPS or PotentialLAMMPSKIM
         The LAMMPS implemented potential to use.
-    hkl : array-like object
+    hkl : array-like object or str
         The Miller(-Bravais) crystal fault plane relative to ucell.
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
@@ -212,7 +60,7 @@ def stackingfault(lammps_command: str,
         The three System.supersize multipliers [a_mult, b_mult, c_mult] to use on the
         rotated cell to build the final system. Note that the cutboxvector sizemult
         must be an integer and not a tuple.  Default value is [1, 1, 1].
-    minwidth : float, optional
+    minwidth : float or str, optional
         If given, the sizemult along the cutboxvector will be selected such that the
         width of the resulting final system in that direction will be at least this
         value. If both sizemults and minwidth are given, then the larger of the two
@@ -220,10 +68,10 @@ def stackingfault(lammps_command: str,
     even : bool, optional
         A True value means that the sizemult for cutboxvector will be made an even
         number by adding 1 if it is odd.  Default value is False.
-    a1vect_uvw : array-like object, optional
+    a1vect_uvw : array-like object or str, optional
         The crystal vector to use for one of the two shifting vectors.  If
         not given, will be set to the shortest in-plane lattice vector.
-    a2vect_uvw : array-like object, optional
+    a2vect_uvw : array-like object or str, optional
         The crystal vector to use for one of the two shifting vectors.  If
         not given, will be set to the shortest in-plane lattice vector not
         parallel to a1vect_uvw.
@@ -264,7 +112,7 @@ def stackingfault(lammps_command: str,
     etol : float, optional
         The energy tolerance for the structure minimization. This value is
         unitless. (Default is 0.0).
-    ftol : float, optional
+    ftol : float or str, optional
         The force tolerance for the structure minimization. This value is in
         units of force. (Default is 0.0).
     maxiter : int, optional
@@ -273,7 +121,7 @@ def stackingfault(lammps_command: str,
     maxeval : int, optional
         The maximum number of minimization evaluations to use (default is 
         100000).
-    dmax : float, optional
+    dmax : float or str, optional
         The maximum distance in length units that any atom is allowed to relax
         in any direction during a single minimization iteration (default is
         0.01 Angstroms).
@@ -302,6 +150,15 @@ def stackingfault(lammps_command: str,
         - **'dumpfile_sf'** (*str*) - The name of the LAMMMPS dump file
           associated with the relaxed system after applying the faultshift.
     """
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
+
+    # Convert values given with units if needed
+    if minwidth is not None:
+        minwidth = uc.set_in_units(minwidth)
+    ftol = uc.set_in_units(ftol)
+    dmax = uc.set_in_units(dmax)
+
     # Construct stacking fault configuration generator
     gsf_gen = am.defect.StackingFault(hkl, ucell, cutboxvector=cutboxvector,
                                       a1vect_uvw=a1vect_uvw, a2vect_uvw=a2vect_uvw,
@@ -324,38 +181,44 @@ def stackingfault(lammps_command: str,
     cutindex = gsf_gen.cutindex
     A_fault = gsf_gen.surfacearea
 
-    # Identify lammps_date version
-    lammps_date = lmp.checkversion(lammps_command)['date']
-    
-
     # Evaluate the zero shift configuration
-    zeroshift = stackingfaultrelax(lammps_command, sfsystem, potential,
-                                   mpi_command=mpi_command,
+    zeroshift = stackingfaultrelax(lmp, sfsystem,
                                    cutboxvector=cutboxvector,
                                    etol=etol, ftol=ftol, maxiter=maxiter,
                                    maxeval=maxeval, dmax=dmax,
-                                   lammps_date=lammps_date)
+                                   logfile='zeroshift-log.lammps', usefiles=usefiles)
     
-    # Extract terms
-    E_total_0 = zeroshift['E_total']
-    pos_0 = zeroshift['system'].atoms.pos
-    shutil.move('log.lammps', 'zeroshift-log.lammps')
-    shutil.move(zeroshift['dumpfile'], 'zeroshift.dump')
+    # Extract results from zero shift
+    dumpfile_zero = 'zeroshift.dump'
+    last_dump_file = f'{int(zeroshift["Step"])}.dump'
+    if Path(last_dump_file).is_file():
+        shutil.move(last_dump_file, dumpfile_zero)
+    else:
+        zeroshift['system_final'].dump('atom_dump', f=dumpfile_zero, float_format='%.17f')
+    E_total_0 = zeroshift['PotEng']
+    pos_0 = zeroshift['system_final'].atoms.pos
 
     # Evaluate the system after shifting along the fault plane
     sfsystem = gsf_gen.fault(a1=a1, a2=a2)
-    shifted = stackingfaultrelax(lammps_command, sfsystem, potential,
-                                 mpi_command=mpi_command,
+    shifted = stackingfaultrelax(lmp, sfsystem,
                                  cutboxvector=cutboxvector,
                                  etol=etol, ftol=ftol, maxiter=maxiter,
                                  maxeval=maxeval, dmax=dmax,
-                                 lammps_date=lammps_date)
+                                 logfile='shifted-log.lammps', usefiles=usefiles)
     
-    # Extract terms
-    E_total_sf = shifted['E_total']
-    pos_sf = shifted['system'].atoms.pos
-    shutil.move('log.lammps', 'shifted-log.lammps')
-    shutil.move(shifted['dumpfile'], 'shifted.dump')
+    # Extract results from the shifted system
+    dumpfile_shifted = 'shifted.dump'
+    last_dump_file = f'{int(shifted["Step"])}.dump'
+    if Path(last_dump_file).is_file():
+        shutil.move(last_dump_file, dumpfile_shifted)
+    else:
+        shifted['system_final'].dump('atom_dump', f=dumpfile_shifted, float_format='%.17f')
+    E_total_sf = shifted['PotEng']
+    pos_sf = shifted['system_final'].atoms.pos
+
+    # Clean up dump files
+    if Path('0.dump').is_file():
+        Path('0.dump').unlink()
 
     # Compute the stacking fault energy
     E_gsf = (E_total_sf - E_total_0) / A_fault
@@ -380,3 +243,144 @@ def stackingfault(lammps_command: str,
     results['dumpfile_sf'] = 'shifted.dump'
     
     return results
+
+
+def stackingfaultrelax(lmp: LAMMPSobj,
+                       system: am.System,
+                       cutboxvector: str = 'c',
+                       etol: float = 0.0,
+                       ftol: float = 0.0,
+                       maxiter: int = 10000,
+                       maxeval: int = 100000,
+                       dmax: float = 0.01,
+                       logfile: str = 'none',
+                       usefiles: bool = False) -> dict:
+    """
+    Perform a stacking fault relaxation simulation for a single fault shift.
+    
+    Parameters
+    ----------
+    lammps_command :str
+        Command for running LAMMPS.
+    system : atomman.System
+        The system containing a stacking fault.
+    potential : atomman.lammps.Potential
+        The LAMMPS implemented potential to use.
+    mpi_command : str, optional
+        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
+        will run serially.
+    cutboxvector : str, optional
+        Indicates which of the three system box vectors, 'a', 'b', or 'c', has
+        the non-periodic boundary (default is 'c').  Fault plane normal is
+        defined by the cross of the other two box vectors.
+    etol : float, optional
+        The energy tolerance for the structure minimization. This value is
+        unitless. (Default is 0.0).
+    ftol : float, optional
+        The force tolerance for the structure minimization. This value is in
+        units of force. (Default is 0.0).
+    maxiter : int, optional
+        The maximum number of minimization iterations to use (default is 
+        10000).
+    maxeval : int, optional
+        The maximum number of minimization evaluations to use (default is 
+        100000).
+    dmax : float, optional
+        The maximum distance in length units that any atom is allowed to relax
+        in any direction during a single minimization iteration (default is
+        0.01 Angstroms).
+    
+    Returns
+    -------
+    dict
+        Dictionary of results consisting of keys:
+        
+        - **'logfile'** (*str*) - The filename of the LAMMPS log file.
+        - **'dumpfile'** (*str*) - The filename of the LAMMPS dump file
+          of the relaxed system.
+        - **'system'** (*atomman.System*) - The relaxed system.
+        - **'E_total'** (*float*) - The total potential energy of the relaxed
+          system.
+    
+    Raises
+    ------
+    ValueError
+        For invalid cutboxvectors.
+    """
+    if usefiles:
+        logfile = logfile
+        script = 'sfmin.in'
+    else:
+        logfile = 'none'
+        script = None
+
+    # Pass system and potential info into LAMMPS
+    lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                  usefiles=usefiles, logfile=logfile)
+    
+    # Give correct LAMMPS fix setforce command
+    if cutboxvector == 'a':
+        lmp.cmd.fix('cut', 'all', 'setforce', 'NULL', 0, 0)
+    elif cutboxvector == 'b':
+        lmp.cmd.fix('cut', 'all', 'setforce', 0, 'NULL', 0)
+    elif cutboxvector == 'c':
+        lmp.cmd.fix('cut', 'all', 'setforce', 0, 0, 'NULL')
+    else: 
+        raise ValueError('Invalid cutboxvector')
+    
+    # Set up thermo info
+    lmp.cmd.thermo_style('custom', 'step', 'lx', 'ly', 'lz', 'pxx', 'pyy', 'pzz', 'pe')
+    lmp.cmd.thermo_modify('format', 'float', '%.17e')
+
+    # Define compute for per atom potential energy
+    lmp.cmd.compute('peatom', 'all', 'pe/atom')
+
+    # Create dump file if needed/requested
+    if usefiles or not lmp.islib:
+        if lmp.potential.atom_style == 'charge':
+            dumpkeys = ['id', 'type', 'q', 'x', 'y', 'z', 'c_peatom']
+        else:
+            dumpkeys = ['id', 'type', 'x', 'y', 'z', 'c_peatom']
+        lmp.cmd.dump('dumpit', 'all', 'custom', maxiter, '*.dump', *dumpkeys)
+        lmp.cmd.dump_modify('dumpit', 'format', 'float', '%.17e')
+
+    # Minimization settings and run
+    lmp.cmd.min_modify('dmax', uc.get_in_units(dmax, lmp.unitsdict['length']))
+    lmp.cmd.minimize(etol, uc.get_in_units(ftol, lmp.unitsdict['force']), maxiter, maxeval)
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
+
+    if log is None:
+        # Get thermo directly from lammps object if no log file
+        thermo: dict = lmp.last_thermo()
+    else:
+        # Extract thermo terms from log output
+        thermo = log.simulations[-1].thermo.iloc[-1].to_dict()
+
+    # Convert units on standard thermo terms
+    lmp.set_thermo_units(thermo)
+
+    if usefiles or not lmp.islib:
+        # Read final system from dump file
+        final_dump = f'{int(thermo["Step"])}.dump'
+        system_final = am.load('atom_dump', final_dump, symbols=system.symbols,
+                               lammps_units=lmp.potential.units)
+
+    else:
+        # Load final system information directly from LAMMPS
+        system_final = am.load('lammps_lib', lmp, symbols=system.symbols,
+                               lammps_units=lmp.potential.units)
+        if lmp.potential.atom_style == 'charge':
+            charge = lmp.numpy.extract_atom('q', nelem=system.natoms, dim=1)
+            system_final.atoms.charge = charge
+        system_final.atoms.c_peatom = lmp.numpy.extract_compute('peatom', lammps.LMP_STYLE_ATOM, lammps.LMP_TYPE_VECTOR)
+    
+    # Unit conversion of system_final atom properties
+    system_final.atoms.c_peatom = uc.set_in_units(system_final.atoms.c_peatom, lmp.unitsdict['energy'])
+    if 'charge' in system_final.atoms_prop():
+        system_final.atoms.charge = uc.set_in_units(system_final.atoms.charge, lmp.unitsdict['charge'])
+
+    thermo['system_final'] = system_final
+    return thermo
+

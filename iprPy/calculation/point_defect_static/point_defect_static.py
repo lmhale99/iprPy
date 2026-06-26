@@ -1,38 +1,32 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale
 
 # Standard library imports
 from pathlib import Path
 from copy import deepcopy
-import shutil
-import datetime
 from typing import Optional, Union
 
 # http://www.numpy.org/
-import numpy as np 
+import numpy as np
 
-# https://github.com/usnistgov/atomman 
+# https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
-from atomman.tools import filltemplate
+from atomman.typing import lammpspotential, unitfloat, lammps
+from atomman.lammps import LAMMPS, LAMMPSobj
 
-# iprPy imports
-from ...tools import read_calc_file
-
-def calc(lammps_command: str,
-         system: am.System,
-         potential: lmp.Potential,
-         point_kwargs: Union[list, dict],
-         cutoff: float,
-         mpi_command: Optional[str] = None,
-         etol: float = 0.0,
-         ftol: float = 0.0,
-         maxiter: int = 10000,
-         maxeval: int = 100000,
-         dmax: float = uc.set_in_units(0.01, 'angstrom'),
-         tol: float = uc.set_in_units(1e-5, 'angstrom')) -> dict:
+def point_defect_static(lammps_command: Union[str, LAMMPSobj],
+                        system: am.System,
+                        potential: lammpspotential,
+                        point_kwargs: Union[list, dict],
+                        cutoff: unitfloat,
+                        mpi_command: Optional[str] = None,
+                        etol: float = 0.0,
+                        ftol: unitfloat = 0.0,
+                        maxiter: int = 10000,
+                        maxeval: int = 100000,
+                        dmax: unitfloat = '0.01 angstrom',
+                        tol: unitfloat = '1e-5 angstrom',
+                        usefiles: bool = False) -> dict:
     """
     Adds one or more point defects to a system and evaluates the defect 
     formation energy. Evaluates a relaxed system containing a point defect
@@ -41,17 +35,18 @@ def calc(lammps_command: str,
     
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     system : atomman.System
         The system to perform the calculation on.
-    potential : atomman.lammps.Potential
+    potential : PotentialLAMMPS or PotentialLAMMPSKIM
         The LAMMPS implemented potential to use.
     point_kwargs : dict or list of dict
         One or more dictionaries containing the keyword arguments for
         the atomman.defect.point() function to generate specific point
         defect configuration(s).
-    cutoff : float
+    cutoff : float or str
         Cutoff distance to use in identifying neighbor atoms.
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
@@ -62,7 +57,7 @@ def calc(lammps_command: str,
     etol : float, optional
         The energy tolerance for the structure minimization. This value is
         unitless. (Default is 0.0).
-    ftol : float, optional
+    ftol : float or str, optional
         The force tolerance for the structure minimization. This value is in
         units of force. (Default is 0.0).
     maxiter : int, optional
@@ -71,11 +66,11 @@ def calc(lammps_command: str,
     maxeval : int, optional
         The maximum number of minimization evaluations to use (default is 
         100000).
-    dmax : float, optional
+    dmax : float or str, optional
         The maximum distance in length units that any atom is allowed to relax
         in any direction during a single minimization iteration (default is
         0.01 Angstroms).
-    tol : float, optional
+    tol : float or str, optional
         Absolute tolerance to use for identifying if a defect has
         reconfigured (default is 1e-5 Angstoms).
     
@@ -111,16 +106,17 @@ def calc(lammps_command: str,
     """
     
     # Run ptd_energy to refine values
-    results_dict = pointdefect(lammps_command,
-                               system,
-                               potential,
-                               point_kwargs,
-                               mpi_command = mpi_command,
-                               etol = etol,
-                               ftol = ftol,
-                               maxiter = maxiter,
-                               maxeval = maxeval,
-                               dmax = dmax)
+    results_dict = point_defect_relax(lammps_command,
+                                      system,
+                                      potential,
+                                      point_kwargs,
+                                      mpi_command = mpi_command,
+                                      etol = etol,
+                                      ftol = ftol,
+                                      maxiter = maxiter,
+                                      maxeval = maxeval,
+                                      dmax = dmax,
+                                      usefiles = usefiles)
     
     # Run check_ptd_config
     results_dict2 = check_ptd_config(results_dict['system_ptd'],
@@ -130,27 +126,29 @@ def calc(lammps_command: str,
 
     return results_dict
 
-def pointdefect(lammps_command: str,
-                system: am.System,
-                potential: lmp.Potential,
-                point_kwargs: Union[list, dict],
-                mpi_command: Optional[str] = None,
-                etol: float = 0.0,
-                ftol: float = 0.0,
-                maxiter: int = 10000,
-                maxeval: int = 100000,
-                dmax: float = uc.set_in_units(0.01, 'angstrom')) -> dict:
+def point_defect_relax(lammps_command: Union[str, LAMMPSobj],
+                       system: am.System,
+                       potential: lammpspotential,
+                       point_kwargs: Union[list, dict],
+                       mpi_command: Optional[str] = None,
+                       etol: float = 0.0,
+                       ftol: unitfloat = 0.0,
+                       maxiter: int = 10000,
+                       maxeval: int = 100000,
+                       dmax: unitfloat = '0.01 angstrom',
+                       usefiles: bool = False) -> dict:
     """
     Adds one or more point defects to a system and evaluates the defect 
     formation energy.
     
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     system : atomman.System
         The system to perform the calculation on.
-    potential : atomman.lammps.Potential
+    potential : PotentialLAMMPS or PotentialLAMMPSKIM
         The LAMMPS implemented potential to use.
     point_kwargs : dict or list of dict
         One or more dictionaries containing the keyword arguments for
@@ -165,7 +163,7 @@ def pointdefect(lammps_command: str,
     etol : float, optional
         The energy tolerance for the structure minimization. This value is
         unitless. (Default is 0.0).
-    ftol : float, optional
+    ftol : float or str, optional
         The force tolerance for the structure minimization. This value is in
         units of force. (Default is 0.0).
     maxiter : int, optional
@@ -174,7 +172,7 @@ def pointdefect(lammps_command: str,
     maxeval : int, optional
         The maximum number of minimization evaluations to use (default is 
         100000).
-    dmax : float, optional
+    dmax : float or str, optional
         The maximum distance in length units that any atom is allowed to relax
         in any direction during a single minimization iteration (default is
         0.01 Angstroms).
@@ -199,63 +197,35 @@ def pointdefect(lammps_command: str,
         - **'dumpfile_ptd'** (*str*) - The filename of the LAMMPS dump file
           for the relaxed defect system.
     """
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
-    
-    #Get lammps version date
-    lammps_date = lmp.checkversion(lammps_command)['date']
-    
-    # Define lammps variables
-    lammps_variables = {}
-    system_info = system.dump('atom_data', f='perfect.dat',
-                              potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
-    lammps_variables['etol'] = etol
-    lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])
-    lammps_variables['maxiter'] = maxiter
-    lammps_variables['maxeval'] = maxeval
-    lammps_variables['dmax'] = dmax
-    
-    # Set dump_modify_format based on lammps_date
-    if lammps_date < datetime.date(2016, 8, 3):
-        lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e %.13e %.13e %.13e"'
-    else:
-        lammps_variables['dump_modify_format'] = 'float %.13e'
-    
-    # Write lammps input script
-    lammps_script = 'min.in'
-    template = read_calc_file('iprPy.calculation.point_defect_static',
-                              'min.template')
-    with open(lammps_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
 
-    # Run lammps to relax perfect.dat
-    output = lmp.run(lammps_command, script_name=lammps_script,
-                     mpi_command=mpi_command)
+    # Convert values given with units if needed
+    ftol = uc.set_in_units(ftol)
+    dmax = uc.set_in_units(dmax)
     
-    # Extract LAMMPS thermo data.
-    thermo = output.simulations[0]['thermo']
-    E_total_base = uc.set_in_units(thermo.PotEng.values[-1],
-                                   lammps_units['energy'])
-    E_pot = E_total_base / system.natoms
+    # Relax base system with an energy/force minimization
+    base_results = min(lmp, system, etol=etol, ftol=ftol,
+                       maxiter=maxiter, maxeval=maxeval, dmax=dmax,
+                       usefiles=usefiles)
     
-    pxx = uc.set_in_units(thermo.Pxx.values[-1], lammps_units['pressure'])
-    pyy = uc.set_in_units(thermo.Pyy.values[-1], lammps_units['pressure'])
-    pzz = uc.set_in_units(thermo.Pzz.values[-1], lammps_units['pressure'])
-    pxy = uc.set_in_units(thermo.Pxy.values[-1], lammps_units['pressure'])
-    pxz = uc.set_in_units(thermo.Pxz.values[-1], lammps_units['pressure'])
-    pyz = uc.set_in_units(thermo.Pyz.values[-1], lammps_units['pressure'])
+    
+    # Extract energy and pressures of base
+    Epot_base = base_results['PotEng']
+    Epot_base_atom = Epot_base / system.natoms
+    pxx = base_results['Pxx']
+    pyy = base_results['Pyy']
+    pzz = base_results['Pzz']
+    pxy = base_results['Pxy']
+    pxz = base_results['Pxz']
+    pyz = base_results['Pyz']
     pressure_base = np.array([[pxx, pxy, pxz], [pxy, pyy, pyz], [pxz, pyz, pzz]])
+    system_base = base_results['system_final']
     
-    # Rename log file
-    shutil.move('log.lammps', 'min-perfect-log.lammps')
-    
-    # Load relaxed system from dump file and copy old box vectors because 
-    # dump files crop the values.
-    last_dump_file = 'atom.' + str(thermo.Step.values[-1])
-    system_base = am.load('atom_dump', last_dump_file, symbols=system.symbols)
-    system_base.box_set(vects=system.box.vects)
-    system_base.dump('atom_dump', f='perfect.dump')
+    # Copy old box vectors if LAMMPS exe is used to minimize rounding
+    if not lmp.islib:
+        system_base.box_set(vects=system.box.vects)
+    system_base.dump('atom_dump', f='perfect.dump', float_format='%.17f')
     
     # Add defect(s)
     system_ptd = deepcopy(system_base)
@@ -264,43 +234,29 @@ def pointdefect(lammps_command: str,
     for pkwargs in point_kwargs:
         system_ptd = am.defect.point(system_ptd, **pkwargs)
     
-    # Update lammps variables
-    system_info = system_ptd.dump('atom_data', f='defect.dat',
-                                  potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
+    # Relax defect system with an energy/force minimization
+    ptd_results = min(lmp, system_ptd, etol=etol, ftol=ftol,
+                      maxiter=maxiter, maxeval=maxeval, dmax=dmax,
+                      usefiles=usefiles)
     
-    # Write lammps input script
-    with open(lammps_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
-    
-    # Run lammps
-    output = lmp.run(lammps_command, script_name=lammps_script,
-                     mpi_command=mpi_command)
-    
-    # Extract lammps thermo data
-    thermo = output.simulations[0]['thermo']
-    E_total_ptd = uc.set_in_units(thermo.PotEng.values[-1],
-                                  lammps_units['energy'])
-    pxx = uc.set_in_units(thermo.Pxx.values[-1], lammps_units['pressure'])
-    pyy = uc.set_in_units(thermo.Pyy.values[-1], lammps_units['pressure'])
-    pzz = uc.set_in_units(thermo.Pzz.values[-1], lammps_units['pressure'])
-    pxy = uc.set_in_units(thermo.Pxy.values[-1], lammps_units['pressure'])
-    pxz = uc.set_in_units(thermo.Pxz.values[-1], lammps_units['pressure'])
-    pyz = uc.set_in_units(thermo.Pyz.values[-1], lammps_units['pressure'])
+    # Extract energy and pressures of ptd
+    Epot_ptd = ptd_results['PotEng']
+    pxx = ptd_results['Pxx']
+    pyy = ptd_results['Pyy']
+    pzz = ptd_results['Pzz']
+    pxy = ptd_results['Pxy']
+    pxz = ptd_results['Pxz']
+    pyz = ptd_results['Pyz']
     pressure_ptd = np.array([[pxx, pxy, pxz], [pxy, pyy, pyz], [pxz, pyz, pzz]])
+    system_ptd = ptd_results['system_final']
     
-    # Rename log file
-    shutil.move('log.lammps', 'min-defect-log.lammps')
-    
-    # Load relaxed system from dump file and copy old vects as 
-    # the dump files crop the values
-    last_dump_file = 'atom.'+str(thermo.Step.values[-1])
-    system_ptd = am.load('atom_dump', last_dump_file, symbols=system_ptd.symbols)
-    system_ptd.box_set(vects=system.box.vects)
-    system_ptd.dump('atom_dump', f='defect.dump')
+    # Copy old box vectors if LAMMPS exe is used to minimize rounding
+    if not lmp.islib:
+        system_ptd.box_set(vects=system.box.vects)
+    system_ptd.dump('atom_dump', f='defect.dump', float_format='%.17f')
     
     # Compute defect formation energy
-    E_ptd_f = E_total_ptd - E_pot * system_ptd.natoms
+    E_ptd_f = Epot_ptd - Epot_base_atom * system_ptd.natoms
     
     # Compute strain tensor
     pij = -(pressure_base - pressure_ptd) * system_base.box.volume
@@ -313,10 +269,10 @@ def pointdefect(lammps_command: str,
     
     # Return results
     results_dict = {}
-    results_dict['E_pot'] = E_pot
+    results_dict['E_pot'] = Epot_base_atom
     results_dict['E_ptd_f'] = E_ptd_f
-    results_dict['E_total_base'] = E_total_base
-    results_dict['E_total_ptd'] = E_total_ptd
+    results_dict['E_total_base'] = Epot_base
+    results_dict['E_total_ptd'] = Epot_ptd
     results_dict['pij_tensor'] = pij
     results_dict['system_base'] = system_base
     results_dict['system_ptd'] = system_ptd
@@ -325,10 +281,154 @@ def pointdefect(lammps_command: str,
     
     return results_dict
 
+def min(lmp: LAMMPSobj,
+        system: am.System,
+        etol: float = 0.0,
+        ftol: float = 0.0,
+        maxiter: int = 10000,
+        maxeval: int = 100000,
+        dmax: float = 0.01,
+        logfile: str = 'none',
+        usefiles: bool = False):
+
+    """
+    Performs an energy/force minimization calculation.
+    
+    Parameters
+    ----------
+    lmp : LAMMPSEXE or LAMMPSLIB
+        An atomman LAMMPS interface object.
+    system : atomman.System
+        The atomic configuration to evaluate.
+    etol : float, optional
+        The energy tolerance for the structure minimization. This value is
+        unitless. Default is 0.0.
+    ftol : float or str, optional
+        The force tolerance for the structure minimization. This value is in
+        units of force. Default is 0.0.
+    maxiter : int, optional
+        The maximum number of minimization iterations to use default is 
+        10000.
+    maxeval : int, optional
+        The maximum number of minimization evaluations to use default is 
+        100000.
+    dmax : float or str, optional
+        The maximum distance in length units that any atom is allowed to relax
+        in any direction during a single minimization iteration default is
+        0.01 Angstroms.
+    dump : bool, optional
+        If True, the initial and final configurations will be saved as LAMMPS dump
+        files.  Default value is False.
+    return_system : bool, optional
+        If True, the final relaxed configuration will be returned as an atomman.System
+        object.
+    tilt_large : bool, optional
+        For LAMMPS versions prior to Dec 2022, a "box tilt large" command was needed if
+        any box tilts exceed 50% of the reference box lengths.  Default value of False
+        will never include the extra line.  Ignored if using a newer LAMMPS version.
+    logfile : str or None, optional
+        The file name to use for LAMMPS log files.  If None (default),
+        no log file will be created.
+    lammps_units : dict, optional
+        Allows for passing in the units information associated with a LAMMPS
+        units option if already known.  If not given, then atomman.lammps.style.unit()
+        will be called using the unit setting for the potential.
+    lammps_date : datetime.date, optional
+        Allows for passing in the version date for the LAMMPS code being used.
+        If not given, this will be obtained by calling atomman.lammps.versiondate().
+
+    Returns
+    -------
+    dict
+        Dictionary of results consisting of keys:
+        - **'PotEng'** (*float*) - The total potential energy of the system.
+        - **'Lx'** (*float*) - The relaxed lx box length.
+        - **'Ly'** (*float*) - The relaxed ly box length.
+        - **'Lz'** (*float*) - The relaxed lz box length.
+        - **'Xy'** (*float*) - The relaxed xy box tilt.
+        - **'Xz'** (*float*) - The relaxed xz box tilt.
+        - **'Yz'** (*float*) - The relaxed yz box tilt.
+        - **'Pxx'** (*float*) - The measured xx component of the pressure on the system.
+        - **'Pyy'** (*float*) - The measured yy component of the pressure on the system.
+        - **'Pzz'** (*float*) - The measured zz component of the pressure on the system.
+        - **'Pxy'** (*float*) - The measured xy component of the pressure on the system.
+        - **'Pxz'** (*float*) - The measured xz component of the pressure on the system.
+        - **'Pyz'** (*float*) - The measured yz component of the pressure on the system.
+        - **'system_final'** (*atomman.System*) The relaxed system.  Only included if return_system is True.
+    """
+    if usefiles:
+        logfile = logfile
+        script = 'min.in'
+    else:
+        logfile = 'none'
+        script = None
+
+    # Pass system and potential info into LAMMPS
+    lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                  usefiles=usefiles, logfile=logfile)
+    
+    # Set up thermo info
+    lmp.cmd.thermo_style('custom', 'step', 'lx', 'ly', 'lz', 'xy', 'xz', 'yz',
+                         'pxx', 'pyy', 'pzz', 'pxy', 'pxz', 'pyz', 'pe')
+    lmp.cmd.thermo_modify('format', 'float', '%.17e')
+    
+    # Define compute for per atom potential energy
+    lmp.cmd.compute('peatom', 'all', 'pe/atom')
+
+    # Create dump file if needed/requested
+    if usefiles or not lmp.islib:
+        if lmp.potential.atom_style == 'charge':
+            dumpkeys = ['id', 'type', 'q', 'x', 'y', 'z', 'c_peatom']
+        else:
+            dumpkeys = ['id', 'type', 'x', 'y', 'z', 'c_peatom']
+        lmp.cmd.dump('dumpit', 'all', 'custom', maxiter, '*.dump', *dumpkeys)
+        lmp.cmd.dump_modify('dumpit', 'format', 'float', '%.17e')
+
+    # Minimization settings and run
+    lmp.cmd.min_modify('dmax', uc.get_in_units(dmax, lmp.unitsdict['length']))
+    lmp.cmd.minimize(etol, uc.get_in_units(ftol, lmp.unitsdict['force']), maxiter, maxeval)
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
+
+    if log is None:
+        # Get thermo directly from lammps object if no log file
+        thermo: dict = lmp.last_thermo()
+    else:
+        # Extract thermo terms from log output
+        thermo = log.simulations[-1].thermo.iloc[-1].to_dict()
+
+    # Convert units on standard thermo terms
+    lmp.set_thermo_units(thermo)
+
+
+    if usefiles or not lmp.islib:
+        # Read final system from dump file
+        final_dump = f'{int(thermo["Step"])}.dump'
+        system_final = am.load('atom_dump', final_dump, symbols=system.symbols,
+                               lammps_units=lmp.potential.units)
+
+    else:
+        # Load final system information directly from LAMMPS
+        system_final = am.load('lammps_lib', lmp, symbols=system.symbols,
+                               lammps_units=lmp.potential.units)
+        if lmp.potential.atom_style == 'charge':
+            charge = lmp.numpy.extract_atom('q', nelem=system.natoms, dim=1)
+            system_final.atoms.charge = charge
+        system_final.atoms.c_peatom = lmp.numpy.extract_compute('peatom', lammps.LMP_STYLE_ATOM, lammps.LMP_TYPE_VECTOR)
+    
+    # Unit conversion of system_final atom properties
+    system_final.atoms.c_peatom = uc.set_in_units(system_final.atoms.c_peatom, lmp.unitsdict['energy'])
+    if 'charge' in system_final.atoms_prop():
+        system_final.atoms.charge = uc.set_in_units(system_final.atoms.charge, lmp.unitsdict['charge'])
+
+    thermo['system_final'] = system_final
+    return thermo
+
 def check_ptd_config(system: am.System,
                      point_kwargs: Union[list, dict],
-                     cutoff: float,
-                     tol: float = uc.set_in_units(1e-5, 'angstrom')) -> dict:
+                     cutoff: unitfloat,
+                     tol: unitfloat = '1e-5 angstrom') -> dict:
     """
     Evaluates a relaxed system containing a point defect to determine if the
     defect structure has transformed to a different configuration.
@@ -363,7 +463,10 @@ def check_ptd_config(system: am.System,
           parameter used for evaluating if the configuration has relaxed.
           Only given for dumbbell-style defects.
     """
-    
+    # Convert values given with units if needed
+    cutoff = uc.set_in_units(cutoff)
+    tol = uc.set_in_units(tol)
+
     # Check if point_kwargs is a list
     if not isinstance(point_kwargs, (list, tuple)):
         pos = point_kwargs['pos']

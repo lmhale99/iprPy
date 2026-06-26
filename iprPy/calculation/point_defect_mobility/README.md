@@ -12,7 +12,8 @@ The point_defect_mobility calculation style uses a nudged elastic band (NEB) cal
 
 - 2019-8-09: Calculation created by Jacob Hechter.
 - 2024-4-24: Calculation updated to current iprPy, and code and methodology cleaned up.
-
+- v0.12.0: Method updated to support the LAMMPS library interface.
+  
 ### Additional dependencies
 
 ### Disclaimers

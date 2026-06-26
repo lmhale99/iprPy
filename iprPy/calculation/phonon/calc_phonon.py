@@ -1,11 +1,8 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale
 
 # Standard Python libraries
 from pathlib import Path
-from typing import Optional
-import datetime
+from typing import Optional, Union
 
 # http://www.numpy.org/
 import numpy as np
@@ -25,16 +22,13 @@ from DataModelDict import DataModelDict as DM
 
 # https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
-from atomman.tools import filltemplate
+from atomman.typing import lammpspotential
+from atomman.lammps import LAMMPS, LAMMPSobj
 
-# iprPy imports
-from ...tools import read_calc_file
-
-def phonon_quasiharmonic(lammps_command: str,
+def phonon_quasiharmonic(lammps_command: Union[str, LAMMPSobj],
                          ucell: am.System,
-                         potential: lmp.Potential,
+                         potential: lammpspotential,
                          mpi_command: Optional[str] = None,
                          a_mult: int = 2,
                          b_mult: int = 2,
@@ -42,18 +36,20 @@ def phonon_quasiharmonic(lammps_command: str,
                          distance: float = 0.01,
                          symprec: float = 1e-5,
                          strainrange: float = 0.01,
-                         numstrains: int = 5) -> dict:
+                         numstrains: int = 5,
+                         usefiles: bool = False) -> dict:
     """
     Function that performs phonon and quasiharmonic approximation calculations
     using phonopy and LAMMPS.
 
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     ucell : atomman.System
         The unit cell system to perform the calculation on.
-    potential : atomman.lammps.Potential
+    potential : PotentialLAMMPS or PotentialLAMMPSKIM
         The LAMMPS implemented potential to use.
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
@@ -81,12 +77,9 @@ def phonon_quasiharmonic(lammps_command: str,
         Must be an odd integer.  If 1, then the quasiharmonic calculations
         will not be performed.  Default value is 5.
     """
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
-    
-    # Get lammps version date
-    lammps_date = lmp.checkversion(lammps_command)['date']
-    
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
+
     # Convert ucell to a primitive cell
     ucell = ucell.dump('primitive_cell', symprec=symprec)
 
@@ -95,11 +88,9 @@ def phonon_quasiharmonic(lammps_command: str,
 
     # Generate the range of strains
     if numstrains == 1:
-        zerostrain = phononcalc(lammps_command, ucell, potential,
-                                mpi_command=mpi_command,
+        zerostrain = phononcalc(lmp, ucell,
                                 a_mult=a_mult, b_mult=b_mult, c_mult=c_mult,
-                                distance=distance, symprec=symprec,
-                                lammps_date=lammps_date)
+                                distance=distance, symprec=symprec, usefiles=usefiles)
         phonons = [zerostrain['phonon']]
         qha = None
 
@@ -137,40 +128,18 @@ def phonon_quasiharmonic(lammps_command: str,
             volumes.append(ucell.box.volume)
             system = ucell.supersize(a_mult, b_mult, c_mult)
 
-            # Define lammps variables
-            lammps_variables = {}
-            system_info = system.dump('atom_data', f='disp.dat',
-                                    potential=potential)
-            lammps_variables['atomman_system_pair_info'] = system_info
-
-            # Set dump_modify_format based on lammps_date
-            if lammps_date < datetime.date(2016, 8, 3):
-                lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e %.13e %.13e"'
-            else:
-                lammps_variables['dump_modify_format'] = 'float %.13e'
-
-            # Write lammps input script
-            lammps_script = 'phonon.in'
-            template = read_calc_file('iprPy.calculation.phonon', 'phonon.template')
-            with open(lammps_script, 'w') as f:
-                f.write(filltemplate(template, lammps_variables, '<', '>'))
-
-            # Run LAMMPS
-            output = lmp.run(lammps_command, script_name='phonon.in',
-                             mpi_command=mpi_command)
-
-            # Extract system energy
-            thermo = output.simulations[0]['thermo']
-            energy = uc.set_in_units(thermo.PotEng.values[-1], lammps_units['energy'])
+            results = run0(lmp, system, usefiles=usefiles)
+            
+            energy = results['PotEng']
 
             # Scale energy by sizemults and append to list
             energies.append(energy / (a_mult * b_mult * c_mult))
 
             # Compute phonon info for ucell
-            phononinfo = phononcalc(lammps_command, ucell, potential, mpi_command=mpi_command,
+            phononinfo = phononcalc(lmp, ucell,
                                     a_mult=a_mult, b_mult=b_mult, c_mult=c_mult,
                                     distance=distance, symprec=symprec, istrain=istrain,
-                                    plot=zerostrainrun, lammps_date=lammps_date)
+                                    usefiles=usefiles)
             phonons.append(phononinfo['phonon'])
             
             # Extract temperature values from the first run
@@ -212,7 +181,7 @@ def phonon_quasiharmonic(lammps_command: str,
             except:
                 qha = None
     
-    results = {}    
+    results = {}
     
     # Add phonopy objects
     results['phonon_objects'] = phonons
@@ -272,11 +241,8 @@ def phonon_quasiharmonic(lammps_command: str,
 
     return results
 
-
-def phononcalc(lammps_command: str,
+def phononcalc(lmp: LAMMPSobj,
                ucell: am.System,
-               potential: lmp.Potential,
-               mpi_command: Optional[str] = None,
                a_mult: int = 2,
                b_mult: int = 2,
                c_mult: int = 2,
@@ -284,7 +250,7 @@ def phononcalc(lammps_command: str,
                symprec: float = 1e-5,
                istrain: str = '',
                plot: bool = True,
-               lammps_date: Optional[datetime.date] = None) -> dict:
+               usefiles: bool = False) -> dict:
     """
     Uses phonopy to compute the phonons for a unit cell structure using a
     LAMMPS interatomic potential.
@@ -326,20 +292,17 @@ def phononcalc(lammps_command: str,
         The version date associated with lammps_command.  If not given, the
         version will be identified.
     """
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
-    
-    # Get lammps version date
-    if lammps_date is None:
-        lammps_date = lmp.checkversion(lammps_command)['date']
-    
-   # Convert ucell to a primitive cell
-    ucell = ucell.dump('primitive_cell', symprec=symprec)
-    
+    try:
+        from phonopy.physical_units import get_physical_units
+        factor = get_physical_units().DefaultToTHz
+    except:
+        factor = phonopy.units.VaspToTHz
+
     # Initialize Phonopy object
-    phonon = phonopy.Phonopy(ucell.dump('phonopy_Atoms', symbols=potential.elements(ucell.symbols)),
+    symbols = lmp.potential.elements(ucell.symbols)
+    phonon = phonopy.Phonopy(ucell.dump('phonopy_Atoms', symbols=symbols),
                              [[a_mult, 0, 0], [0, b_mult, 0], [0, 0, c_mult]],
-                             factor=phonopy.units.VaspToTHz)
+                             factor=factor)
     phonon.generate_displacements(distance=distance)
     
     # Loop over displaced supercells to compute forces
@@ -348,42 +311,18 @@ def phononcalc(lammps_command: str,
         
         # Save to LAMMPS data file
         system = am.load('phonopy_Atoms', supercell, symbols=ucell.symbols)
-        system_info = system.dump('atom_data', f='disp.dat',
-                                  potential=potential)
-        
-        # Define lammps variables
-        lammps_variables = {}
-        lammps_variables['atomman_system_pair_info'] = system_info
-
-        # Set dump_modify_format based on lammps_date
-        if lammps_date < datetime.date(2016, 8, 3):
-            lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e %.13e %.13e"'
-        else:
-            lammps_variables['dump_modify_format'] = 'float %.13e'
-
-        # Write lammps input script
-        lammps_script = 'phonon.in'
-        template = read_calc_file('iprPy.calculation.phonon', 'phonon.template')
-        with open(lammps_script, 'w') as f:
-            f.write(filltemplate(template, lammps_variables, '<', '>'))
-        
-        # Run LAMMPS
-        lmp.run(lammps_command, script_name=lammps_script, mpi_command=mpi_command)
-        
-        # Extract forces from dump file
-        forcestructure = am.load('atom_dump', 'forces.dump')
-        forces = uc.set_in_units(forcestructure.atoms.force, lammps_units['force'])
-        forcearrays.append(forces)
+        results = run0(lmp, system, usefiles=usefiles)
+        forcearrays.append(uc.get_in_units(results['F'], 'eV/angstrom'))
     
     results = {}
 
     # Set computed forces
     phonon.forces = forcearrays
     
-    # Save to yaml file    
+    # Save to yaml file
     phonon.save(f'phonopy_params{istrain}.yaml')
     
-    # Compute band structure    
+    # Compute band structure
     phonon.produce_force_constants()
     phonon.auto_band_structure(plot=plot)
     results['band_structure'] = phonon.get_band_structure_dict()
@@ -407,6 +346,59 @@ def phononcalc(lammps_command: str,
 
     results['phonon'] = phonon
     return results
+
+def run0(lmp: LAMMPSobj,
+         system: am.System,
+         usefiles: bool = False) -> dict:
+
+    # Handle file generation settings
+    if usefiles:
+        logfile = 'log.lammps'
+        script = 'run0.in'
+    else:
+        logfile = 'none'
+        script = None
+
+    # Pass system and potential info into LAMMPS
+    lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                  usefiles=usefiles, logfile=logfile)
+
+    # Set up thermo style
+    lmp.cmd.thermo_style('custom', 'step', 'pe')
+    lmp.cmd.thermo_modify('format', 'float', '%.17e')
+    
+    # Optionally dump forces to a file
+    if usefiles or not lmp.islib:
+        lmp.cmd.dump('dumpy', 'all', 'custom', '1', 'forces.dump', 'id', 'type', ' fx', 'fy', 'fz')
+        lmp.cmd.dump_modify('dumpy', 'format', 'float', '%.17e')
+
+    # Perform a run 0 to evaluate the system
+    lmp.cmd.fix('nve', 'all', 'nve')
+    lmp.cmd.run(0)
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
+
+    if log is None:
+        # Get thermo directly from lammps object if no log file
+        thermo: dict = lmp.last_thermo()
+    else:
+        # Extract thermo terms from log output
+        thermo = log.simulations[0].thermo.iloc[0].to_dict()
+
+    # Convert units on standard thermo terms
+    lmp.set_thermo_units(thermo)
+
+    # Get forces directly or from the dump file
+    if lmp.islib and not usefiles:
+        thermo['F'] = lmp.numpy.extract_atom('f', nelem=system.natoms, dim=3)
+    else:
+        system = am.load('atom_dump', 'forces.dump')
+        thermo['F'] = system.atoms.force
+    thermo['F'] = uc.set_in_units(thermo['F'], lmp.unitsdict['force'])
+
+    return thermo
+
 
 def save_band_structure(band_structure_dict):
     """Create a JSON file containing the zero strain band structure data"""

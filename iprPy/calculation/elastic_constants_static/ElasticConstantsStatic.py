@@ -1,4 +1,3 @@
-# coding: utf-8
 # Standard Python libraries
 from io import IOBase
 from pathlib import Path
@@ -85,8 +84,7 @@ class ElasticConstantsStatic(Calculation):
     def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
-            'elastic_constants_static.py',
-            'cij.template'
+            'elastic_constants_static.py'
         ]
 
 ############################## Class attributes ###############################

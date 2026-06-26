@@ -9,8 +9,9 @@ The phonon calculation style applies small atomic displacements to a unit cell s
 ### Version notes
 
 - 2020-12-21: Script extended to include quasiharmonic calculations.
-- 2022-03-11: Notebook updated to reflect version 0.11.
-
+- v0.11.0: Notebook updated to reflect version 0.11.
+- v0.12.0: Method updated to support the LAMMPS library interface.
+  
 ### Additional dependencies
 
 - [spglib](https://atztogo.github.io/spglib/python-spglib.html)
