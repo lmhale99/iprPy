@@ -12,7 +12,8 @@ The dislocation_monopole calculation style calculation inserts a dislocation mon
 - 2019-07-30: Method and Notebook updated for iprPy version 0.9.
 - 2020-09-22: Notebook updated to reflect that calculation method has changed to now use atomman.defect.Dislocation.
 - 2022-03-11: Notebook updated to reflect version 0.11.
-
+- v0.12.0: Method updated to support the LAMMPS library interface.
+  
 ### Additional dependencies
 
 ### Disclaimers

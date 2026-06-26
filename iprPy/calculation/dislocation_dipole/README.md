@@ -9,7 +9,8 @@ The dislocation_dipole calculation style calculation creates a small-cell disloc
 ### Version notes
 
 - 2024-12-19: Calculation added
-
+- v0.12.0: Method updated to support the LAMMPS library interface.
+  
 ### Additional dependencies
 
 ### Disclaimers

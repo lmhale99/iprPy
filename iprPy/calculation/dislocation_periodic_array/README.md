@@ -12,7 +12,8 @@ The dislocation_periodic_array calculation constructs an atomic system with a pe
 - 2020-05-22: Notebook updated for iprPy version 0.10 and tested for hcp
 - 2020-09-22: Notebook updated to reflect that calculation method has changed to now use atomman.defect.Dislocation. Setup and parameter definition cleaned up and streamlined.
 - 2022-03-11: Notebook updated to reflect version 0.11.
-
+- v0.12.0: Method updated to support the LAMMPS library interface.
+  
 ### Additional dependencies
 
 ### Disclaimers

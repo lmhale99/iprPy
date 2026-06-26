@@ -1,5 +1,3 @@
-# coding: utf-8
-
 # Standard Python libraries
 from io import IOBase
 from pathlib import Path
@@ -91,8 +89,7 @@ class DislocationDipole(Calculation):
     def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
-            'dislocation_dipole.py',
-            'disl_relax.template'
+            'dislocation_dipole.py'
         ]
 
 ############################## Class attributes ###############################

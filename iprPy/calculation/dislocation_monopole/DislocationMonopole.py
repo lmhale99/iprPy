@@ -1,5 +1,3 @@
-# coding: utf-8
-
 # Standard Python libraries
 from io import IOBase, BytesIO
 from pathlib import Path
@@ -100,8 +98,7 @@ class DislocationMonopole(Calculation):
     def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
-            'dislocation_monopole.py',
-            'disl_relax.template'
+            'dislocation_monopole.py'
         ]
 
 ############################## Class attributes ###############################
