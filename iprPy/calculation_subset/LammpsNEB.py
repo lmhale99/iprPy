@@ -51,7 +51,6 @@ class LammpsNEB(CalculationSubset):
         self.forcetolerance = 0.0
         self.minsteps = 10000
         self.climbsteps = 10000
-        self.timestep = uc.set_in_units(0.01, 'ps')
         self.maxatommotion = uc.set_in_units(0.01, 'angstrom') 
 
 ############################## Class attributes ################################
@@ -133,18 +132,6 @@ class LammpsNEB(CalculationSubset):
         self.__climbsteps = val
 
     @property
-    def timestep(self) -> float:
-        """float: The timestep to use with the quickmin minimization"""
-        return self.__timestep
-
-    @timestep.setter
-    def timestep(self, val: Union[str, float]):
-        if isinstance(val, str):
-            self.__timestep = uc.set_literal(val)
-        else:
-            self.__timestep = float(val)
-
-    @property
     def maxatommotion(self) -> float:
         """float: The max distance for atomic relaxations each iteration"""
         return self.__maxatommotion
@@ -201,8 +188,6 @@ class LammpsNEB(CalculationSubset):
             self.minsteps = kwargs['minsteps']
         if 'climbsteps' in kwargs:
             self.climbsteps = kwargs['climbsteps']
-        if 'timestep' in kwargs:
-            self.timestep = kwargs['timestep']
         if 'maxatommotion' in kwargs:
             self.maxatommotion = kwargs['maxatommotion']
 
@@ -258,10 +243,6 @@ class LammpsNEB(CalculationSubset):
                 "The maximum number of NEB climbing steps to perform.",
                 "This value corresponds to the N2 term for the LAMMPS",
                 "neb command. Default value is 10000."]),
-            'timestep': ' '.join([
-                "The timestep to use with the quickmin minimization algorithm",
-                "used for the NEB relaxations.  This value is in units of time.",
-                "Default value is '0.01 ps'."]),
             'maxatommotion': ' '.join([
                 "The maximum distance that any atom can move during a minimization",
                 "iteration. This value is in units length and corresponds to the",
@@ -316,9 +297,6 @@ class LammpsNEB(CalculationSubset):
                                     default_term='0.0')
         self.minsteps = input_dict.get(keymap['minsteps'], 10000)
         self.climbsteps = input_dict.get(keymap['climbsteps'], 10000)
-        self.timestep = value(input_dict, keymap['timestep'],
-                              default_unit='ps',
-                              default_term='0.01 ps')
         self.maxatommotion = value(input_dict, keymap['maxatommotion'],
                                    default_unit=self.parent.units.length_unit,
                                    default_term='0.01 angstrom')
@@ -339,7 +317,6 @@ class LammpsNEB(CalculationSubset):
         self.forcetolerance = uc.value_unit(run_params[f'{self.modelprefix}forcetolerance'])
         self.minsteps = run_params[f'{self.modelprefix}minsteps']
         self.climbsteps = run_params[f'{self.modelprefix}climbsteps']
-        self.timestep = uc.value_unit(run_params[f'{self.modelprefix}timestep'])
         self.maxatommotion = uc.value_unit(run_params[f'{self.modelprefix}maxatommotion'])
 
     def build_model(self,
@@ -379,7 +356,6 @@ class LammpsNEB(CalculationSubset):
                                                               self.parent.units.force_unit)
         run_params[f'{self.modelprefix}minsteps']  = self.minsteps
         run_params[f'{self.modelprefix}climbsteps'] = self.climbsteps
-        run_params[f'{self.modelprefix}timestep']  = uc.model(self.timestep, 'ps')
         run_params[f'{self.modelprefix}maxatommotion']  = uc.model(self.maxatommotion,
                                                               self.parent.units.length_unit)
 
@@ -405,7 +381,6 @@ class LammpsNEB(CalculationSubset):
         meta[f'{prefix}forcetolerance'] = self.forcetolerance
         meta[f'{prefix}minsteps'] = self.minsteps
         meta[f'{prefix}climbsteps'] = self.climbsteps
-        meta[f'{prefix}timestep'] = self.timestep
         meta[f'{prefix}maxatommotion'] = self.maxatommotion
 
 ########################### Calculation interactions ##########################
@@ -431,5 +406,4 @@ class LammpsNEB(CalculationSubset):
         input_dict['ftol'] = self.forcetolerance
         input_dict['minsteps'] = self.minsteps
         input_dict['climbsteps'] = self.climbsteps
-        input_dict['timestep'] = self.timestep
         input_dict['dmax'] = self.maxatommotion
