@@ -1,4 +1,3 @@
-# coding: utf-8
 # Standard Python libraries
 from io import IOBase
 from pathlib import Path
@@ -88,8 +87,7 @@ class PointDefectMobility(Calculation):
     def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
-                 'point_defect_mobility.py',
-                 'neb_lammps.template',
+                 'point_defect_mobility.py'
         ]
 
 ############################## Class attributes ################################

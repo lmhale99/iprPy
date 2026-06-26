@@ -1,28 +1,25 @@
-# coding: utf-8
-
 # Python script created by Jacob Hechter and Lucas Hale
 
 # Standard library imports
-import datetime
 from typing import Optional, Union
 from copy import deepcopy
+from pathlib import Path
+import shlex
+import shutil
 
 # http://www.numpy.org/
 import numpy as np 
 import numpy.typing as npt
 
-# https://github.com/usnistgov/atomman 
+# https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
-from atomman.tools import filltemplate
+from atomman.typing import lammpspotential, unitfloat
+from atomman.lammps import LAMMPS, LAMMPSobj
 
-# iprPy imports
-from ...tools import read_calc_file
-
-def point_defect_mobility(lammps_command: str,
+def point_defect_mobility(lammps_command: Union[str, LAMMPSobj],
                           system: am.System,
-                          potential: lmp.Potential,
+                          potential: lammpspotential,
                           neb_pos1: npt.ArrayLike,
                           neb_pos2: npt.ArrayLike,
                           mpi_command: Optional[str] = None,
@@ -31,14 +28,14 @@ def point_defect_mobility(lammps_command: str,
                           partition: Optional[str] = None,
                           point_kwargs: Union[list, dict, None] = None,
                           etol: float = 0.0,
-                          ftol: float = 0.0,
-                          dmax: float = uc.set_in_units(0.01, 'angstrom'),
-                          springconst: float = 5, 
+                          ftol: unitfloat = 0.0,
+                          dmax: unitfloat = '0.01 angstrom',
+                          springconst: unitfloat = '5 eV/angstrom^2',
                           thermosteps: int = 100,
                           dumpsteps: Optional[int] = None,
-                          timestep: float = uc.set_in_units(0.01, 'ps'),
                           minsteps: int = 10000,
-                          climbsteps: int = 10000):
+                          climbsteps: int = 10000,
+                          usefiles: bool = False):
     """
     Evaluates the mobility of point defects using NEB.
 
@@ -96,9 +93,6 @@ def point_defect_mobility(lammps_command: str,
         Default value of None will set this to the max of (minsteps, climbsteps)
         so that only three states will be dumped: the initial unrelaxed, and the
         relaxed states at the end of the two NEB operations. 
-    timestep : float, optional
-        The timestep to use with the quickmin minimization algorithm.  Default
-        value is 0.001 ps.
     minsteps : int, optional
         The maximum number of steps to perform during the NEB minimization
         operation.  Default value is 10000.
@@ -122,6 +116,22 @@ def point_defect_mobility(lammps_command: str,
         - **'reverse_barrier'** (*float*) - The energy barrier for the reverse
           reaction: difference between max energy and the last replica's energy.
     """
+    # Build the partition option for the LAMMPS command
+    if partition is None:
+        partition = f'{numreplicas}x1'
+    
+    # Create a LAMMPS object if needed
+    if isinstance(lammps_command, str) and shutil.which(shlex.split(lammps_command)[0]) is None:
+        cmdargs = ['-l', 'none', '-screen', 'none', '-partition', partition]
+    else:
+        cmdargs = None
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, cmdargs=cmdargs,
+                 potential=potential)
+
+    # Convert values given with units if needed
+    ftol = float(uc.set_in_units(ftol))
+    dmax = float(uc.set_in_units(dmax))
+    springconst = float(uc.set_in_units(springconst))
 
     # First check of pos values
     neb_pos1 = np.asarray(neb_pos1)
@@ -183,13 +193,12 @@ def point_defect_mobility(lammps_command: str,
     lastsystem = am.System(atoms=atoms2, box=firstsystem.box)
             
     # Run NEB
-    neblog = neb(lammps_command, firstsystem, lastsystem, potential,
-                 mpi_command=mpi_command, partition=partition,
+    neblog = neb(lmp, firstsystem, lastsystem, partition=partition,
                  id_key='a_id', id_start0=True,
                  etol=etol, ftol=ftol, dmax=dmax, numreplicas=numreplicas,
                  springconst=springconst, thermosteps=thermosteps,
-                 dumpsteps=dumpsteps, timestep=timestep, minsteps=minsteps,
-                 climbsteps=climbsteps)
+                 dumpsteps=dumpsteps, minsteps=minsteps,
+                 climbsteps=climbsteps, usefiles=usefiles)
 
     # Get final step and NEB path values at that step
     finalstep = neblog.climbrun.Step.values[-1]
@@ -203,7 +212,7 @@ def point_defect_mobility(lammps_command: str,
     # Get the moving atom positions for each replica
     moving_pos = np.empty((len(a_ids), numreplicas, 3))
     for r in range(numreplicas):
-        replica = am.load('atom_dump', f'step-{finalstep}.replica-{r+1}.dump')    
+        replica = am.load('atom_dump', f'step-{finalstep}.replica-{r+1}.dump')
         for i, a_id in enumerate(a_ids):
             moving_pos[i, r, :] = replica.atoms.pos[a_id, :]
     results['neb_positions'] = moving_pos
@@ -214,24 +223,22 @@ def point_defect_mobility(lammps_command: str,
 
     return results
 
-def neb(lammps_command: str,
+def neb(lmp: LAMMPSobj,
         firstsystem: am.System,
         lastsystem: am.System,
-        potential: lmp.Potential,
-        mpi_command: Optional[str] = None,
-        numreplicas: int = 11, 
-        partition: Optional[str] = None,
+        numreplicas: int,
+        partition: str,
         id_key: Optional[str] = None,
         id_start0: bool = True,
         etol: float = 0.0,
         ftol: float = 0.0,
-        dmax: float = uc.set_in_units(0.01, 'angstrom'),
+        dmax: float = 0.01,
         springconst: float = 5, 
         thermosteps: int = 100,
         dumpsteps: Optional[int] = None, 
-        timestep: float = uc.set_in_units(0.01, 'ps'),
         minsteps: int = 10000,
-        climbsteps: int = 10000) -> dict:
+        climbsteps: int = 10000,
+        usefiles: bool = False) -> dict:
     """
     Sets up and runs the neb.template LAMMPS script for performing an NEB
     calculation between two configurations.
@@ -290,9 +297,6 @@ def neb(lammps_command: str,
         Default value of None will set this to the max of (minsteps, climbsteps)
         so that only three states will be dumped: the initial unrelaxed, and the
         relaxed states at the end of the two NEB operations. 
-    timestep : float, optional
-        The timestep to use with the quickmin minimization algorithm.  Default
-        value is 0.01 ps.
     minsteps : int, optional
         The maximum number of steps to perform during the NEB minimization
         operation.  Default value is 10000.
@@ -307,60 +311,60 @@ def neb(lammps_command: str,
         log.lammps values for both individual replicas and the overall NEB
         run.
     """
-    
-    # Dump the two systems
-    system_pair_info = firstsystem.dump('atom_data', f='init.dat',
-                                           potential=potential)
-    lastsystem.dump('neb_replica', f='final.dat',
-                     id_key=id_key, id_start0=id_start0)
+    logfile = 'log.lammps'
+    if usefiles or not lmp.islib:
+        script = 'neb_lammps.in'
+    else:
+        script = None
 
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
-    force_per_length = f"{lammps_units['force']}/{lammps_units['length']}"
-    
-    # Get lammps version date
-    lammps_date = lmp.checkversion(lammps_command)['date']
-    
     # Set default dumpsteps
     if dumpsteps is None:
         dumpsteps = max(minsteps, climbsteps)
 
-    # Define lammps variables
-    lammps_variables = {}
-    
-    lammps_variables['atomman_system_pair_info'] = system_pair_info
-    lammps_variables['numreplicas'] = numreplicas
-    lammps_variables['springconst'] = uc.get_in_units(springconst, force_per_length)
-    lammps_variables['thermosteps'] = thermosteps
-    lammps_variables['dumpsteps'] = dumpsteps
-    lammps_variables['timestep'] = uc.get_in_units(timestep, lammps_units['time'])
-    lammps_variables['minsteps'] = minsteps
-    lammps_variables['climbsteps'] = climbsteps
-    lammps_variables['dmax'] = uc.get_in_units(dmax, lammps_units['length'])
-    lammps_variables['etol'] = etol
-    lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])
-    lammps_variables['final_system'] = 'final.dat'
-    
-    # Set dump_modify_format based on lammps_date
-    if lammps_date < datetime.date(2016, 8, 3):
-        lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e %.13e %.13e %.13e"'
-    else:
-        lammps_variables['dump_modify_format'] = 'float %.13e'
-    
-    # Write lammps input script
-    lammps_script = 'neb_lammps.in'
-    template = read_calc_file('iprPy.calculation.point_defect_mobility',
-                              'neb_lammps.template')
-    with open(lammps_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
-    
-    # Add the partition option to the LAMMPS command
-    if partition is None:
-        partition = f'{numreplicas}x1'
+    # Timestep and timestep-dependent variables
+    timestep = am.lammps.style.timestep(lmp.potential.units)
 
-    # Run the calc_neb
-    output = lmp.run(lammps_command, script_name=lammps_script,
-                     partition=partition, mpi_command=mpi_command, screen=False)
-    neblog = lmp.NEBLog()
+    lmp.commands_string('# LAMMPS setting parameters')
+    lmp.cmd.clear()
+    lmp.cmd.atom_modify('map', 'array')
+
+    # Pass systems and potential info into LAMMPS
+    lmp.new_system_from_data_file(firstsystem, filename='init.dat', tilt_large=True,
+                                  usefiles=usefiles, logfile=logfile, clear=False)
+    lastsystem.dump('neb_replica', f='final.dat',
+                     id_key=id_key, id_start0=id_start0)
+
+    lmp.commands_string('# property compute definitions')
+    lmp.cmd.compute('peatom', 'all', 'pe/atom')
+
+    lmp.commands_string('# define neb')
+    springconst_units = f'{lmp.unitsdict['force']}/{lmp.unitsdict['length']}'
+    lmp.cmd.fix('neb', 'all', 'neb', uc.set_in_units(springconst, springconst_units))
+
+    lmp.commands_string('# dump file definition')
+    lmp.cmd.variable('i', 'uloop', numreplicas)
+    lmp.cmd.dump('dumpy', 'all', 'custom', dumpsteps, 'step-*.replica-${i}.dump',
+                 'id', 'type', 'x', 'y', 'z', 'c_peatom')
+    lmp.cmd.dump_modify('dumpy', 'format', 'float', '%.17e')
+
+    lmp.commands_string('# thermo definition')
+    lmp.cmd.thermo(thermosteps)
+    lmp.cmd.thermo_style('custom', 'step', 'lx', 'ly', 'lz', 'pe')
+    lmp.cmd.thermo_modify('format', 'float', '%.17e')
+
+    lmp.commands_string('# minimization definition')
+    lmp.cmd.timestep(timestep)
+    lmp.cmd.min_style('quickmin')
+    lmp.cmd.min_modify('dmax', uc.get_in_units(dmax, lmp.unitsdict['length']))
+
+    lmp.commands_string('# run neb')
+    lmp.cmd.neb(etol, uc.get_in_units(ftol, lmp.unitsdict['force']),
+                minsteps, climbsteps, thermosteps, 'final', 'final.dat')
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script, partition=partition)
+
+    # Read and return NEB log output
+    neblog = am.lammps.NEBLog()
 
     return neblog
