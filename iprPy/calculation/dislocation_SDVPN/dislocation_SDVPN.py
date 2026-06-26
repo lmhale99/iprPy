@@ -1,5 +1,3 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale
 
 # Standard library imports
@@ -11,16 +9,17 @@ import numpy as np
 # https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.unitconvert as uc
+from atomman.typing import  unitfloat, millerindices
 
 def sdvpn(ucell: am.System,
           C: am.ElasticConstants,
-          burgers: Union[list, np.ndarray],
-          ξ_uvw: Union[list, np.ndarray],
-          slip_hkl: Union[list, np.ndarray],
+          burgers: millerindices,
+          ξ_uvw: millerindices,
+          slip_hkl: millerindices,
           gamma: am.defect.GammaSurface,
           m: Union[list, np.ndarray] = [0,1,0],
           n: Union[list, np.ndarray] = [0,0,1],
-          cutofflongrange: float = uc.set_in_units(1000, 'angstrom'),
+          cutofflongrange: unitfloat = '1000 angstrom',
           tau: np.ndarray = np.zeros((3,3)),
           alpha: list = [0.0],
           beta: np.ndarray = np.zeros((3,3)),
@@ -28,11 +27,11 @@ def sdvpn(ucell: am.System,
           cdiffsurface: bool = True,
           cdiffstress: bool = False,
           fullstress: bool = True,
-          halfwidth: float = uc.set_in_units(1, 'angstrom'),
+          halfwidth: unitfloat = '1 angstrom',
           normalizedisreg: bool = True,
           xnum: Optional[int] = None,
-          xmax: Optional[float] = None,
-          xstep: Optional[float] = None,
+          xmax: Optional[unitfloat] = None,
+          xstep: Optional[unitfloat] = None,
           xscale: bool = False,
           min_method: str = 'Powell',
           min_options: dict = {},
@@ -141,6 +140,21 @@ def sdvpn(ucell: am.System,
         - **'disregistry_profiles'** (*list*) - The disregistry profiles
           obtained after each minimization cycle.
     """
+    # Convert values given with units if needed
+    cutofflongrange = uc.set_in_units(cutofflongrange)
+    halfwidth = uc.set_in_units(halfwidth)
+
+    # Scale xmax and xstep by alat
+    if xscale is True:
+        if xmax is not None:
+            xmax *= ucell.box.a
+        if xstep is not None:
+            xstep *= ucell.box.a
+    else:
+        if xmax is not None:
+            xmax = uc.set_in_units(xmax)
+        if xstep is not None:
+            xstep = uc.set_in_units(xstep)
 
     # Solve Volterra dislocation
     volterra = am.defect.solve_volterra_dislocation(C, burgers, ξ_uvw=ξ_uvw,
@@ -155,12 +169,7 @@ def sdvpn(ucell: am.System,
                                  cdiffsurface=cdiffsurface, cdiffstress=cdiffstress,
                                  min_method=min_method, min_options=min_options)
 
-    # Scale xmax and xstep by alat
-    if xscale is True:
-        if xmax is not None:
-            xmax *= ucell.box.a
-        if xstep is not None:
-            xstep *= ucell.box.a
+    
     
     # Generate initial disregistry guess
     x, idisreg = am.defect.pn_arctan_disregistry(xmax=xmax, xstep=xstep, xnum=xnum,
