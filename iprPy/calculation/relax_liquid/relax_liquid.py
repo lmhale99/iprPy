@@ -1,124 +1,109 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale
 
 # Standard library imports
 from pathlib import Path
-import datetime
-import random
-from typing import Optional
+from typing import Optional, Union
+
+# http://www.numpy.org/
+import numpy as np
 
 # https://github.com/usnistgov/atomman 
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
-from atomman.tools import filltemplate
+from atomman.typing import lammpspotential, unitfloat
+from atomman.lammps import LAMMPS, LAMMPSobj
+from atomman.thermo import RDF
 
-import numpy as np
-
-# iprPy imports
-from ...tools import read_calc_file
-
-def relax_liquid(lammps_command: str,
+def relax_liquid(lammps_command: Union[str, LAMMPSobj],
                  system: am.System,
-                 potential: lmp.Potential,
+                 potential: lammpspotential,
                  temperature: float,
                  mpi_command: Optional[str] = None,
-                 pressure: float = 0.0,
+                 pressure: unitfloat = 0.0,
                  temperature_melt: float = 3000.0,
-                 rdfcutoff: Optional[float] = None,
                  meltsteps: int = 50000,
-                 coolsteps: int = 10000,
-                 equilvolumesteps: int = 50000,
-                 equilvolumesamples: int = 300,
-                 equilenergysteps: int = 10000,
-                 equilenergysamples: int = 100,
-                 equilenergystyle: str = 'pe',
-                 runsteps: int = 50000,
+                 equilsteps: int = 20000,
+                 runsteps: int = 1000000,
                  dumpsteps: Optional[int] = None,
                  restartsteps: Optional[int] = None,
                  createvelocities: bool = True,
-                 randomseed: Optional[int] = None) -> dict:
+                 rdf_nbins: int = 400,
+                 rdf_minr: unitfloat = 0.0,
+                 rdf_maxr: unitfloat = '10.0 angstrom',
+                 rdf_delete_dump = True,
+                 randomseed: Optional[int] = None,
+                 usefiles: bool = False) -> dict:
     """
-    Performs a multi-stage simulation to obtain a liquid phase configuration 
-    at a given temperature. Radial displacement functions and mean squared
-    displacements are automatically computed for the system.
+    Performs an npt simulation with coupled box dimensions to obtain a liquid
+    phase configuration at a given temperature. Can be used for creating an
+    initial melt phase or for continuing relaxation of a previous melt phase.
+    
+    Radial displacement functions are automatically computed for the system
+    based on generated dump files allowing for any arbitrary cutoff distance.
     
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     system : atomman.System
         The system to perform the calculation on.
-    potential : atomman.lammps.Potential
+    potential : PotentialLAMMPS or PotentialLAMMPSKIM
         The LAMMPS implemented potential to use.
     temperature : float
         The target temperature to relax to.
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
         will run serially.
-    pressure : float, optional
-        The target hydrostatic pressure to relax to. Default value is 0. GPa.
+    pressure : float or str, optional
+        The target hydrostatic pressure to relax to. Default value is 0 GPa.
     temperature_melt : float, optional
         The elevated temperature to first use to hopefully melt the initial
-        configuration.
-    rdfcutoff : float, optional
-        The cutoff distance to use for the RDF cutoff.  If not given then
-        will use 4 * r0, where r0 is the shortest atomic distance found in
-        the given system configuration.
+        configuration during the meltsteps.
     meltsteps : int, optional
-        The number of npt integration steps to perform during the melting
-        stage at the melt temperature to create an amorphous liquid structure.
-        Default value is 50000.
-    coolsteps : int, optional
-        The number of npt integration steps to perform during the cooling
-        stage where the temperature is reduced from the melt temperature
-        to the target temperature.  Default value is 10000.
-    equilvolumesteps : int, optional
-        The number of npt integration steps to perform during the volume
-        equilibration stage where the system is held at the target temperature
-        and pressure to obtain an estimate for the relaxed volume.  Default
-        value is 50000.
-    equilvolumesamples : int, optional
-        The number of thermo samples from the end of the volume equilibration
-        stage to use in computing the average volume.  Cannot be larger than
-        equilvolumesteps / 100.  It is recommended to set smaller than the max
-        to allow for some convergence time.  Default value is 300. 
-    equilenergysteps : int, optional
-        The number of nvt integration steps to perform during the energy
-        equilibration stage where the system is held at the target temperature
-        to obtain an estimate for the total energy.  Default value is 10000.
-    equilenergysamples : int, optional
-        The number of thermo samples from the end of the energy equilibrium
-        stage to use in computing the target total energy.  Cannot be
-        larger than equilenergysteps / 100.  Default value is 100.
-    equilenergystyle : str, optional
-        Indicates which scheme to use for computing the target total energy.
-        Allowed values are 'pe' or 'te'.  For 'te', the average total energy
-        from the equilenergysamples is used as the target energy.  For 'pe',
-        the average potential energy plus 3/2 N kB T is used as the target
-        energy.  Default value is 'pe'.
+        The number of npt integration steps to perform at the melt temperature
+        to create an amorphous liquid structure.  Default value is 50,000.
+    equilsteps : int, optional
+        The number of npt integration steps to perform at the target temperature
+        and pressure prior to collecting the thermo and dump files for property
+        evaluation.  Default value is 20,000.
     runsteps : int or None, optional
-        The number of nve integration steps to perform on the system to
-        obtain measurements of MSD and RDF of the liquid. Default value is
-        50000.
+        The number of npt integration steps to perform at the target temperature
+        and pressure where thermo and dump files are used for property
+        evaluation.  Default value is 1,000,000.
     dumpsteps : int or None, optional
         Dump files will be saved every this many steps during the runsteps
-        simulation. Default is None, which sets dumpsteps equal to the sum of
-        all "steps" terms above so that only the final configuration is saved.
+        simulation.  Note that these are used to compute the RDF curve rather
+        than using the LAMMPS method to allow for larger RDF cutoffs.  Default
+        value of None will use runsteps / 100.
     restartsteps : int or None, optional
         Restart files will be saved every this many steps.  Default is None,
-        which sets dumpsteps equal to the sum of all "steps" terms above so
-        that only the final configuration is saved.
+        which will not create restart files.
     createvelocities : bool, optional
         If True (default), velocities will be created for the atoms prior to
         running the simulations.  Setting this to False can be useful if the
         initial system already has velocity information.
+    rdf_nbins : int, optional
+        The number of bins to use for the RDF calculation.  Default value is
+        400.
+    rdf_minr : float or str, optional
+        The minimum radial distance for the RDF calculation.  Default value
+        is 0.0 angstroms.
+    rdf_maxr: float or str, optional
+        The mxaimum radial distance for the RDF calculation.  Default value
+        is 10.0 angstroms.
+    rdf_delete_dump : bool, optional
+        If True (default), all dump files except for the final one will be
+        deleted after the RDF calculation.  Setting this to False will leave
+        all dump files allowing for further analysis.
     randomseed : int or None, optional
         Random number seed used by LAMMPS in creating velocities and with
         the Langevin thermostat.  Default is None which will select a
         random int between 1 and 900000000.
-    
+    usefiles : bool, optional
+        If set to True, then all input/output files for LAMMPS will be generated.
+        Default value of False will minimize the files created.
+
     Returns
     -------
     dict
@@ -128,179 +113,255 @@ def relax_liquid(lammps_command: str,
           created.
         - **'symbols_final'** (*list*) - The symbols associated with the final
           dump file.
-        - **'volume'** (*float*) - The volume per atom identified after the volume 
-          equilibration stage.
-        - **'volume_stderr'** (*float*) - The standard error in the volume per atom
-          measured during the volume equilibration stage.
-        - **'E_total'** (*float*) - The total energy of the system used during the nve
-          stage.
-        - **'E_total_stderr'** (*float*) - The standard error in the mean total energy
-          computed during the energy equilibration stage.
         - **'E_pot'** (*float*) - The mean measured potential energy during the energy
           equilibration stage.
         - **'E_pot_stderr'** (*float*) - The standard error in the mean potential energy
           during the energy equilibration stage.
-        - **'measured_temp'** (*float*) - The mean measured temperature during the nve
+        - **'E_total'** (*float*) - The total energy of the system used during the nve
           stage.
-        - **'measured_temp_stderr'** (*float*) - The standard error in the measured
-          temperature values of the nve stage.
+        - **'E_total_stderr'** (*float*) - The standard error in the mean total energy
+          computed during the energy equilibration stage.
+        - **'volume'** (*float*) - The volume per atom identified after the volume 
+          equilibration stage.
+        - **'volume_stderr'** (*float*) - The standard error in the volume per atom
+          measured during the volume equilibration stage.
         - **'measured_press'** (*float*) - The mean measured pressure during the nve
           stage.
         - **'measured_press_stderr'** (*float*) - The standard error in the measured
           pressure values of the nve stage.
-        - **'time_values'** (*numpy.array of float*) - The values of time that
-          correspond to the mean squared displacement values.
-        - **'msd_x_values'** (*numpy.array of float*) - The mean squared displacement
-          values only in the x direction.
-        - **'msd_y_values'** (*numpy.array of float*) - The mean squared displacement
-          values only in the y direction.
-        - **'msd_z_values'** (*numpy.array of float*) - The mean squared displacement
-          values only in the z direction.
-        - **'msd_values'** (*numpy.array of float*) - The total mean squared
-          displacement values.
-        - **'lammps_output'** (*atomman.lammps.Log*) - The LAMMPS logfile output.
-          Can be useful for checking the thermo data at each simulation stage.
-    
+        - **'measured_temp'** (*float*) - The mean measured temperature during the nve
+          stage.
+        - **'measured_temp_stderr'** (*float*) - The standard error in the measured
+          temperature values of the nve stage.
+        - **'rdf'** (*atomman.thermo.RDF*) - The RDF calculation object obtained
+          from the dump files.
     """
 
-    if equilenergystyle not in ['pe', 'te']:
-        raise ValueError('invalid equilenergystyle option: must be "pe" or "te"')
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
 
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
+    # Convert values given with units if needed
+    pressure = uc.set_in_units(pressure)
+    rdf_minr = uc.set_in_units(rdf_minr)
+    rdf_maxr = uc.set_in_units(rdf_maxr)
 
-    #Get lammps version date
-    lammps_date = lmp.checkversion(lammps_command)['date']
+    # Run LAMMPS simulation
+    results = liquid_npt(lmp, system, temperature, pressure=pressure,
+                         temperature_melt=temperature_melt,
+                         meltsteps=meltsteps, equilsteps=equilsteps,
+                         runsteps=runsteps, dumpsteps=dumpsteps,
+                         restartsteps=restartsteps, createvelocities=createvelocities,
+                         randomseed=randomseed, usefiles=usefiles)
+
+    # Compute RDF table based on dump files
+    rdf = compute_ave_rdf(rdf_nbins, rdf_minr, rdf_maxr)
+    results['rdf'] = rdf
     
+    # Delete all but the last dump file
+    if rdf_delete_dump:
+        for dump_file in Path('.').glob('*.dump'):
+            if dump_file.name != results['dumpfile_final']:
+                dump_file.unlink()
+
+    # Delete restart files now that calculation is finished
+    for restart_file in Path('.').glob('*.restart'):
+        restart_file.unlink()
+
+    return results
+
+def liquid_npt(lmp: LAMMPSobj,
+               system: am.System,
+               temperature: float,
+               pressure: float = 0.0,
+               temperature_melt: float = 3000.0,
+               meltsteps: int = 50000,
+               equilsteps: int = 20000,
+               runsteps: int = 1000000,
+               dumpsteps: Optional[int] = None,
+               restartsteps: Optional[int] = None,
+               createvelocities: bool = True,
+               randomseed: Optional[int] = None,
+               usefiles: bool = False) -> dict:
+    """
+    Runs the LAMMPS MD liquid relaxation simulation.
+
+    Parameters
+    ----------
+    lmp : LAMMPSEXE or LAMMPSLIB
+        An atomman LAMMPS interface object.
+    system : atomman.System
+        The atomic configuration to evaluate.
+    temperature : float
+        The target temperature to relax to.
+    pressure : float, optional
+        The target hydrostatic pressure to relax to. Default value is 0 GPa.
+    temperature_melt : float, optional
+        The elevated temperature to first use to hopefully melt the initial
+        configuration during the meltsteps.
+    meltsteps : int, optional
+        The number of npt integration steps to perform at the melt temperature
+        to create an amorphous liquid structure.  Default value is 50,000.
+    equilsteps : int, optional
+        The number of npt integration steps to perform at the target temperature
+        and pressure prior to collecting the thermo and dump files for property
+        evaluation.  Default value is 20,000.
+    runsteps : int or None, optional
+        The number of npt integration steps to perform at the target temperature
+        and pressure where thermo and dump files are used for property
+        evaluation.  Default value is 1,000,000.
+    dumpsteps : int or None, optional
+        Dump files will be saved every this many steps during the runsteps
+        simulation.  Note that these are used to compute the RDF curve rather
+        than using the LAMMPS method to allow for larger RDF cutoffs.  Default
+        value of None will use runsteps / 100.
+    restartsteps : int or None, optional
+        Restart files will be saved every this many steps.  Default is None,
+        which will not create restart files.
+    createvelocities : bool, optional
+        If True (default), velocities will be created for the atoms prior to
+        running the simulations.  Setting this to False can be useful if the
+        initial system already has velocity information.
+    randomseed : int or None, optional
+        Random number seed used by LAMMPS in creating velocities and with
+        the Langevin thermostat.  Default is None which will select a
+        random int between 1 and 900000000.
+    usefiles : bool, optional
+        If set to True, then all input/output files for LAMMPS will be generated.
+        Default value of False will minimize the files created.
+
+    Returns
+    -------
+    dict
+        Dictionary of results consisting of keys:
+        
+        - **'dumpfile_final'** (*str*) - The name of the final dump file
+          created.
+        - **'symbols_final'** (*list*) - The symbols associated with the final
+          dump file.
+        - **'E_pot'** (*float*) - The mean measured potential energy during the energy
+          equilibration stage.
+        - **'E_pot_stderr'** (*float*) - The standard error in the mean potential energy
+          during the energy equilibration stage.
+        - **'E_total'** (*float*) - The total energy of the system used during the nve
+          stage.
+        - **'E_total_stderr'** (*float*) - The standard error in the mean total energy
+          computed during the energy equilibration stage.
+          - **'volume'** (*float*) - The volume per atom identified after the volume 
+          equilibration stage.
+        - **'volume_stderr'** (*float*) - The standard error in the volume per atom
+          measured during the volume equilibration stage.
+        - **'measured_press'** (*float*) - The mean measured pressure during the nve
+          stage.
+        - **'measured_press_stderr'** (*float*) - The standard error in the measured
+          pressure values of the nve stage.
+        - **'measured_temp'** (*float*) - The mean measured temperature during the nve
+          stage.
+        - **'measured_temp_stderr'** (*float*) - The standard error in the measured
+          temperature values of the nve stage.
+    """
+    logfile = 'log.lammps'
+    restartfile = '*.restart'
+
+    if usefiles:
+        script = 'liquid.in'
+    else:
+        script = None
+
     # Handle default values
+    randomseed = am.lammps.seed(randomseed)
     if dumpsteps is None:
-        dumpsteps = meltsteps + coolsteps + equilvolumesteps + equilenergysteps + runsteps
-    if restartsteps is None:
-        restartsteps = meltsteps + coolsteps + equilvolumesteps + equilenergysteps + runsteps
+        dumpsteps = round(runsteps / 100)
 
-    # Check volrelax and temprelax settings
-    if equilvolumesamples > equilvolumesteps / 100:
-        raise ValueError('invalid values: equilvolumesamples must be <= equilvolumesteps / 100')
-    if equilenergysamples > equilenergysteps / 100:
-        raise ValueError('invalid values: equilenergysamples must be <= equilenergysteps / 100')
-
-    # Set default rdfcutoff
-    if rdfcutoff is None:
-        rdfcutoff = 4 * system.r0()
-
-    # Define lammps variables
-    lammps_variables = {}
-
-    lammps_variables['boltzmann'] = uc.get_in_units(uc.unit['kB'],
-                                                    lammps_units['energy'])
-
-    # Dump initial system as data and build LAMMPS inputs
-    system_info = system.dump('atom_data', f='init.dat',
-                              potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
-
-    # Generate LAMMPS inputs for restarting
-    system_info2 = potential.pair_restart_info('*.restart', system.symbols)
-    lammps_variables['atomman_pair_restart_info'] = system_info2
-
-    # Phase settings
-    lammps_variables['temperature'] = temperature
-    lammps_variables['temperature_melt'] = temperature_melt
-    lammps_variables['pressure'] = pressure
-
-    # Set timestep dependent parameters
-    timestep = lmp.style.timestep(potential.units)
-    lammps_variables['timestep'] = timestep
-    lammps_variables['temperature_damp'] = 100 * timestep
-    lammps_variables['pressure_damp'] = 1000 * timestep
-
-    # Number of run/dump steps
-    lammps_variables['meltsteps'] = meltsteps
-    lammps_variables['coolsteps'] = coolsteps
-    lammps_variables['equilvolumesteps'] = equilvolumesteps
-    lammps_variables['equilenergysteps'] = equilenergysteps
-    lammps_variables['runsteps'] = runsteps
-    lammps_variables['dumpsteps'] = dumpsteps
-    lammps_variables['restartsteps'] = restartsteps
-
-    # Number of samples
-    lammps_variables['equilvolumesamples'] = equilvolumesamples
-    lammps_variables['equilenergysamples'] = equilenergysamples
+    # Timestep and timestep-dependent variables
+    timestep = am.lammps.style.timestep(lmp.potential.units)
+    temperature_damp = 100 * timestep
+    pressure_damp = 1000 * timestep
     
-    lammps_variables['rdfcutoff'] = rdfcutoff
+    # Check if simulation is a restart
+    isrestart = lmp.restart_check(logfile, restartfile)
 
-    # Set randomseed
-    if randomseed is None: 
-        randomseed = random.randint(1, 900000000)
+    # Set up new simulation and run initial relaxations
+    if not isrestart:
 
-    # create velocities 
-    if createvelocities:
-        if meltsteps == 0 and coolsteps == 0:
-            velocity_temp = temperature
-        else:
-            velocity_temp = temperature_melt
-        lammps_variables['create_velocities'] = f'velocity all create {velocity_temp} {randomseed} mom yes rot yes dist gaussian'
+        # Pass system and potential info into LAMMPS
+        lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                      usefiles=usefiles, logfile=logfile)
+    
+        # Set timestep
+        lmp.cmd.timestep(timestep)
+
+        # Define thermo
+        lmp.cmd.thermo(100)
+        lmp.cmd.thermo_style('custom', 'step', 'temp', 'pe', 'ke', 'etotal',
+                            'press', 'lx', 'ly', 'lz', 'vol')
+        lmp.cmd.thermo_modify('format', 'float', '%.17e')
+
+        # Create new velocities
+        if createvelocities:
+            if meltsteps == 0:
+                velocity_temp = temperature
+            else:
+                velocity_temp = temperature_melt
+            lmp.cmd.velocity('all', 'create', velocity_temp, randomseed, 'mom',
+                            'yes', 'rot', 'yes', 'dist', 'gaussian')
+
+        # Melt run
+        lmp.cmd.fix('npt', 'all', 'npt',
+                    'temp', temperature_melt, temperature_melt, temperature_damp,
+                    'iso', pressure, pressure, pressure_damp)
+        lmp.cmd.run(meltsteps)
+        lmp.cmd.unfix('npt')
+
+        # Equilibrium run
+        lmp.cmd.fix('npt', 'all', 'npt',
+                    'temp', temperature, temperature, temperature_damp,
+                    'iso', pressure, pressure, pressure_damp)
+        lmp.cmd.run(equilsteps)
+        lmp.cmd.unfix('npt')
+
+        # Reset timestep before main run
+        lmp.cmd.reset_timestep(0)
+
+    # Set up restart simulation
     else:
-        lammps_variables['create_velocities'] = ''
+        # Tell LAMMPS to read in from restart and redefine potential
+        lmp.new_system_from_restart(system, restartfile, tilt_large=True,
+                                    usefiles=True, logfile=logfile)
 
-    # Set dump_keys based on atom_style
-    if potential.atom_style in ['charge']:
-        lammps_variables['dump_keys'] = 'id type q xu yu zu c_pe vx vy vz'
+        # Define thermo
+        lmp.cmd.thermo(100)
+        lmp.cmd.thermo_style('custom', 'step', 'temp', 'pe', 'ke', 'etotal',
+                            'press', 'lx', 'ly', 'lz', 'vol')
+        lmp.cmd.thermo_modify('format', 'float', '%.17e')
+    
+
+    # Set up analysis computes
+    lmp.cmd.compute('pe', 'all', 'pe/atom')
+
+    # Dump configurations
+    if lmp.potential.atom_style == 'charge':
+        dump_keys = ['id', 'type', 'q', 'xu', 'yu', 'zu', 'c_pe', 'vx', 'vy', 'vz']
     else:
-        lammps_variables['dump_keys'] = 'id type xu yu zu c_pe vx vy vz'
+        dump_keys = ['id', 'type', 'xu', 'yu', 'zu', 'c_pe', 'vx', 'vy', 'vz']
+    lmp.cmd.dump('dumpit', 'all', 'custom', dumpsteps, '*.dump', *dump_keys)
+    lmp.cmd.dump_modify('dumpit', 'format', 'float', '%.17e')
+    
+    # Restart configurations
+    if restartsteps is not None:
+        lmp.cmd.restart(restartsteps, restartfile)
 
-    # Set dump_modify_format based on lammps_date
-    if lammps_date < datetime.date(2016, 8, 3):
-        if potential.atom_style in ['charge']:
-            lammps_variables['dump_modify_format'] = f'"%d %d{8 * " %.13e"}"'
-        else:
-            lammps_variables['dump_modify_format'] = f'"%d %d{7 * " %.13e"}"'
-    else:
-        lammps_variables['dump_modify_format'] = 'float %.13e'
+    # Perform npt at target temperature and pressure
+    lmp.cmd.fix('npt', 'all', 'npt',
+                'temp', temperature, temperature, temperature_damp,
+                'iso', pressure, pressure, pressure_damp)
+    lmp.cmd.run(runsteps, 'upto')
 
-    # Write lammps input script
-    lammps_script = 'liquid.in'
-    lammps_template = f'liquid_ave_{equilenergystyle}.template'
-    template = read_calc_file('iprPy.calculation.relax_liquid', lammps_template)
-    with open(lammps_script, 'w', encoding='UTF-8') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
 
-    # Write lammps restart input script
-    restart_script = 'liquid_restart.in'
-    lammps_template = 'liquid_restart.template'
-    template = read_calc_file('iprPy.calculation.relax_liquid', lammps_template)
-    with open(restart_script, 'w', encoding='UTF-8') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
-
-    # Fix for restart runs: only use restart script if restart file(s) exist
-    if Path('log.lammps').exists() and len(list(Path('.').glob('*.restart'))) == 0:
-        Path('log.lammps').unlink()
-
-    # Uniquely rename rdf.txt on restarts to prevent overwrite
-    elif Path('rdf.txt').exists():
-        maxrdfid = 0
-        for oldrdf in Path('.').glob('rdf-*.txt'):
-            rdfid = int(oldrdf.stem.split('-')[-1])
-            if rdfid > maxrdfid:
-                maxrdfid = rdfid
-        Path('rdf.txt').rename(f'rdf-{maxrdfid+1}.txt')
-
-    # Run lammps
-    output = lmp.run(lammps_command, script_name=lammps_script,
-                     restart_script_name=restart_script,
-                     mpi_command=mpi_command, screen=False)
-
-    # Extract LAMMPS thermo data.
-    run1steps = meltsteps
-    run2steps = run1steps + coolsteps
-    run3steps = run2steps + equilvolumesteps
-    run4steps = run3steps + equilenergysteps
-    thermo = output.flatten()['thermo']
-    #thermo_melt = thermo[thermo.Step < run1steps]
-    #thermo_cool = thermo[(thermo.Step < run2steps) & (thermo.Step >= run1steps)]
-    thermo_vol_equil = thermo[(thermo.Step < run3steps) & (thermo.Step >= run2steps)]
-    thermo_temp_equil = thermo[(thermo.Step < run4steps) & (thermo.Step >= run3steps)]
-    thermo_nve = thermo[thermo.Step >= run4steps]
+    # Get combined thermo data of primary simulation(s).
+    thermo = log.flatten('last', firstindex=2).thermo
+    lmp.set_thermo_units(thermo)
 
     results = {}
 
@@ -314,38 +375,57 @@ def relax_liquid(lammps_command: str,
     results['dumpfile_final'] = last_dump_file
     results['symbols_final'] = system.symbols
 
+    # Get ave/stderr thermo properties
+    nsamples = len(thermo)
+    sqrt_nsamples = nsamples ** 0.5
+    
     natoms = system.natoms
-
-    # Get equilibrated volume 
-    volume_unit = f"{lammps_units['length']}^3"
-    samplestart = len(thermo_vol_equil) - equilvolumesamples
-    results['volume'] = uc.set_in_units(thermo_temp_equil.Volume.values[-1], volume_unit) / natoms
-    results['volume_stderr'] = uc.set_in_units(thermo_vol_equil.Volume[samplestart:].std(), volume_unit) / natoms / (equilvolumesamples)**0.5
-
-    # Get equilibrated energies
-    samplestart = len(thermo_temp_equil) - equilenergysamples
-    results['E_total'] = uc.set_in_units(thermo_nve.TotEng.values[-1], lammps_units['energy']) / natoms
-    results['E_total_stderr'] = uc.set_in_units(thermo_temp_equil.TotEng[samplestart:].std(), lammps_units['energy']) / natoms / (equilenergysamples)**0.5
-    results['E_pot'] = uc.set_in_units(thermo_temp_equil.PotEng[samplestart:].mean(), lammps_units['energy']) / natoms
-    results['E_pot_stderr'] = uc.set_in_units(thermo_temp_equil.PotEng[samplestart:].std(), lammps_units['energy']) / natoms / (equilenergysamples)**0.5
-
-    # Get measured temperature and pressure during the nve run
-    nsamples = len(thermo_nve)
-    results['measured_temp'] = thermo_nve.Temp.values.mean()
-    results['measured_temp_stderr'] = thermo_nve.Temp.values.std() / (nsamples)**0.5
-    pressure = (thermo_nve.Pxx.values + thermo_nve.Pyy.values + thermo_nve.Pzz.values) / 3
-    results['measured_press'] = uc.set_in_units(pressure.mean(), lammps_units['pressure'])
-    results['measured_press_stderr'] = uc.set_in_units(pressure.std(), lammps_units['pressure']) / (nsamples)**0.5
-
-    # Get MSD values
-    msd_unit = f"{lammps_units['length']}^2"
-    time = (thermo_nve.Step.values - thermo_nve.Step.values[0]) * timestep
-    results['time_values'] = uc.set_in_units(time, lammps_units['time'])
-    results['msd_x_values'] = uc.set_in_units(thermo_nve['c_msd[1]'].values, msd_unit)
-    results['msd_y_values'] = uc.set_in_units(thermo_nve['c_msd[2]'].values, msd_unit)
-    results['msd_z_values'] = uc.set_in_units(thermo_nve['c_msd[3]'].values, msd_unit)
-    results['msd_values'] = uc.set_in_units(thermo_nve['c_msd[4]'].values, msd_unit)
-
-    results['lammps_output'] = output
+    results['E_pot'] = thermo.PotEng.mean() / natoms
+    results['E_pot_stderr'] = thermo.PotEng.std() / natoms / sqrt_nsamples
+    results['E_total'] = thermo.TotEng.mean() / natoms
+    results['E_total_stderr'] = thermo.TotEng.std() / natoms / sqrt_nsamples
+    results['volume'] = thermo.Volume.mean() / natoms
+    results['volume_stderr'] = thermo.Volume.std() / natoms / sqrt_nsamples
+    results['measured_press'] = thermo.Press.mean()
+    results['measured_press_stderr'] = thermo.Press.std() / sqrt_nsamples
+    results['measured_temp'] = thermo.Temp.mean()
+    results['measured_temp_stderr'] = thermo.Temp.std() / sqrt_nsamples
 
     return results
+
+
+def compute_ave_rdf(nbins=400, rmin=0.0, rmax=10.0) -> am.thermo.RDF:
+    """
+    Computes the averaged RDF across the dump files and saves the
+    data to a LAMMPS-style RDF text file.
+
+    Parameters
+    ----------
+    nbins : int, optional
+        The number of bins to use for the RDF calculation.  Default value is
+        400.
+    minr : float or str, optional
+        The minimum radial distance for the RDF calculation.  Default value
+        is 0.0 angstroms.
+    maxr: float or str, optional
+        The mxaimum radial distance for the RDF calculation.  Default value
+        is 10.0 angstroms.
+
+    Returns
+    -------
+    atomman.thermo.RDF
+        The RDF object
+    """
+    # Load dump files and compute RDFs
+    rdfs = []
+    for dumpfile in Path('.').glob('*.dump'):
+        system = am.load('atom_dump', dumpfile)
+        rdfs.append(system.rdf(nbins=nbins, rmin=rmin, rmax=rmax))
+    
+    # Average the rdfs
+    rdf = RDF.average(rdfs)
+
+    # Save the averaged RDF file
+    rdf.build_lammps_file('rdf_dump.txt')
+
+    return rdf

@@ -1,25 +1,19 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale
 import datetime
-from typing import Optional
-import random
+from typing import Optional, Union
 
 # http://www.numpy.org/
 import numpy as np
 
 # https://github.com/usnistgov/atomman 
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
-from atomman.tools import filltemplate
+from atomman.typing import lammpspotential, unitfloat
+from atomman.lammps import LAMMPS, LAMMPSobj
 
-# iprPy imports
-from ...tools import read_calc_file
-
-def elastic_constants_dynamic(lammps_command: str,
+def elastic_constants_dynamic(lammps_command: Union[str, LAMMPSobj],
                               system: am.System,
-                              potential: lmp.Potential,
+                              potential: lammpspotential,
                               temperature: float,
                               mpi_command: Optional[str] = None,
                               normalized_as: str = 'triclinic',
@@ -27,19 +21,21 @@ def elastic_constants_dynamic(lammps_command: str,
                               equilsteps: int = 20000,
                               runsteps: int = 200000,
                               thermosteps: int = 100,
-                              randomseed: Optional[int] = None
-                              ) -> dict:
+                              createvelocities: bool = True,
+                              randomseed: Optional[int] = None,
+                              usefiles: bool = False) -> dict:
     """
     Computes elastic constants for a system during dynamic simulations using
     the LAMMPS compute born/matrix method.
     
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     system : atomman.System
         The system to perform the calculation on.
-    potential : atomman.lammps.Potential
+    potential : PotentialLAMMPS or PotentialLAMMPSKIM
         The LAMMPS implemented potential to use.
     temperature : float
         The temperature to run the calculation at.
@@ -85,61 +81,81 @@ def elastic_constants_dynamic(lammps_command: str,
         - **'C'** (*atomman.ElasticConstants*) - The total elastic constants
           normalized by the crystal symmetry specified.
     """
+    logfile = 'log.lammps'
+    if usefiles:
+        script = 'born_matrix.in'
+    else:
+        script = None
+
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
+
     # Convert hexagonal cells to orthorhombic to avoid LAMMPS tilt issues
-    #if am.tools.ishexagonal(system.box):
-    #    system = system.rotate([[2,-1,-1,0], [0, 1, -1, 0], [0,0,0,1]])
+    if am.tools.ishexagonal(system.box):
+        system = system.rotate([[2,-1,-1,0], [0, 1, -1, 0], [0,0,0,1]])
     
     # Set randomseed
-    if randomseed is None: 
-        randomseed = random.randint(1, 900000000)
+    randomseed = am.lammps.seed(randomseed)
     
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
-    
-    # Get lammps version date
-    lammps_date = lmp.checkversion(lammps_command)['date']
-
     # Check for compatibility
-    if lammps_date < datetime.date(2022, 5, 4):
+    if lmp.versiondate < datetime.date(2022, 5, 4):
         raise ValueError('LAMMPS from May 4, 2022 or newer required for the born/matrix calculation')
     
-    # Define lammps variables
-    lammps_variables = {}
-    system_info = system.dump('atom_data', f='init.dat', potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
-    lammps_variables['temperature'] = temperature
-    lammps_variables['strainrange'] = strainrange
-    lammps_variables['equilsteps'] = equilsteps
-    lammps_variables['runsteps'] = runsteps
-    lammps_variables['thermosteps'] = thermosteps
-    lammps_variables['randomseed'] = randomseed
+    # Timestep and timestep-dependent variables
+    timestep = am.lammps.style.timestep(lmp.potential.units)
+    temperature_damp = 100 * timestep
+
+    # Pass system and potential info into LAMMPS
+    lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                  usefiles=usefiles, logfile=logfile)
+
+    # Set timestep
+    lmp.cmd.timestep(timestep)
+
+    # Thermo output definition
+    lmp.cmd.thermo(thermosteps)
+    lmp.cmd.thermo_style('custom', 'step', 'temp', 'pe', 'ke', 'etotal', 'press')
+    lmp.cmd.thermo_modify('format', 'float', '%.17e')
+
+    if createvelocities:
+        lmp.cmd.velocity('all', 'create', temperature, randomseed,
+                         'mom', 'yes', 'rot', 'yes', 'dist', 'gaussian')
+
+    # Define thermostat
+    lmp.cmd.fix('nve', 'all', 'nve')
+    lmp.cmd.fix('langevin', 'all', 'langevin', temperature, temperature,
+                temperature_damp, randomseed)
     
-    timestep = lmp.style.timestep(potential.units)
-    lammps_variables['timestep'] = timestep
-    
-    # Fill in template files
-    lammps_script = 'born_matrix.in'
-    template = read_calc_file('iprPy.calculation.elastic_constants_dynamic',
-                              'born_matrix.template')
-    with open(lammps_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
-    
-    # Run LAMMPS
-    output = lmp.run(lammps_command, script_name=lammps_script,
-                     mpi_command=mpi_command, screen=False)
-        
+    # Equilibrium relax
+    lmp.cmd.thermo_style('custom', 'step', 'temp', 'pe', 'press')
+    lmp.cmd.run(equilsteps)
+
+    # Define virial contribution to the pressure compute
+    lmp.cmd.compute('virial', 'all', 'pressure', 'NULL', 'virial')
+
+    # Define born matrix compute
+    lmp.cmd.compute('born', 'all', 'born/matrix', 'numdiff', strainrange, 'virial')
+
+    lmp.cmd.thermo_style('custom', 'step', 'temp', 'pe', 'press', 'c_virial[*]', 'c_born[*]')
+    lmp.cmd.thermo_modify('format', 'float', '%.17e')
+
+    lmp.cmd.run(runsteps)
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
+
     # Extract thermo data
-    thermo = output.simulations[1].thermo
+    thermo = log.simulations[1].thermo
     
     # Compute the different components of the Cij expression from thermo data
-    Cij_born = build_Cij_born(thermo, system.box.volume, lammps_units)
+    Cij_born = build_Cij_born(thermo, system.box.volume, lmp.unitsdict)
     Cij_fluc = build_Cij_fluc(thermo, system.natoms, temperature,
-                              system.box.volume, lammps_units)
+                              system.box.volume, lmp.unitsdict)
     Cij_kin = build_Cij_kin(system.natoms, temperature, system.box.volume)
     
     C = am.ElasticConstants(Cij = Cij_born + Cij_fluc + Cij_kin).normalized_as(normalized_as)
     
-    pressure = uc.set_in_units(thermo.Press.mean(), lammps_units['pressure'])
+    pressure = uc.set_in_units(thermo.Press.mean(), lmp.unitsdict['pressure'])
     
     results_dict = {}
     results_dict['measured_pressure'] = pressure

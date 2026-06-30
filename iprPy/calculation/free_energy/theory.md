@@ -6,4 +6,6 @@ The Einstein solid spring constants, $k_i$, are evaluated using an nvt simulatio
 
 $$ k_i = \frac{3 k_B T}{\left<\left( \Delta r_i \right)^2\right>} $$
 
-For the integration, TBD...
+The free energy integration works by first allowing the system to come to equilibrium with the target potential.  Next, "switching" steps are performed during which the interatomic potential gradually switches from the target potential to the reference potential. The system is then allowed to equilibrate using the reference potential before performing another switching stage back to the target potential.
+
+Once the simulations are done, the measured Hamiltonian energy is integrated across the potential transformations allowing for the work of transformation to be estimated.  The work of transformation can then be added to the Gibbs free energy of the reference potential state to compute the absolute Gibbs free energy of the target potential state.

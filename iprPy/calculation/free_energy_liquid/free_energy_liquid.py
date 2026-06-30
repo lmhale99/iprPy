@@ -1,48 +1,47 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale
 
 # Standard library imports
-import random
 from typing import Optional, Union
+
+from potentials.record.PotentialLAMMPS import PotentialLAMMPS
 
 # https://github.com/usnistgov/atomman 
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
-from atomman.tools import filltemplate, aslist
+from atomman.typing import lammpspotential, unitfloat
+from atomman.lammps import LAMMPS, LAMMPSobj
+from atomman.tools import aslist
+from atomman.thermo import UhlenbeckFordModel
 
 # http://www.numpy.org/
 import numpy as np
 import numpy.typing as npt
 
-# iprPy imports
-from ...tools import read_calc_file
-from .UhlenbeckFordModel import UhlenbeckFordModel
-
-def free_energy_liquid(lammps_command: str,
+def free_energy_liquid(lammps_command: Union[str, LAMMPSobj],
                        system: am.System,
-                       potential: lmp.Potential,
+                       potential: lammpspotential,
                        temperature: float,
                        mpi_command: Optional[str] = None,
                        p: int = 50,
                        sigma: float = 1.5,
                        equilsteps: int = 25000,
                        switchsteps: int = 50000,
-                       pressure: float = 0.0,
+                       pressure: unitfloat = 0.0,
                        createvelocities: bool = True,
-                       randomseed: Optional[int] = None) -> dict:
+                       randomseed: Optional[int] = None,
+                       usefiles: bool = False) -> dict:
     """
     Performs a full dynamic relax on a given system at the given temperature
     to the specified pressure state.
     
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     system : atomman.System
         The system to perform the calculation on.
-    potential : atomman.lammps.Potential
+    potential : PotentialLAMMPS or PotentialLAMMPSKIM
         The LAMMPS implemented potential to use.
     temperature : float
         The temperature to run at.
@@ -84,76 +83,46 @@ def free_energy_liquid(lammps_command: str,
         - **'Helmholtz'** (*float*) - The Helmholtz free energy/atom.
         - **'Gibbs'** (*float*) - The Gibbs free energy/atom.
     """
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
 
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
-    timestep = lmp.style.timestep(potential.units)
+    # Convert values given with units if needed
+    pressure = uc.set_in_units(pressure)
+
+    # Set randomseed
+    randomseed = am.lammps.seed(randomseed)
 
     # Build Uhlenbeck-Ford solution
     ufm = UhlenbeckFordModel(sigma=sigma, p=p, temperature=temperature,
                              volume=system.box.volume, natoms=system.natoms)
 
-    if randomseed is None:
-        randomseed = random.randint(1, 900000000)
+    # Create a UFM potential object
+    pot_ufm = PotentialLAMMPS(pair_style='ufm', atoms=potential.atoms)
+    pot_ufm.pair_style_terms.add_term('parameter', uc.get_in_units(7.5, lmp.unitsdict['length']))
+    pot_ufm.add_pair_coeff()
+    pot_ufm.pair_coeffs[0].add_term('parameter', uc.get_in_units(ufm.epsilon, lmp.unitsdict['energy']))
+    pot_ufm.pair_coeffs[0].add_term('parameter', uc.get_in_units(sigma, lmp.unitsdict['length']))
 
-    # Define lammps variables
-    lammps_variables = {}
+    # Create a hybrid/scaled potential between the given potential and the UFM one
+    scalars = ['v_nlambda', 'v_lambda']
+    hybrid_potential = PotentialLAMMPS.hybrid([potential, pot_ufm],
+                                               pair_style='hybrid/scaled',
+                                               scalars=scalars)
     
-    # Dump initial system as data and build LAMMPS inputs
-    system_info = system.dump('atom_data', f='init.dat',
-                              potential=potential)
+    # Update lmp object's potential to be the hybrid
+    lmp.potential = hybrid_potential
 
-    # Modify pair_info into a hybrid/scaled with ufm
-    if potential.pair_style in ['hybrid', 'hybrid/overlay']:
-        system_info, pair_styles = modify_hybrid_pair_info_ufm(system_info, ufm,
-                                                               energy_unit=lammps_units['energy'],
-                                                               length_unit=lammps_units['length'])
-    elif potential.pair_style == 'hybrid/scaled':
-        raise ValueError('calculation does not yet support hybrid/scaled potentials')
-    else:
-        system_info, pair_styles = modify_pair_info_ufm(system_info, ufm,
-                                                        energy_unit=lammps_units['energy'],
-                                                        length_unit=lammps_units['length'])
+    # Run thermodynamic integration simulation
+    thermodynamic_integration(lmp, system, temperature,
+                              equilsteps, switchsteps, createvelocities,
+                              randomseed, usefiles)
 
-    lammps_variables['atomman_system_pair_info'] = system_info
-
-    # Build compute pair line(s)
-    compute_pair = ''
-    for i in range(len(pair_styles)):
-        compute_pair += f'compute E_pair_{i+1} all pair {pair_styles[i]}\n'
-    compute_pair += 'variable E_pair equal c_E_pair_1'
-    for i in range(1, len(pair_styles)):
-        compute_pair += f'+c_E_pair_{i+1}'
-    lammps_variables['compute_pair'] = compute_pair
-
-    # Create new velocities or not
-    if createvelocities:
-        lammps_variables['create_velocities'] = f'velocity all create {temperature} {randomseed} mom yes rot yes dist gaussian'
-    else:
-        lammps_variables['create_velocities'] = ''
-
-    # Other run settings
-    lammps_variables['timestep'] = timestep
-    lammps_variables['switchsteps'] = switchsteps
-    lammps_variables['equilsteps'] = equilsteps
-    lammps_variables['temperature'] = temperature
-    lammps_variables['temperature_damp'] = 100 * timestep
-    lammps_variables['randomseed'] = randomseed
-    
-    # Write lammps input script
-    lammps_script = 'free_energy_liquid.in'
-    template = read_calc_file('iprPy.calculation.free_energy_liquid',
-                              'free_energy_liquid.template')
-    with open(lammps_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
-
-    # Run lammps 
-    output = lmp.run(lammps_command, script_name=lammps_script,
-                     mpi_command=mpi_command, screen=False)
-    
     # Extract LAMMPS thermo data for the switching runs.
-    hamil_forward = np.loadtxt('forward_switch.txt', skiprows=1)
-    hamil_reverse = np.loadtxt('reverse_switch.txt', skiprows=1)
+    hamil_forward = uc.set_in_units(np.loadtxt('forward_switch.txt', skiprows=1),
+                                    lmp.unitsdict['energy'])
+    hamil_reverse = uc.set_in_units(np.loadtxt('reverse_switch.txt', skiprows=1),
+                                    lmp.unitsdict['energy'])
+
 
     # Integrate the Hamiltonians to compute the switching work
     work_forward, work_reverse, work = integrate_for_work(hamil_forward,
@@ -185,6 +154,95 @@ def free_energy_liquid(lammps_command: str,
     results['Gibbs'] = G_sys / system.natoms
     
     return results
+
+
+
+
+
+def thermodynamic_integration(lmp: LAMMPSobj,
+                              system: am.System,
+                              temperature: float,
+                              equilsteps: int,
+                              switchsteps: int,
+                              createvelocities: bool,
+                              randomseed: int,
+                              usefiles: bool):
+    logfile = 'log_ti.lammps'
+    if usefiles:
+        script = 'free_energy_liquid.in'
+    else:
+        script = None
+
+    # Search potential pair_info to identify included pair styles
+    pair_styles = []
+    terms = lmp.potential.pair_info(comments=False).split()
+    for i, term in enumerate(terms):
+        if term in ['v_nlambda']:
+            pair_styles.append(terms[i+1])
+
+    # Define lambda factors
+    lmp.cmd.variable('tau', 'equal', 0.0)
+    lmp.cmd.variable('lambda', 'equal', 'v_tau^5*(70*v_tau^4-315*v_tau^3+540*v_tau^2-420*v_tau+126)')
+    lmp.cmd.variable('nlambda', 'equal', '1-v_lambda')
+
+    # Timestep and timestep-dependent variables
+    timestep = am.lammps.style.timestep(lmp.potential.units)
+    temperature_damp = 100 * timestep
+
+    # Pass system and potential info into LAMMPS
+    lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                  usefiles=usefiles, logfile=logfile)
+    
+    lmp.cmd.timestep(timestep)
+    lmp.cmd.variable('pe', 'equal', 'pe')
+
+    if createvelocities:
+        lmp.commands_string('\n# Create velocities')
+        lmp.cmd.velocity('all', 'create', temperature, randomseed,
+                         'mom', 'yes', 'rot', 'yes', 'dist', 'gaussian')
+        
+    lmp.cmd.compute('E_ufm', 'all', 'pair', 'ufm')
+    
+    E_pair = []
+    for i in range(len(pair_styles)):
+        lmp.cmd.compute(f'E_pair_{i+1}', 'all', 'pair', f'{pair_styles[i]}')
+        E_pair.append(f'c_E_pair_{i+1}')
+    lmp.cmd.variable('E_pair', 'equal', '+'.join(E_pair))
+    lmp.cmd.variable('hamil', 'equal', 'v_E_pair-c_E_ufm')
+
+
+    lmp.cmd.fix('nve', 'all', 'nve')
+    lmp.cmd.fix('langevin', 'all', 'langevin',
+                temperature, temperature, temperature_damp, randomseed, 'zero', 'yes')
+    lmp.cmd.compute('temp_com', 'all', 'temp/com')
+    lmp.cmd.fix_modify('langevin', 'temp', 'temp_com')
+
+    lmp.cmd.thermo(100)
+    lmp.cmd.thermo_style('custom', 'step', 'c_temp_com', 'pe', 'ke', 'etotal',
+                         'v_E_pair', 'c_E_ufm', 'v_lambda')
+
+    lmp.cmd.run(equilsteps)
+
+    # Run forward integration
+    lmp.cmd.variable('tau', 'equal', 'ramp(0.0,1.0)')
+    lmp.cmd.fix('forward_switch', 'all', 'print', 1, '"${hamil}"',
+                'screen', 'no', 'file', 'forward_switch.txt')
+    lmp.cmd.run(switchsteps)
+    lmp.cmd.unfix('forward_switch')
+
+    # Equilibrate for pure ufm
+    lmp.cmd.variable('tau', 'equal', 1.0)
+    lmp.cmd.run(equilsteps)
+
+    # Run reverse integration
+    lmp.cmd.variable('tau', 'equal', 'ramp(1.0,0.0)')
+    lmp.cmd.fix('reverse_switch', 'all', 'print', 1, '"${hamil}"',
+                'screen', 'no', 'file', 'reverse_switch.txt')
+    lmp.cmd.run(switchsteps)
+    lmp.cmd.unfix('reverse_switch')
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
 
 def ideal_gas_free_energy(temperature, volume, masses, natoms):
     """
@@ -249,62 +307,3 @@ def integrate_for_work(hamil_forward, hamil_reverse):
 
     return work_forward, work_reverse, work
 
-def modify_pair_info_ufm(pair_info, ufm, energy_unit='eV', length_unit='angstrom'):
-    """Transforms pair_info for a potential into a hybrid/scaled with ufm for thermodynamic integration"""
-    newlines = []
-    
-    for line in pair_info.split('\n'):
-        terms = line.split()
-        
-        if len(terms) > 0 and terms[0] == 'pair_style':
-            # Extract original pair style
-            pair_style = terms[1]
-            pair_style_coeff = ' '.join(terms[1:])
-            
-            # Construct hybrid pair style
-            newlines.append(f'pair_style hybrid/scaled v_nlambda {pair_style_coeff} v_lambda ufm 7.5')
-            
-            # Add pair_coeff for ufm
-            epsilon = uc.get_in_units(ufm.epsilon, energy_unit)
-            sigma = uc.get_in_units(ufm.sigma, length_unit)
-            newlines.append(f'pair_coeff * * ufm {epsilon} {sigma}')
-            
-        elif len(terms) > 0 and terms[0] == 'pair_coeff':
-            terms.insert(3, pair_style)
-            newlines.append(' '.join(terms))
-            
-        else:
-            newlines.append(line)
-    
-    return '\n'.join(newlines), [pair_style]
-
-def modify_hybrid_pair_info_ufm(pair_info, ufm, energy_unit='eV', length_unit='angstrom'):
-    newlines = []
-    for line in pair_info.split('\n'):
-        terms = line.split()
-
-        if len(terms) > 0 and terms[0] == 'pair_style':
-            pair_styles = []
-            newline = 'pair_style hybrid/scaled'
-            s = 2
-            for e in range(3, len(terms)):
-                try:
-                    float(terms[e])
-                except:
-                    pair_styles.append(terms[s])
-                    newline += f' v_nlambda {" ".join(terms[s:e])}'
-                    s=e
-            pair_styles.append(terms[s])
-            newline += f' v_nlambda {" ".join(terms[s:e+1])} v_lambda ufm 7.5'
-            newlines.append(newline)
-
-            # Add pair_coeff for ufm
-            epsilon = uc.get_in_units(ufm.epsilon, energy_unit)
-            sigma = uc.get_in_units(ufm.sigma, length_unit)
-            newlines.append(f'pair_coeff * * ufm {epsilon} {sigma}')
-    
-        else:
-            newlines.append(line)
-    
-    return '\n'.join(newlines), pair_styles
-    

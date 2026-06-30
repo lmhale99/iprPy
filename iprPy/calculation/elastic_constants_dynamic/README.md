@@ -9,6 +9,7 @@ The elastic_constants_dynamic calculation style computes the elastic constants, 
 ### Version notes
 
 - 2024-04-25 Calculation method based on the fluctuations/born matrix method finalized.
+- 2026-06-25: Method updated to support the LAMMPS library interface.
 
 ### Additional dependencies
 

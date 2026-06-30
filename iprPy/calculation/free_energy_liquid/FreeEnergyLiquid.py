@@ -1,4 +1,3 @@
-# coding: utf-8
 # Standard Python libraries
 from io import IOBase
 from pathlib import Path
@@ -93,8 +92,7 @@ class FreeEnergyLiquid(Calculation):
     def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
-            'free_energy_liquid.py',
-            'free_energy_liquid.template',
+            'free_energy_liquid.py'
         ]
 
 ############################## Class attributes ################################

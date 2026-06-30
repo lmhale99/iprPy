@@ -1,46 +1,44 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale
 
 # Standard library imports
-import random
 from typing import Optional, Union
-
-# https://github.com/usnistgov/atomman 
-import atomman as am
-import atomman.lammps as lmp
-import atomman.unitconvert as uc
-from atomman.tools import filltemplate, aslist
 
 # http://www.numpy.org/
 import numpy as np
 import numpy.typing as npt
 
-# iprPy imports
-from ...tools import read_calc_file
+# https://github.com/usnistgov/atomman 
+import atomman as am
+import atomman.unitconvert as uc
+from atomman.typing import lammpspotential, unitfloat
+from atomman.lammps import LAMMPS, LAMMPSobj
+from atomman.tools import aslist
 
-def free_energy(lammps_command: str,
+def free_energy(lammps_command: Union[str, LAMMPSobj],
                 system: am.System,
-                potential: lmp.Potential,
+                potential: lammpspotential,
                 temperature: float,
                 mpi_command: Optional[str] = None,
                 spring_constants: Union[float, npt.ArrayLike, None] = None,
                 equilsteps: int = 25000,
                 switchsteps: int = 50000,
                 springsteps: int = 50000,
-                pressure: float = 0.0,
-                randomseed: Optional[int] = None) -> dict:
+                pressure: unitfloat = 0.0,
+                createvelocities: bool = True,
+                randomseed: Optional[int] = None,
+                usefiles: bool = False) -> dict:
     """
     Performs a full dynamic relax on a given system at the given temperature
     to the specified pressure state.
     
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     system : atomman.System
         The system to perform the calculation on.
-    potential : atomman.lammps.Potential
+    potential : PotentialLAMMPS or PotentialLAMMPSKIM
         The LAMMPS implemented potential to use.
     temperature : float
         The temperature to run at.
@@ -88,62 +86,34 @@ def free_energy(lammps_command: str,
         - **'Helmholtz'** (*float*) - The Helmholtz free energy/atom.
         - **'Gibbs'** (*float*) - The Gibbs free energy/atom.
     """
-  
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
+
+    # Convert values given with units if needed
+    pressure = uc.set_in_units(pressure)
+
+    # Set randomseed
+    randomseed = am.lammps.seed(randomseed)
+    
     if spring_constants is None:
-        spring_constants = einstein_spring_constants(lammps_command, system,
-                                                     potential, temperature,
-                                                     mpi_command=mpi_command,
-                                                     equilsteps=equilsteps,
-                                                     springsteps=springsteps,
-                                                     randomseed=randomseed)
+        # Run spring constants simulation
+        spring_constants = einstein_spring_constants(lmp, system,
+                                                     temperature,
+                                                     equilsteps,
+                                                     springsteps,
+                                                     createvelocities,
+                                                     randomseed,
+                                                     usefiles)
     else:
-        spring_constants = np.asarray(aslist(spring_constants))
-        assert len(spring_constants) == system.natypes, 'number of spring constants must match number of atypes'
+        # Check given spring constant values
+        spring_constants = aslist(spring_constants)
+        if len(spring_constants) != system.natypes:
+            raise ValueError('number of spring constants must match number of atypes')
 
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
-    timestep = lmp.style.timestep(potential.units)
-    
-    if randomseed is None:
-        randomseed = random.randint(1, 900000000)
-
-    # Define lammps variables
-    lammps_variables = {}
-    
-    # Dump initial system as data and build LAMMPS inputs
-    system_info = system.dump('atom_data', f='init.dat',
-                              potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
-
-    # Build spring fixes for each atype
-    spring_fix = '# Define spring fixes\n'
-    spring_hamil = 'v_pe'
-
-    for i in range(system.natypes):
-        spring_fix += f'group atype_{i+1} type {i+1}\n'
-        spring_fix += f'fix ti_spring_{i+1} atype_{i+1} ti/spring {spring_constants[i]} {switchsteps} {equilsteps} function 2\n'
-        spring_hamil += f'-f_ti_spring_{i+1}'
-
-    # Other run settings
-    lammps_variables['timestep'] = timestep
-    lammps_variables['switchsteps'] = switchsteps
-    lammps_variables['equilsteps'] = equilsteps
-    lammps_variables['spring_fix'] = spring_fix
-    lammps_variables['spring_hamil'] = spring_hamil
-    lammps_variables['temperature'] = temperature
-    lammps_variables['temperature_damp'] = 100 * timestep
-    lammps_variables['randomseed'] = randomseed
-    
-    # Write lammps input script
-    lammps_script = 'free_energy.in'
-    template = read_calc_file('iprPy.calculation.free_energy',
-                              'free_energy.template')
-    with open(lammps_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
-
-    # Run lammps 
-    output = lmp.run(lammps_command, script_name=lammps_script,
-                     mpi_command=mpi_command, screen=False)
+    # Run thermodynamic integration simulation
+    thermodynamic_integration(lmp, system, temperature, spring_constants,
+                              equilsteps, switchsteps, createvelocities,
+                              randomseed, usefiles)
     
     # Extract LAMMPS thermo data for the switching runs.
     hamil_forward = np.loadtxt('forward_switch.txt', skiprows=1)
@@ -180,14 +150,14 @@ def free_energy(lammps_command: str,
     
     return results
 
-def einstein_spring_constants(lammps_command: str,
+def einstein_spring_constants(lmp: LAMMPSobj,
                               system: am.System,
-                              potential: lmp.Potential,
                               temperature: float,
-                              mpi_command: Optional[str] = None,
-                              equilsteps: int = 1000,
-                              springsteps: int = 50000,
-                              randomseed: Optional[int] = None) -> dict:
+                              equilsteps: int,
+                              springsteps: int,
+                              createvelocities: bool,
+                              randomseed: int,
+                              usefiles: bool) -> list:
     """
     Runs an nvt simulation to evaluate atomic mean squared displacements in
     order to estimate a spring constant for an Einstein model.
@@ -205,7 +175,7 @@ def einstein_spring_constants(lammps_command: str,
         will run serially.
     temperature : float, optional
         The temperature to relax at (default is 0.0).
-    runsteps : int, optional
+    springsteps : int, optional
         The number of integration steps to perform (default is 50000).
     randomseed : int or None, optional
         Random number seed used by LAMMPS in creating velocities and with
@@ -214,104 +184,68 @@ def einstein_spring_constants(lammps_command: str,
     
     Returns
     -------
-    dict
-        Dictionary of results consisting of keys:
-        
-        - **'dumpfile_initial'** (*str*) - The name of the initial dump file
-          created.
-        - **'symbols_initial'** (*list*) - The symbols associated with the
-          initial dump file.
-        - **'dumpfile_final'** (*str*) - The name of the final dump file
-          created.
-        - **'symbols_final'** (*list*) - The symbols associated with the final
-          dump file.
-        - **'nsamples'** (*int*) - The number of thermodynamic samples included
-          in the mean and standard deviation estimates.  Can also be used to
-          estimate standard error values assuming that the thermo step size is
-          large enough (typically >= 100) to assume the samples to be
-          independent.
-        - **'E_pot'** (*float*) - The mean measured potential energy.
-        - **'measured_pxx'** (*float*) - The measured x tensile pressure of the
-          relaxed system.
-        - **'measured_pyy'** (*float*) - The measured y tensile pressure of the
-          relaxed system.
-        - **'measured_pzz'** (*float*) - The measured z tensile pressure of the
-          relaxed system.
-        - **'measured_pxy'** (*float*) - The measured xy shear pressure of the
-          relaxed system.
-        - **'measured_pxz'** (*float*) - The measured xz shear pressure of the
-          relaxed system.
-        - **'measured_pyz'** (*float*) - The measured yz shear pressure of the
-          relaxed system.
-        - **'temp'** (*float*) - The mean measured temperature.
-        - **'E_pot_std'** (*float*) - The standard deviation in the measured
-          potential energy values.
-        - **'measured_pxx_std'** (*float*) - The standard deviation in the
-          measured x tensile pressure of the relaxed system.
-        - **'measured_pyy_std'** (*float*) - The standard deviation in the
-          measured y tensile pressure of the relaxed system.
-        - **'measured_pzz_std'** (*float*) - The standard deviation in the
-          measured z tensile pressure of the relaxed system.
-        - **'measured_pxy_std'** (*float*) - The standard deviation in the
-          measured xy shear pressure of the relaxed system.
-        - **'measured_pxz_std'** (*float*) - The standard deviation in the
-          measured xz shear pressure of the relaxed system.
-        - **'measured_pyz_std'** (*float*) - The standard deviation in the
-          measured yz shear pressure of the relaxed system.
-        - **'temp_std'** (*float*) - The standard deviation in the measured
-          temperature values.
+    spring_constant : list
+        The estimated Einstein spring constants
     """
-  
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
-    timestep = lmp.style.timestep(potential.units)
-    
-    if randomseed is None:
-        randomseed = random.randint(1, 900000000)
+    logfile = 'log_msd.lammps'
+    if usefiles:
+        script = 'msd.in'
+    else:
+        script = None
 
-    # Define lammps variables
-    lammps_variables = {}
-    
-    # Dump initial system as data and build LAMMPS inputs
-    system_info = system.dump('atom_data', f='init.dat',
-                              potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
+    # Timestep and timestep-dependent variables
+    timestep = am.lammps.style.timestep(lmp.potential.units)
+    temperature_damp = 100 * timestep
 
-    # Build msd computes and outputs based on natypes
-    msd_compute = '# Define computes for msd for each atom type\n'
-    msd_average = '# Start cumulative averaging of msd\n'
-    msd_thermo = ''
+    # Pass system and potential info into LAMMPS
+    lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                  usefiles=usefiles, logfile=logfile)
+
+    lmp.commands_string('# Define computes for msd for each atom type')
     for i in range(system.natypes):
-        msd_compute += f'group group{i+1} type {i+1}\n'
-        msd_compute += f'compute msd{i+1} group{i+1} msd com yes\n'
-        msd_compute += f'variable msd{i+1} equal c_msd{i+1}[4]\n'
-        msd_average += f'fix msd{i+1} all ave/time 1 100 100 v_msd{i+1} ave running\n'
-        msd_thermo += f'f_msd{i+1} '
+        lmp.cmd.group(f'group{i+1}', 'type', i+1)
+        lmp.cmd.compute(f'msd{i+1}', f'group{i+1}', 'msd', 'com', 'yes')
+        lmp.cmd.variable(f'msd{i+1}', 'equal', f'c_msd{i+1}[4]')
 
-    # Other run settings
-    lammps_variables['runsteps'] = springsteps
-    lammps_variables['equilsteps'] = equilsteps
-    lammps_variables['timestep'] = timestep
-    lammps_variables['msd_compute'] = msd_compute
-    lammps_variables['msd_average'] = msd_average
-    lammps_variables['msd_thermo'] = msd_thermo
-    lammps_variables['temperature'] = temperature
-    lammps_variables['temperature_damp'] = 100 * timestep
-    lammps_variables['randomseed'] = randomseed
-    
-    # Write lammps input script
-    lammps_script = 'msd.in'
-    template = read_calc_file('iprPy.calculation.free_energy',
-                              'msd.template')
-    with open(lammps_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
-    
-    # Run lammps 
-    output = lmp.run(lammps_command, script_name=lammps_script,
-                     mpi_command=mpi_command, logfile='log.msd.lammps')
-    
+    lmp.commands_string('\n# Thermo settings for equilibrium run')
+    lmp.cmd.thermo(100)
+    lmp.cmd.thermo_style('custom', 'step', 'temp', 'pe', 'ke', 'etotal',
+                         'pxx', 'pyy', 'pzz', 'pxy', 'pxz', 'pyz')
+    lmp.cmd.thermo_modify('format', 'float', '%.17e')
+    lmp.cmd.timestep(timestep)
+
+    if createvelocities:
+        lmp.commands_string('\n# Create velocities')
+        lmp.cmd.velocity('all', 'create', temperature, randomseed,
+                         'mom', 'yes', 'rot', 'yes', 'dist', 'gaussian')
+
+    lmp.commands_string('\n# Define thermostat')
+    lmp.cmd.fix('nvt', 'all', 'nvt', 'temp',
+                temperature, temperature, temperature_damp)
+
+    lmp.commands_string('\n# Equilibration run')
+    lmp.cmd.run(equilsteps)
+
+    lmp.commands_string('# Start cumulative averaging of msd')
+    msd_thermo = []
+    for i in range(system.natypes):
+        lmp.cmd.fix(f'msd{i+1}', 'all', 'ave/time', 1, 100, 100,
+                    f'v_msd{i+1}', 'ave', 'running')
+        msd_thermo.append(f'f_msd{i+1}')
+
+    lmp.commands_string('\n# Thermo settings for spring estimate run')
+    lmp.cmd.thermo_style('custom', 'step', 'temp', 'pe', 'ke', 'etotal',
+                         'pxx', 'pyy', 'pzz', 'pxy', 'pxz', 'pyz', *msd_thermo)
+    lmp.cmd.thermo_modify('format', 'float', '%.17e')
+
+    lmp.commands_string('\n# Spring constant estimate run')
+    lmp.cmd.run(springsteps)
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
+
     # Extract LAMMPS thermo data. 
-    thermo = output.simulations[1].thermo
+    thermo = log.simulations[1].thermo
 
     spring_constant = []
     for i in range(system.natypes):
@@ -320,6 +254,78 @@ def einstein_spring_constants(lammps_command: str,
         spring_constant.append(k)
     
     return spring_constant
+
+def thermodynamic_integration(lmp: LAMMPSobj,
+                              system: am.System,
+                              temperature: float,
+                              spring_constants: list,
+                              equilsteps: int,
+                              switchsteps: int,
+                              createvelocities: bool,
+                              randomseed: int,
+                              usefiles: bool):
+    logfile = 'log_ti.lammps'
+    if usefiles:
+        script = 'free_energy.in'
+    else:
+        script = None
+    
+    # Timestep and timestep-dependent variables
+    timestep = am.lammps.style.timestep(lmp.potential.units)
+    temperature_damp = 100 * timestep
+
+    # Pass system and potential info into LAMMPS
+    lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                  usefiles=usefiles, logfile=logfile)
+
+    lmp.cmd.timestep(timestep)
+    lmp.cmd.variable('pe', 'equal', 'pe')
+
+    if createvelocities:
+        lmp.commands_string('\n# Create velocities')
+        lmp.cmd.velocity('all', 'create', temperature, randomseed,
+                         'mom', 'yes', 'rot', 'yes', 'dist', 'gaussian')
+
+    lmp.commands_string('\n# Define thermostat')
+    lmp.cmd.fix('nve', 'all', 'nve')
+
+    lmp.commands_string('\n# Define spring fixes')
+    for i in range(system.natypes):
+        lmp.cmd.group(f'atype_{i+1}', 'type', f'{i+1}')
+        lmp.cmd.fix(f'ti_spring_{i+1}', f'atype_{i+1}', 'ti/spring', spring_constants[i], switchsteps, equilsteps, 'function', 2)
+
+    lmp.commands_string('\n# Langevin thermostat must be placed after ti/spring fixes')
+    lmp.cmd.fix('langevin', 'all', 'langevin',
+                temperature, temperature, temperature_damp, randomseed, 'zero', 'yes')
+    lmp.cmd.compute('temp_com', 'all', 'temp/com')
+    lmp.cmd.fix_modify('langevin', 'temp', 'temp_com')
+
+    lmp.commands_string('\n# Compute the Hamiltonian as potential energy minus the ti/spring energies')
+    spring_hamil = 'v_pe'
+    for i in range(system.natypes):
+        spring_hamil += f'-f_ti_spring_{i+1}'
+    lmp.cmd.variable('hamil', 'equal', spring_hamil)
+
+    lmp.commands_string('\n# Define minimal thermo')
+    lmp.cmd.thermo(0)
+    lmp.cmd.thermo_style('custom', 'step', 'c_temp_com', 'pe')
+
+    lmp.commands_string('\n# Equilibrate and forward switch')
+    lmp.cmd.run(equilsteps)
+    lmp.cmd.fix('forward_switch', 'all', 'print', 1, '"${hamil}"',
+                'screen', 'no', 'file', 'forward_switch.txt')
+    lmp.cmd.run(switchsteps)
+    lmp.cmd.unfix('forward_switch')
+
+    lmp.commands_string('\n# Equilibrate and reverse switch')
+    lmp.cmd.run(equilsteps)
+    lmp.cmd.fix('reverse_switch', 'all', 'print', 1, '"${hamil}"',
+                'screen', 'no', 'file', 'reverse_switch.txt')
+    lmp.cmd.run(switchsteps)
+    lmp.cmd.unfix('reverse_switch')
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
 
 def einstein_free_energy(temperature: float,
                          volume: float,

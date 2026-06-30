@@ -1,12 +1,8 @@
-# coding: utf-8
 # Standard Python libraries
 from io import IOBase
 from pathlib import Path
 from copy import deepcopy
 from typing import Optional, Union
-import random
-
-import numpy as np
 
 from yabadaba import load_query
 
@@ -22,7 +18,7 @@ from .. import Calculation
 from .relax_liquid import relax_liquid
 from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
                                    AtommanSystemLoad, AtommanSystemManipulate)
-from ...input import value
+from ...input import value, boolean
 
 class RelaxLiquid(Calculation):
     """Class for managing dynamic relaxations"""
@@ -30,11 +26,11 @@ class RelaxLiquid(Calculation):
 ############################# Core properties #################################
 
     def __init__(self,
-                 model: Union[str, Path, IOBase, DM, None]=None,
+                 model: Union[str, Path, IOBase, DM, None] = None,
                  name: Optional[str]=None,
                  database = None,
-                 params: Union[str, Path, IOBase, dict] = None,
-                 **kwargs: any):
+                 params: Union[str, Path, IOBase, dict, None] = None,
+                 **kwargs):
         """
         Initializes a Calculation object for a given style.
 
@@ -74,18 +70,16 @@ class RelaxLiquid(Calculation):
         self.randomseed = None
 
         self.meltsteps = 50000
-        self.coolsteps = 10000
-        self.equilvolumesteps = 50000
-        self.equilenergysteps = 10000
-        self.runsteps = 50000
+        self.equilsteps = 20000
+        self.runsteps = 1000000
         self.dumpsteps = None
         self.restartsteps = None
 
-        self.equilvolumesamples = 300
-        self.equilenergysamples = 100
-        self.equilenergystyle = 'pe'
-
-        self.rdfcutoff = None
+        self.createvelocities = True
+        self.rdf_nbins = 400
+        self.rdf_minr = 0.0
+        self.rdf_maxr = 10.0
+        self.rdf_delete_dump = True
 
         self.__final_dump = None
         self.__volume = None
@@ -98,12 +92,6 @@ class RelaxLiquid(Calculation):
         self.__measured_temperature_stderr = None
         self.__measured_pressure = None
         self.__measured_pressure_stderr = None
-        self.__time_values = None
-        self.__msd_x_values = None
-        self.__msd_y_values = None
-        self.__msd_z_values = None
-        self.__msd_values = None
-        self.__lammps_output = None
 
         # Define calc shortcut
         self.calc = relax_liquid
@@ -116,8 +104,7 @@ class RelaxLiquid(Calculation):
     def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
-            'relax_liquid.py',
-            'liquid.template'
+            'relax_liquid.py'
         ]
 
 ############################## Class attributes ################################
@@ -173,28 +160,10 @@ class RelaxLiquid(Calculation):
             self.__temperature = val
 
     @property
-    def rdfcutoff(self) -> float:
-        """float: The cutoff distance for the RDF calculation."""
-        if self.__rdfcutoff is None:
-            try:
-                ucell = self.system.ucell
-            except:
-                #raise ValueError('rdfcutoff not set and no ucell found to compute the default value')
-                return None
-            self.__rdfcutoff = 4 * ucell.r0()
-        return self.__rdfcutoff
-
-    @rdfcutoff.setter
-    def rdfcutoff(self, val: Optional[float]):
-        if val is not None:
-            val = float(val)
-        self.__rdfcutoff = val
-
-    @property
     def dumpsteps(self) -> int:
         """int: How often to dump configuration during the final run."""
         if self.__dumpsteps is None:
-            return self.meltsteps + self.coolsteps + self.equilvolumesteps + self.equilenergysteps + self.runsteps
+            return round(self.runsteps / 100)
         else:
             return self.__dumpsteps
 
@@ -208,12 +177,9 @@ class RelaxLiquid(Calculation):
             self.__dumpsteps = val
 
     @property
-    def restartsteps(self) -> int:
+    def restartsteps(self) -> Optional[int]:
         """int: How often to dump restart files during the final run."""
-        if self.__restartsteps is None:
-            return self.meltsteps + self.coolsteps + self.equilvolumesteps + self.equilenergysteps + self.runsteps
-        else:
-            return self.__restartsteps
+        return self.__restartsteps
 
     @restartsteps.setter
     def restartsteps(self, val: Optional[int]):
@@ -236,41 +202,19 @@ class RelaxLiquid(Calculation):
         self.__meltsteps = val
 
     @property
-    def coolsteps(self) -> int:
-        """int: Number of MD steps during the cooling stage"""
-        return self.__coolsteps
+    def equilsteps(self) -> int:
+        """int: Number of MD steps during the equilibration stage"""
+        return self.__equilsteps
 
-    @coolsteps.setter
-    def coolsteps(self, val: int):
+    @equilsteps.setter
+    def equilsteps(self, val: int):
         val = int(val)
         assert val >= 0
-        self.__coolsteps = val
-
-    @property
-    def equilvolumesteps(self) -> int:
-        """int: Number of MD steps during the volume equilibration stage"""
-        return self.__equilvolumesteps
-
-    @equilvolumesteps.setter
-    def equilvolumesteps(self, val: int):
-        val = int(val)
-        assert val >= 0
-        self.__equilvolumesteps = val
-
-    @property
-    def equilenergysteps(self) -> int:
-        """int: Number of MD steps during the energy equilibration stage"""
-        return self.__equilenergysteps
-
-    @equilenergysteps.setter
-    def equilenergysteps(self, val: int):
-        val = int(val)
-        assert val >= 0
-        self.__equilenergysteps = val
+        self.__equilsteps = val
 
     @property
     def runsteps(self) -> int:
-        """int: Number of MD steps during the nve analysis stage"""
+        """int: Number of MD steps during the analysis stage"""
         return self.__runsteps
 
     @runsteps.setter
@@ -280,45 +224,51 @@ class RelaxLiquid(Calculation):
         self.__runsteps = val
 
     @property
-    def equilvolumesamples(self) -> int:
-        """
-        int: Number of thermo samples from the volume equilibration run to
-        use for averaging volume
-        """
-        return self.__equilvolumesamples
-
-    @equilvolumesamples.setter
-    def equilvolumesamples(self, val: int):
-        val = int(val)
-        assert val >= 0
-        self.__equilvolumesamples = val
+    def createvelocities(self) -> bool:
+        """bool: Indicates if new velocities are to be created"""
+        return self.__createvelocities
+    
+    @createvelocities.setter
+    def createvelocities(self, val: bool):
+        assert isinstance(val, bool)
+        self.__createvelocities = val
 
     @property
-    def equilenergysamples(self) -> int:
-        """
-        int: Number of thermo samples from the energy equilibration run to use
-        for averaging energies
-        """
-        return self.__equilenergysamples
+    def rdf_nbins(self) -> int:
+        """int: The number of bins to use when computing the RDF"""
+        return self.__rdf_nbins
 
-    @equilenergysamples.setter
-    def equilenergysamples(self, val: int):
-        val = int(val)
-        assert val >= 0
-        self.__equilenergysamples = val
+    @rdf_nbins.setter
+    def rdf_nbins(self, val: int):
+        self.__rdf_nbins = int(val)
 
     @property
-    def equilenergystyle(self) -> str:
-        """
-        str: Specifies the option to use for computing the target total energy
-        during the energy equilibration run
-        """
-        return self.__equilenergystyle
+    def rdf_minr(self) -> float:
+        """float: The minimum r value to use when computing the RDF"""
+        return self.__rdf_minr
+    
+    @rdf_minr.setter
+    def rdf_minr(self, val: float):
+        self.__rdf_minr = float(val)
 
-    @equilenergystyle.setter
-    def equilenergystyle(self, val: str):
-        assert val in ['pe', 'te']
-        self.__equilenergystyle = val
+    @property
+    def rdf_maxr(self) -> float:
+        """float: The maximum r value to use when computing the RDF"""
+        return self.__rdf_maxr
+    
+    @rdf_maxr.setter
+    def rdf_maxr(self, val: float):
+        self.__rdf_maxr = float(val)
+
+    @property
+    def rdf_delete_dump(self) -> bool:
+        """bool: Indicates if dump files should be deleted after computing RDF"""
+        return self.__rdf_delete_dump
+    
+    @rdf_delete_dump.setter
+    def rdf_delete_dump(self, val: bool):
+        assert isinstance(val, bool)
+        self.__rdf_delete_dump = val
 
     @property
     def randomseed(self) -> int:
@@ -326,13 +276,8 @@ class RelaxLiquid(Calculation):
         return self.__randomseed
 
     @randomseed.setter
-    def randomseed(self, val: int):
-        if val is None:
-            val = random.randint(1, 900000000)
-        else:
-            val = int(val)
-            assert val > 0 and val <= 900000000
-        self.__randomseed = val
+    def randomseed(self, val: Optional[int]):
+        self.__randomseed = am.lammps.seed(val)
 
     @property
     def final_dump(self) -> dict:
@@ -414,48 +359,6 @@ class RelaxLiquid(Calculation):
             raise ValueError('No results yet!')
         return self.__measured_temperature_stderr
 
-    @property
-    def time_values(self) -> np.ndarray:
-        """numpy.array: Time values associated with the msd values"""
-        if self.__time_values is None:
-            raise ValueError('No results yet!')
-        return self.__time_values
-
-    @property
-    def msd_x_values(self) -> np.ndarray:
-        """numpy.array: Mean squared displacements along the x direction"""
-        if self.__msd_x_values is None:
-            raise ValueError('No results yet!')
-        return self.__msd_x_values
-
-    @property
-    def msd_y_values(self) -> np.ndarray:
-        """numpy.array: Mean squared displacements along the y direction"""
-        if self.__msd_y_values is None:
-            raise ValueError('No results yet!')
-        return self.__msd_y_values
-
-    @property
-    def msd_z_values(self) -> np.ndarray:
-        """numpy.array: Mean squared displacements along the z direction"""
-        if self.__msd_z_values is None:
-            raise ValueError('No results yet!')
-        return self.__msd_z_values
-
-    @property
-    def msd_values(self) -> np.ndarray:
-        """numpy.array: Total mean squared displacements"""
-        if self.__msd_values is None:
-            raise ValueError('No results yet!')
-        return self.__msd_values
-
-    @property
-    def lammps_output(self) -> am.lammps.Log:
-        """atomman.lammps.Log: The simulation output"""
-        if self.__lammps_output is None:
-            raise ValueError('No results! Does not get loaded from records!')
-        return self.__lammps_output
-
     def set_values(self,
                    name: Optional[str] = None,
                    **kwargs: any):
@@ -480,33 +383,10 @@ class RelaxLiquid(Calculation):
         meltsteps : int, optional
             The number of npt integration steps to perform during the melting
             stage at the melt temperature to create an amorphous liquid structure.
-        coolsteps : int, optional
+        equilsteps : int, optional
             The number of npt integration steps to perform during the cooling
             stage where the temperature is reduced from the melt temperature
             to the target temperature.
-        equilvolumesteps : int, optional
-            The number of npt integration steps to perform during the volume
-            equilibration stage where the system is held at the target temperature
-            and pressure to obtain an estimate for the relaxed volume.
-        equilvolumesamples : int, optional
-            The number of thermo samples from the end of the volume equilibration
-            stage to use in computing the average volume.  Cannot be larger than
-            equilvolumesteps / 100.  It is recommended to set smaller than the max
-            to allow for some convergence time.
-        equilenergysteps : int, optional
-            The number of nvt integration steps to perform during the energy
-            equilibration stage where the system is held at the target temperature
-            to obtain an estimate for the total energy.
-        equilenergysamples : int, optional
-            The number of thermo samples from the end of the energy equilibrium
-            stage to use in computing the target total energy.  Cannot be
-            larger than equilenergysteps / 100.
-        equilenergystyle : str, optional
-            Indicates which scheme to use for computing the target total energy.
-            Allowed values are 'pe' or 'te'.  For 'te', the average total energy
-            from the equilenergysamples is used as the target energy.  For 'pe',
-            the average potential energy plus 3/2 N kB T is used as the target
-            energy.
         runsteps : int or None, optional
             The number of nve integration steps to perform on the system to
             obtain measurements of MSD and RDF of the liquid.
@@ -533,32 +413,28 @@ class RelaxLiquid(Calculation):
             self.temperature = kwargs['temperature']
         if 'temperature_melt' in kwargs:
             self.temperature_melt = kwargs['temperature_melt']
-        if 'rdfcutoff' in kwargs:
-            self.rdfcutoff = kwargs['rdfcutoff']
         if 'randomseed' in kwargs:
             self.randomseed = kwargs['randomseed']
         if 'meltsteps' in kwargs:
             self.meltsteps = kwargs['meltsteps']
-        if 'coolsteps' in kwargs:
-            self.coolsteps = kwargs['coolsteps']
-        if 'equilvolumesteps' in kwargs:
-            self.equilvolumesteps = kwargs['equilvolumesteps']
-        if 'equilenergysteps' in kwargs:
-            self.equilenergysteps = kwargs['equilenergysteps']
-        if 'thermosteps' in kwargs:
-            self.thermosteps = kwargs['thermosteps']
+        if 'equilsteps' in kwargs:
+            self.equilsteps = kwargs['equilsteps']
         if 'runsteps' in kwargs:
             self.runsteps = kwargs['runsteps']
         if 'dumpsteps' in kwargs:
             self.dumpsteps = kwargs['dumpsteps']
         if 'restartsteps' in kwargs:
             self.restartsteps = kwargs['restartsteps']
-        if 'equilvolumesamples' in kwargs:
-            self.equilvolumesamples = kwargs['equilvolumesamples']
-        if 'equilenergysamples' in kwargs:
-            self.equilenergysamples = kwargs['equilenergysamples']
-        if 'equilenergystyle' in kwargs:
-            self.equilenergystyle = kwargs['equilenergystyle']
+        if 'createvelocities' in kwargs:
+            self.createvelocities = kwargs['createvelocities']
+        if 'rdf_nbins' in kwargs:
+            self.rdf_nbins = kwargs['rdf_nbins']
+        if 'rdf_minr' in kwargs:
+            self.rdf_minr = kwargs['rdf_minr']
+        if 'rdf_maxr' in kwargs:
+            self.rdf_maxr = kwargs['rdf_maxr']
+        if 'rdf_delete_dump' in kwargs:
+            self.rdf_maxr = kwargs['rdf_delete_dump']
 
 ####################### Parameter file interactions ###########################
 
@@ -587,21 +463,19 @@ class RelaxLiquid(Calculation):
         input_dict['sizemults'] = input_dict.get('sizemults', '10 10 10')
 
         # Load calculation-specific strings
-        self.equilenergystyle = input_dict.get('equilenergystyle', 'pe')
 
         # Load calculation-specific booleans
+        self.createvelocities = boolean(input_dict.get('createvelocities', True))
+        self.rdf_delete_dump = boolean(input_dict.get('rdf_delete_dump', True))
 
         # Load calculation-specific integers
         self.meltsteps = int(input_dict.get('meltsteps', 50000))
-        self.coolsteps = int(input_dict.get('coolsteps', 10000))
-        self.equilvolumesteps = int(input_dict.get('equilvolumesteps', 50000))
-        self.equilvolumesamples = int(input_dict.get('equilvolumesamples', 300))
-        self.equilenergysteps = int(input_dict.get('equilenergysteps', 10000))
-        self.equilenergysamples = int(input_dict.get('equilenergysamples', 100))
+        self.equilsteps = int(input_dict.get('equilsteps', 10000))
         self.runsteps = int(input_dict.get('runsteps', 50000))
         self.dumpsteps = input_dict.get('dumpsteps', None)
         self.restartsteps = input_dict.get('restartsteps', None)
         self.randomseed = input_dict.get('randomseed', None)
+        self.rdf_nbins = input_dict.get('rdf_nbins', 400)
 
         # Load calculation-specific unitless floats
         self.temperature = float(input_dict['temperature'])
@@ -611,11 +485,12 @@ class RelaxLiquid(Calculation):
         self.pressure = value(input_dict, 'pressure',
                               default_unit=self.units.pressure_unit,
                               default_term='0.0 GPa')
-        if 'rdfcutoff' in input_dict:
-            self.rdfcutoff = value(input_dict, 'rdfcutoff',
-                              default_unit=self.units.length_unit)
-        else:
-            self.rdfcutoff = None
+        self.rdf_minr = value(input_dict, 'rdf_minr',
+                              default_unit=self.units.length_unit,
+                              default_term='0.0 angstrom')
+        self.rdf_maxr = value(input_dict, 'rdf_maxr',
+                              default_unit=self.units.length_unit,
+                              default_term='10.0 angstrom')
 
         # Load LAMMPS commands
         self.commands.load_parameters(input_dict)
@@ -656,33 +531,7 @@ class RelaxLiquid(Calculation):
         params['branch'] = branch
 
         # main branch
-        if branch == 'main':
-
-            # Check for required kwargs
-            assert 'lammps_command' in kwargs
-
-            # Set default workflow settings
-            params['buildcombos'] = 'atomicparent load_file parent'
-            params['parent_record'] = 'relaxed_crystal'
-            params['parent_method'] = 'dynamic'
-            params['parent_standing'] = 'good'
-            params['parent_family'] = 'A1--Cu--fcc'
-            params['sizemults'] = '10 10 10'
-            params['atomshift'] = '0.05 0.05 0.05'
-            params['temperature'] = [str(i) for i in np.arange(50, 3050, 50)]
-
-            # Copy kwargs to params
-            for key in kwargs:
-
-                # Rename potential-related terms for buildcombos
-                if key[:10] == 'potential_':
-                    params[f'parent_{key}'] = kwargs[key]
-
-                # Copy/overwrite other terms
-                else:
-                    params[key] = kwargs[key]
-
-        elif branch == 'melt':
+        if branch == 'melt':
 
             # Check for required kwargs
             assert 'lammps_command' in kwargs
@@ -696,7 +545,6 @@ class RelaxLiquid(Calculation):
             params['parent_family'] = 'A1--Cu--fcc'
             params['sizemults'] = '10 10 10'
             params['atomshift'] = '0.05 0.05 0.05'
-            params['runsteps'] = '1000000'
             params['temperature'] = '3000'
 
             # Copy kwargs to params
@@ -709,7 +557,7 @@ class RelaxLiquid(Calculation):
                 # Copy/overwrite other terms
                 else:
                     params[key] = kwargs[key]
-
+            
             # Set temperature_melt to temperature
             params['temperature_melt'] = params['temperature']
 
@@ -728,10 +576,10 @@ class RelaxLiquid(Calculation):
             params['archive_temperature'] = kwargs['temperature_melt']
             params['sizemults'] = '1 1 1'
             params['atomshift'] = '0.0 0.0 0.0'
-            params['runsteps'] = '1000000'
             params['temperature'] = kwargs['temperature']
             params['temperature_melt'] = kwargs['temperature_melt']
             params['meltsteps'] = '0'
+            params['createvelocities'] = 'False'
 
             # Copy kwargs to params
             for key in kwargs:
@@ -761,42 +609,14 @@ class RelaxLiquid(Calculation):
             'temperature_melt': ' '.join([
                 "The elevated temperature to first use to hopefully melt the initial",
                 "configuration."]),
-            'rdfcutoff': ' '.join([
-                "The cutoff distance to use for the RDF cutoff.  If not given then",
-                "will use 4 * r0, where r0 is the shortest atomic distance found in",
-                "the given system configuration."]),
             'meltsteps': ' '.join([
                 "The number of npt integration steps to perform during the melting",
                 "stage at the melt temperature to create an amorphous liquid structure.",
                 "Default value is 50000."]),
-            'coolsteps': ' '.join([
+            'equilsteps': ' '.join([
                 "The number of npt integration steps to perform during the cooling",
                 "stage where the temperature is reduced from the melt temperature",
                 "to the target temperature.  Default value is 10000."]),
-            'equilvolumesteps': ' '.join([
-                "The number of npt integration steps to perform during the volume",
-                "equilibration stage where the system is held at the target temperature",
-                "and pressure to obtain an estimate for the relaxed volume.  Default",
-                "value is 50000."]),
-            'equilvolumesamples': ' '.join([
-                "The number of thermo samples from the end of the volume equilibration",
-                "stage to use in computing the average volume.  Cannot be larger than",
-                "equilvolumesteps / 100.  It is recommended to set smaller than the max",
-                "to allow for some convergence time.  Default value is 300. "]),
-            'equilenergysteps': ' '.join([
-                "The number of nvt integration steps to perform during the energy",
-                "equilibration stage where the system is held at the target temperature",
-                "to obtain an estimate for the total energy.  Default value is 10000."]),
-            'equilenergysamples': ' '.join([
-                "The number of thermo samples from the end of the energy equilibrium",
-                "stage to use in computing the target total energy.  Cannot be",
-                "larger than equilenergysteps / 100.  Default value is 100."]),
-            'equilenergystyle': ' '.join([
-                "Indicates which scheme to use for computing the target total energy.",
-                "Allowed values are 'pe' or 'te'.  For 'te', the average total energy",
-                "from the equilenergysamples is used as the target energy.  For 'pe',",
-                "the average potential energy plus 3/2 N kB T is used as the target",
-                "energy.  Default value is 'pe'."]),
             'runsteps': ' '.join([
                 "The number of nve integration steps to perform on the system to",
                 "obtain measurements of MSD and RDF of the liquid. Default value is",
@@ -809,6 +629,24 @@ class RelaxLiquid(Calculation):
                 "Restart files will be saved every this many steps. Default is None",
                 "which sets restartsteps equal to the sum",
                 "of all other steps values so only the final configuration is saved."]),
+            'createvelocities': ' '.join([
+                "Flag indicating if new velocities should be created and assigned to",
+                "the atoms prior to any simulation runs.  Useful to set this to False",
+                "for subsequent runs of already relaxed liquid phases.  Default value",
+                "is True"]),
+            'rdf_nbins': ' '.join([
+                "The number of bins to use for generating the RDF plot from the dump",
+                "files.  Default value is 400."]),
+            'rdf_minr': ' '.join([
+                "The minimum r value to use for generating the RDF plot from the dump",
+                "files.  Default value is 0.0 angstrom."]),
+            'rdf_maxr': ' '.join([
+                "The maximum r value to use for generating the RDF plot from the dump",
+                "files.  Default value is 10.0 angstrom."]),
+            'rdf_delete_dump': ' '.join([
+                'If True (default), all dump files except for the final one will be',
+                'deleted after the RDF calculation.  Setting this to False will leave',
+                'all dump files allowing for further analysis.']),
             'randomseed': ' '.join([
                 "Random number seed used by LAMMPS in creating velocities and with",
                 "the Langevin thermostat.  Default is None which will select a",
@@ -828,6 +666,10 @@ class RelaxLiquid(Calculation):
             + self.units.keyset
 
             # Calculation-specific keys
+            + [
+                'createvelocities',
+                'rdf_delete_dump'
+                ]
         )
         return keys
 
@@ -842,10 +684,7 @@ class RelaxLiquid(Calculation):
             # Combination of potential and system keys
             [
                 self.potential.keyset +
-                self.system.keyset +
-                [
-                    "rdfcutoff"
-                ]
+                self.system.keyset
             ] +
 
             # System mods keys
@@ -872,16 +711,14 @@ class RelaxLiquid(Calculation):
                 [
                     'temperature_melt',
                     'meltsteps',
-                    'coolsteps',
-                    'equilvolumesteps',
-                    'equilvolumesamples',
-                    'equilenergysteps',
-                    'equilenergysamples',
-                    'equilenergystyle',
+                    'equilsteps',
                     'runsteps',
                     'dumpsteps',
                     'restartsteps',
                     'randomseed',
+                    'rdf_nbins',
+                    'rdf_minr',
+                    'rdf_maxr',
                 ]
             ]
         )
@@ -916,16 +753,15 @@ class RelaxLiquid(Calculation):
         run_params = calc['calculation']['run-parameter']
 
         run_params['temperature_melt'] = self.temperature_melt
-        run_params['rdfcutoff'] = self.rdfcutoff
         run_params['meltsteps'] = self.meltsteps
-        run_params['coolsteps'] = self.coolsteps
-        run_params['equilvolumesteps'] = self.equilvolumesteps
-        run_params['equilvolumesamples'] = self.equilvolumesamples
-        run_params['equilenergysteps'] = self.equilenergysteps
-        run_params['equilenergysamples'] = self.equilenergysamples
-        run_params['equilenergystyle'] = self.equilenergystyle
+        run_params['equilsteps'] = self.equilsteps
         run_params['runsteps'] = self.runsteps
         run_params['dumpsteps'] = self.dumpsteps
+        run_params['createvelocities'] = self.createvelocities
+        run_params['rdf_nbins'] = self.rdf_nbins
+        run_params['rdf_minr'] = uc.model(self.rdf_minr, 'angstrom')
+        run_params['rdf_maxr'] = uc.model(self.rdf_maxr, 'angstrom')
+        run_params['rdf_delete_dump'] = self.rdf_delete_dump
         run_params['randomseed'] = self.randomseed
 
         # Save phase-state info
@@ -959,14 +795,6 @@ class RelaxLiquid(Calculation):
             calc['potential-energy-per-atom'] = uc.model(self.E_pot, self.units.energy_unit,
                                                          self.E_pot_stderr)
 
-            # Save mean squared displacements
-            calc['mean-squared-displacements-relation'] = scan = DM()
-            scan['t'] = uc.model(self.time_values, 'ps')
-            scan['msd_x'] = uc.model(self.msd_x_values, f'{self.units.length_unit}^2')
-            scan['msd_y'] = uc.model(self.msd_y_values, f'{self.units.length_unit}^2')
-            scan['msd_z'] = uc.model(self.msd_z_values, f'{self.units.length_unit}^2')
-            scan['msd'] = uc.model(self.msd_values, f'{self.units.length_unit}^2')
-
         self._set_model(model)
         return model
 
@@ -991,16 +819,15 @@ class RelaxLiquid(Calculation):
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
         self.temperature_melt = run_params['temperature_melt']
-        self.rdfcutoff = run_params['rdfcutoff']
         self.meltsteps = run_params['meltsteps']
-        self.coolsteps = run_params['coolsteps']
-        self.equilvolumesteps = run_params['equilvolumesteps']
-        self.equilvolumesamples = run_params['equilvolumesamples']
-        self.equilenergysteps = run_params['equilenergysteps']
-        self.equilenergysamples = run_params['equilenergysamples']
-        self.equilenergystyle = run_params['equilenergystyle']
+        self.equilsteps = run_params['equilsteps']
         self.runsteps = run_params['runsteps']
         self.dumpsteps = run_params['dumpsteps']
+        self.createvelocities = run_params.get('createvelocities', True)
+        self.rdf_nbins = run_params.get('rdf_nbins', 400)
+        self.rdf_minr = uc.value_unit(run_params.get('rdf_minr', {'value':0.0, 'unit':'angstrom'}))
+        self.rdf_maxr = uc.value_unit(run_params.get('rdf_maxr', {'value':10.0, 'unit':'angstrom'}))
+        self.rdf_delete_dump = run_params.get('rdf_delete_dump', True)
         self.randomseed = run_params['randomseed']
 
         # Load phase-state info
@@ -1027,13 +854,6 @@ class RelaxLiquid(Calculation):
             self.__E_total_stderr = uc.error_unit(calc['total-energy-per-atom'])
             self.__E_pot = uc.value_unit(calc['potential-energy-per-atom'])
             self.__E_pot_stderr = uc.error_unit(calc['potential-energy-per-atom'])
-
-            scan = calc['mean-squared-displacements-relation']
-            self.__time_values = uc.value_unit(scan['t'])
-            self.__msd_x_values = uc.value_unit(scan['msd_x'])
-            self.__msd_y_values = uc.value_unit(scan['msd_y'])
-            self.__msd_z_values = uc.value_unit(scan['msd_z'])
-            self.__msd_values = uc.value_unit(scan['msd'])
 
     @property
     def queries(self) -> dict:
@@ -1067,7 +887,6 @@ class RelaxLiquid(Calculation):
         # Extract calculation-specific content
         meta['temperature'] = self.temperature
         meta['pressure'] = self.pressure
-        meta['rdfcutoff'] = self.rdfcutoff
 
         # Extract results
         if self.status == 'finished':
@@ -1082,12 +901,6 @@ class RelaxLiquid(Calculation):
             meta['E_total_stderr'] = self.E_total_stderr
             meta['E_pot'] = self.E_pot
             meta['E_pot_stderr'] = self.E_pot_stderr
-
-            meta['time_values'] = self.time_values.tolist()
-            meta['msd_x_values'] = self.msd_x_values.tolist()
-            meta['msd_y_values'] = self.msd_y_values.tolist()
-            meta['msd_z_values'] = self.msd_z_values.tolist()
-            meta['msd_values'] = self.msd_values.tolist()
 
         return meta
 
@@ -1133,22 +946,33 @@ class RelaxLiquid(Calculation):
         input_dict['pressure'] = self.pressure
         input_dict['temperature'] = self.temperature
         input_dict['temperature_melt'] = self.temperature_melt
-        input_dict['rdfcutoff'] = self.rdfcutoff
         input_dict['meltsteps'] = self.meltsteps
-        input_dict['coolsteps'] = self.coolsteps
-        input_dict['equilvolumesteps'] = self.equilvolumesteps
-        input_dict['equilvolumesamples'] = self.equilvolumesamples
-        input_dict['equilenergysteps'] = self.equilenergysteps
-        input_dict['equilenergysamples'] = self.equilenergysamples
-        input_dict['equilenergystyle'] = self.equilenergystyle
+        input_dict['equilsteps'] = self.equilsteps
         input_dict['runsteps'] = self.runsteps
         input_dict['dumpsteps'] = self.dumpsteps
         input_dict['restartsteps'] = self.restartsteps
+        input_dict['createvelocities'] = self.createvelocities
+        input_dict['rdf_nbins'] = self.rdf_nbins
+        input_dict['rdf_minr'] = self.rdf_minr
+        input_dict['rdf_maxr'] = self.rdf_maxr
+        input_dict['rdf_delete_dump'] = self.rdf_delete_dump
         input_dict['randomseed'] = self.randomseed
 
         # Return input_dict
         return input_dict
 
+    @property
+    def calc_output_files(self) -> list:
+        """list : Glob path strings for files generated by this calculation"""
+        return [
+            'init.dat',
+            'log.lammps',
+            '*.dump',
+            'liquid.in',
+            'rdf_dump.txt'
+            
+        ]
+    
     def process_results(self, results_dict: dict):
         """
         Processes calculation results and saves them to the object's results
@@ -1175,10 +999,3 @@ class RelaxLiquid(Calculation):
         self.__E_total_stderr = results_dict['E_total_stderr']
         self.__E_pot = results_dict['E_pot']
         self.__E_pot_stderr = results_dict['E_pot_stderr']
-
-        self.__time_values = results_dict['time_values']
-        self.__msd_x_values = results_dict['msd_x_values']
-        self.__msd_y_values = results_dict['msd_y_values']
-        self.__msd_z_values = results_dict['msd_z_values']
-        self.__msd_values = results_dict['msd_values']
-        self.__lammps_output = results_dict['lammps_output']

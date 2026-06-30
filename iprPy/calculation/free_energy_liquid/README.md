@@ -1,4 +1,4 @@
-# relax_box calculation style
+# free_energy_liquid calculation style
 
 **Lucas M. Hale**, [lucas.hale@nist.gov](mailto:lucas.hale@nist.gov?Subject=ipr-demo), *Materials Science and Engineering Division, NIST*.
 
@@ -9,7 +9,8 @@ The free_energy_liquid calculation style uses thermodynamic integration to evalu
 ### Version notes
 
 - 2022-09-20: Calculation first added to iprPy
-
+- v0.12.0: Method updated to support the LAMMPS library interface.
+  
 ### Additional dependencies
 
 ### Disclaimers
