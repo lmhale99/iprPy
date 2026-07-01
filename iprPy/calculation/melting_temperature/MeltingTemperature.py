@@ -1,4 +1,3 @@
-# coding: utf-8
 # Standard Python libraries
 from io import IOBase
 from pathlib import Path
@@ -77,7 +76,8 @@ class MeltingTemperature(Calculation):
         self.runsteps = 200000
         self.thermosteps = 100
         self.dumpsteps = None
-        self.randomseed = None
+        self.randomseed1 = None
+        self.randomseed2 = None
 
         self.__melting_temperature = None
         self.__fraction_solids = None
@@ -95,8 +95,7 @@ class MeltingTemperature(Calculation):
     def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
-            'melting_temperature.py',
-            'two_phase_melting_temperature.template'
+            'melting_temperature.py'
         ]
     
 ############################## Class attributes ################################
@@ -252,18 +251,22 @@ class MeltingTemperature(Calculation):
             self.__dumpsteps = val
 
     @property
-    def randomseed(self) -> int:
-        """int: Random number generator seed"""
-        return self.__randomseed
+    def randomseed1(self) -> int:
+        """int: Random number seed."""
+        return self.__randomseed1
 
-    @randomseed.setter
-    def randomseed(self, val: int):
-        if val is None:
-            val = random.randint(1, 900000000)
-        else:
-            val = int(val)
-            assert val > 0 and val <= 900000000
-        self.__randomseed = val
+    @randomseed1.setter
+    def randomseed1(self, val: Optional[int]):
+        self.__randomseed1 = am.lammps.seed(val)
+
+    @property
+    def randomseed2(self) -> int:
+        """int: Random number seed."""
+        return self.__randomseed2
+
+    @randomseed2.setter
+    def randomseed2(self, val: Optional[int]):
+        self.__randomseed2 = am.lammps.seed(val)
 
     @property
     def melting_temperature(self) -> float:
@@ -315,9 +318,12 @@ class MeltingTemperature(Calculation):
         dumpsteps : int, optional
             Indicates how often the atomic configuration is output to a LAMMPS
             dump file.
-        randomseed : int, optional
+        randomseed1 : int, optional
             A random number generator seed to use for constructing the initial
-            atomic velocities.
+            atomic velocities of the liquid phase.
+        randomseed2 : int, optional
+            A random number generator seed to use for constructing the initial
+            atomic velocities of the solid phase.
         **kwargs : any, optional
             Any keyword parameters supported by the set_values() methods of
             the parent Calculation class and the subset classes.
@@ -347,8 +353,10 @@ class MeltingTemperature(Calculation):
             self.thermosteps = kwargs['thermosteps']
         if 'dumpsteps' in kwargs:
             self.dumpsteps = kwargs['dumpsteps']
-        if 'randomseed' in kwargs:
-            self.randomseed = kwargs['randomseed']
+        if 'randomseed1' in kwargs:
+            self.randomseed1 = kwargs['randomseed1']
+        if 'randomseed2' in kwargs:
+            self.randomseed2 = kwargs['randomseed2']
 
 ####################### Parameter file interactions ###########################
 
@@ -387,7 +395,8 @@ class MeltingTemperature(Calculation):
         self.runsteps = int(input_dict.get('runsteps', 200000))
         self.thermosteps = int(input_dict.get('thermosteps', 100))
         self.dumpsteps = input_dict.get('dumpsteps', None)
-        self.randomseed = input_dict.get('randomseed', 1)
+        self.randomseed1 = input_dict.get('randomseed1', None)
+        self.randomseed2 = input_dict.get('randomseed2', None)
 
         # Load calculation-specific unitless floats
         self.temperature_guess = input_dict['temperature_guess']
@@ -482,9 +491,12 @@ class MeltingTemperature(Calculation):
                 "How often LAMMPS will save the atomic configuration to a",
                 "LAMMPS dump file.  Default value is meltsteps+scalesteps+runsteps,",
                 "meaning that only the initial and final states are saved."]),
-            'randomseed': ' '.join([
-                "An int random number seed to use for generating initial velocities.",
-                "A random int will be selected if not given."]),
+            'randomseed1': ' '.join([
+                "An int random number seed to use for generating initial velocities",
+                "in the liquid region. A random int will be selected if not given."]),
+            'randomseed2': ' '.join([
+                "An int random number seed to use for generating initial velocities",
+                "in the solid region. A random int will be selected if not given."]),
         }
 
     @property
@@ -548,13 +560,14 @@ class MeltingTemperature(Calculation):
                     'scalesteps',
                     'runsteps',
                     'thermosteps',
-                    'dumpsteps',   
+                    'dumpsteps',
                 ]
             ] + 
             
             [
                 [
-                    'randomseed',
+                    'randomseed1',
+                    'randomseed2',
                 ]
             ]
         )
@@ -596,7 +609,8 @@ class MeltingTemperature(Calculation):
         run_params['scalesteps'] = self.scalesteps
         run_params['runsteps'] = self.runsteps
         run_params['thermosteps'] = self.thermosteps
-        run_params['randomseed'] = self.randomseed
+        run_params['randomseed1'] = self.randomseed1
+        run_params['randomseed2'] = self.randomseed2
 
         # Save phase-state info
         calc['phase-state'] = DM()
@@ -640,7 +654,8 @@ class MeltingTemperature(Calculation):
         self.scalesteps = run_params['scalesteps']
         self.runsteps = run_params['runsteps']
         self.thermosteps = run_params['thermosteps']
-        self.randomseed = run_params['randomseed']
+        self.randomseed1 = run_params['randomseed1']
+        self.randomseed2 = run_params['randomseed2']
 
         # Load phase-state info
         self.pressure = uc.value_unit(calc['phase-state']['pressure'])
@@ -664,7 +679,8 @@ class MeltingTemperature(Calculation):
         # Extract calculation-specific content
         meta['temperature_guess'] = self.temperature_guess
         meta['pressure'] = self.pressure
-        meta['randomseed'] = self.randomseed
+        meta['randomseed1'] = self.randomseed1
+        meta['randomseed2'] = self.randomseed2
 
         # Extract results
         if self.status == 'finished':
@@ -686,7 +702,8 @@ class MeltingTemperature(Calculation):
             'potential_LAMMPS_key',
             'potential_key',
 
-            'randomseed',
+            'randomseed1',
+            'randomseed2',
         ]
 
     @property
@@ -725,7 +742,8 @@ class MeltingTemperature(Calculation):
         input_dict['runsteps'] = self.runsteps
         input_dict['thermosteps'] = self.thermosteps
         input_dict['dumpsteps'] = self.dumpsteps
-        input_dict['randomseed'] = self.randomseed
+        input_dict['randomseed1'] = self.randomseed1
+        input_dict['randomseed2'] = self.randomseed2
 
         # Return input_dict
         return input_dict

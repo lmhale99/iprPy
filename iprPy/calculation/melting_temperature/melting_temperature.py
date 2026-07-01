@@ -1,5 +1,3 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale
 
 # Standard library imports
@@ -7,23 +5,21 @@ from typing import Optional, Union
 from pathlib import Path
 import random
 
-# https://github.com/usnistgov/atomman 
-import atomman as am
-import atomman.lammps as lmp
-import atomman.unitconvert as uc
-from atomman.tools import filltemplate
-
+# http://www.numpy.org/
 import numpy as np
 
-# iprPy imports
-from ...tools import read_calc_file
+# https://github.com/usnistgov/atomman 
+import atomman as am
+import atomman.unitconvert as uc
+from atomman.typing import lammpspotential, unitfloat
+from atomman.lammps import LAMMPS, LAMMPSobj
 
-def melting_temperature(lammps_command: str,
+def melting_temperature(lammps_command: Union[str, LAMMPSobj],
                         system: am.System,
-                        potential: lmp.Potential,
+                        potential: lammpspotential,
                         temperature_guess: float,
                         mpi_command: Optional[str] = None,
-                        pressure: float = 0.0,
+                        pressure: unitfloat = 0.0,
                         temperature_solid: Optional[float] = None,
                         temperature_liquid: Optional[float] = None,
                         ptm_structures: Optional[str] = None,
@@ -32,7 +28,9 @@ def melting_temperature(lammps_command: str,
                         runsteps: int = 200000,
                         thermosteps: int = 100,
                         dumpsteps: Optional[int] = None,
-                        randomseed: Union[int, list] = None) -> dict:
+                        randomseed1: Optional[int] = None,
+                        randomseed2: Optional[int] = None,
+                        usefiles: bool = False) -> dict:
     """
     Creates a solid-liquid phase coexistence simulation to estimate the melting
     temperature.  The boundary for the two phases will be perpendicular to the
@@ -40,13 +38,14 @@ def melting_temperature(lammps_command: str,
     
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     system : atomman.System
         The initial system to perform the calculation on.  This should be a
         supercell with dimensions along the z direction roughly twice the
         dimensions in the other directions.
-    potential : atomman.lammps.Potential
+    potential : PotentialLAMMPS or PotentialLAMMPSKIM
         The LAMMPS implemented potential to use.
     temperature_guess : float, optional
         The initial guess for the melting temperature. The closer to the actual
@@ -54,7 +53,7 @@ def melting_temperature(lammps_command: str,
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
         will run serially.
-    pressure : float, optional
+    pressure : float or str, optional
         The target pressure to use with the barostat.  Default value is 0.0.
     temperature_liquid : float or None, optional
         The initial temperature to use for the liquid region to melt the crystal.
@@ -80,24 +79,39 @@ def melting_temperature(lammps_command: str,
     dumpsteps : int or None, optional
         Dump files will be saved every this many steps. Default is None,
         which sets dumpsteps equal to meltsteps + scalesteps + runsteps.
-    randomseed : int, list or None, optional
-        Random number seed(s) used by LAMMPS in creating velocities for the liquid
-        and solid regions.  Default is None which will select random ints
-        between 1 and 900000000.
-    
+    randomseed1 : int or None, optional
+        Random number seed used by LAMMPS in creating velocities for the liquid
+        region.  Default is None which will select random ints between 1 and
+        900000000.
+    randomseed2 : int or None, optional
+        Random number seed used by LAMMPS in creating velocities for the solid
+        region.  Default is None which will select random ints between 1 and
+        900000000.
+    usefiles : bool, optional
+        If set to True, then all input/output files for LAMMPS will be generated.
+        Default value of False will minimize the files created.
+
     Returns
     -------
     dict
         Dictionary of results consisting of keys:
         - **'temp'** (*float*) - The mean measured temperature.
     """
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
-    
-    #Get lammps version date
-    lammps_date = lmp.checkversion(lammps_command)['date']
+    logfile = 'log.lammps'
+    if usefiles:
+        script = 'liquid.in'
+    else:
+        script = None
+
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
+
+    # Convert values given with units if needed
+    pressure = uc.set_in_units(pressure)
     
     # Handle default values
+    randomseed1 = am.lammps.seed(randomseed1)
+    randomseed2 = am.lammps.seed(randomseed2)
     if dumpsteps is None:
         dumpsteps = meltsteps + scalesteps + runsteps
     if temperature_liquid is None:
@@ -105,52 +119,79 @@ def melting_temperature(lammps_command: str,
     if temperature_solid is None:
         temperature_solid = 0.5 * temperature_guess
     
-    # Random seed settings
-    if randomseed is None:
-        randomseed = random.randint(1, 900000000)
-        
-    # Define lammps variables
-    lammps_variables = {}
-    
-    # Dump initial system as data and build LAMMPS inputs
-    system_info = system.dump('atom_data', f='init.dat',
-                              potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
+    # Boundary position between the two phases
+    zboundary = system.box.origin[2] + 0.5 * system.box.cvect[2]
 
-    lammps_variables['zboundary'] = system.box.origin[2] + 0.5 * system.box.cvect[2] 
-    lammps_variables['temperature_guess'] = temperature_guess
-    lammps_variables['temperature_liquid'] = temperature_liquid
-    lammps_variables['temperature_solid'] = temperature_solid
-    lammps_variables['pressure'] = pressure
-    lammps_variables['meltsteps'] = meltsteps
-    lammps_variables['scalesteps'] = scalesteps
-    lammps_variables['runsteps'] = runsteps
-    lammps_variables['dumpsteps'] = dumpsteps
-    lammps_variables['thermosteps'] = thermosteps
-    lammps_variables['randomseed'] = randomseed
-    
-    if ptm_structures is None:
-        lammps_variables['compute_ptm'] = ''
-        lammps_variables['ptm_dump'] = ''
-    else:
-        lammps_variables['compute_ptm'] = f'compute ptm all ptm/atom {ptm_structures} 0.15'
-        lammps_variables['ptm_dump'] = 'c_ptm[1]'
+    # Simulation dump file keys
+    dump_keys = ['id', 'type', 'x', 'y', 'z', 'c_pe', 'c_ke']
 
-    timestep = lmp.style.timestep(potential.units)
-    lammps_variables['timestep'] = timestep
-    
-    # Write lammps input script
-    lammps_script = 'two_phase_melting_temp.in'
-    template = read_calc_file('iprPy.calculation.melting_temperature',
-                              'two_phase_melting_temp.template')
-    with open(lammps_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
-    
-    # Run lammps 
-    output = lmp.run(lammps_command, script_name=lammps_script,
-                     mpi_command=mpi_command, screen=False)
-    
-    thermo = output.simulations[2].thermo
+    # Timestep and timestep-dependent variables
+    timestep = am.lammps.style.timestep(lmp.potential.units)
+    temperature_damp = 100 * timestep
+    pressure_damp = 1000 * timestep
+
+    # Pass system and potential info into LAMMPS
+    lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                  usefiles=usefiles, logfile=logfile)
+
+    # Split system into top and bot regions
+    lmp.cmd.region('top', 'block', 'INF', 'INF', 'INF', 'INF', zboundary, 'INF')
+    lmp.cmd.region('bot', 'block', 'INF', 'INF', 'INF', 'INF', 'INF', zboundary)
+    lmp.cmd.group('top', 'region', 'top')
+    lmp.cmd.group('bot', 'region', 'bot')
+
+    # Per-atom property computes
+    lmp.cmd.compute('pe', 'all', 'pe/atom')
+    lmp.cmd.compute('ke', 'all', 'ke/atom')
+
+    # Add polyhedral template matching
+    if ptm_structures is not None:
+        lmp.cmd.compute('ptm', 'all', 'ptm/atom', ptm_structures, 0.15)
+        dump_keys.append('c_ptm[1]')
+
+    # Thermo output definition
+    lmp.cmd.thermo(thermosteps)
+    lmp.cmd.thermo_style('custom', 'step', 'temp', 'pe', 'ke', 'etotal',
+                         'lx', 'ly', 'lz', 'pxx', 'pyy', 'pzz')
+    lmp.cmd.thermo_modify('format', 'float', '%.17e')
+    lmp.cmd.timestep(timestep)
+
+    # Define dump files
+    lmp.cmd.dump('dumpit', 'all', 'custom', dumpsteps, '*.dump', *dump_keys)
+    lmp.cmd.dump_modify('dumpit', 'format', 'float', '%.17e')
+
+    # Create velocities
+    lmp.cmd.velocity('top', 'create', temperature_liquid, randomseed1)
+    lmp.cmd.velocity('bot', 'create', temperature_solid, randomseed2)
+
+    # Set barostat to use throughout
+    lmp.cmd.fix('nph', 'all', 'nph', 'aniso', pressure, pressure, pressure_damp)
+
+    # Set different thermostats to top and bottom to create two phases
+    lmp.cmd.fix('beren_liquid', 'top', 'temp/berendsen',
+                temperature_liquid, temperature_liquid, temperature_damp)
+    lmp.cmd.fix('beren_solid', 'bot', 'temp/berendsen',
+                temperature_solid, temperature_solid, temperature_damp)
+    lmp.cmd.run(meltsteps)
+
+    # Update thermostats to scale to the guess temperature
+    lmp.cmd.unfix('beren_liquid')
+    lmp.cmd.unfix('beren_solid')
+    lmp.cmd.fix('beren_liquid', 'top', 'temp/berendsen',
+                temperature_liquid, temperature_guess, temperature_damp)
+    lmp.cmd.fix('beren_solid', 'bot', 'temp/berendsen',
+                temperature_solid, temperature_guess, temperature_damp)
+    lmp.cmd.run(scalesteps)
+
+    # Remove thermostats and relax
+    lmp.cmd.unfix('beren_liquid')
+    lmp.cmd.unfix('beren_solid')
+    lmp.cmd.run(runsteps)
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
+   
+    thermo = log.simulations[2].thermo
     
     results_dict = {}
     results_dict['melting_temperature'] = thermo.Temp[round(len(thermo)/2):].mean()

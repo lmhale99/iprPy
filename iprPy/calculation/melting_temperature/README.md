@@ -8,8 +8,9 @@ The melting_temperature calculation style attempts to determine the melting temp
 
 ### Version notes
 
-- 0.11.4: calculation method added.
-
+- v0.11.4: calculation method added.
+- v0.12.0: Method updated to support the LAMMPS library interface.
+  
 ### Additional dependencies
 
 ### Disclaimers
