@@ -1,12 +1,8 @@
-# coding: utf-8
 # Standard Python libraries
 from io import IOBase
 from pathlib import Path
 from copy import deepcopy
 from typing import Optional, Union
-import random
-
-import numpy as np
 
 from yabadaba import load_query
 
@@ -70,29 +66,19 @@ class ViscosityGreenKubo(Calculation):
         self.temperature = None
         self.timestep = None
         self.runsteps = 1000000
-        self.outputsteps = 2000
         self.sampleinterval = 5
         self.correlationlength = 200
         self.dragcoeff = 0.2
         self.equilsteps = 0
-        self.resetvelocities = False
+        self.createvelocities = False
         self.randomseed = None
 
 ########################################################
 
-        self.__pxy_values = None
-        self.__pxz_values = None
-        self.__pyz_values = None
-
-        self.__vx_value = None
-        self.__vy_value = None
-        self.__vz_value = None
-
-        self.__measured_temperature = None
-        self.__measured_temperature_stderr = None
+        self.__viscosity_xy = None
+        self.__viscosity_xz = None
+        self.__viscosity_yz = None
         self.__viscosity = None
-        self.__viscosity_stderr = None
-        self.__lammps_output = None
 
         # Define calc shortcut
         self.calc = viscosity_green_kubo
@@ -105,8 +91,7 @@ class ViscosityGreenKubo(Calculation):
     def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
-            'viscosity_green_kubo.py',
-            'in.viscosity_green_kubo.template'
+            'viscosity_green_kubo.py'
         ]
 
 ############################## Class attributes ################################
@@ -183,17 +168,6 @@ class ViscosityGreenKubo(Calculation):
         self.__runsteps = val
 
     @property
-    def outputsteps(self) -> int:
-        """Frequency of the thermo outputs"""
-        return self.__outputsteps
-    
-    @outputsteps.setter
-    def outputsteps(self, val: Optional[int]):
-        val = int(val)
-        assert val >= 0
-        self.__outputsteps = val
-
-    @property
     def equilsteps(self) -> int:
         """int: Number of MD steps during the volume equilibration stage"""
         return self.__equilsteps
@@ -236,109 +210,52 @@ class ViscosityGreenKubo(Calculation):
     @property
     def randomseed(self) -> int:
         """int: Random number generator seed"""
-        if not self.resetvelocities:
-            return 900000000
-        else:
-            return self.__randomseed
+        return self.__randomseed
 
     @randomseed.setter
-    def randomseed(self, val: int):
-        if val is None:
-            val = random.randint(1, 900000000)
-        else:
-            val = int(val)
-            assert val > 0 and val <= 900000000
-        self.__randomseed = val
+    def randomseed(self, val: Optional[int]):
+        self.__randomseed = am.lammps.seed(val)
     
     @property
-    def resetvelocities(self) -> bool:
+    def createvelocities(self) -> bool:
         """bool: Indicates if velocities are to be reset before evaluating"""
-        return self.__resetvelocities
+        return self.__createvelocities
     
-    @resetvelocities.setter
-    def resetvelocities(self, val: bool):
-        self.__resetvelocities = boolean(val)
+    @createvelocities.setter
+    def createvelocities(self, val: bool):
+        self.__createvelocities = boolean(val)
 
 ###################################################################################################################
     ################# Calculated results #########################
 
     @property
-    def pxy_values(self) -> np.ndarray:
-        """xy component of pressure tensor"""
-        if self.__pxy_values is None:
-            raise ValueError('No results! Does not get loaded from records!')
-        return self.__pxy_values
-
-    @property
-    def pxz_values(self) -> np.ndarray:
-        """xz component of pressure tensor"""
-        if self.__pxz_values is None:
-            raise ValueError('No results! Does not get loaded from records!')
-        return self.__pxz_values
-
-    @property
-    def pyz_values(self) -> np.ndarray:
-        """yz component of pressure tensor"""
-        if self.__pyz_values is None:
-            raise ValueError('No results! Does not get loaded from records!')
-        return self.__pyz_values
-    
-    @property
-    def vx_value(self) -> float:
-        """x component of viscosity"""
-        if self.__vx_value is None:
-            raise ValueError('No results! Does not get loaded from records!')
-        return self.__vx_value
-
-    @property
-    def vy_value(self) -> float:
-        """y component of viscosity """
-        if self.__vy_value is None:
-            raise ValueError('No results! Does not get loaded from records!')
-        return self.__vy_value
-
-    @property
-    def vz_value(self) -> float:
-        """y component of viscosity """
-        if self.__vz_value is None:
-            raise ValueError('No results! Does not get loaded from records!')
-        return self.__vz_value
-
-    @property
-    def lammps_output(self) -> am.lammps.Log:
-        """atomman.lammps.Log: The simulation output"""
-        if self.__lammps_output is None:
-            raise ValueError('No results! Does not get loaded from records!')
-        return self.__lammps_output
-    
-    @property
-    def measured_temperature(self) -> float:
-        """Measured temperature values throughout simulation"""
-        if self.__measured_temperature is None:
+    def viscosity_xy(self) -> float:
+        """Viscosity coeffecient estimated from only Pxy pressures"""
+        if self.__viscosity_xy is None:
             raise ValueError("No results! Does not get loaded from records")
-        return self.__measured_temperature
+        return self.__viscosity_xy
     
     @property
-    def measured_temperature_stderr(self) -> float:
-        """Standard error of temperature over run"""
-        if self.__measured_temperature_stderr is None:
+    def viscosity_xz(self) -> float:
+        """Viscosity coeffecient estimated from only Pxz pressures"""
+        if self.__viscosity_xz is None:
             raise ValueError("No results! Does not get loaded from records")
-        return self.__measured_temperature_stderr
+        return self.__viscosity_xz
+    
+    @property
+    def viscosity_yz(self) -> float:
+        """Viscosity coeffecient estimated from only Pyz pressures"""
+        if self.__viscosity_yz is None:
+            raise ValueError("No results! Does not get loaded from records")
+        return self.__viscosity_yz
     
     @property
     def viscosity(self) -> float:
-        """Calculated viscosity coeffecient averaged over the run 
-            starting at the data offset value"""
+        """Viscosity coeffecient estimated from all shear pressures"""
         if self.__viscosity is None:
             raise ValueError("No results! Does not get loaded from records")
         return self.__viscosity
     
-    @property
-    def viscosity_stderror(self) -> float:
-        """Error in the viscosity measurements"""
-        if self.__viscosity_stderr is None:
-            raise ValueError("No results! Does not get loaded from records")
-        return self.__viscosity_stderr
     
     def set_values(self,
                    name: Optional[str] = None,
@@ -359,8 +276,6 @@ class ViscosityGreenKubo(Calculation):
             obtain measurements of viscosity
         timestep: float or None
             the difference in time between each step of the calculation
-        outputsteps: int or None
-            The number of steps in between the thermo writes to the log file
         dragcoeff: float or None
             this term affects the drag force that the thermostat function uses
             to calculate the temperature of the system.  
@@ -379,8 +294,6 @@ class ViscosityGreenKubo(Calculation):
             self.timestep = kwargs['timestep']
         if 'runsteps' in kwargs:
             self.runsteps = kwargs['runsteps']
-        if 'outputsteps' in kwargs:
-            self.outputsteps = kwargs['outputsteps']
         if 'equilsteps' in kwargs:
             self.equilsteps = kwargs['equilsteps']
         if 'dragcoeff' in kwargs:
@@ -389,8 +302,8 @@ class ViscosityGreenKubo(Calculation):
             self.sampleinterval = kwargs['sampleinterval']
         if 'correlationlength' in kwargs:
             self.correlationlength = kwargs['correlationlength']
-        if 'resetvelocities' in kwargs:
-            self.resetvelocities = kwargs['resetvelocities']
+        if 'createvelocities' in kwargs:
+            self.createvelocities = kwargs['createvelocities']
         if 'randomseed' in kwargs:
             self.randomseed = kwargs['randomseed']
 
@@ -422,12 +335,11 @@ class ViscosityGreenKubo(Calculation):
         # Load calculation-specific strings
     
         # Load calculation-specific booleans
-        self.resetvelocities = input_dict.get('resetvelocities', False)
+        self.createvelocities = input_dict.get('createvelocities', False)
     
         # Load calculation-specific integers
         self.runsteps = int(input_dict.get('runsteps', 1000000))
         self.equilsteps = int(input_dict.get('equilsteps', 0))
-        self.outputsteps = int(input_dict.get('outputsteps', 2000))
         self.eq_thermosteps = int(input_dict.get('eq_termosteps', 0))
         self.eq_runsteps = int(input_dict.get('eq_runsteps', 0))
         self.sampleinterval = int(input_dict.get('sampleinterval', 5))
@@ -529,9 +441,6 @@ class ViscosityGreenKubo(Calculation):
                 "potential's unit style."]),
             'runsteps':' '.join([
                 "How many time steps to run the simulation. Default value is 1000000"]),
-            'outputsteps':' '.join([
-                "How often to write calculated values to the log file. Default",
-                "value is 2000"]),
             'equilsteps':' '.join([
                 "The number of equilibrium timesteps to run prior to evaluating the",
                 "viscosity.  Useful if your initial configuration and velocities are",
@@ -546,7 +455,7 @@ class ViscosityGreenKubo(Calculation):
                 "The number of averaged intervals for one calculation window.",
                 "This time the sample interval must be a divisor of outputsteps.",
                 "Default value is 200."]),
-            'resetvelocities': ' '.join([
+            'createvelocities': ' '.join([
                 "Setting this to True will reset the atomic velocities prior to",
                 "running.  If used, equilsteps should also be set to allow for the",
                 "velocities to equilibrate prior to the main Green-Kubo run."]),
@@ -597,13 +506,12 @@ class ViscosityGreenKubo(Calculation):
                     'timestep',
                     'dragcoeff',
                     'runsteps',
-                    'outputsteps',
                     'equilsteps',
                     'sampleinterval',
                     'correlationlength'
                 ],
                 [
-                    'resetvelocities',
+                    'createvelocities',
                     'randomseed'
                 ]
             ]
@@ -641,13 +549,12 @@ class ViscosityGreenKubo(Calculation):
 
         run_params['timestep'] = uc.model(self.timestep,'ps')
         run_params['runsteps'] = self.runsteps
-        run_params['outputsteps'] = self.outputsteps
         run_params['dragcoeff'] = self.dragcoeff
         run_params['equilsteps'] = self.equilsteps
         run_params['sampleinterval'] = self.sampleinterval
         run_params['correlationlength'] = self.correlationlength
-        if self.resetvelocities:
-            run_params['resetvelocities'] = self.resetvelocities
+        if self.createvelocities:
+            run_params['createvelocities'] = self.createvelocities
             run_params['randomseed'] = self.randomseed
 
         # Save phase-state info
@@ -656,17 +563,11 @@ class ViscosityGreenKubo(Calculation):
 
         # Build results
         if self.status == 'finished':
-            
-            calc['pxy_values'] = uc.model(self.pxy_values.tolist(), f'{self.units.pressure_unit}')
-            calc['pxz_values'] = uc.model(self.pxz_values.tolist(), f'{self.units.pressure_unit}')
-            calc['pyz_values'] = uc.model(self.pyz_values.tolist(), f'{self.units.pressure_unit}')
-            calc['vx_value'] = uc.model(self.vx_value, f'{self.units.pressure_unit}*ps')
-            calc['vy_value'] = uc.model(self.vy_value, f'{self.units.pressure_unit}*ps')
-            calc['vz_value'] = uc.model(self.vz_value, f'{self.units.pressure_unit}*ps')
-            calc['measured_temperature'] = uc.model(self.measured_temperature, 'K')
-            calc['measured_temperature_stderr'] = uc.model(self.measured_temperature_stderr, 'K')
-            calc['viscosity'] = uc.model(self.viscosity, f'{self.units.pressure_unit}*ps')
-            calc['viscosity_stderr'] = uc.model(self.viscosity_stderror, f'{self.units.pressure_unit}*ps')
+            viscosity_unit = 'Pa*ms'
+            calc['viscosity_xy'] = uc.model(self.viscosity_xy, viscosity_unit)
+            calc['viscosity_xz'] = uc.model(self.viscosity_xz, viscosity_unit)
+            calc['viscosity_yz'] = uc.model(self.viscosity_yz, viscosity_unit)
+            calc['viscosity'] = uc.model(self.viscosity, viscosity_unit)
 
         self._set_model(model)
         return model
@@ -693,12 +594,11 @@ class ViscosityGreenKubo(Calculation):
         run_params = calc['calculation']['run-parameter']
         self.runsteps = run_params['runsteps']
         self.timestep = uc.value_unit(run_params['timestep'])
-        self.outputsteps = run_params['outputsteps']
         self.equilsteps = run_params['equilsteps']
         self.dragcoeff = run_params['dragcoeff']
         self.sampleinterval = run_params['sampleinterval']
         self.correlationlength = run_params['correlationlength']
-        self.resetvelocities = run_params.get('resetvelocities', False)
+        self.createvelocities = run_params.get('createvelocities', False)
         self.randomseed = run_params.get('randomseed', 900000000)
 
         # Load phase-state info
@@ -706,17 +606,10 @@ class ViscosityGreenKubo(Calculation):
 
         # Load results
         if self.status == 'finished':
-            self.__pxy_values = uc.value_unit(calc['pxy_values']) 
-            self.__pxz_values  = uc.value_unit(calc['pxz_values'])
-            self.__pyz_values  = uc.value_unit(calc['pyz_values']) 
-            self.__vx_value  = uc.value_unit(calc['vx_value']) 
-            self.__vy_value  = uc.value_unit(calc['vy_value']) 
-            self.__vz_value  = uc.value_unit(calc['vz_value']) 
-
+            self.__viscosity_xy = uc.value_unit(calc['viscosity_xy'])
+            self.__viscosity_xz = uc.value_unit(calc['viscosity_xz'])
+            self.__viscosity_yz = uc.value_unit(calc['viscosity_yz'])
             self.__viscosity = uc.value_unit(calc['viscosity'])
-            self.__viscosity_stderr = uc.value_unit(calc['viscosity_stderr'])
-            self.__measured_temperature = uc.value_unit(calc['measured_temperature'])
-            self.__measured_temperature_stderr = uc.value_unit(calc['measured_temperature_stderr'])
 
     @property
     def queries(self) -> dict:
@@ -743,23 +636,15 @@ class ViscosityGreenKubo(Calculation):
 
         # Extract calculation-specific content
         meta['temperature'] = self.temperature
-        meta['resetvelocities'] = self.resetvelocities
+        meta['createvelocities'] = self.createvelocities
         meta['randomseed'] = self.randomseed
 
         # Extract results
         if self.status == 'finished':
-
-            meta['measured_temperature'] = self.measured_temperature
-            meta['measured_temperature_stderr'] = self.measured_temperature_stderr
-            meta['measured_viscosity'] = self.viscosity
-            meta['measured_viscosity_stderr'] = self.viscosity_stderror
-
-            meta['pxy_values'] = self.pxy_values
-            meta['pxz_values'] = self.pxz_values
-            meta['pyz_values'] = self.pyz_values
-            meta['vx_value'] = self.vx_value
-            meta['vy_value'] = self.vy_value
-            meta['vz_value'] = self.vz_value
+            meta['viscosity_xy'] = self.viscosity_xy
+            meta['viscosity_xz'] = self.viscosity_xz
+            meta['viscosity_yz'] = self.viscosity_yz
+            meta['viscosity'] = self.viscosity
 
         return meta
 
@@ -776,7 +661,7 @@ class ViscosityGreenKubo(Calculation):
             'potential_LAMMPS_key',
             'potential_key',
 
-            'resetvelocities',
+            'createvelocities',
             'randomseed',
         ]
 
@@ -807,12 +692,11 @@ class ViscosityGreenKubo(Calculation):
         input_dict['runsteps'] = self.runsteps
         input_dict['temperature'] = self.temperature
         input_dict['timestep'] = self.timestep
-        input_dict['outputsteps'] = self.outputsteps
         input_dict['dragcoeff'] = self.dragcoeff
         input_dict['equilsteps'] = self.equilsteps
         input_dict['sampleinterval'] = self.sampleinterval
         input_dict['correlationlength'] = self.correlationlength
-        input_dict['resetvelocities'] = self.resetvelocities
+        input_dict['createvelocities'] = self.createvelocities
         input_dict['randomseed'] = self.randomseed
 
         # Return input_dict
@@ -825,7 +709,7 @@ class ViscosityGreenKubo(Calculation):
             'init.dat',
             'log.lammps',
             'viscosity_green_kubo.in',
-            'S0St.dat'
+            'P0Pt.dat'
         ]
     
     def process_results(self, results_dict: dict):
@@ -838,17 +722,7 @@ class ViscosityGreenKubo(Calculation):
         results_dict: dict
             The dictionary returned by the calc() method.
         """
-        self.__measured_temperature = results_dict['measured_temperature']
-        self.__measured_temperature_stderr = results_dict['measured_temperature_stderr']
+        self.__viscosity_xy = results_dict["viscosity_xy"]
+        self.__viscosity_xz = results_dict["viscosity_xz"]
+        self.__viscosity_yz = results_dict["viscosity_yz"]
         self.__viscosity = results_dict["viscosity"]
-        self.__viscosity_stderr = results_dict["viscosity_stderr"] 
-        
-        self.__pxy_values = results_dict['pxy_values']
-        self.__pxz_values = results_dict['pxz_values']
-        self.__pyz_values = results_dict['pyz_values']
-
-        self.__vx_value = results_dict['vx_value']
-        self.__vy_value = results_dict['vy_value']
-        self.__vz_value = results_dict['vz_value']
-        
-        self.__lammps_output = results_dict['lammps_output']

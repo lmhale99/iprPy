@@ -1,11 +1,7 @@
-# coding: utf-8
-
 # Standard Python libraries
 from io import IOBase
 from pathlib import Path
 from typing import Optional, Union
-
-import numpy as np
 
 # https://github.com/usnistgov/atomman
 import atomman as am
@@ -20,7 +16,7 @@ from .grain_boundary_static import grain_boundary_static
 from ...calculation_subset import (LammpsPotential, LammpsCommands, Units,
                                    AtommanSystemLoad, LammpsMinimize,
                                    GrainBoundary)
-from ...input import value
+from ...input import value, boolean
 
 class GrainBoundaryStatic(Calculation):
     """Class for static grain boundary energy calculations"""
@@ -31,7 +27,7 @@ class GrainBoundaryStatic(Calculation):
                  model: Union[str, Path, IOBase, DM, None]=None,
                  name: Optional[str]=None,
                  database = None,
-                 params: Union[str, Path, IOBase, dict] = None,
+                 params: Union[str, Path, IOBase, dict, None] = None,
                  **kwargs: any):
         """
         Initializes a Calculation object for a given style.
@@ -77,6 +73,7 @@ class GrainBoundaryStatic(Calculation):
         self.min_deleter = 0.30
         self.max_deleter = 0.99
         self.num_deleter = 100
+        self.alldump = True
         self.__gb_energies = None
         self.__min_gb_energy = None
         self.__final_dump = None
@@ -92,8 +89,7 @@ class GrainBoundaryStatic(Calculation):
     def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
-            'grain_boundary_static.py',
-            'gbmin.template'
+            'grain_boundary_static.py'
         ]
 
 ############################## Class attributes ###############################
@@ -212,6 +208,15 @@ class GrainBoundaryStatic(Calculation):
         self.__num_deleter = int(val)
 
     @property
+    def alldump(self) -> bool:
+        """bool: Indicates if dump files for all relaxed structures or only the lowest energy structure are retained"""
+        return self.__alldump
+
+    @alldump.setter
+    def alldump(self, val: bool):
+        self.__alldump = boolean(val)
+
+    @property
     def final_dump(self) -> dict:
         """dict: Info about the final dump file"""
         if self.__final_dump is None:
@@ -295,6 +300,8 @@ class GrainBoundaryStatic(Calculation):
             self.max_deleter = kwargs['max_deleter']
         if 'num_deleter' in kwargs:
             self.num_deleter = kwargs['num_deleter']
+        if 'alldump' in kwargs:
+            self.alldump = kwargs['alldump']
 
 ####################### Parameter file interactions ###########################
 
@@ -328,6 +335,7 @@ class GrainBoundaryStatic(Calculation):
         self.deletefrom = input_dict.get('deletefrom', 'top')
 
         # Load calculation-specific booleans
+        self.alldump = boolean(input_dict.get('alldump', True))
 
         # Load calculation-specific integers
         self.num_a1 = int(input_dict.get('num_a1', 8))
@@ -484,6 +492,10 @@ class GrainBoundaryStatic(Calculation):
                 "threshold.  Note that only unique configurations will be minimized",
                 "so this is the max number of configurations that can be explored",
                 "for each a1,a2 shift set.  Default value is 100"]),
+            'alldump': ' '.join([
+                "Boolean flag indicating if the dump files for all relaxed structures",
+                "(True) or only the lowest energy structure (False) are retained.",
+                "Default value is True, i.e. no dump files deleted."]),
         }
 
     @property
@@ -532,7 +544,8 @@ class GrainBoundaryStatic(Calculation):
                     'deletefrom',
                     'min_deleter',
                     'max_deleter',
-                    'num_deleter'
+                    'num_deleter',
+                    'alldump'
                 ]
             ] +
 
@@ -584,6 +597,7 @@ class GrainBoundaryStatic(Calculation):
         run_params['min_deleter'] = self.min_deleter
         run_params['max_deleter'] = self.max_deleter
         run_params['num_deleter'] = self.num_deleter
+        #run_params['alldump'] = self.alldump
 
         # Build results
         if self.status == 'finished':
@@ -633,6 +647,7 @@ class GrainBoundaryStatic(Calculation):
         self.min_deleter = run_params['min_deleter']
         self.max_deleter = run_params['max_deleter']
         self.num_deleter = run_params['num_deleter']
+        #self.alldump = run_params['alldump']
 
         # Load results
         if self.status == 'finished':
@@ -718,6 +733,7 @@ class GrainBoundaryStatic(Calculation):
         input_dict['min_deleter'] = self.min_deleter
         input_dict['max_deleter'] = self.max_deleter
         input_dict['num_deleter'] = self.num_deleter
+        input_dict['alldump'] = self.alldump
 
         # Return input_dict
         return input_dict
@@ -726,10 +742,10 @@ class GrainBoundaryStatic(Calculation):
     def calc_output_files(self) -> list:
         """list : Glob path strings for files generated by this calculation"""
         return [
-            'gb-*.dat',
-            'log-*.lammps',
+            'log.lammps',
             '*.dump',
-            'gbmin.in'
+            'gbmin.in',
+            'init.dat',
         ]
 
     def process_results(self, results_dict: dict):

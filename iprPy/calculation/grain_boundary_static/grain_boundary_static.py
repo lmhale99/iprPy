@@ -1,47 +1,43 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale
 
 # Standard library imports
-import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 # http://www.numpy.org/
 import numpy as np
 import numpy.typing as npt
 
-# https://github.com/usnistgov/atomman
+# https://github.com/usnistgov/atomman 
 import atomman as am
 import atomman.unitconvert as uc
-import atomman.lammps as lmp
-from atomman.tools import filltemplate
+from atomman.typing import lammpspotential, unitfloat, lammps
+from atomman.lammps import LAMMPS, LAMMPSobj
 
-# iprPy imports
-from ...tools import read_calc_file
-
-def grain_boundary_static(lammps_command: str,
+def grain_boundary_static(lammps_command: Union[str, LAMMPSobj],
                           ucell: am.System,
-                          potential: lmp.Potential,
+                          potential: lammpspotential,
                           uvws1: npt.ArrayLike,
                           uvws2: npt.ArrayLike,
-                          potential_energy: float,
+                          potential_energy: unitfloat,
                           mpi_command: Optional[str] = None,
                           conventional_setting: str = 'p',
                           cutboxvector: str = 'c',
-                          gbwidth: float = uc.set_in_units(20, 'angstrom'),
-                          boundarywidth: float = uc.set_in_units(10, 'angstrom'),
+                          gbwidth: unitfloat = '20 angstrom',
+                          boundarywidth: unitfloat = '10 angstrom',
                           num_a1: int = 8,
                           num_a2: int = 8,
                           deletefrom: str = 'top',
                           min_deleter = 0.30,
                           max_deleter = 0.99,
-                          num_deleter = 100, 
+                          num_deleter = 100,
                           etol: float = 1e-15,
-                          ftol: float = 1e-15,
+                          ftol: unitfloat = '1e-15 eV/atom',
                           maxiter: int = 100000,
                           maxeval: int = 1000000,
-                          dmax: float = uc.set_in_units(0.01, 'angstrom')):
+                          dmax: unitfloat = '0.01 angstrom',
+                          alldump: bool = True,
+                          usefiles: bool = False) -> dict:
     """
     Evaluates the energy of a grain boundary by building a two grain system and
     statically relaxing a range of atomic configurations that iterate over
@@ -49,12 +45,13 @@ def grain_boundary_static(lammps_command: str,
 
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     ucell : atomman.System
         The crystal unit cell to use as the basis of the grain boundary
         configurations.
-    potential : atomman.lammps.Potential
+    potential : PotentialLAMMPS or PotentialLAMMPSKIM
         The LAMMPS implemented potential to use.
     uvws1 : array-like object
         The Miller(-Bravais) crystal vectors associated with rotating ucell to
@@ -152,15 +149,22 @@ def grain_boundary_static(lammps_command: str,
     ValueError
         For invalid cutboxvectors
     """
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
 
-    lammps_date = lmp.checkversion(lammps_command)['date']
+    # Convert values given with units if needed
+    potential_energy = float(uc.set_in_units(potential_energy))
+    gbwidth = float(uc.set_in_units(gbwidth))
+    boundarywidth = float(uc.set_in_units(boundarywidth))
+    ftol = float(uc.set_in_units(ftol))
+    dmax = float(uc.set_in_units(dmax))
 
     gb = am.defect.GrainBoundary(ucell, uvws1, uvws2,
-                       conventional_setting=conventional_setting,
-                       cutboxvector=cutboxvector)
+                                 conventional_setting=conventional_setting,
+                                 cutboxvector=cutboxvector)
     
     # Add boundary width and identify multiples
-    minwidth = gbwidth+boundarywidth
+    minwidth = gbwidth + boundarywidth
     gb.identifymults(minwidth=minwidth, setvalues=True)
 
     # Build list of deleter values
@@ -169,6 +173,8 @@ def grain_boundary_static(lammps_command: str,
     i = 0
     gb_energies = []
     A_fault = None
+    min_gb_energy = np.inf
+    min_i = -1
     for system, natoms1 in gb.iterboundaryshift(deletefrom=deletefrom,
                                                 shifts1=num_a1, shifts2=num_a2,
                                                 freesurface=True, 
@@ -192,29 +198,37 @@ def grain_boundary_static(lammps_command: str,
                 raise ValueError("cutboxvector limited to values 'a', 'b', or 'c'")
 
         # Relax the configuration
-        results = grain_boundary_relax(lammps_command,
+        results = grain_boundary_relax(lmp,
                                        system,
-                                       potential,
-                                       mpi_command=mpi_command,
                                        gbwidth=gbwidth,
                                        etol = etol,
                                        ftol = ftol,
-                                       lammps_date=lammps_date,
                                        maxiter = maxiter,
                                        maxeval = maxeval,
                                        gbindex = i,
                                        cutboxvector = cutboxvector,
-                                       dmax = dmax)
-        i += 1
- 
+                                       dmax = dmax,
+                                       usefiles = usefiles)
+        
         # Calculate grain boundary energy
         delta_pe = results['Epotgb'] - results['natomsgb'] * potential_energy
         gb_energy = delta_pe / A_fault
         
+        # Check if energy is < current minimum
+        if gb_energy < min_gb_energy:
+            min_gb_energy = gb_energy
+            if not alldump and min_i != -1:
+                # Delete previous lowest energy structure
+                Path(f'{min_i}.dump').unlink()
+            min_i = i
+        
+        elif not alldump:
+            # Delete dump file if not the lowest energy structure
+            Path(f'{i}.dump').unlink()
+
+        # Append energy to the list and increase i
         gb_energies.append(gb_energy)
-    
-    min_gb_energy = min(gb_energies)
-    min_i = np.arange(len(gb_energies))[gb_energies == min_gb_energy][0]
+        i += 1
     
     results = {}
     results['gb_energies'] = gb_energies
@@ -224,35 +238,27 @@ def grain_boundary_static(lammps_command: str,
     
     return results
 
-
-def grain_boundary_relax(lammps_command: str,
+def grain_boundary_relax(lmp: LAMMPSobj,
                          system: am.System,
-                         potential: lmp.Potential,
-                         mpi_command: Optional[str] = None,
                          gbwidth: float = 20.0,
                          etol: float = 0.0,
                          ftol: float = 0.0,
                          maxiter: int = 10000,
                          maxeval: int = 100000,
-                         dmax: float = uc.set_in_units(0.01, 'angstrom'),
-                         lammps_date = None,
+                         dmax: float = 0.01,
                          cutboxvector = 'c', 
-                         gbindex: int = 0) -> dict:
+                         gbindex: int = 0,
+                         usefiles: bool = False) -> dict:
     """
     Sets up and runs an energy/force minimization using LAMMPS for a single
     grain boundary configuration.
 
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lmp : LAMMPSEXE or LAMMPSLIB
+        An atomman LAMMPS interface object.
     system : atomman.System
         The grain boundary system to perform the relaxation on.
-    potential : atomman.lammps.Potential
-        The LAMMPS implemented potential to use.
-    mpi_command : str, optional
-        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
-        will run serially.
     gbwidth : float, optional
         The width of the region around the grain boundary that will be relaxed.
         Note that the region itself will be twice as thick as gbwidth as it is
@@ -293,65 +299,105 @@ def grain_boundary_relax(lammps_command: str,
         - **'gbindex'** (*int*) - The index label used.
         - **'natoms'** (*int*) - The number of atoms in the configuration.
         - **'potentialenergy'** (*float*) - The total potential energy of
-          the relaxed system.    
+          the relaxed system.
     """
-    
-    # Get lammps units
-    lammps_units = lmp.style.unit(potential.units)
-    
-    #Get lammps version date
-    if lammps_date is None:
-        lammps_date = lmp.checkversion(lammps_command)['date']
-        
-    lammps_variables = {}
-    
-    system_info = system.dump('atom_data', f=f'gb-{gbindex}.dat',
-                              potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
-    lammps_variables['dmax'] = dmax
-    lammps_variables['etol'] = etol
-    lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])
-    lammps_variables['maxiter'] = maxiter
-    lammps_variables['maxeval'] =  maxeval
-    lammps_variables['gbwidth'] = uc.get_in_units(gbwidth, lammps_units['length'])
-    
-    # Set box relax direction based on cutboxvector orientation
-    box2cart = {'a':'x', 'b':'y', 'c':'z'}
-    lammps_variables['box_relax_direction'] = box2cart[cutboxvector]
-    
-    # Set dump_modify_format based on lammps_date
-    if lammps_date < datetime.date(2016, 8, 3):
-        lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e"'
+    # Handle file generation settings
+    if usefiles:
+        logfile = 'log.lammps'
+        script = 'gbmin.in'
     else:
-        lammps_variables['dump_modify_format'] = 'float %.13e'
-        
-    # Write lammps input script
-    lammps_script = 'gbmin.in'
-        
-    template = read_calc_file('iprPy.calculation.grain_boundary_static',
-                              'gbmin.template')
+        logfile = 'none'
+        script = None
     
-    with open(lammps_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
+    lmp.commands_string('\n# Define relaxation region width')
+    lmp.cmd.variable('gbwidth', 'equal', uc.get_in_units(gbwidth, lmp.unitsdict['length']))
 
-    # Run lammps to relax perfect.dat
-    output = lmp.run(lammps_command, script_name=lammps_script, logfile=f'log-{gbindex}.lammps',
-                     mpi_command=mpi_command)
+    # Pass system and potential info into LAMMPS
+    lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                  usefiles=usefiles, logfile=logfile)
     
-    # Extract total final potential energy
-    thermo = output.simulations[0].thermo
+    lmp.commands_string('\n# Define regions')
+    if cutboxvector == 'a':
+        lmp.cmd.region('relax', 'block', '-${gbwidth}', '${gbwidth}', 'INF', 'INF', 'INF', 'INF', 'units', 'box')
+        lmp.cmd.region('topboundary', 'block', '${gbwidth}', 'INF', 'INF', 'INF', 'INF', 'INF', 'units', 'box')
+        lmp.cmd.region('botboundary', 'block', 'INF', '-${gbwidth}', 'INF', 'INF', 'INF', 'INF', 'units', 'box')
+    elif cutboxvector == 'b':
+        lmp.cmd.region('relax', 'block', 'INF', 'INF', '-${gbwidth}', '${gbwidth}', 'INF', 'INF', 'units', 'box')
+        lmp.cmd.region('topboundary', 'block', 'INF', 'INF', '${gbwidth}', 'INF', 'INF', 'INF', 'units', 'box')
+        lmp.cmd.region('botboundary', 'block', 'INF', 'INF', 'INF', '-${gbwidth}', 'INF', 'INF', 'units', 'box')
+    elif cutboxvector == 'c':
+        lmp.cmd.region('relax', 'block', 'INF', 'INF', 'INF', 'INF', '-${gbwidth}', '${gbwidth}', 'units', 'box')
+        lmp.cmd.region('topboundary', 'block', 'INF', 'INF', 'INF', 'INF', '${gbwidth}', 'INF', 'units', 'box')
+        lmp.cmd.region('botboundary', 'block', 'INF', 'INF', 'INF', 'INF', 'INF', '-${gbwidth}', 'units', 'box')
+    else:
+        raise ValueError("cutboxvector limited to values 'a', 'b', or 'c'")
+
+    lmp.commands_string('\n# Define region groups')
+    lmp.cmd.group('relax', 'region', 'relax')
+    lmp.cmd.group('topboundary', 'region', 'topboundary')
+    lmp.cmd.group('botboundary', 'region', 'botboundary')
+
+    lmp.commands_string('\n# Define property computes')
+    lmp.cmd.compute('peatom', 'all', 'pe/atom')
+    lmp.cmd.compute('pegb', 'relax', 'reduce', 'sum', 'c_peatom')
+    lmp.cmd.variable('natomsgb', 'equal', 'count(relax)')
+
+    lmp.commands_string('\n# Define thermo style')
+    lmp.cmd.thermo_style('custom', 'step', 'lx', 'ly', 'lz',
+                         'pxx', 'pyy', 'pzz', 'pxy', 'pxz', 'pyz',
+                         'c_pegb', 'v_natomsgb')
+    lmp.cmd.thermo_modify('format', 'float', '%.17e')
+
+    # Create dump file if needed/requested
+    if usefiles or not lmp.islib:
+        lmp.commands_string('\n# Define dump')
+        if lmp.potential.atom_style == 'charge':
+            dumpkeys = ['id', 'type', 'q', 'x', 'y', 'z', 'c_peatom']
+        else:
+            dumpkeys = ['id', 'type', 'x', 'y', 'z', 'c_peatom']
+        lmp.cmd.dump('dumpit', 'all', 'custom', maxiter, 'run_*.dump', *dumpkeys)
+        lmp.cmd.dump_modify('dumpit', 'format', 'float', '%.17e')
     
-    # Rename and clean up dump files
-    finalstep = thermo.Step.values[-1]
-    Path(f'run_{finalstep}.dump').rename(f'{gbindex}.dump')
-    for atomfile in Path('.').glob('run_*.dump'):
-        atomfile.unlink()
+    lmp.commands_string('\n# Set up and run minimization')
+    lmp.cmd.fix('bothold', 'botboundary', 'setforce', 0.0, 0.0, 0.0)
+    lmp.cmd.fix('tophold', 'topboundary', 'aveforce', 0.0, 0.0, 0.0)
+    lmp.cmd.min_style('cg')
+    lmp.cmd.min_modify('dmax', uc.get_in_units(dmax, lmp.unitsdict['length']))
+    lmp.cmd.minimize(etol, uc.get_in_units(ftol, lmp.unitsdict['force']), maxiter, maxeval)
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
+
+    if log is None:
+        # Get thermo directly from lammps object if no log file
+        thermo: dict = lmp.last_thermo()
+    else:
+        # Extract thermo terms from log output
+        thermo = log.simulations[-1].thermo.iloc[-1].to_dict()
+    
+    # Save/rename final dump
+    dumpfile = f'{gbindex}.dump'
+    if usefiles or not lmp.islib:
+        # Rename final dump file if it exists
+        Path(f'run_{int(thermo["Step"])}.dump').rename(dumpfile)
+        for atomfile in Path('.').glob('run_*.dump'):
+            atomfile.unlink()
+
+    else:
+        # Load final system information directly from LAMMPS
+        system_final = am.load('lammps_lib', lmp, symbols=system.symbols,
+                               lammps_units=lmp.potential.units)
+        if lmp.potential.atom_style == 'charge':
+            charge = lmp.numpy.extract_atom('q', nelem=system.natoms, dim=1)
+            system_final.atoms.charge = charge
+        system_final.atoms.c_peatom = lmp.numpy.extract_compute('peatom', lammps.LMP_STYLE_ATOM, lammps.LMP_TYPE_VECTOR)
+        system_final.dump('atom_dump', f=dumpfile, float_format='%.17e')
     
     results = {}
     results['gbindex'] = gbindex
-    results['natomsgb'] = thermo.v_natomsgb.values[-1]
-    results['Epotgb'] = uc.set_in_units(thermo.c_pegb.values[-1],
-                                        lammps_units['energy'])
+    results['natomsgb'] = thermo['v_natomsgb']
+    results['Epotgb'] = uc.set_in_units(thermo['c_pegb'],
+                                        lmp.unitsdict['energy'])
     
     return results
 

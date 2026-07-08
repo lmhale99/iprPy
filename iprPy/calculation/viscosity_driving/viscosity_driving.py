@@ -1,35 +1,31 @@
-# coding: utf-8
+# Python script created by Peter Winstel and Lucas Hale
+
 # Standard Python libraries
-from typing import Optional
+from typing import Optional, Union
 
+# https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
-from atomman.tools import filltemplate
+from atomman.typing import lammpspotential, unitfloat
+from atomman.lammps import LAMMPS, LAMMPSobj
 
-import numpy as np 
-
-from ...tools import read_calc_file
-
-# Note - the system fed in needs to be relaxed to a liquid phase 
-# otherwise the calculation doesn't make much sense and it needs to run for 
-# significantly longer 
-
-def viscosity_driving(lammps_command: str,
+def viscosity_driving(lammps_command: Union[str, LAMMPSobj],
                       system: am.System,
-                      potential: lmp.Potential,
+                      potential: lammpspotential,
                       temperature: float,
                       mpi_command: Optional[str] = None,
-                      timestep: Optional[float] = None,
-                      drivingforce: float = uc.set_in_units(2.0, 'angstrom/(ps^2)'),
+                      timestep: Optional[unitfloat] = None,
+                      drivingforce: unitfloat = '2.0 angstrom/(ps^2)',
                       runsteps: int = 100000,
                       thermosteps: int = 100,
                       equilsteps: int = 0,
-                      ) -> dict:
+                      createvelocities: bool = False,
+                      randomseed: Optional[int] = None,
+                      usefiles: bool = False) -> dict:
     
     """
-    Calculates the diffusion constant for a liquid system using
-    the derivative of the mean squared displacement
+    Calculates the viscosity for a liquid system by applying a driving
+    force.
 
     Parameters
     ----------
@@ -61,7 +57,6 @@ def viscosity_driving(lammps_command: str,
         How many timesteps the equilibration simulation will run for. Default 
         value of 0.
     
-    
     Returns
     -------
     dict
@@ -76,60 +71,91 @@ def viscosity_driving(lammps_command: str,
         -**'viscosity'** (*float*) - The calculated viscosity 
         -**'viscosity_stderr'** (*float*) - The standard deviation
         of the viscosity
-        -**'lammps_output'** - The lammps output log
     """
-    # Get the Units from Potential
-    lammps_units = lmp.style.unit(potential.units)
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
 
-    # Set default timestep based on units
+    logfile = 'log.lammps'
+    if usefiles or not lmp.islib:
+        script = 'viscosity_driving.in'
+    else:
+        script = None
+
+    # Convert values given with units if needed
+    drivingforce = uc.set_in_units(drivingforce)
+
+    # Check/select a randomseed value
+    randomseed = am.lammps.seed(randomseed)
+
+    # Set timestep in atomman and LAMMPS units
     if timestep is None:
-        timestep = uc.set_in_units(lmp.style.timestep(potential.units),
-                                   lammps_units['time'])
+        timestep_lammps = am.lammps.style.timestep(lmp.potential.units)
+        timestep = uc.set_in_units(timestep_lammps, lmp.unitsdict['time'])
+    else:
+        timestep = uc.set_in_units(timestep)
+        timestep_lammps = uc.get_in_units(timestep, lmp.unitsdict['time'])
+    temperature_damp = 100 * timestep_lammps
 
-    # Initialize the variables to fill in the script
-    lammps_variables = {}
 
-    # Get the system info by loading the system into the init.dat and using the specified potential
-    system_info = system.dump('atom_data', f='init.dat', potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
+    # Pass system and potential info into LAMMPS
+    lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                  usefiles=usefiles, logfile=logfile)
 
-    # Raise Error if the values don't commute
-    if (runsteps % (thermosteps) != 0):
-        raise ValueError('thermosteps must divide runsteps')
+    lmp.commands_string('\n# Integrator definition')
+    lmp.cmd.timestep(timestep_lammps)
+    lmp.cmd.fix('nvt', 'all', 'nvt',
+                'temp', temperature, temperature, temperature_damp)
 
-    # Initialize the rest of the inputs to the Lammps Scripts 
-    lammps_variables['temperature'] = temperature
-    lammps_variables['timestep'] = uc.get_in_units(timestep, lammps_units['time'])
+    if createvelocities:
+        lmp.commands_string('\n# Create new velocities')
+        lmp.cmd.velocity('all', 'create', temperature, randomseed,
+                         'mom', 'yes', 'rot', 'yes', 'dist', 'gaussian')
 
-    lammps_variables['runsteps'] = runsteps
-    lammps_variables['drivingforce'] = uc.get_in_units(drivingforce, 
-                                                       f"{lammps_units['velocity']} / {lammps_units['time']}")
-    lammps_variables['equilsteps'] = equilsteps
-    lammps_variables['thermosteps'] = thermosteps
+    lmp.commands_string('\n# Equilibration run')
+    lmp.cmd.run(equilsteps)
+    lmp.cmd.reset_timestep(0)
 
-    # Fill in the template 
-    lammps_script = 'viscosity_driving.in'
-    template = read_calc_file('iprPy.calculation.viscosity_driving',
-                              'viscosity_driving.template')
-    with open(lammps_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
+    lmp.commands_string('\n# Set up the applied perturbation')
+    drivingforce_units = f"{lmp.unitsdict['velocity']}/{lmp.unitsdict['time']}"
+    lmp.cmd.variable('A', 'equal', uc.get_in_units(drivingforce, 
+                                                   drivingforce_units))
+    lmp.cmd.fix('cos', 'all', 'accelerate/cos', '${A}')
+    lmp.cmd.compute('cos', 'all', 'viscosity/cos')
+    lmp.cmd.variable('vMax', 'equal', 'c_cos[7]')
+    lmp.cmd.fix_modify('nvt', 'temp', 'cos')
 
-    # Run lammps
-    output = lmp.run(lammps_command, script_name=lammps_script,
-                     mpi_command=mpi_command, screen=False)
+    lmp.commands_string('\n# Define calculation terms')
+    lmp.cmd.variable('density', 'equal', 'density')
+    lmp.cmd.variable('lz', 'equal', 'lz')
+    lmp.cmd.variable('reciprocalViscosity', 'equal', 'v_vMax/${A}/v_density*39.4784/v_lz/v_lz')
+
+    lmp.commands_string('\n# Set thermo outputs')
+    lmp.cmd.thermo_style('custom', 'step', 'cpu', 'temp', 'press', 'pe', 'density', 'v_vMax', 'v_reciprocalViscosity')
+    lmp.cmd.thermo_modify('temp', 'cos')
+    lmp.cmd.thermo(thermosteps)
+
+    lmp.commands_string('\n# Run for runsteps')
+    lmp.cmd.run(runsteps)
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
     
-    thermo = output.simulations[-1].thermo
+    thermo = log.simulations[-1].thermo
+
+    sqrt_nsamples = len(thermo) ** 0.5
 
     # Compute mean and stderr of mean for temp
     measured_temps = thermo["Temp"].values
-    measured_temp = np.average(measured_temps)
-    measured_temp_stderr = np.std(measured_temps) / ((len(measured_temps) / 100) ** .5)
+    measured_temp = measured_temps.mean()
+    measured_temp_stderr = measured_temps.std() / sqrt_nsamples
 
     # From thermo data calculate the viscosity
-    inv_viscosities = thermo["v_reciprocalViscosity"]
+    inv_viscosities_units = f"{lmp.unitsdict['time']}/({lmp.unitsdict['density']}*{lmp.unitsdict['length']}^2)"
+    inv_viscosities = uc.set_in_units(thermo["v_reciprocalViscosity"].values,
+                                      inv_viscosities_units)
     
-    inv_viscosity = np.average(inv_viscosities)
-    inv_viscosity_std = np.std(inv_viscosities)
+    inv_viscosity = inv_viscosities.mean()
+    inv_viscosity_std = inv_viscosities.std()
 
     # This is the correct way to average the data according to the "Harmonic Mean" 
     viscosity = 1 / inv_viscosity
@@ -137,16 +163,13 @@ def viscosity_driving(lammps_command: str,
     # This is the error propagation formula for f(x)=1/x 
     viscosity_std = (viscosity) * abs(inv_viscosity_std / inv_viscosity)
 
-    # Unit conversions according to the units in the lammps script 
-    viscosity_unit = f"({lammps_units['length']}^3*{lammps_units['density']})/({lammps_units['velocity']}*{lammps_units['time']}^2)"
-
     # Initialize the return dictionary
     results = {}
 
     # Data of interest
-    results['viscosity'] = uc.set_in_units(viscosity, viscosity_unit)
-    results['viscosity_stderr'] = uc.set_in_units(viscosity_std / ((len(inv_viscosities))**0.5), viscosity_unit)
-    results['measured_temperature'] = uc.set_in_units(measured_temp, 'K')
-    results['measured_temperature_stderr'] = uc.set_in_units(measured_temp_stderr, 'K')
-    results['lammps_output'] = output    
+    results['viscosity'] = viscosity
+    results['viscosity_stderr'] = viscosity_std / sqrt_nsamples
+    results['measured_temperature'] = measured_temp
+    results['measured_temperature_stderr'] = measured_temp_stderr
+
     return results

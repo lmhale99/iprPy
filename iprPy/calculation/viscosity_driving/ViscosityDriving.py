@@ -1,12 +1,8 @@
-# coding: utf-8
 # Standard Python libraries
 from io import IOBase
 from pathlib import Path
 from copy import deepcopy
 from typing import Optional, Union
-import random
-
-import numpy as np
 
 from yabadaba import load_query
 
@@ -81,7 +77,6 @@ class ViscosityDriving(Calculation):
         self.__measured_temperature_stderr = None
         self.__viscosity = None
         self.__viscosity_stderr = None
-        self.__lammps_output = None
 
         # Define calc shortcut
         self.calc = viscosity_driving
@@ -94,8 +89,7 @@ class ViscosityDriving(Calculation):
     def filenames(self) -> list:
         """list: the names of each file used by the calculation."""
         return [
-            'viscosity_driving.py',
-            'viscosity_driving.template'
+            'viscosity_driving.py'
         ]
 
 ############################## Class attributes ################################
@@ -200,14 +194,6 @@ class ViscosityDriving(Calculation):
 
 ###################################################################################################################
     ################# Calculated results #########################
-
-
-    @property
-    def lammps_output(self) -> am.lammps.Log:
-        """atomman.lammps.Log: The simulation output"""
-        if self.__lammps_output is None:
-            raise ValueError('No results! Does not get loaded from records!')
-        return self.__lammps_output
     
     @property
     def measured_temperature(self) -> float:
@@ -677,4 +663,3 @@ class ViscosityDriving(Calculation):
         self.__measured_temperature_stderr = results_dict['measured_temperature_stderr']
         self.__viscosity = results_dict["viscosity"]
         self.__viscosity_stderr = results_dict["viscosity_stderr"]
-        self.__lammps_output = results_dict['lammps_output']

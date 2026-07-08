@@ -1,12 +1,8 @@
-# coding: utf-8
-
 # Python script created by Lucas Hale
 
 # Standard library imports
-import datetime
 from pathlib import Path
 from typing import Optional, Union
-import secrets
 
 # http://www.numpy.org/
 import numpy as np
@@ -15,33 +11,31 @@ import numpy.typing as npt
 # https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.unitconvert as uc
-import atomman.lammps as lmp
-from atomman.tools import filltemplate
+from atomman.typing import lammpspotential, unitfloat, lammps
+from atomman.lammps import LAMMPS, LAMMPSobj
 from atomman.defect import GrainBoundary, GRIP
 
-# iprPy imports
-from ...tools import read_calc_file
-
-def grain_boundary_grip(lammps_command: str,
+def grain_boundary_grip(lammps_command: Union[str, LAMMPSobj],
                         ucell: am.System,
-                        potential: lmp.Potential,
+                        potential: lammpspotential,
                         uvws1: npt.ArrayLike,
                         uvws2: npt.ArrayLike,
                         potential_energy: float,
                         mpi_command: Optional[str] = None,
                         conventional_setting: str = 'p',
                         cutboxvector: str = 'c',
-                        gbwidth: float = uc.set_in_units(10, 'angstrom'),
-                        bufferwidth: float = uc.set_in_units(10, 'angstrom'),
-                        boundarywidth: float = uc.set_in_units(10, 'angstrom'),
+                        gbwidth: unitfloat = '10 angstrom',
+                        bufferwidth: unitfloat = '10 angstrom',
+                        boundarywidth: unitfloat = '10 angstrom',
                         etol: float = 1e-15,
-                        ftol: float = 1e-15,
+                        ftol: unitfloat = '1e-15 eV/atom',
                         maxiter: int = 100000,
                         maxeval: int = 1000000,
-                        dmax: float = uc.set_in_units(0.01, 'angstrom'),
+                        dmax: unitfloat = '0.01 angstrom',
                         grip: Optional[GRIP] = None,
                         randomseed: Optional[int] = None,
                         verbose: bool = False,
+                        usefiles: bool = False,
                         **kwargs):
     """
     Creates a grain boundary using the GRIP algorithm, relaxes it using both
@@ -49,12 +43,13 @@ def grain_boundary_grip(lammps_command: str,
 
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     ucell : atomman.System
         The crystal unit cell to use as the basis of the grain boundary
         configurations.
-    potential : atomman.lammps.Potential
+    potential : PotentialLAMMPS or PotentialLAMMPSKIM
         The LAMMPS implemented potential to use.
     uvws1 : array-like object
         The Miller(-Bravais) crystal vectors associated with rotating ucell to
@@ -134,8 +129,22 @@ def grain_boundary_grip(lammps_command: str,
         - **'dumpfile_final'** (*str*) - The atom dump file of the final relaxed
           configuration.
         - **'symbols_final'** (*str*) - The atomic model symbols associated with
-          dumpfile_final.          
+          dumpfile_final.
     """
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
+
+    # Convert values given with units if needed
+    potential_energy = float(uc.set_in_units(potential_energy))
+    gbwidth = float(uc.set_in_units(gbwidth))
+    bufferwidth = float(uc.set_in_units(bufferwidth))
+    boundarywidth = float(uc.set_in_units(boundarywidth))
+    ftol = float(uc.set_in_units(ftol))
+    dmax = float(uc.set_in_units(dmax))
+
+    # Set randomseed
+    randomseed = am.lammps.seed(randomseed)
+
     # Build grip parameters if needed
     if grip is None:
         grip = GRIP(**kwargs)
@@ -151,9 +160,6 @@ def grain_boundary_grip(lammps_command: str,
                        conventional_setting=conventional_setting,
                        cutboxvector=cutboxvector)
     
-    if randomseed is None: 
-        randomseed = secrets.randbelow(2147483646)+1
-
     # Generate grain boundary system
     system = grip.boundary(gb, randomseed=randomseed, verbose=verbose)[0]
     
@@ -174,13 +180,12 @@ def grain_boundary_grip(lammps_command: str,
         raise ValueError("cutboxvector limited to values 'a', 'b', or 'c'")
 
     # Relax the configuration
-    results = relax(lammps_command, system, potential,
-                    grip.temperature, grip.runsteps,
-                    mpi_command=mpi_command, gbwidth=gbwidth,
-                    bufferwidth=bufferwidth, 
-                    etol=etol, ftol=ftol, maxiter=maxiter,
-                    maxeval=maxeval, dmax=dmax,
-                    randomseed=randomseed)
+    results = grip_relax(lmp, system, grip.temperature, grip.runsteps,
+                         gbwidth=gbwidth,
+                         bufferwidth=bufferwidth, 
+                         etol=etol, ftol=ftol, maxiter=maxiter,
+                         maxeval=maxeval, dmax=dmax,
+                         randomseed=randomseed, usefiles=usefiles)
 
     # Calculate grain boundary energy
     delta_pe = results['Epotgb'] - results['natomsgb'] * potential_energy
@@ -194,21 +199,22 @@ def grain_boundary_grip(lammps_command: str,
     
     return results
 
-def relax(lammps_command: str,
-          system: am.System,
-          potential: lmp.Potential,
-          temperature: float,
-          runsteps: int,
-          mpi_command: Optional[str] = None,
-          gbwidth: float = uc.set_in_units(10, 'angstrom'),
-          bufferwidth: float = uc.set_in_units(10, 'angstrom'),
-          etol: float = 0.0,
-          ftol: float = 0.0,
-          maxiter: int = 10000,
-          maxeval: int = 100000,
-          dmax: float = uc.set_in_units(0.01, 'angstrom'),
-          cutboxvector: str = 'c',
-          randomseed: Optional[int] = None) -> dict:
+def grip_relax(lmp: LAMMPSobj,
+               system: am.System,
+               temperature: float,
+               runsteps: int,
+               coolsteps: int = 1000,
+               temperature_low: float = 50,
+               gbwidth: float = 10,
+               bufferwidth: float = 10,
+               etol: float = 0.0,
+               ftol: float = 0.0,
+               maxiter: int = 10000,
+               maxeval: int = 100000,
+               dmax: float = 0.01,
+               cutboxvector: str = 'c',
+               randomseed: Optional[int] = None,
+               usefiles: bool = False) -> dict:
     """
     Run a LAMMPS simulation in two steps: Optional high-temperature MD
     then relaxation. Writes the input structure with dummy GB energy
@@ -216,19 +222,20 @@ def relax(lammps_command: str,
 
     Parameters
     ----------
-    lammps_command :str
-        Command for running LAMMPS.
+    lmp : LAMMPSEXE or LAMMPSLIB
+        An atomman LAMMPS interface object.
     system : atomman.System
         The grain boundary system to perform the relaxation on.
-    potential : atomman.lammps.Potential
-        The LAMMPS implemented potential to use.
     temperature : float
         The temperature to relax the system at during the MD run.
     runsteps : int
         The number of MD run steps to perform.
-    mpi_command : str, optional
-        The MPI command for running LAMMPS in parallel.  If not given, LAMMPS
-        will run serially.
+    coolsteps : int, optional
+        The number of MD run steps to perform when cooling from temperature
+        down to near zero.  Default value is 1000.
+    temperature_low : float, optional
+        The final target temperature of the cooling stage.  Default value is
+        50.
     gbwidth : float, optional
         The width of the grain boundary region taken as the distance into both
         crystals from the grain boundary plane.  This region will be relaxed
@@ -272,66 +279,145 @@ def relax(lammps_command: str,
         - **'natomsgb'** (*int*) - The number of atoms in the grain boundary
           region.
         - **'Epotgb'** (*float*) - The total potential energy of
-          the grain boundary region after relaxing.    
+          the grain boundary region after relaxing.
     """
-    assert cutboxvector == 'c', 'alt values not yet supported by relax()'
-
-    # Get the units from Potential
-    lammps_units = lmp.style.unit(potential.units)
-    
-    # Get lammps version date
-    lammps_date = lmp.checkversion(lammps_command)['date']
-
-    # Random seed settings
-    if randomseed is None: 
-        randomseed = lmp.seed()
-
-    # Use 2x the default timestep for the potential's units
-    timestep = 2 * lmp.style.timestep(potential.units)
-    
-    # Define LAMMPS input script variables
-    lammps_variables = {}
-    system_info = system.dump('atom_data', f=f'init.dat',
-                                potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
-    lammps_variables['temperature'] = temperature
-    lammps_variables['runsteps'] = runsteps
-    lammps_variables['dmax'] = dmax
-    lammps_variables['etol'] = etol
-    lammps_variables['ftol'] = uc.get_in_units(ftol, lammps_units['force'])
-    lammps_variables['maxiter'] = maxiter
-    lammps_variables['maxeval'] =  maxeval
-    lammps_variables['gbwidth'] = uc.get_in_units(gbwidth, lammps_units['length'])
-    lammps_variables['bufferwidth'] = uc.get_in_units(bufferwidth, lammps_units['length'])
-    lammps_variables['randomseed'] = randomseed
-    lammps_variables['timestep'] = timestep
-
-    # Set dump_modify_format based on lammps_date
-    if lammps_date < datetime.date(2016, 8, 3):
-        lammps_variables['dump_modify_format'] = '"%d %d %.13e %.13e %.13e %.13e"'
+    # Handle file generation settings
+    if usefiles:
+        logfile = 'log.lammps'
+        script = 'grip_relax.in'
     else:
-        lammps_variables['dump_modify_format'] = 'float %.13e'
+        logfile = 'none'
+        script = None
 
-    # Write LAMMPS input script
-    lammps_script = 'grip_relax.in'
-    template = read_calc_file('iprPy.calculation.grain_boundary_grip',
-                                'grip_relax.template')
-    with open(lammps_script, 'w') as f:
-        f.write(am.tools.filltemplate(template, lammps_variables, '<', '>'))
+    # Timestep and timestep-dependent variables
+    timestep = am.lammps.style.timestep(lmp.potential.units)
+    temperature_damp = 100 * timestep
     
-    # Run lammps 
-    output = am.lammps.run(lammps_command, script_name=lammps_script,   
-                            mpi_command=mpi_command, screen=False)
+    lmp.commands_string('\n# Define region widths')
+    lmp.cmd.variable('gbwidth', 'equal', uc.get_in_units(gbwidth, lmp.unitsdict['length']))
+    lmp.cmd.variable('bufferwidth', 'equal', uc.get_in_units(bufferwidth, lmp.unitsdict['length']))
+    lmp.cmd.variable('energybufferwidth', 'equal', uc.get_in_units(1.5, lmp.unitsdict['length']))
+    lmp.cmd.variable('gbbufferwidth', 'equal', '${gbwidth}+${bufferwidth}')
+    lmp.cmd.variable('energywidth', 'equal', '${gbbufferwidth}+${energybufferwidth}')
+
+    # Pass system and potential info into LAMMPS
+    lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                  usefiles=usefiles, logfile=logfile)
+
+    lmp.commands_string('\n# Define regions')
+    if cutboxvector == 'a':
+        lmp.cmd.region('gbregion',    'block', '-${gbwidth}',       '${gbwidth}',       'INF', 'INF', 'INF', 'INF', 'units', 'box')
+        lmp.cmd.region('topbuffer',   'block', '${gbwidth}',        '${gbbufferwidth}', 'INF', 'INF', 'INF', 'INF', 'units', 'box')
+        lmp.cmd.region('botbuffer',   'block', '-${gbbufferwidth}', '-${gbwidth}',      'INF', 'INF', 'INF', 'INF', 'units', 'box')
+        lmp.cmd.region('topboundary', 'block', '${gbbufferwidth}',  'INF',              'INF', 'INF', 'INF', 'INF', 'units', 'box')
+        lmp.cmd.region('botboundary', 'block', 'INF',               '-${gbwidth}',      'INF', 'INF', 'INF', 'INF', 'units', 'box')
+        lmp.cmd.region('energyeval',  'block', '-${energywidth}',   '${energywidth}',   'INF', 'INF', 'INF', 'INF', 'units', 'box')
+    elif cutboxvector == 'b':
+        lmp.cmd.region('gbregion',    'block', 'INF', 'INF', '-${gbwidth}',       '${gbwidth}',        'INF', 'INF', 'units', 'box')
+        lmp.cmd.region('topbuffer',   'block', 'INF', 'INF', '${gbwidth}',        '${gbbufferwidth}',  'INF', 'INF', 'units', 'box')
+        lmp.cmd.region('botbuffer',   'block', 'INF', 'INF', '-${gbbufferwidth}', '-${gbwidth}',       'INF', 'INF', 'units', 'box')
+        lmp.cmd.region('topboundary', 'block', 'INF', 'INF', '${gbbufferwidth}',  'INF',               'INF', 'INF', 'units', 'box')
+        lmp.cmd.region('botboundary', 'block', 'INF', 'INF', 'INF',               '-${gbbufferwidth}', 'INF', 'INF', 'units', 'box')
+        lmp.cmd.region('energyeval',  'block', 'INF', 'INF', '-${energywidth}',   '${energywidth}',    'INF', 'INF', 'units', 'box')
+    elif cutboxvector == 'c':
+        lmp.cmd.region('gbregion',    'block', 'INF', 'INF', 'INF', 'INF', '-${gbwidth}',       '${gbwidth}',        'units', 'box')
+        lmp.cmd.region('topbuffer',   'block', 'INF', 'INF', 'INF', 'INF', '${gbwidth}',        '${gbbufferwidth}',  'units', 'box')
+        lmp.cmd.region('botbuffer',   'block', 'INF', 'INF', 'INF', 'INF', '-${gbbufferwidth}', '-${gbwidth}',       'units', 'box')
+        lmp.cmd.region('topboundary', 'block', 'INF', 'INF', 'INF', 'INF', '${gbbufferwidth}',  'INF',               'units', 'box')
+        lmp.cmd.region('botboundary', 'block', 'INF', 'INF', 'INF', 'INF', 'INF',               '-${gbbufferwidth}', 'units', 'box')
+        lmp.cmd.region('energyeval',  'block', 'INF', 'INF', 'INF', 'INF', '-${energywidth}',   '${energywidth}',    'units', 'box')
+    else:
+        raise ValueError("cutboxvector limited to values 'a', 'b', or 'c'")
+
+    lmp.commands_string('\n# Define region groups')
+    lmp.cmd.group('gbregion', 'region', 'gbregion')
+    lmp.cmd.group('topbuffer', 'region', 'topbuffer')
+    lmp.cmd.group('botbuffer', 'region', 'botbuffer')
+    lmp.cmd.group('topboundary', 'region', 'topboundary')
+    lmp.cmd.group('botboundary', 'region', 'botboundary')
+    lmp.cmd.group('energyeval', 'region', 'energyeval')
+
+    lmp.commands_string('\n# Define composite groups')
+    lmp.cmd.group('topboundary_md', 'union', 'topbuffer', 'topboundary')
+    lmp.cmd.group('botboundary_md', 'union', 'botbuffer', 'botboundary')
+    lmp.cmd.group('gbregion_min', 'union', 'gbregion', 'topbuffer', 'botbuffer')
+
+    # Check if MD relaxation should be performed
+    if runsteps > 0 and temperature > 0:
+
+        lmp.commands_string('\n# Fix atoms in buffer and boundary regions')
+        lmp.cmd.fix('bothold', 'botboundary_md', 'setforce', 0.0, 0.0, 0.0)
+        lmp.cmd.fix('tophold', 'topboundary_md', 'aveforce', 0.0, 0.0, 0.0)
+
+        lmp.commands_string('\n# Minimize')
+        lmp.cmd.min_style('cg')
+        lmp.cmd.min_modify('dmax', uc.get_in_units(dmax, lmp.unitsdict['length']))
+        lmp.cmd.minimize(etol, uc.get_in_units(ftol, lmp.unitsdict['force']), maxiter, maxeval)
+
+        lmp.commands_string('\n# Set timestep and initialize velocities')
+        lmp.cmd.timestep(timestep)
+        lmp.cmd.velocity('gbregion', 'create', 2*temperature, randomseed,
+                         'dist', 'gaussian', 'rot', 'yes')
+
+        lmp.commands_string('\n# MD relaxation')
+        lmp.cmd.fix('nve', 'all', 'nve')
+        lmp.cmd.fix('langevin', 'gbregion', 'langevin',
+                    temperature, temperature, temperature_damp, randomseed)
+        lmp.cmd.run(runsteps)
+
+        lmp.commands_string('\n# Cool the system')
+        lmp.cmd.unfix('langevin')
+        lmp.cmd.fix('langevin', 'gbregion', 'langevin',
+                    temperature, temperature_low, temperature_damp, randomseed)
+        lmp.cmd.run(coolsteps)
+
+        lmp.commands_string('\n# Unfix everything')
+        lmp.cmd.unfix('bothold')
+        lmp.cmd.unfix('tophold')
+        lmp.cmd.unfix('langevin')
+        lmp.cmd.unfix('nve')
+        lmp.cmd.reset_timestep(0)
+
+    lmp.commands_string('\n# Define property computes')
+    lmp.cmd.compute('peatom', 'all', 'pe/atom')
+    lmp.cmd.compute('pegb', 'energyeval', 'reduce', 'sum', 'c_peatom')
+    lmp.cmd.variable('natomsgb', 'equal', 'count(energyeval)')
+
+    lmp.commands_string('\n# Define thermo')
+    lmp.cmd.thermo(0)
+    lmp.cmd.thermo_style('custom', 'step', 'pe', 'lx', 'ly', 'lz', 'press', 'pxx', 'pyy', 'pzz', 'c_pegb', 'v_natomsgb')
     
-    # Extract results
-    thermo = output.simulations[-1].thermo
+    lmp.commands_string('\n# Define dump')
+    if lmp.potential.atom_style == 'charge':
+        dumpkeys = ['id', 'type', 'q', 'x', 'y', 'z', 'c_peatom']
+    else:
+        dumpkeys = ['id', 'type', 'x', 'y', 'z', 'c_peatom']
+    lmp.cmd.dump('dumpit', 'all', 'custom', maxiter, '*.dump', *dumpkeys)
+    lmp.cmd.dump_modify('dumpit', 'format', 'float', '%.17e')
     
+    lmp.commands_string('\n# Set up and run minimization')
+    lmp.cmd.fix('bothold', 'botboundary', 'setforce', 0.0, 0.0, 0.0)
+    lmp.cmd.fix('tophold', 'topboundary', 'aveforce', 0.0, 0.0, 0.0)
+    lmp.cmd.min_style('cg')
+    lmp.cmd.min_modify('dmax', uc.get_in_units(dmax, lmp.unitsdict['length']))
+    lmp.cmd.minimize(etol, uc.get_in_units(ftol, lmp.unitsdict['force']), maxiter, maxeval)
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
+
+    if log is None:
+        # Get thermo directly from lammps object if no log file
+        thermo: dict = lmp.last_thermo()
+    else:
+        # Extract thermo terms from log output
+        thermo = log.simulations[-1].thermo.iloc[-1].to_dict()
+
     # Rename final dump file
-    Path(f'{thermo.Step.values[-1]}.dump').rename('final.dump')
+    Path(f'{int(thermo["Step"])}.dump').rename('final.dump')
 
     results = {}
-    results['natomsgb'] = thermo.v_natomsgb.values[-1]
-    results['Epotgb'] = uc.set_in_units(thermo.c_pegb.values[-1],
-                                        lammps_units['energy'])
+    results['natomsgb'] = thermo['v_natomsgb']
+    results['Epotgb'] = uc.set_in_units(thermo['c_pegb'],
+                                        lmp.unitsdict['energy'])
 
     return results

@@ -1,37 +1,45 @@
+# Python script created by Peter Winstel and Lucas Hale
 
-from typing import Optional
+# Standard library imports
+from typing import Optional, Union
 
+# http://www.numpy.org/
+import numpy as np
+
+from scipy.integrate import trapezoid
+from scipy.optimize import curve_fit
+
+import matplotlib.pyplot as plt
+
+# https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
-from atomman.tools import filltemplate
+from atomman.typing import lammpspotential, unitfloat
+from atomman.lammps import LAMMPS, LAMMPSobj
 
-import numpy as np 
 
-from ...tools import read_calc_file
-
-# Note - the system fed in needs to be relaxed to a liquid phase 
-# otherwise the calculation doesn't make much sense and it needs to run for 
-# significantly longer 
-
-def diffusion_liquid(lammps_command:str,
+def diffusion_liquid(lammps_command: Union[str, LAMMPSobj],
                      system: am.System,
-                     potential: lmp.Potential,
+                     potential: lammpspotential,
                      temperature: float,
                      mpi_command: Optional[str] = None,
-                     timestep: Optional[float] = None,
-                     runsteps: int = 50000,
-                     simruns: int = 10,
+                     timestep: Optional[unitfloat] = None,
                      equilsteps: int = 0,
-                     ) -> dict:
+                     runsteps: int = 2000,
+                     simruns: int = 100,
+                     msd_start: int = 500,
+                     createvelocities: bool = False,
+                     randomseed: Optional[int] = None,
+                     usefiles: bool = False) -> dict:
     """
-    Calculates the diffusion constant for a liquid system using
-    the integral of the velocity autocorrelation function
+    Calculates the diffusion constant for a liquid system using both
+    mean squared displacements and the velocity auto-correlation function.
 
     Parameters
     ----------
-    lammps_command : str
-        Command for running LAMMPS
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     system : atomman.System
         The system to perform the calculation on.
     potential : atomman.lammps.Potential
@@ -41,141 +49,223 @@ def diffusion_liquid(lammps_command:str,
     mpi_command : str, optional
         The MPI command for running LAMMPS in parallel. If not given, LAMMPS
         will run serially.
-    timestep : float, optional
+    timestep : float, str or None, optional
         The amount of time to increase each frame of the simulation. The 
         default value is given by the default value for the specified LAMMPS
-        unit system. 
-    runsteps : int, optional
-        How many timesteps each simulation will run for. Default value is 50000. 
-    simruns : int, optional
-        The number of simulations to run. The higher the number the less noise
-        in the VACF calculation. Default value of 10.
+        unit system.
     equilsteps : int, optional
-        How many timesteps the equilibiration simulation will run for. Default 
-        value of 0.
-
+        How many timesteps to run to equilibrate the system before starting the
+        diffusion calculations. Default value is 0.
+    runsteps : int, optional
+        How many timesteps each short diffusion simulation will run for.  This
+        should be a good value for the velocity auto correlation function,
+        typically in the low 1000's.  Default value is 2000.
+    simruns : int, optional
+        The number of short diffusion simulations to run. The VACF and short
+        MSD values are averaged over the runs.  Default value of 100.
+    msd_start : int, optional
+        The starting timestep for including MSD data in the MSD diffusion
+        calculations.  Initial values should be ignored due to correlation
+        with the initial atomic positions for the MSD run.  Default value is
+        500.
+    createvelocities : bool, optional
+        If True, velocities will be created for the atoms prior to running the
+        simulations.  Default value is False, which assumes the initial system
+        already has velocity information.  Typically, if this is True then
+        equilsteps > 0.
+    randomseed : int or None, optional
+        Random number seed used by LAMMPS in creating velocities and with
+        the Langevin thermostat.  Default is None which will select a
+        random int between 1 and 900000000.
+    usefiles : bool, optional
+        If set to True, then all input/output files for LAMMPS will be generated.
+        Default value of False will minimize the files created.
+    
     Returns
     -------
     dict
         Dictionary of results consisting of keys:
 
-        -**'vacf_x_values'** (*Numpy array of floats*) - The array of 
-        calculated x components of the msd values
-        -**'vacf_y_values'** (*Numpy array of floats*) - The array of 
-        calculated y components of the msd values
-        -**'vacf_z_values'** (*Numpy array of floats*) - The array of 
-        calculated z components of the msd values
-        -**'vacf_values'** (*Numpy array of floats*) - The array of 
-        calculated msd values
-        -**'measured_temperature'** (*float*) - The average measured
-        temperature of the system ignore initial data according to 
-        the data offset.
-        -**'measured_temperature_stderr'** (*float*) - The standard 
-        deviation measured temperature of the system ignore initial 
-        data according to the data offset.
-        -**'diffusion'** (*float*) - The calculated diffusion 
-        coeffecient
-        -**'diffusion_stderr'** (*float*) - The standard deviation
-        of the diffusion coeffecient
-        -**'lammps_output'** - The lammps output log
+        -**'diffusion_msd_short'** (*float*) - The diffusion constant estimate
+        obtained using the slope of the mean squared displacement averaged over
+        all separate simulations.
+        -**'diffusion_msd_long'** (*float*) - The diffusion constant estimate
+        obtained from the mean squared displacement slope of the full combined
+        simulation run.
+        -**'diffusion_vacf'** (*float*) - The diffusion constant estimate
+        obtained using the velocity auto correlation function averaged over
+        all separate simulations.
+        -**'measured_temperature'** (*float*) - The mean observed temperature
     """
-    # Get the Units from Potential
-    lammps_units = lmp.style.unit(potential.units)
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
 
-    # Set default timestep based on units
+    logfile = 'log.lammps'
+    if usefiles or not lmp.islib:
+        script = 'liquid.in'
+    else:
+        script = None
+
+    # Check/select a randomseed value
+    randomseed = am.lammps.seed(randomseed)
+
+    # Set timestep in atomman and LAMMPS units
     if timestep is None:
-        timestep = uc.set_in_units(lmp.style.timestep(potential.units),
-                                   lammps_units['time'])
+        timestep_lammps = am.lammps.style.timestep(lmp.potential.units)
+        timestep = uc.set_in_units(timestep_lammps, lmp.unitsdict['time'])
+    else:
+        timestep = uc.set_in_units(timestep)
+        timestep_lammps = uc.get_in_units(timestep, lmp.unitsdict['time'])
+    temperature_damp = 100 * timestep_lammps
 
-    # Initialize the variables to fill in the script
-    lammps_variables = {}
+    # Pass system and potential info into LAMMPS
+    lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                  usefiles=usefiles, logfile=logfile)
 
-    # Get the system info by loading the system into the init.dat and using the specified potential
-    system_info = system.dump('atom_data', f='init.dat', potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
+    lmp.commands_string('\n# Integrator definition')
+    lmp.cmd.timestep(timestep_lammps)
+    lmp.cmd.fix('NVT', 'all', 'nvt', 'temp', temperature, temperature, temperature_damp)
 
-    # Initialize the rest of the inputs to the Lammps Scripts 
-    lammps_variables['temperature'] = temperature
-    lammps_variables['timestep'] = uc.get_in_units(timestep, lammps_units['time'])
-    lammps_variables['runsteps'] = runsteps
-    lammps_variables['equilsteps'] = equilsteps
-    lammps_variables['num_simulations'] = simruns
+    if createvelocities:
+        lmp.commands_string('\n# Create new velocities')
+        lmp.cmd.velocity('all', 'create', temperature, randomseed, 'mom',
+                        'yes', 'rot', 'yes', 'dist', 'gaussian')
 
-    #Fill in the template
-    lammps_script = 'diffusion_liquid.in'
-    template = read_calc_file('iprPy.calculation.diffusion_liquid',
-                              'diffusion_liquid.template')
-    with open(lammps_script,'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
-    
-    #Run lamps
-    output = lmp.run(lammps_command, script_name=lammps_script,
-                     mpi_command=mpi_command, screen=False)
-    
-    # Init lists of values
-    diffusion_vacf_values = []
-    diffusion_msd_short_values = []
-    measured_temps = []
-    msd_long_running = []
-    steps_long_running = []
+    lmp.commands_string('\n# Equilibration run')
+    lmp.cmd.run(equilsteps)
+    lmp.cmd.reset_timestep(0)
 
-    msd_unit = f"{lammps_units['length']}^2"
-    diffusion_msd_unit = f"{lammps_units['length']}^2/{lammps_units['time']}"
-    diffusion_vacf_unit = f"{lammps_units['velocity']}^2*{lammps_units['time']}"
+    lmp.commands_string('\n# MSD long calculation parameters')
+    lmp.cmd.compute('msdLong', 'all', 'msd', 'com', 'yes')
 
-    for i in range(1, simruns+1):
-        thermo = output.simulations[i].thermo
+    lmp.commands_string('\n# Simulation loops')
+    for i in lmp.loop('i', simruns):
 
-        # Get last diffusion values for short MSD and VACF
-        diffusion_vacf_values.append(thermo['v_eta'].values[-1])
-        diffusion_msd_short_values.append(thermo['v_fitslopeShort'].values[-1])
+        lmp.commands_string('\n# MSD short calculation parameters')
+        lmp.cmd.compute('msdShort', 'all', 'msd', 'com', 'yes')
         
-        # Append lists with all long MSD, steps, and temperature measurements
-        msd_long_running += thermo['c_msdLong[4]'].tolist()
-        steps_long_running += thermo['Step'].tolist()
-        measured_temps += thermo['Temp'].tolist()
+        lmp.commands_string('\n# VACF calculation parameters')
+        lmp.cmd.compute('vacf', 'all', 'vacf')
 
-    # Get long MSD estimate from the last simulation
-    thermo = output.simulations[-1].thermo
-    diffusion_msd_long_value = uc.set_in_units(thermo['v_fitslopeLong'].values[-1], 
-                                               diffusion_msd_unit)
+        lmp.commands_string('\n# Set thermo outputs')
+        thermo_keys = ['step', 'temp',
+                       'c_vacf[1]', 'c_vacf[2]', 'c_vacf[3]', 'c_vacf[4]',
+                       'c_msdShort[1]', 'c_msdShort[2]', 'c_msdShort[3]', 'c_msdShort[4]',
+                       'c_msdLong[1]', 'c_msdLong[2]', 'c_msdLong[3]', 'c_msdLong[4]']
+        lmp.cmd.thermo_style('custom', *thermo_keys)
+        lmp.cmd.thermo_modify('format', 'float', '%.17e')
+        lmp.cmd.thermo(1)
 
-    # Unit convert MSD and diffusion values
-    diffusion_vacf_values = uc.set_in_units(diffusion_vacf_values, diffusion_vacf_unit)
-    diffusion_msd_short_values = uc.set_in_units(diffusion_msd_short_values, diffusion_msd_unit)
-    msd_long_running = uc.set_in_units(msd_long_running, msd_unit)
-    time_running = np.array(steps_long_running) * timestep
+        lmp.commands_string('\n# Run')
+        lmp.cmd.run(runsteps)
 
-    # Compute error associated with linear fit for MSD long
-    #temp_error_sum = 0
-    #for i in range(len(msd_long_running)):
-    #    temp_error_sum += (msd_long_running[i] - (diffusion_msd_long_value*2*3*timestep))**2 
-        #Note the 2 and 3 come from the diffusion formula 
-    #diffusion_msd_long_stderr = temp_error_sum / len(msd_long_running)
-    diffusion_msd_long_stderr = (np.sum((msd_long_running[1:] / (6 * time_running[1:]) - diffusion_msd_long_value)**2) / len(msd_long_running)) ** 0.5
+        lmp.commands_string('\n# Clear short computes')
+        lmp.cmd.uncompute('msdShort')
+        lmp.cmd.uncompute('vacf')
 
-    # Compute mean and stderr of mean for temp, VACF and MSD short
-    measured_temp = np.average(measured_temps)
-    measured_temp_stderr = np.std(measured_temps) / ((len(measured_temps) / 100) ** .5)
+
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
+
+    # Define complex LAMMPS output units
+    msd_unit = f"{lmp.unitsdict['length']}^2"
+    vacf_unit = f"{lmp.unitsdict['velocity']}^2"
+
+    # Extract time from first simulation
+    time_short = log.simulations[1].thermo.Step.values * timestep
+
+    # Loop over simulations and extract results
+    msd_short = np.empty((simruns, time_short.shape[0]))
+    vacf = np.empty((simruns, time_short.shape[0]))
+    for i, sim in enumerate(log.simulations[1:]):
+        thermo = sim.thermo
+        msd_short[i,:] = uc.set_in_units(thermo['c_msdShort[4]'], msd_unit)
+        vacf[i,:] = uc.set_in_units(thermo['c_vacf[4]'], vacf_unit)
+
+    # Combine simulations for the long estimate
+    allsim = log.flatten(firstindex=1)
+    thermo = allsim.thermo
+    time_long = thermo.Step * timestep
+    msd_long = uc.get_in_units(thermo['c_msdLong[4]'], msd_unit)
+
+
+    # Compute diffusion constant estimates
+    def line(x, slope, intercept):
+        return intercept + x * slope
     
-    diffusion_msd_short_value = np.average(diffusion_msd_short_values)
-    diffusion_msd_short_stderr = np.std(diffusion_msd_short_values) / (simruns ** .5)
-    
-    diffusion_vacf_value = np.average(diffusion_vacf_values)
-    diffusion_vacf_stderr = np.std(diffusion_vacf_values) / (simruns ** .5)
+    slope = curve_fit(line, time_short[msd_start:], msd_short.mean(axis=0)[msd_start:])[0][0]
+    diffusion_msd_short = slope / 6
+
+    slope = curve_fit(line, time_long[msd_start:], msd_long[msd_start:])[0][0]
+    diffusion_msd_long = slope / 6
+
+    diffusion_vacf = trapezoid(vacf.mean(axis=0), time_short) / 3
+
+    msd_short_plot(time_short, msd_short, msd_start)
+    msd_long_plot(time_long, msd_long, msd_start)
+    vacf_plot(time_short, vacf)
+
 
     # Build results dict
     results = {}
-    results['diffusion_msd_short'] = diffusion_msd_short_value
-    results['diffusion_msd_short_stderr'] = diffusion_msd_short_stderr
-    results['diffusion_msd_long'] = diffusion_msd_long_value
-    results['diffusion_msd_long_stderr'] = diffusion_msd_long_stderr
-    results['diffusion_vacf'] = diffusion_vacf_value
-    results['diffusion_vacf_stderr'] = diffusion_vacf_stderr
-    results['measured_temperature'] = measured_temp
-    results['measured_temperature_stderr'] = measured_temp_stderr
-    
-    results['lammps_output'] = output 
+    results['diffusion_msd_short'] = diffusion_msd_short
+    results['diffusion_msd_long'] = diffusion_msd_long
+    results['diffusion_vacf'] = diffusion_vacf
+    results['measured_temperature'] = allsim.thermo.Temp.mean()
+
+    results['lammps_output'] = log
+
     return results
-    
-    
+
+
+def msd_short_plot(time_short, msd_short, msd_start):
+    """
+    Create a plot of MSD vs t for the short simulations
+    """
+    t = uc.get_in_units(time_short, 'ps')
+    msd = uc.get_in_units(msd_short, 'angstrom^2')
+
+    plt.plot(t[msd_start:], msd.T[msd_start:])
+    plt.plot(t[msd_start:], msd.mean(axis=0)[msd_start:], 'k-', linewidth=3)
+    plt.xlim(t[msd_start], t[-1])
+    plt.ylim(0.0, None)
+
+    plt.title('MSD Short')
+    plt.xlabel('time (ps)')
+    plt.ylabel('MSD (angstrom^2)')
+    plt.savefig('MSD short')
+    plt.close()
+
+def vacf_plot(time_short, vacf):
+    """
+    Create a plot of VACF vs t for the short simulations
+    """
+    t = uc.get_in_units(time_short, 'ps')
+    v = uc.get_in_units(vacf, 'angstrom/ps')
+
+    plt.plot(t, v.T)
+    plt.plot(t, v.mean(axis=0), 'k-', linewidth=3)
+    plt.xlim(0, t[-1])
+
+    plt.title('VACF')
+    plt.xlabel('time (ps)')
+    plt.ylabel('VACF (angstrom/ps)')
+    plt.savefig('VACF')
+    plt.close()
+
+def msd_long_plot(time_long, msd_long, msd_start):
+    """
+    Create a plot of MSD vs t for the full simulation
+    """
+    t = uc.get_in_units(time_long, 'ps')
+    msd = uc.get_in_units(msd_long, 'angstrom^2')
+
+    plt.plot(t[msd_start:], msd[msd_start:], 'k-', linewidth=3)
+    plt.xlim(t[msd_start], t[-1])
+    plt.ylim(0.0, None)
+
+    plt.title('MSD Long')
+    plt.xlabel('time (ps)')
+    plt.ylabel('MSD (angstrom^2)')
+    plt.savefig('MSD Long')
+    plt.close()

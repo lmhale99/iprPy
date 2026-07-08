@@ -1,41 +1,36 @@
-from typing import Optional
-import random
+# Python script created by Peter Winstel and Lucas Hale
 
+# Standard library imports
+from typing import Optional, Union
+
+import matplotlib.pyplot as plt
+
+# https://github.com/usnistgov/atomman
 import atomman as am
-import atomman.lammps as lmp
 import atomman.unitconvert as uc
-from atomman.tools import filltemplate
+from atomman.typing import lammpspotential, unitfloat
+from atomman.lammps import LAMMPS, LAMMPSobj
 
-import numpy as np 
-
-from ...tools import read_calc_file
-# Note - the system fed in needs to be relaxed to a liquid phase 
-# otherwise the calculation doesn't make much sense and it needs to run for 
-# significantly longer 
-
-def viscosity_green_kubo(lammps_command:str,
+def viscosity_green_kubo(lammps_command: Union[str, LAMMPSobj],
                          system: am.System,
-                         potential: lmp.Potential,
+                         potential: lammpspotential,
                          temperature: float,
                          mpi_command: Optional[str] = None,
-                         timestep: Optional[float] = None,
-                         correlationlength: int = 200,
-                         sampleinterval: int = 5,
-                         outputsteps: int = 2000,
+                         timestep: Optional[unitfloat] = None,
                          runsteps: int = 1000000,
                          equilsteps: int = 0,
-                         dragcoeff: float = 0.2,
-                         resetvelocities: bool = False,
+                         createvelocities: bool = False,
                          randomseed: Optional[int] = None,
-                         ) -> dict:
+                         usefiles: bool = False) -> dict:
     """
-    Calculates the diffusion constant for a liquid system using
-    the derivative of the mean squared displacement
+    Calculates the viscosity for a liquid system using the Green-Kubo
+    method.
 
     Parameters
     ----------
-    lammps_command : str
-        Command for running LAMMPS
+    lammps_command : str, LAMMPSEXE or LAMMPSLIB
+        LAMMPS executable command, LAMMPS library name, or an atomman LAMMPS
+        interface object.
     system : atomman.System
         The system to perform the calculation on.
     potential : atomman.lammps.Potential
@@ -49,9 +44,6 @@ def viscosity_green_kubo(lammps_command:str,
         The amount of time to increase each frame of the simulation. The 
         default value is given by the default value for the specified LAMMPS
         unit system. 
-    drivingforce : float, optional
-        The amplitude of the driving force for the calculation method. Default 
-        value of 0.2. 
     runsteps : int, optional
         How many timesteps the simulation will run for. Default value of 1,000,000
         should be suitable for a short run. 
@@ -61,10 +53,7 @@ def viscosity_green_kubo(lammps_command:str,
     equilsteps : int, optional
         How many timesteps the equilibration simulation will run for. Default 
         value of 0.
-    dragcoeff : float, optional
-        The drag coefficient to use on the thermostat during NVT integration.
-        Default value is 0.2
-    resetvelocities : bool, optional
+    createvelocities : bool, optional
         Setting this to True will assign new random velocities to the atoms
         prior to running.  If this is used, then it would be wise to set an
         equilsteps value to let the velocities equilibrate before running the
@@ -73,134 +62,123 @@ def viscosity_green_kubo(lammps_command:str,
         Random number seed used by LAMMPS in creating velocities.  Only used
         if resetvelocities is True.  Default is None which will select a
         random int between 1 and 900000000.
+    usefiles : bool, optional
+        If set to True, then all input/output files for LAMMPS will be generated.
+        Default value of False will minimize the files created.
     
     Returns
     -------
     dict
         Dictionary of results consisting of keys:
 
-        -**'measured_temperature'** (*float*) - The average measured
-        temperature of the system ignore initial data according to 
-        the data offset.
-        -**'measured_temperature_stderr'** (*float*) - The standard 
-        deviation measured temperature of the system ignore initial 
-        data according to the data offset.
-        -**'viscosity'** (*float*) - The calculated viscosity 
-        -**'viscosity_stderr'** (*float*) - The standard deviation
-        of the viscosity
-        -**'lammps_output'** - The lammps output log
+        -**'viscosity_xy'** (*float*) - The calculated viscosity using only the
+        Pxy pressures.
+        -**'viscosity_xz'** (*float*) - The calculated viscosity using only the
+        Pxz pressures.
+        -**'viscosity_yz'** (*float*) - The calculated viscosity using only the
+        Pyz pressures.
+        -**'viscosity'** (*float*) - The calculated viscosity using all three
+        shear pressures.
     """
-    # Get the units from Potential
-    lammps_units = lmp.style.unit(potential.units)
+    # Create a LAMMPS object if needed
+    lmp = LAMMPS(lammps_command, mpi_command=mpi_command, potential=potential)
 
-    # Set default timestep based on units
-    if timestep is None:
-        timestep = uc.set_in_units(lmp.style.timestep(potential.units),
-                                   lammps_units['time'])
-
-    # Initialize the variables to fill in the script
-    lammps_variables = {}
-
-    # Get the system info by loading the system into the init.dat and using the specified potential
-    system_info = system.dump('atom_data', f='init.dat', potential=potential)
-    lammps_variables['atomman_system_pair_info'] = system_info
-
-    # Conversion tools
-
-    # Get the Boltzmann constant in si
-    kB_SI = uc.set_in_units(1.3806504*(10**(-23)),"(kg*m^2)/(s^2*K)")
-
-    # Account for /mole unit
-    mass_unit = lammps_units['mass']
-    if mass_unit == "g/mol": 
-        mass_unit = 'g'
-
-    # Get the Boltzmann constant in the LAMMPS unit system
-    lammps_kB_unit = f"({mass_unit}*{lammps_units['length']}^2)/({lammps_units['time']}^2*{lammps_units['temperature']})"
-    kB_lammps = uc.get_in_units(kB_SI, lammps_kB_unit)
-
-    # Conversion factor from dimensions of pressure to working calculation units
-    scale_unit_str = f"({mass_unit})/({lammps_units['length']}*{lammps_units['time']}^2)"
-    scale_unit = uc.set_in_units(1, f"{lammps_units['pressure']}")
-    scale = uc.get_in_units(scale_unit, scale_unit_str)
- 
-    # Raise Error if the values don't commute
-    if (runsteps % (outputsteps) != 0):
-        raise ValueError('thermosteps must divide runsteps')
-    
-    # Build the set velocities command if needed
-    if resetvelocities:
-        # Set default randomseed
-        if randomseed is None: 
-            randomseed = random.randint(1, 900000000)
-        lammps_variables['velocity_create'] = f'velocity all create {temperature} {randomseed}'
+    logfile = 'log.lammps'
+    if usefiles or not lmp.islib:
+        script = 'viscosity_green_kubo.in'
     else:
-        lammps_variables['velocity_create'] = ''
+        script = None
 
-    # Initialize the rest of the inputs to the Lammps Scripts 
-    lammps_variables['temperature'] = temperature
-    lammps_variables['timestep'] = uc.get_in_units(timestep, lammps_units['time'])
-    lammps_variables['correlationlength'] = correlationlength
-    lammps_variables['sampleinterval'] = sampleinterval
-    lammps_variables['runsteps'] = runsteps
-    lammps_variables['equilsteps'] = equilsteps
-    lammps_variables['outputsteps'] = outputsteps
-    lammps_variables['kB'] = kB_lammps
-    lammps_variables['convert'] = scale 
-    lammps_variables['dragcoeff'] = dragcoeff 
+    # Check/select a randomseed value
+    randomseed = am.lammps.seed(randomseed)
 
-    # Fill in the template
-    lammps_script = 'viscosity_green_kubo.in'
-    template = read_calc_file('iprPy.calculation.viscosity_green_kubo',
-                              'viscosity_green_kubo.template')
-    with open(lammps_script, 'w') as f:
-        f.write(filltemplate(template, lammps_variables, '<', '>'))
+    # Set timestep in atomman and LAMMPS units
+    if timestep is None:
+        timestep_lammps = am.lammps.style.timestep(lmp.potential.units)
+        timestep = uc.set_in_units(timestep_lammps, lmp.unitsdict['time'])
+    else:
+        timestep = uc.set_in_units(timestep)
+        timestep_lammps = uc.get_in_units(timestep, lmp.unitsdict['time'])
+    temperature_damp = 100 * timestep_lammps
+
+    # Pass system and potential info into LAMMPS
+    lmp.new_system_from_data_file(system, filename='init.dat', tilt_large=True,
+                                  usefiles=usefiles, logfile=logfile)
+
+    lmp.commands_string('\n# Integrator definition')
+    lmp.cmd.timestep(timestep_lammps)
+    lmp.cmd.fix('nvt', 'all', 'nvt',
+                'temp', temperature, temperature, temperature_damp)
+
+    if createvelocities:
+        lmp.commands_string('\n# Create new velocities')
+        lmp.cmd.velocity('all', 'create', temperature, randomseed,
+                         'mom', 'yes', 'rot', 'yes', 'dist', 'gaussian')
+
+    lmp.commands_string('\n# Equilibration run')
+    lmp.cmd.run(equilsteps)
+    lmp.cmd.reset_timestep(0)
+    lmp.cmd.unfix('nvt')
+
+    lmp.cmd.fix('nve', 'all', 'nve')
     
-    # Run lammps
-    output = lmp.run(lammps_command, script_name=lammps_script,
-                     mpi_command=mpi_command, screen=False)
+    lmp.cmd.variable('pxy', 'equal', 'pxy')
+    lmp.cmd.variable('pxz', 'equal', 'pxz')
+    lmp.cmd.variable('pyz', 'equal', 'pyz')
+
     
-    thermo = output.simulations[-1].thermo
+    # Set thermo outputs
+    lmp.cmd.thermo(1)
+    lmp.cmd.thermo_style('custom', 'step', 'time', 'pxy', 'pxz', 'pyz')
+    lmp.cmd.thermo_modify('format', 'float', '%.17e')
 
-    # Compute mean and stderr of mean for temp
-    measured_temps = thermo["Temp"].values
-    measured_temp = np.average(measured_temps)
-    measured_temp_stderr = np.std(measured_temps) / ((len(measured_temps) / 100) ** .5)
+    # Run for runsteps
+    lmp.cmd.run(runsteps)
 
-    # Extract viscosity and pressure values from thermo
-    viscosity_unit = f"{lammps_units['pressure']}*{lammps_units['time']}"
-    pressure_unit = lammps_units['pressure']
+    # Run EXE, get log output
+    log = lmp.end_and_get_log(script)
+    thermo = log.simulations[1].thermo
 
-    viscosities = uc.set_in_units(thermo["v_v"].values, viscosity_unit)
+    # Convert units on standard thermo terms
+    lmp.set_thermo_units(thermo)
 
-    pressures_xy = uc.set_in_units(thermo['v_pxy'].values, pressure_unit)
-    pressures_xz = uc.set_in_units(thermo['v_pxz'].values, pressure_unit)
-    pressures_yz = uc.set_in_units(thermo['v_pyz'].values, pressure_unit)
+    # Analyze the results with the Green-Kubo tools
+    volume = system.box.volume
+    gkxy = am.thermo.GreenKuboMu(thermo.Time, thermo.Pxy, fluctuation_delta=100,
+                                 temperature=temperature, volume=volume)
+    gkxz = am.thermo.GreenKuboMu(thermo.Time, thermo.Pxz, fluctuation_delta=100,
+                                 temperature=temperature, volume=volume)
+    gkyz = am.thermo.GreenKuboMu(thermo.Time, thermo.Pyz, fluctuation_delta=100,
+                                 temperature=temperature, volume=volume)
 
-    viscosities_x = uc.set_in_units(thermo['v_v11'].values, viscosity_unit)
-    viscosities_y = uc.set_in_units(thermo['v_v22'].values, viscosity_unit)
-    viscosities_z = uc.set_in_units(thermo['v_v33'].values, viscosity_unit)
+    # Generate plot of <P0*Pt> vs t for quality verification
+    acf_units = 'MPa^2'
 
-    # Viscosity measurement is the final value of the integral
-    viscosity = viscosities[-1] 
-    
-    # Initialize the return dictionary
+    time = uc.get_in_units(gkxy.time, 'ps')
+    acfxy = uc.get_in_units(gkxy.acf, acf_units)
+    acfxz = uc.get_in_units(gkxz.acf, acf_units)
+    acfyz = uc.get_in_units(gkyz.acf, acf_units)
+
+    plt.plot(time[:gkxy.index_cut], acfxy[:gkxy.index_cut], label='xy')
+    plt.plot(time[:gkxz.index_cut], acfxz[:gkxz.index_cut], label='xz')
+    plt.plot(time[:gkyz.index_cut], acfyz[:gkyz.index_cut], label='yz')
+
+    plt.legend()
+    plt.title('<P0*Pt> vs t')
+    plt.xlabel('t (ps)')
+    plt.xscale('log')
+    plt.ylabel(f'<P0*Pt> (${acf_units}$)')
+    plt.savefig('P0Pt.png')
+    plt.close()
+
     results = {}
+    results['thermo'] = thermo
+    results['viscosity_xy'] = gkxy.mu()
+    results['viscosity_xz'] = gkxz.mu()
+    results['viscosity_yz'] = gkyz.mu()
+    results['viscosity'] = (gkxy.mu() + gkxz.mu() + gkyz.mu()) / 3
+    results['gkxy'] = gkxy
+    results['gkxz'] = gkxz
+    results['gkyz'] = gkyz
 
-    # Data of interest
-    results['viscosity'] = viscosity
-    results['viscosity_stderr'] = 0.0   # There is no notion of error for the Green-Kubo Calculation Method
-    
-    results['measured_temperature'] = measured_temp
-    results['measured_temperature_stderr'] = measured_temp_stderr
-
-    results['pxy_values'] = pressures_xy
-    results['pxz_values'] = pressures_xz
-    results['pyz_values'] = pressures_yz
-
-    results['vx_value'] = np.average(viscosities_x[1:])
-    results['vy_value'] = np.average(viscosities_y[1:])
-    results['vz_value'] = np.average(viscosities_z[1:])
-
-    results['lammps_output'] = output
     return results

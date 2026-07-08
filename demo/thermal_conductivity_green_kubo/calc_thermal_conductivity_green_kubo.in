@@ -1,32 +1,32 @@
-# Input script for iprPy calculation free_energy_liquid
+# Input script for iprPy calculation thermal_conductivity_green_kubo
 
 # Calculation Metadata
 branch                          
 
 # LAMMPS and MPI Commands
 lammps_command                  lmp_mpi
-mpi_command                     mpiexec -localonly 8
+mpi_command                     
 
 # Interatomic Potential
 potential_file                  ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1.json
 potential_kim_id                
 potential_kim_potid             
-potential_dir                   ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1
+potential_dir                   ../0-files/1999--Mishin-Y--Ni--LAMMPS--ipr1               
 
 # Initial System Configuration
-load_file                       ../0-files/relax_liquid_170000.dump
+load_file                       ../0-files/relax_dynamic_420000.dump
 load_style                      atom_dump
 load_options                    
 family                          
 symbols                         Ni
-box_parameters                  
+box_parameters                            
 
 # System Manipulations
 a_uvw                           
 b_uvw                           
 c_uvw                           
 atomshift                       
-sizemults                       1 1 1
+sizemults                       
 
 # Input/Output Units
 length_unit                     
@@ -35,10 +35,10 @@ energy_unit
 force_unit                      
 
 # Run Parameters
-temperature                     1500
-p                               
-sigma                           
-equilsteps                      5000
-switchsteps                     10000
-pressure                        
+temperature                     100
+timestep                        
+runsteps                        
+equilsteps                      0
+centroid_stress                 
+createvelocities                False
 randomseed                      
