@@ -11,7 +11,7 @@ Settings for every calculation can be specified and defined in the same way.  Fi
 
 <details><summary>1.1. <b>lammps_command</b></summary>
 
-The path to the LAMMPS executable that you wish to use.
+The path to the LAMMPS executable that you wish to use. Setting this to "LAMMPSLIB" will use the lammps.lammps Python interface if it is available.
 
 </details>
 
@@ -102,6 +102,7 @@ Input parameters
 - __rmax__: The maximum r separation to use for the scan.  Default value is 6.0.
 - __rsteps__: The number of r separations to evaluate.  Default value is 50.
 
+
 </details>
 
 <details><summary>1.5. <b>relax_static_diatom</b></summary>
@@ -129,7 +130,45 @@ The crystal element provides a list of the crystal-based calculations an setting
 
 <details><summary>1.7. <b>html_results</b></summary>
 
-Collects the HTML results settings as described in Section 3.
+Collects the HTML results settings.
+
+- __filename__: The HTML file to save the results to.
+- <details><summary><b>plot_diatom_scan</b>: Dict or list of dict providing the settings for generating plots from the diatom_scan results.</summary>
+    <ul>
+        <li>__filename__ The name of the file where the plot will be saved.</li>
+        <li>__symbols__ A list of pairs of symbols identifying which diatom_scans to include in this plot.  If not given, all scans will be plotted.</li>
+        <li>__xlim__ Optional limiters to use on the x coordinates.</li>
+        <li>__ylim__ Optional limiters to use on the y coordinates.</li>
+    </ul>
+    </details>
+- <details><summary><b>plot_E_vs_r_scan</b>: Dict or list of dict providing the settings for generating plots from the E_vs_r_scan results.</summary>
+    <ul>
+        <li>__filename__ The name of the file where the plot will be saved.</li>
+        <li>__crystals__ A list of crystal names indicating which scans to include in the plot.  If not given, all scans will be plotted.</li>
+        <li>__xaxis__ Indicates which x-axis type to use: 'r' (radial distance) or 'a' (lattice parameter).</li>
+        <li>__xlim__ Optional limiters to use on the x coordinates.</li>
+        <li>__ylim__ Optional limiters to use on the y coordinates.</li>
+    </ul>
+    </details>
+- __plot_width__: The html width setting to use for displaying the plots.  Default value is '500px'.
+- __length_unit__: Unit of length to display results in.  Default value is 'angstrom'.
+- __energy_unit__: Unit of energy to display results in.  Default value is 'eV'.
+- __pressure_unit__: Unit of pressure to display results in.  Default value is 'GPa'.
+- __energy_per_area_unit__: Unit of energy per area to display results in.  Default value is  'mJ/m^2'.
+
+</details>
+
+<details><summary>1.8. <b>json_results</b></summary>
+
+Allows for modification of the JSON results file being saved.  By default, the results are saved to 'quickcheckresults.json'.
+
+Input parameters
+- __filename__: The file to save the JSON results to.  Default value is 'quick_check_data.json'. If set to None then no JSON file will be created.
+- __indent__: The line indent to use inside the JSON file.  Default value is 4.
+- __length_unit__: Unit of length to display results in.  Default value is 'angstrom'.
+- __energy_unit__: Unit of energy to display results in.  Default value is 'eV'.
+- __pressure_unit__: Unit of pressure to display results in.  Default value is 'GPa'.
+- __energy_per_area_unit__: Unit of energy per area to display results in.  Default value is  'mJ/m^2'.
 
 </details>
 
@@ -233,65 +272,5 @@ List of symbols to assign to each integer atom type of the crystal.  Optional if
 - __maxiter__: 100000
 - __maxeval__: 1000000
 - __dmax__: 0.01
-
-</details>
-
-## 3. Output settings
-
-<details><summary>3.1. <b>filename</b></summary>
-
-The HTML file to save the results to.
-
-</details>
-
-<details><summary>3.2. <b>plot_diatom_scan</b></summary>
-
-Dict or list of dict providing the settings for generating plots from the diatom_scan results.  Each dict specified one plot and takes the terms
-
-- __filename__ The name of the file where the plot will be saved.
-- __symbols__ A list of pairs of symbols identifying which diatom_scans to include in this plot.  If not given, all scans will be plotted.
-- __xlim__ Optional limiters to use on the x coordinates.
-- __ylim__ Optional limiters to use on the y coordinates.
-
-</details>
-
-<details><summary>3.3. <b>plot_E_vs_r_scan</b></summary>
-
-Dict or list of dict providing the settings for generating plots from the E_vs_r_scan results.  Each dict specified one plot and takes the terms
-
-- __filename__ The name of the file where the plot will be saved.
-- __crystals__ A list of crystal names indicating which scans to include in the plot.  If not given, all scans will be plotted.
-- __xaxis__ Indicates which x-axis type to use: 'r' (radial distance) or 'a' (lattice parameter).
-- __xlim__ Optional limiters to use on the x coordinates.
-- __ylim__ Optional limiters to use on the y coordinates.
-
- </details>
-<details><summary>3.4. <b>plot_width</b></summary>
-
-The html width setting to use for displaying the plots.  Default value is '500px'.
-
-</details>
-
-<details><summary>3.5. <b>length_unit</b></summary>
-
-Unit of length to display results in.  Default value is 'angstrom'.
-
-</details>
-
-<details><summary>3.6. <b>energy_unit</b></summary>
-
-Unit of energy to display results in.  Default value is 'eV'.
-
-</details>
-
-<details><summary>3.7. <b>pressure_unit</b></summary>
-
-Unit of pressure to display results in.  Default value is 'GPa'.
-
-</details>
-
-<details><summary>3.8. <b>energy_per_area_unit</b></summary>
-
-Unit of energy per area to display results in.  Default value is  'mJ/m^2'.
 
 </details>

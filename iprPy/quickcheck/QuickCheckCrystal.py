@@ -3,6 +3,7 @@ from typing import Optional, Union
 
 import atomman as am
 import atomman.unitconvert as uc
+from atomman.lammps import LAMMPSobj
 
 import numpy as np
 import pandas as pd
@@ -13,16 +14,16 @@ from ..calculation_subset.PointDefect import PointDefectParams
 class QuickCheckCrystal():
     def __init__(self,
                  name: str,
-                 lammps_command: str,
-                 potential: am.lammps.Potential,
-                 ucell: am.System):
+                 lmp: LAMMPSobj,
+                 ucell: am.System,
+                 verbose: bool = True):
         
         self.__name = name
-        self.__lammps_command = lammps_command
-        self.__potential = potential
+        self.__lmp = lmp
         self.__ucell = ucell
         self.__space_group = None
         self.__results = {}
+        self.verbose = verbose
 
 ###############################################################################
 
@@ -32,14 +33,9 @@ class QuickCheckCrystal():
         return self.__name
 
     @property
-    def lammps_command(self) -> str:
-        """str: The LAMMPS executable to use"""
-        return self.__lammps_command
-    
-    @property
-    def potential(self) -> am.lammps.Potential:
-        """atomman.lammps.Potential: The LAMMPS potential to use"""
-        return self.__potential
+    def lmp(self) -> LAMMPSobj:
+        """LAMMPSLIB or LAMMPSEXE: The LAMMPS interface object to use"""
+        return self.__lmp
 
     @property
     def ucell(self) -> am.System:
@@ -54,6 +50,17 @@ class QuickCheckCrystal():
     def results(self) -> dict:
         """dict: Collection of calculation results"""
         return self.__results
+
+    @property
+    def verbose(self) -> bool:
+        """bool: Indicates if calculation progress messages are to be printed"""
+        return self.__verbose
+    
+    @verbose.setter
+    def verbose(self, val: bool):
+        if not isinstance(val, bool):
+            raise TypeError('verbose must be a bool')
+        self.__verbose = val
 
 ###############################################################################
 
@@ -140,7 +147,9 @@ class QuickCheckCrystal():
         calc = load_calculation('E_vs_r_scan')
         system = self.ucell.supersize(sizemult, sizemult, sizemult)
         try:
-            results = calc.calc(self.lammps_command, system, self.potential,
+            if self.verbose:
+                print(f'running E_vs_r_scan for {self.name}')
+            results = calc.calc(self.lmp, system, self.lmp.potential,
                                 ucell=self.ucell, rmin=rmin, rmax=rmax,
                                 rsteps=rsteps)
         except Exception as error:
@@ -196,9 +205,11 @@ class QuickCheckCrystal():
         
         self.results['relax_static'] = []
         calc = load_calculation('relax_static')
-        for ucell in ucells:
+        for i, ucell in enumerate(ucells):
             try:
-                results = calc.calc(self.lammps_command, ucell, self.potential,
+                if self.verbose:
+                    print(f'running relax_static for {self.name} cell {i}')
+                results = calc.calc(self.lmp, ucell, self.lmp.potential,
                                     etol=etol, ftol=ftol, maxiter=maxiter,
                                     maxeval=maxeval, dmax=dmax, maxcycles=maxcycles,
                                     ctol=ctol, raise_at_maxcycles=raise_at_maxcycles)
@@ -238,8 +249,11 @@ class QuickCheckCrystal():
             self.__space_group = base['number']
         
         # Run on the relaxed cells
-        for static in self.results['relax_static']:
+        for i, static in enumerate(self.results['relax_static']):
             ucell = static['relaxed_ucell']
+
+            if self.verbose:
+                print(f'running crystal_space_group for {self.name} relax {i}')
             results = calc.calc(ucell, symprec, to_primitive, no_idealize)
             calc.clean_files()
 
@@ -258,10 +272,19 @@ class QuickCheckCrystal():
         calc = load_calculation('elastic_constants_static')
 
         self.results['elastic_constants_static'] = []
-        for static in self.results['relax_static']:
-            ucell = static['relaxed_ucell']
+        for i, cspg in enumerate(self.results['crystal_space_group']):
+            
+            # Skip if crystal transformed
+            if cspg['transformed']:
+                self.results['elastic_constants_static'].append(None)
+                continue
+            
+            ucell = cspg['ucell']
             try:
-                results = calc.calc(self.lammps_command, ucell, self.potential,
+                
+                if self.verbose:
+                    print(f'running elastic_constants_static for {self.name} relax {i}')
+                results = calc.calc(self.lmp, ucell, self.lmp.potential,
                                     strainrange=strainrange, etol=etol, ftol=ftol,
                                     maxiter=maxiter, maxeval=maxeval, dmax=dmax)
             except Exception as error:
@@ -279,10 +302,18 @@ class QuickCheckCrystal():
         calc = load_calculation('phonon')
 
         self.results['phonon'] = []
-        for i, static in enumerate(self.results['relax_static']):
-            ucell = static['relaxed_ucell']
+        for i, cspg in enumerate(self.results['crystal_space_group']):
+            
+            # Skip if crystal transformed
+            if cspg['transformed']:
+                self.results['phonon'].append(None)
+                continue
+            
+            ucell = cspg['ucell']
             try:
-                results = calc.calc(self.lammps_command, ucell, self.potential,
+                if self.verbose:
+                    print(f'running phonon for {self.name} relax {i}')
+                results = calc.calc(self.lmp, ucell, self.lmp.potential,
                                     distance=distance, symprec=symprec,
                                     numstrains=numstrains, strainrange=strainrange)
             except Exception as error:
@@ -307,13 +338,21 @@ class QuickCheckCrystal():
         calc = load_calculation('point_defect_static')
         self.results['point_defect_static'] = []
 
-        for cspg in self.results['crystal_space_group']:
+        for i, cspg in enumerate(self.results['crystal_space_group']):
+            
+            # Skip if crystal transformed
+            if cspg['transformed']:
+                r = {}
+                for name, point_defect in point_defects.items():
+                    r[name] = None
+                self.results['point_defect_static'].append(r)
+                continue
+
             ucell = cspg['ucell']
             r = {}
 
             for name, point_defect in point_defects.items():
 
-                
                 # Load point_defect file
                 if isinstance(point_defect, dict) and 'file' in point_defect:
                     if len(point_defect) > 1:
@@ -335,7 +374,9 @@ class QuickCheckCrystal():
 
                 # Run the calculation
                 try:
-                    results = calc.calc(self.lammps_command, system, self.potential,
+                    if self.verbose:
+                        print(f'running point_defect_static for {self.name} relax {i} {name}')
+                    results = calc.calc(self.lmp, system, self.lmp.potential,
                                         point_kwargs, cutoff, etol=etol, ftol=ftol,
                                         maxiter=maxiter, maxeval=maxeval, dmax=dmax)
                 except Exception as error:
@@ -358,8 +399,17 @@ class QuickCheckCrystal():
         calc = load_calculation('surface_energy_static')
         self.results['surface_energy_static'] = []
 
-        for static in self.results['relax_static']:
-            ucell = static['relaxed_ucell']
+        for i, cspg in enumerate(self.results['crystal_space_group']):
+            
+            # Skip if crystal transformed
+            if cspg['transformed']:
+                r = {}
+                for name, surface in surfaces.items():
+                    r[name] = None
+                self.results['surface_energy_static'].append(r)
+                continue
+
+            ucell = cspg['ucell']
             r = {}
 
             for name, surface in surfaces.items():
@@ -383,7 +433,9 @@ class QuickCheckCrystal():
                 
                 # Run the calculation
                 try:
-                    results = calc.calc(self.lammps_command, ucell, self.potential,
+                    if self.verbose:
+                        print(f'running surface_energy_static for {self.name} relax {i} {name}')
+                    results = calc.calc(self.lmp, ucell, self.lmp.potential,
                                         hkl=hkl, minwidth=minwidth, even=True,
                                         shiftindex=shiftindex, etol=etol, ftol=ftol,
                                         maxiter=maxiter, maxeval=maxeval, dmax=dmax)
@@ -391,8 +443,8 @@ class QuickCheckCrystal():
                 except Exception as error:
                     print(f'surface {name} failed for {self.name}!')
                     print(f'{type(error).__name__}: {error}')
-                else:
-                    r[name] = results
+                    r[name] = None
+
                 calc.clean_files()
             self.results['surface_energy_static'].append(r)
         
@@ -550,6 +602,8 @@ class QuickCheckCrystal():
             point_defects = self.results['point_defect_static'][i]
             d = {}
             for name, point_defect in point_defects.items():
+                if point_defect is None:
+                    continue
                 d[f'E_ptd_{name}'] = uc.get_in_units(point_defect['E_ptd_f'],
                                                       energy_unit)
             data.append(d)
@@ -568,6 +622,8 @@ class QuickCheckCrystal():
             surfaces = self.results['surface_energy_static'][i]
             d = {}
             for name, surface in surfaces.items():
+                if surface is None:
+                    continue
                 d[f'E_surf_{name}'] = uc.get_in_units(surface['E_surf_f'],
                                                       energy_per_area_unit)
             data.append(d)
@@ -590,5 +646,3 @@ class QuickCheckCrystal():
             return 'hexagonal'
         else:
             return 'cubic'
-        
-

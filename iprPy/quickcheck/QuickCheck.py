@@ -2,53 +2,75 @@ from pathlib import Path
 from typing import Optional, Union
 import json
 
-import potentials
+from DataModelDict import DataModelDict as DM
+
 import atomman as am
 import atomman.unitconvert as uc
+from atomman.typing import lammpspotential, unitfloat
+from atomman.lammps import LAMMPS, LAMMPSobj
 
 import numpy as np
 import pandas as pd
 
 import matplotlib.pyplot as plt
 
+# mpi4py placeholder
+comm = None
+
+# iprPy imports
 from .. import load_calculation
 from .QuickCheckCrystal import QuickCheckCrystal
 
 class QuickCheck():
 
     def __init__(self,
-                 lammps_command: str,
-                 potential: am.lammps.Potential,
-                 ucells: dict):
+                 lammps_command: Union[str, LAMMPSobj],
+                 potential: lammpspotential,
+                 ucells: dict,
+                 mpi_command: Optional[str] = None,
+                 verbose: bool = True
+                 ):
 
-        self.__lammps_command = lammps_command
-        self.__potential = potential
+        # Create a LAMMPS object if needed
+        if isinstance(lammps_command, str) and lammps_command == 'LAMMPSLIB':
+            self.__lmp = LAMMPS(cmdargs=['-l', 'none', '-screen', 'none'],
+                                mpi_command=mpi_command, # Checks that this is None
+                                comm=comm, potential=potential)
+        else:
+            self.__lmp = LAMMPS(lammps_command, mpi_command=mpi_command,
+                                potential=potential)
         
         self.__crystals = {}
         for name, ucell in ucells.items():
-            self.crystals[name] = QuickCheckCrystal(name, lammps_command,
-                                                    potential, ucell)
+            self.crystals[name] = QuickCheckCrystal(name, self.lmp, ucell, verbose)
         self.__results = {}
+        self.verbose = verbose
 
     @property
-    def lammps_command(self) -> str:
-        """str: The LAMMPS executable to use"""
-        return self.__lammps_command
-    
-    @property
-    def potential(self) -> am.lammps.Potential:
-        """atomman.lammps.Potential: The LAMMPS potential to use"""
-        return self.__potential
+    def lmp(self) -> LAMMPSobj:
+        """LAMMPSLIB or LAMMPSEXE: The LAMMPS interface object to use"""
+        return self.__lmp
 
     @property
-    def crystals(self) -> str:
-        """list: QuickCheckCrystal objects"""
+    def crystals(self) -> dict:
+        """dict: QuickCheckCrystal objects"""
         return self.__crystals
 
     @property
     def results(self) -> dict:
-        """dict: Collection of calculation results"""
+        """dict: Collection of all calculation results"""
         return self.__results
+    
+    @property
+    def verbose(self) -> bool:
+        """bool: Indicates if calculation progress messages are to be printed"""
+        return self.__verbose
+    
+    @verbose.setter
+    def verbose(self, val: bool):
+        if not isinstance(val, bool):
+            raise TypeError('verbose must be a bool')
+        self.__verbose = val
 
 ###############################################################################
 
@@ -77,8 +99,9 @@ class QuickCheck():
         if not isinstance(input_dict, dict):
             raise TypeError('input_dict neither a dict or JSON content')
 
-        # Extract lammps_command
+        # Extract lammps_command and mpi_command
         lammps_command = input_dict.pop('lammps_command')
+        mpi_command = input_dict.pop('mpi_command', None)
 
         # Extract or build potential
         pot_dict = input_dict.pop('potential')
@@ -106,7 +129,7 @@ class QuickCheck():
             ucell = d['ucell']
             ucells[name] = ucell
         
-        self = cls(lammps_command, potential, ucells)
+        self = cls(lammps_command, potential, ucells, mpi_command=mpi_command)
 
         self.run(**input_dict)
 
@@ -118,6 +141,9 @@ class QuickCheck():
             if htmlfilename is not None:
                 with open(htmlfilename, 'w') as f:
                     f.write(html)
+
+        json_results = input_dict.get('json_results', {})
+        self.json_results(**json_results)
 
         return self
 
@@ -152,7 +178,10 @@ class QuickCheck():
     def run_isolated_atom(self):
 
         calc = load_calculation('isolated_atom')
-        results = calc.calc(self.lammps_command, self.potential)
+
+        if self.verbose:
+            print('running isolated_atom')
+        results = calc.calc(self.lmp, self.lmp.potential)
         calc.clean_files()
 
         self.results['isolated_atom'] = results
@@ -168,14 +197,16 @@ class QuickCheck():
         if symbols is None:
             # Generate all unique symbol pairs
             symbols = []
-            potsymbols = self.potential.symbols
+            potsymbols = self.lmp.potential.symbols
             for i in range(len(potsymbols)):
                 for j in range(i, len(potsymbols)):
                     symbols.append([potsymbols[i], potsymbols[j]])
 
         self.results['diatom_scan'] = []
         for symbolpair in symbols:
-            results = calc.calc(self.lammps_command, self.potential, symbolpair,
+            if self.verbose:
+                print(f'running diatom_scan for {"-".join(symbolpair)}')
+            results = calc.calc(self.lmp, self.lmp.potential, symbolpair,
                                 rmin=rmin, rmax=rmax, rsteps=rsteps)
             results['symbols'] = symbolpair
             calc.clean_files()
@@ -214,22 +245,27 @@ class QuickCheck():
             # Find the minimum energy from the diatom scan run
             r = diatom_scan['r_values']
             energy = diatom_scan['energy_values']
-            r_min = r[energy == energy.min()][0]
-        
-            # Build a diatom configuration
-            box = am.Box.cubic(a=1000)
-            atoms = am.Atoms(atype=[1,2], pos = [[500, 500, 500], [500+r_min, 500, 500]])
-            diatom = am.System(box=box, atoms=atoms, scale=False, symbols=symbolset)
-        
-            results = calc.calc(self.lammps_command, diatom, self.potential,
-                                etol=etol, ftol=ftol, maxiter=maxiter,
-                                maxeval=maxeval, dmax=dmax, maxcycles=maxcycles,
-                                ctol=ctol, raise_at_maxcycles=raise_at_maxcycles)
-            results['relaxed_diatom'] = am.load('atom_dump', results['dumpfile_final'],
-                                                symbols=results['symbols_final'])
-            calc.clean_files()
+            try:
+                r_min = r[energy == energy.min()][0]
+            except:
+                pass
+            else:
+                # Build a diatom configuration
+                box = am.Box.cubic(a=1000)
+                atoms = am.Atoms(atype=[1,2], pos = [[500, 500, 500], [500+r_min, 500, 500]])
+                diatom = am.System(box=box, atoms=atoms, scale=False, symbols=symbolset)
+                
+                if self.verbose:
+                    print(f'running relax_static_diatom for {"-".join(symbolset)}')
+                results = calc.calc(self.lmp, diatom, self.lmp.potential,
+                                    etol=etol, ftol=ftol, maxiter=maxiter,
+                                    maxeval=maxeval, dmax=dmax, maxcycles=maxcycles,
+                                    ctol=ctol, raise_at_maxcycles=raise_at_maxcycles)
+                results['relaxed_diatom'] = am.load('atom_dump', results['dumpfile_final'],
+                                                    symbols=results['symbols_final'])
+                calc.clean_files()
 
-            self.results['relax_static_diatom'].append(results)
+                self.results['relax_static_diatom'].append(results)
 
 ###############################################################################
 
@@ -275,6 +311,23 @@ class QuickCheck():
         
         data = pd.DataFrame(data)
         return data
+
+    def data_model(self,
+                   length_unit: str = 'angstrom',
+                   energy_unit: str = 'eV',
+                   pressure_unit: str = 'GPa',
+                   energy_per_area_unit: str = 'mJ/m^2') -> DM:
+        model = DM()
+        data = self.data(length_unit=length_unit, energy_unit=energy_unit)
+        model['quick-check-data'] = qcd = data.to_dict(into=DM)
+
+        for name, crystal in self.crystals.items():
+            data = crystal.data(length_unit=length_unit, energy_unit=energy_unit,
+                                pressure_unit=pressure_unit,
+                                energy_per_area_unit=energy_per_area_unit)
+            qcd[name] = data.to_dict(into=DM)
+
+        return model
 
 ###############################################################################
 
@@ -326,8 +379,8 @@ class QuickCheck():
                          filename=None,
                          xlim=(None, None),
                          ylim=(None, None)):
-                        
-    
+        
+
         if crystals is None:
             crystals = list(self.crystals.keys())
         
@@ -375,6 +428,28 @@ class QuickCheck():
                                pressure_unit=pressure_unit, 
                                energy_per_area_unit=energy_per_area_unit))
             print()
+
+    def json_results(self,
+                     filename: Optional[str] ='quick_check_data.json',
+                     indent: Optional[int] = 4,
+                     length_unit: str = 'angstrom',
+                     energy_unit: str = 'eV',
+                     pressure_unit: str = 'GPa',
+                     energy_per_area_unit: str = 'mJ/m^2'):
+        
+        # Do nothing if filename is None
+        if filename is None:
+            return
+
+        # Build model representation of the data fields
+        model = self.data_model(length_unit=length_unit,
+                                energy_unit=energy_unit,
+                                pressure_unit=pressure_unit,
+                                energy_per_area_unit=energy_per_area_unit)
+        
+        # Save to filename
+        with open(filename, 'w') as f:
+            model.json(fp=f, indent=indent)
 
     def html_results(self,
                      length_unit: str = 'angstrom',
