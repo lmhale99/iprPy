@@ -6,6 +6,7 @@ from typing import Optional, Union
 # http://www.numpy.org/
 import numpy as np
 
+# https://matplotlib.org/
 import matplotlib.pyplot as plt
 
 # https://github.com/usnistgov/atomman 
@@ -127,7 +128,7 @@ def thermal_conductivity_green_kubo(lammps_command: Union[str, LAMMPSobj],
         lmp.cmd.fix('NVT', 'all', 'nvt', 'temp', temperature, temperature, temperature_damp)
         lmp.cmd.run(equilsteps)
         lmp.cmd.unfix('NVT')
-        lmp.cmd.reset_timestep(0, 'time', 0)
+        lmp.cmd.reset_timestep(0)
 
     lmp.commands_string('\n# Main simulation integrator definition')
     lmp.cmd.fix('NVE', 'all', 'nve')
@@ -170,21 +171,40 @@ def thermal_conductivity_green_kubo(lammps_command: Union[str, LAMMPSobj],
     
     # Pass results into the Green-Kubo solver
     volume = system.box.volume
-    gkx = am.thermo.GreenKuboKappa(thermo.Time, thermo.v_Jx, temperature=temperature, volume=volume)
-    gky = am.thermo.GreenKuboKappa(thermo.Time, thermo.v_Jy, temperature=temperature, volume=volume)
-    gkz = am.thermo.GreenKuboKappa(thermo.Time, thermo.v_Jz, temperature=temperature, volume=volume)
+    time = thermo.Time - thermo.Time.values[0]
+    gkx = am.thermo.GreenKuboKappa(time, thermo.v_Jx, temperature=temperature, volume=volume)
+    gky = am.thermo.GreenKuboKappa(time, thermo.v_Jy, temperature=temperature, volume=volume)
+    gkz = am.thermo.GreenKuboKappa(time, thermo.v_Jz, temperature=temperature, volume=volume)
+
+    # Identify integral cutoffs to use
+    icutx, tcutx = gkx.tcut_std_noise_fraction(15, threshold=.90)
+    icuty, tcuty = gky.tcut_std_noise_fraction(15, threshold=.90)
+    icutz, tcutz = gkz.tcut_std_noise_fraction(15, threshold=.90)
+
+    # Find the kappa value at the cutoff index
+    kappax = gkx.kappa()[icutx]
+    kappay = gky.kappa()[icuty]
+    kappaz = gkz.kappa()[icutz]
+    kappa = (kappax + kappay + kappaz) / 3
 
     # Generate plot of <J0*Jt> vs t for quality verification
     acf_units = 'eV^2*angstrom^2/ps^2'
+    time_units = 'ps'
 
     time = uc.get_in_units(gkx.time, 'ps')
     acfx = uc.get_in_units(gkx.acf, acf_units)
     acfy = uc.get_in_units(gky.acf, acf_units)
     acfz = uc.get_in_units(gkz.acf, acf_units)
 
-    plt.plot(time[:gkx.index_cut], acfx[:gkx.index_cut], label='x')
-    plt.plot(time[:gky.index_cut], acfy[:gky.index_cut], label='y')
-    plt.plot(time[:gkz.index_cut], acfz[:gkz.index_cut], label='z')
+    plt.plot(time, acfx, 'C1', label='x')
+    plt.plot(time, acfy, 'C2', label='y')
+    plt.plot(time, acfz, 'C3', label='z')
+
+     # Plot cutoff positions
+    acfmax = np.max([acfx, acfy, acfz])
+    plt.plot([uc.get_in_units(tcutx, time_units), uc.get_in_units(tcutx, time_units)], [0.0, acfmax], 'C1:')
+    plt.plot([uc.get_in_units(tcuty, time_units), uc.get_in_units(tcuty, time_units)], [0.0, acfmax], 'C2:')
+    plt.plot([uc.get_in_units(tcutz, time_units), uc.get_in_units(tcutz, time_units)], [0.0, acfmax], 'C3:')
 
     plt.legend()
     plt.title('<J0*Jt> vs t')
@@ -199,9 +219,9 @@ def thermal_conductivity_green_kubo(lammps_command: Union[str, LAMMPSobj],
     results_dict['gkx'] = gkx
     results_dict['gky'] = gky
     results_dict['gkz'] = gkz
-    results_dict['kappax'] = gkx.kappa()
-    results_dict['kappay'] = gky.kappa()
-    results_dict['kappaz'] = gkz.kappa()
-    results_dict['kappa'] = (gkx.kappa() + gky.kappa() + gkz.kappa()) / 3
+    results_dict['kappax'] = kappax
+    results_dict['kappay'] = kappay
+    results_dict['kappaz'] = kappaz
+    results_dict['kappa'] = kappa
     
     return results_dict

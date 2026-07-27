@@ -3,6 +3,10 @@
 # Standard library imports
 from typing import Optional, Union
 
+# http://www.numpy.org/
+import numpy as np
+
+# https://matplotlib.org/
 import matplotlib.pyplot as plt
 
 # https://github.com/usnistgov/atomman
@@ -144,24 +148,42 @@ def viscosity_green_kubo(lammps_command: Union[str, LAMMPSobj],
 
     # Analyze the results with the Green-Kubo tools
     volume = system.box.volume
-    gkxy = am.thermo.GreenKuboMu(thermo.Time, thermo.Pxy, fluctuation_delta=100,
+    time = thermo.Time - thermo.Time.values[0]
+    gkxy = am.thermo.GreenKuboMu(time, thermo.Pxy,
                                  temperature=temperature, volume=volume)
-    gkxz = am.thermo.GreenKuboMu(thermo.Time, thermo.Pxz, fluctuation_delta=100,
+    gkxz = am.thermo.GreenKuboMu(time, thermo.Pxz,
                                  temperature=temperature, volume=volume)
-    gkyz = am.thermo.GreenKuboMu(thermo.Time, thermo.Pyz, fluctuation_delta=100,
+    gkyz = am.thermo.GreenKuboMu(time, thermo.Pyz,
                                  temperature=temperature, volume=volume)
+
+    # Identify integral cutoffs to use
+    icutxy, tcutxy = gkxy.tcut_std_noise_fraction(15, threshold=.90)
+    icutxz, tcutxz = gkxz.tcut_std_noise_fraction(15, threshold=.90)
+    icutyz, tcutyz = gkyz.tcut_std_noise_fraction(15, threshold=.90)
+
+    # Find the mu value at the cutoff index
+    mu_xy = gkxy.mu()[icutxy]
+    mu_xz = gkxz.mu()[icutxz]
+    mu_yz = gkyz.mu()[icutyz]
+    mu = (mu_xy + mu_xz + mu_yz) / 3
 
     # Generate plot of <P0*Pt> vs t for quality verification
     acf_units = 'MPa^2'
+    time_units = 'ps'
 
-    time = uc.get_in_units(gkxy.time, 'ps')
+    time = uc.get_in_units(gkxy.time, time_units)
     acfxy = uc.get_in_units(gkxy.acf, acf_units)
     acfxz = uc.get_in_units(gkxz.acf, acf_units)
     acfyz = uc.get_in_units(gkyz.acf, acf_units)
+    plt.plot(time, acfxy, 'C1', label='xy')
+    plt.plot(time, acfxz, 'C2', label='xz')
+    plt.plot(time, acfyz, 'C3', label='yz')
 
-    plt.plot(time[:gkxy.index_cut], acfxy[:gkxy.index_cut], label='xy')
-    plt.plot(time[:gkxz.index_cut], acfxz[:gkxz.index_cut], label='xz')
-    plt.plot(time[:gkyz.index_cut], acfyz[:gkyz.index_cut], label='yz')
+    # Plot cutoff positions
+    acfmax = np.max([acfxy, acfxz, acfyz])
+    plt.plot([uc.get_in_units(tcutxy, time_units), uc.get_in_units(tcutxy, time_units)], [0.0, acfmax], 'C1:')
+    plt.plot([uc.get_in_units(tcutxz, time_units), uc.get_in_units(tcutxz, time_units)], [0.0, acfmax], 'C2:')
+    plt.plot([uc.get_in_units(tcutyz, time_units), uc.get_in_units(tcutyz, time_units)], [0.0, acfmax], 'C3:')
 
     plt.legend()
     plt.title('<P0*Pt> vs t')
@@ -173,10 +195,10 @@ def viscosity_green_kubo(lammps_command: Union[str, LAMMPSobj],
 
     results = {}
     results['thermo'] = thermo
-    results['viscosity_xy'] = gkxy.mu()
-    results['viscosity_xz'] = gkxz.mu()
-    results['viscosity_yz'] = gkyz.mu()
-    results['viscosity'] = (gkxy.mu() + gkxz.mu() + gkyz.mu()) / 3
+    results['viscosity_xy'] = mu_xy
+    results['viscosity_xz'] = mu_xz
+    results['viscosity_yz'] = mu_yz
+    results['viscosity'] = mu
     results['gkxy'] = gkxy
     results['gkxz'] = gkxz
     results['gkyz'] = gkyz

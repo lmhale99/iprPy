@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Optional, Union
 from copy import deepcopy
 
+from yabadaba import load_query
+
 # https://github.com/usnistgov/atomman
 import atomman as am
 import atomman.unitconvert as uc
@@ -353,18 +355,22 @@ class ThermalConductivityGK(Calculation):
         # main branch
         if branch == 'main':
 
-            # Check for required kwargs
+            ## Check for required kwargs
             assert 'lammps_command' in kwargs
-            assert 'temperature' in kwargs, 'temperature must be specified for this branch'
+            assert 'temperature' in kwargs
 
             # Set default workflow settings
-            params['buildcombos'] =  'atomicarchive load_file archive'
-            params['archive_record'] = 'calculation_relax_liquid_redo'
+            params['buildcombos'] = 'atomicarchive load_file archive'
+
+            params['archive_record'] = 'calculation_relax_dynamic'
+            params['archive_temperature'] = kwargs['temperature']
             params['archive_load_key'] = 'final-system'
             params['archive_status'] = 'finished'
-            params['archive_temperature'] = kwargs['temperature']
-            params['temperature'] = kwargs['temperature']
             params['sizemults'] = '1 1 1'
+
+            params['runsteps'] = '5000000'
+            params['equilsteps'] = '0'
+            params['createvelocities'] = 'False'
 
             # Copy kwargs to params
             for key in kwargs:
