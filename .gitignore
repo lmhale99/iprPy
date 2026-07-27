@@ -47,4 +47,8 @@ IPR workflow/csv
 # Virtual Studio Code metadata
 .vscode/
 
+# uv files
+uv.lock
+.venv/
+
 upload_package.bash
