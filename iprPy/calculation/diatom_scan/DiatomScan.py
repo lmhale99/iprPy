@@ -488,10 +488,10 @@ class DiatomScan(Calculation):
                 name='number_of_steps_r',
                 path=f'{self.modelroot}.calculation.run-parameter.number_of_steps_r',
                 description='search by the number of r steps used'),
-            'symbol': load_query(
+            'symbols': load_query(
                 style='list_contains',
                 name='symbols',
-                path=f'{self.modelroot}.system-info.symbols',
+                path=f'{self.modelroot}.system-info.symbol',
                 description='search by element symbols used'),
         })
         return queries
