@@ -1,6 +1,40 @@
 Updates
 =======
 
+0.12.0
+------
+
+- Support for performing LAMMPS simulations using the LAMMPS library
+  interface or a LAMMPS executable has been added to all parts of iprPy by
+  using the new atomman.lammps.LAMMPS classes.  This includes reworking all
+  calculations so that the LAMMPS simulation inputs are now Python code rather
+  that using LAMMPS script templates.
+
+- The output format for floating point numbers in the generated LAMMPS log and
+  dump files has been increased from 1e-13 to 1e-17 to reduce the precision
+  errors associated with reading/writing from outputs.
+
+- Where possible, multi-simulation calculations were reworked to call/init
+  LAMMPS only once allowing for considerable speed up in calculation execution
+  time.
+  
+- **thermal_conductivity_green_kubo** calculation added that computes the
+  thermal conductivity of a crystal using the Green-Kubo method.
+
+- **viscosity_green_kubo** calculation updated to use atomman.thermo.GreenKubo
+  for obtaining better estimates of the auto-correlation function integral used
+  in the Green-Kubo calculation method.
+  
+- Minor changes were made to some of the calculations to increase consistency
+  with other calculations.
+
+- The **PropertyProcessor** class and **PotentialProperties** records were
+  expanded to support dislocation and melting point calculation results.
+  Updates were also made to the analysis of E_vs_r_scan and the dynamic liquid
+  and solid calculations.
+
+- Bug fixes for the analysis tools.
+
 0.11.8
 ------
 
