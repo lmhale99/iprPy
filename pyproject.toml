@@ -1,6 +1,84 @@
-[build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
+[project]
+name = "iprPy"
+version = "0.12.0"
+description = "Interatomic Potential Repository Python Property Calculations and Tools"
+readme = "README.rst"
+requires-python = ">=3.8"
+dependencies = [
+    'DataModelDict',
+    'numpy', 
+    'matplotlib',
+    'scipy',
+    'pandas',
+    'atomman>=1.5.3',
+    'requests',
+    'bokeh',
+    'plotly',
 ]
-build-backend = "setuptools.build_meta"
+authors = [
+  {name = "Lucas Hale", email = "lucas.hale@nist.gov"}
+]
+license = "NIST-Software"
+keywords = [
+    'atom', 
+    'atomic', 
+    'atomistic', 
+    'molecular dynamics', 
+    'high-throughput', 
+    'interatomic potential',
+]
+classifiers = [
+    'Development Status :: 4 - Beta',
+    'Intended Audience :: Science/Research',
+    'Natural Language :: English',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
+    'Programming Language :: Python :: 3.14',
+    'Topic :: Scientific/Engineering :: Physics'
+]
+
+[project.urls]
+Homepage = "https://github.com/usnistgov/iprPy/"
+Documentation = "https://www.ctcms.nist.gov/potentials/iprPy/"
+Repository = "https://github.com/usnistgov/iprPy.git"
+
+[project.optional-dependencies]
+optional = [
+    "ase>=3.23.0",
+    "diffpy-structure>=3.1.0",
+    "freud>=0.1.2",
+    "phonopy>=2.30.0",
+    "pymatgen>=2023.8.10",
+    "seekpath>=2.2.1",
+    "mpi4py",
+]
+
+[project.scripts]
+iprPy = "iprPy.command_line:command_line"
+
+[tool.uv.sources]
+DataModelDict = { path = "../DataModelDict", editable = true }
+cdcs = { path = "../pycdcs", editable = true }
+yabadaba = { path = "../yabadaba", editable = true }
+potentials = { path = "../potentials", editable = true }
+atomman = { path = "../atomman", editable = true }
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+    "pytest>=7.4.4",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.26,<0.12"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "iprPy"
+module-root = ""
