@@ -83,6 +83,7 @@ force_unit
 annealtemperature               0.0
 annealsteps                     
 randomseed                      
+strohtol                        1e-2
 dislocation_boundaryshape       cylinder
 dislocation_boundarywidth       3
 dislocation_boundaryscale       True
