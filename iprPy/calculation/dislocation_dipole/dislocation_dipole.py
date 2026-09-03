@@ -212,7 +212,7 @@ def dislocation_dipole(lammps_command: Union[str, LAMMPSobj],
         timestep = am.lammps.style.timestep(lmp.potential.units)
         temperature_damp = 100 * timestep
         
-        lmp.cmd.velocity('move', 'create', start_temp, randomseed,
+        lmp.cmd.velocity('all', 'create', start_temp, randomseed,
                          'mom', 'yes', 'rot', 'yes', 'dist', 'gaussian')
         lmp.cmd.fix('nvt', 'all', 'nvt', 'temp', annealtemp, annealtemp, temperature_damp)
         lmp.cmd.timestep(timestep)
