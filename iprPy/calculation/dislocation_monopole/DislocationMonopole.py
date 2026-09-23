@@ -78,6 +78,7 @@ class DislocationMonopole(Calculation):
         self.boundaryshape = 'cylinder'
         self.boundarywidth = 0.0
         self.boundaryscale = False
+        self.strohtol = 1e-8
         self.__dumpfile_base = None
         self.__dumpfile_defect = None
         self.__symbols_base = None
@@ -210,6 +211,15 @@ class DislocationMonopole(Calculation):
     @boundaryscale.setter
     def boundaryscale(self, val: bool):
         self.__boundaryscale = boolean(val)
+
+    @property
+    def strohtol(self) -> float:
+        """float: tolerance to use for verifying the Stroh calculation worked correctly"""
+        return self.__strohtol
+    
+    @strohtol.setter
+    def strohtol(self, val: float):
+        self.__strohtol = float(val)
 
     @property
     def dumpfile_base(self) -> str:
@@ -387,6 +397,8 @@ class DislocationMonopole(Calculation):
         boundaryscale : bool, optional
             Indicates if boundarywidth is absolute (False) or relative to the
             unit cell's a lattice parameter (True).
+        strohtol : float, optional
+            The tolerance parameter to use for validating the Stroh calculation.
         **kwargs : any, optional
             Any keyword parameters supported by the set_values() methods of
             the parent Calculation class and the subset classes.
@@ -407,6 +419,8 @@ class DislocationMonopole(Calculation):
             self.boundarywidth = kwargs['boundarywidth']
         if 'boundaryscale' in kwargs:
             self.boundaryscale = kwargs['boundaryscale']
+        if 'strohtol' in kwargs:
+            self.strohtol = kwargs['strohtol']
 
 ####################### Parameter file interactions ###########################
 
@@ -449,6 +463,7 @@ class DislocationMonopole(Calculation):
 
         # Load calculation-specific unitless floats
         self.annealtemperature = float(input_dict.get('annealtemperature', 0.0))
+        self.strohtol = float(input_dict.get('strohtol', 1e-8))
 
         # Load calculation-specific floats with units
         self.boundarywidth = value(input_dict, 'dislocation_boundarywidth',
@@ -519,6 +534,7 @@ class DislocationMonopole(Calculation):
         params['annealsteps'] = '1000000'
         params['maxiterations'] = '10000'
         params['maxevaluations'] = '100000'
+        params['strohtol'] = 1e-2
 
         # Set branch-specific parameters
         if branch == 'fcc_edge_100':
@@ -569,6 +585,10 @@ class DislocationMonopole(Calculation):
                 "The number of MD steps to perform at  the anneal temperature",
                 "before running the energy/force minimization.  Default value",
                 "is 0 if annealtemperature=0, and 10,000 if annealtemperature > 0."]),
+            'strohtol':  ' '.join([
+                "The tolerance to use for validating that the Stroh elasticity",
+                "solution calculations are valid.  Default value is 1e-8, but",
+                "may need to be increased..."]),
             'randomseed': ' '.join([
                 "An int random number seed to use for generating initial velocities.",
                 "A random int will be selected if not given."]),
@@ -602,6 +622,7 @@ class DislocationMonopole(Calculation):
                 'dislocation_boundaryshape',
                 'dislocation_boundarywidth',
                 'dislocation_boundaryscale',
+                'strohtol',
             ]
         )
         return keys
@@ -816,6 +837,7 @@ class DislocationMonopole(Calculation):
         input_dict['boundaryshape'] = self.boundaryshape
         input_dict['boundarywidth'] = self.boundarywidth
         input_dict['boundaryscale'] = self.boundaryscale
+        input_dict['tol'] = self.strohtol
 
         # Return input_dict
         return input_dict

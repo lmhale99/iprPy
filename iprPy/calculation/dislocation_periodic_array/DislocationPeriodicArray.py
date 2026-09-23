@@ -74,6 +74,7 @@ class DislocationPeriodicArray(Calculation):
         self.boundarywidth = 0.0
         self.boundaryscale = False
         self.onlylinear = False
+        self.strohtol = 1e-8
         self.__dumpfile_base = None
         self.__dumpfile_defect = None
         self.__symbols_base = None
@@ -218,6 +219,15 @@ class DislocationPeriodicArray(Calculation):
         self.__onlylinear = boolean(val)
 
     @property
+    def strohtol(self) -> float:
+        """float: tolerance to use for verifying the Stroh calculation worked correctly"""
+        return self.__strohtol
+    
+    @strohtol.setter
+    def strohtol(self, val: float):
+        self.__strohtol = float(val)
+
+    @property
     def dumpfile_base(self) -> str:
         """str: Name of the LAMMPS dump file of the 0 shift reference system"""
         if self.__dumpfile_base is None:
@@ -306,6 +316,8 @@ class DislocationPeriodicArray(Calculation):
             If True, the dislocation solution used will only be based on a
             linear gradient of displacements rather than the Volterra
             dislocation solution.
+        strohtol : float, optional
+            The tolerance parameter to use for validating the Stroh calculation.
         **kwargs : any, optional
             Any keyword parameters supported by the set_values() methods of
             the parent Calculation class and the subset classes.
@@ -328,6 +340,8 @@ class DislocationPeriodicArray(Calculation):
             self.boundaryscale = kwargs['boundaryscale']
         if 'onlylinear' in kwargs:
             self.onlylinear = kwargs['onlylinear']
+        if 'strohtol' in kwargs:
+            self.strohtol = kwargs['strohtol']
 
 ####################### Parameter file interactions ###########################
 
@@ -371,6 +385,7 @@ class DislocationPeriodicArray(Calculation):
 
         # Load calculation-specific unitless floats
         self.annealtemperature = float(input_dict.get('annealtemperature', 0.0))
+        self.strohtol = float(input_dict.get('strohtol', 1e-8))
 
         # Load calculation-specific floats with units
         self.boundarywidth = value(input_dict, 'dislocation_boundarywidth',
@@ -444,6 +459,7 @@ class DislocationPeriodicArray(Calculation):
         params['annealsteps'] = '10000000'
         params['maxiterations'] = '10000'
         params['maxevaluations'] = '100000'
+        params['strohtol'] = 1e-2
 
         # Set branch-specific parameters
         if branch == 'fcc_edge_mix':
@@ -486,6 +502,10 @@ class DislocationPeriodicArray(Calculation):
                 "The number of MD steps to perform at  the anneal temperature",
                 "before running the energy/force minimization.  Default value",
                 "is 0 if annealtemperature=0, and 10,000 if annealtemperature > 0."]),
+            'strohtol':  ' '.join([
+                "The tolerance to use for validating that the Stroh elasticity",
+                "solution calculations are valid.  Default value is 1e-8, but",
+                "may need to be increased..."]),
             'randomseed': ' '.join([
                 "An int random number seed to use for generating initial velocities.",
                 "A random int will be selected if not given."]),
@@ -524,6 +544,7 @@ class DislocationPeriodicArray(Calculation):
                 'dislocation_boundarywidth',
                 'dislocation_boundaryscale',
                 'dislocation_onlylinear',
+                'strohtol',
             ]
         )
         return keys
@@ -739,6 +760,7 @@ class DislocationPeriodicArray(Calculation):
         input_dict['cutoff'] = self.duplicatecutoff
         input_dict['boundarywidth'] = self.boundarywidth
         input_dict['boundaryscale'] = self.boundaryscale
+        input_dict['tol'] = self.strohtol
 
         # Return input_dict
         return input_dict

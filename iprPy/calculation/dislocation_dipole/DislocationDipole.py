@@ -69,6 +69,7 @@ class DislocationDipole(Calculation):
         self.annealtemperature = 0.0
         self.annealsteps = None
         self.randomseed = None
+        self.strohtol = 1e-8
         self.__dumpfile_base = None
         self.__dumpfile_defect = None
         self.__symbols_base = None
@@ -173,6 +174,15 @@ class DislocationDipole(Calculation):
         self.__randomseed = val
 
     @property
+    def strohtol(self) -> float:
+        """float: tolerance to use for verifying the Stroh calculation worked correctly"""
+        return self.__strohtol
+    
+    @strohtol.setter
+    def strohtol(self, val: float):
+        self.__strohtol = float(val)
+
+    @property
     def dumpfile_base(self) -> str:
         """str: Name of the LAMMPS dump file of the 0 shift reference system"""
         if self.__dumpfile_base is None:
@@ -249,6 +259,8 @@ class DislocationDipole(Calculation):
         randomseed : int, optional
             A random number seed to use for generating the initial velocities
             for the MD anneal.
+        strohtol : float, optional
+            The tolerance parameter to use for validating the Stroh calculation
         **kwargs : any, optional
             Any keyword parameters supported by the set_values() methods of
             the parent Calculation class and the subset classes.
@@ -263,6 +275,8 @@ class DislocationDipole(Calculation):
             self.annealsteps = kwargs['annealsteps']
         if 'randomseed' in kwargs:
             self.randomseed = kwargs['randomseed']
+        if 'strohtol' in kwargs:
+            self.strohtol = kwargs['strohtol']
 
 ####################### Parameter file interactions ###########################
 
@@ -301,6 +315,7 @@ class DislocationDipole(Calculation):
 
         # Load calculation-specific unitless floats
         self.annealtemperature = float(input_dict.get('annealtemperature', 0.0))
+        self.strohtol = float(input_dict.get('strohtol', 1e-8))
 
         # Load calculation-specific floats with units
         
@@ -366,6 +381,7 @@ class DislocationDipole(Calculation):
         params['ftol'] = '1e-6 eV/angstrom'
         params['maxiterations'] = '10000'
         params['maxevaluations'] = '100000'
+        params['strohtol'] = 1e-2
 
         # Set branch-specific parameters
         if branch == 'dc_screw_a':
@@ -418,6 +434,10 @@ class DislocationDipole(Calculation):
                 "The number of MD steps to perform at  the anneal temperature",
                 "before running the energy/force minimization.  Default value",
                 "is 0 if annealtemperature=0, and 10,000 if annealtemperature > 0."]),
+            'strohtol':  ' '.join([
+                "The tolerance to use for validating that the Stroh elasticity",
+                "solution calculations are valid.  Default value is 1e-8, but",
+                "may need to be increased..."]),
             'randomseed': ' '.join([
                 "An int random number seed to use for generating initial velocities.",
                 "A random int will be selected if not given."]),
@@ -436,7 +456,9 @@ class DislocationDipole(Calculation):
             + self.units.keyset
 
             # Calculation-specific keys
-            + []
+            + [
+                'strohtol',
+            ]
         )
         return keys
 
@@ -638,6 +660,7 @@ class DislocationDipole(Calculation):
         input_dict['annealtemp'] = self.annealtemperature
         input_dict['annealsteps'] = self.annealsteps
         input_dict['randomseed'] = self.randomseed
+        input_dict['tol'] = self.strohtol
         
         del input_dict['amin']
         del input_dict['bmin']
