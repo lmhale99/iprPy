@@ -301,8 +301,8 @@ def phononcalc(lmp: LAMMPSobj,
     # Initialize Phonopy object
     symbols = lmp.potential.elements(ucell.symbols)
     phonon = phonopy.Phonopy(ucell.dump('phonopy_Atoms', symbols=symbols),
-                             [[a_mult, 0, 0], [0, b_mult, 0], [0, 0, c_mult]],
-                             factor=factor)
+                             [[a_mult, 0, 0], [0, b_mult, 0], [0, 0, c_mult]])
+    phonon.unit_conversion_factor = factor
     phonon.generate_displacements(distance=distance)
     
     # Loop over displaced supercells to compute forces

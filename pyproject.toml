@@ -6,7 +6,7 @@ readme = "README.rst"
 requires-python = ">=3.8"
 dependencies = [
     'DataModelDict',
-    'numpy', 
+    'numpy',
     'matplotlib',
     'scipy',
     'pandas',
@@ -53,7 +53,7 @@ optional = [
     "ase>=3.23.0",
     "diffpy-structure>=3.1.0",
     "freud>=0.1.2",
-    "phonopy>=2.30.0",
+    "phonopy<4.0.0",
     "pymatgen>=2023.8.10",
     "seekpath>=2.2.1",
     "mpi4py",
