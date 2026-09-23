@@ -541,7 +541,7 @@ class StackingFaultMap2D(Calculation):
         # Load calculation-specific content
         run_params = calc['calculation']['run-parameter']
         self.num_a1 = run_params['stackingfault_num_a1']
-        self.nun_a2 = run_params['stackingfault_num_a2']
+        self.num_a2 = run_params['stackingfault_num_a2']
 
         # Load results
         if self.status == 'finished':
