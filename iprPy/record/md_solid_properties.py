@@ -9,6 +9,8 @@ from atomman import Box
 # https://github.com/usnistgov/yabadaba
 from yabadaba.record import Record
 
+__all__ = ['MDSolidProperties']
+
 class MDSolidProperties(Record):
     """
     Class for representing relaxed_crystal records that provide the structure

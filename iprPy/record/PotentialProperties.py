@@ -17,6 +17,8 @@ from .PotentialPropertiesSubsets import (DiatomScan, EvsRScan, CrystalStructure,
                                          PointDefect, DislMono, DislDi, Phonon, 
                                          MDThermo, MDSolid, MDLiquid, Melt)
 
+__all__ = ['PotentialProperties']
+
 class PotentialProperties(Record):
     """
     Class for representing PotentialProperties records that contain the data
@@ -26,7 +28,7 @@ class PotentialProperties(Record):
                  model: Union[str, io.IOBase, DM, None] = None,
                  name: Optional[str] = None,
                  database = None,
-                 **kwargs: any):
+                 **kwargs):
         """
         Initialize a PotentialProperties object.  Calculation-specific content
         is managed by PotentialPropertiesSubsets.
