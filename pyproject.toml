@@ -1,19 +1,23 @@
 [project]
 name = "iprPy"
-version = "0.12.0"
+version = "0.13.0"
 description = "Interatomic Potential Repository Python Property Calculations and Tools"
 readme = "README.rst"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     'DataModelDict',
     'numpy',
     'matplotlib',
     'scipy',
     'pandas',
-    'atomman>=1.5.3',
+    'atomman',
     'requests',
     'bokeh',
     'plotly',
+    'yabadabado',
+    'potentials',
+    'cdcs',
+    'yabadaba'
 ]
 authors = [
   {name = "Lucas Hale", email = "lucas.hale@nist.gov"}
@@ -33,13 +37,13 @@ classifiers = [
     'Natural Language :: English',
     'Operating System :: OS Independent',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.8',
-    'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
     'Programming Language :: Python :: 3.13',
     'Programming Language :: Python :: 3.14',
+    'Programming Language :: Python :: 3.15',
+    'Programming Language :: Python :: 3.16',
     'Topic :: Scientific/Engineering :: Physics'
 ]
 
@@ -66,6 +70,7 @@ iprPy = "iprPy.command_line:command_line"
 DataModelDict = { path = "../DataModelDict", editable = true }
 cdcs = { path = "../pycdcs", editable = true }
 yabadaba = { path = "../yabadaba", editable = true }
+yabadabado = { path = "../yabadabado", editable = true }
 potentials = { path = "../potentials", editable = true }
 atomman = { path = "../atomman", editable = true }
 
