@@ -10,10 +10,15 @@ from .load_run_directory import load_run_directory
 from .fix_lammps_versions import fix_lammps_versions
 from . import input
 
+from .query import querymanager, load_query
+
 from . import value
-from .value import valuemanager
+from .value import valuemanager, load_value
+
 from . import record
 from .record import load_record, recordmanager
+
+from . import subset
 
 from . import calculation_subset
 from . import calculation
@@ -31,9 +36,10 @@ from . import analysis
 from . import quickcheck
 
 __all__ = ['__version__', 'tools', 'settings', 'input',
+           'querymanager', 'load_query',
            'load_run_directory', 'fix_lammps_versions',
            'record', 'load_record', 'recordmanager',
-           'value', 'valuemanager',
+           'value', 'valuemanager', 'subset',
            'calculation_subset', 'analysis', 'workflow',
            'calculation', 'load_calculation', 'calculationmanager',
            'database', 'load_database', 'databasemanager',
