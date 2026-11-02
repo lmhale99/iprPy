@@ -1,7 +1,4 @@
-# coding: utf-8
-
-# iprPy imports
-from . import recordmanager, calculationmanager, databasemanager
+from . import recordmanager, calculationmanager, databasemanager, querymanager, valuemanager
 
 __all__ = ['check_modules']
 
@@ -15,3 +12,8 @@ def check_modules():
     calculationmanager.check_styles()
     print()
     recordmanager.check_styles()
+    print()
+    querymanager.check_styles()
+    print()
+    valuemanager.check_styles()
+    print()
