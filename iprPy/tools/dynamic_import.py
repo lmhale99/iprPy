@@ -1,13 +1,11 @@
-# coding: utf-8
-
 # Standard Python libraries
 from importlib import import_module, resources
 from pathlib import Path
 import sys
-from typing import Optional, Tuple
+from typing import Tuple
 
 def dynamic_import(module_name: str,
-                   ignorelist: Optional[list] = None) -> Tuple[dict, dict]:
+                   ignorelist: list | None = None) -> Tuple[dict, dict]:
     """
     Dynamically imports classes stored in submodules and makes them directly
     accessible by style name within the returned loaded dictionary.

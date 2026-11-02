@@ -1,8 +1,5 @@
 # Python script created by Lucas Hale
 
-# Standard Python libraries
-from typing import Optional, Union
-
 import pandas as pd
 
 # https://github.com/usnistgov/atomman
@@ -10,9 +7,9 @@ import atomman as am
 from atomman.typing import lammpspotential
 from atomman.lammps import LAMMPS, LAMMPSobj
 
-def isolated_atom(lammps_command: Union[str, LAMMPSobj],
+def isolated_atom(lammps_command: str | LAMMPSobj,
                   potential: lammpspotential,
-                  mpi_command: Optional[str] = None,
+                  mpi_command: str | None = None,
                   usefiles: bool = False) -> dict:
     """
     Evaluates the isolated atom energy for each elemental model of a potential.

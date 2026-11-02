@@ -1,9 +1,6 @@
-# coding: utf-8
-
 # Standard Python libraries
 from copy import deepcopy
 from pathlib import Path
-from typing import Optional, Union
 
 # https://github.com/usnistgov/potentials
 import potentials
@@ -39,7 +36,7 @@ class Settings(potentials.Settings.Settings):
         return list(self.run_directories.keys())
 
     def set_runner_log_directory(self,
-                                 path: Union[str, Path, None] = None):
+                                 path: str | Path | None = None):
         """
         Sets the runner log directory to a different location.
 
@@ -89,8 +86,8 @@ class Settings(potentials.Settings.Settings):
             self.save()
 
     def set_run_directory(self,
-                          name: Optional[str] = None,
-                          path: Optional[str] = None):
+                          name: str | None = None,
+                          path: str | None = None):
         """
         Allows for run_directory information to be defined in the settings file.
 
@@ -129,7 +126,7 @@ class Settings(potentials.Settings.Settings):
         self.save()
 
     def unset_run_directory(self,
-                            name: Optional[str] = None):
+                            name: str | None = None):
         """
         Deletes the settings for a pre-defined run_directory from the settings
         file.

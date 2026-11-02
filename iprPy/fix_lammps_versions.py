@@ -1,14 +1,11 @@
-# coding: utf-8
-
 # Standard Python libraries
 from pathlib import Path
-from typing import Optional
 
 # iprPy imports
 from . import load_run_directory
 
 def fix_lammps_versions(run_directory: str,
-                        calc_names: Optional[list] = None,
+                        calc_names: list | None = None,
                         **kwargs):
     """
     Iterates over all prepared calculations in a run_directory and updates
@@ -88,7 +85,7 @@ def fix_lammps_versions(run_directory: str,
                 with open(inscript, 'w', encoding='UTF-8') as f:
                     f.write(content)
 
-def iter_calc_scripts(run_directory: Path, calc_names: Optional[list]):
+def iter_calc_scripts(run_directory: Path, calc_names: list | None):
     """Iterate over calc scripts in a run directory: either all or a selection"""
     if calc_names is None:
         # Iterate over all calc scripts

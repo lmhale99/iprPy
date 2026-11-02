@@ -1,5 +1,3 @@
-# coding: utf-8
-
 # https://github.com/usnistgov/yabadaba
 from yabadaba.tools import aslist, iaslist, screen_input
 

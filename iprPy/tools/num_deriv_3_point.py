@@ -1,5 +1,3 @@
-# coding: utf-8
-
 # http://www.numpy.org/
 import numpy as np
 import numpy.typing as npt

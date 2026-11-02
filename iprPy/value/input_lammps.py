@@ -1,5 +1,3 @@
-from typing import Optional
-
 from atomman.lammps import LAMMPS, LAMMPSobj
 
 from yabadabado.value import InputValue
