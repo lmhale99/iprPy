@@ -1,5 +1,3 @@
-from typing import Any, Optional, Union
-
 from yabadaba.value import Value
 
 from DataModelDict import DataModelDict as DM
@@ -7,13 +5,16 @@ from DataModelDict import DataModelDict as DM
 from atomman import unitconvert as uc
 from atomman import ElasticConstants
 
+__all__ = ['CijValue']
+
 class CijValue(Value):
     """
     Class for representing atomman.ElasticConstants objects as yabadaba values.
     """
 
 
-    def set_value_mod(self, val: Union[ElasticConstants, DM, None]):
+    def set_value_mod(self,
+                      val: ElasticConstants | DM | None) -> ElasticConstants:
 
         if isinstance(val, ElasticConstants):
             return val
@@ -37,7 +38,7 @@ class CijValue(Value):
         """Function to modify how values are interpreted from the model"""
         return DM([('elastic-constants', val)])
 
-    def metadata(self, meta):
+    def metadata(self, meta: dict):
         """
         Adds the parameter to the record's metadata dict.
 

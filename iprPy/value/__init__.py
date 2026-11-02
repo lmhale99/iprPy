@@ -1,3 +1,5 @@
-from atomman.library import valuemanager
+from yabadabado import valuemanager, load_value
 
-valuemanager.import_style('cij', '.CijValue', __name__)
+# Dynamically import value submodules
+ignorelist = ['__pycache__', '__init__']
+valuemanager.dynamic_import(__name__, ignorelist)
